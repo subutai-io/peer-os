@@ -94,12 +94,36 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
     }
 
 
-    private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
+    private void executeCommand( CommandImpl command ) {
         //check if peers are accessible otherwise throw RunCommandException
         //not implemented yet...
 
         //check if agents are connected otherwise throw RunCommandException
         //not implemented yet...
+
+        //send remote requests
+        if ( !command.getRemoteRequests().isEmpty() ) {
+            LOG.warning( "executing remote requests" );
+            sendRequests( command.getRemoteRequests() );
+        }
+
+        //send local requests
+        if ( !command.getRequests().isEmpty() ) {
+            LOG.warning( "executing local requests" );
+            Command localCommand = new CommandImpl( command.getRequests() );
+            final CommandDispatcherImpl self = this;
+            commandRunner.runCommandAsync( localCommand, new CommandCallback() {
+                @Override
+                public void onResponse( final Response response, final AgentResult agentResult,
+                                        final Command command ) {
+                    self.onResponse( response );
+                }
+            } );
+        }
+    }
+
+
+    private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() ) {
             //use PeerManager to figure out IP of target peer by UUID
@@ -219,27 +243,12 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
         if ( queued ) {
             //set command status to RUNNING
             commandImpl.setCommandStatus( CommandStatus.RUNNING );
+
             //execute command
-
-            //send remote requests
-            if ( !commandImpl.getRemoteRequests().isEmpty() ) {
-                LOG.warning( "executing remote requests" );
-                sendRequests( commandImpl.getRemoteRequests() );
-            }
-
-            //send local requests
-            if ( !commandImpl.getRequests().isEmpty() ) {
-                LOG.warning( "executing local requests" );
-                Command localCommand = new CommandImpl( commandImpl.getRequests() );
-                final CommandDispatcherImpl self = this;
-                commandRunner.runCommandAsync( localCommand, new CommandCallback() {
-                    @Override
-                    public void onResponse( final Response response, final AgentResult agentResult,
-                                            final Command command ) {
-                        self.onResponse( response );
-                    }
-                } );
-            }
+            executeCommand( commandImpl );
+        }
+        else {
+            throw new RunCommandException( "Could not queue command for processing" );
         }
     }
 

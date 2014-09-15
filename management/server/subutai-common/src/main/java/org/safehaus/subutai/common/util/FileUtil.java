@@ -1,7 +1,11 @@
 package org.safehaus.subutai.common.util;
 
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
@@ -12,18 +16,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class FileUtil
-{
+public class FileUtil {
 
     private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
 
 
-    public static File getFile( String fileName, Object object )
-    {
+    public static File getFile( String fileName, Object object ) {
         String currentPath = System.getProperty( "user.dir" ) + "/res/" + fileName;
         File file = new File( currentPath );
-        if ( !file.exists() )
-        {
+        if ( !file.exists() ) {
             checkFolder( System.getProperty( "user.dir" ) + "/res/" );
             writeFile( fileName, object );
             file = new File( currentPath );
@@ -32,74 +33,76 @@ public class FileUtil
     }
 
 
-    private static void checkFolder( String path )
-    {
+    private static void checkFolder( String path ) {
         File file = new File( path );
-        if ( !file.exists() )
-        {
+        if ( !file.exists() ) {
             file.mkdir();
         }
     }
 
 
-    private static void writeFile( String fileName, Object object )
-    {
-
-        try
-        {
+    private static void writeFile( String fileName, Object object ) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
             String currentPath = System.getProperty( "user.dir" ) + "/res/" + fileName;
-            InputStream inputStream = getClassLoader( object.getClass() ).getResourceAsStream( "img/" + fileName );
-            OutputStream outputStream = new FileOutputStream( new File( currentPath ) );
+            inputStream = getClassLoader( object.getClass() ).getResourceAsStream( "img/" + fileName );
+            outputStream = new FileOutputStream( new File( currentPath ) );
             int read = 0;
             byte[] bytes = new byte[1024];
 
-            while ( ( read = inputStream.read( bytes ) ) != -1 )
-            {
+            while ( ( read = inputStream.read( bytes ) ) != -1 ) {
                 outputStream.write( bytes, 0, read );
             }
-
-            inputStream.close();
-            outputStream.close();
         }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
+        catch ( Exception ex ) {
+            log.log( Level.SEVERE, "Error while writing to file: " + ex );
+        }
+        finally {
+            if ( inputStream != null ) {
+                try {
+                    inputStream.close();
+                }
+                catch ( IOException ignore ) {
+                }
+            }
+            if ( outputStream != null ) {
+                try {
+                    outputStream.close();
+                }
+                catch ( IOException ignore ) {
+                }
+            }
         }
     }
 
 
-    private static URLClassLoader getClassLoader( Class clazz )
-    {
+    private static URLClassLoader getClassLoader( Class clazz ) {
         // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
         URLClassLoader classLoader =
-            new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
+                new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
 
         return classLoader;
     }
 
 
-    public static String getContent( String filePath, Object object )
-    {
+    public static String getContent( String filePath, Object object ) {
 
-        if ( object != null )
-        {
+        if ( object != null ) {
             return getContent( filePath, object.getClass() );
         }
         return null;
     }
 
 
-    public static String getContent( String filePath, Class clazz )
-    {
+    public static String getContent( String filePath, Class clazz ) {
         String content = "";
 
-        try
-        {
+        try {
             content = readFile( filePath, clazz );
         }
-        catch ( Exception e )
-        {
+        catch ( Exception e ) {
             log.log( Level.SEVERE, "Error while reading file: " + e );
         }
 
@@ -107,8 +110,7 @@ public class FileUtil
     }
 
 
-    private static String readFile( String filePath, Class clazz ) throws IOException
-    {
+    private static String readFile( String filePath, Class clazz ) throws IOException {
 
         InputStream is = getClassLoader( clazz ).getResourceAsStream( filePath );
         String s = streamToString( is );
@@ -118,15 +120,13 @@ public class FileUtil
     }
 
 
-    private static String streamToString( InputStream is )
-    {
+    private static String streamToString( InputStream is ) {
         Scanner scanner = new Scanner( is ).useDelimiter( "\\A" );
         return scanner.hasNext() ? scanner.next() : "";
     }
 
 
-    public static String readFile( String path, Charset encoding ) throws IOException
-    {
+    public static String readFile( String path, Charset encoding ) throws IOException {
         byte[] encoded = Files.readAllBytes( Paths.get( path ) );
         return new String( encoded, encoding );
     }
