@@ -50,9 +50,9 @@ public class PeerImpl implements PeerManager {
     public String register( final Peer peer ) {
 
         try {
-            String id = peer.getId();
-            peerDAO.saveInfo( SOURCE, id, peer );
-            return id;
+            String peerId = peer.getId();
+            peerDAO.saveInfo( SOURCE, peerId, peer );
+            return peerId;
         }
         catch ( DBException e ) {
             logger.info( e.getMessage() );

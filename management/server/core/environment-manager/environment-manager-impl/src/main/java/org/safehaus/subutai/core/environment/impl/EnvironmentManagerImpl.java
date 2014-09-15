@@ -63,7 +63,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     public void destroy() {
-
+        this.environmentDAO = null;
+        this.environmentBuilder = null;
+        this.blueprintParser = null;
+        this.containerManager = null;
+        this.templateRegistryManager = null;
+        this.agentManager = null;
+        this.networkManager = null;
+        this.dbManager = null;
     }
 
 
@@ -152,20 +159,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    /**
-     * Builds an environment by provided blueprint description
-     */
-    //    @Override
-    //    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask) {
-
-    //        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-    //        environmentBuildTask.setPhysicalNodes( physicalServers );
-
-    //        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-
-    //        environmentBuildTask.setEnvironmentBlueprint( blueprint );
-    //        return build( environmentBuildTask );
-    //    }
     private boolean build( EnvironmentBuildTask environmentBuildTask ) {
 
         if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
