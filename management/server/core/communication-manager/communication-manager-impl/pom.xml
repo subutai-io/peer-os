@@ -49,6 +49,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
+            <Import-Package>
+              !org.slf4j,*
+            </Import-Package>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
