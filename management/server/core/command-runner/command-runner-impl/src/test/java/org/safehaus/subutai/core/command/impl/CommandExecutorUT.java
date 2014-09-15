@@ -23,37 +23,29 @@ public class CommandExecutorUT {
 
 	@Test (expected = NullPointerException.class)
 	public void constructorShouldFailNullCommand() {
-		new CommandExecutor(null, mock(ExecutorService.class), mock(CommandCallback.class));
-	}
-
-
-	@Test (expected = NullPointerException.class)
-	public void constructorShouldFailNullExecutor() {
-		new CommandExecutor(mock(CommandImpl.class), null, mock(CommandCallback.class));
+		new CommandExecutor(null,  mock(CommandCallback.class));
 	}
 
 
 	@Test (expected = NullPointerException.class)
 	public void constructorShouldFailNullCallback() {
-		new CommandExecutor(mock(CommandImpl.class), mock(ExecutorService.class), null);
+		new CommandExecutor(mock(CommandImpl.class),  null);
 	}
 
 
 	@Test
 	public void constructorShouldPass() {
-		new CommandExecutor(mock(CommandImpl.class), mock(ExecutorService.class), mock(CommandCallback.class));
+		new CommandExecutor(mock(CommandImpl.class), mock(CommandCallback.class));
 	}
 
 
 	@Test
 	public void shouldReturnValidValues() {
 		CommandImpl command = mock(CommandImpl.class);
-		ExecutorService executorService = mock(ExecutorService.class);
 		CommandCallback callback = mock(CommandCallback.class);
-		CommandExecutor commandExecutor = new CommandExecutor(command, executorService, callback);
+		CommandExecutor commandExecutor = new CommandExecutor(command,  callback);
 
 		assertEquals(command, commandExecutor.getCommand());
-		assertEquals(executorService, commandExecutor.getExecutor());
 		assertEquals(callback, commandExecutor.getCallback());
 	}
 }
