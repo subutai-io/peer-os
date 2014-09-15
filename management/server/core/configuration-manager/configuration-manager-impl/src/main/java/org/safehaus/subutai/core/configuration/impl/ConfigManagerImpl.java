@@ -6,20 +6,35 @@
 package org.safehaus.subutai.core.configuration.impl;
 
 
-import com.google.gson.JsonObject;
-import org.apache.commons.configuration.ConfigurationException;
+import java.util.logging.Logger;
+
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.configuration.api.ConfigManager;
 import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
 import org.safehaus.subutai.core.configuration.api.TextInjector;
-import org.safehaus.subutai.core.configuration.impl.loaders.*;
-import org.safehaus.subutai.core.configuration.impl.utils.*;
-import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.configuration.impl.loaders.ConfigurationLoader;
+import org.safehaus.subutai.core.configuration.impl.loaders.PlainConfigurationLoader;
+import org.safehaus.subutai.core.configuration.impl.loaders.PropertiesConfigurationLoader;
+import org.safehaus.subutai.core.configuration.impl.loaders.ShellConfigurationLoader;
+import org.safehaus.subutai.core.configuration.impl.loaders.XMLConfigurationLoader;
+import org.safehaus.subutai.core.configuration.impl.loaders.YamConfigurationlLoader;
+import org.safehaus.subutai.core.configuration.impl.utils.ConfigParser;
+import org.safehaus.subutai.core.configuration.impl.utils.IniParser;
+import org.safehaus.subutai.core.configuration.impl.utils.PlainParser;
+import org.safehaus.subutai.core.configuration.impl.utils.ShellParser;
+import org.safehaus.subutai.core.configuration.impl.utils.XmlParser;
+
+import org.apache.commons.configuration.ConfigurationException;
+
+import com.google.gson.JsonObject;
 
 
 /**
  * This is an implementation of LxcManager
  */
 public class ConfigManagerImpl implements ConfigManager {
+
+    private final Logger LOG = Logger.getLogger( ConfigManagerImpl.class.getName() );
 
 	private TextInjector textInjector;
 
@@ -127,7 +142,7 @@ public class ConfigManagerImpl implements ConfigManager {
             configParser.getProperty( path );
         }
         catch ( ConfigurationException e ) {
-            e.printStackTrace();
+             LOG.info(e.getMessage());
         }*/
 		return null;
 	}
@@ -153,7 +168,7 @@ public class ConfigManagerImpl implements ConfigManager {
             configParser.setProperty( path, value );
         }
         catch ( ConfigurationException e ) {
-            e.printStackTrace();
+             LOG.info(e.getMessage());
         }*/
 	}
 
@@ -185,8 +200,8 @@ public class ConfigManagerImpl implements ConfigManager {
 			}
 			return parser.parserConfig(configPathFilename, configTypeEnum);
 		} catch (ConfigurationException e) {
-			e.printStackTrace();
-		}
+            LOG.info(e.getMessage());
+        }
 		return null;
 	}
 }
