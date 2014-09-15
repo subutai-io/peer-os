@@ -1,28 +1,25 @@
 package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
-import java.util.UUID;
-
+import com.google.common.base.Strings;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 
-import com.google.common.base.Strings;
+import java.util.UUID;
 
 
 /**
  * Sets up Zookeeper cluster either a standalone ZK cluster or over hadoop cluster nodes or together with hadoop
  */
-public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
-    private final ProductOperation po;
+public class InstallOperationHandler  extends AbstractOperationHandler<ZookeeperImpl> {
     private final ZookeeperClusterConfig config;
     private HadoopClusterConfig hadoopClusterConfig;
 
@@ -31,7 +28,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -45,7 +42,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
     @Override
     public UUID getTrackerId() {
-        return po.getId();
+        return productOperation.getId();
     }
 
 
@@ -57,12 +54,12 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                 config.getSetupType() == SetupType.OVER_HADOOP && CollectionUtil.isCollectionEmpty( config.getNodes() )
                         && Strings.isNullOrEmpty( config.getHadoopClusterName() ) ) ||
                 ( config.getSetupType() == SetupType.WITH_HADOOP && hadoopClusterConfig == null ) ) {
-            po.addLogFailed( "Malformed configuration" );
+            productOperation.addLogFailed( "Malformed configuration" );
             return;
         }
 
         if ( manager.getCluster( clusterName ) != null ) {
-            po.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
+            productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
             return;
         }
 
@@ -75,6 +72,10 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
             setupWithHadoop();
         }
+        else {
+            productOperation.addLogFailed( "Wrong setup type !" );
+            return;
+        }
     }
 
 
@@ -85,13 +86,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
         try {
             //setup ZK cluster
-            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( null, config, po );
+            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( null, config, productOperation );
             zkClusterSetupStrategy.setup();
 
-            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e ) {
-            po.addLogFailed(
+            productOperation.addLogFailed(
                     String.format( "Failed to setup an over-Hadoop ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
@@ -108,13 +109,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                                      .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
 
             //setup ZK cluster
-            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
+            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( env, config, productOperation );
             zkClusterSetupStrategy.setup();
 
-            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( EnvironmentBuildException | ClusterSetupException e ) {
-            po.addLogFailed(
+            productOperation.addLogFailed(
                     String.format( "Failed to setup a standalone ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
@@ -135,17 +136,17 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
             //setup Hadoop cluster
             ClusterSetupStrategy hadoopClusterSetupStrategy =
-                    manager.getHadoopManager().getClusterSetupStrategy( po, hadoopClusterConfig, env );
+                    manager.getHadoopManager().getClusterSetupStrategy( productOperation, hadoopClusterConfig, env );
             hadoopClusterSetupStrategy.setup();
 
             //setup ZK cluster
-            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
+            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( env, config, productOperation );
             zkClusterSetupStrategy.setup();
 
-            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( EnvironmentBuildException | ClusterSetupException e ) {
-            po.addLogFailed(
+            productOperation.addLogFailed(
                     String.format( "Failed to setup a standalone ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
