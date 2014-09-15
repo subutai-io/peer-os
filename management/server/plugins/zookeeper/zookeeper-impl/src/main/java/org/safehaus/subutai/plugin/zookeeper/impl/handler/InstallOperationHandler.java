@@ -79,6 +79,16 @@ public class InstallOperationHandler  extends AbstractOperationHandler<Zookeeper
     }
 
 
+    public HadoopClusterConfig getHadoopClusterConfig() {
+        return hadoopClusterConfig;
+    }
+
+
+    public void setHadoopClusterConfig( HadoopClusterConfig hadoopClusterConfig ) {
+        this.hadoopClusterConfig = hadoopClusterConfig;
+    }
+
+
     /**
      * Sets up ZK cluster over supplied Hadoop cluster nodes
      */
