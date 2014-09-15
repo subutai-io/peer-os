@@ -17,8 +17,9 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
  */
 public class PeerImpl implements PeerManager {
 
-    private final static String source = "PEER_MANAGER";
     private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
+
+    private final static String source = "PEER_MANAGER";
     private UUID id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
@@ -53,7 +54,6 @@ public class PeerImpl implements PeerManager {
             peerDAO.saveInfo( source, id, peer );
         }
         catch ( DBException e ) {
-            //            e.printStackTrace();
             LOG.info( e.getMessage() );
             return null;
         }
@@ -75,7 +75,6 @@ public class PeerImpl implements PeerManager {
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
-            //            e.printStackTrace();
         }
         return peers;
     }
@@ -88,7 +87,6 @@ public class PeerImpl implements PeerManager {
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
-            //            e.printStackTrace();
             return false;
         }
         return true;
