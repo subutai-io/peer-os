@@ -8,6 +8,7 @@ package org.safehaus.subutai.core.environment.impl;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -34,6 +35,8 @@ import com.google.common.base.Strings;
  * This is an implementation of EnvironmentManager
  */
 public class EnvironmentManagerImpl implements EnvironmentManager {
+
+    private final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
 
     private String ENVIRONMENT = "ENVIRONMENT";
     private String BLUEPRINT = "BLUEPRINT";
@@ -172,10 +175,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
             }
             catch ( EnvironmentBuildException e ) {
-                System.out.println( e.getMessage() );
+                LOG.info( e.getMessage() );
             }
             catch ( DBException e ) {
-                e.printStackTrace();
+                LOG.info( e.getMessage() );
             }
         }
         return false;
@@ -196,7 +199,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
             return null;
         }
     }
@@ -208,7 +211,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return environmentDAO.getInfo( ENVIRONMENT, environmentName, Environment.class );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
         }
         return null;
         //        .getEnvironment( environmentName );
@@ -224,7 +227,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return true;
         }
         catch ( EnvironmentDestroyException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
         }
         catch ( DBException e ) {
             e.printStackTrace();
@@ -245,7 +248,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return true;
         }
         catch ( DBException e ) {
-            //TODO log exception
+            LOG.info( e.getMessage() );
         }
         return false;
     }
@@ -257,7 +260,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
         }
         return null;
     }
@@ -270,7 +273,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return true;
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
         }
         return false;
     }
@@ -298,7 +301,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
         }
     }
 
@@ -309,7 +312,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return environmentDAO.getInfo( "PROCESS", BuildProcess.class );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
         }
         return null;
     }
