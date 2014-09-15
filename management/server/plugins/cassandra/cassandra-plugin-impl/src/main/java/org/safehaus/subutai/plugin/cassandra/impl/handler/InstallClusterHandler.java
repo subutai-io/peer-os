@@ -1,8 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -12,15 +10,13 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 
+import java.util.UUID;
 
-/**
- * Created by bahadyr on 8/25/14.
- */
+
 public class InstallClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
-    private ProductOperation po;
     private CassandraClusterConfig config;
-
+    private ProductOperation po;
 
     public InstallClusterHandler( final CassandraImpl manager, final CassandraClusterConfig config ) {
         super( manager, config.getClusterName() );
@@ -38,6 +34,7 @@ public class InstallClusterHandler extends AbstractOperationHandler<CassandraImp
 
     @Override
     public void run() {
+        productOperation = po;
         po.addLog( "Building environment..." );
 
         try {
