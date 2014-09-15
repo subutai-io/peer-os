@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
+import com.datastax.driver.core.Cluster;
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
@@ -28,9 +29,11 @@ import java.util.UUID;
 public class AddNodeOperationHandler  extends AbstractOperationHandler<ZookeeperImpl> {
 
     private String lxcHostname;
+    private ClusterConfiguration clusterConfiguration;
 
     public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName ) {
         super( manager, clusterName );
+        clusterConfiguration = new ClusterConfiguration( manager, productOperation );
         productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
     }
@@ -39,6 +42,7 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
     public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
+        clusterConfiguration = new ClusterConfiguration( manager, productOperation );
         productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
     }
@@ -261,7 +265,8 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
 
             //reconfigure cluster
             try {
-                new ClusterConfiguration( manager, productOperation ).configureCluster( config );
+                getClusterConfiguration().configureCluster( config );
+//                new ClusterConfiguration( manager, productOperation ).configureCluster( config );
             }
             catch ( ClusterConfigurationException e ) {
                 productOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
@@ -283,5 +288,13 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
         catch ( LxcCreateException ex ) {
             productOperation.addLogFailed( ex.getMessage() );
         }
+    }
+
+    public ClusterConfiguration getClusterConfiguration() {
+        return clusterConfiguration;
+    }
+
+    public void setClusterConfiguration( ClusterConfiguration clusterConfiguration ) {
+        this.clusterConfiguration = clusterConfiguration;
     }
 }
