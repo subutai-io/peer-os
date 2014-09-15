@@ -20,8 +20,9 @@ public class FileContentReader {
     public String readFile( String pathToFile ) {
         StringBuilder sb = new StringBuilder();
         File file = new File( pathToFile );
+        FileReader fileReader = null;
         try {
-            FileReader fileReader = new FileReader( file );
+            fileReader = new FileReader( file );
             BufferedReader bufferedReader = new BufferedReader( fileReader );
 
             for ( String line; ( line = bufferedReader.readLine() ) != null; ) {
@@ -34,7 +35,14 @@ public class FileContentReader {
         catch ( IOException e ) {
             LOG.info( e.getMessage() );
         }
-
+        finally {
+            try {
+                fileReader.close();
+            }
+            catch ( IOException e ) {
+                LOG.info( e.getMessage() );
+            }
+        }
 
         return sb.toString();
     }
