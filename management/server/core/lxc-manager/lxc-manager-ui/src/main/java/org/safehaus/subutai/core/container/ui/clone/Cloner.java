@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.server.ui.component.AgentTree;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.container.ui.LxcUI;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;
@@ -50,14 +50,15 @@ public class Cloner extends VerticalLayout {
     private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
+    private final Executor executor;
 
 
-    public Cloner( final LxcManager lxcManager, AgentTree agentTree ) {
+    public Cloner( final LxcManager lxcManager, AgentTree agentTree, Executor executor ) {
         setSpacing( true );
         setMargin( true );
 
         this.agentTree = agentTree;
-
+        this.executor = executor;
         this.lxcManager = lxcManager;
 
         textFieldLxcName = new TextField();
@@ -139,7 +140,7 @@ public class Cloner extends VerticalLayout {
         else if ( physicalAgents.isEmpty() ) {
             indicator.setVisible( true );
             final double count = ( Double ) slider.getValue();
-            LxcUI.getExecutor().execute( new Runnable() {
+            executor.execute( new Runnable() {
                 public void run() {
                     Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
                     if ( bestServers.isEmpty() ) {
@@ -182,7 +183,7 @@ public class Cloner extends VerticalLayout {
                                 lxcHostNames.add( lxcHost.toString() );
 
                                 //start clone task
-                                LxcUI.getExecutor().execute( new Runnable() {
+                                executor.execute( new Runnable() {
                                     public void run() {
                                         boolean result =
                                                 lxcManager.cloneLxcOnHost( entry.getKey(), lxcHost.toString() );
@@ -232,7 +233,7 @@ public class Cloner extends VerticalLayout {
             final AtomicInteger countProcessed = new AtomicInteger( ( int ) ( count * physicalAgents.size() ) );
             for ( final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet() ) {
                 for ( final String lxcHostname : agg.getValue() ) {
-                    LxcUI.getExecutor().execute( new Runnable() {
+                    executor.execute( new Runnable() {
                         public void run() {
                             boolean result = lxcManager.cloneLxcOnHost( agg.getKey(), lxcHostname );
                             Item row = lxcTable.getItem( lxcHostname );
@@ -287,8 +288,8 @@ public class Cloner extends VerticalLayout {
                 Embedded progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
 
                 lxcTable.addItem( new Object[] {
-                                null, lxc, progressIcon
-                        }, lxc );
+                        null, lxc, progressIcon
+                }, lxc );
 
                 lxcTable.setParent( lxc, agent.getHostname() );
                 lxcTable.setChildrenAllowed( lxc, false );
