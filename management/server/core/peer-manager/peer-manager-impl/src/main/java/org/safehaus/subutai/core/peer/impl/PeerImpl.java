@@ -19,7 +19,7 @@ public class PeerImpl implements PeerManager {
 
     private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
 
-    private final static String source = "PEER_MANAGER";
+    private final String SOURCE = "PEER_MANAGER";
     private UUID id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
@@ -51,7 +51,7 @@ public class PeerImpl implements PeerManager {
 
         try {
             String id = peer.getId();
-            peerDAO.saveInfo( source, id, peer );
+            peerDAO.saveInfo( SOURCE, id, peer );
             return peer.getId();
         }
         catch ( DBException e ) {
@@ -71,7 +71,7 @@ public class PeerImpl implements PeerManager {
     public List<Peer> peers() {
         List<Peer> peers = null;
         try {
-            peers = peerDAO.getInfo( source, Peer.class );
+            peers = peerDAO.getInfo( SOURCE, Peer.class );
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
@@ -83,7 +83,7 @@ public class PeerImpl implements PeerManager {
     @Override
     public boolean unregister( final String uuid ) {
         try {
-            peerDAO.deleteInfo( source, uuid );
+            peerDAO.deleteInfo( SOURCE, uuid );
             return true;
         }
         catch ( DBException e ) {
@@ -96,7 +96,7 @@ public class PeerImpl implements PeerManager {
     @Override
     public Peer getPeerByUUID( String uuid ) {
         try {
-            return peerDAO.getInfo( source, uuid, Peer.class );
+            return peerDAO.getInfo( SOURCE, uuid, Peer.class );
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
