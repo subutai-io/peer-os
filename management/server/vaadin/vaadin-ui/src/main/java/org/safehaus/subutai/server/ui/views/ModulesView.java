@@ -10,10 +10,12 @@
 
 package org.safehaus.subutai.server.ui.views;
 
+import com.vaadin.Application;
 import com.vaadin.event.LayoutEvents;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FileResource;
+import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -23,19 +25,30 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ModulesView extends VerticalLayout implements View, PortalModuleListener {
+public class ModulesView extends VerticalLayout implements View, PortalModuleListener, HttpServletRequestListener {
 
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
     private TabSheet editors;
     private CssLayout modulesLayout;
     private HashMap<String, PortalModule> modules = new HashMap<>();
-    private HashMap<String, PortalModuleView> portalModuleViews = new HashMap<>();
 
+    private static ThreadLocal<ModulesView> instance = new ThreadLocal<>();
 
+    private Application application;
+
+    public ModulesView(Application application) {
+        this.application = application;
+        instance.set(this);
+    }
+
+    public static TabSheet getEditor(){
+        return instance.get().editors;
+    }
     @Override
     public void enter(ViewChangeEvent event) {
         setSizeFull();
@@ -45,17 +58,17 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         getPortalModuleService().addListener(this);
     }
 
-    private Component buildDraftsView() {
-        editors = new TabSheet();
-        editors.setSizeFull();
-        editors.addStyleName("borderless");
-        editors.addStyleName("editors");
+    private static Component buildDraftsView() {
+        instance.get().editors = new TabSheet();
+        instance.get().editors.setSizeFull();
+        instance.get().editors.addStyleName("borderless");
+        instance.get().editors.addStyleName("editors");
 
-        editors.setCloseHandler(new TabSheet.CloseHandler() {
+        instance.get().editors.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet components, Component component) {
-                editors.removeComponent(component);
-                modules.remove(component.getId());
+                instance.get().editors.removeComponent(component);
+                instance.get().modules.remove(component.getId());
             }
         });
 
@@ -64,7 +77,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         titleAndDrafts.setCaption("Modules");
         titleAndDrafts.setSpacing(true);
         titleAndDrafts.addStyleName("drafts");
-        editors.addComponent(titleAndDrafts);
+        instance.get().editors.addComponent(titleAndDrafts);
 
         Label draftsTitle = new Label("Modules");
         draftsTitle.addStyleName("h1");
@@ -72,18 +85,16 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         titleAndDrafts.addComponent(draftsTitle);
         titleAndDrafts.setComponentAlignment(draftsTitle, Alignment.TOP_CENTER);
 
-        modulesLayout = new CssLayout();
-        modulesLayout.setSizeUndefined();
-        modulesLayout.addStyleName("catalog");
-        titleAndDrafts.addComponent(modulesLayout);
+        instance.get().modulesLayout = new CssLayout();
+        instance.get().modulesLayout.setSizeUndefined();
+        instance.get().modulesLayout.addStyleName("catalog");
+        titleAndDrafts.addComponent(instance.get().modulesLayout);
 
-        Notification.show("Adding new modules",
-                Notification.Type.ERROR_MESSAGE);
         for (PortalModule module : getPortalModuleService().getModules()) {
             addModule(module);
         }
 
-        return editors;
+        return instance.get().editors;
     }
 
     public static PortalModuleService getPortalModuleService() {
@@ -99,26 +110,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         return null;
     }
 
-    private void addModule(final PortalModule module) {
-
-        if (module == null) {
-            LOG.log(Level.SEVERE, "Module to add was null value.");
-        }
-        LOG.log(Level.WARNING, "Adding module: " + module.getId());
-
-        PortalModuleView portalModuleView = new PortalModuleView(module, new PortalModelViewListener() {
-            @Override
-            public void onItemClick(PortalModuleView module) {
-                if (!portalModuleViews.containsKey(module.getId())) {
-                    autoCreate(module.getPortalModule());
-                    portalModuleViews.put(module.getId(), module);
-                }
-            }
-        });
-
-        modulesLayout.addComponent(portalModuleView);
-
-
+    private static void addModule(final PortalModule module) {
         CssLayout moduleLayout = new CssLayout();
         moduleLayout.setId(module.getId());
         moduleLayout.setWidth(150, Unit.PIXELS);
@@ -128,9 +120,9 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
             @Override
             public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
-                if (!modules.containsKey(module.getId())) {
+                if (!instance.get().modules.containsKey(module.getId())) {
                     autoCreate(module);
-                    modules.put(module.getId(), module);
+                    instance.get().modules.put(module.getId(), module);
                 }
             }
         });
@@ -140,47 +132,39 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         image.setDescription(module.getName());
         moduleLayout.addComponent(image);
 
-        modulesLayout.addComponent(moduleLayout);
+        instance.get().modulesLayout.addComponent(moduleLayout);
     }
 
-    public void autoCreate(PortalModule module) {
+    public static void autoCreate(PortalModule module) {
         Component component = module.createComponent();
         component.setId(module.getId());
-        TabSheet.Tab tab = editors.addTab(component);
+        TabSheet.Tab tab = instance.get().editors.addTab(component);
         tab.setCaption(module.getName());
         tab.setClosable(true);
-        editors.setSelectedTab(tab);
-//        Notification.show("Creating module", module.getName(), Notification.Type.WARNING_MESSAGE);
+        instance.get().editors.setSelectedTab(tab);
     }
 
     @Override
     public void moduleRegistered(PortalModule module) {
-
-//        MySub mySub = new MySub();
-//        modulesLayout.addComponent(mySub);
-//        this.getUI().addWindow(mySub);
-
-        Notification.show("Registering new module", Notification.Type.ERROR_MESSAGE);
-        LOG.warning(module.toString());
-        this.addModule(module);
-//        addModule(module);
-//        String caption = "Registering new module: ";
-//        try {
-//            Notification.show(caption, module.getName() + " " + module.getId(), Notification.Type.HUMANIZED_MESSAGE);
-//        } catch (NullPointerException ex) {
-//
-//            Notification.show("Registering new module is null!!!");
-//        }
+        instance.get().addModule(module);
     }
 
     @Override
     public void moduleUnregistered(PortalModule module) {
-//        Notification.show("Unregistered module");
-        addModule(null);
     }
 
-    public interface PortalModelViewListener {
-        public void onItemClick(PortalModuleView module);
+    @Override
+    public void onRequestStart(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        instance.set(this);
+    }
+
+    @Override
+    public void onRequestEnd(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        instance.remove();
+    }
+
+    public static ModulesView getInstance() {
+        return instance.get();
     }
 }
 
