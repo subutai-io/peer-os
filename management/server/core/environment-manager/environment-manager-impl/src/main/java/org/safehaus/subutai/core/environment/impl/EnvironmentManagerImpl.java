@@ -200,8 +200,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
-            return null;
         }
+        return null;
     }
 
 
