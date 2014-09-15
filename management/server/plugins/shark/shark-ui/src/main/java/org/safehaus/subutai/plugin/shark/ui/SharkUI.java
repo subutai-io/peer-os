@@ -5,94 +5,74 @@
  */
 package org.safehaus.subutai.plugin.shark.ui;
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.plugin.spark.api.Spark;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 /**
  * @author dilshat
  */
 public class SharkUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "shark.png";
+    public static final String MODULE_IMAGE = "shark.png";
+    protected static final Logger LOG = Logger.getLogger( SharkUI.class.getName() );
 
-	private static Shark sharkManager;
-	private static AgentManager agentManager;
-	private static Tracker tracker;
-	private static Spark sparkManager;
-	private static CommandRunner commandRunner;
-	private static ExecutorService executor;
 
-	public SharkUI(AgentManager agentManager, Tracker tracker, Spark sparkManager, Shark sharkManager, CommandRunner commandRunner) {
-		SharkUI.agentManager = agentManager;
-		SharkUI.tracker = tracker;
-		SharkUI.sparkManager = sparkManager;
-		SharkUI.sharkManager = sharkManager;
-		SharkUI.commandRunner = commandRunner;
-	}
+    private ExecutorService executor;
+    private final ServiceLocator serviceLocator;
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
 
-	public static Shark getSharkManager() {
-		return sharkManager;
-	}
+    public SharkUI() throws NamingException {
+        this.serviceLocator = new ServiceLocator();
+    }
 
-	public static Spark getSparkManager() {
-		return sparkManager;
-	}
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+    public void destroy() {
+        executor.shutdown();
+    }
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
 
-	public void destroy() {
-		sharkManager = null;
-		agentManager = null;
-		sparkManager = null;
-		tracker = null;
-		executor.shutdown();
-	}
+    @Override
+    public String getId() {
+        return SharkClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public String getId() {
-		return SharkClusterConfig.PRODUCT_KEY;
-	}
 
-	public String getName() {
-		return SharkClusterConfig.PRODUCT_KEY;
-	}
+    public String getName() {
+        return SharkClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(SharkUI.MODULE_IMAGE, this);
-	}
 
-	public Component createComponent() {
-		return new SharkForm();
-	}
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( SharkUI.MODULE_IMAGE, this );
+    }
 
+
+    public Component createComponent() {
+        try {
+            return new SharkForm( executor, serviceLocator );
+        }
+        catch ( NamingException e ) {
+            LOG.severe( e.getMessage() );
+        }
+        return null;
+    }
 }
