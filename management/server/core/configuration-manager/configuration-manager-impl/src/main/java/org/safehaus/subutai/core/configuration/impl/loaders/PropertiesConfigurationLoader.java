@@ -70,8 +70,6 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             }
             JsonObject cjo = configBuilder.addJsonArrayToConfig( jo, fields );
             return cjo;
-            //            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            //            System.out.println( gson.toJson( cjo ) );
         }
         catch ( ConfigurationException e ) {
             LOG.info( e.getMessage() );

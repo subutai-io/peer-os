@@ -12,28 +12,33 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.apt.api.AptCommand;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.apt.api.PackageInfo;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.settings.Common;
 
 
 /**
  * This is an implementation of AptRepositoryManager
  */
 public class AptRepositoryManagerImpl implements AptRepositoryManager {
+
+
+    private final Logger LOG = Logger.getLogger( AptRepositoryManagerImpl.class.getName() );
+
     private static final String LINE_SEPARATOR = "\n";
 
     private CommandRunner commandRunner;
@@ -100,7 +105,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         }
         else if ( output ) {
             AgentResult agentResult = command.getResults().get( host.getUuid() );
-            System.out.println( agentResult.getStdOut() );
+            LOG.info( agentResult.getStdOut() );
+            //            System.out.println( agentResult.getStdOut() );
         }
     }
 
