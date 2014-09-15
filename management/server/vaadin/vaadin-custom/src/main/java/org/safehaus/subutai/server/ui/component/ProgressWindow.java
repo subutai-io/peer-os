@@ -101,7 +101,6 @@ public class ProgressWindow {
 
 
     private synchronized void start() {
-
         showProgress();
         executor.execute( new Runnable() {
 

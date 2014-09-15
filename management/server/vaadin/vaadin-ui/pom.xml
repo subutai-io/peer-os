@@ -57,6 +57,7 @@
               com.vaadin.client.*;
               <!--com.vaadin.shared.*;-->
               com.google.gwt.*;
+              <!--{local-packages};version=${project.version};-noimport:=true-->
             </Export-Package>
 
             <!-- Package format version - do not change -->
