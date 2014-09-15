@@ -16,19 +16,19 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "cassandra", name = "describe-cluster", description = "Shows the details of the Cassandra cluster.")
 public class DescribeClusterCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
+    private Cassandra cassandraManager;
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
 
 
-    public static Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
-        DescribeClusterCommand.cassandraManager = cassandraManager;
+        this.cassandraManager = cassandraManager;
     }
 
 

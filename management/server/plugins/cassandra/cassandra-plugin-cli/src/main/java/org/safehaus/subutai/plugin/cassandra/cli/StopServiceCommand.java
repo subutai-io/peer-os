@@ -16,25 +16,25 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "cassandra", name = "service-cassandra-stop", description = "Command to stop Cassandra service" )
+@Command(scope = "cassandra", name = "service-cassandra-stop", description = "Command to stop Cassandra service")
 public class StopServiceCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
-    @Argument( index = 0, name = "clusterName", description = "Name of the cluster.", required = true,
-            multiValued = false )
+    private Cassandra cassandraManager;
+    private Tracker tracker;
+    @Argument(index = 0, name = "clusterName", description = "Name of the cluster.", required = true,
+            multiValued = false)
     String clusterName = null;
-    @Argument( index = 1, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false )
+    @Argument(index = 1, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
     String agentUUID = null;
 
 
-    public static Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
-        StopServiceCommand.cassandraManager = cassandraManager;
+        this.cassandraManager = cassandraManager;
     }
 
 
@@ -44,7 +44,7 @@ public class StopServiceCommand extends OsgiCommandSupport {
 
 
     public void setTracker( Tracker tracker ) {
-        StopServiceCommand.tracker = tracker;
+        this.tracker = tracker;
     }
 
 
