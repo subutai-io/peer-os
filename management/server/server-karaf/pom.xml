@@ -175,6 +175,11 @@
                   <version>2.2</version>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>cglib</groupId>
+                  <artifactId>cglib</artifactId>
+                  <version>3.0</version>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
