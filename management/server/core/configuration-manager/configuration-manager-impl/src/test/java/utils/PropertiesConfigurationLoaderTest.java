@@ -13,11 +13,6 @@ import java.util.Set;
  */
 public class PropertiesConfigurationLoaderTest {
 
-	//    @Test
-	//    public void convertStringToJson() {
-	//        System.out.println( "convert" );
-	//    }
-	//
 
 
 	@Test

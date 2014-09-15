@@ -7,9 +7,9 @@ package org.safehaus.subutai.core.environment.ui;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.ui.manage.BlueprintLoadForm;
 import org.safehaus.subutai.core.environment.ui.manage.BlueprintsForm;
+import org.safehaus.subutai.core.environment.ui.manage.EnvironmentsBuildProcessForm;
 import org.safehaus.subutai.core.environment.ui.manage.EnvironmentsForm;
 
 import com.vaadin.ui.CustomComponent;
@@ -27,6 +27,7 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
     private BlueprintLoadForm blueprintManager;
     private BlueprintsForm blueprintsForm;
     private EnvironmentsForm environmentForm;
+    private EnvironmentsBuildProcessForm environmentBuildForm;
 
 
     public EnvironmentManagerForm( EnvironmentManagerUI managerUI ) {
@@ -41,9 +42,11 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
         sheet.setSizeFull();
         blueprintManager = new BlueprintLoadForm( managerUI );
         blueprintsForm = new BlueprintsForm( managerUI );
+        environmentBuildForm = new EnvironmentsBuildProcessForm( managerUI );
         environmentForm = new EnvironmentsForm( managerUI );
         sheet.addTab( blueprintManager.getContentRoot(), "Blueprint load" );
         sheet.addTab( blueprintsForm.getContentRoot(), "Blueprints" );
+        sheet.addTab( environmentBuildForm.getContentRoot(), "Build process" );
         sheet.addTab( environmentForm.getContentRoot(), "Environments" );
         verticalLayout.addComponent( sheet );
 
@@ -53,5 +56,9 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
 
 
     public void dispose() {
+        this.blueprintManager = null;
+        this.blueprintsForm = null;
+        this.environmentForm = null;
+        this.environmentBuildForm = null;
     }
 }

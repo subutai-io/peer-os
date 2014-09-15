@@ -2,8 +2,8 @@ package utils;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.core.configuration.impl.utils.FileContentReader;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.configuration.impl.utils.FileContentReader;
 
 
 /**
@@ -11,26 +11,10 @@ import org.safehaus.subutai.common.util.FileUtil;
  */
 public class FileContentReaderTest {
 
-	@Test
-	public void test() {
-		FileContentReader fileContentReader = new FileContentReader();
-		//        String filePath =
-		//                "/home/bahadyr/SUBUTAI/main/management/server/core/configuration-manager/configuration
-		// -manager-impl"
-		//                        + "/src/main/resources/flume_conf/flume-conf.properties";
-
-		String filePath = "cassandra_conf/cassandra.yaml";
-		String content = FileUtil.getContent(filePath, this);
-
-//        System.out.println(content);
-       /* try {
-            ConfigParser iniParser = new IniParser( content );
-            JsonObject cjo = iniParser.parserConfig( filePath, ConfigTypeEnum.PROPERTIES );
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            System.out.println( gson.toJson( cjo ) );
-        }
-        catch ( ConfigurationException e ) {
-            e.printStackTrace();
-        }*/
-	}
+    @Test
+    public void test() {
+//        FileContentReader fileContentReader = new FileContentReader();
+//        String filePath = "cassandra_conf/cassandra.yaml";
+//        String content = FileUtil.getContent( filePath, this );
+    }
 }
