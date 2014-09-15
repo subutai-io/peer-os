@@ -56,5 +56,9 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
 
 
     public void dispose() {
+        this.blueprintManager = null;
+        this.blueprintsForm = null;
+        this.environmentForm = null;
+        this.environmentBuildForm = null;
     }
 }

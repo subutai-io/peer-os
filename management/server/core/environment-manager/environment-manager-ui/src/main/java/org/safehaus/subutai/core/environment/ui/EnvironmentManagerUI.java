@@ -65,6 +65,8 @@ public class EnvironmentManagerUI implements PortalModule {
 
 
     public void destroy() {
+        this.environmentManager = null;
+        this.peerManager = null;
         executor.shutdown();
     }
 
