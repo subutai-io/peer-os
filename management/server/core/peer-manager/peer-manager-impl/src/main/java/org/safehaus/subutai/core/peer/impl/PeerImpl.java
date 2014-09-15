@@ -17,7 +17,7 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
  */
 public class PeerImpl implements PeerManager {
 
-    private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
+    private final static Logger logger = Logger.getLogger( PeerImpl.class.getName() );
 
     private final String SOURCE = "PEER_MANAGER";
     private UUID id;
@@ -31,7 +31,7 @@ public class PeerImpl implements PeerManager {
 
 
     public void init() {
-        LOG.info( "SUBUTAID ID: " + id );
+        logger.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
@@ -52,10 +52,10 @@ public class PeerImpl implements PeerManager {
         try {
             String id = peer.getId();
             peerDAO.saveInfo( SOURCE, id, peer );
-            return peer.getId();
+            return id;
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            logger.info( e.getMessage() );
         }
         return null;
     }
@@ -74,7 +74,7 @@ public class PeerImpl implements PeerManager {
             peers = peerDAO.getInfo( SOURCE, Peer.class );
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            logger.info( e.getMessage() );
         }
         return peers;
     }
@@ -87,7 +87,7 @@ public class PeerImpl implements PeerManager {
             return true;
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            logger.info( e.getMessage() );
         }
         return false;
     }
@@ -99,7 +99,7 @@ public class PeerImpl implements PeerManager {
             return peerDAO.getInfo( SOURCE, uuid, Peer.class );
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            logger.info( e.getMessage() );
         }
         return null;
     }
