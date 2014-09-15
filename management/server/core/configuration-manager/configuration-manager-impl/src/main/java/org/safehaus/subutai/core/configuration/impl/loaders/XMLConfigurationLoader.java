@@ -16,8 +16,6 @@ import com.google.gson.JsonObject;
  */
 public class XMLConfigurationLoader implements ConfigurationLoader {
 
-    //            String xmlConfig = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/core-site.xml";
-
     private final Logger LOG = Logger.getLogger( XMLConfigurationLoader.class.getName() );
     private TextInjector textInjector;
 

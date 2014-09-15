@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.configuration.impl.command;
 
 
+import java.util.logging.Logger;
+
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.FileUtil;
@@ -14,6 +16,7 @@ import org.safehaus.subutai.core.configuration.api.TextInjector;
  */
 public class TextInjectorImpl implements TextInjector {
 
+    private static final Logger logger = Logger.getLogger( TextInjector.class.getName() );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
 
@@ -49,7 +52,7 @@ public class TextInjectorImpl implements TextInjector {
             String config = command.getResults().get( agent.getUuid() ).getStdOut();
         }
         else {
-            //            po.addLogFailed( String.format( "Installation failed, %s", catCommand.getAllErrors() ) );
+            logger.info( "Failed to echo content to file" );
             return false;
         }
         return true;
@@ -64,21 +67,17 @@ public class TextInjectorImpl implements TextInjector {
         commandRunner.runCommand( catCommand );
 
         if ( catCommand.hasSucceeded() ) {
-            //            po.addLog( "cat done" );
-            String config = catCommand.getResults().get( agent.getUuid() ).getStdOut();
+            return catCommand.getResults().get( agent.getUuid() ).getStdOut();
         }
         else {
-            //            po.addLogFailed( String.format( "Installation failed, %s", catCommand.getAllErrors() ) );
-            System.out.println( "cat failed!" );
+            logger.info( "Failed to cat file" );
             return "";
         }
-        return "";
     }
 
 
     @Override
     public String getConfigTemplate( final String path ) {
-        String content = FileUtil.getContent( path, this );
-        return content;
+        return FileUtil.getContent( path, this );
     }
 }

@@ -25,14 +25,6 @@ import com.google.gson.JsonObject;
  */
 public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
-    //    String filename = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/log4j.properties";
-
-    //    private Agent agent;
-    //
-    //    public PropertiesConfigurationLoader(Agent agent) {
-    //        this.agent = agent;
-    //    }
-
     private final Logger LOG = Logger.getLogger( PropertiesConfigurationLoader.class.getName() );
 
     private TextInjector textInjector;
@@ -43,14 +35,10 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
     }
 
 
-    // Maps configuration into Config object
     @Override
     public JsonObject getConfiguration( String hostname, String configPathFilename ) {
 
         TextInjectorImpl configurationInjector = new TextInjectorImpl();
-        //        Agent agent = null;
-        //        Agent agent = agentManager.getAgentByHostname( hostname );
-
         String content = configurationInjector.catFile( hostname, configPathFilename );
 
         try {
@@ -68,8 +56,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
                 JsonObject field = configBuilder.buildFieldJsonObject( key, "", true, "", true, value );
                 fields.add( field );
             }
-            JsonObject cjo = configBuilder.addJsonArrayToConfig( jo, fields );
-            return cjo;
+            return configBuilder.addJsonArrayToConfig( jo, fields );
         }
         catch ( ConfigurationException e ) {
             LOG.info( e.getMessage() );
@@ -80,10 +67,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
     @Override
     public boolean setConfiguration( final String hostname, String configFilePath, String jsonObjectConfig ) {
-        //TODO Read config from instance, set values from Config, inject Config
-        //        JsonObject jsonObject = getConfiguration( agent, "" );
-
-        //        Agent agent = null;
+        // TODO Read config from instance, set values from Config, inject Config
 
         String content = textInjector.catFile( hostname, configFilePath );
         Gson gson = new Gson();
@@ -106,15 +90,5 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             LOG.info( e.getMessage() );
         }
         return false;
-    }
-
-
-    private void convertConfig( String configText ) {
-        try {
-            IniParser iniParser = new IniParser( "" );
-        }
-        catch ( ConfigurationException e ) {
-            LOG.info( e.getMessage() );
-        }
     }
 }
