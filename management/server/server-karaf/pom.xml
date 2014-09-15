@@ -159,11 +159,11 @@
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-pool</artifactId>
                 </artifactItem>
-                <!--<artifactItem>
+                <artifactItem>
                   <groupId>javax.management.j2ee</groupId>
                   <artifactId>management-api</artifactId>
                   <version>1.1-rev-1</version>
-                </artifactItem>-->
+                </artifactItem>
                 <artifactItem>
                 	<groupId>org.apache.activemq</groupId>
                 	<artifactId>activemq-jms-pool</artifactId>
