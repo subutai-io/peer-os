@@ -84,20 +84,19 @@ public class PeerImpl implements PeerManager {
     public boolean unregister( final String uuid ) {
         try {
             peerDAO.deleteInfo( source, uuid );
+            return true;
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
-            return false;
         }
-        return true;
+        return false;
     }
 
 
     @Override
     public Peer getPeerByUUID( String uuid ) {
         try {
-            Peer peer = peerDAO.getInfo( source, uuid, Peer.class );
-            return peer;
+            return peerDAO.getInfo( source, uuid, Peer.class );
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
