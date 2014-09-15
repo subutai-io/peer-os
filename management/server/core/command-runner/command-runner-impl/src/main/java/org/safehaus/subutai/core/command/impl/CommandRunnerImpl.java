@@ -75,7 +75,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
     @Override
     public Command createBroadcastCommand( RequestBuilder requestBuilder ) {
         Set<Agent> agents = agentManager.getAgents();
-        return new CommandImpl( requestBuilder, agents.size() );
+        return new CommandImpl( requestBuilder, agents.size(), this );
     }
 
 
@@ -126,7 +126,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      * @param agents - target agents
      */
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents ) {
-        return new CommandImpl( null, requestBuilder, agents );
+        return new CommandImpl( null, requestBuilder, agents, this );
     }
 
 
@@ -139,7 +139,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      */
     @Override
     public Command createCommand( String description, RequestBuilder requestBuilder, Set<Agent> agents ) {
-        return new CommandImpl( description, requestBuilder, agents );
+        return new CommandImpl( description, requestBuilder, agents, this );
     }
 
 
@@ -150,7 +150,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      */
     @Override
     public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( null, agentRequestBuilders );
+        return new CommandImpl( null, agentRequestBuilders, this );
     }
 
 
@@ -162,6 +162,6 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      */
     @Override
     public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( description, agentRequestBuilders );
+        return new CommandImpl( description, agentRequestBuilders, this );
     }
 }

@@ -19,6 +19,7 @@ import org.safehaus.subutai.common.command.AgentRequestBuilder;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandExecutor;
 import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.common.command.CommandStatus;
@@ -93,15 +94,20 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         //send local requests
         if ( !command.getRequests().isEmpty() ) {
             LOG.warning( "executing local requests" );
-            Command localCommand = new CommandImpl( command.getRequests() );
+            Command localCommand = new CommandImpl( command.getRequests(), commandRunner );
             final CommandDispatcherImpl self = this;
-            commandRunner.runCommandAsync( localCommand, new CommandCallback() {
-                @Override
-                public void onResponse( final Response response, final AgentResult agentResult,
-                                        final Command command ) {
-                    self.onResponse( response );
-                }
-            } );
+            try {
+                localCommand.executeAsync( new CommandCallback() {
+                    @Override
+                    public void onResponse( final Response response, final AgentResult agentResult,
+                                            final Command command ) {
+                        self.onResponse( response );
+                    }
+                } );
+            }
+            catch ( CommandException e ) {
+                LOG.severe( String.format( "Error executing local requests: %s", e.getMessage() ) );
+            }
         }
     }
 
@@ -170,8 +176,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                 dispatcherDAO.saveRemoteRequest( remoteRequest );
 
                 //execute requests using Command Runner
-                Command command = new CommandImpl( requests );
-                commandRunner.runCommandAsync( command, new CommandCallback() {
+                Command command = new CommandImpl( requests, commandRunner );
+                command.executeAsync( new CommandCallback() {
                     @Override
                     public void onResponse( final Response response, final AgentResult agentResult,
                                             final Command command ) {
@@ -194,7 +200,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                         String.format( "Command %s is already queued for processing", commandId ) );
             }
         }
-        catch ( DBException e ) {
+        catch ( CommandException | DBException e ) {
             LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ) );
             throw new RunCommandException( e.getMessage() );
         }
@@ -237,26 +243,26 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
     @Override
     public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents ) {
-        return new CommandImpl( null, requestBuilder, agents, peerManager );
+        return new CommandImpl( null, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final String description, final RequestBuilder requestBuilder,
                                   final Set<Agent> agents ) {
-        return new CommandImpl( description, requestBuilder, agents, peerManager );
+        return new CommandImpl( description, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( null, agentRequestBuilders, peerManager );
+        return new CommandImpl( null, agentRequestBuilders, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( description, agentRequestBuilders, peerManager );
+        return new CommandImpl( description, agentRequestBuilders, peerManager, this );
     }
 
 

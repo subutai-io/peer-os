@@ -15,6 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
@@ -49,6 +50,14 @@ public abstract class AbstractCommand implements Command {
     private Object data;
     //indicates if this command is broadcast command
     protected boolean broadcastCommand;
+
+    private final CommandRunnerBase commandRunner;
+
+
+    protected AbstractCommand( final CommandRunnerBase commandRunner ) {
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        this.commandRunner = commandRunner;
+    }
 
 
     /**
@@ -310,4 +319,58 @@ public abstract class AbstractCommand implements Command {
     public boolean isBroadcastCommand() {
         return broadcastCommand;
     }
+
+
+    @Override
+    public void execute() throws CommandException {
+        execute( null );
+    }
+
+
+    @Override
+    public void execute( final CommandCallback callback ) throws CommandException {
+        executeCommand( callback, false );
+    }
+
+
+    @Override
+    public void executeAsync() throws CommandException {
+        executeAsync( null );
+    }
+
+
+    @Override
+    public void executeAsync( final CommandCallback callback ) throws CommandException {
+        executeCommand( callback, true );
+    }
+
+
+    private void executeCommand( final CommandCallback callback, boolean async ) throws CommandException {
+        if ( this.commandStatus != CommandStatus.NEW ) {
+            throw new CommandException( String.format( "Command status must be %s", CommandStatus.NEW.name() ) );
+        }
+
+        try {
+            if ( async ) {
+                if ( callback == null ) {
+                    commandRunner.runCommandAsync( this );
+                }
+                else {
+                    commandRunner.runCommandAsync( this, callback );
+                }
+            }
+            else {
+                if ( callback == null ) {
+                    commandRunner.runCommand( this );
+                }
+                else {
+                    commandRunner.runCommand( this, callback );
+                }
+            }
+        }
+        catch ( RuntimeException e ) {
+            throw new CommandException( e.getMessage() );
+        }
+    }
 }
+
