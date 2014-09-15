@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
  */
 public class XMLConfigurationLoader implements ConfigurationLoader {
 
-    private final Logger LOG = Logger.getLogger( XMLConfigurationLoader.class.getName() );
+    private static final Logger LOG = Logger.getLogger( XMLConfigurationLoader.class.getName() );
     private TextInjector textInjector;
 
 
