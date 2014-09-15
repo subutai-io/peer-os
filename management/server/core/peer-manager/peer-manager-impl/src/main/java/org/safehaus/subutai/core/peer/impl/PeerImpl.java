@@ -102,8 +102,6 @@ public class PeerImpl implements PeerManager {
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
         }
-        finally {
-            return null;
-        }
+        return null;
     }
 }
