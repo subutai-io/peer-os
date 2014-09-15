@@ -6,11 +6,17 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
@@ -22,6 +28,11 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 public class Manager {
 
     private final GridLayout contentRoot;
@@ -29,6 +40,8 @@ public class Manager {
     private final Table nodesTable;
     private final String COORDINATOR_PREFIX = "Coordinator: ";
     private PrestoClusterConfig config;
+    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final String message = "No cluster is installed !";
 
     public Manager() {
 
@@ -58,10 +71,12 @@ public class Manager {
             public void valueChange(Property.ValueChangeEvent event) {
                 config = (PrestoClusterConfig)event.getProperty().getValue();
                 refreshUI();
+                checkAllNodes();
             }
         });
 
         controlsContent.addComponent(clusterCombo);
+        controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
 
         Button refreshClustersBtn = new Button("Refresh clusters");
         refreshClustersBtn.addStyleName("default");
@@ -72,36 +87,52 @@ public class Manager {
             }
         });
         controlsContent.addComponent(refreshClustersBtn);
+        controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
 
         Button checkAllBtn = new Button("Check All");
         checkAllBtn.addStyleName("default");
         checkAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                checkAllNodes();
+                if ( config == null ){
+                    show( message );
+                } else{
+                    checkAllNodes();
+                }
             }
         });
         controlsContent.addComponent(checkAllBtn);
+        controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
         Button startAllBtn = new Button("Start All");
         startAllBtn.addStyleName("default");
         startAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                startAllNodes();
+                if ( config == null ){
+                    show( message );
+                } else{
+                    startAllNodes();
+                }
             }
         });
         controlsContent.addComponent(startAllBtn);
+        controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
-        Button stopAllBtn = new Button("Stop All");
+        final Button stopAllBtn = new Button("Stop All");
         stopAllBtn.addStyleName("default");
         stopAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                stopAllNodes();
+                if ( config == null ){
+                    show( message );
+                } else{
+                    stopAllNodes();
+                }
             }
         });
         controlsContent.addComponent(stopAllBtn);
+        controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addStyleName("default");
@@ -115,6 +146,8 @@ public class Manager {
                     alert.getOk().addClickListener(new Button.ClickListener() {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
+                            /** before destroying cluster, stop it first to not leave background zombie processes **/
+                            stopAllBtn.click();
                             UUID trackID = PrestoUI.getPrestoManager().uninstallCluster(config.getClusterName());
                             ProgressWindow window
                                     = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID,
@@ -136,6 +169,7 @@ public class Manager {
         });
 
         controlsContent.addComponent(destroyClusterBtn);
+        controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
         Button addNodeBtn = new Button("Add Node");
         addNodeBtn.addStyleName("default");
@@ -188,24 +222,30 @@ public class Manager {
         });
 
         controlsContent.addComponent(addNodeBtn);
+        controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
 
+        controlsContent.addComponent( progressIcon );
         contentRoot.addComponent(controlsContent, 0, 0);
         contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
+
     }
 
     private Table createTableTemplate(String caption) {
         final Table table = new Table(caption);
-        table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Action", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
+        table.addContainerProperty( "Host", String.class, null );
+        table.addContainerProperty( "IP", String.class, null );
+        table.addContainerProperty( "Role", String.class, null );
+        table.addContainerProperty( "Check", Button.class, null );
+        table.addContainerProperty( "Start", Button.class, null );
+        table.addContainerProperty( "Stop", Button.class, null );
+        table.addContainerProperty( "Action", Button.class, null );
+        table.addContainerProperty( "Destroy", Button.class, null );
         table.setSizeFull();
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
+        table.setColumnCollapsingAllowed( true );
+        table.setColumnCollapsed( "Check", true );
 
         table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
@@ -226,6 +266,27 @@ public class Manager {
             }
         });
         return table;
+    }
+
+    /**
+     * @param agent agent
+     * @return Yes if give agent is among seeds, otherwise returns No
+     */
+    public String checkIfCoordinator( Agent agent ){
+        if ( config.getCoordinatorNode().equals( agent ) ){
+            return "Coordinator";
+        }
+        return "Worker";
+    }
+
+
+    /**
+     * Parses supplied string argument to extract external IP.
+     * @param ipList ex: [10.10.10.10, 127.0.0.1]
+     * @return 10.10.10.10
+     */
+    public String parseIPList( String ipList ){
+        return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," )  );
     }
 
     private void refreshUI() {
@@ -254,6 +315,7 @@ public class Manager {
             } else
                 clusterCombo.setValue(clustersInfo.iterator().next());
         }
+        progressIcon.setVisible( false );
     }
 
     public void checkAllNodes() {
@@ -302,13 +364,12 @@ public class Manager {
             setCoordinatorBtn.addStyleName("default");
             final Button destroyBtn = new Button("Destroy");
             destroyBtn.addStyleName("default");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
-                agent.getHostname(), checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn, progressIcon
+                agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkIfCoordinator( agent ), checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn
             }, null);
 
             checkBtn.addClickListener(new Button.ClickListener() {
@@ -464,7 +525,7 @@ public class Manager {
         progressIcon.setVisible(false);
 
         table.addItem(new Object[]{
-            COORDINATOR_PREFIX + coordinator.getHostname(), checkBtn, startBtn, stopBtn, null, null, progressIcon
+            coordinator.getHostname(), parseIPList( coordinator.getListIP().toString() ), checkIfCoordinator( coordinator ), checkBtn, startBtn, stopBtn, null, null
         }, null);
 
         checkBtn.addClickListener(new Button.ClickListener() {

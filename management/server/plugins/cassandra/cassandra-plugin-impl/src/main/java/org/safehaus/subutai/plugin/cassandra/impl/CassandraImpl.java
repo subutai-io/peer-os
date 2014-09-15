@@ -4,7 +4,14 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.protocol.*;
+
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -21,6 +28,8 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.*;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 
+
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -175,22 +184,26 @@ public class CassandraImpl extends CassandraBase {
         return operationHandler.getTrackerId();
     }
 
-
+    @Override
     public List<CassandraClusterConfig> getClusters() {
-        return dbManager.getInfo(CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class);
+        try {
+            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return Collections.emptyList();
+        }
     }
 
 
     @Override
-    public CassandraClusterConfig getCluster(String clusterName) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(clusterName), "Cluster name is null or empty");
+    public CassandraClusterConfig getCluster( String clusterName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         try {
             return pluginDAO.getInfo(CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class);
         } catch (DBException e) {
             return null;
         }
     }
-
 
     @Override
     public UUID startCluster(final String clusterName) {
@@ -205,6 +218,7 @@ public class CassandraImpl extends CassandraBase {
         AbstractOperationHandler operationHandler = new CheckClusterHandler(this, clusterName);
         executor.execute(operationHandler);
         return operationHandler.getTrackerId();
+
     }
 
 
@@ -217,16 +231,16 @@ public class CassandraImpl extends CassandraBase {
 
 
     @Override
-    public UUID startService(final String clusterName, final String agentUUID) {
-        AbstractOperationHandler operationHandler = new StartServiceHandler(this, clusterName, agentUUID);
+    public UUID startService(final String clusterName, final String lxchostname) {
+        AbstractOperationHandler operationHandler = new StartServiceHandler(this, clusterName, lxchostname);
         executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopService(final String clusterName, final String agentUUID) {
-        AbstractOperationHandler operationHandler = new StopServiceHandler(this, clusterName, agentUUID);
+    public UUID stopService(final String clusterName, final String lxchostname) {
+        AbstractOperationHandler operationHandler = new StopServiceHandler(this, clusterName, lxchostname);
         executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
