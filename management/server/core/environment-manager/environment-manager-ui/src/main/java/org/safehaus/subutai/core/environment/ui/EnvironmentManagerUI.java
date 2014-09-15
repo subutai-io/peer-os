@@ -41,17 +41,10 @@ public class EnvironmentManagerUI implements PortalModule {
         this.environmentManager = environmentManager;
     }
 
-    //    private AgentManager agentManager;
-
 
     public PeerManager getPeerManager() {
         return peerManager;
     }
-
-
-    //    public void setAgentManager( AgentManager agentManager ) {
-    //        this.agentManager = agentManager;
-    //    }
 
 
     public void setPeerManager( final PeerManager peerManager ) {
