@@ -7,6 +7,7 @@ package org.safehaus.subutai.core.environment.impl;
 
 
 import java.util.List;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -17,7 +18,9 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
+import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
@@ -25,7 +28,6 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -243,10 +245,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             return true;
         }
         catch ( DBException e ) {
-
-        }
-        catch ( JsonSyntaxException jse ) {
-
+            //TODO log exception
         }
         return false;
     }
@@ -280,5 +279,38 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public String parseBlueprint( final EnvironmentBlueprint blueprint ) {
         return blueprintParser.parseEnvironmentBlueprint( blueprint );
+    }
+
+
+    @Override
+    public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
+        UUID uuid = lxcBuildMessage.getEnvironmentId();
+        String templateName = lxcBuildMessage.getTemplateName();
+        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
+        String strategyName = lxcBuildMessage.getStrategyName();
+        //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
+    }
+
+
+    @Override
+    public void saveBuildProcess( final BuildProcess buildProgress ) {
+        try {
+            environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
+        }
+        catch ( DBException e ) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public List<BuildProcess> getBuildProcesses() {
+        try {
+            return environmentDAO.getInfo( "PROCESS", BuildProcess.class );
+        }
+        catch ( DBException e ) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

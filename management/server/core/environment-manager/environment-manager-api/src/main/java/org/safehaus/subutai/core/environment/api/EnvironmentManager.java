@@ -6,13 +6,15 @@
 package org.safehaus.subutai.core.environment.api;
 
 
+import java.util.List;
+
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
+import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-
-import java.util.List;
+import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 
 
 /**
@@ -56,4 +58,10 @@ public interface EnvironmentManager {
     boolean deleteBlueprint(String name);
 
     public String parseBlueprint(EnvironmentBlueprint blueprint);
+
+    public void saveBuildProcess(BuildProcess buildProgress);
+
+    List<BuildProcess> getBuildProcesses();
+
+    void createContainers( LxcBuildMessage lxcBuildMessage );
 }
