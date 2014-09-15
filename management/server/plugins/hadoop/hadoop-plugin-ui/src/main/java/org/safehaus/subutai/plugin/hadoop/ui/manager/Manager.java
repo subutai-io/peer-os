@@ -37,24 +37,24 @@ import com.vaadin.ui.Window;
 
 public class Manager {
 
-    private final static String CHECK_ALL_BUTTON_CAPTION="Check All";
-    private final static String START_ALL_BUTTON_CAPTION="Start All";
-    private final static String STOP_ALL_BUTTON_CAPTION="Stop All";
-    private final static String DESTROY_CLUSTER_BUTTON_CAPTION="Destroy Cluster";
-    private final static String ADD_NODE_BUTTON_CAPTION="Add Node";
-    private final static String CHECK_BUTTON_CAPTION="Check";
-    private final static String START_NAMENODE_BUTTON_CAPTION ="Start Namenode";
+    private final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    private final static String START_ALL_BUTTON_CAPTION = "Start All";
+    private final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    private final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    private final static String ADD_NODE_BUTTON_CAPTION = "Add Node";
+    private final static String CHECK_BUTTON_CAPTION = "Check";
+    private final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
     private static final String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
-    private final static String STOP_NAMENODE_BUTTON_CAPTION ="Stop Namenode";
+    private final static String STOP_NAMENODE_BUTTON_CAPTION = "Stop Namenode";
     private static final String STOP_JOBTRACKER_BUTTON_CAPTION = "Stop JobTracker";
-    private final static String EXCLUDE_BUTTON_CAPTION="Exclude";
-    private final static String INCLUDE_BUTTON_CAPTION="Include";
-    private final static String DESTROY_BUTTON_CAPTION="Destroy";
+    private final static String EXCLUDE_BUTTON_CAPTION = "Exclude";
+    private final static String INCLUDE_BUTTON_CAPTION = "Include";
+    private final static String DESTROY_BUTTON_CAPTION = "Destroy";
 
-    private final static String HOST_COLUMN_CAPTION="Host";
-    private final static String NODE_ROLE_COLUMN_CAPTION="Node Role";
-    private final static String STATUS_COLUMN_CAPTION="Status";
-    private final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION="AVAILABLE_OPERATIONS";
+    private final static String HOST_COLUMN_CAPTION = "Host";
+    private final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    private final static String STATUS_COLUMN_CAPTION = "Status";
+    private final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
 
     private final GridLayout contentRoot;
     private final ComboBox clusterList;
@@ -184,8 +184,7 @@ public class Manager {
                 if ( hadoopCluster != null ) {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to add slave node to the %s cluster?",
-                                    hadoopCluster.getClusterName() ), "Yes", "No"
-                    );
+                                    hadoopCluster.getClusterName() ), "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -262,7 +261,7 @@ public class Manager {
             populateTable( slaveNodesTable, hadoopCluster.getDataNodes() );
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
             domainName.setValue( hadoopCluster.getDomainName() );
-            slaveNodeCount.setValue( hadoopCluster.getAllSlaveNodes().size()+"" );
+            slaveNodeCount.setValue( hadoopCluster.getAllSlaveNodes().size() + "" );
         }
         else {
             masterNodesTable.removeAllItems();
@@ -305,12 +304,12 @@ public class Manager {
                 HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( table, rowId );
                 if ( availableOperationsLayout != null ) {
                     Button checkButton = getCheckButton( availableOperationsLayout );
-                    if ( checkButton != null )
+                    if ( checkButton != null ) {
                         checkButton.click();
+                    }
                 }
             }
         }
-
     }
 
 
@@ -320,8 +319,9 @@ public class Manager {
             HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( table, rowId );
             if ( availableOperationsLayout != null ) {
                 Button startButton = getStartButton( availableOperationsLayout );
-                if ( startButton != null )
+                if ( startButton != null ) {
                     startButton.click();
+                }
             }
         }
     }
@@ -333,45 +333,48 @@ public class Manager {
             HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( table, rowId );
             if ( availableOperationsLayout != null ) {
                 Button startButton = getStopButton( availableOperationsLayout );
-                if ( startButton != null )
+                if ( startButton != null ) {
                     startButton.click();
+                }
             }
         }
     }
 
 
-    private static HorizontalLayout getAvailableOperationsLayout( Table table, int rowId) {
+    private static HorizontalLayout getAvailableOperationsLayout( Table table, int rowId ) {
         Item row = table.getItem( rowId );
-        HorizontalLayout buttonLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+        HorizontalLayout buttonLayout =
+                ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
         return buttonLayout;
     }
 
 
     private static Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null )
+        if ( availableOperationsLayout == null ) {
             return null;
-        else
-        {
+        }
+        else {
             for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) )
+                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) ) {
                     return ( Button ) component;
+                }
             }
             // If not found
             return null;
         }
-
     }
 
 
     private static Button getStartButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null )
+        if ( availableOperationsLayout == null ) {
             return null;
-        else
-        {
+        }
+        else {
             for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( START_NAMENODE_BUTTON_CAPTION )
-                        || component.getCaption().equals( START_JOBTRACKER_BUTTON_CAPTION ) )
+                if ( component.getCaption().equals( START_NAMENODE_BUTTON_CAPTION ) || component.getCaption().equals(
+                        START_JOBTRACKER_BUTTON_CAPTION ) ) {
                     return ( Button ) component;
+                }
             }
             // If not found
             return null;
@@ -380,14 +383,15 @@ public class Manager {
 
 
     private static Button getStopButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null )
+        if ( availableOperationsLayout == null ) {
             return null;
-        else
-        {
+        }
+        else {
             for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( STOP_NAMENODE_BUTTON_CAPTION )
-                        || component.getCaption().equals( STOP_JOBTRACKER_BUTTON_CAPTION ) )
+                if ( component.getCaption().equals( STOP_NAMENODE_BUTTON_CAPTION ) || component.getCaption().equals(
+                        STOP_JOBTRACKER_BUTTON_CAPTION ) ) {
                     return ( Button ) component;
+                }
             }
             // If not found
             return null;
@@ -419,8 +423,8 @@ public class Manager {
             // Buttons to be added to availableOperations
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
             final Button destroyButton = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-            final Button startStopButton = new Button("Start/Stop");
-            final Button excludeIncludeNodeButton = new Button("Exclude/Include");
+            final Button startStopButton = new Button( "Start/Stop" );
+            final Button excludeIncludeNodeButton = new Button( "Exclude/Include" );
 
             checkButton.addStyleName( "default" );
             startStopButton.addStyleName( "default" );
@@ -432,8 +436,8 @@ public class Manager {
 
 
             // Labels to be added to statusGroup
-            final Label statusDatanode = new Label("");
-            final Label statusTaskTracker = new Label("");
+            final Label statusDatanode = new Label( "" );
+            final Label statusTaskTracker = new Label( "" );
 
             statusDatanode.addStyleName( "default" );
             statusTaskTracker.addStyleName( "default" );
@@ -442,7 +446,8 @@ public class Manager {
 
             // Populate table with proper content according to node types
             startStopButton.setEnabled( false );
-            final HadoopClusterConfig cluster = HadoopUI.getHadoopManager().getCluster( hadoopCluster.getClusterName() );
+            final HadoopClusterConfig cluster =
+                    HadoopUI.getHadoopManager().getCluster( hadoopCluster.getClusterName() );
 
 
             // If master node
@@ -485,7 +490,7 @@ public class Manager {
                             startStopButton.setEnabled( false );
                             enableProgressBar();
                             boolean isRunning = startStopButton.getCaption().equals( STOP_NAMENODE_BUTTON_CAPTION );
-                            if ( ! isRunning ) {
+                            if ( !isRunning ) {
                                 HadoopUI.getExecutor().execute(
 
                                         new StartTask( NodeType.NAMENODE, hadoopCluster, new CompleteEvent() {
@@ -501,8 +506,7 @@ public class Manager {
                                                 checkAllIfNoProcessRunning();
                                                 startStopButton.setEnabled( true );
                                             }
-                                        }, null, agent )
-                                                              );
+                                        }, null, agent ) );
                             }
                             else {
                                 HadoopUI.getExecutor().execute(
@@ -515,13 +519,10 @@ public class Manager {
                                                 checkAllIfNoProcessRunning();
                                                 startStopButton.setEnabled( true );
                                             }
-                                        }, null, agent )
-                                                              );
+                                        }, null, agent ) );
                             }
-
                         }
                     } );
-
                 }
                 // If Jobtracker
                 else if ( cluster.isJobTracker( agent ) ) {
@@ -531,29 +532,28 @@ public class Manager {
                         public void buttonClick( Button.ClickEvent clickEvent ) {
                             startStopButton.setEnabled( false );
                             checkButton.setEnabled( false );
-                            HadoopUI.getExecutor().execute(
-                                    new CheckTask( NodeType.JOBTRACKER, hadoopCluster, new CompleteEvent() {
+                            HadoopUI.getExecutor()
+                                    .execute( new CheckTask( NodeType.JOBTRACKER, hadoopCluster, new CompleteEvent() {
 
-                                        public void onComplete( NodeState state ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                statusTaskTracker.setValue( "JobTracker Running" );
-                                                startStopButton.setCaption( STOP_JOBTRACKER_BUTTON_CAPTION );
-                                                startStopButton.setEnabled( true );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
-                                                statusTaskTracker.setValue( "JobTracker Stopped" );
-                                                startStopButton.setCaption( START_JOBTRACKER_BUTTON_CAPTION );
-                                                startStopButton.setEnabled( true );
-                                            }
-                                            else {
-                                                statusTaskTracker.setValue( "JobTracker Not Connected" );
-                                                startStopButton.setCaption( "Not connected" );
-                                            }
+                                                public void onComplete( NodeState state ) {
+                                                    if ( state == NodeState.RUNNING ) {
+                                                        statusTaskTracker.setValue( "JobTracker Running" );
+                                                        startStopButton.setCaption( STOP_JOBTRACKER_BUTTON_CAPTION );
+                                                        startStopButton.setEnabled( true );
+                                                    }
+                                                    else if ( state == NodeState.STOPPED ) {
+                                                        statusTaskTracker.setValue( "JobTracker Stopped" );
+                                                        startStopButton.setCaption( START_JOBTRACKER_BUTTON_CAPTION );
+                                                        startStopButton.setEnabled( true );
+                                                    }
+                                                    else {
+                                                        statusTaskTracker.setValue( "JobTracker Not Connected" );
+                                                        startStopButton.setCaption( "Not connected" );
+                                                    }
 
-                                            checkButton.setEnabled( true );
-                                        }
-                                    }, null, agent )
-                                                          );
+                                                    checkButton.setEnabled( true );
+                                                }
+                                            }, null, agent ) );
                         }
                     } );
 
@@ -563,7 +563,7 @@ public class Manager {
                             startStopButton.setEnabled( false );
                             enableProgressBar();
                             boolean isRunning = startStopButton.getCaption().equals( STOP_JOBTRACKER_BUTTON_CAPTION );
-                            if ( ! isRunning ) {
+                            if ( !isRunning ) {
                                 startStopButton.setEnabled( false );
                                 HadoopUI.getExecutor().execute(
                                         new StartTask( NodeType.JOBTRACKER, hadoopCluster, new CompleteEvent() {
@@ -579,8 +579,7 @@ public class Manager {
                                                 checkAllIfNoProcessRunning();
                                                 startStopButton.setEnabled( true );
                                             }
-                                        }, null, agent )
-                                                              );
+                                        }, null, agent ) );
                             }
                             else {
                                 startStopButton.setEnabled( false );
@@ -592,12 +591,10 @@ public class Manager {
                                                 checkAllIfNoProcessRunning();
                                                 startStopButton.setEnabled( true );
                                             }
-                                        }, null, agent )
-                                                              );
+                                        }, null, agent ) );
                             }
                         }
                     } );
-
                 }
                 else if ( cluster.isSecondaryNameNode( agent ) ) {
                     checkButton.addClickListener( new Button.ClickListener() {
@@ -620,8 +617,7 @@ public class Manager {
 
                                             checkButton.setEnabled( true );
                                         }
-                                    }, null, agent )
-                                                          );
+                                    }, null, agent ) );
                         }
                     } );
                 }
@@ -763,7 +759,7 @@ public class Manager {
                                 @Override
                                 public void buttonClick( Button.ClickEvent clickEvent ) {
                                     checkButton.setEnabled( false );
-                                                            excludeIncludeNodeButton.setEnabled( false );
+                                    excludeIncludeNodeButton.setEnabled( false );
                                     UUID trackID = HadoopUI.getHadoopManager().excludeNode( hadoopCluster, agent );
                                     ProgressWindow window =
                                             new ProgressWindow( HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID,
@@ -781,9 +777,7 @@ public class Manager {
                             } );
 
                             contentRoot.getUI().addWindow( alert.getAlert() );
-
                         }
-
                     }
                 } );
 
@@ -825,7 +819,7 @@ public class Manager {
 
             // Add UI components into relevant fields according to its role in cluster
             if ( cluster.isMasterNode( agent ) ) {
-                if ( cluster.isNameNode( agent )  ) {
+                if ( cluster.isNameNode( agent ) ) {
                     availableOperations.addComponent( checkButton );
                     availableOperations.addComponent( startStopButton );
                     statusGroup.addComponent( statusDatanode );
@@ -835,7 +829,7 @@ public class Manager {
                     availableOperations.addComponent( startStopButton );
                     statusGroup.addComponent( statusTaskTracker );
                 }
-                else  if ( cluster.isSecondaryNameNode( agent ) ) {
+                else if ( cluster.isSecondaryNameNode( agent ) ) {
                     availableOperations.addComponent( checkButton );
                     statusGroup.addComponent( statusDatanode );
                 }
@@ -848,8 +842,7 @@ public class Manager {
                 statusGroup.addComponent( statusTaskTracker );
             }
             table.addItem( new Object[] {
-                    agent.getHostname(), cluster.getNodeRoles( agent ).toString(),
-                    statusGroup, availableOperations
+                    agent.getHostname(), cluster.getNodeRoles( agent ).toString(), statusGroup, availableOperations
             }, null );
         }
     }
@@ -876,6 +869,7 @@ public class Manager {
             checkAllButton.click();
         }
     }
+
 
     public Component getContent() {
         return contentRoot;
@@ -910,6 +904,6 @@ public class Manager {
                     }
                 }
             }
-        } ;
+        };
     }
 }

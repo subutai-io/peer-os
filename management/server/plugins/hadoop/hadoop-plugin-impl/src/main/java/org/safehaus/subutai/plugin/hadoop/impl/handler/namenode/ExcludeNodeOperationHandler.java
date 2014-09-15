@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
@@ -34,9 +34,10 @@ public class ExcludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
             return;
         }
 
-        if ( ! hadoopClusterConfig.getDataNodes().contains( node ) ||
-                ! hadoopClusterConfig.getTaskTrackers().contains( node ) ) {
-            productOperation.addLogFailed( String.format( "Node in %s cluster as a slave does not exist", clusterName ) );
+        if ( !hadoopClusterConfig.getDataNodes().contains( node ) || !hadoopClusterConfig.getTaskTrackers()
+                                                                                         .contains( node ) ) {
+            productOperation
+                    .addLogFailed( String.format( "Node in %s cluster as a slave does not exist", clusterName ) );
             return;
         }
 
@@ -78,12 +79,10 @@ public class ExcludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
             manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                     hadoopClusterConfig );
             productOperation.addLog( "Cluster info saved to DB" );
-            return;
         }
         catch ( DBException e ) {
             productOperation
                     .addLogFailed( "Could not save cluster info to DB! Please see logs\n" + "Blocking node aborted" );
-            return;
         }
     }
 
