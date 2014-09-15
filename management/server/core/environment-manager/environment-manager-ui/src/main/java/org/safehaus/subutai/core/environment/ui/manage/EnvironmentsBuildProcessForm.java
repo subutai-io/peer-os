@@ -17,7 +17,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class EnvironmentsBuildProcessForm {
 
     private VerticalLayout contentRoot;
@@ -25,7 +25,8 @@ public class EnvironmentsBuildProcessForm {
     private EnvironmentManagerUI managerUI;
 
 
-    public EnvironmentsBuildProcessForm( final EnvironmentManagerUI managerUI ) {
+    public EnvironmentsBuildProcessForm( final EnvironmentManagerUI managerUI )
+    {
         this.managerUI = managerUI;
 
         contentRoot = new VerticalLayout();
@@ -38,7 +39,8 @@ public class EnvironmentsBuildProcessForm {
 
         getEnvironmentsButton.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 updateTableData();
             }
         } );
@@ -49,7 +51,8 @@ public class EnvironmentsBuildProcessForm {
 
         saveBuildProcessButton.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
 
                 BuildProcess buildProcess = new BuildProcess();
                 buildProcess.addBuildBlock( new BuildBlock() );
@@ -64,7 +67,8 @@ public class EnvironmentsBuildProcessForm {
     }
 
 
-    private Table createTable( String caption, int size ) {
+    private Table createTable( String caption, int size )
+    {
         Table table = new Table( caption );
         table.addContainerProperty( "Name", UUID.class, null );
         table.addContainerProperty( "Date", String.class, null );
@@ -90,14 +94,17 @@ public class EnvironmentsBuildProcessForm {
     }
 
 
-    private void updateTableData() {
+    private void updateTableData()
+    {
         environmentsTable.removeAllItems();
         List<BuildProcess> environmentList = managerUI.getEnvironmentManager().getBuildProcesses();
-        for ( final BuildProcess buildProcess : environmentList ) {
+        for ( final BuildProcess buildProcess : environmentList )
+        {
             Button viewEnvironmentInfoButton = new Button( "Info" );
             viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {
                 @Override
-                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                public void buttonClick( final Button.ClickEvent clickEvent )
+                {
                     EnvironmentBuildProcessDetails detailsWindow =
                             new EnvironmentBuildProcessDetails( "Environment details" );
                     detailsWindow.setContent( buildProcess );
@@ -109,26 +116,26 @@ public class EnvironmentsBuildProcessForm {
             Button terminateButton = new Button( "Terminate" );
             terminateButton.addClickListener( new Button.ClickListener() {
                 @Override
-                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                public void buttonClick( final Button.ClickEvent clickEvent )
+                {
                     // TODO terminate environment build process
-                    Notification.show("Terminated", Notification.Type.WARNING_MESSAGE);
+                    Notification.show( "Terminated", Notification.Type.WARNING_MESSAGE );
                 }
             } );
 
-            final Embedded progressIcon =
-                                        new Embedded("", new ThemeResource("img/spinner.gif"));
-                                progressIcon.setVisible(true);
+            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+            progressIcon.setVisible( true );
 
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    buildProcess.getUuid(), "$date", progressIcon, viewEnvironmentInfoButton,
-                    terminateButton
+                    buildProcess.getUuid(), "$date", progressIcon, viewEnvironmentInfoButton, terminateButton
             }, null );
         }
         environmentsTable.refreshRowCache();
     }
 
 
-    public VerticalLayout getContentRoot() {
+    public VerticalLayout getContentRoot()
+    {
         return this.contentRoot;
     }
 }

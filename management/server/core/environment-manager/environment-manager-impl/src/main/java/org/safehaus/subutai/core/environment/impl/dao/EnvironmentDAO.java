@@ -27,23 +27,27 @@ public class EnvironmentDAO {
     private final DbManager dbManager;
 
 
-    public EnvironmentDAO( final DbManager dbManager ) {
+    public EnvironmentDAO( final DbManager dbManager )
+    {
         Preconditions.checkNotNull( dbManager, "Db Manager is null" );
         this.dbManager = dbManager;
     }
 
 
-    public boolean saveInfo( String source, String key, Object info ) {
+    public boolean saveInfo( String source, String key, Object info )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( info, "Info is null" );
 
-        try {
+        try
+        {
             dbManager.executeUpdate2( "insert into environment_info(source,key,info) values (?,?,?)",
                     source.toLowerCase(), key.toLowerCase(), gson.toJson( info ) );
             return true;
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return false;
@@ -58,25 +62,31 @@ public class EnvironmentDAO {
      *
      * @return - list of POJOs
      */
-    public <T> List<T> getInfo( String source, Class<T> clazz ) {
+    public <T> List<T> getInfo( String source, Class<T> clazz )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
         List<T> list = new ArrayList<>();
-        try {
+        try
+        {
             ResultSet rs = dbManager
                     .executeQuery2( "select info from environment_info where source = ?", source.toLowerCase() );
-            if ( rs != null ) {
-                for ( Row row : rs ) {
+            if ( rs != null )
+            {
+                for ( Row row : rs )
+                {
                     String info = row.getString( "info" );
                     list.add( gson.fromJson( info, clazz ) );
                 }
             }
         }
-        catch ( JsonSyntaxException ex ) {
+        catch ( JsonSyntaxException ex )
+        {
             logger.info( ex.getMessage() );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return list;
@@ -92,28 +102,34 @@ public class EnvironmentDAO {
      *
      * @return - POJO
      */
-    public <T> T getInfo( String source, String key, Class<T> clazz ) {
+    public <T> T getInfo( String source, String key, Class<T> clazz )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
-        try {
+        try
+        {
 
             ResultSet rs = dbManager.executeQuery2( "select info from environment_info where source = ? and key = ?",
                     source.toLowerCase(), key.toLowerCase() );
-            if ( rs != null ) {
+            if ( rs != null )
+            {
                 Row row = rs.one();
-                if ( row != null ) {
+                if ( row != null )
+                {
 
                     String info = row.getString( "info" );
                     return gson.fromJson( info, clazz );
                 }
             }
         }
-        catch ( JsonSyntaxException ex ) {
+        catch ( JsonSyntaxException ex )
+        {
             logger.info( ex.getMessage() );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return null;
@@ -126,16 +142,19 @@ public class EnvironmentDAO {
      * @param source - source key
      * @param key - POJO key
      */
-    public boolean deleteInfo( String source, String key ) {
+    public boolean deleteInfo( String source, String key )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
 
-        try {
+        try
+        {
             dbManager.executeUpdate2( "delete from environment_info where source = ? and key = ?", source.toLowerCase(),
                     key.toLowerCase() );
             return true;
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return false;

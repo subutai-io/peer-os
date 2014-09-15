@@ -17,17 +17,20 @@ public class BlueprintParser {
     Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
-    public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) throws JsonSyntaxException {
+    public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) throws JsonSyntaxException
+    {
         return gson.fromJson( blueprintStr, EnvironmentBlueprint.class );
     }
 
 
-    public String parseEnvironmentBlueprint( EnvironmentBlueprint blueprint ) throws JsonSyntaxException {
+    public String parseEnvironmentBlueprint( EnvironmentBlueprint blueprint ) throws JsonSyntaxException
+    {
         return gson.toJson( blueprint, EnvironmentBlueprint.class );
     }
 
 
-    public Environment parseEnvironment( final String blueprintStr ) throws JsonSyntaxException {
+    public Environment parseEnvironment( final String blueprintStr ) throws JsonSyntaxException
+    {
         return gson.fromJson( blueprintStr, Environment.class );
     }
 }
