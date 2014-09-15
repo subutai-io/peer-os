@@ -230,7 +230,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             LOG.info( e.getMessage() );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
         }
         return false;
     }
