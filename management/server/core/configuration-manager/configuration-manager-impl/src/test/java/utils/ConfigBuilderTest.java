@@ -31,7 +31,6 @@ public class ConfigBuilderTest {
 		JsonObject njo = configBuilder.addJsonArrayToConfig(jo, fields);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-//        System.out.println(gson.toJson( njo ));
 
 	}
 

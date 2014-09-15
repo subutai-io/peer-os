@@ -1,12 +1,14 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
+import java.util.logging.Logger;
+
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
@@ -15,6 +17,8 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
  * Created by bahadyr on 9/1/14.
  */
 public class ClusterConfiguration {
+
+    private final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
 
     private ProductOperation po;
     private CassandraImpl cassandraManager;
@@ -139,7 +143,7 @@ public class ClusterConfiguration {
                             .saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info(e.getMessage());
         }
     }
 }

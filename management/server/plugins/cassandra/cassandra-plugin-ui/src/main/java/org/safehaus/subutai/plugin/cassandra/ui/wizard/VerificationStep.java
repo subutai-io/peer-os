@@ -9,7 +9,6 @@ package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 import java.util.UUID;
 
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -52,9 +51,9 @@ public class VerificationStep extends VerticalLayout {
         install.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = CassandraUI.getCassandraManager().installCluster( wizard.getConfig() );
+                UUID trackID = wizard.getCassandraUI().getCassandraManager().installCluster( wizard.getConfig() );
                 ProgressWindow window =
-                        new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
+                        new ProgressWindow( wizard.getCassandraUI().getExecutor(), wizard.getCassandraUI().getTracker(), trackID,
                                 CassandraClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override

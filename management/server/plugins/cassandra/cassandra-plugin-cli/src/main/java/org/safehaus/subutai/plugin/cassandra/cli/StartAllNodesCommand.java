@@ -21,20 +21,20 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "cassandra", name = "stop-cluster", description = "Command to start Cassandra cluster")
 public class StartAllNodesCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
 
 
-    public static Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
-        StartAllNodesCommand.cassandraManager = cassandraManager;
+        this.cassandraManager = cassandraManager;
     }
 
 
@@ -44,7 +44,7 @@ public class StartAllNodesCommand extends OsgiCommandSupport {
 
 
     public void setTracker( Tracker tracker ) {
-        StartAllNodesCommand.tracker = tracker;
+        this.tracker = tracker;
     }
 
 

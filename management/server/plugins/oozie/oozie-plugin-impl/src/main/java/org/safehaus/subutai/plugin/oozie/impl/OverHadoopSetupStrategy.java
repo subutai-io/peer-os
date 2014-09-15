@@ -56,7 +56,8 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy {
             allOozieAgents.add( agent );
         }
 
-        if ( !hc.getAllNodes().containsAll( allOozieHostnames ) ) {
+
+        if ( !hc.getAllNodes().containsAll( allOozieAgents ) ) {
             throw new ClusterSetupException(
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }

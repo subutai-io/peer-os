@@ -7,6 +7,7 @@ package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -24,9 +25,12 @@ public class Wizard {
     GridLayout grid;
     private int step = 1;
     private CassandraClusterConfig config = new CassandraClusterConfig();
+    private CassandraUI cassandraUI;
 
 
-    public Wizard() {
+    public Wizard( CassandraUI cassandraUI ) {
+
+        this.cassandraUI = cassandraUI;
         verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         grid = new GridLayout( 1, 1 );
@@ -36,6 +40,16 @@ public class Wizard {
         grid.setComponentAlignment( verticalLayout, Alignment.TOP_CENTER );
 
         putForm();
+    }
+
+
+    public CassandraUI getCassandraUI() {
+        return cassandraUI;
+    }
+
+
+    public void setCassandraUI( final CassandraUI cassandraUI ) {
+        this.cassandraUI = cassandraUI;
     }
 
 

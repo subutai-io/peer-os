@@ -20,7 +20,8 @@ public class CassandraForm extends CustomComponent {
     private final Manager manager;
 
 
-    public CassandraForm() {
+    public CassandraForm(CassandraUI cassandraUI) {
+
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -31,8 +32,8 @@ public class CassandraForm extends CustomComponent {
 
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
-        manager = new Manager();
-        wizard = new Wizard();
+        manager = new Manager(cassandraUI);
+        wizard = new Wizard(cassandraUI);
         sheet.addTab( wizard.getContent(), "Install" );
         //		sheet.addTab(new ConfigurationView(), "Configure");
         sheet.addTab( manager.getContent(), "Manage" );
@@ -48,4 +49,7 @@ public class CassandraForm extends CustomComponent {
         } );
         verticalLayout.addComponent( sheet );
     }
+
+
+
 }
