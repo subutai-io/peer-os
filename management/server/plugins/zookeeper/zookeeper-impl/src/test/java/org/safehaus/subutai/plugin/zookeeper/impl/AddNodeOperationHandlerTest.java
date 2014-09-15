@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.AddNodeOperationHandler;
 
 import static junit.framework.Assert.assertTrue;
@@ -28,11 +27,11 @@ public class AddNodeOperationHandlerTest {
         when( zookeeperMock.getTracker() ).thenReturn( new TrackerMock() );
         when( zookeeperMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
         when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
-        when( zookeeperMock.getCluster( anyString() ) ).thenReturn( new ZookeeperClusterConfig() );
+        when( zookeeperMock.getCluster( anyString() ) ).thenReturn( null );
         AbstractOperationHandler operationHandler = new AddNodeOperationHandler( zookeeperMock, "test-cluster" );
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Wrong setup type" ) );
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
     }
 }

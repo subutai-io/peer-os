@@ -67,10 +67,6 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
         else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
             addWithHadoop( config );
         }
-        else {
-            productOperation.addLogFailed( "Wrong setup type" );
-            return;
-        }
     }
 
 
