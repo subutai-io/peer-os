@@ -46,9 +46,10 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         instance.set(this);
     }
 
-    public static TabSheet getEditor(){
+    public static TabSheet getEditor() {
         return instance.get().editors;
     }
+
     @Override
     public void enter(ViewChangeEvent event) {
         setSizeFull();
