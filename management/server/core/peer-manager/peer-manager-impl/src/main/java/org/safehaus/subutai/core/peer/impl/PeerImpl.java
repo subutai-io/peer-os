@@ -52,12 +52,12 @@ public class PeerImpl implements PeerManager {
         try {
             String id = peer.getId();
             peerDAO.saveInfo( source, id, peer );
+            return peer.getId();
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
-            return null;
         }
-        return peer.getId();
+        return null;
     }
 
 
