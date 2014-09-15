@@ -28,26 +28,14 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-pool</groupId>
-      <artifactId>commons-pool</artifactId>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-all</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <!--<dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-pool</artifactId>
-    </dependency>-->
-    <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.junit</artifactId>
-      <scope>test</scope>
+      <version>5.10.0</version>
     </dependency>
   </dependencies>
   <build>

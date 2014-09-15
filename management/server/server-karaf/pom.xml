@@ -152,18 +152,6 @@
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
                 <artifactItem>
-                  <groupId>commons-pool</groupId>
-                  <artifactId>commons-pool</artifactId>
-                </artifactItem>
-                <!--<artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-client</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-pool</artifactId>
-                </artifactItem>-->
-                <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
@@ -183,7 +171,7 @@
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>cxf</feature>
-            <feature>webconsole</feature>
+            <!--<feature>webconsole</feature>-->
             <feature>jms</feature>
           </bootFeatures>
         </configuration>
