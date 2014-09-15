@@ -34,7 +34,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
+      <artifactId>activemq-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-pool</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -49,9 +53,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
-            <Import-Package>
-              !org.slf4j,*
-            </Import-Package>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

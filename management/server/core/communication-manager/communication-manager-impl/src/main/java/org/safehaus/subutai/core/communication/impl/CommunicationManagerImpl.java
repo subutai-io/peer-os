@@ -73,47 +73,56 @@ public class CommunicationManagerImpl implements CommunicationManager {
     private boolean persistentMessages;
 
 
-    public Connection createConnection() throws JMSException {
+    public Connection createConnection() throws JMSException
+    {
         return pooledConnectionFactory.createConnection();
     }
 
 
-    boolean isPersistentMessages() {
+    boolean isPersistentMessages()
+    {
         return persistentMessages;
     }
 
 
-    public void setPersistentMessages( final boolean persistentMessages ) {
+    public void setPersistentMessages( final boolean persistentMessages )
+    {
         this.persistentMessages = persistentMessages;
     }
 
 
-    int getAmqMaxMessageToAgentTtlSec() {
+    int getAmqMaxMessageToAgentTtlSec()
+    {
         return amqMaxMessageToAgentTtlSec;
     }
 
 
-    public void setAmqMaxMessageToAgentTtlSec( int amqMaxMessageToAgentTtlSec ) {
+    public void setAmqMaxMessageToAgentTtlSec( int amqMaxMessageToAgentTtlSec )
+    {
         this.amqMaxMessageToAgentTtlSec = amqMaxMessageToAgentTtlSec;
     }
 
 
-    public void setAmqServiceTopic( String amqServiceTopic ) {
+    public void setAmqServiceTopic( String amqServiceTopic )
+    {
         this.amqServiceTopic = amqServiceTopic;
     }
 
 
-    public void setAmqMaxPooledConnections( int amqMaxPooledConnections ) {
+    public void setAmqMaxPooledConnections( int amqMaxPooledConnections )
+    {
         this.amqMaxPooledConnections = amqMaxPooledConnections;
     }
 
 
-    public void setAmqMaxSenderPoolSize( int amqMaxSenderPoolSize ) {
+    public void setAmqMaxSenderPoolSize( int amqMaxSenderPoolSize )
+    {
         this.amqMaxSenderPoolSize = amqMaxSenderPoolSize;
     }
 
 
-    public void setAmqUrl( final String amqUrl ) {
+    public void setAmqUrl( final String amqUrl )
+    {
         this.amqUrl = amqUrl;
     }
 
@@ -123,13 +132,15 @@ public class CommunicationManagerImpl implements CommunicationManager {
      *
      * @param request - request to send
      */
-    public void sendRequest( Request request ) {
+    public void sendRequest( Request request )
+    {
         exec.submit( new CommandProducer( request, this ) );
     }
 
 
     @Override
-    public void sendBroadcastRequest( final Request request ) {
+    public void sendBroadcastRequest( final Request request )
+    {
         exec.submit( new CommandProducer( request, this, true ) );
     }
 
@@ -140,13 +151,17 @@ public class CommunicationManagerImpl implements CommunicationManager {
      * @param listener - listener to add
      */
     @Override
-    public void addListener( ResponseListener listener ) {
-        try {
-            if ( listener != null && communicationMessageListener != null ) {
+    public void addListener( ResponseListener listener )
+    {
+        try
+        {
+            if ( listener != null && communicationMessageListener != null )
+            {
                 communicationMessageListener.addListener( listener );
             }
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in addListener", ex );
         }
     }
@@ -158,19 +173,24 @@ public class CommunicationManagerImpl implements CommunicationManager {
      * @param listener - - listener to remove
      */
     @Override
-    public void removeListener( ResponseListener listener ) {
-        try {
-            if ( listener != null && communicationMessageListener != null ) {
+    public void removeListener( ResponseListener listener )
+    {
+        try
+        {
+            if ( listener != null && communicationMessageListener != null )
+            {
                 communicationMessageListener.removeListener( listener );
             }
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in removeListener", ex );
         }
     }
 
 
-    public Collection getListeners() {
+    public Collection getListeners()
+    {
         return communicationMessageListener.getListeners();
     }
 
@@ -178,7 +198,8 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * Initializes communication manager
      */
-    public void init() {
+    public void init()
+    {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( amqUrl ), "ActiveMQ  URL is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( amqServiceTopic ), "Service queue name is null or empty" );
@@ -187,23 +208,30 @@ public class CommunicationManagerImpl implements CommunicationManager {
         Preconditions.checkArgument( amqMaxPooledConnections >= 1, "Max Pool Connections size must be greater than 0" );
         Preconditions.checkArgument( amqMaxSenderPoolSize >= 1, "Max Sender Pool size must be greater than 0" );
 
-        if ( pooledConnectionFactory != null ) {
-            try {
+        if ( pooledConnectionFactory != null )
+        {
+            try
+            {
                 pooledConnectionFactory.stop();
             }
-            catch ( Exception e ) {
+            catch ( Exception e )
+            {
             }
         }
 
-        if ( communicationMessageListener != null ) {
-            try {
+        if ( communicationMessageListener != null )
+        {
+            try
+            {
                 communicationMessageListener.destroy();
             }
-            catch ( Exception e ) {
+            catch ( Exception e )
+            {
             }
         }
 
-        try {
+        try
+        {
             //executor service setup
             exec = Executors.newFixedThreadPool( amqMaxSenderPoolSize );
             //pooled connection factory setup
@@ -215,7 +243,8 @@ public class CommunicationManagerImpl implements CommunicationManager {
             setupListener();
             LOG.log( Level.INFO, "Communication Manager started..." );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in init", ex );
         }
     }
@@ -224,8 +253,10 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * Sets up listener to receive messages from agents
      */
-    private void setupListener() {
-        try {
+    private void setupListener()
+    {
+        try
+        {
             // Do not close this connection otherwise server listener will be closed
             Connection connection = pooledConnectionFactory.createConnection();
             connection.start();
@@ -245,7 +276,8 @@ public class CommunicationManagerImpl implements CommunicationManager {
             MessageConsumer inotifyConsumer = session.createConsumer( inotifyTopic );
             inotifyConsumer.setMessageListener( communicationMessageListener );
         }
-        catch ( JMSException ex ) {
+        catch ( JMSException ex )
+        {
             LOG.log( Level.SEVERE, "Error in setupListener", ex );
         }
     }
@@ -254,27 +286,36 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * Disposes communication manager
      */
-    public void destroy() {
-        try {
-            if ( pooledConnectionFactory != null ) {
-                try {
+    public void destroy()
+    {
+        try
+        {
+            if ( pooledConnectionFactory != null )
+            {
+                try
+                {
                     pooledConnectionFactory.stop();
                 }
-                catch ( Exception e ) {
+                catch ( Exception e )
+                {
                 }
             }
-            if ( communicationMessageListener != null ) {
-                try {
+            if ( communicationMessageListener != null )
+            {
+                try
+                {
                     communicationMessageListener.destroy();
                 }
-                catch ( Exception e ) {
+                catch ( Exception e )
+                {
                 }
             }
             exec.shutdown();
 
             LOG.log( Level.INFO, "Communication Manager stopped..." );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in destroy", ex );
         }
     }
