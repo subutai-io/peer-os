@@ -174,7 +174,7 @@
             <feature>standard</feature>
             <feature>war</feature>
             <feature>ssh</feature>
-            <feature>cxf</feature>
+            <!--<feature>cxf</feature>-->
             <!--<feature>webconsole</feature>-->
             <feature>jms</feature>
           </bootFeatures>
