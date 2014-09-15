@@ -1,9 +1,20 @@
 package org.safehaus.subutai.plugin.spark.ui.wizard;
 
+
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.Spark;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+
 
 public class Wizard {
 
@@ -11,29 +22,43 @@ public class Wizard {
     private int step = 1;
     private SparkClusterConfig config = new SparkClusterConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
+    private final ServiceLocator serviceLocator;
+    private final ExecutorService executor;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+    private final Spark spark;
 
-    public Wizard() {
-        grid = new GridLayout(1, 20);
-        grid.setMargin(true);
+
+    public Wizard( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException {
+        this.serviceLocator = serviceLocator;
+        this.executor = executor;
+
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.spark = serviceLocator.getService( Spark.class );
+
+        grid = new GridLayout( 1, 20 );
+        grid.setMargin( true );
         grid.setSizeFull();
 
         putForm();
     }
 
+
     private void putForm() {
-        grid.removeComponent(0, 1);
+        grid.removeComponent( 0, 1 );
         Component component = null;
-        switch (step) {
+        switch ( step ) {
             case 1: {
-                component = new WelcomeStep(this);
+                component = new WelcomeStep( this );
                 break;
             }
             case 2: {
-                component = new ConfigurationStep(this);
+                component = new ConfigurationStep( hadoop, this );
                 break;
             }
             case 3: {
-                component = new VerificationStep(this);
+                component = new VerificationStep( tracker, spark, executor, this );
                 break;
             }
             default: {
@@ -41,23 +66,28 @@ public class Wizard {
             }
         }
 
-        if (component != null)
-            grid.addComponent(component, 0, 1, 0, 19);
+        if ( component != null ) {
+            grid.addComponent( component, 0, 1, 0, 19 );
+        }
     }
+
 
     public Component getContent() {
         return grid;
     }
+
 
     protected void next() {
         step++;
         putForm();
     }
 
+
     protected void back() {
         step--;
         putForm();
     }
+
 
     protected void init() {
         step = 1;
@@ -66,12 +96,13 @@ public class Wizard {
         putForm();
     }
 
+
     public SparkClusterConfig getConfig() {
         return config;
     }
 
+
     public HadoopClusterConfig getHadoopConfig() {
         return hadoopConfig;
     }
-
 }
