@@ -12,9 +12,6 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.hadoop.ui.HadoopUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="hadoopManager" ref="hadoopManager"/>
-        <property name="tracker" ref="tracker"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>

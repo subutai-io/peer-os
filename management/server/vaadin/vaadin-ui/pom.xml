@@ -195,5 +195,15 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin</artifactId>
+            <version>6.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin</artifactId>
+            <version>6.8.2</version>
+        </dependency>
     </dependencies>
 </project>

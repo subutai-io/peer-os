@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 import java.util.List;
 
-import org.safehaus.subutai.plugin.shark.ui.SharkUI;
+import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.base.Strings;
@@ -28,7 +28,7 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class ConfigurationStep extends Panel {
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( Spark spark, final Wizard wizard ) {
 
         setSizeFull();
 
@@ -44,7 +44,7 @@ public class ConfigurationStep extends Panel {
         sparkClusters.setRequired( true );
         sparkClusters.setNullSelectionAllowed( false );
 
-        List<SparkClusterConfig> clusters = SharkUI.getSparkManager().getClusters();
+        List<SparkClusterConfig> clusters = spark.getClusters();
         if ( clusters.size() > 0 ) {
             for ( SparkClusterConfig info : clusters ) {
                 sparkClusters.addItem( info );
@@ -70,7 +70,7 @@ public class ConfigurationStep extends Panel {
             }
         }
         else {
-            SparkClusterConfig info = SharkUI.getSparkManager().getCluster( wizard.getConfig().getClusterName() );
+            SparkClusterConfig info = spark.getCluster( wizard.getConfig().getClusterName() );
             if ( info != null ) {
                 //restore cluster
                 sparkClusters.setValue( info );

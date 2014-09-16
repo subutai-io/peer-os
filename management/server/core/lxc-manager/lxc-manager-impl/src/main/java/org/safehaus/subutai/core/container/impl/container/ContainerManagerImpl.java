@@ -236,7 +236,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 	@Override
 	public void clonesCreate(final String hostName, final String templateName, final Set<String> cloneNames)
 			throws LxcCreateException {
-		boolean result = templateManager.clone(hostName, templateName, cloneNames);
+        //TODO: check envId
+		boolean result = templateManager.clone(hostName, templateName, cloneNames, "test");
 		if (!result) {
 			throw new LxcCreateException(
 					String.format("Not all containers from %s : %s are created. Use LXC module to cleanup", hostName,

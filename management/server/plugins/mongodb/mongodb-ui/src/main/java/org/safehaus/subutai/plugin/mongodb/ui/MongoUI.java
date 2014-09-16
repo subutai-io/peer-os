@@ -5,86 +5,74 @@
  */
 package org.safehaus.subutai.plugin.mongodb.ui;
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.mongodb.api.Mongo;
-import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 /**
  * @author dilshat
  */
 public class MongoUI implements PortalModule {
+    protected static final Logger LOG = Logger.getLogger( MongoUI.class.getName() );
 
-	public static final String MODULE_IMAGE = "mongodb.png";
+    public static final String MODULE_IMAGE = "mongodb.png";
 
-	private static Mongo mongoManager;
-	private static AgentManager agentManager;
-	private static CommandRunner commandRunner;
-	private static ExecutorService executor;
-	private static Tracker tracker;
+    private ExecutorService executor;
+    private final ServiceLocator serviceLocator;
 
-	public MongoUI(AgentManager agentManager, Mongo mongoManager, Tracker tracker, CommandRunner commandRunner) {
-		MongoUI.agentManager = agentManager;
-		MongoUI.mongoManager = mongoManager;
-		MongoUI.tracker = tracker;
-		MongoUI.commandRunner = commandRunner;
-	}
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
+    public MongoUI() {
+        serviceLocator = new ServiceLocator();
+    }
 
-	public static Mongo getMongoManager() {
-		return mongoManager;
-	}
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+    public void destroy() {
+        executor.shutdown();
+    }
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
 
-	public void destroy() {
-		tracker = null;
-		mongoManager = null;
-		agentManager = null;
-		executor.shutdown();
-	}
+    @Override
+    public String getId() {
+        return MongoClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public String getId() {
-		return MongoClusterConfig.PRODUCT_KEY;
-	}
 
-	public String getName() {
-		return MongoClusterConfig.PRODUCT_KEY;
-	}
+    public String getName() {
+        return MongoClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(MongoUI.MODULE_IMAGE, this);
-	}
 
-	public Component createComponent() {
-		return new MongoForm();
-	}
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( MongoUI.MODULE_IMAGE, this );
+    }
 
+
+    public Component createComponent() {
+        try {
+            return new MongoForm( executor, serviceLocator );
+        }
+        catch ( NamingException e ) {
+            LOG.severe( e.getMessage() );
+        }
+
+        return null;
+    }
 }

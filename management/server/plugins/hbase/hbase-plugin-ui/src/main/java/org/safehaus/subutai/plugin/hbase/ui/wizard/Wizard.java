@@ -7,6 +7,7 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
@@ -20,13 +21,25 @@ public class Wizard {
     private final VerticalLayout vlayout;
     private int step = 1;
     private HBaseClusterConfig config = new HBaseClusterConfig();
+    private HBaseUI hBaseUI;
 
 
-    public Wizard() {
+    public Wizard(HBaseUI hBaseUI) {
+        this.hBaseUI = hBaseUI;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin( true );
         putForm();
+    }
+
+
+    public HBaseUI gethBaseUI() {
+        return hBaseUI;
+    }
+
+
+    public void sethBaseUI( final HBaseUI hBaseUI ) {
+        this.hBaseUI = hBaseUI;
     }
 
 

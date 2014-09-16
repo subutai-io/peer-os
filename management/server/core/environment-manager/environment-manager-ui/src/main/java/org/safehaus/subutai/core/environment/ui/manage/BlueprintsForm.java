@@ -87,7 +87,7 @@ public class BlueprintsForm {
                         //                        EnvironmentManagerUI.getExecutor().execute( new Runnable() {
                         //                            @Override
                         //                            public void run() {
-                        WizardWindow wizardWindow = new WizardWindow( "Wizard" );
+                        WizardWindow wizardWindow = new WizardWindow( "Wizard", managerUI, environmentBuildTask );
                         wizardWindow.setContent( getPeersTable() );
                         contentRoot.getUI().addWindow( wizardWindow );
                         wizardWindow.setVisible( true );

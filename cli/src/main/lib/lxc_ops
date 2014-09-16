@@ -181,7 +181,6 @@ function lxc_clone {
   lxc_assert_name "$child"
   
   local environmentId="$3"
-  lxc_assert_name "$environmentId"
   
   local usage="$4"
 
@@ -273,8 +272,8 @@ function lxc_clone {
   echo "subutai_parent_hostname = `hostname`" >> $child_rootfs/etc/subutai/lxc-config
 
   # removing the agent uuid of the cloned instance template
-  if [ -s "$child_rootfs/etc/ksks-agent/config/uuid.txt" ]; then
-    echo "" > $child_rootfs/etc/ksks-agent/config/uuid.txt
+  if [ -s "$child_rootfs/etc/subutai-agent/uuid.txt" ]; then
+    echo "" > $child_rootfs/etc/subutai-agent/uuid.txt
   fi  
 }
 

@@ -18,23 +18,23 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "cassandra", name = "check-cluster", description = "Command to check Cassandra cluster" )
+@Command(scope = "cassandra", name = "check-cluster", description = "Command to check Cassandra cluster")
 public class CheckAllNodesCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
-    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false )
+    private Cassandra cassandraManager;
+    private Tracker tracker;
+    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false)
     String clusterName = null;
 
 
-    public static Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
-        CheckAllNodesCommand.cassandraManager = cassandraManager;
+        this.cassandraManager = cassandraManager;
     }
 
 
@@ -44,7 +44,7 @@ public class CheckAllNodesCommand extends OsgiCommandSupport {
 
 
     public void setTracker( Tracker tracker ) {
-        CheckAllNodesCommand.tracker = tracker;
+        this.tracker = tracker;
     }
 
 

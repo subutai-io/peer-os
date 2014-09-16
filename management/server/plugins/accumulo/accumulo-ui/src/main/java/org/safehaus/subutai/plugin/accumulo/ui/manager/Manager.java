@@ -11,17 +11,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -58,8 +66,20 @@ public class Manager {
     private final Pattern tabletServerPattern = Pattern.compile( ".*(Tablet Server.+?g).*" );
     private AccumuloClusterConfig accumuloClusterConfig;
 
+    private final Accumulo accumulo;
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
 
-    public Manager() {
+
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+
+        this.executorService = executorService;
+        this.accumulo = serviceLocator.getService( Accumulo.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+        AgentManager agentManager = serviceLocator.getService( AgentManager.class );
+        CommandRunner commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -69,9 +89,9 @@ public class Manager {
         contentRoot.setColumns( 1 );
 
         //tables go here
-        mastersTable = UiUtil.createTableTemplate( "Masters", false );
-        tracersTable = UiUtil.createTableTemplate( "Tracers", true );
-        slavesTable = UiUtil.createTableTemplate( "Slaves", true );
+        mastersTable = UiUtil.createTableTemplate( "Masters", false, agentManager, commandRunner, executorService );
+        tracersTable = UiUtil.createTableTemplate( "Tracers", true, agentManager, commandRunner, executorService );
+        slavesTable = UiUtil.createTableTemplate( "Slaves", true, agentManager, commandRunner, executorService );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -124,9 +144,9 @@ public class Manager {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                UUID trackID = AccumuloUI.getAccumuloManager().startCluster( accumuloClusterConfig.getClusterName() );
-                ProgressWindow window = new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                        AccumuloClusterConfig.PRODUCT_KEY );
+                UUID trackID = accumulo.startCluster( accumuloClusterConfig.getClusterName() );
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackID, AccumuloClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -144,9 +164,9 @@ public class Manager {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                UUID trackID = AccumuloUI.getAccumuloManager().stopCluster( accumuloClusterConfig.getClusterName() );
-                ProgressWindow window = new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                        AccumuloClusterConfig.PRODUCT_KEY );
+                UUID trackID = accumulo.stopCluster( accumuloClusterConfig.getClusterName() );
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackID, AccumuloClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -171,11 +191,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = AccumuloUI.getAccumuloManager()
-                                                     .uninstallCluster( accumuloClusterConfig.getClusterName() );
-                            ProgressWindow window =
-                                    new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                            AccumuloClusterConfig.PRODUCT_KEY );
+                            UUID trackID = accumulo.uninstallCluster( accumuloClusterConfig.getClusterName() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    AccumuloClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -202,8 +220,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( accumuloClusterConfig != null ) {
 
-                    HadoopClusterConfig hadoopConfig =
-                            AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
+                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
 
                     if ( hadoopConfig != null ) {
                         Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
@@ -214,7 +231,8 @@ public class Manager {
                         }
 
                         AddNodeWindow addNodeWindow =
-                                new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.TRACER );
+                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
+                                        availableNodes, NodeType.TRACER );
                         contentRoot.getUI().addWindow( addNodeWindow );
                         addNodeWindow.addCloseListener( new Window.CloseListener() {
                             @Override
@@ -243,8 +261,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( accumuloClusterConfig != null ) {
 
-                    HadoopClusterConfig hadoopConfig =
-                            AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
+                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( accumuloClusterConfig.getClusterName() );
                     if ( hadoopConfig != null ) {
                         Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
                         availableNodes.removeAll( accumuloClusterConfig.getSlaves() );
@@ -254,7 +271,8 @@ public class Manager {
                         }
 
                         AddNodeWindow addNodeWindow =
-                                new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.LOGGER );
+                                new AddNodeWindow( accumulo, executorService, tracker, accumuloClusterConfig,
+                                        availableNodes, NodeType.LOGGER );
                         contentRoot.getUI().addWindow( addNodeWindow );
                         addNodeWindow.addCloseListener( new Window.CloseListener() {
                             @Override
@@ -294,13 +312,10 @@ public class Manager {
                         Notification.show( "Please, specify property name to remove" );
                     }
                     else {
-                        UUID trackID = AccumuloUI.getAccumuloManager()
-                                                 .removeProperty( accumuloClusterConfig.getClusterName(),
-                                                         propertyName );
+                        UUID trackID = accumulo.removeProperty( accumuloClusterConfig.getClusterName(), propertyName );
 
-                        ProgressWindow window =
-                                new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                        AccumuloClusterConfig.PRODUCT_KEY );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                AccumuloClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener() {
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent ) {
@@ -336,13 +351,11 @@ public class Manager {
                         Notification.show( "Please, specify property name to set" );
                     }
                     else {
-                        UUID trackID = AccumuloUI.getAccumuloManager()
-                                                 .addProperty( accumuloClusterConfig.getClusterName(), propertyName,
-                                                         propertyValue );
+                        UUID trackID = accumulo.addProperty( accumuloClusterConfig.getClusterName(), propertyName,
+                                propertyValue );
 
-                        ProgressWindow window =
-                                new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                        AccumuloClusterConfig.PRODUCT_KEY );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                AccumuloClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener() {
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent ) {
@@ -386,7 +399,7 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<AccumuloClusterConfig> mongoClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
+        List<AccumuloClusterConfig> mongoClusterInfos = accumulo.getClusters();
         AccumuloClusterConfig clusterInfo = ( AccumuloClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
@@ -441,26 +454,25 @@ public class Manager {
                 public void buttonClick( Button.ClickEvent event ) {
                     progressIcon.setVisible( true );
 
-                    AccumuloUI.getExecutor().execute(
-                            new CheckTask( accumuloClusterConfig.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                    executorService.execute( new CheckTask( accumulo, tracker, accumuloClusterConfig.getClusterName(),
+                            agent.getHostname(), new CompleteEvent() {
 
-                                        public void onComplete( String result ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( masters ) {
-                                                    resultHolder.setValue( parseMastersState( result ) );
-                                                }
-                                                else if ( table == tracersTable ) {
-                                                    resultHolder.setValue( parseTracersState( result ) );
-                                                }
-                                                else if ( table == slavesTable ) {
-                                                    resultHolder.setValue( parseSlavesState( result ) );
-                                                }
-                                                destroyBtn.setEnabled( true );
-                                                progressIcon.setVisible( false );
-                                            }
-                                        }
-                                    } ) );
+                        public void onComplete( String result ) {
+                            synchronized ( progressIcon ) {
+                                if ( masters ) {
+                                    resultHolder.setValue( parseMastersState( result ) );
+                                }
+                                else if ( table == tracersTable ) {
+                                    resultHolder.setValue( parseTracersState( result ) );
+                                }
+                                else if ( table == slavesTable ) {
+                                    resultHolder.setValue( parseSlavesState( result ) );
+                                }
+                                destroyBtn.setEnabled( true );
+                                progressIcon.setVisible( false );
+                            }
+                        }
+                    } ) );
                 }
             } );
 
@@ -475,15 +487,12 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = AccumuloUI.getAccumuloManager()
-                                                     .destroyNode( accumuloClusterConfig.getClusterName(),
-                                                             agent.getHostname(),
-                                                             table == tracersTable ? NodeType.TRACER :
-                                                             NodeType.LOGGER );
+                            UUID trackID =
+                                    accumulo.destroyNode( accumuloClusterConfig.getClusterName(), agent.getHostname(),
+                                            table == tracersTable ? NodeType.TRACER : NodeType.LOGGER );
 
-                            ProgressWindow window =
-                                    new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                            AccumuloClusterConfig.PRODUCT_KEY );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    AccumuloClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {

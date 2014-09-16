@@ -1,27 +1,44 @@
 package org.safehaus.subutai.plugin.presto.ui;
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.presto.ui.manager.Manager;
 import org.safehaus.subutai.plugin.presto.ui.wizard.Wizard;
 
 public class PrestoForm extends CustomComponent {
 
-    public PrestoForm() {
+    public PrestoForm(ExecutorService executorService, ServiceLocator serviceLocator) throws NamingException {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
-        Manager manager = new Manager();
-        Wizard wizard = new Wizard();
-        mongoSheet.addTab(wizard.getContent(), "Install");
-        mongoSheet.addTab(manager.getContent(), "Manage");
-        verticalLayout.addComponent(mongoSheet);
+        TabSheet cassandraSheet = new TabSheet();
+        cassandraSheet.setSizeFull();
+        final Manager manager = new Manager(executorService, serviceLocator);
+        Wizard wizard = new Wizard(executorService, serviceLocator);
+        cassandraSheet.addTab( wizard.getContent(), "Install" );
+        cassandraSheet.addTab( manager.getContent(), "Manage" );
+        cassandraSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) ) {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( cassandraSheet );
+        verticalLayout.addComponent(cassandraSheet);
 
         setCompositionRoot(verticalLayout);
         manager.refreshClustersInfo();

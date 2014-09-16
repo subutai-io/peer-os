@@ -12,19 +12,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.server.ui.component.AgentTree;
+import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
@@ -44,7 +44,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
     final CommandRunner commandRunner;
     final AgentManager agentManager;
-    private AtomicInteger taskCount = new AtomicInteger(  );
+    private AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
     private AgentTree agentTree;
     private TerminalControl commandOutputTxtArea;
@@ -224,9 +224,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
                     @Override
                     public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                        Agent agent = agentManager.getAgentByUUID( response.getUuid() );
-                        String host = agent == null ? String.format( "Offline[%s]", response.getUuid() ) :
-                                      agent.getHostname();
                         StringBuilder out = new StringBuilder( "" );
 
                         if ( !Strings.isNullOrEmpty( response.getStdOut() ) ) {
@@ -237,7 +234,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
                         }
 
                         output[0] += out.toString();
-                        //						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
                     }
                 } );
 

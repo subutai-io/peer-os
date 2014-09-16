@@ -21,7 +21,7 @@ public class MonitorImpl implements Monitor {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static final String QUERY = FileUtil.getContent("elasticsearch/query.json");
 
@@ -99,7 +99,7 @@ public class MonitorImpl implements Monitor {
 	}
 
 
-	private static Map<Date, Double> toMap(List<JsonNode> nodes) {
+	private Map<Date, Double> toMap(List<JsonNode> nodes) {
 
 		Map<Date, Double> values = new TreeMap<>();
 
@@ -113,7 +113,7 @@ public class MonitorImpl implements Monitor {
 	}
 
 
-	private static Date strToDate(String dateStr) {
+	private Date strToDate(String dateStr) {
 
 		String target = dateStr.replace("T", " ").replace("Z", "");
 		Date date = null;
@@ -128,7 +128,7 @@ public class MonitorImpl implements Monitor {
 	}
 
 
-	private static String dateToStr(Date date) {
+	private String dateToStr(Date date) {
 		return DATE_FORMAT.format(date).replace(" ", "T");
 	}
 }

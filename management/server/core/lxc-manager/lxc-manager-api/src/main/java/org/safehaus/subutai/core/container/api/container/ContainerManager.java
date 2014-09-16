@@ -1,15 +1,15 @@
 package org.safehaus.subutai.core.container.api.container;
 
 
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 
 
 public interface ContainerManager {
@@ -43,4 +43,6 @@ public interface ContainerManager {
 
 	public void clonesCreate(final String hostName, final String templateName, final Set<String> cloneNames)
 			throws LxcCreateException;
+
+
 }
