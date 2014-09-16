@@ -164,6 +164,7 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>16.0.1</version>
+        <!--Because of cassandra-driver-core lib-->
       </dependency>
       <dependency>
         <groupId>com.fasterxml.uuid</groupId>
@@ -215,6 +216,16 @@
         <groupId>com.datastax.cassandra</groupId>
         <artifactId>cassandra-driver-core</artifactId>
         <version>2.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.codahale.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>3.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty</artifactId>
+        <version>3.9.4.Final</version>
       </dependency>
 
     </dependencies>

@@ -207,6 +207,14 @@
                   <groupId>com.datastax.cassandra</groupId>
                   <artifactId>cassandra-driver-core</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>com.codahale.metrics</groupId>
+                  <artifactId>metrics-core</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>io.netty</groupId>
+                  <artifactId>netty</artifactId>
+                </artifactItem>
 
               </artifactItems>
             </configuration>
