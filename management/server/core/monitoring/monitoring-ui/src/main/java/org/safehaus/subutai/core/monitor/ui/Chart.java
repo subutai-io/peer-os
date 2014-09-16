@@ -12,7 +12,7 @@ import java.util.Map;
 
 class Chart {
 
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static final String CHART_TEMPLATE = FileUtil.getContent("js/chart.js");
 
