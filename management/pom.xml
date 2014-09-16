@@ -82,6 +82,19 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- config-point-tracker -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>config-point-tracker-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!--<dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>communication-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>-->
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Internal karaf dependencies-->
       <dependency>

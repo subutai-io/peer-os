@@ -15,8 +15,8 @@
 
     <modules>
         <module>config-point-tracker-api</module>
-        <module>config-point-tracker-impl</module>
-        <module>config-point-tracker-cli</module>
+      <!--<module>config-point-tracker-impl</module>
+      <module>config-point-tracker-cli</module>-->
     </modules>
 
 </project>
