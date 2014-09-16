@@ -15,13 +15,15 @@ public class Environment {
     private Set<Node> nodes;
     private String name;
     private Set<String> containers;
+    private String peerUuid;
 
 
-    public Environment( String name ) {
+    public Environment( String name, String peerUuid ) {
         this.uuid = UUID.randomUUID();
         this.nodes = new HashSet<>();
         this.name = name;
         this.containers = new HashSet<>();
+        this.peerUuid = peerUuid;
     }
 
 

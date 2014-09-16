@@ -48,7 +48,8 @@ public class EnvironmentsForm {
         addEnvironmentButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
-                Environment environment = new Environment( "environment" );
+                String siteId = managerUI.getPeerManager().getSiteId().toString();
+                Environment environment = new Environment( "environment", siteId );
                 environment.addContainer( "Container 1" );
                 environment.addContainer( "Container 2" );
                 environment.addContainer( "Container 3" );
