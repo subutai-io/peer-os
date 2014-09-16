@@ -1,21 +1,21 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
+import java.util.Map;
+import java.util.UUID;
 
-/**
- * Created by bahadyr on 8/25/14.
- */
+
 public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
 
-    private ProductOperation po;
     private String clusterName;
     private String lxcHostname;
 
@@ -24,10 +24,29 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Checking cassandra on %s of %s cluster...", lxcHostname, clusterName ) );
     }
 
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
+
+        String log = "";
+
+        for ( Map.Entry<UUID, AgentResult > e : checkStatusCommand.getResults().entrySet() ) {
+
+            String status = "UNKNOWN";
+            if ( e.getValue().getExitCode() == 0 ) {
+                status = "Cassandra is running";
+            }
+            else if ( e.getValue().getExitCode() == 768 ) {
+                status = "Cassandra is not running";
+            }
+
+            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+        }
+
+        po.addLogDone( log );
+    }
 
     @Override
     public void run() {
@@ -52,12 +71,12 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
         manager.getCommandRunner().runCommand( checkNodeCommand );
 
         if ( checkNodeCommand.hasSucceeded() ) {
+            String s = checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ;
             productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
                     checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
         else {
-            productOperation.addLogFailed(
-                    String.format( "Failed to check status of %s, %s", lxcHostname, checkNodeCommand.getAllErrors() ) );
+            logStatusResults( productOperation, checkNodeCommand );
         }
     }
 }

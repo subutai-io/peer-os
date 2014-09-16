@@ -19,8 +19,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "cassandra", name = "service-cassandra-status", description = "Command to check Cassandra service")
 public class StatusServiceCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "Name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
@@ -28,13 +28,13 @@ public class StatusServiceCommand extends OsgiCommandSupport {
     String agentUUID = null;
 
 
-    public static Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
-        StatusServiceCommand.cassandraManager = cassandraManager;
+        this.cassandraManager = cassandraManager;
     }
 
 
@@ -44,7 +44,7 @@ public class StatusServiceCommand extends OsgiCommandSupport {
 
 
     public void setTracker( Tracker tracker ) {
-        StatusServiceCommand.tracker = tracker;
+        this.tracker = tracker;
     }
 
 

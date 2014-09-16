@@ -15,13 +15,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
 /**
  * Provides command Command functionality
  */
-public class AbstractCommand implements Command {
+public abstract class AbstractCommand implements Command {
 
     //lock used to synchronize update of command state between command executor thread and cache evictor thread
     private final Lock updateLock = new ReentrantLock( true );
@@ -50,6 +51,14 @@ public class AbstractCommand implements Command {
     //indicates if this command is broadcast command
     protected boolean broadcastCommand;
 
+    private final CommandRunnerBase commandRunner;
+
+
+    protected AbstractCommand( final CommandRunnerBase commandRunner ) {
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        this.commandRunner = commandRunner;
+    }
+
 
     /**
      * Shows if command has completed. The same as checking command.getCommandStatus == CommandStatus.SUCCEEDED ||
@@ -57,6 +66,7 @@ public class AbstractCommand implements Command {
      *
      * @return - true if completed, false otherwise
      */
+    @Override
     public boolean hasCompleted() {
         return commandStatus == CommandStatus.FAILED || commandStatus == CommandStatus.SUCCEEDED;
     }
@@ -67,6 +77,7 @@ public class AbstractCommand implements Command {
      *
      * @return - true if succeeded, false otherwise
      */
+    @Override
     public boolean hasSucceeded() {
         return commandStatus == CommandStatus.SUCCEEDED;
     }
@@ -77,6 +88,7 @@ public class AbstractCommand implements Command {
      *
      * @return - status of command
      */
+    @Override
     public CommandStatus getCommandStatus() {
         return commandStatus;
     }
@@ -97,6 +109,7 @@ public class AbstractCommand implements Command {
      *
      * @return - map of agents' results
      */
+    @Override
     public Map<UUID, AgentResult> getResults() {
         return Collections.unmodifiableMap( results );
     }
@@ -107,6 +120,7 @@ public class AbstractCommand implements Command {
      *
      * @return - UUID of command
      */
+    @Override
     public UUID getCommandUUID() {
         return commandUUID;
     }
@@ -117,6 +131,7 @@ public class AbstractCommand implements Command {
      *
      * @return - custom object or null
      */
+    @Override
     public Object getData() {
         return data;
     }
@@ -127,6 +142,7 @@ public class AbstractCommand implements Command {
      *
      * @param data - custom object
      */
+    @Override
     public void setData( Object data ) {
         this.data = data;
     }
@@ -137,6 +153,7 @@ public class AbstractCommand implements Command {
      *
      * @return - all std err outputs from agents joined in one string
      */
+    @Override
     public String getAllErrors() {
         StringBuilder errors = new StringBuilder();
         for ( Map.Entry<UUID, AgentResult> result : results.entrySet() ) {
@@ -159,6 +176,7 @@ public class AbstractCommand implements Command {
      *
      * @return - description of command
      */
+    @Override
     public String getDescription() {
         return description;
     }
@@ -301,4 +319,58 @@ public class AbstractCommand implements Command {
     public boolean isBroadcastCommand() {
         return broadcastCommand;
     }
+
+
+    @Override
+    public void execute() throws CommandException {
+        execute( null );
+    }
+
+
+    @Override
+    public void execute( final CommandCallback callback ) throws CommandException {
+        executeCommand( callback, false );
+    }
+
+
+    @Override
+    public void executeAsync() throws CommandException {
+        executeAsync( null );
+    }
+
+
+    @Override
+    public void executeAsync( final CommandCallback callback ) throws CommandException {
+        executeCommand( callback, true );
+    }
+
+
+    private void executeCommand( final CommandCallback callback, boolean async ) throws CommandException {
+        if ( this.commandStatus != CommandStatus.NEW ) {
+            throw new CommandException( String.format( "Command status must be %s", CommandStatus.NEW.name() ) );
+        }
+
+        try {
+            if ( async ) {
+                if ( callback == null ) {
+                    commandRunner.runCommandAsync( this );
+                }
+                else {
+                    commandRunner.runCommandAsync( this, callback );
+                }
+            }
+            else {
+                if ( callback == null ) {
+                    commandRunner.runCommand( this );
+                }
+                else {
+                    commandRunner.runCommand( this, callback );
+                }
+            }
+        }
+        catch ( RuntimeException e ) {
+            throw new CommandException( e.getMessage() );
+        }
+    }
 }
+

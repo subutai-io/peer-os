@@ -10,10 +10,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
@@ -50,7 +52,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
     private final AgentTree agentTree;
     private final TextArea commandOutputTxtArea;
-    private volatile int taskCount = 0;
+    private AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
 
@@ -168,41 +170,58 @@ public class TerminalForm extends CustomComponent implements Disposable {
                     }
                     final Command command = commandRunner.createCommand( requestBuilder, agents );
                     indicator.setVisible( true );
-                    taskCount++;
+                    taskCount.incrementAndGet();
                     executor.execute( new Runnable() {
 
                         public void run() {
-                            commandRunner.runCommand( command, new CommandCallback() {
+                            try {
+                                command.execute( new CommandCallback() {
 
-                                @Override
-                                public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                                    Agent agent = agentManager.getAgentByUUID( response.getUuid() );
-                                    String host = agent == null ? String.format( "Offline[%s]", response.getUuid() ) :
-                                                  agent.getHostname();
-                                    StringBuilder out =
-                                            new StringBuilder( host ).append( " [" ).append( response.getPid() )
-                                                                     .append( "]" ).append( ":\n" );
-                                    if ( !Strings.isNullOrEmpty( response.getStdOut() ) ) {
-                                        out.append( response.getStdOut() ).append( "\n" );
-                                    }
-                                    if ( !Strings.isNullOrEmpty( response.getStdErr() ) ) {
-                                        out.append( response.getStdErr() ).append( "\n" );
-                                    }
-                                    if ( response.isFinal() ) {
-                                        if ( response.getType() == ResponseType.EXECUTE_RESPONSE_DONE ) {
-                                            out.append( "Exit code: " ).append( response.getExitCode() )
-                                               .append( "\n\n" );
-                                        }
-                                        else {
-                                            out.append( response.getType() ).append( "\n\n" );
-                                        }
-                                    }
-                                    addOutput( out.toString() );
-                                }
-                            } );
+                                    @Override
+                                    public void onResponse( Response response, AgentResult agentResult,
+                                                            Command command ) {
+                                        StringBuilder out = new StringBuilder();
+                                        if ( !Strings.isNullOrEmpty( response.getStdOut() ) || !Strings
+                                                .isNullOrEmpty( response.getStdErr() ) ) {
 
-                            taskCount--;
-                            if ( taskCount == 0 ) {
+                                            if ( !Strings.isNullOrEmpty( response.getStdOut() ) ) {
+                                                out.append( response.getStdOut() ).append( "\n" );
+                                            }
+                                            if ( !Strings.isNullOrEmpty( response.getStdErr() ) ) {
+                                                out.append( response.getStdErr() ).append( "\n" );
+                                            }
+                                        }
+                                        if ( response.isFinal() ) {
+                                            if ( response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
+                                                    && response.getExitCode() != 0 ) {
+                                                out.append( "Exit code: " ).append( response.getExitCode() )
+                                                   .append( "\n\n" );
+                                            }
+                                            else if ( response.getType() != ResponseType.EXECUTE_RESPONSE_DONE ) {
+                                                out.append( response.getType() ).append( "\n\n" );
+                                            }
+                                        }
+
+                                        if ( out.length() > 0 ) {
+                                            Agent agent = agentManager.getAgentByUUID( response.getUuid() );
+                                            StringBuilder host = new StringBuilder(
+                                                    agent == null ? String.format( "Offline[%s]", response.getUuid() ) :
+                                                    agent.getHostname() );
+
+                                            host.append( " [" ).append( response.getPid() ).append( "]" )
+                                                .append( ":\n" );
+                                            out.insert( 0, host );
+                                            addOutput( out.toString() );
+                                        }
+                                    }
+                                } );
+                            }
+                            catch ( CommandException e ) {
+                                show( e.getMessage() );
+                            }
+
+                            taskCount.decrementAndGet();
+                            if ( taskCount.get() == 0 ) {
                                 indicator.setVisible( false );
                             }
                         }
