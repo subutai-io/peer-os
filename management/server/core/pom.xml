@@ -20,6 +20,7 @@
     <module>command-dispatcher</module>
     <module>command-runner</module>
     <module>communication-manager</module>
+    <module>config-point-tracker</module>
     <!--<module>db-manager</module>
     <module>strategy-manager</module>
     <module>container-manager</module>
@@ -34,7 +35,7 @@
     <module>configuration-manager</module>
     <module>template-manager</module>
     <module>file-tracker</module>
-    <module>config-point-tracker</module>
+
     <module>pet_core</module>
     <module>peer-manager</module>
     -->
