@@ -162,23 +162,15 @@
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-jms-pool</artifactId>
-                  <version>5.10.0</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>javax.management.j2ee</groupId>
                   <artifactId>management-api</artifactId>
-                  <version>1.1-rev-1</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-pool</groupId>
                   <artifactId>commons-pool</artifactId>
-                  <version>1.6</version>
                 </artifactItem>
-                <!--<artifactItem>
-                  <groupId>cglib</groupId>
-                  <artifactId>cglib</artifactId>
-                  <version>3.0</version>
-                </artifactItem>-->
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
