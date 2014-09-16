@@ -26,7 +26,7 @@ public class BuildEnvironmentCommand extends OsgiCommandSupport {
             valueToShowInHelp = "Blueprint for building environment")
     private String blueprintStr;
     @Argument(name = "physicalServers", description = "Environment blueprint",
-            index = 0, multiValued = true, required = true,
+            index = 1, multiValued = true, required = true,
             valueToShowInHelp = "Physical server hostnames")
     private Set<String> physicalServers;
 
