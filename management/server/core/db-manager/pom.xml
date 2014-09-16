@@ -16,6 +16,6 @@
 
     <modules>
         <module>db-manager-api</module>
-        <module>db-manager-impl</module>
+        <!--<module>db-manager-impl</module>-->
     </modules>
 </project>

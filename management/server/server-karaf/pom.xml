@@ -189,6 +189,14 @@
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
+
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- db-manager -->
+                <artifactItem>
+                  <groupId>com.datastax.cassandra</groupId>
+                  <artifactId>cassandra-driver-core</artifactId>
+                </artifactItem>
+
               </artifactItems>
             </configuration>
           </execution>

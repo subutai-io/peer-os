@@ -22,9 +22,10 @@
     <module>communication-manager</module>
     <module>config-point-tracker</module>
     <module>configuration-manager</module>
-    <!--<module>db-manager</module>
+    <module>db-manager</module>
+    <!--<module>container-manager</module>-->
+    <!--
     <module>strategy-manager</module>
-    <module>container-manager</module>
     <module>lxc-manager</module>
     <module>network-manager</module>
     <module>tracker</module>
