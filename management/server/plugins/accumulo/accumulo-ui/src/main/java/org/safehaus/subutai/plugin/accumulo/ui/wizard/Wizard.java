@@ -6,8 +6,17 @@
 package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.vaadin.ui.Component;
@@ -24,9 +33,21 @@ public class Wizard {
     private AccumuloClusterConfig config = new AccumuloClusterConfig();
     private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
     private ZookeeperClusterConfig zookeeperClusterConfig = new ZookeeperClusterConfig();
+    private final Hadoop hadoop;
+    private final Accumulo accumulo;
+    private final Zookeeper zookeeper;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
 
 
-    public Wizard() {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+
+        this.executorService = executorService;
+        this.accumulo = serviceLocator.getService( Accumulo.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.zookeeper = serviceLocator.getService( Zookeeper.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
         grid.setSizeFull();
@@ -44,11 +65,11 @@ public class Wizard {
                 break;
             }
             case 2: {
-                component = new ConfigurationStep( this );
+                component = new ConfigurationStep( hadoop, zookeeper, this );
                 break;
             }
             case 3: {
-                component = new VerificationStep( this );
+                component = new VerificationStep( accumulo, executorService, tracker, this );
                 break;
             }
             default: {
