@@ -14,12 +14,29 @@ public class Environment {
     private UUID uuid;
     private Set<Node> nodes;
     private String name;
+    private Set<String> containers;
 
 
-    public Environment(String name) {
+    public Environment( String name ) {
         this.uuid = UUID.randomUUID();
         this.nodes = new HashSet<>();
         this.name = name;
+        this.containers = new HashSet<>();
+    }
+
+
+    public void addContainer( String containerUuid ) {
+        this.containers.add( containerUuid );
+    }
+
+
+    public Set<String> getContainers() {
+        return containers;
+    }
+
+
+    public void setContainers( final Set<String> containers ) {
+        this.containers = containers;
     }
 
 

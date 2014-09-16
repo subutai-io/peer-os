@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
@@ -48,7 +49,9 @@ public class EnvironmentsForm {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                 Environment environment = new Environment( "environment" );
-
+                environment.addContainer( "Container 1" );
+                environment.addContainer( "Container 2" );
+                environment.addContainer( "Container 3" );
                 managerUI.getEnvironmentManager().saveEnvironment( environment );
             }
         } );
@@ -94,9 +97,37 @@ public class EnvironmentsForm {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
                     EnvironmentDetails detailsWindow = new EnvironmentDetails( "Environment details" );
-                    detailsWindow.setContent( environment );
+                    detailsWindow.setContent( genContainersTable() );
                     contentRoot.getUI().addWindow( detailsWindow );
                     detailsWindow.setVisible( true );
+                }
+
+
+                private VerticalLayout genContainersTable() {
+                    VerticalLayout vl = new VerticalLayout();
+
+                    Table containersTable = new Table();
+                    containersTable.addContainerProperty( "Name", String.class, null );
+                    containersTable.addContainerProperty( "Destroy", Button.class, null );
+                    containersTable.setPageLength( 10 );
+                    containersTable.setSelectable( false );
+                    containersTable.setEnabled( true );
+                    containersTable.setImmediate( true );
+                    containersTable.setSizeFull();
+
+
+                    Set<String> containers = environment.getContainers();
+                    for ( String container : containers )
+                    {
+
+                        containersTable.addItem( new Object[] {
+                                container, new Button( "Destroy" )
+                        }, null );
+                    }
+
+
+                    vl.addComponent( containersTable );
+                    return vl;
                 }
             } );
 
