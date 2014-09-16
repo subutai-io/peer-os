@@ -25,7 +25,7 @@ public class SqoopUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public SqoopUI() throws NamingException {
+    public SqoopUI()  {
         this.serviceLocator = new ServiceLocator();
     }
 

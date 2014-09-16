@@ -25,7 +25,7 @@ public class HiveUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public HiveUI() throws NamingException {
+    public HiveUI()  {
         this.serviceLocator = new ServiceLocator();
     }
 

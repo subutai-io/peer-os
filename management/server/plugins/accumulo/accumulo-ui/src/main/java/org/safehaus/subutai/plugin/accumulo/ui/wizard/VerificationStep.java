@@ -7,12 +7,14 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -28,7 +30,8 @@ import com.vaadin.ui.Window;
  */
 public class VerificationStep extends Panel {
 
-    public VerificationStep( final Wizard wizard ) {
+    public VerificationStep( final Accumulo accumulo, final ExecutorService executorService, final Tracker tracker,
+                             final Wizard wizard ) {
 
         setSizeFull();
 
@@ -77,12 +80,11 @@ public class VerificationStep extends Panel {
             public void buttonClick( Button.ClickEvent event ) {
 
                 UUID trackID = wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ?
-                               AccumuloUI.getAccumuloManager().installCluster( wizard.getConfig() ) :
-                               AccumuloUI.getAccumuloManager()
-                                         .installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig(),
-                                                 wizard.getZookeeperClusterConfig() );
-                ProgressWindow window = new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                        AccumuloClusterConfig.PRODUCT_KEY );
+                               accumulo.installCluster( wizard.getConfig() ) :
+                               accumulo.installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig(),
+                                       wizard.getZookeeperClusterConfig() );
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackID, AccumuloClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {

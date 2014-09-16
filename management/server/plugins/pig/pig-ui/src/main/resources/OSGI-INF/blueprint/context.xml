@@ -15,11 +15,6 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.pig.ui.PigUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="hadoopManager"/>
-        <argument ref="pigManager"/>
-        <argument ref="commandRunner"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
