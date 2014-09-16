@@ -29,55 +29,55 @@ public class HBaseUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "hbase.png";
 
-    private static HBase hbaseManager;
-    private static AgentManager agentManager;
-    private static Hadoop hadoopManager;
-    private static Tracker tracker;
-    private static CommandRunner commandRunner;
-    private static ExecutorService executor;
+    private HBase hbaseManager;
+    private AgentManager agentManager;
+    private Hadoop hadoopManager;
+    private Tracker tracker;
+    private CommandRunner commandRunner;
+    private ExecutorService executor;
 
 
     public HBaseUI( AgentManager agentManager, Tracker tracker, HBase hbaseManager, CommandRunner commandRunner,
                     Hadoop hadoopManager ) {
-        HBaseUI.agentManager = agentManager;
-        HBaseUI.tracker = tracker;
-        HBaseUI.hbaseManager = hbaseManager;
-        HBaseUI.commandRunner = commandRunner;
-        HBaseUI.hadoopManager = hadoopManager;
+        this.agentManager = agentManager;
+        this.tracker = tracker;
+        this.hbaseManager = hbaseManager;
+        this.commandRunner = commandRunner;
+        this.hadoopManager = hadoopManager;
     }
 
 
-    public static Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager() {
         return hadoopManager;
     }
 
 
-    public static void setHadoopManager( final Hadoop hadoopManager ) {
-        HBaseUI.hadoopManager = hadoopManager;
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
     }
 
 
-    public static Tracker getTracker() {
+    public Tracker getTracker() {
         return tracker;
     }
 
 
-    public static HBase getHbaseManager() {
+    public HBase getHbaseManager() {
         return hbaseManager;
     }
 
 
-    public static ExecutorService getExecutor() {
+    public ExecutorService getExecutor() {
         return executor;
     }
 
 
-    public static AgentManager getAgentManager() {
+    public AgentManager getAgentManager() {
         return agentManager;
     }
 
 
-    public static CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner() {
         return commandRunner;
     }
 
@@ -115,6 +115,6 @@ public class HBaseUI implements PortalModule {
 
 
     public Component createComponent() {
-        return new HBaseForm();
+        return new HBaseForm(this);
     }
 }

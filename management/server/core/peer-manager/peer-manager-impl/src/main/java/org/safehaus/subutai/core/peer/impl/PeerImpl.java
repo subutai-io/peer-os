@@ -17,8 +17,9 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
  */
 public class PeerImpl implements PeerManager {
 
-    private final static String source = "PEER_MANAGER";
-    private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
+    private final static Logger logger = Logger.getLogger( PeerImpl.class.getName() );
+
+    private final String SOURCE = "PEER_MANAGER";
     private UUID id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
@@ -30,7 +31,7 @@ public class PeerImpl implements PeerManager {
 
 
     public void init() {
-        LOG.info( "SUBUTAID ID: " + id );
+        logger.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
@@ -49,15 +50,14 @@ public class PeerImpl implements PeerManager {
     public String register( final Peer peer ) {
 
         try {
-            String id = peer.getId();
-            peerDAO.saveInfo( source, id, peer );
+            String peerId = peer.getId();
+            peerDAO.saveInfo( SOURCE, peerId, peer );
+            return peerId;
         }
         catch ( DBException e ) {
-            //            e.printStackTrace();
-            LOG.info( e.getMessage() );
-            return null;
+            logger.info( e.getMessage() );
         }
-        return peer.getId();
+        return null;
     }
 
 
@@ -71,11 +71,10 @@ public class PeerImpl implements PeerManager {
     public List<Peer> peers() {
         List<Peer> peers = null;
         try {
-            peers = peerDAO.getInfo( source, Peer.class );
+            peers = peerDAO.getInfo( SOURCE, Peer.class );
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-            //            e.printStackTrace();
+            logger.info( e.getMessage() );
         }
         return peers;
     }
@@ -84,28 +83,24 @@ public class PeerImpl implements PeerManager {
     @Override
     public boolean unregister( final String uuid ) {
         try {
-            peerDAO.deleteInfo( source, uuid );
+            peerDAO.deleteInfo( SOURCE, uuid );
+            return true;
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-            //            e.printStackTrace();
-            return false;
+            logger.info( e.getMessage() );
         }
-        return true;
+        return false;
     }
 
 
     @Override
     public Peer getPeerByUUID( String uuid ) {
         try {
-            Peer peer = peerDAO.getInfo( source, uuid, Peer.class );
-            return peer;
+            return peerDAO.getInfo( SOURCE, uuid, Peer.class );
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            logger.info( e.getMessage() );
         }
-        finally {
-            return null;
-        }
+        return null;
     }
 }

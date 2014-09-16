@@ -17,17 +17,17 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "cassandra", name = "list-clusters", description = "Gets the list of Cassandra clusters")
 public class ListClustersCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
 
 
-    public static Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
-        ListClustersCommand.cassandraManager = cassandraManager;
+        this.cassandraManager = cassandraManager;
     }
 
 
@@ -37,7 +37,7 @@ public class ListClustersCommand extends OsgiCommandSupport {
 
 
     public void setTracker( Tracker tracker ) {
-        ListClustersCommand.tracker = tracker;
+        this.tracker = tracker;
     }
 
 
