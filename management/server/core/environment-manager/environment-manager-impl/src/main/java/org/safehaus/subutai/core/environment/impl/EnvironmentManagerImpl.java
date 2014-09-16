@@ -191,7 +191,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         }
         catch ( EnvironmentDestroyException e )
         {
-            LOG.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return false;
     }
@@ -211,7 +211,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return false;
     }
@@ -275,7 +275,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             }
             catch ( EnvironmentBuildException e )
             {
-                LOG.info( e.getMessage() );
+                LOG.severe( e.getMessage() );
             }
         }
         return false;

@@ -55,7 +55,7 @@ public class PeerImpl implements PeerManager {
             return peerId;
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return null;
     }
@@ -74,7 +74,7 @@ public class PeerImpl implements PeerManager {
             peers = peerDAO.getInfo( SOURCE, Peer.class );
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return peers;
     }
@@ -99,7 +99,7 @@ public class PeerImpl implements PeerManager {
             return peerDAO.getInfo( SOURCE, uuid, Peer.class );
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return null;
     }
