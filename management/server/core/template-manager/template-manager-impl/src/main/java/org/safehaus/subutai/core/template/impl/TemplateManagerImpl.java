@@ -3,16 +3,19 @@ package org.safehaus.subutai.core.template.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.registry.api.Template;
+
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
-import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class TemplateManagerImpl extends TemplateManagerBase
@@ -37,22 +40,14 @@ public class TemplateManagerImpl extends TemplateManagerBase
 
 
     @Override
-    public boolean clone( String hostName, String templateName, String cloneName )
+    public boolean clone( String hostName, String templateName, String cloneName, String environmentId )
     {
-        Agent a = agentManager.getAgentByHostname( hostName );
-        if ( !prepareTemplates( a, templateName ) )
-        {
-            return false;
-        }
-
-        return scriptExecutor.execute( a, ActionType.CLONE, templateName, cloneName, " &" );
-        // TODO: script does not return w/o redirecting outputs!!!
-        // for now, script is run in background
+        return clone(hostName, templateName, Sets.newHashSet(cloneName), environmentId);
     }
 
 
     @Override
-    public boolean clone( String hostName, String templateName, Set<String> cloneNames )
+    public boolean clone( String hostName, String templateName, Set<String> cloneNames, String environmentId)
     {
         Agent a = agentManager.getAgentByHostname( hostName );
         if ( !prepareTemplates( a, templateName ) )
@@ -63,7 +58,9 @@ public class TemplateManagerImpl extends TemplateManagerBase
         boolean result = true;
         for ( String cloneName : cloneNames )
         {
-            result &= scriptExecutor.execute( a, ActionType.CLONE, templateName, cloneName, "&" );
+            result &= scriptExecutor.execute( a, ActionType.CLONE, templateName, cloneName, String.format(" %s &", environmentId) );
+            // TODO: script does not return w/o redirecting outputs!!!
+            // for now, script is run in background
         }
         return result;
     }
