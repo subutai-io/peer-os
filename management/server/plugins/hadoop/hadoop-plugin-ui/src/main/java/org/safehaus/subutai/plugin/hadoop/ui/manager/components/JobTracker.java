@@ -2,11 +2,13 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
 import com.vaadin.event.MouseEvents;
 
@@ -16,15 +18,25 @@ import com.vaadin.event.MouseEvents;
  */
 public class JobTracker extends ClusterNode {
 
-    public JobTracker( final HadoopClusterConfig cluster ) {
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
+
+
+    public JobTracker( final Hadoop hadoop, final Tracker tracker, final ExecutorService executorService,
+                       final HadoopClusterConfig cluster ) {
         super( cluster );
+        this.tracker = tracker;
+        this.executorService = executorService;
+        this.hadoop = hadoop;
+
         setHostname( cluster.getJobTracker().getHostname() );
 
         startButton.addClickListener( new MouseEvents.ClickListener() {
             @Override
             public void click( MouseEvents.ClickEvent clickEvent ) {
                 setLoading( true );
-                getStatus( HadoopUI.getHadoopManager().startJobTracker( cluster ) );
+                getStatus( hadoop.startJobTracker( cluster ) );
             }
         } );
 
@@ -32,7 +44,7 @@ public class JobTracker extends ClusterNode {
             @Override
             public void click( MouseEvents.ClickEvent clickEvent ) {
                 setLoading( true );
-                getStatus( HadoopUI.getHadoopManager().stopJobTracker( cluster ) );
+                getStatus( hadoop.stopJobTracker( cluster ) );
             }
         } );
 
@@ -40,7 +52,7 @@ public class JobTracker extends ClusterNode {
             @Override
             public void click( MouseEvents.ClickEvent clickEvent ) {
                 setLoading( true );
-                getStatus( HadoopUI.getHadoopManager().restartJobTracker( cluster ) );
+                getStatus( hadoop.restartJobTracker( cluster ) );
             }
         } );
 
@@ -55,7 +67,7 @@ public class JobTracker extends ClusterNode {
             slaveNode.setLoading( true );
         }
 
-        HadoopUI.getExecutor().execute( new CheckTask( cluster, new CompleteEvent() {
+        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent() {
 
             public void onComplete( NodeState state ) {
                 synchronized ( progressButton ) {

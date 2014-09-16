@@ -5,87 +5,76 @@
  */
 package org.safehaus.subutai.plugin.solr.ui;
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
-import org.safehaus.subutai.plugin.solr.api.Solr;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 /**
  * @author dilshat
  */
 public class SolrUI implements PortalModule {
+    protected static final Logger LOG = Logger.getLogger( SolrUI.class.getName() );
 
-	public static final String MODULE_IMAGE = "solr.png";
+    public static final String MODULE_IMAGE = "solr.png";
 
-	private static Solr solrManager;
-	private static AgentManager agentManager;
-	private static Tracker tracker;
-	private static CommandRunner commandRunner;
-	private static ExecutorService executor;
 
-	public SolrUI(AgentManager agentManager, Tracker tracker, Solr solrManager, CommandRunner commandRunner) {
-		SolrUI.agentManager = agentManager;
-		SolrUI.tracker = tracker;
-		SolrUI.solrManager = solrManager;
-		SolrUI.commandRunner = commandRunner;
-	}
+    private ExecutorService executor;
+    private final ServiceLocator serviceLocator;
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
 
-	public static Solr getSolrManager() {
-		return solrManager;
-	}
+    public SolrUI() {
+        serviceLocator = new ServiceLocator();
+    }
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
+    public void destroy() {
 
-	public void destroy() {
-		solrManager = null;
-		agentManager = null;
-		tracker = null;
-		commandRunner = null;
-		executor.shutdown();
-	}
+        executor.shutdown();
+    }
 
-	@Override
-	public String getId() {
-		return SolrClusterConfig.PRODUCT_KEY;
-	}
 
-	public String getName() {
-		return SolrClusterConfig.PRODUCT_KEY;
-	}
+    @Override
+    public String getId() {
+        return SolrClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(SolrUI.MODULE_IMAGE, this);
-	}
 
-	public Component createComponent() {
-		return new SolrForm();
-	}
+    public String getName() {
+        return SolrClusterConfig.PRODUCT_KEY;
+    }
 
+
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( SolrUI.MODULE_IMAGE, this );
+    }
+
+
+    public Component createComponent() {
+        try {
+            return new SolrForm( executor, serviceLocator );
+        }
+        catch ( NamingException e ) {
+            LOG.severe( e.getMessage() );
+        }
+
+        return null;
+    }
 }
