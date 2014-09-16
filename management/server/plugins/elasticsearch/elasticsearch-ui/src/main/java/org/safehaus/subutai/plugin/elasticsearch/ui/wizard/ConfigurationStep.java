@@ -24,13 +24,13 @@ public class ConfigurationStep extends VerticalLayout
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name:" );
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setMaxLength( 20 );
-        clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
+        clusterNameTxtFld.setValue( wizard.getElasticsearchClusterConfiguration().getClusterName() );
         clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
+                wizard.getElasticsearchClusterConfiguration().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
 
@@ -38,14 +38,14 @@ public class ConfigurationStep extends VerticalLayout
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setTextInputAllowed( false );
         nodesCountCombo.setNullSelectionAllowed( false );
-        nodesCountCombo.setValue( wizard.getConfig() );
+        nodesCountCombo.setValue( wizard.getElasticsearchClusterConfiguration() );
 
         nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getConfig().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
+                wizard.getElasticsearchClusterConfiguration().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
@@ -54,14 +54,14 @@ public class ConfigurationStep extends VerticalLayout
         mastersCountCombo.setImmediate( true );
         mastersCountCombo.setTextInputAllowed( false );
         mastersCountCombo.setNullSelectionAllowed( false );
-        mastersCountCombo.setValue( wizard.getConfig() );
+        mastersCountCombo.setValue( wizard.getElasticsearchClusterConfiguration() );
 
         mastersCountCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getConfig().setNumberOfMasterNodes( ( Integer ) event.getProperty().getValue() );
+                wizard.getElasticsearchClusterConfiguration().setNumberOfMasterNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
@@ -70,14 +70,14 @@ public class ConfigurationStep extends VerticalLayout
         dataNodesCountCombo.setImmediate( true );
         dataNodesCountCombo.setTextInputAllowed( false );
         dataNodesCountCombo.setNullSelectionAllowed( false );
-        dataNodesCountCombo.setValue( wizard.getConfig() );
+        dataNodesCountCombo.setValue( wizard.getElasticsearchClusterConfiguration() );
 
         dataNodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getConfig().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
+                wizard.getElasticsearchClusterConfiguration().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
@@ -86,14 +86,14 @@ public class ConfigurationStep extends VerticalLayout
         numberOfShardsCombo.setImmediate( true );
         numberOfShardsCombo.setTextInputAllowed( false );
         numberOfShardsCombo.setNullSelectionAllowed( false );
-        numberOfShardsCombo.setValue( wizard.getConfig() );
+        numberOfShardsCombo.setValue( wizard.getElasticsearchClusterConfiguration() );
 
         numberOfShardsCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getConfig().setNumberOfShards( ( Integer ) event.getProperty().getValue() );
+                wizard.getElasticsearchClusterConfiguration().setNumberOfShards( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
@@ -102,14 +102,14 @@ public class ConfigurationStep extends VerticalLayout
         numberOfReplicasCombo.setImmediate( true );
         numberOfReplicasCombo.setTextInputAllowed( false );
         numberOfReplicasCombo.setNullSelectionAllowed( false );
-        numberOfReplicasCombo.setValue( wizard.getConfig() );
+        numberOfReplicasCombo.setValue( wizard.getElasticsearchClusterConfiguration() );
 
         numberOfReplicasCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getConfig().setNumberOfReplicas( ( Integer ) event.getProperty().getValue() );
+                wizard.getElasticsearchClusterConfiguration().setNumberOfReplicas( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
@@ -120,7 +120,7 @@ public class ConfigurationStep extends VerticalLayout
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                if ( Strings.isNullOrEmpty( wizard.getElasticsearchClusterConfiguration().getClusterName() ) )
                 {
                     show( "Please provide cluster name" );
                 }

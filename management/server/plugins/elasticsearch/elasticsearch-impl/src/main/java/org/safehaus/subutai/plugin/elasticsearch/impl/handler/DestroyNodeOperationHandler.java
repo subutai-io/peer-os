@@ -1,16 +1,18 @@
-package org.safehaus.subutai.plugin.elasticsearch.impl;
+package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 import com.google.common.collect.Sets;
+import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
+import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 
-public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl >
 {
     private final String lxcHostname;
 
@@ -19,7 +21,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
             String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -27,8 +29,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
     @Override
     public void run()
     {
-        final Config config = manager.getCluster( clusterName );
-        if ( config == null )
+        final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
+        if ( elasticsearchClusterConfiguration == null )
         {
             productOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
@@ -43,14 +45,14 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
             return;
         }
 
-        if ( !config.getNodes().contains( agent ) )
+        if ( !elasticsearchClusterConfiguration.getNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
-        if ( config.getNodes().size() == 1 )
+        if ( elasticsearchClusterConfiguration.getNodes().size() == 1 )
         {
             productOperation.addLogFailed(
                     "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
@@ -83,10 +85,10 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
                         String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
             }
 
-            config.getNodes().remove( agent );
+            elasticsearchClusterConfiguration.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
-            if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
+            if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
             {
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
             }

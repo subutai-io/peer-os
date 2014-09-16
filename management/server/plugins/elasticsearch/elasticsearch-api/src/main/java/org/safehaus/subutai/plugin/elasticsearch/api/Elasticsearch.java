@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import java.util.UUID;
 
 
-public interface Elasticsearch extends ApiBase<Config> {
+public interface Elasticsearch extends ApiBase<ElasticsearchClusterConfiguration > {
 
 	public UUID startAllNodes(String clusterName);
 
@@ -19,8 +19,14 @@ public interface Elasticsearch extends ApiBase<Config> {
 
     public UUID addNode(String clusterName, String lxcHostname);
 
+    public UUID checkNode(String clusterName, String lxcHostname);
+
+    public UUID startNode(String clusterName, String lxcHostname);
+
+    public UUID stopNode(String clusterName, String lxcHostname);
+
     public UUID destroyNode(String clusterName, String lxcHostname);
 
-    ClusterSetupStrategy getClusterSetupStrategy( Environment environment, Config config, ProductOperation po );
+    ClusterSetupStrategy getClusterSetupStrategy( Environment environment, ElasticsearchClusterConfiguration elasticsearchClusterConfiguration, ProductOperation po );
 
 }

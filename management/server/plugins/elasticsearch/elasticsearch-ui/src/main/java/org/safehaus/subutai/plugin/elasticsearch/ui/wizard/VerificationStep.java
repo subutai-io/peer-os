@@ -24,12 +24,12 @@ public class VerificationStep extends VerticalLayout {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name: ", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Number of Nodes: ", "" + wizard.getConfig().getNumberOfNodes());
-		cfgView.addStringCfg("Number of Master Nodes: ", "" + wizard.getConfig().getNumberOfMasterNodes());
-		cfgView.addStringCfg("Number of Data Nodes: ", "" + wizard.getConfig().getNumberOfDataNodes());
-		cfgView.addStringCfg("Number of Shards: ", "" + wizard.getConfig().getNumberOfShards());
-		cfgView.addStringCfg("Number of Replicas: ", "" + wizard.getConfig().getNumberOfReplicas());
+		cfgView.addStringCfg("Cluster Name: ", wizard.getElasticsearchClusterConfiguration().getClusterName());
+		cfgView.addStringCfg("Number of Nodes: ", "" + wizard.getElasticsearchClusterConfiguration().getNumberOfNodes());
+		cfgView.addStringCfg("Number of Master Nodes: ", "" + wizard.getElasticsearchClusterConfiguration().getNumberOfMasterNodes());
+		cfgView.addStringCfg("Number of Data Nodes: ", "" + wizard.getElasticsearchClusterConfiguration().getNumberOfDataNodes());
+		cfgView.addStringCfg("Number of Shards: ", "" + wizard.getElasticsearchClusterConfiguration().getNumberOfShards());
+		cfgView.addStringCfg("Number of Replicas: ", "" + wizard.getElasticsearchClusterConfiguration().getNumberOfReplicas());
 
 		Button installButton = new Button("Install");
 		installButton.addStyleName("default");
@@ -37,11 +37,11 @@ public class VerificationStep extends VerticalLayout {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 
-				UUID trackID = ElasticsearchUI.getElasticsearchManager().installCluster(wizard.getConfig());
+				UUID trackID = ElasticsearchUI.getElasticsearchManager().installCluster(wizard.getElasticsearchClusterConfiguration());
 
 				ProgressWindow window =
 						new ProgressWindow(ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID,
-								Config.PRODUCT_KEY);
+								ElasticsearchClusterConfiguration.PRODUCT_KEY);
 
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override

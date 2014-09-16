@@ -12,7 +12,7 @@ public class Wizard {
 	private final VerticalLayout verticalLayout;
 	GridLayout grid;
 	private int step = 1;
-	private Config config = new Config();
+	private ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = new ElasticsearchClusterConfiguration();
 
 	public Wizard() {
 		verticalLayout = new VerticalLayout();
@@ -69,13 +69,13 @@ public class Wizard {
 		putForm();
 	}
 
-	public Config getConfig() {
-		return config;
+	public ElasticsearchClusterConfiguration getElasticsearchClusterConfiguration() {
+		return elasticsearchClusterConfiguration;
 	}
 
 	public void init() {
 		step = 1;
-		config = new Config();
+		elasticsearchClusterConfiguration = new ElasticsearchClusterConfiguration();
 		putForm();
 	}
 

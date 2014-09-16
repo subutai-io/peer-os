@@ -6,9 +6,9 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Config implements ConfigBase {
+public class ElasticsearchClusterConfiguration implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Elasticsearch2";
+	public static final String PRODUCT_KEY = "Elasticsearch";
     public static final String PRODUCT_NAME = "elasticsearch";
 
     public static final String templateName = "elasticsearch";

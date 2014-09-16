@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.elasticsearch.rest;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 
 import javax.ws.rs.*;
@@ -38,11 +38,11 @@ public class RestService {
     @Produces ({MediaType.APPLICATION_JSON})
     public Response listClusters() {
 
-		List<Config> configList = elasticsearch.getClusters();
+		List<ElasticsearchClusterConfiguration > elasticsearchClusterConfigurationList = elasticsearch.getClusters();
 		ArrayList<String> clusterNames = new ArrayList();
 
-		for (Config config : configList) {
-			clusterNames.add(config.getClusterName());
+		for (ElasticsearchClusterConfiguration elasticsearchClusterConfiguration : elasticsearchClusterConfigurationList ) {
+			clusterNames.add( elasticsearchClusterConfiguration.getClusterName());
 		}
 
         String clusters = JsonUtil.GSON.toJson(clusterNames);
@@ -62,15 +62,15 @@ public class RestService {
             @QueryParam("numberOfReplicas") int numberOfReplicas
     ) {
 
-		Config config = new Config();
-		config.setClusterName(clusterName);
-		config.setNumberOfNodes(numberOfNodes);
-		config.setNumberOfMasterNodes(numberOfMasterNodes);
-		config.setNumberOfDataNodes(numberOfDataNodes);
-		config.setNumberOfShards(numberOfShards);
-		config.setNumberOfReplicas(numberOfReplicas);
+		ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = new ElasticsearchClusterConfiguration();
+		elasticsearchClusterConfiguration.setClusterName(clusterName);
+		elasticsearchClusterConfiguration.setNumberOfNodes(numberOfNodes);
+		elasticsearchClusterConfiguration.setNumberOfMasterNodes(numberOfMasterNodes);
+		elasticsearchClusterConfiguration.setNumberOfDataNodes(numberOfDataNodes);
+		elasticsearchClusterConfiguration.setNumberOfShards(numberOfShards);
+		elasticsearchClusterConfiguration.setNumberOfReplicas(numberOfReplicas);
 
-		UUID uuid = elasticsearch.installCluster(config);
+		UUID uuid = elasticsearch.installCluster( elasticsearchClusterConfiguration );
 
         String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
         return Response.status(Response.Status.CREATED).entity(operationId).build();

@@ -39,7 +39,7 @@ public class StepStart extends VerticalLayout {
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.getConfig().reset();
+				wizard.getElasticsearchClusterConfiguration().reset();
 				wizard.next();
 			}
 		});

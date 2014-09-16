@@ -11,6 +11,7 @@ import static junit.framework.Assert.assertNotNull;
 public class CommandsTest {
 
     private static Commands commands;
+
     @BeforeClass
     public static void setUp() {
         commands = new Commands( new CommandRunnerMock() );

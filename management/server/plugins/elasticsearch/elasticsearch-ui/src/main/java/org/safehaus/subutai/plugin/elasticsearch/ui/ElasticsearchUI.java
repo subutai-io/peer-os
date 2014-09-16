@@ -62,11 +62,11 @@ public class ElasticsearchUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return Config.PRODUCT_KEY;
+		return ElasticsearchClusterConfiguration.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return Config.PRODUCT_KEY;
+		return ElasticsearchClusterConfiguration.PRODUCT_KEY;
 	}
 
 	@Override
