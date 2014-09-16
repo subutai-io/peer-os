@@ -6,13 +6,24 @@ package org.safehaus.subutai.core.environment.api.helper;
  */
 public class BuildBlock {
 
-    int numberOfContainers;
-    String templateName;
-    String strategy;
-    String environmentUuid;
-    boolean completeState;
-    int timestamp;
-    String targetPeerId;
+    private int numberOfContainers;
+    private String templateName;
+    private String strategy;
+    private String environmentUuid;
+    private boolean completeState;
+    private int timestamp;
+    private String targetPeerId;
+    private String peerId;
+
+
+    public String getPeerId() {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId ) {
+        this.peerId = peerId;
+    }
 
 
     public int getNumberOfContainers() {
