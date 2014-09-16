@@ -15,11 +15,6 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="manager"/>
-        <argument ref="hadoopManager"/>
-        <argument ref="commandRunner"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
