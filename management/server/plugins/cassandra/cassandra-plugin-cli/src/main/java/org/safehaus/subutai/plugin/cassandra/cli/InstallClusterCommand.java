@@ -19,8 +19,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "cassandra", name = "install-cluster", description = "Command to install Cassandra cluster")
 public class InstallClusterCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
@@ -35,13 +35,13 @@ public class InstallClusterCommand extends OsgiCommandSupport {
     String numberOfSeeds = null;
 
 
-    public static Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
-        InstallClusterCommand.cassandraManager = cassandraManager;
+        this.cassandraManager = cassandraManager;
     }
 
 
@@ -51,7 +51,7 @@ public class InstallClusterCommand extends OsgiCommandSupport {
 
 
     public void setTracker( Tracker tracker ) {
-        InstallClusterCommand.tracker = tracker;
+        this.tracker = tracker;
     }
 
 

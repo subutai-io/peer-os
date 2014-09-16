@@ -8,11 +8,13 @@ package org.safehaus.subutai.core.command.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.command.AbstractCommandRunner;
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,32 +41,32 @@ public class CommandImplUT {
 	public void beforeMethod() {
 		Set<Agent> agents = MockUtils.getAgents(agentUUID);
 		RequestBuilder requestBuilder = MockUtils.getRequestBuilder("pwd", 1, agents);
-		command = new CommandImpl(null, requestBuilder, agents);
+		command = new CommandImpl(null, requestBuilder, agents, mock( AbstractCommandRunner.class));
 	}
 
 
 	@Test (expected = NullPointerException.class)
 	public void constructorShouldFailNullBuilder() {
-		new CommandImpl(null, mock(Set.class));
+		new CommandImpl(null, mock(Set.class), mock( AbstractCommandRunner.class));
 	}
 
 
 	@Test (expected = IllegalArgumentException.class)
 	public void constructorShouldFailNullAgentBuilder() {
-		new CommandImpl(null, null);
+		new CommandImpl(null, null, mock( AbstractCommandRunner.class));
 	}
 
 
 	@Test (expected = IllegalArgumentException.class)
 	public void constructorShouldFailEmptyAgentBuilder() {
 		Set<AgentRequestBuilder> ag = new HashSet<>();
-		new CommandImpl(null, ag);
+		new CommandImpl(null, ag, mock( AbstractCommandRunner.class));
 	}
 
 
 	@Test (expected = IllegalArgumentException.class)
 	public void constructorShouldFailNullAgents() {
-		new CommandImpl(null, mock(RequestBuilder.class), null);
+		new CommandImpl(null, mock(RequestBuilder.class), null, mock( AbstractCommandRunner.class));
 	}
 
 

@@ -12,25 +12,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.command.AbstractCommandRunner;
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
 import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.CacheEntry;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandExecutor;
 import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.ExpiringCache;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -48,8 +44,7 @@ import com.google.common.base.Strings;
 /**
  * Implementation of CommandDispatcher interface
  */
-public class CommandDispatcherImpl implements CommandDispatcher, ResponseListener {
-    private static final Logger LOG = Logger.getLogger( CommandDispatcherImpl.class.getName() );
+public class CommandDispatcherImpl extends AbstractCommandRunner implements CommandDispatcher {
 
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
@@ -57,12 +52,11 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
     private final ResponseSender responseSender;
     private final HttpUtil httpUtil;
     private final PeerManager peerManager;
-    //cache of command executors where key is command UUID and value is CommandExecutor
-    private ExpiringCache<UUID, CommandExecutor> commandExecutors;
 
 
     public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
                                   final DbManager dbManager, final PeerManager peerManager ) {
+        super();
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.dispatcherDAO = new DispatcherDAO( dbManager );
@@ -73,7 +67,6 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
 
 
     public void init() {
-        commandExecutors = new ExpiringCache<>();
         responseSender.init();
     }
 
@@ -81,24 +74,15 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
     public void destroy() {
         responseSender.dispose();
         httpUtil.dispose();
-        Map<UUID, CacheEntry<CommandExecutor>> entries = commandExecutors.getEntries();
-        //shutdown all executors which are still there
-        for ( Map.Entry<UUID, CacheEntry<CommandExecutor>> entry : entries.entrySet() ) {
-            try {
-                entry.getValue().getValue().getExecutor().shutdown();
-            }
-            catch ( Exception ignore ) {
-            }
-        }
-        commandExecutors.dispose();
+        super.dispose();
     }
 
 
     private void executeCommand( CommandImpl command ) {
-        //check if peers are accessible otherwise throw RunCommandException
+        //TODO check if peers are accessible otherwise throw RunCommandException
         //not implemented yet...
 
-        //check if agents are connected otherwise throw RunCommandException
+        //TODO check if agents are connected otherwise throw RunCommandException
         //not implemented yet...
 
         //send remote requests
@@ -110,15 +94,20 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
         //send local requests
         if ( !command.getRequests().isEmpty() ) {
             LOG.warning( "executing local requests" );
-            Command localCommand = new CommandImpl( command.getRequests() );
+            Command localCommand = new CommandImpl( command.getRequests(), commandRunner );
             final CommandDispatcherImpl self = this;
-            commandRunner.runCommandAsync( localCommand, new CommandCallback() {
-                @Override
-                public void onResponse( final Response response, final AgentResult agentResult,
-                                        final Command command ) {
-                    self.onResponse( response );
-                }
-            } );
+            try {
+                localCommand.executeAsync( new CommandCallback() {
+                    @Override
+                    public void onResponse( final Response response, final AgentResult agentResult,
+                                            final Command command ) {
+                        self.onResponse( response );
+                    }
+                } );
+            }
+            catch ( CommandException e ) {
+                LOG.severe( String.format( "Error executing local requests: %s", e.getMessage() ) );
+            }
         }
     }
 
@@ -126,7 +115,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
     private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() ) {
-            //use PeerManager to figure out IP of target peer by UUID
+            //TODO use PeerManager to figure out IP of target peer by UUID
             //not implemented yet...
             String peerIP = getLocalIp();
 
@@ -187,8 +176,8 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
                 dispatcherDAO.saveRemoteRequest( remoteRequest );
 
                 //execute requests using Command Runner
-                Command command = new CommandImpl( requests );
-                commandRunner.runCommandAsync( command, new CommandCallback() {
+                Command command = new CommandImpl( requests, commandRunner );
+                command.executeAsync( new CommandCallback() {
                     @Override
                     public void onResponse( final Response response, final AgentResult agentResult,
                                             final Command command ) {
@@ -211,7 +200,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
                         String.format( "Command %s is already queued for processing", commandId ) );
             }
         }
-        catch ( DBException e ) {
+        catch ( CommandException | DBException e ) {
             LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ) );
             throw new RunCommandException( e.getMessage() );
         }
@@ -232,8 +221,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
                 .checkArgument( !( commandImpl.getRequests().isEmpty() && commandImpl.getRemoteRequests().isEmpty() ),
                         "Requests are empty" );
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        CommandExecutor commandExecutor = new CommandExecutor( commandImpl, executor, commandCallback );
+        CommandExecutor commandExecutor = new CommandExecutor( commandImpl, commandCallback );
 
         //put command to cache
         boolean queued = commandExecutors.put( commandImpl.getCommandUUID(), commandExecutor,
@@ -254,47 +242,27 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
 
 
     @Override
-    public void runCommandAsync( final Command command ) {
-        runCommandAsync( command, new CommandCallback() );
-    }
-
-
-    @Override
-    public void runCommand( final Command command ) {
-        runCommandAsync( command, new CommandCallback() );
-        ( ( CommandImpl ) command ).waitCompletion();
-    }
-
-
-    @Override
-    public void runCommand( final Command command, final CommandCallback commandCallback ) {
-        runCommandAsync( command, commandCallback );
-        ( ( CommandImpl ) command ).waitCompletion();
-    }
-
-
-    @Override
     public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents ) {
-        return new CommandImpl( null, requestBuilder, agents, peerManager );
+        return new CommandImpl( null, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final String description, final RequestBuilder requestBuilder,
                                   final Set<Agent> agents ) {
-        return new CommandImpl( description, requestBuilder, agents, peerManager );
+        return new CommandImpl( description, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( null, agentRequestBuilders, peerManager );
+        return new CommandImpl( null, agentRequestBuilders, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( description, agentRequestBuilders, peerManager );
+        return new CommandImpl( description, agentRequestBuilders, peerManager, this );
     }
 
 
@@ -319,57 +287,5 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
 
 
         return "172.16.192.64";
-    }
-
-
-    @Override
-    public void onResponse( final Response response ) {
-        if ( response != null && response.getUuid() != null && response.getTaskUuid() != null ) {
-            final CommandExecutor commandExecutor = commandExecutors.get( response.getTaskUuid() );
-
-            if ( commandExecutor != null ) {
-
-                //process command response
-                commandExecutor.getExecutor().execute( new Runnable() {
-
-                    public void run() {
-                        //obtain command lock
-                        commandExecutor.getCommand().getUpdateLock();
-                        try {
-                            if ( commandExecutors.get( response.getTaskUuid() ) != null ) {
-
-                                //append results to command
-                                commandExecutor.getCommand().appendResult( response );
-
-                                //call command callback
-                                try {
-                                    commandExecutor.getCallback().onResponse( response,
-                                            commandExecutor.getCommand().getResults().get( response.getUuid() ),
-                                            commandExecutor.getCommand() );
-                                }
-                                catch ( Exception e ) {
-                                    LOG.log( Level.SEVERE, "Error in callback {0}", e );
-                                }
-
-                                //do cleanup on command completion or interruption by user
-                                if ( commandExecutor.getCommand().hasCompleted() || commandExecutor.getCallback()
-                                                                                                   .isStopped() ) {
-                                    //remove command executor so that
-                                    //if response comes from agent it is not processed by callback
-                                    commandExecutors.remove( commandExecutor.getCommand().getCommandUUID() );
-                                    //call this to notify all waiting threads that command completed
-                                    commandExecutor.getCommand().notifyWaitingThreads();
-                                    //shutdown command executor
-                                    commandExecutor.getExecutor().shutdown();
-                                }
-                            }
-                        }
-                        finally {
-                            commandExecutor.getCommand().releaseUpdateLock();
-                        }
-                    }
-                } );
-            }
-        }
     }
 }

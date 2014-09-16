@@ -7,7 +7,6 @@ package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -35,7 +34,7 @@ public class StepStart extends VerticalLayout {
         gridLayout.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( CassandraUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( wizard.getCassandraUI().MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 150, Unit.PIXELS );
         logoImg.setWidth( 220, Unit.PIXELS );

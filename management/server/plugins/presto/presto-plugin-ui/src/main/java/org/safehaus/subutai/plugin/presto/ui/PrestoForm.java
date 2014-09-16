@@ -1,14 +1,20 @@
 package org.safehaus.subutai.plugin.presto.ui;
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.presto.ui.manager.Manager;
 import org.safehaus.subutai.plugin.presto.ui.wizard.Wizard;
 
 public class PrestoForm extends CustomComponent {
 
-    public PrestoForm() {
+    public PrestoForm(ExecutorService executorService, ServiceLocator serviceLocator) throws NamingException {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -17,8 +23,8 @@ public class PrestoForm extends CustomComponent {
 
         TabSheet cassandraSheet = new TabSheet();
         cassandraSheet.setSizeFull();
-        final Manager manager = new Manager();
-        Wizard wizard = new Wizard();
+        final Manager manager = new Manager(executorService, serviceLocator);
+        Wizard wizard = new Wizard(executorService, serviceLocator);
         cassandraSheet.addTab( wizard.getContent(), "Install" );
         cassandraSheet.addTab( manager.getContent(), "Manage" );
         cassandraSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {

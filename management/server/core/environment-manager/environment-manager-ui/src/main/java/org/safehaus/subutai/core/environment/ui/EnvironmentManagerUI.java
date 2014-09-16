@@ -15,20 +15,20 @@ import com.vaadin.ui.Component;
 
 public class EnvironmentManagerUI implements PortalModule {
 
-    public static final String MODULE_IMAGE = "env.png";
-    public static final String MODULE_NAME = "Environment";
-    private static ExecutorService executor;
+    public final String MODULE_IMAGE = "env.png";
+    public final String MODULE_NAME = "Environment";
+    private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
 
 
-    public static ExecutorService getExecutor() {
+    public ExecutorService getExecutor() {
         return executor;
     }
 
 
-    public static void setExecutor( final ExecutorService executor ) {
-        EnvironmentManagerUI.executor = executor;
+    public void setExecutor( final ExecutorService executor ) {
+        this.executor = executor;
     }
 
 
@@ -41,17 +41,10 @@ public class EnvironmentManagerUI implements PortalModule {
         this.environmentManager = environmentManager;
     }
 
-    //    private AgentManager agentManager;
-
 
     public PeerManager getPeerManager() {
         return peerManager;
     }
-
-
-    //    public void setAgentManager( AgentManager agentManager ) {
-    //        this.agentManager = agentManager;
-    //    }
 
 
     public void setPeerManager( final PeerManager peerManager ) {
@@ -65,6 +58,8 @@ public class EnvironmentManagerUI implements PortalModule {
 
 
     public void destroy() {
+        this.environmentManager = null;
+        this.peerManager = null;
         executor.shutdown();
     }
 
@@ -83,7 +78,7 @@ public class EnvironmentManagerUI implements PortalModule {
 
     @Override
     public File getImage() {
-        return FileUtil.getFile( EnvironmentManagerUI.MODULE_IMAGE, this );
+        return FileUtil.getFile( MODULE_IMAGE, this );
     }
 
 

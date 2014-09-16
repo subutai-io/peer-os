@@ -34,7 +34,9 @@ function master_export {
   local container="master"
   local debian_package_name=`get_debian_package_name $container`
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-  local debian_root="$SUBUTAI_TMPDIR/$container"
+  local debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
+  local debian_root="$debian_dir$SUBUTAI_TMPDIR/$container"
+  local deltas="$debian_root/deltas"
 
   if [ -f "$debian_file" ]; then
     msg_error "It seems the debian package file has already been generated"
@@ -44,7 +46,6 @@ function master_export {
     exit 1
   fi
 
-  deltas="$debian_root/deltas"
   mkdir -p $deltas
 
   zfs send "lxc/master@template" > "$deltas/rootfs.delta"

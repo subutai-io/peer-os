@@ -479,11 +479,6 @@
         <artifactId>slf4j-simple</artifactId>
         <version>${org.slf4j.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.url</groupId>
-        <artifactId>pax-url-wrap</artifactId>
-        <version>1.4.2</version>
-      </dependency>
 
       <!-- Core Modules - START -->
 

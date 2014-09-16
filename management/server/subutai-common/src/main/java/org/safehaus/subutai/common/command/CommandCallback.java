@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.Response;
 /**
  * Command callback triggered every time a response is received from agent
  */
-public class CommandCallback {
+public abstract class CommandCallback {
 
     private volatile boolean stopped;
 
@@ -24,8 +24,7 @@ public class CommandCallback {
      * @param agentResult - the cumulated result from an agent which sent this response
      * @param command - the original command which was executed for on agent
      */
-    public void onResponse( Response response, AgentResult agentResult, Command command ) {
-    }
+    public abstract void onResponse( Response response, AgentResult agentResult, Command command );
 
 
     /**

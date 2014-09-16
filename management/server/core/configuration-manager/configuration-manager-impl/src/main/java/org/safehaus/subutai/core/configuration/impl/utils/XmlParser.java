@@ -1,19 +1,21 @@
 package org.safehaus.subutai.core.configuration.impl.utils;
 
 
-import com.google.gson.JsonObject;
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.DefaultExpressionEngine;
 import org.apache.commons.configuration.tree.ExpressionEngine;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
 
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.JsonObject;
 
 
 /**
@@ -70,9 +72,6 @@ public class XmlParser implements ConfigParser {
 
 		List<HierarchicalConfiguration> properties = config.configurationsAt("property");
 		config.setDelimiterParsingDisabled(false);
-
-		String s = getConventionalProperty("general.classpaths");
-		System.out.println(s);
 
 		List<JsonObject> fields = new ArrayList<>();
 		for (HierarchicalConfiguration property : properties) {

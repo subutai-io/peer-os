@@ -1,6 +1,10 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -10,11 +14,10 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
-import java.util.Map;
-import java.util.UUID;
-
 
 public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl> {
+
+    private final Logger LOG = Logger.getLogger( CheckClusterHandler.class.getName() );
 
     private String clusterName;
 
@@ -31,9 +34,11 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
     public void run() {
         CassandraClusterConfig config = null;
         try {
-            config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName, CassandraClusterConfig.class );
-        } catch( DBException e ) {
-            e.printStackTrace();
+            config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName,
+                    CassandraClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            LOG.info( e.getMessage() );
         }
 
         if ( config == null ) {
@@ -53,11 +58,12 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
         }
     }
 
+
     private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
 
-        String log = "";
+        StringBuilder log = new StringBuilder();
 
-        for ( Map.Entry<UUID, AgentResult > e : checkStatusCommand.getResults().entrySet() ) {
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
 
             String status = "UNKNOWN";
             if ( e.getValue().getExitCode() == 0 ) {
@@ -67,9 +73,9 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
                 status = "Cassandra is not running";
             }
 
-            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );
         }
 
-        po.addLogDone( log );
+        po.addLogDone( log.toString() );
     }
 }

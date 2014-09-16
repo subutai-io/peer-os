@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.command.AbstractCommand;
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.CommandRunnerBase;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.BatchRequest;
@@ -38,9 +39,9 @@ public class CommandImpl extends AbstractCommand {
      * @param requestBuilder - request builder used to produce request
      * @param agents - target agents
      */
-    public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents,
-                        PeerManager peerManager ) {
-
+    public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents, PeerManager peerManager,
+                        CommandRunnerBase commandRunner ) {
+        super( commandRunner );
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
 
@@ -76,8 +77,8 @@ public class CommandImpl extends AbstractCommand {
      *
      * @param batchRequests - requests to execute
      */
-    protected CommandImpl( Set<BatchRequest> batchRequests ) {
-
+    protected CommandImpl( Set<BatchRequest> batchRequests, CommandRunnerBase commandRunner ) {
+        super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( batchRequests ),
                 "Batch Requests are null or empty" );
 
@@ -104,7 +105,8 @@ public class CommandImpl extends AbstractCommand {
      *
      * @param requests - requests to execute
      */
-    protected CommandImpl( Collection<Request> requests ) {
+    protected CommandImpl( Collection<Request> requests, CommandRunnerBase commandRunner ) {
+        super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are null or empty" );
         this.requestsCount = requests.size();
         int timeout = 0;
@@ -127,7 +129,9 @@ public class CommandImpl extends AbstractCommand {
      * @param description - command description
      * @param requestBuilders - request builder used to produce request
      */
-    public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders, PeerManager peerManager ) {
+    public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders, PeerManager peerManager,
+                        CommandRunnerBase commandRunner ) {
+        super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
                 "Request Builders are null or empty" );
 
