@@ -58,8 +58,8 @@ public class EnvironmentsForm {
         } );
 
 
-        contentRoot.addComponent( addEnvironmentButton );
         contentRoot.addComponent( getEnvironmentsButton );
+        contentRoot.addComponent( addEnvironmentButton );
         contentRoot.addComponent( environmentsTable );
     }
 
