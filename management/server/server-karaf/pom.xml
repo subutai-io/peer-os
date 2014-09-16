@@ -144,6 +144,13 @@
                   <artifactId>configuration-manager-api</artifactId>
                 </artifactItem>
 
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- db-manager -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>db-manager-api</artifactId>
+                </artifactItem>
+
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
                 <artifactItem>
