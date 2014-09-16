@@ -7,7 +7,6 @@ package org.safehaus.subutai.core.environment.impl;
 
 
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -177,18 +176,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public Environment getEnvironmentInfo( final String environmentName ) {
-        return environmentDAO.getInfo( ENVIRONMENT, environmentName, Environment.class );
+    public Environment getEnvironmentInfo( final String uuid ) {
+        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
 
 
     @Override
-    public boolean destroyEnvironment( final String environmentName ) {
-        Environment environment = getEnvironmentInfo( environmentName );
+    public boolean destroyEnvironment( final String uuid ) {
+        Environment environment = getEnvironmentInfo( uuid );
         try
         {
             environmentBuilder.destroy( environment );
-            return environmentDAO.deleteInfo( ENVIRONMENT, environmentName );
+            return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
         }
         catch ( EnvironmentDestroyException e )
         {
@@ -250,11 +249,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
-//        UUID uuid = lxcBuildMessage.getEnvironmentId();
-//        String templateName = lxcBuildMessage.getTemplateName();
-//        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
-//        String strategyName = lxcBuildMessage.getStrategyName();
+        //        UUID uuid = lxcBuildMessage.getEnvironmentId();
+        //        String templateName = lxcBuildMessage.getTemplateName();
+        //        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
+        //        String strategyName = lxcBuildMessage.getStrategyName();
         //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
+    }
+
+
+    @Override
+    public void saveEnvironment( final Environment environment ) {
+        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
     }
 
 
