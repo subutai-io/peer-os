@@ -9,7 +9,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintLoadForm {
 
     private final VerticalLayout contentRoot;
@@ -53,8 +53,10 @@ public class BlueprintLoadForm {
 
     private void uploadBlueprint() {
 
-        boolean result = managerUI.getEnvironmentManager().saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
-        if ( !result ) {
+        boolean result =
+                managerUI.getEnvironmentManager().saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
+        if ( !result )
+        {
             Notification.show( "Error saving blueprint", "Check blueprint format", Notification.Type.WARNING_MESSAGE );
         }
     }

@@ -1,9 +1,11 @@
 package org.safehaus.subutai.core.environment.ui.manage;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -11,6 +13,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -51,7 +54,7 @@ public class WizardWindow extends DetailsWindow {
             }
             case 2:
             {
-                setContent( genPeers2Table() );
+                setContent( genContainerToPeersTable() );
                 break;
             }
             case 3:
@@ -188,12 +191,14 @@ public class WizardWindow extends DetailsWindow {
     }
 
 
-    private VerticalLayout genPeers2Table() {
+    private VerticalLayout genContainerToPeersTable() {
+
+
         VerticalLayout vl = new VerticalLayout();
 
         Table table = new Table();
-        table.addContainerProperty( "Na123213me", String.class, null );
-        table.addContainerProperty( "Sel23423ect", CheckBox.class, null );
+        table.addContainerProperty( "Container", String.class, null );
+        table.addContainerProperty( "Put", ComboBox.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
@@ -202,13 +207,20 @@ public class WizardWindow extends DetailsWindow {
 
 
         List<Peer> peers = managerUI.getPeerManager().peers();
-        for ( Peer peer : peers )
+
+        for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
         {
-            table.addItem( new Object[] {
-                    peer.getName(), new CheckBox()
-            }, null );
+            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
+            {
+                ComboBox box = new ComboBox( "", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+                box.setNullSelectionAllowed( false );
+                box.setTextInputAllowed( false );
+                table.addItem( new Object[] {
+                        ng.getTemplateName(), box
+                }, null );
+            }
         }
-        Button nextButton = new Button( "Finish" );
+        Button nextButton = new Button( "Build" );
         nextButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {

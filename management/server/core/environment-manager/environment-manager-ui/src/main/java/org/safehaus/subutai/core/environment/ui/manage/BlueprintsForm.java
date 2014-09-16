@@ -6,10 +6,8 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
-import org.safehaus.subutai.core.peer.api.Peer;
 
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -87,7 +85,7 @@ public class BlueprintsForm {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent ) {
                         WizardWindow wizardWindow = new WizardWindow( "Wizard", managerUI, environmentBuildTask );
-//                        wizardWindow.setContent( buildWizard() );
+                        //                        wizardWindow.setContent( buildWizard() );
                         contentRoot.getUI().addWindow( wizardWindow );
                         wizardWindow.setVisible( true );
                     }
@@ -113,13 +111,6 @@ public class BlueprintsForm {
         }
         environmentsTable.refreshRowCache();
     }
-
-
-
-
-
-
-
 
 
     public VerticalLayout getContentRoot() {
