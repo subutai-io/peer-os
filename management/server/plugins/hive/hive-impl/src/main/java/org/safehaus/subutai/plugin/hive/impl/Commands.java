@@ -30,7 +30,7 @@ public class Commands {
 			default:
 				throw new AssertionError(type.name());
 		}
-		return sb != null ? sb.toString() : null;
+		return sb.toString();
 	}
 
 	public static String configureHiveServer(String host) {
