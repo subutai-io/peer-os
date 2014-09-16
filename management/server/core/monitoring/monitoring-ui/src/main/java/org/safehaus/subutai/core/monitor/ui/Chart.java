@@ -55,12 +55,13 @@ class Chart {
         StringBuilder str = new StringBuilder();
         int i = 0;
 
-        for ( Date date : values.keySet() ) {
+        for ( Map.Entry<Date, Double> entry : values.entrySet() ) {
             if ( str.length() > 0 ) {
                 str.append( ", " );
             }
 
-            str.append( String.format( "[Date.parse('%s'), %s ]", DATE_FORMAT.format( date ), values.get( date ) ) );
+            str.append( String.format( "[Date.parse('%s'), %s ]", DATE_FORMAT.format( entry.getKey() ),
+                    entry.getValue() ) );
             i++;
 
             if ( i > maxSize ) {
