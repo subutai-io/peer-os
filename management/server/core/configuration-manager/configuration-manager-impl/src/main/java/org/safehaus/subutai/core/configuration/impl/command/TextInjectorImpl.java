@@ -48,10 +48,7 @@ public class TextInjectorImpl implements TextInjector {
         Command command = Commands.getEchoCommand( agent, path, content );
         commandRunner.runCommand( command );
 
-        if ( command.hasSucceeded() ) {
-            String config = command.getResults().get( agent.getUuid() ).getStdOut();
-        }
-        else {
+        if ( !command.hasSucceeded() ) {
             logger.info( "Failed to echo content to file" );
             return false;
         }
