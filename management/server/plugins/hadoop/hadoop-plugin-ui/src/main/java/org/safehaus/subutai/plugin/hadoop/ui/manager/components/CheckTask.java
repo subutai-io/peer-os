@@ -13,8 +13,9 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
 
 /**
@@ -28,9 +29,14 @@ public class CheckTask implements Runnable {
     private Agent agent;
     private Boolean isDataNode;
 
+    private final Hadoop hadoop;
+    private final Tracker tracker;
 
-    public CheckTask( HadoopClusterConfig hadoopClusterConfig, CompleteEvent completeEvent, UUID trackID,
-                      Agent agent ) {
+
+    public CheckTask( Hadoop hadoop, Tracker tracker, HadoopClusterConfig hadoopClusterConfig,
+                      CompleteEvent completeEvent, UUID trackID, Agent agent ) {
+        this.hadoop = hadoop;
+        this.tracker = tracker;
         this.completeEvent = completeEvent;
         this.trackID = trackID;
         this.hadoopClusterConfig = hadoopClusterConfig;
@@ -38,8 +44,10 @@ public class CheckTask implements Runnable {
     }
 
 
-    public CheckTask( HadoopClusterConfig hadoopClusterConfig, CompleteEvent completeEvent, UUID trackID, Agent agent,
-                      boolean isDataNode ) {
+    public CheckTask( Hadoop hadoop, Tracker tracker, HadoopClusterConfig hadoopClusterConfig,
+                      CompleteEvent completeEvent, UUID trackID, Agent agent, boolean isDataNode ) {
+        this.hadoop = hadoop;
+        this.tracker = tracker;
         this.completeEvent = completeEvent;
         this.trackID = trackID;
         this.hadoopClusterConfig = hadoopClusterConfig;
@@ -52,8 +60,7 @@ public class CheckTask implements Runnable {
 
         if ( trackID != null ) {
             while ( true ) {
-                ProductOperationView prevPo =
-                        HadoopUI.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
+                ProductOperationView prevPo = tracker.getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
                 if ( prevPo.getState() == ProductOperationState.RUNNING ) {
                     try {
                         Thread.sleep( 1000 );
@@ -71,28 +78,27 @@ public class CheckTask implements Runnable {
         NodeState state = NodeState.UNKNOWN;
         if ( agent != null ) {
             if ( agent.equals( hadoopClusterConfig.getNameNode() ) ) {
-                trackID = HadoopUI.getHadoopManager().statusNameNode( hadoopClusterConfig );
+                trackID = hadoop.statusNameNode( hadoopClusterConfig );
             }
             else if ( agent.equals( hadoopClusterConfig.getJobTracker() ) ) {
-                trackID = HadoopUI.getHadoopManager().statusJobTracker( hadoopClusterConfig );
+                trackID = hadoop.statusJobTracker( hadoopClusterConfig );
             }
             else if ( agent.equals( hadoopClusterConfig.getSecondaryNameNode() ) ) {
-                trackID = HadoopUI.getHadoopManager().statusSecondaryNameNode( hadoopClusterConfig );
+                trackID = hadoop.statusSecondaryNameNode( hadoopClusterConfig );
             }
             else if ( isDataNode != null ) {
                 if ( isDataNode ) {
-                    trackID = HadoopUI.getHadoopManager().statusDataNode( hadoopClusterConfig, agent );
+                    trackID = hadoop.statusDataNode( hadoopClusterConfig, agent );
                 }
                 else {
-                    trackID = HadoopUI.getHadoopManager().statusTaskTracker( hadoopClusterConfig, agent );
+                    trackID = hadoop.statusTaskTracker( hadoopClusterConfig, agent );
                 }
             }
 
 
             long start = System.currentTimeMillis();
             while ( !Thread.interrupted() ) {
-                ProductOperationView po =
-                        HadoopUI.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
+                ProductOperationView po = tracker.getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
                 if ( po != null ) {
                     if ( po.getState() != ProductOperationState.RUNNING ) {
                         if ( po.getLog().contains( NodeState.STOPPED.toString() ) ) {

@@ -2,20 +2,30 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
 
 /**
  * Created by daralbaev on 12.04.14.
  */
 public class SecondaryNameNode extends ClusterNode {
+    private final ExecutorService executorService;
+    private final Hadoop hadoop;
+    private final Tracker tracker;
 
-    public SecondaryNameNode( HadoopClusterConfig cluster ) {
+
+    public SecondaryNameNode( Hadoop hadoop, Tracker tracker, final ExecutorService executorService,
+                              HadoopClusterConfig cluster ) {
         super( cluster );
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.executorService = executorService;
         setHostname( cluster.getSecondaryNameNode().getHostname() );
 
         restartButton.setVisible( false );
@@ -30,7 +40,7 @@ public class SecondaryNameNode extends ClusterNode {
     protected void getStatus( UUID trackID ) {
         setLoading( true );
 
-        HadoopUI.getExecutor().execute( new CheckTask( cluster, new CompleteEvent() {
+        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent() {
 
             public void onComplete( NodeState state ) {
                 synchronized ( progressButton ) {
