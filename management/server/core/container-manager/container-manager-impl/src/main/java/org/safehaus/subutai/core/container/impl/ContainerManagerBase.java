@@ -1,16 +1,20 @@
 package org.safehaus.subutai.core.container.impl;
 
-import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.ContainerDestroyException;
+import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
 
 public abstract class ContainerManagerBase implements ContainerManager {
 
@@ -68,4 +72,7 @@ public abstract class ContainerManagerBase implements ContainerManager {
     public void setPlacementStrategies(List<ContainerPlacementStrategy> placementStrategies) {
         this.placementStrategies = placementStrategies;
     }
+
+
+    public abstract void destroy( String hostName, Set<String> cloneNames ) throws ContainerDestroyException;
 }
