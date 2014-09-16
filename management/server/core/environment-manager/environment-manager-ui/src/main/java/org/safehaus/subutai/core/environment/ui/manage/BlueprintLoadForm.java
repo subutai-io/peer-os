@@ -70,6 +70,10 @@ public class BlueprintLoadForm {
                     Notification.show( "Blueprint saved", "Blueprint saved", Notification.Type.HUMANIZED_MESSAGE );
                 }
             }
+            else
+            {
+                Notification.show( "Please provide a blueprint", "Content is empty", Notification.Type.ERROR_MESSAGE );
+            }
         }
         catch ( JsonSyntaxException e )
         {

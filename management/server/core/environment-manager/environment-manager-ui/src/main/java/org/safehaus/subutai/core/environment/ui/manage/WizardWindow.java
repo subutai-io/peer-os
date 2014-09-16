@@ -26,7 +26,7 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class WizardWindow extends DetailsWindow {
 
-    private static final Logger logger = Logger.getLogger( WizardWindow.class.getName() );
+    private static final Logger LOG = Logger.getLogger( WizardWindow.class.getName() );
 
     int step = 0;
     EnvironmentBuildTask environmentBuildTask;
@@ -261,7 +261,7 @@ public class WizardWindow extends DetailsWindow {
         {
             String name = ( String ) peersTable.getItem( itemId ).getItemProperty( "Name" ).getValue();
             CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
-            logger.info( name + " " + selection.getValue() );
+            LOG.info( name + " " + selection.getValue() );
             /*if ( selection.getValue() )
             {
                 BuildBlock bb = new BuildBlock();
