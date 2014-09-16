@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -22,7 +23,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-            String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
+                String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
 
@@ -88,13 +89,12 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
             elasticsearchClusterConfiguration.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
-            if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
-            {
+            try {
+                manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
-            }
-            else
-            {
+            } catch( DBException e ) {
                 productOperation.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
+                e.printStackTrace();
             }
         }
         else

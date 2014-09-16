@@ -42,7 +42,7 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
     @Override
     public ElasticsearchClusterConfiguration setup() throws ClusterSetupException {
         if ( Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getClusterName() ) ||
-                Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getTemplateName() ) ||
+                Strings.isNullOrEmpty( ElasticsearchClusterConfiguration.getTemplateName() ) ||
                 elasticsearchClusterConfiguration.getNumberOfNodes() <= 0 ) {
             throw new ClusterSetupException( "Malformed configuration" );
         }
@@ -60,7 +60,7 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
         Set<Agent> agents = new HashSet<>();
         for ( Node node : environment.getNodes() ) {
             if ( node.getTemplate().getProducts()
-                     .contains( Common.PACKAGE_PREFIX + elasticsearchClusterConfiguration.PRODUCT_NAME ) ) {
+                     .contains( Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_NAME ) ) {
                 agents.add( node.getAgent() );
             }
         }
@@ -85,7 +85,7 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
 
         try {
             elasticsearchManager.getPluginDAO()
-                            .saveInfo( elasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
+                            .saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
             po.addLog( "Cluster information saved to database" );
         }
         catch ( DBException e ) {
