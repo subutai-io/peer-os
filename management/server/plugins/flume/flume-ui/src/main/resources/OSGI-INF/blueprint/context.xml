@@ -14,11 +14,6 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.flume.ui.FlumeUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="manager"/>
-        <argument ref="commandRunner"/>
-        <argument ref="hadoopManager"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>

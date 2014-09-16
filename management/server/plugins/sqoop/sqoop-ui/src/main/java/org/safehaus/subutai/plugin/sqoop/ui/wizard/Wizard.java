@@ -1,9 +1,20 @@
 package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 
+
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+
 
 public class Wizard {
 
@@ -11,29 +22,41 @@ public class Wizard {
     private int step = 1;
     private SqoopConfig config = new SqoopConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
+    private final Sqoop sqoop;
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
 
-    public Wizard() {
-        grid = new GridLayout(1, 20);
-        grid.setMargin(true);
+
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+
+        this.executorService = executorService;
+        this.sqoop = serviceLocator.getService( Sqoop.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+
+        grid = new GridLayout( 1, 20 );
+        grid.setMargin( true );
         grid.setSizeFull();
 
         putForm();
     }
 
+
     private void putForm() {
-        grid.removeComponent(0, 1);
+        grid.removeComponent( 0, 1 );
         Component component = null;
-        switch(step) {
+        switch ( step ) {
             case 1: {
-                component = new WelcomeStep(this);
+                component = new WelcomeStep( this );
                 break;
             }
             case 2: {
-                component = new NodeSelectionStep(this);
+                component = new NodeSelectionStep( hadoop, this );
                 break;
             }
             case 3: {
-                component = new VerificationStep(this);
+                component = new VerificationStep( sqoop, executorService, tracker, this );
                 break;
             }
             default: {
@@ -41,23 +64,28 @@ public class Wizard {
             }
         }
 
-        if(component != null)
-            grid.addComponent(component, 0, 1, 0, 19);
+        if ( component != null ) {
+            grid.addComponent( component, 0, 1, 0, 19 );
+        }
     }
+
 
     public Component getContent() {
         return grid;
     }
+
 
     protected void next() {
         step++;
         putForm();
     }
 
+
     protected void back() {
         step--;
         putForm();
     }
+
 
     protected void init() {
         step = 1;
@@ -66,12 +94,13 @@ public class Wizard {
         putForm();
     }
 
+
     public SqoopConfig getConfig() {
         return config;
     }
 
+
     public HadoopClusterConfig getHadoopConfig() {
         return hadoopConfig;
     }
-
 }

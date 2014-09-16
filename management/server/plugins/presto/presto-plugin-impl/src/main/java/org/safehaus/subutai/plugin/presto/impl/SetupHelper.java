@@ -69,11 +69,9 @@ public class SetupHelper {
 
     public void startNodes(final Set<Agent> set) throws ClusterSetupException {
         po.addLog("Starting Presto node(s)...");
-
         Command cmd = Commands.getStartCommand(set);
         final AtomicInteger okCount = new AtomicInteger();
         manager.getCommandRunner().runCommand(cmd, new CommandCallback() {
-
             @Override
             public void onResponse(Response response, AgentResult agentResult, Command command) {
                 if(agentResult.getStdOut().toLowerCase().contains("started"))

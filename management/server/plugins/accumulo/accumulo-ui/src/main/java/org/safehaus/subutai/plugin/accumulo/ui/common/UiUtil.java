@@ -1,9 +1,12 @@
 package org.safehaus.subutai.plugin.accumulo.ui.common;
 
 
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
+import java.util.concurrent.ExecutorService;
+
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
@@ -54,7 +57,9 @@ public class UiUtil {
     }
 
 
-    public static Table createTableTemplate( String caption, boolean destroyButtonNeeded ) {
+    public static Table createTableTemplate( String caption, boolean destroyButtonNeeded,
+                                             final AgentManager agentManager, final CommandRunner commandRunner,
+                                             final ExecutorService executorService ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
@@ -76,11 +81,11 @@ public class UiUtil {
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     lxcHostname = lxcHostname.replace( MASTER_PREFIX, "" ).replace( MONITOR_PREFIX, "" )
                                              .replace( GC_PREFIX, "" );
-                    Agent lxcAgent = AccumuloUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), AccumuloUI.getExecutor(),
-                                        AccumuloUI.getCommandRunner(), AccumuloUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         table.getUI().addWindow( terminal.getWindow() );
                     }
                     else {

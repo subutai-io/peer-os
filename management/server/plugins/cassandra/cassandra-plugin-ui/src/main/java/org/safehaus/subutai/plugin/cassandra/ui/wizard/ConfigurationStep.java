@@ -6,8 +6,6 @@
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
-import java.util.Arrays;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -18,6 +16,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+
+import java.util.Arrays;
 
 
 /**
@@ -37,7 +37,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setRequired( true );
-        clusterNameTxtFld.setMaxLength( 20 );
         clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
         clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -48,8 +47,8 @@ public class ConfigurationStep extends VerticalLayout {
 
         final TextField domainNameTxtFld = new TextField( "Enter domain name" );
         domainNameTxtFld.setInputPrompt( "Domain name" );
+        domainNameTxtFld.setInputPrompt( "intra.lan" );
         domainNameTxtFld.setRequired( true );
-        domainNameTxtFld.setMaxLength( 20 );
         domainNameTxtFld.setValue( wizard.getConfig().getClusterName() );
         domainNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -61,7 +60,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField dataDirectoryTxtFld = new TextField( "Data directory" );
         dataDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/data" );
         dataDirectoryTxtFld.setRequired( true );
-        dataDirectoryTxtFld.setMaxLength( 20 );
         dataDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
         dataDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -73,7 +71,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField commitLogDirectoryTxtFld = new TextField( "Commit log directory" );
         commitLogDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/commitlog" );
         commitLogDirectoryTxtFld.setRequired( true );
-        commitLogDirectoryTxtFld.setMaxLength( 20 );
         commitLogDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
         commitLogDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -85,7 +82,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField savedCachesDirectoryTxtFld = new TextField( "Saved caches directory" );
         savedCachesDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/saved_caches" );
         savedCachesDirectoryTxtFld.setRequired( true );
-        savedCachesDirectoryTxtFld.setMaxLength( 20 );
         savedCachesDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
         savedCachesDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -95,11 +91,12 @@ public class ConfigurationStep extends VerticalLayout {
         } );
 
         //configuration servers number
-        ComboBox nodesCountCombo =
+        final ComboBox nodesCountCombo =
                 new ComboBox( "Choose number of nodes in cluster", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         //        nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate( true );
-        nodesCountCombo.setTextInputAllowed( false );
+        nodesCountCombo.setTextInputAllowed( true );
+        nodesCountCombo.setImmediate(true);
         nodesCountCombo.setNullSelectionAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
 
@@ -111,11 +108,12 @@ public class ConfigurationStep extends VerticalLayout {
         } );
 
         //configuration servers number
-        ComboBox seedsCountCombo =
+        final ComboBox seedsCountCombo =
                 new ComboBox( "Choose number of seeds", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         //        seedsCountCombo.setMultiSelect(false);
         seedsCountCombo.setImmediate( true );
-        seedsCountCombo.setTextInputAllowed( false );
+        seedsCountCombo.setTextInputAllowed( true );
+        seedsCountCombo.setImmediate(true);
         seedsCountCombo.setNullSelectionAllowed( false );
         seedsCountCombo.setValue( wizard.getConfig() );
 
@@ -132,10 +130,13 @@ public class ConfigurationStep extends VerticalLayout {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
-                    show( "Please provide cluster name" );
+                    show( "Please provide cluster name !" );
                 }
                 else if ( Strings.isNullOrEmpty( wizard.getConfig().getDomainName() ) ) {
-                    show( "Please provide domain name" );
+                    show( "Please provide domain name !" );
+                }
+                else if ( ( int ) nodesCountCombo.getValue()  <= ( int ) seedsCountCombo.getValue() ){
+                    show( "Number of seeds should be smaller than total number nodes in the cluster !");
                 }
                 else {
                     wizard.next();

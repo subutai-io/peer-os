@@ -15,7 +15,6 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -55,7 +54,7 @@ public class ConfigurationStep extends VerticalLayout {
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<HadoopClusterConfig> clusters = HBaseUI.getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = wizard.gethBaseUI().getHadoopManager().getClusters();
         if ( clusters.size() > 0 ) {
             for ( HadoopClusterConfig config : clusters ) {
                 hadoopClusters.addItem( config );
@@ -63,7 +62,7 @@ public class ConfigurationStep extends VerticalLayout {
             }
         }
 
-        HadoopClusterConfig info = HBaseUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+        HadoopClusterConfig info = wizard.gethBaseUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null ) {
             hadoopClusters.setValue( info );

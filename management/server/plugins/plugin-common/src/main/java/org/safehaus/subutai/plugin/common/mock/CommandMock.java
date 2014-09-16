@@ -4,6 +4,8 @@ package org.safehaus.subutai.plugin.common.mock;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandStatus;
 
 import java.util.Map;
@@ -60,7 +62,32 @@ public class CommandMock implements Command {
 		return description;
 	}
 
-	public CommandMock setDescription(final String description) {
+
+    @Override
+    public void execute( final CommandCallback callback ) throws CommandException {
+
+    }
+
+
+    @Override
+    public void executeAsync( final CommandCallback callback ) throws CommandException {
+
+    }
+
+
+    @Override
+    public void execute() throws CommandException {
+
+    }
+
+
+    @Override
+    public void executeAsync() throws CommandException {
+
+    }
+
+
+    public CommandMock setDescription(final String description) {
 		this.description = description;
 		return this;
 	}

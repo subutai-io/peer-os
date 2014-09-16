@@ -216,6 +216,15 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
+    @Override
+    public Set<Agent> clone( final UUID envId, final String templateName, final int numOfContainers,
+                             final String strategyId, final List<Criteria> criteria )
+    {
+        //TODO: Implement me
+        return new HashSet<Agent>();
+    }
+
+
     /**
      * Clones container by given environment ID, physical host and template name.
      *

@@ -50,10 +50,12 @@ public class Manager {
     private final Table quorumTable;
     private final Table bmasterTable;
     private HBaseClusterConfig config;
+    private HBaseUI hBaseUI;
 
 
-    public Manager() {
+    public Manager( final HBaseUI hBaseUI) {
 
+        this.hBaseUI = hBaseUI;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setSizeFull();
@@ -110,8 +112,8 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config != null ) {
-                    UUID trackID = HBaseUI.getHbaseManager().startCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
+                    UUID trackID = hBaseUI.getHbaseManager().startCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener() {
                         @Override
@@ -135,8 +137,8 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config != null ) {
-                    UUID trackID = HBaseUI.getHbaseManager().stopCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
+                    UUID trackID = hBaseUI.getHbaseManager().stopCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener() {
                         @Override
@@ -160,8 +162,8 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config != null ) {
-                    UUID trackID = HBaseUI.getHbaseManager().checkCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
+                    UUID trackID = hBaseUI.getHbaseManager().checkCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener() {
                         @Override
@@ -191,9 +193,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = HBaseUI.getHbaseManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = hBaseUI.getHbaseManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
+                                    new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
                                             HBaseClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -252,7 +254,7 @@ public class Manager {
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
 
-            Agent a = HBaseUI.getAgentManager().getAgentByHostname( hostname );
+            Agent a = hBaseUI.getAgentManager().getAgentByHostname( hostname );
             if ( a == null ) {
                 continue;
             }
@@ -272,7 +274,7 @@ public class Manager {
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
 
-            Agent a = HBaseUI.getAgentManager().getAgentByHostname( hostname );
+            Agent a = hBaseUI.getAgentManager().getAgentByHostname( hostname );
             if ( a == null ) {
                 continue;
             }
@@ -285,7 +287,7 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<HBaseClusterConfig> clusters = HBaseUI.getHbaseManager().getClusters();
+        List<HBaseClusterConfig> clusters = hBaseUI.getHbaseManager().getClusters();
         HBaseClusterConfig clusterInfo = ( HBaseClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clusters != null && clusters.size() > 0 ) {
@@ -325,11 +327,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = HBaseUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = hBaseUI.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), HBaseUI.getExecutor(),
-                                        HBaseUI.getCommandRunner(), HBaseUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hBaseUI.getExecutor(),
+                                        hBaseUI.getCommandRunner(), hBaseUI.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
