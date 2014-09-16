@@ -55,9 +55,7 @@ public class ConfigManagerImpl implements ConfigManager {
 
         //TODO echo to given agent
         ConfigurationLoader configurationLoader = null;
-        //        Agent agent = agentManager.getAgentByHostname( agentHostname );
 
-        String type = "";
         switch ( configTypeEnum ) {
             case YAML: {
                 configurationLoader = new YamConfigurationlLoader( textInjector );
@@ -81,10 +79,14 @@ public class ConfigManagerImpl implements ConfigManager {
                 configurationLoader = new ShellConfigurationLoader( textInjector );
                 break;
             }
+            default:
+                break;
         }
-        boolean result = configurationLoader.setConfiguration( hostname, configFilePath, jsonObjectConfig );
+        if ( configurationLoader != null ) {
+            return configurationLoader.setConfiguration( hostname, configFilePath, jsonObjectConfig );
+        }
 
-        return result;
+        return false;
     }
 
 
@@ -115,9 +117,15 @@ public class ConfigManagerImpl implements ConfigManager {
                 loader = new ShellConfigurationLoader( textInjector );
                 break;
             }
+            default:
+                break;
         }
 
-        return loader.getConfiguration( agentHostname, configPathFilename );
+        if ( loader != null ) {
+            return loader.getConfiguration( agentHostname, configPathFilename );
+        }
+
+        return null;
     }
 
 
@@ -201,8 +209,12 @@ public class ConfigManagerImpl implements ConfigManager {
                     parser = new ShellParser( content );
                     break;
                 }
+                default:
+                    break;
             }
-            return parser.parserConfig( configPathFilename, configTypeEnum );
+            if ( parser != null ) {
+                return parser.parserConfig( configPathFilename, configTypeEnum );
+            }
         }
         catch ( ConfigurationException e ) {
             LOG.info( e.getMessage() );
