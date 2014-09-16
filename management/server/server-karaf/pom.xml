@@ -196,6 +196,11 @@
                   <groupId>com.datastax.cassandra</groupId>
                   <artifactId>cassandra-driver-core</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>com.codahale.metrics</groupId>
+                  <artifactId>metrics-core</artifactId>
+                  <version>3.0.2</version>
+                </artifactItem>
 
               </artifactItems>
             </configuration>
