@@ -193,13 +193,8 @@
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- db-manager -->
                 <artifactItem>
-                  <groupId>com.datastax.cassandra</groupId>
-                  <artifactId>cassandra-driver-core</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.codahale.metrics</groupId>
-                  <artifactId>metrics-core</artifactId>
-                  <version>3.0.2</version>
+                  <groupId>org.apache.cassandra</groupId>
+                  <artifactId>cassandra-all</artifactId>
                 </artifactItem>
 
               </artifactItems>

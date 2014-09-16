@@ -8,7 +8,7 @@ package org.safehaus.subutai.core.db.api;
 
 import java.util.List;
 
-import com.datastax.driver.core.ResultSet;
+import org.apache.cassandra.cql3.ResultSet;
 
 
 /**
