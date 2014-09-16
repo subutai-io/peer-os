@@ -56,16 +56,19 @@ public class BlueprintLoadForm {
 
         try
         {
-            boolean result =
-                    managerUI.getEnvironmentManager().saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
-            if ( !result )
+            String content = blueprintTxtArea.getValue().toString().trim();
+            if ( content.length() > 0 )
             {
-                Notification
-                        .show( "Error saving blueprint", "Check blueprint format", Notification.Type.WARNING_MESSAGE );
-            }
-            else
-            {
-                Notification.show( "Blueprint saved", "Blueprint saved", Notification.Type.HUMANIZED_MESSAGE );
+                boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
+                if ( !result )
+                {
+                    Notification.show( "Error saving blueprint", "Check blueprint format",
+                            Notification.Type.WARNING_MESSAGE );
+                }
+                else
+                {
+                    Notification.show( "Blueprint saved", "Blueprint saved", Notification.Type.HUMANIZED_MESSAGE );
+                }
             }
         }
         catch ( JsonSyntaxException e )

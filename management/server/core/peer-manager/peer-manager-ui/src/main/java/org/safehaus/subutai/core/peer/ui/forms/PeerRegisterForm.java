@@ -11,6 +11,7 @@ import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 
@@ -202,7 +203,7 @@ public class PeerRegisterForm extends CustomComponent {
                     peerUI.getPeerManager().unregister( peer.getId().toString() );
                 }
             } );
-            peersTable.addItem( new Object[] { peer.getId(), peer.getName(), peer.getIp(), unregisterButton}, null );
+            peersTable.addItem( new Object[] { peer.getId(), peer.getName(), peer.getIp(), unregisterButton }, null );
         }
     }
 
@@ -221,10 +222,17 @@ public class PeerRegisterForm extends CustomComponent {
                 String name = nameTextField.getValue();
                 String ip = ipTextField.getValue();
                 String id = idTextField.getValue();
-                peer.setName( name );
-                peer.setIp( ip );
-                peer.setId( id );
-                peerUI.getPeerManager().register( peer );
+                if ( name.length() > 0 && ip.length() > 0 && id.length() > 0 )
+                {
+                    peer.setName( name );
+                    peer.setIp( ip );
+                    peer.setId( id );
+                    peerUI.getPeerManager().register( peer );
+                }
+                else
+                {
+                    Notification.show( "Check form values" );
+                }
             }
         } );
 
