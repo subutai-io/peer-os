@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.template.api;
 
 import java.util.Set;
+import java.util.UUID;
+
 
 /**
  * A wrapper interface that wraps LXC and ZFS command scripts on physical hosts.
@@ -28,9 +30,9 @@ public interface TemplateManager {
      * @param cloneName the clone name of the new instance container
      * @return <tt>true</tt> if successfully cloned, <tt>false</tt> otherwise
      */
-    public boolean clone(String hostName, String templateName, String cloneName);
+    public boolean clone(String hostName, String templateName, String cloneName, String environmentId);
 
-    public boolean clone(String hostName, String templateName, Set<String> cloneNames);
+    public boolean clone(String hostName, String templateName, Set<String> cloneNames, String environmentId);
 
     /**
      * Destroys a clone with given name.
