@@ -25,7 +25,7 @@ public class SparkUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public SparkUI() throws NamingException {
+    public SparkUI(){
         this.serviceLocator = new ServiceLocator();
     }
 

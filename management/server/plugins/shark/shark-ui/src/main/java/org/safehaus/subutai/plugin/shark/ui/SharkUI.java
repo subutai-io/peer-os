@@ -34,7 +34,7 @@ public class SharkUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public SharkUI() throws NamingException {
+    public SharkUI() {
         this.serviceLocator = new ServiceLocator();
     }
 

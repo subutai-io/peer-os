@@ -33,7 +33,7 @@ public class LuceneUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public LuceneUI() throws NamingException {
+    public LuceneUI()  {
         serviceLocator = new ServiceLocator();
     }
 

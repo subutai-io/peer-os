@@ -25,7 +25,7 @@ public class PrestoUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public PrestoUI() throws NamingException {
+    public PrestoUI()  {
         this.serviceLocator = new ServiceLocator();
     }
 

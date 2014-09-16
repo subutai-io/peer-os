@@ -6,113 +6,74 @@
 package org.safehaus.subutai.plugin.accumulo.ui;
 
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
-import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
-
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
 
 
 /**
  * @author dilshat
  */
 public class AccumuloUI implements PortalModule {
+    protected static final Logger LOG = Logger.getLogger( AccumuloUI.class.getName() );
+    public static final String MODULE_IMAGE = "accumulo.png";
 
-	public static final String MODULE_IMAGE = "accumulo.png";
+    private static ExecutorService executor;
 
-	private static Accumulo accumuloManager;
-	private static Hadoop hadoopManager;
-	private static Zookeeper zookeeperManager;
-	private static AgentManager agentManager;
-	private static Tracker tracker;
-	private static ExecutorService executor;
-	private static CommandRunner commandRunner;
+    private final ServiceLocator serviceLocator;
 
 
-	public AccumuloUI(AgentManager agentManager, Tracker tracker, Accumulo accumuloManager, Hadoop hadoopManager,
-	                  Zookeeper zookeeperManager, CommandRunner commandRunner) {
-		AccumuloUI.agentManager = agentManager;
-		AccumuloUI.tracker = tracker;
-		AccumuloUI.accumuloManager = accumuloManager;
-		AccumuloUI.hadoopManager = hadoopManager;
-		AccumuloUI.zookeeperManager = zookeeperManager;
-		AccumuloUI.commandRunner = commandRunner;
-	}
+    public AccumuloUI() {
+        this.serviceLocator = new ServiceLocator();
+    }
 
 
-	public static Zookeeper getZookeeperManager() {
-		return zookeeperManager;
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
 
-	public static Hadoop getHadoopManager() {
-		return hadoopManager;
-	}
+    public void destroy() {
+        ;
+        executor.shutdown();
+    }
 
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
+    @Override
+    public String getId() {
+        return AccumuloClusterConfig.PRODUCT_KEY;
+    }
 
 
-	public static Accumulo getAccumuloManager() {
-		return accumuloManager;
-	}
+    public String getName() {
+        return AccumuloClusterConfig.PRODUCT_KEY;
+    }
 
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( AccumuloUI.MODULE_IMAGE, this );
+    }
 
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
+    public Component createComponent() {
+        try {
+            return new AccumuloForm( executor, serviceLocator );
+        }
+        catch ( NamingException e ) {
+            LOG.severe( e.getMessage() );
+        }
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
-
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
-
-
-	public void destroy() {
-		accumuloManager = null;
-		agentManager = null;
-		tracker = null;
-		hadoopManager = null;
-		zookeeperManager = null;
-		executor.shutdown();
-	}
-
-
-	@Override
-	public String getId() {
-		return AccumuloClusterConfig.PRODUCT_KEY;
-	}
-
-	public String getName() {
-		return AccumuloClusterConfig.PRODUCT_KEY;
-	}
-
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(AccumuloUI.MODULE_IMAGE, this);
-	}
-
-
-	public Component createComponent() {
-		return new AccumuloForm();
-	}
+        return null;
+    }
 }
