@@ -250,10 +250,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
-        UUID uuid = lxcBuildMessage.getEnvironmentId();
-        String templateName = lxcBuildMessage.getTemplateName();
-        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
-        String strategyName = lxcBuildMessage.getStrategyName();
+//        UUID uuid = lxcBuildMessage.getEnvironmentId();
+//        String templateName = lxcBuildMessage.getTemplateName();
+//        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
+//        String strategyName = lxcBuildMessage.getStrategyName();
         //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
     }
 

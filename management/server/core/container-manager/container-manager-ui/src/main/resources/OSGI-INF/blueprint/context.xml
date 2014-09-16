@@ -10,8 +10,6 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.core.container.ui.ContainerUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="containerManager" ref="containerManager"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
