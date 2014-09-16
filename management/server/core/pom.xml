@@ -21,6 +21,7 @@
     <module>command-runner</module>
     <module>communication-manager</module>
     <module>config-point-tracker</module>
+    <module>configuration-manager</module>
     <!--<module>db-manager</module>
     <module>strategy-manager</module>
     <module>container-manager</module>
@@ -32,7 +33,6 @@
     <module>package-manager</module>
     <module>environment-manager</module>
     <module>template-registry</module>
-    <module>configuration-manager</module>
     <module>template-manager</module>
     <module>file-tracker</module>
 

@@ -16,8 +16,8 @@
 
     <modules>
         <module>configuration-manager-api</module>
-        <module>configuration-manager-impl</module>
-        <module>configuration-manager-cli</module>
-        <module>configuration-manager-ui</module>
+      <!--<module>configuration-manager-impl</module>
+      <module>configuration-manager-cli</module>
+      <module>configuration-manager-ui</module>-->
     </modules>
 </project>
