@@ -150,6 +150,10 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>db-manager-api</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>db-manager-impl</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
@@ -200,8 +204,8 @@
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- db-manager -->
                 <artifactItem>
-                  <groupId>org.apache.cassandra</groupId>
-                  <artifactId>cassandra-all</artifactId>
+                  <groupId>com.datastax.cassandra</groupId>
+                  <artifactId>cassandra-driver-core</artifactId>
                 </artifactItem>
 
               </artifactItems>
