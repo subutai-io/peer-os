@@ -26,7 +26,7 @@ public class StormUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public StormUI() throws NamingException {
+    public StormUI() {
         serviceLocator = new ServiceLocator();
     }
 

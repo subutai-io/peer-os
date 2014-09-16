@@ -25,7 +25,7 @@ public class ContainerUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public ContainerUI() throws NamingException {
+    public ContainerUI()  {
         this.serviceLocator = new ServiceLocator();
     }
 

@@ -25,7 +25,7 @@ public class ElasticsearchUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public ElasticsearchUI() throws NamingException {
+    public ElasticsearchUI()  {
         this.serviceLocator = new ServiceLocator();
     }
 
