@@ -5,13 +5,13 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
-import org.safehaus.subutai.core.container.ui.ContainerUI;
 import org.safehaus.subutai.core.container.ui.common.Buttons;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 
@@ -40,9 +40,12 @@ public class Manager extends VerticalLayout {
     private final ContainerManager containerManager;
     private final AgentManager agentManager;
     private volatile boolean isDestroyAllButtonClicked = false;
+    private final ExecutorService executorService;
 
 
-    public Manager( AgentManager agentManager, ContainerManager containerManager ) {
+    public Manager( ExecutorService executorService, AgentManager agentManager, ContainerManager containerManager ) {
+
+        this.executorService = executorService;
 
         setSpacing( true );
         setMargin( true );
@@ -158,7 +161,7 @@ public class Manager extends VerticalLayout {
     public void getLxcInfo() {
         lxcTable.setEnabled( false );
         indicator.setVisible( true );
-        ContainerUI.getExecutor().execute( new Runnable() {
+        executorService.execute( new Runnable() {
 
             public void run() {
                 Map<String, EnumMap<ContainerState, List<String>>> agentFamilies;
@@ -288,7 +291,7 @@ public class Manager extends VerticalLayout {
                                 startBtn.setEnabled( false );
                                 destroyBtn.setEnabled( false );
                                 progressIcon.setVisible( true );
-                                ContainerUI.getExecutor().execute( new Runnable() {
+                                executorService.execute( new Runnable() {
 
                                     public void run() {
                                         boolean success = containerManager.startLxcOnHost( physicalAgent, lxcHostname );
@@ -313,7 +316,7 @@ public class Manager extends VerticalLayout {
                                 stopBtn.setEnabled( false );
                                 destroyBtn.setEnabled( false );
                                 progressIcon.setVisible( true );
-                                ContainerUI.getExecutor().execute( new Runnable() {
+                                executorService.execute( new Runnable() {
 
                                     public void run() {
                                         boolean success = containerManager.stopLxcOnHost( physicalAgent, lxcHostname );
@@ -346,7 +349,7 @@ public class Manager extends VerticalLayout {
                                             stopBtn.setEnabled( false );
                                             destroyBtn.setEnabled( false );
                                             progressIcon.setVisible( true );
-                                            ContainerUI.getExecutor().execute( new Runnable() {
+                                            executorService.execute( new Runnable() {
 
                                                 public void run() {
                                                     try {
@@ -377,7 +380,7 @@ public class Manager extends VerticalLayout {
                                     stopBtn.setEnabled( false );
                                     destroyBtn.setEnabled( false );
                                     progressIcon.setVisible( true );
-                                    ContainerUI.getExecutor().execute( new Runnable() {
+                                    executorService.execute( new Runnable() {
 
                                         public void run() {
                                             try {
