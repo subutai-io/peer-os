@@ -1,9 +1,9 @@
 package org.safehaus.subutai.core.container.impl;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
+import java.util.UUID;
 
-import java.util.Set;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -11,29 +11,75 @@ import java.util.Set;
  */
 public class ContainerInfo {
 
-	private final Agent physicalAgent;
-	private final Set<String> lxcHostnames;
-	private boolean result;
+    private final Agent physicalAgent;
+    private final String cloneName;
+    private final String templateName;
+    private final UUID envId;
+    private boolean ok;
+    private ContainerAction containerAction;
 
 
-	public ContainerInfo(final Agent physicalAgent, final Set<String> lxcHostnames) {
-		this.physicalAgent = physicalAgent;
-		this.lxcHostnames = lxcHostnames;
-	}
+    public ContainerInfo( final Agent physicalAgent, final UUID envId, final String templateName,
+                          final String cloneName, final ContainerAction containerAction )
+    {
+        this.physicalAgent = physicalAgent;
+        this.cloneName = cloneName;
+        this.templateName = templateName;
+        this.envId = envId;
+        this.containerAction = containerAction;
+    }
 
-	public Agent getPhysicalAgent() {
-		return physicalAgent;
-	}
 
-	public Set<String> getLxcHostnames() {
-		return lxcHostnames;
-	}
+    public Agent getPhysicalAgent()
+    {
+        return physicalAgent;
+    }
 
-	public boolean isResult() {
-		return result;
-	}
 
-	public void setResult(final boolean result) {
-		this.result = result;
-	}
+    public String getCloneName()
+    {
+        return cloneName;
+    }
+
+
+    public boolean isOk()
+    {
+        return ok;
+    }
+
+
+    public void fail()
+    {
+        this.ok = false;
+    }
+
+
+    public void success()
+    {
+        this.ok = true;
+    }
+
+
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public UUID getEnvId()
+    {
+        return envId;
+    }
+
+
+    public ContainerAction getContainerAction()
+    {
+        return containerAction;
+    }
+
+
+    public void setContainerAction( final ContainerAction containerAction )
+    {
+        this.containerAction = containerAction;
+    }
 }

@@ -264,11 +264,13 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         populateLxcTable(agentFamilies);
         countProcessed = new AtomicInteger((int) (count));
         errorProcessed = new AtomicInteger(0);
+        //TODO: set UUID on cloning from UI
+        UUID envId = UUID.randomUUID();
         for (final Map.Entry<Agent, List<String>> agent : agentFamilies.entrySet()) {
             AgentExecutor agentExecutor = new AgentExecutorImpl(agent.getKey().getHostname(), agent.getValue());
             agentExecutor.addListener(this);
             ExecutorService executor = Executors.newFixedThreadPool(1);
-            agentExecutor.execute(executor, new CloneCommandFactory(containerManager, agent.getKey().getHostname(), "master"));
+            agentExecutor.execute(executor, new CloneCommandFactory(containerManager, envId, agent.getKey().getHostname(), "master"));
             executor.shutdown();
         }
     }
