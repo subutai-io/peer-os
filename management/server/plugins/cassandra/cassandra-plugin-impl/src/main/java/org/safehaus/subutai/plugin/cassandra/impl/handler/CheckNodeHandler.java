@@ -1,6 +1,9 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import java.util.Map;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -9,9 +12,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
-
-import java.util.Map;
-import java.util.UUID;
 
 
 public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
@@ -28,11 +28,12 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
                 String.format( "Checking cassandra on %s of %s cluster...", lxcHostname, clusterName ) );
     }
 
+
     private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
 
-        String log = "";
+        StringBuilder log = new StringBuilder();
 
-        for ( Map.Entry<UUID, AgentResult > e : checkStatusCommand.getResults().entrySet() ) {
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
 
             String status = "UNKNOWN";
             if ( e.getValue().getExitCode() == 0 ) {
@@ -42,11 +43,12 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
                 status = "Cassandra is not running";
             }
 
-            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );
         }
 
-        po.addLogDone( log );
+        po.addLogDone( log.toString() );
     }
+
 
     @Override
     public void run() {
@@ -71,7 +73,6 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
         manager.getCommandRunner().runCommand( checkNodeCommand );
 
         if ( checkNodeCommand.hasSucceeded() ) {
-            String s = checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ;
             productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
                     checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }

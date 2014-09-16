@@ -19,7 +19,6 @@ public class StartTask implements Runnable {
         this.clusterName = clusterName;
         this.hostname = lxcHostname;
         this.completeEvent = completeEvent;
-        this.manager = manager;
     }
 
 
