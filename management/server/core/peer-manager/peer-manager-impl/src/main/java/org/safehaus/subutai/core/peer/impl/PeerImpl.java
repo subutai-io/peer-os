@@ -87,7 +87,7 @@ public class PeerImpl implements PeerManager {
             return true;
         }
         catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return false;
     }
