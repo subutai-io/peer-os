@@ -215,6 +215,14 @@
                   <groupId>io.netty</groupId>
                   <artifactId>netty</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.xerial.snappy</groupId>
+                  <artifactId>snappy-java</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.jpountz.lz4</groupId>
+                  <artifactId>lz4</artifactId>
+                </artifactItem>
 
               </artifactItems>
             </configuration>
