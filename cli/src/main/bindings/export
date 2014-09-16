@@ -101,7 +101,6 @@ function export {
   #     'pool/parent-partition@child' -> 'pool/child-partition@template'
   # ----------------------------------------------------------------------------
 
-  debian_package_name=`get_debian_package_name $container`
   debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
   debian_root="$debian_dir$SUBUTAI_TMPDIR/$container"
   deltas="$debian_root/deltas"
