@@ -2,11 +2,13 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
 import com.vaadin.event.MouseEvents;
 
@@ -16,15 +18,24 @@ import com.vaadin.event.MouseEvents;
  */
 public class NameNode extends ClusterNode {
 
-    public NameNode( final HadoopClusterConfig cluster ) {
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
+
+
+    public NameNode( final Hadoop hadoop, Tracker tracker, final ExecutorService executorService,
+                     final HadoopClusterConfig cluster ) {
         super( cluster );
+        this.executorService = executorService;
+        this.hadoop = hadoop;
+        this.tracker = tracker;
         setHostname( cluster.getNameNode().getHostname() );
 
         startButton.addClickListener( new MouseEvents.ClickListener() {
             @Override
             public void click( MouseEvents.ClickEvent clickEvent ) {
                 setLoading( true );
-                getStatus( HadoopUI.getHadoopManager().startNameNode( cluster ) );
+                getStatus( hadoop.startNameNode( cluster ) );
             }
         } );
 
@@ -32,7 +43,7 @@ public class NameNode extends ClusterNode {
             @Override
             public void click( MouseEvents.ClickEvent clickEvent ) {
                 setLoading( true );
-                getStatus( HadoopUI.getHadoopManager().stopNameNode( cluster ) );
+                getStatus( hadoop.stopNameNode( cluster ) );
             }
         } );
 
@@ -40,7 +51,7 @@ public class NameNode extends ClusterNode {
             @Override
             public void click( MouseEvents.ClickEvent clickEvent ) {
                 setLoading( true );
-                getStatus( HadoopUI.getHadoopManager().restartNameNode( cluster ) );
+                getStatus( hadoop.restartNameNode( cluster ) );
             }
         } );
 
@@ -55,7 +66,7 @@ public class NameNode extends ClusterNode {
             slaveNode.setLoading( true );
         }
 
-        HadoopUI.getExecutor().execute( new CheckTask( cluster, new CompleteEvent() {
+        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent() {
 
             public void onComplete( NodeState state ) {
                 synchronized ( progressButton ) {

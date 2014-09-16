@@ -14,10 +14,6 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.solr.ui.SolrUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="solrManager"/>
-        <argument ref="commandRunner"/>
     </bean>
 
 

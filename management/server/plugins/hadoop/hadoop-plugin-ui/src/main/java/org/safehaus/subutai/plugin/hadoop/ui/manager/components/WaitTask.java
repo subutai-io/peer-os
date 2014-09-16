@@ -7,8 +7,8 @@ import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
 
 /**
@@ -17,9 +17,11 @@ import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 public class WaitTask implements Runnable {
     private final CompleteEvent completeEvent;
     private UUID trackID;
+    private final Tracker tracker;
 
 
-    public WaitTask( UUID trackID, CompleteEvent completeEvent ) {
+    public WaitTask( Tracker tracker, UUID trackID, CompleteEvent completeEvent ) {
+        this.tracker = tracker;
         this.trackID = trackID;
         this.completeEvent = completeEvent;
     }
@@ -29,8 +31,7 @@ public class WaitTask implements Runnable {
     public void run() {
         if ( trackID != null ) {
             while ( true ) {
-                ProductOperationView po =
-                        HadoopUI.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
+                ProductOperationView po = tracker.getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
                 if ( po.getState() == ProductOperationState.RUNNING ) {
                     try {
                         Thread.sleep( 1000 );
