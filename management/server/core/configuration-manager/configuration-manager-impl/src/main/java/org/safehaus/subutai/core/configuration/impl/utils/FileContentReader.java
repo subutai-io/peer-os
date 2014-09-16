@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.configuration.impl.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -21,26 +20,32 @@ public class FileContentReader {
         StringBuilder sb = new StringBuilder();
         File file = new File( pathToFile );
         FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
         try {
             fileReader = new FileReader( file );
-            BufferedReader bufferedReader = new BufferedReader( fileReader );
+            bufferedReader = new BufferedReader( fileReader );
 
             for ( String line; ( line = bufferedReader.readLine() ) != null; ) {
                 sb.append( line ).append( System.getProperty( "line.separator" ) );
             }
-        }
-        catch ( FileNotFoundException e ) {
-            LOG.info( e.getMessage() );
         }
         catch ( IOException e ) {
             LOG.info( e.getMessage() );
         }
         finally {
             try {
-                fileReader.close();
+                if ( bufferedReader != null ) {
+                    bufferedReader.close();
+                }
             }
-            catch ( IOException e ) {
-                LOG.info( e.getMessage() );
+            catch ( IOException ignore ) {
+            }
+            try {
+                if ( fileReader != null ) {
+                    fileReader.close();
+                }
+            }
+            catch ( IOException ignore ) {
             }
         }
 
