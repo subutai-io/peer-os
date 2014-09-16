@@ -18,11 +18,6 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.lucene.ui.LuceneUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="hadoopManager"/>
-        <argument ref="luceneManager"/>
-        <argument ref="commandRunner"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>

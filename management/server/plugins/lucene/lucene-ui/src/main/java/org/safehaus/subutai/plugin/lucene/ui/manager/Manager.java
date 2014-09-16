@@ -6,40 +6,68 @@
 package org.safehaus.subutai.plugin.lucene.ui.manager;
 
 
-import com.google.common.collect.Sets;
-import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.Sizeable;
-import com.vaadin.ui.*;
-
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.*;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.plugin.lucene.ui.LuceneUI;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.Lucene;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
+import com.google.common.collect.Sets;
+import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Sizeable;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
 
 
 /**
  * @author dilshat
  */
-public class Manager
-{
+public class Manager {
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private Config config;
+    private final Lucene lucene;
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
 
 
-    public Manager()
-    {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+
+        this.executorService = executorService;
+        this.lucene = serviceLocator.getService( Lucene.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -61,11 +89,9 @@ public class Manager
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 config = ( Config ) event.getProperty().getValue();
                 refreshUI();
             }
@@ -75,11 +101,9 @@ public class Manager
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener()
-        {
+        refreshClustersBtn.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 refreshClustersInfo();
             }
         } );
@@ -88,30 +112,22 @@ public class Manager
 
         Button destroyClusterBtn = new Button( "Destroy cluster" );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener()
-        {
+        destroyClusterBtn.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if ( config != null ) {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
-                        "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = LuceneUI.getLuceneManager().uninstallCluster( config.getClusterName() );
+                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                            UUID trackID = lucene.uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                new ProgressWindow( LuceneUI.getExecutor(), LuceneUI.getTracker(), trackID,
-                                    Config.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
+                                    new ProgressWindow( executorService, tracker, trackID, Config.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
+                                public void windowClose( Window.CloseEvent closeEvent ) {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -121,8 +137,7 @@ public class Manager
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else
-                {
+                else {
                     show( "Please, select cluster" );
                 }
             }
@@ -132,44 +147,34 @@ public class Manager
 
         Button addNodeBtn = new Button( "Add Node" );
         addNodeBtn.addStyleName( "default" );
-        addNodeBtn.addClickListener( new Button.ClickListener()
-        {
+        addNodeBtn.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    HadoopClusterConfig hadoopConfig =
-                        LuceneUI.getHadoopManager().getCluster( config.getHadoopClusterName() );
-                    if ( hadoopConfig != null )
-                    {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if ( config != null ) {
+                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
+                    if ( hadoopConfig != null ) {
                         Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
-                        if ( !nodes.isEmpty() )
-                        {
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, nodes );
+                        if ( !nodes.isEmpty() ) {
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( lucene, tracker, executorService, config, nodes );
                             contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener()
-                            {
+                            addNodeWindow.addCloseListener( new Window.CloseListener() {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
+                                public void windowClose( Window.CloseEvent closeEvent ) {
                                     refreshClustersInfo();
                                 }
                             } );
                         }
-                        else
-                        {
+                        else {
                             show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
                         }
                     }
-                    else
-                    {
+                    else {
                         show( "Hadoop cluster info not found" );
                     }
                 }
-                else
-                {
+                else {
                     show( "Please, select cluster" );
                 }
             }
@@ -182,8 +187,7 @@ public class Manager
     }
 
 
-    private Table createTableTemplate( String caption )
-    {
+    private Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "IPs", String.class, null );
@@ -193,25 +197,20 @@ public class Manager
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
-        {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
             @Override
-            public void itemClick( ItemClickEvent event )
-            {
-                if ( event.isDoubleClick() )
-                {
+            public void itemClick( ItemClickEvent event ) {
+                if ( event.isDoubleClick() ) {
                     String lxcHostname =
-                        ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = LuceneUI.getAgentManager().getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+                    if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                            new TerminalWindow( Sets.newHashSet( lxcAgent ), LuceneUI.getExecutor(),
-                                LuceneUI.getCommandRunner(), LuceneUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else
-                    {
+                    else {
                         show( "Agent is not connected" );
                     }
                 }
@@ -221,93 +220,72 @@ public class Manager
     }
 
 
-    private void refreshUI()
-    {
-        if ( config != null )
-        {
+    private void refreshUI() {
+        if ( config != null ) {
             populateTable( nodesTable, config.getNodes() );
         }
-        else
-        {
+        else {
             nodesTable.removeAllItems();
         }
     }
 
 
-    public void refreshClustersInfo()
-    {
-        List<Config> clustersInfo = LuceneUI.getLuceneManager().getClusters();
+    public void refreshClustersInfo() {
+        List<Config> clustersInfo = lucene.getClusters();
         Config clusterInfo = ( Config ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
-        {
-            for ( Config luceneClusterInfo : clustersInfo )
-            {
+        if ( clustersInfo != null && clustersInfo.size() > 0 ) {
+            for ( Config luceneClusterInfo : clustersInfo ) {
                 clusterCombo.addItem( luceneClusterInfo );
                 clusterCombo.setItemCaption( luceneClusterInfo,
-                    String.format( "%s (%s)", luceneClusterInfo.getClusterName(),
-                        luceneClusterInfo.getHadoopClusterName() ) );
+                        String.format( "%s (%s)", luceneClusterInfo.getClusterName(),
+                                luceneClusterInfo.getHadoopClusterName() ) );
             }
-            if ( clusterInfo != null )
-            {
-                for ( Config luceneClusterInfo : clustersInfo )
-                {
-                    if ( luceneClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
-                    {
+            if ( clusterInfo != null ) {
+                for ( Config luceneClusterInfo : clustersInfo ) {
+                    if ( luceneClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
                         clusterCombo.setValue( luceneClusterInfo );
                         return;
                     }
                 }
             }
-            else
-            {
+            else {
                 clusterCombo.setValue( clustersInfo.iterator().next() );
             }
         }
     }
 
 
-    private void show( String notification )
-    {
+    private void show( String notification ) {
         Notification.show( notification );
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
-    {
+    private void populateTable( final Table table, Set<Agent> agents ) {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
-        {
+        for ( final Agent agent : agents ) {
             final Button destroyBtn = new Button( "Destroy" );
 
             table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(), destroyBtn
+                    agent.getHostname(), agent.getListIP().toString(), destroyBtn
             }, null );
 
-            destroyBtn.addClickListener( new Button.ClickListener()
-            {
+            destroyBtn.addClickListener( new Button.ClickListener() {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
+                public void buttonClick( Button.ClickEvent clickEvent ) {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
+                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = LuceneUI.getLuceneManager()
-                                .destroyNode( config.getClusterName(), agent.getHostname() );
+                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                            UUID trackID = lucene.destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
-                                new ProgressWindow( LuceneUI.getExecutor(), LuceneUI.getTracker(), trackID,
-                                    Config.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
+                                    new ProgressWindow( executorService, tracker, trackID, Config.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
+                                public void windowClose( Window.CloseEvent closeEvent ) {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -322,8 +300,7 @@ public class Manager
     }
 
 
-    public Component getContent()
-    {
+    public Component getContent() {
         return contentRoot;
     }
 }
