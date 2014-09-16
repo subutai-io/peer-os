@@ -9,15 +9,22 @@ package org.safehaus.subutai.plugin.solr.ui.manager;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
-import org.safehaus.subutai.plugin.solr.ui.SolrUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
@@ -46,8 +53,20 @@ public class Manager {
     private final Table nodesTable;
     private SolrClusterConfig solrClusterConfig;
 
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final Solr solr;
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
 
-    public Manager() {
+
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+
+        this.executorService = executorService;
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.solr = serviceLocator.getService( Solr.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -100,10 +119,9 @@ public class Manager {
                 alert.getOk().addClickListener( new Button.ClickListener() {
                     @Override
                     public void buttonClick( Button.ClickEvent clickEvent ) {
-                        UUID trackID = SolrUI.getSolrManager().uninstallCluster( solrClusterConfig.getClusterName() );
+                        UUID trackID = solr.uninstallCluster( solrClusterConfig.getClusterName() );
                         final ProgressWindow window =
-                                new ProgressWindow( SolrUI.getExecutor(), SolrUI.getTracker(), trackID,
-                                        SolrClusterConfig.PRODUCT_KEY );
+                                new ProgressWindow( executorService, tracker, trackID, SolrClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener() {
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent ) {
@@ -162,8 +180,8 @@ public class Manager {
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
 
-                    SolrUI.getExecutor().execute(
-                            new CheckTask( solrClusterConfig.getClusterName(), agent.getHostname(),
+                    executorService.execute(
+                            new CheckTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
 
                                         public void onComplete( NodeState state ) {
@@ -188,8 +206,8 @@ public class Manager {
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
 
-                    SolrUI.getExecutor().execute(
-                            new StartTask( solrClusterConfig.getClusterName(), agent.getHostname(),
+                    executorService.execute(
+                            new StartTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
 
                                         public void onComplete( NodeState state ) {
@@ -214,21 +232,22 @@ public class Manager {
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
 
-                    SolrUI.getExecutor().execute(
-                            new StopTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    executorService.execute(
+                            new StopTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
 
-                                public void onComplete( NodeState state ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( state == NodeState.STOPPED ) {
-                                            startBtn.setEnabled( true );
+                                        public void onComplete( NodeState state ) {
+                                            synchronized ( progressIcon ) {
+                                                if ( state == NodeState.STOPPED ) {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                else {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                progressIcon.setVisible( false );
+                                            }
                                         }
-                                        else {
-                                            stopBtn.setEnabled( true );
-                                        }
-                                        progressIcon.setVisible( false );
-                                    }
-                                }
-                            } ) );
+                                    } ) );
                 }
             } );
         }
@@ -246,7 +265,7 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<SolrClusterConfig> mongoClusterInfos = SolrUI.getSolrManager().getClusters();
+        List<SolrClusterConfig> mongoClusterInfos = solr.getClusters();
         SolrClusterConfig clusterInfo = ( SolrClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
@@ -287,10 +306,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = SolrUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( lxcAgent ), SolrUI.getExecutor(),
-                                SolrUI.getCommandRunner(), SolrUI.getAgentManager() );
+                        TerminalWindow terminal =
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {

@@ -8,6 +8,8 @@ package org.safehaus.subutai.plugin.solr.ui.manager;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.plugin.solr.ui.SolrUI;
@@ -21,8 +23,12 @@ public class StartTask implements Runnable {
 
 	private final String clusterName, lxcHostname;
 	private final CompleteEvent completeEvent;
+    private final Solr solr;
+    private final Tracker tracker;
 
-	public StartTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
+	public StartTask( Solr solr, Tracker tracker,String clusterName, String lxcHostname, CompleteEvent completeEvent) {
+        this.solr = solr;
+        this.tracker = tracker;
 		this.clusterName = clusterName;
 		this.lxcHostname = lxcHostname;
 		this.completeEvent = completeEvent;
@@ -30,13 +36,13 @@ public class StartTask implements Runnable {
 
 	public void run() {
 
-		UUID trackID = SolrUI.getSolrManager().startNode(clusterName, lxcHostname);
+		UUID trackID = solr.startNode( clusterName, lxcHostname );
 
 		long start = System.currentTimeMillis();
 		NodeState state = NodeState.UNKNOWN;
 
 		while (!Thread.interrupted()) {
-			ProductOperationView po = SolrUI.getTracker().getProductOperation( SolrClusterConfig.PRODUCT_KEY, trackID);
+			ProductOperationView po =tracker.getProductOperation( SolrClusterConfig.PRODUCT_KEY, trackID );
 			if (po != null) {
 				if (po.getState() != ProductOperationState.RUNNING) {
 					if (po.getState() == ProductOperationState.SUCCEEDED) {
