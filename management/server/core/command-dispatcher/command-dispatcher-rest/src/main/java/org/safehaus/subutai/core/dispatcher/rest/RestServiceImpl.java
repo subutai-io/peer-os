@@ -11,13 +11,11 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
-import org.eclipse.jetty.server.Request;
 import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -45,6 +43,7 @@ public class RestServiceImpl implements RestService {
             return Response.ok().build();
         }
         catch ( RuntimeException e ) {
+            LOG.severe( e.getMessage() );
             return Response.serverError().entity( e.getMessage() ).build();
         }
     }
@@ -55,7 +54,7 @@ public class RestServiceImpl implements RestService {
         try {
 
             Message message = PhaseInterceptorChain.getCurrentMessage();
-            Request request = ( Request ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+            //            Request request = ( Request ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
             //            String ip =    request.getRemoteAddr();
             //for now set IP to local subutai
             //TODO remove this in production
@@ -65,6 +64,7 @@ public class RestServiceImpl implements RestService {
             return Response.ok().build();
         }
         catch ( RuntimeException e ) {
+            LOG.severe( e.getMessage() );
             return Response.serverError().entity( e.getMessage() ).build();
         }
     }
@@ -87,6 +87,7 @@ public class RestServiceImpl implements RestService {
             }
         }
         catch ( SocketException e ) {
+            LOG.severe( e.getMessage() );
         }
 
 
