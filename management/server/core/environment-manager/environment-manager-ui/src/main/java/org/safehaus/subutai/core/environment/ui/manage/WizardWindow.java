@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.helper.BuildBlock;
 import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
@@ -229,7 +228,7 @@ public class WizardWindow extends DetailsWindow {
         nextButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
-                sendBuilProcessToBackground();
+                createBackgroundEnvironmentBuildProcess();
                 close();
             }
         } );
@@ -243,29 +242,34 @@ public class WizardWindow extends DetailsWindow {
 
     private List<String> selectedPeers() {
         List<String> l = new ArrayList<String>();
-        l.add( "peer1" );
-        l.add( "peer12" );
-        l.add( "peer132" );
-        l.add( "peer133" );
-        l.add( "peer221" );
+        for ( Object itemId : peersTable.getItemIds() )
+        {
+            String name = ( String ) peersTable.getItem( itemId ).getItemProperty( "Name" ).getValue();
+            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
+            if ( selection.getValue() )
+            {
+                l.add( name );
+            }
+        }
         return l;
     }
 
 
-    private void sendBuilProcessToBackground() {
+    private void createBackgroundEnvironmentBuildProcess() {
         BuildProcess buildProcess = new BuildProcess();
         for ( Object itemId : peersTable.getItemIds() )
         {
-            String name = ( String ) peersTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
-            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
-            if ( selection.getValue() )
+            String name = ( String ) peersTable.getItem( itemId ).getItemProperty( "Name" ).getValue();
+            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
+            logger.info( name + " " + selection.getValue() );
+            /*if ( selection.getValue() )
             {
                 BuildBlock bb = new BuildBlock();
                 bb.setPeerId( name );
                 buildProcess.addBuildBlock( bb );
-            }
+            }*/
         }
 
-        managerUI.getEnvironmentManager().saveBuildProcess( buildProcess );
+        //        managerUI.getEnvironmentManager().saveBuildProcess( buildProcess );
     }
 }
