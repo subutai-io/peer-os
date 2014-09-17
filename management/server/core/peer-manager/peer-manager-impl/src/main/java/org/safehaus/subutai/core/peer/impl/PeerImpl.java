@@ -1,14 +1,22 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.message.PeerMessage;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 
 
@@ -17,7 +25,9 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
  */
 public class PeerImpl implements PeerManager {
 
-    private final static Logger logger = Logger.getLogger( PeerImpl.class.getName() );
+    private final static Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
+    private final Queue<PeerMessageListener> listeners = new ConcurrentLinkedQueue<>();
+
 
     private final String SOURCE = "PEER_MANAGER";
     private UUID id;
@@ -31,7 +41,7 @@ public class PeerImpl implements PeerManager {
 
 
     public void init() {
-        logger.info( "SUBUTAID ID: " + id );
+        LOG.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
@@ -55,7 +65,7 @@ public class PeerImpl implements PeerManager {
             return peerId;
         }
         catch ( DBException e ) {
-            logger.info( e.getMessage() );
+            LOG.info( e.getMessage() );
         }
         return null;
     }
@@ -74,7 +84,7 @@ public class PeerImpl implements PeerManager {
             peers = peerDAO.getInfo( SOURCE, Peer.class );
         }
         catch ( DBException e ) {
-            logger.info( e.getMessage() );
+            LOG.info( e.getMessage() );
         }
         return peers;
     }
@@ -87,7 +97,7 @@ public class PeerImpl implements PeerManager {
             return true;
         }
         catch ( DBException e ) {
-            logger.info( e.getMessage() );
+            LOG.info( e.getMessage() );
         }
         return false;
     }
@@ -99,8 +109,49 @@ public class PeerImpl implements PeerManager {
             return peerDAO.getInfo( SOURCE, uuid, Peer.class );
         }
         catch ( DBException e ) {
-            logger.info( e.getMessage() );
+            LOG.info( e.getMessage() );
         }
         return null;
+    }
+
+
+    public Collection<PeerMessageListener> getListeners() {
+        return Collections.unmodifiableCollection( listeners );
+    }
+
+
+    @Override
+    public void addPeerMessageListener( PeerMessageListener listener ) {
+        try {
+            if ( !listeners.contains( listener ) ) {
+                listeners.add( listener );
+            }
+        }
+        catch ( Exception ex ) {
+            LOG.log( Level.SEVERE, "Error in addPeerMessageListener", ex );
+        }
+    }
+
+
+    @Override
+    public void removePeerMessageListener( PeerMessageListener listener ) {
+        try {
+            listeners.remove( listener );
+        }
+        catch ( Exception ex ) {
+            LOG.log( Level.SEVERE, "Error in removePeerMessageListener", ex );
+        }
+    }
+
+
+    @Override
+    public void sendPeerMessage( final Peer peer, final PeerMessage peerMessage ) throws PeerMessageException {
+
+    }
+
+
+    @Override
+    public void processPeerMessage( final Peer peer, final PeerMessage peerMessage ) throws PeerMessageException {
+
     }
 }
