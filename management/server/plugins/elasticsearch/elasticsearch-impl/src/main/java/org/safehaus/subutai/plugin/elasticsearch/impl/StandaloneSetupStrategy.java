@@ -85,7 +85,7 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
 
         try {
             elasticsearchManager.getPluginDAO()
-                            .saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
+                            .saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase(), elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
             po.addLog( "Cluster information saved to database" );
         }
         catch ( DBException e ) {

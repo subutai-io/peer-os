@@ -1,12 +1,14 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.common.base.Strings;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -21,6 +23,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -33,8 +36,11 @@ import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.AddNodeOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.CheckNodeOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StartNodeOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StopNodeOperationHandler;
 
 
 public class ElasticsearchImpl implements Elasticsearch {
@@ -118,6 +124,7 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     public void init() {
         Commands.init( commandRunner );
+        this.pluginDAO = new PluginDAO(dbManager);
         executor = Executors.newCachedThreadPool();
     }
 
@@ -169,11 +176,13 @@ public class ElasticsearchImpl implements Elasticsearch {
                     po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
                 }
                 po.addLog( "Updating db..." );
-                if ( dbManager.deleteInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName() ) ) {
+
+                try {
+                    pluginDAO.deleteInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName()  );
                     po.addLogDone( "Cluster info deleted from DB\nDone" );
-                }
-                else {
+                } catch( DBException e ) {
                     po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+                    e.printStackTrace();
                 }
             }
         } );
@@ -181,16 +190,25 @@ public class ElasticsearchImpl implements Elasticsearch {
         return po.getId();
     }
 
-
     @Override
-    public List<ElasticsearchClusterConfiguration > getClusters() {
-        return dbManager.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, ElasticsearchClusterConfiguration.class );
+    public List<ElasticsearchClusterConfiguration> getClusters() {
+        try {
+            return pluginDAO.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, ElasticsearchClusterConfiguration.class );
+        }
+        catch ( DBException e ) {
+            return Collections.emptyList();
+        }
     }
 
 
     @Override
     public ElasticsearchClusterConfiguration getCluster( String clusterName ) {
-        return dbManager.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName, ElasticsearchClusterConfiguration.class );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        try {
+            return pluginDAO.getInfo(ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName, ElasticsearchClusterConfiguration.class);
+        } catch (DBException e) {
+            return null;
+        }
     }
 
 
@@ -201,7 +219,7 @@ public class ElasticsearchImpl implements Elasticsearch {
 
         executor.execute( new Runnable() {
             public void run() {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = dbManager.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName, ElasticsearchClusterConfiguration.class );
+                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
@@ -231,7 +249,7 @@ public class ElasticsearchImpl implements Elasticsearch {
         executor.execute( new Runnable() {
 
             public void run() {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = dbManager.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName, ElasticsearchClusterConfiguration.class );
+                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
@@ -262,7 +280,7 @@ public class ElasticsearchImpl implements Elasticsearch {
         executor.execute( new Runnable() {
 
             public void run() {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = dbManager.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName, ElasticsearchClusterConfiguration.class );
+                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
@@ -276,7 +294,7 @@ public class ElasticsearchImpl implements Elasticsearch {
                     po.addLogDone( "Stop succeeded" );
                 }
                 else {
-                    po.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
+                    po.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
                 }
             }
         } );
@@ -294,7 +312,7 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     @Override
     public UUID checkNode( final String clusterName, final String lxcHostname ) {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -302,7 +320,7 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     @Override
     public UUID startNode( final String clusterName, final String lxcHostname ) {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -310,7 +328,7 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     @Override
     public UUID stopNode( final String clusterName, final String lxcHostname ) {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -371,7 +389,7 @@ public class ElasticsearchImpl implements Elasticsearch {
         NodeGroup nodesGroup = new NodeGroup();
         nodesGroup.setName( "DEFAULT" );
         nodesGroup.setNumberOfNodes( elasticsearchClusterConfiguration.getNumberOfNodes() );
-        nodesGroup.setTemplateName( elasticsearchClusterConfiguration.getTemplateName() );
+        nodesGroup.setTemplateName( ElasticsearchClusterConfiguration.getTemplateName() );
         nodesGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );

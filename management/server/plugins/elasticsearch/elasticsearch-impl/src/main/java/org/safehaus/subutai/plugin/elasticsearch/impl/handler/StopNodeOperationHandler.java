@@ -24,8 +24,8 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Elasticse
 
     @Override
     public void run() {
-        ElasticsearchClusterConfiguration cassandraConfig = manager.getCluster( clusterName );
-        if ( cassandraConfig == null ) {
+        ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
+        if ( elasticsearchClusterConfiguration == null ) {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
@@ -35,22 +35,26 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Elasticse
             productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) ) {
+        if ( !elasticsearchClusterConfiguration.getNodes().contains( node ) ) {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
+
         Command stopServiceCommand = Commands.getStopCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( stopServiceCommand );
-
         if ( stopServiceCommand.hasSucceeded() ) {
             AgentResult ar = stopServiceCommand.getResults().get( node.getUuid() );
-            productOperation.addLog( ar.getStdOut() );
-            productOperation.addLogDone( "Stop succeeded" );
+            if ( ar.getStdOut().contains( "is running" ) ) {
+                productOperation.addLog( "elasticsearch is running" );
+            }
+            else {
+                productOperation.addLogFailed( "elasticsearch is not running" );
+            }
         }
         else {
-            productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+            productOperation.addLogFailed( "elasticsearch is not running" );
         }
     }
 }

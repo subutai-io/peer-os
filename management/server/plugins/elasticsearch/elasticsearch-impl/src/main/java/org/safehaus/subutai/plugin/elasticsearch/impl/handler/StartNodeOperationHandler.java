@@ -1,17 +1,22 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
+import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 public class StartNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl> {
     private String clusterName;
+    private String lxcHostname;
 
-    public StartNodeOperationHandler( final ElasticsearchImpl manager, final String clusterName ) {
+    public StartNodeOperationHandler( final ElasticsearchImpl manager, final String clusterName, final String lxcHostname ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
+        this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
@@ -19,20 +24,36 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Elastics
 
     @Override
     public void run() {
-        ElasticsearchClusterConfiguration config = manager.getCluster( clusterName );
-        if ( config == null ) {
-            productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+        ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
+        if ( elasticsearchClusterConfiguration == null ) {
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
-        Command startServiceCommand = Commands.getStartCommand( config.getNodes() );
-        manager.getCommandRunner().runCommand( startServiceCommand );
 
+        final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        if ( node == null ) {
+            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            return;
+        }
+        if ( !elasticsearchClusterConfiguration.getNodes().contains( node ) ) {
+            productOperation.addLogFailed(
+                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+            return;
+        }
+
+        Command startServiceCommand = Commands.getStartCommand( Sets.newHashSet( node ) );
+        manager.getCommandRunner().runCommand( startServiceCommand );
         if ( startServiceCommand.hasSucceeded() ) {
-            productOperation.addLogDone( "Start succeeded" );
+            AgentResult ar = startServiceCommand.getResults().get( node.getUuid() );
+            if ( ar.getStdOut().contains( "is running" ) ) {
+                productOperation.addLog( "elasticsearch is running" );
+            }
+            else {
+                productOperation.addLogFailed( "elasticsearch is not running" );
+            }
         }
         else {
-            productOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+            productOperation.addLogFailed( "elasticsearch is not running" );
         }
     }
 }

@@ -19,7 +19,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
         this.lxcHostname = agentUUID;
         this.clusterName = clusterName;
         this.productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                String.format( "Starting %s cluster...", clusterName ) );
+                String.format( "Checking %s cluster...", clusterName ) );
     }
 
 
@@ -42,11 +42,10 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
             return;
         }
 
-        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( agent ) );
+        Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( statusServiceCommand );
         if ( statusServiceCommand.hasSucceeded() ) {
-            AgentResult ar = statusServiceCommand.getResults().get( agent.getUuid() );
+            AgentResult ar = statusServiceCommand.getResults().get( node.getUuid() );
             if ( ar.getStdOut().contains( "is running" ) ) {
                 productOperation.addLog( "elasticsearch is running" );
             }

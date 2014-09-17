@@ -28,7 +28,6 @@ public class Manager
     private final Table nodesTable;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
-    private HorizontalLayout controlsContent;
     private ElasticsearchClusterConfiguration elasticsearchClusterConfiguration;
     private final String message = "No cluster is installed !";
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
@@ -47,7 +46,7 @@ public class Manager
         //tables go here
         nodesTable = createTableTemplate( "Cluster nodes" );
 
-        controlsContent = new HorizontalLayout();
+        HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
         controlsContent.setHeight( 100, Sizeable.Unit.PERCENTAGE );
 
