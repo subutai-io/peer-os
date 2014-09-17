@@ -61,11 +61,14 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     public void init() {
+
+        peerManager.addPeerMessageListener( this );
         responseSender.init();
     }
 
 
     public void destroy() {
+        peerManager.removePeerMessageListener( this );
         responseSender.dispose();
         super.dispose();
     }
