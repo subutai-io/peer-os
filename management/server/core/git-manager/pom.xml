@@ -16,8 +16,8 @@
 
     <modules>
         <module>git-manager-api</module>
-        <module>git-manager-impl</module>
-        <module>git-manager-cli</module>
+        <!--<module>git-manager-impl</module>
+        <module>git-manager-cli</module>-->
     </modules>
 
 </project>
