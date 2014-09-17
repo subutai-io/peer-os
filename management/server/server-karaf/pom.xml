@@ -1063,6 +1063,12 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>container-manager-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Core Modules - END -->
 
                 <!-- <artifactItem>
