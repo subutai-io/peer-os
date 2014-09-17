@@ -65,7 +65,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="container/clone-many">
-            <action class="org.safehaus.subutai.core.template.cli.CloneMany">
+            <action class="org.safehaus.subutai.core.container.cli.CloneMany">
                 <property name="templateManager" ref="templateManager"/>
                 <property name="containerManager" ref="containerManager"/>
                 <property name="agentManager" ref="agentManager"/>

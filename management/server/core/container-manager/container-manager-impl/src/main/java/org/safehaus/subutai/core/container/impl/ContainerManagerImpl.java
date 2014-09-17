@@ -235,7 +235,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
      * @param cloneName host name of cloned container
      */
     @Override
-    public void clone( UUID envId, String hostName, String templateName, String cloneName )
+    public Agent clone( UUID envId, String hostName, String templateName, String cloneName )
             throws ContainerCreateException
     {
         fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, hostName, cloneName ) );
@@ -269,6 +269,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             else
             {
                 fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, hostName, cloneName ) );
+                return agent;
             }
         }
     }
