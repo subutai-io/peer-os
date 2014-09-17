@@ -32,11 +32,12 @@
     <module>network-manager</module>
     <module>package-manager</module>
     <module>peer-manager</module>
+    <!--<module>strategy-manager</module>-->
+    <module>template-manager</module>
     <!--
-    <module>strategy-manager</module>
     <module>tracker</module>
     <module>template-registry</module>
-    <module>template-manager</module>
+
     <module>pet_core</module>
     -->
   </modules>

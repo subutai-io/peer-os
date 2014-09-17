@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.template.api;
 
+
 import java.util.Set;
-import java.util.UUID;
 
 
 /**
@@ -12,38 +12,38 @@ public interface TemplateManager {
     public String getMasterTemplateName();
 
     /**
-     * Checks environment and setups master template. It is safe to run this
-     * method multiple times.
+     * Checks environment and setups master template. It is safe to run this method multiple times.
      *
      * @param hostName the physical host name
-     * @return <tt>true</tt> if check and setup is successful, <tt>false</tt>
-     * otherwise
+     *
+     * @return <tt>true</tt> if check and setup is successful, <tt>false</tt> otherwise
      */
-    public boolean setup(String hostName);
+    public boolean setup( String hostName );
 
     /**
      * Clone an instance container from a given template.
      *
      * @param hostName the physical host name
-     * @param templateName the template name from which a new instance container
-     * is to be cloned
+     * @param templateName the template name from which a new instance container is to be cloned
      * @param cloneName the clone name of the new instance container
+     *
      * @return <tt>true</tt> if successfully cloned, <tt>false</tt> otherwise
      */
-    public boolean clone(String hostName, String templateName, String cloneName, String environmentId);
+    public boolean clone( String hostName, String templateName, String cloneName, String environmentId );
 
-    public boolean clone(String hostName, String templateName, Set<String> cloneNames, String environmentId);
+    public boolean clone( String hostName, String templateName, Set<String> cloneNames, String environmentId );
 
     /**
      * Destroys a clone with given name.
      *
      * @param hostName the physical host name
      * @param cloneName name of a clone to be destroyed
+     *
      * @return <tt>true</tt> if destroyed successfully, <tt>false</tt> otherwise
      */
-    public boolean cloneDestroy(String hostName, String cloneName);
+    public boolean cloneDestroy( String hostName, String cloneName );
 
-    public boolean cloneDestroy(String hostName, Set<String> cloneNames);
+    public boolean cloneDestroy( String hostName, Set<String> cloneNames );
 
     /**
      * Renames an instance container.
@@ -51,58 +51,56 @@ public interface TemplateManager {
      * @param hostName the physical host name where container resides
      * @param oldName current name of the container
      * @param newName new name for the container
+     *
      * @return <tt>true</tt> if successfully renamed; <tt>false</tt> otherwise
      */
-    public boolean cloneRename(String hostName, String oldName, String newName);
+    public boolean cloneRename( String hostName, String oldName, String newName );
 
     /**
      * Promotes a given clone into a template.
      *
      * @param hostName the physical host name
      * @param cloneName name of the clone to be converted
+     *
      * @return <tt>true</tt> if promote successfully completed
      */
-    public boolean promoteClone(String hostName, String cloneName);
+    public boolean promoteClone( String hostName, String cloneName );
 
     /**
-     * Promotes a given clone into a template with given name. This method gives
-     * possibility to promote a copy of the clone instead of the clone itself.
+     * Promotes a given clone into a template with given name. This method gives possibility to promote a copy of the
+     * clone instead of the clone itself.
      *
      * @param hostName the physical host name
      * @param cloneName name of the clone to be converted
      * @param newName new name for template
-     * @param copyit if set <tt>true</tt>, a copy of clone is made first and a
-     * copied clone is promoted to template
+     * @param copyit if set <tt>true</tt>, a copy of clone is made first and a copied clone is promoted to template
+     *
      * @return <tt>true</tt> if promote successfully completed
      */
-    public boolean promoteClone(String hostName, String cloneName, String newName, boolean copyit);
+    public boolean promoteClone( String hostName, String cloneName, String newName, boolean copyit );
 
-    public boolean importTemplate(String hostName, String templateName);
+    public boolean importTemplate( String hostName, String templateName );
 
     /**
      * Exports the template in the given server into a deb package.
      *
      * @param hostName the physical host name
      * @param templateName the template name to be exported
+     *
      * @return path to generated deb package
      */
-    public String exportTemplate(String hostName, String templateName);
+    public String exportTemplate( String hostName, String templateName );
 
     /**
-     * Gets package name for a given template. Package name is a name used in
-     * Apt commands. It is NOT a full Debian package name of a template.
-     *
-     * @param templateName
-     * @return
+     * Gets package name for a given template. Package name is a name used in Apt commands. It is NOT a full Debian
+     * package name of a template.
      */
-    public String getPackageName(String templateName);
+    public String getPackageName( String templateName );
 
     /**
-     * Gets a full Debian package name for a given template. Name does not have
-     * <tt>.deb</tt> extension.
+     * Gets a full Debian package name for a given template. Name does not have <tt>.deb</tt> extension.
      *
      * @param templateName the template name
-     * @return
      */
-    public String getDebianPackageName(String templateName);
+    public String getDebianPackageName( String templateName );
 }
