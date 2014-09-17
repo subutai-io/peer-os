@@ -3,11 +3,15 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StartNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl> {
     private String clusterName;
@@ -41,19 +45,38 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Elastics
             return;
         }
 
-        Command startServiceCommand = Commands.getStartCommand( Sets.newHashSet( node ) );
-        manager.getCommandRunner().runCommand( startServiceCommand );
-        if ( startServiceCommand.hasSucceeded() ) {
-            AgentResult ar = startServiceCommand.getResults().get( node.getUuid() );
-            if ( ar.getStdOut().contains( "Starting Elasticsearch Server" ) ) {
-                productOperation.addLogDone( "elasticsearch is running" );
+        Command startNodeCommand = Commands.getStartCommand(Sets.newHashSet(node));
+        final AtomicBoolean ok = new AtomicBoolean();
+        manager.getCommandRunner().runCommand(startNodeCommand, new CommandCallback() {
+
+            @Override
+            public void onResponse(Response response, AgentResult agentResult, Command command) {
+                if(agentResult.getStdOut().contains("Starting")) {
+                    ok.set(true);
+                    stop();
+                }
             }
-            else {
-                productOperation.addLogFailed( "Could not start Elasticsearch !!!" );
-            }
-        }
-        else {
-            productOperation.addLogFailed( "Elasticsearch start command is not succeeded !!!" );
-        }
+        });
+
+        if(ok.get())
+            productOperation.addLogDone(String.format("Node %s started", node.getHostname()));
+        else
+            productOperation.addLogFailed(String.format("Starting node %s failed, %s", node.getHostname(),
+                    startNodeCommand.getAllErrors()));
+
+//        Command startServiceCommand = Commands.getStartCommand( Sets.newHashSet( node ) );
+//        manager.getCommandRunner().runCommand( startServiceCommand );
+//        if ( startServiceCommand.hasSucceeded() ) {
+//            AgentResult ar = startServiceCommand.getResults().get( node.getUuid() );
+//            if ( ar.getStdOut().contains( "Starting Elasticsearch Server" ) ) {
+//                productOperation.addLogDone( "elasticsearch is running" );
+//            }
+//            else {
+//                productOperation.addLogFailed( "Could not start Elasticsearch !!!" );
+//            }
+//        }
+//        else {
+//            productOperation.addLogFailed( "Elasticsearch start command is not succeeded !!!" );
+//        }
     }
 }

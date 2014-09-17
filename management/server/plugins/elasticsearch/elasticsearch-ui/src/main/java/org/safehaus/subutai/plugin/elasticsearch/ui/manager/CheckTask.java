@@ -28,7 +28,7 @@ public class CheckTask implements Runnable {
 
 	public void run() {
 
-		UUID trackID = ElasticsearchUI.getElasticsearchManager().checkNode( clusterName, lxcHostname );
+    	UUID trackID = ElasticsearchUI.getElasticsearchManager().checkNode( clusterName, lxcHostname );
 
 		long start = System.currentTimeMillis();
 		while (!Thread.interrupted()) {

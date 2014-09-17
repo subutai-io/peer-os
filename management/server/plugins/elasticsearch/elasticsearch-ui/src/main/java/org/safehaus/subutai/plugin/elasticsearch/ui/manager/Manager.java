@@ -7,14 +7,23 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.common.enums.NodeState;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
+import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI;
 
 import java.util.List;
 import java.util.Set;
@@ -351,7 +360,7 @@ public class Manager
             final Label resultHolder = new Label();
             final Button checkButton = new Button( "Check" );
             checkButton.addStyleName( "default" );
-            checkButton.setVisible( false );
+            checkButton.setVisible( true );
 
             final Button startButton = new Button( "Start" );
             startButton.addStyleName( "default" );

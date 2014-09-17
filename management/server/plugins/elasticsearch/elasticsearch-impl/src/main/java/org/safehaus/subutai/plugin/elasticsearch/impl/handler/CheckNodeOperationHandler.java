@@ -5,9 +5,13 @@ import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class CheckNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl> {
     private String lxcHostname;
@@ -25,6 +29,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
 
     @Override
     public void run() {
+
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null ) {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
@@ -44,17 +49,46 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
 
         Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( statusServiceCommand );
+
         if ( statusServiceCommand.hasSucceeded() ) {
-            AgentResult ar = statusServiceCommand.getResults().get( node.getUuid() );
-            if ( ar.getStdOut().contains( "elasticsearch" ) ) {
-                productOperation.addLogDone( ar.getStdOut() );
-            }
-            else {
-                productOperation.addLogFailed( "elasticsearch is not running" );
-            }
+            productOperation.addLogDone( "elasticsearch is running" );
         }
         else {
-            productOperation.addLogFailed( "Elasticsearch check status command is not succeeded !!!" );
+            logStatusResults( productOperation, statusServiceCommand );
         }
+
+//        if ( statusServiceCommand.hasSucceeded() ) {
+//            AgentResult ar = statusServiceCommand.getResults().get( node.getUuid() );
+//            if ( ar.getStdOut().contains( "elasticsearch" ) ) {
+//                productOperation.addLogDone( ar.getStdOut() );
+//            }
+//            else {
+//                productOperation.addLogFailed( "elasticsearch is not running" );
+//            }
+//        }
+//        else {
+//            productOperation.addLogFailed( "Elasticsearch check status command is not succeeded !!!" );
+//        }
     }
+
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
+
+        String log = "";
+
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
+
+            String status = "UNKNOWN";
+            if ( e.getValue().getExitCode() == 0 ) {
+                status = "elasticsearch is running";
+            }
+            else if ( e.getValue().getExitCode() == 768 ) {
+                status = "elasticsearch is not running";
+            }
+
+            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+        }
+
+        po.addLogDone( log );
+    }
+
 }
