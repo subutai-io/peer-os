@@ -3,22 +3,21 @@ package org.safehaus.subutai.core.filetracker.impl;
 
 import java.util.HashSet;
 
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 
 import com.google.common.collect.Sets;
 
 
-public class FileTrackerImpl implements FileTracker, ResponseListener
-{
+public class FileTrackerImpl implements FileTracker, ResponseListener {
 
     private final HashSet<ResponseListener> listeners = new HashSet<>();
 
@@ -70,11 +69,8 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
     {
 
         Command command = commandRunner.createCommand(
-            new RequestBuilder( "pwd" )
-                .withType( RequestType.INOTIFY_CREATE_REQUEST )
-                .withConfPoints( configPoints ),
-            Sets.newHashSet( agent )
-        );
+                new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_CREATE_REQUEST )
+                                           .withConfPoints( configPoints ), Sets.newHashSet( agent ) );
 
         commandRunner.runCommandAsync( command );
     }
@@ -85,11 +81,8 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
     {
 
         Command command = commandRunner.createCommand(
-            new RequestBuilder( "pwd" )
-                .withType( RequestType.INOTIFY_REMOVE_REQUEST )
-                .withConfPoints( configPoints ),
-            Sets.newHashSet( agent )
-        );
+                new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_REMOVE_REQUEST )
+                                           .withConfPoints( configPoints ), Sets.newHashSet( agent ) );
 
         commandRunner.runCommandAsync( command );
     }
@@ -99,11 +92,9 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
     public String[] listConfigPoints( final Agent agent )
     {
 
-        Command command = commandRunner.createCommand(
-            new RequestBuilder( "pwd" )
-                .withType( RequestType.INOTIFY_LIST_REQUEST ),
-            Sets.newHashSet( agent )
-        );
+        Command command = commandRunner
+                .createCommand( new RequestBuilder( "pwd" ).withType( RequestType.INOTIFY_LIST_REQUEST ),
+                        Sets.newHashSet( agent ) );
 
         commandRunner.runCommandAsync( command );
 
