@@ -116,6 +116,14 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- file-tracker -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>file-tracker-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Internal karaf dependencies-->
       <dependency>

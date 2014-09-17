@@ -23,6 +23,7 @@
     <module>config-point-tracker</module>
     <module>configuration-manager</module>
     <module>db-manager</module>
+    <module>file-tracker</module>
 
     <!--<module>container-manager</module>-->
     <!--<module>environment-manager</module>-->
@@ -37,7 +38,7 @@
 
     <module>template-registry</module>
     <module>template-manager</module>
-    <module>file-tracker</module>
+
 
     <module>pet_core</module>
     <module>peer-manager</module>

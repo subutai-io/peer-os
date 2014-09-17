@@ -155,6 +155,13 @@
                   <artifactId>db-manager-impl</artifactId>
                 </artifactItem>
 
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- file-tracker -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>file-tracker-api</artifactId>
+                </artifactItem>
+
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
                 <artifactItem>
