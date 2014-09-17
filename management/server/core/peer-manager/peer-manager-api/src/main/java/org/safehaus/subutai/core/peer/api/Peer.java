@@ -1,11 +1,14 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.io.Serializable;
+
+
 /**
  * Created by bahadyr on 9/6/14.
  */
 //@XmlRootElement(name = "Peer")
-public class Peer {
+public class Peer implements Serializable {
 
     private String name;
     private String ip;

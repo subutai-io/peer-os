@@ -12,7 +12,8 @@ import com.fasterxml.uuid.Generators;
  */
 public class UUIDUtil {
 
-    public static UUID generateTimeBasedUUID() {
+    public static UUID generateTimeBasedUUID()
+    {
         // http://www.cowtowncoder.com/blog/archives/2010/10/entry_429.html
         /*
         // need to pass Ethernet address; can either use real one (shown here)
@@ -28,7 +29,8 @@ public class UUIDUtil {
     }
 
 
-    public static UUID generateCassandraUUID() {
+    public static UUID generateCassandraUUID()
+    {
 
         return Generators.randomBasedGenerator().generate();
     }
