@@ -46,15 +46,15 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
         manager.getCommandRunner().runCommand( statusServiceCommand );
         if ( statusServiceCommand.hasSucceeded() ) {
             AgentResult ar = statusServiceCommand.getResults().get( node.getUuid() );
-            if ( ar.getStdOut().contains( "is running" ) ) {
-                productOperation.addLog( "elasticsearch is running" );
+            if ( ar.getStdOut().contains( "elasticsearch" ) ) {
+                productOperation.addLogDone( ar.getStdOut() );
             }
             else {
                 productOperation.addLogFailed( "elasticsearch is not running" );
             }
         }
         else {
-            productOperation.addLogFailed( "elasticsearch is not running" );
+            productOperation.addLogFailed( "Elasticsearch check status command is not succeeded !!!" );
         }
     }
 }

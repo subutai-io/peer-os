@@ -45,15 +45,15 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Elastics
         manager.getCommandRunner().runCommand( startServiceCommand );
         if ( startServiceCommand.hasSucceeded() ) {
             AgentResult ar = startServiceCommand.getResults().get( node.getUuid() );
-            if ( ar.getStdOut().contains( "is running" ) ) {
-                productOperation.addLog( "elasticsearch is running" );
+            if ( ar.getStdOut().contains( "elasticsearch" ) ) {
+                productOperation.addLogDone( ar.getStdOut() );
             }
             else {
-                productOperation.addLogFailed( "elasticsearch is not running" );
+                productOperation.addLogFailed( "Could not start Elasticsearch !!!" );
             }
         }
         else {
-            productOperation.addLogFailed( "elasticsearch is not running" );
+            productOperation.addLogFailed( "Elasticsearch start command is not succeeded !!!" );
         }
     }
 }

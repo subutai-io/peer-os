@@ -46,15 +46,15 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Elasticse
         manager.getCommandRunner().runCommand( stopServiceCommand );
         if ( stopServiceCommand.hasSucceeded() ) {
             AgentResult ar = stopServiceCommand.getResults().get( node.getUuid() );
-            if ( ar.getStdOut().contains( "is running" ) ) {
-                productOperation.addLog( "elasticsearch is running" );
+            if ( ar.getStdOut().contains( "elasticsearch" ) ) {
+                productOperation.addLogDone( ar.getStdOut() );
             }
             else {
-                productOperation.addLogFailed( "elasticsearch is not running" );
+                productOperation.addLogFailed( "Could not stop Elasticsearch" );
             }
         }
         else {
-            productOperation.addLogFailed( "elasticsearch is not running" );
+            productOperation.addLogFailed( "Elasticsearch stop command is not succeeded !!!\"" );
         }
     }
 }

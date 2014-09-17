@@ -8,6 +8,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -33,9 +34,9 @@ public class Manager
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
 
-    public Manager()
-    {
 
+    public Manager( )
+    {
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
@@ -381,7 +382,7 @@ public class Manager
                                             synchronized( progressIcon ) {
                                                 String status = parseServiceResult( result );
                                                 resultHolder.setValue( status );
-                                                if ( status.contains( "not" ) ){
+                                                if( status.contains( "not" ) ) {
                                                     startButton.setEnabled( true );
                                                     stopButton.setEnabled( false );
                                                 } else {
@@ -402,7 +403,7 @@ public class Manager
                     startButton.setEnabled(false);
                     stopButton.setEnabled(false);
                     ElasticsearchUI.getExecutor()
-                            .execute(new StartTask( elasticsearchClusterConfiguration.getClusterName(), agent.getHostname(),
+                            .execute( new StartTask( elasticsearchClusterConfiguration.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
                                         @Override
                                         public void onComplete( String result ) {
@@ -411,7 +412,7 @@ public class Manager
                                                 progressIcon.setVisible( false );
                                             }
                                         }
-                                    }));
+                                    } ) );
                 }
             });
 
@@ -422,7 +423,7 @@ public class Manager
                     startButton.setEnabled(false);
                     stopButton.setEnabled(false);
                     ElasticsearchUI.getExecutor()
-                            .execute(new StopTask( elasticsearchClusterConfiguration.getClusterName(), agent.getHostname(),
+                            .execute( new StopTask( elasticsearchClusterConfiguration.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
                                         @Override
                                         public void onComplete( String result ) {
@@ -431,7 +432,7 @@ public class Manager
                                                 progressIcon.setVisible( false );
                                             }
                                         }
-                                    }));
+                                    } ) );
                 }
             });
         }
