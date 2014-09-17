@@ -75,9 +75,8 @@ public class PeerImpl implements PeerManager {
     public String register( final Peer peer ) {
 
         try {
-            String peerId = peer.getId().toString();
-            peerDAO.saveInfo( SOURCE, peerId, peer );
-            return peerId;
+            peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
+            return peer.getId().toString();
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
