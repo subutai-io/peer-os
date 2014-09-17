@@ -32,7 +32,7 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class Cloner extends VerticalLayout {
 
     private final AgentTree agentTree;
@@ -279,12 +279,13 @@ public class Cloner extends VerticalLayout {
 
     private void populateLxcTable( Map<Agent, List<String>> agents ) {
 
-        for ( final Agent agent : agents.keySet() ) {
+        for ( final Map.Entry<Agent, List<String>> entry : agents.entrySet() ) {
+            Agent agent = entry.getKey();
             if ( lxcTable.getItem( agent.getHostname() ) == null ) {
                 lxcTable.addItem( new Object[] { agent.getHostname(), null, null }, agent.getHostname() );
             }
             lxcTable.setCollapsed( agent.getHostname(), false );
-            for ( String lxc : agents.get( agent ) ) {
+            for ( String lxc : entry.getValue() ) {
                 Embedded progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
 
                 lxcTable.addItem( new Object[] {
