@@ -12,38 +12,45 @@ public class Peer {
     private String id;
 
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
 
-    public void setName(final String name) {
+    public void setName( final String name )
+    {
         this.name = name;
     }
 
 
-    public String getIp() {
+    public String getIp()
+    {
         return ip;
     }
 
 
-    public void setIp(final String ip) {
+    public void setIp( final String ip )
+    {
         this.ip = ip;
     }
 
 
-    public String getId() {
+    public String getId()
+    {
         return id;
     }
 
 
-    public void setId(final String id) {
+    public void setId( final String id )
+    {
         this.id = id;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Peer{" +
                 "name='" + name + '\'' +
                 ", ip='" + ip + '\'' +

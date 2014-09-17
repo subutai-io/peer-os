@@ -19,5 +19,4 @@ public interface PeerManager {
     boolean unregister( String uuid );
 
     Peer getPeerByUUID( String uuid );
-
 }
