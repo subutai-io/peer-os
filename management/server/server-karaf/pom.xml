@@ -97,10 +97,10 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>agent-manager-api</artifactId>
                 </artifactItem>
-                <!--<artifactItem>
-                  <groupId>${project.groupId}</groupId>
+                <artifactItem>
+                <groupId>${project.groupId}</groupId>
                   <artifactId>agent-manager-impl</artifactId>
-                </artifactItem>-->
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- agent-manager -->
