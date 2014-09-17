@@ -22,7 +22,8 @@ import com.google.gson.GsonBuilder;
 public class CommandJson {
 
     private static final Logger LOG = Logger.getLogger( CommandJson.class.getName() );
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().addDeserializationExclusionStrategy(
+            new SkipNullsExclusionStrategy() ).disableHtmlEscaping().create();
 
 
     /**
