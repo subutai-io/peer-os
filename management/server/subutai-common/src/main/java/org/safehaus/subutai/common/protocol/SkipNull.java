@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Annotation for fields that shud be skiiped when deserializing json to POJO using GSON
+ * Annotation for fields that should be skipped when deserializing json to POJO using GSON
  */
 @Target( value = ElementType.FIELD )
 @Retention( value = RetentionPolicy.RUNTIME )
