@@ -17,17 +17,9 @@ public class EnvironmentBuildProcessDetails extends DetailsWindow {
         }
 
 
-        public void setContent(final EnvironmentBuildProcess environmentBuildProcess ) {
-            StringBuilder sb = new StringBuilder();
-            sb.append( environmentBuildProcess.getUuid()).append( "\n" );
-            if ( environmentBuildProcess.getContainerBuildMessages() != null) {
-                for (ContainerBuildMessage block : environmentBuildProcess.getContainerBuildMessages()) {
-                    sb.append(block.isCompleteState()).append( "\n" );
-                }
-            }
-
+        public void setContent(String content ) {
             TextArea area = getTextArea();
-            area.setValue(sb.toString());
+            area.setValue(content);
             verticalLayout.addComponent(area);
         }
 

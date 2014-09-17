@@ -16,6 +16,8 @@ import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -33,6 +35,7 @@ public class EnvironmentBuildWizard extends DetailsWindow {
 
     private static final Logger LOG = Logger.getLogger( EnvironmentBuildWizard.class.getName() );
 
+    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     int step = 0;
     EnvironmentBuildTask environmentBuildTask;
     Table peersTable;
@@ -199,26 +202,26 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    private List<String> selectedPeers() {
-        List<String> l = new ArrayList<String>();
+    private List<UUID> selectedPeers() {
+        List<UUID> uuids = new ArrayList<>();
         for ( Object itemId : peersTable.getItemIds() )
         {
-            String name = ( String ) peersTable.getItem( itemId ).getItemProperty( "Name" ).getValue();
+            UUID uuid = ( UUID ) peersTable.getItem( itemId ).getItemProperty( "ID" ).getValue();
             CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
             if ( selection.getValue() )
             {
-                l.add( name );
+                uuids.add( uuid );
             }
         }
-        return l;
+        return uuids;
     }
 
 
     private void createBackgroundEnvironmentBuildProcess() {
         EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
 
-        Map<String, Map<String, ContainerBuildMessage>> buildMessageMap =
-                new HashMap<String, Map<String, ContainerBuildMessage>>();
+        Map<UUID, Map<String, ContainerBuildMessage>> buildMessageMap =
+                new HashMap<UUID, Map<String, ContainerBuildMessage>>();
 
         for ( Object itemId : containerToPeerTable.getItemIds() )
         {
@@ -227,33 +230,27 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             ComboBox selection =
                     ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
 
-            String peerName = ( String ) selection.getValue();
+            UUID peerUuid = ( UUID ) selection.getValue();
 
 
-            if ( !buildMessageMap.containsKey( peerName ) )
+            if ( !buildMessageMap.containsKey( peerUuid ) )
             {
-                if ( !buildMessageMap.get( peerName ).containsKey( templateName ) )
-                {
-                    ContainerBuildMessage cbm = new ContainerBuildMessage();
-                    cbm.setTemplateName( templateName );
-                    cbm.setPeerId( peerName );
-                    cbm.setCompleteState( false );
-                    cbm.setEnvironmentUuid( environmentBuildTask.getUuid().toString() );
-                    buildMessageMap.get( peerName ).put( templateName, cbm );
-                }
-                else
-                {
-                    buildMessageMap.get( peerName ).get( templateName ).incrementNumOfCont();
-                }
 
-                //                buildMessageMapput( peerName, buildBlock );
+                ContainerBuildMessage cbm = new ContainerBuildMessage();
+                cbm.setTemplateName( templateName );
+                cbm.setPeerId( peerUuid );
+                cbm.setCompleteState( false );
+                cbm.setEnvironmentUuid( environmentBuildTask.getUuid().toString() );
+//                buildMessageMap.put( peerUuid ).put( templateName, cbm );
             }
             else
             {
-                //                buildMessageMap.get( templateName ).get
+                buildMessageMap.get( peerUuid ).get( templateName ).incrementNumOfCont();
             }
         }
 
+        String json = gson.toJson( environmentBuildProcess );
+        LOG.info( json );
         managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
     }
 }

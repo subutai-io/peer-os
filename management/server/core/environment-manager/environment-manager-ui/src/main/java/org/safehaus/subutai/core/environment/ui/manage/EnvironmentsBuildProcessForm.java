@@ -9,10 +9,11 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
@@ -25,8 +26,7 @@ public class EnvironmentsBuildProcessForm {
     private EnvironmentManagerUI managerUI;
 
 
-    public EnvironmentsBuildProcessForm( final EnvironmentManagerUI managerUI )
-    {
+    public EnvironmentsBuildProcessForm( final EnvironmentManagerUI managerUI ) {
         this.managerUI = managerUI;
 
         contentRoot = new VerticalLayout();
@@ -39,8 +39,7 @@ public class EnvironmentsBuildProcessForm {
 
         getEnvironmentsButton.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( final Button.ClickEvent clickEvent ) {
                 updateTableData();
             }
         } );
@@ -51,10 +50,15 @@ public class EnvironmentsBuildProcessForm {
 
         saveBuildProcessButton.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( final Button.ClickEvent clickEvent ) {
 
                 EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
+                ContainerBuildMessage message = new ContainerBuildMessage();
+                message.setNumberOfContainers( 4 );
+                message.setTemplateName( "master" );
+                message.setStrategy( "ROUND_ROBIN" );
+                message.setEnvironmentUuid( UUID.randomUUID().toString() );
+
                 environmentBuildProcess.addBuildBlock( new ContainerBuildMessage() );
 
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
@@ -67,8 +71,7 @@ public class EnvironmentsBuildProcessForm {
     }
 
 
-    private Table createTable( String caption, int size )
-    {
+    private Table createTable( String caption, int size ) {
         Table table = new Table( caption );
         table.addContainerProperty( "Name", UUID.class, null );
         table.addContainerProperty( "Date", String.class, null );
@@ -94,48 +97,99 @@ public class EnvironmentsBuildProcessForm {
     }
 
 
-    private void updateTableData()
-    {
+    private void updateTableData() {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildProcess> environmentList = managerUI.getEnvironmentManager().getBuildProcesses();
-        for ( final EnvironmentBuildProcess environmentBuildProcess : environmentList )
+        List<EnvironmentBuildProcess> environmentBuildProcessList =
+                managerUI.getEnvironmentManager().getBuildProcesses();
+        for ( final EnvironmentBuildProcess environmentBuildProcess : environmentBuildProcessList )
         {
             Button viewEnvironmentInfoButton = new Button( "Info" );
             viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {
                 @Override
-                public void buttonClick( final Button.ClickEvent clickEvent )
-                {
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
                     EnvironmentBuildProcessDetails detailsWindow =
                             new EnvironmentBuildProcessDetails( "Environment details" );
-                    detailsWindow.setContent( environmentBuildProcess );
-                    contentRoot.getUI().addWindow( detailsWindow );
+                    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+                    String json = gson.toJson( environmentBuildProcess, EnvironmentBuildProcess.class );
+                    detailsWindow.setContent( json );
+                    contentRoot.getUI().addWindow( detailsWindow);
                     detailsWindow.setVisible( true );
                 }
             } );
 
-            Button terminateButton = new Button( "Terminate" );
-            terminateButton.addClickListener( new Button.ClickListener() {
-                @Override
-                public void buttonClick( final Button.ClickEvent clickEvent )
-                {
-                    // TODO terminate environment build process
-                    Notification.show( "Terminated", Notification.Type.WARNING_MESSAGE );
-                }
-            } );
+            Button processButton = null;
+            Embedded progressIcon = null;
 
-            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setVisible( true );
+            switch ( environmentBuildProcess.getProcessStatusEnum() )
+            {
+                case NEW_PROCESS:
+                {
+                    processButton = new Button( "Build" );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon.setVisible( true );
+                    processButton.addClickListener( new Button.ClickListener() {
+                        @Override
+                        public void buttonClick( final Button.ClickEvent clickEvent ) {
+                            // TODO create build thred
+                            //                            managerUI.getPeerManager().createContainers();
+                        }
+                    } );
+                    break;
+                }
+                case IN_PROGRESS:
+                {
+                    processButton = new Button( "Terminate" );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon.setVisible( true );
+                    processButton.addClickListener( new Button.ClickListener() {
+                        @Override
+                        public void buttonClick( final Button.ClickEvent clickEvent ) {
+                            // TODO create build thred
+
+                        }
+                    } );
+                    break;
+                }
+                case FAILED:
+                {
+                    processButton = new Button( "Destroy" );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon.setVisible( true );
+                    processButton.addClickListener( new Button.ClickListener() {
+                        @Override
+                        public void buttonClick( final Button.ClickEvent clickEvent ) {
+                            // TODO create build thred
+
+                        }
+                    } );
+                    break;
+                }
+                case SUCCESSFUL:
+                {
+                    processButton = new Button( "Configure" );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon.setVisible( true );
+                    processButton.addClickListener( new Button.ClickListener() {
+                        @Override
+                        public void buttonClick( final Button.ClickEvent clickEvent ) {
+                            // TODO create build thred
+
+                        }
+                    } );
+                    break;
+                }
+            }
+
 
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    environmentBuildProcess.getUuid(), "$date", progressIcon, viewEnvironmentInfoButton, terminateButton
+                    environmentBuildProcess.getUuid(), "$date", progressIcon, viewEnvironmentInfoButton, processButton
             }, null );
         }
         environmentsTable.refreshRowCache();
     }
 
 
-    public VerticalLayout getContentRoot()
-    {
+    public VerticalLayout getContentRoot() {
         return this.contentRoot;
     }
 }

@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
+import java.util.UUID;
+
+
 /**
  * Created by bahadyr on 9/14/14.
  */
@@ -13,20 +16,20 @@ public class ContainerBuildMessage {
     private boolean completeState;
     private int timestamp;
     private String targetPeerId;
-    private String peerId;
+    private UUID peerId;
 
 
-    public ContainerBuildMessage(  ) {
+    public ContainerBuildMessage() {
         this.numberOfContainers = 0;
-
     }
 
-    public String getPeerId() {
+
+    public UUID getPeerId() {
         return peerId;
     }
 
 
-    public void setPeerId( final String peerId ) {
+    public void setPeerId( final UUID peerId ) {
         this.peerId = peerId;
     }
 

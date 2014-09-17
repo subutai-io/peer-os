@@ -14,6 +14,7 @@ public class EnvironmentBuildProcess {
     String environmentName;
     private UUID uuid;
     private boolean completeStatus;
+    private ProcessStatusEnum processStatusEnum;
     private int timestamp;
     private List<ContainerBuildMessage> containerBuildMessages;
 
@@ -21,6 +22,17 @@ public class EnvironmentBuildProcess {
     public EnvironmentBuildProcess() {
         this.uuid = UUID.randomUUID();
         this.containerBuildMessages = new ArrayList<ContainerBuildMessage>();
+        this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
+    }
+
+
+    public ProcessStatusEnum getProcessStatusEnum() {
+        return processStatusEnum;
+    }
+
+
+    public void setProcessStatusEnum( final ProcessStatusEnum processStatusEnum ) {
+        this.processStatusEnum = processStatusEnum;
     }
 
 

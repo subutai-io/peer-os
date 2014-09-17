@@ -30,4 +30,6 @@ public interface PeerManager {
     public void sendPeerMessage( Peer peer, String recipient, Object message ) throws PeerMessageException;
 
     public void processPeerMessage( String peerId, String peerMessage ) throws PeerMessageException;
+
+    void createContainers( UUID envId, String template, int numberOfNodes, String Strategy, List<String> criteria );
 }

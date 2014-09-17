@@ -215,4 +215,11 @@ public class PeerImpl implements PeerManager {
             throw new PeerMessageException( e.getMessage() );
         }
     }
+
+
+    @Override
+    public void createContainers( final UUID envId, final String template, final int numberOfNodes,
+                                  final String Strategy, final List<String> criteria ) {
+
+    }
 }
