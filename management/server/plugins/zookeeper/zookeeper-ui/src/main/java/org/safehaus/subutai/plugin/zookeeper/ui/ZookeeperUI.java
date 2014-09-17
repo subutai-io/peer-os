@@ -76,6 +76,6 @@ public class ZookeeperUI implements PortalModule {
 
     @Override
     public Boolean isCorePlugin() {
-        return null;
+        return false;
     }
 }

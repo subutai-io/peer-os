@@ -7,15 +7,19 @@ import org.safehaus.subutai.server.ui.api.PortalModuleService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class PortalModuleServiceImpl implements PortalModuleService {
+
+    private static final Logger LOG = Logger.getLogger(PortalModuleServiceImpl.class.getName());
 
     private List<PortalModule> modules = Collections.synchronizedList(new ArrayList<PortalModule>());
 
     private List<PortalModuleListener> listeners = Collections.synchronizedList(new ArrayList<PortalModuleListener>());
 
-    public void registerModule(PortalModule module) {
+    public synchronized void registerModule(PortalModule module) {
         if (module == null) {
             return;
         }
@@ -26,7 +30,7 @@ public class PortalModuleServiceImpl implements PortalModuleService {
         }
     }
 
-    public void unregisterModule(PortalModule module) {
+    public synchronized void unregisterModule(PortalModule module) {
         if (module == null) {
             return;
         }
@@ -37,20 +41,20 @@ public class PortalModuleServiceImpl implements PortalModuleService {
         }
     }
 
-    @Override
-    public PortalModule getModule(String pModuleId) {
-        for (PortalModule module : modules) {
-            if (pModuleId.equals(module.getId())) {
-                return module;
-            }
-        }
-        throw new IllegalArgumentException("Cannot find any module with the id given");
-    }
+	@Override
+	public PortalModule getModule(String pModuleId) {
+		for (PortalModule module : modules) {
+			if (pModuleId.equals(module.getId())) {
+				return module;
+			}
+		}
+		throw new IllegalArgumentException("Cannot find any module with the id given");
+	}
 
     public List<PortalModule> getModules() {
-        List<PortalModule> pluginModules = new ArrayList<>();
+        List<PortalModule> pluginModules = Collections.synchronizedList(new ArrayList<PortalModule>());
         for (PortalModule module : modules) {
-            if (!module.isCorePlugin()) {
+            if (module.isCorePlugin() != null || !module.isCorePlugin()) {
                 pluginModules.add(module);
             }
         }
@@ -58,28 +62,26 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
     public List<PortalModule> getCoreModules() {
-        List<PortalModule> coreModules = new ArrayList<>();
+        List<PortalModule> coreModules = Collections.synchronizedList(new ArrayList<PortalModule>());
         for (PortalModule module : modules) {
-            if (module.isCorePlugin()) {
+            LOG.log(Level.WARNING, module.getId());
+            if (module.isCorePlugin() != null || module.isCorePlugin()) {
                 coreModules.add(module);
             }
         }
         return Collections.unmodifiableList(coreModules);
     }
 
-    public synchronized void addListener(PortalModuleListener listener) {
-        if (listener == null) {
-            return;
-        }
-        System.out.println("ModuleServiceImpl: Adding listener " + listener);
-        listeners.add(listener);
-    }
+	public synchronized void addListener(PortalModuleListener listener) {
+		System.out.println("ModuleServiceImpl: Adding listener " + listener);
+		listeners.add(listener);
+	}
 
-    public synchronized void removeListener(PortalModuleListener listener) {
-        if (listener != null) {
-            System.out.println("ModuleServiceImpl: Removing listener " + listener);
-            listeners.remove(listener);
-        }
-    }
+	public synchronized void removeListener(PortalModuleListener listener) {
+		if (listener != null) {
+			System.out.println("ModuleServiceImpl: Removing listener " + listener);
+			listeners.remove(listener);
+		}
+	}
 
 }

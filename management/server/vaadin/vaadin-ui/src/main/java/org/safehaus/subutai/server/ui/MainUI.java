@@ -40,7 +40,6 @@ import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.safehaus.subutai.server.ui.views.MonitorView;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -68,7 +67,7 @@ public class MainUI extends UI {
 		{
 			put("/modules", ModulesView.class);
 			put("/monitor", MonitorView.class);
-            put("/core", CoreModulesView.class);
+            put("/schedule", CoreModulesView.class);
 		}
 	};
 
@@ -301,7 +300,7 @@ public class MainUI extends UI {
 
 		menu.removeAllComponents();
 
-		for (final String view : new String[] {"modules", "monitor", "core"}) {
+		for (final String view : new String[] {"modules", "monitor", "schedule"}) {
 			Button b = new NativeButton(view.substring(0, 1).toUpperCase()
 					+ view.substring(1).replace('-', ' '));
 			b.addStyleName("icon-" + view);
@@ -352,15 +351,14 @@ public class MainUI extends UI {
 	}
 
 	private void clearMenuSelection() {
-		for (Iterator<Component> it = menu.iterator(); it.hasNext(); ) {
-			Component next = it.next();
-			if (next instanceof NativeButton) {
-				next.removeStyleName("selected");
-			} else if (next instanceof DragAndDropWrapper) {
-				// Wow, this is ugly (even uglier than the rest of the code)
-				((DragAndDropWrapper) next).iterator().next()
-						.removeStyleName("selected");
-			}
-		}
+        for (Component next : menu) {
+            if (next instanceof NativeButton) {
+                next.removeStyleName("selected");
+            } else if (next instanceof DragAndDropWrapper) {
+                // Wow, this is ugly (even uglier than the rest of the code)
+                ((DragAndDropWrapper) next).iterator().next()
+                        .removeStyleName("selected");
+            }
+        }
 	}
 }
