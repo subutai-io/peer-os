@@ -1,9 +1,11 @@
-package org.safehaus.subutai.common.protocol;
+package org.safehaus.subutai.core.dispatcher.impl;
 
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Request;
 
 import com.google.common.base.Preconditions;
 

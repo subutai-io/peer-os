@@ -28,7 +28,7 @@ public class AccumuloUI implements PortalModule {
     protected static final Logger LOG = Logger.getLogger( AccumuloUI.class.getName() );
     public static final String MODULE_IMAGE = "accumulo.png";
 
-    private static ExecutorService executor;
+    private ExecutorService executor;
 
     private final ServiceLocator serviceLocator;
 
@@ -44,7 +44,6 @@ public class AccumuloUI implements PortalModule {
 
 
     public void destroy() {
-        ;
         executor.shutdown();
     }
 

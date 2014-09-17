@@ -3,13 +3,14 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 
+import com.google.gson.JsonSyntaxException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintLoadForm {
 
     private final VerticalLayout contentRoot;
@@ -53,8 +54,29 @@ public class BlueprintLoadForm {
 
     private void uploadBlueprint() {
 
-        boolean result = managerUI.getEnvironmentManager().saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
-        if ( !result ) {
+        try
+        {
+            String content = blueprintTxtArea.getValue().toString().trim();
+            if ( content.length() > 0 )
+            {
+                boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
+                if ( !result )
+                {
+                    Notification.show( "Error saving blueprint", "Check blueprint format",
+                            Notification.Type.WARNING_MESSAGE );
+                }
+                else
+                {
+                    Notification.show( "Blueprint saved", "Blueprint saved", Notification.Type.HUMANIZED_MESSAGE );
+                }
+            }
+            else
+            {
+                Notification.show( "Please provide a blueprint", "Content is empty", Notification.Type.ERROR_MESSAGE );
+            }
+        }
+        catch ( JsonSyntaxException e )
+        {
             Notification.show( "Error saving blueprint", "Check blueprint format", Notification.Type.WARNING_MESSAGE );
         }
     }
