@@ -21,7 +21,7 @@ public interface PeerManager {
 
     boolean unregister( String uuid );
 
-    Peer getPeerByUUID( String uuid );
+    Peer getPeerByUUID( UUID uuid );
 
     public void addPeerMessageListener( PeerMessageListener listener );
 

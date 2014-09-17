@@ -87,7 +87,7 @@ public class RestServiceImpl implements RestService {
         Peer peer = new Peer();
         peer.setName( "Peer name" );
         peer.setIp( "10.10.10.10" );
-        peer.setId( UUID.randomUUID().toString() );
+        peer.setId( UUID.randomUUID() );
         return peer;
     }
 }

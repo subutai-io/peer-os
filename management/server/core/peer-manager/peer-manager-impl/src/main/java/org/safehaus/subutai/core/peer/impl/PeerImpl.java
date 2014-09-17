@@ -75,7 +75,7 @@ public class PeerImpl implements PeerManager {
     public String register( final Peer peer ) {
 
         try {
-            String peerId = peer.getId();
+            String peerId = peer.getId().toString();
             peerDAO.saveInfo( SOURCE, peerId, peer );
             return peerId;
         }
@@ -119,9 +119,17 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public Peer getPeerByUUID( String uuid ) {
+    public Peer getPeerByUUID( UUID uuid ) {
+        if ( getSiteId().compareTo( uuid ) == 0 ) {
+            Peer peer = new Peer();
+            peer.setId( uuid );
+            peer.setIp( "127.0.0.1" );
+            peer.setName( "Me" );
+            return peer;
+        }
+
         try {
-            return peerDAO.getInfo( SOURCE, uuid, Peer.class );
+            return peerDAO.getInfo( SOURCE, uuid.toString(), Peer.class );
         }
         catch ( DBException e ) {
             LOG.info( e.getMessage() );
@@ -162,8 +170,7 @@ public class PeerImpl implements PeerManager {
     @Override
     public void sendPeerMessage( final Peer peer, String recipient, final Object message ) throws PeerMessageException {
         PeerMessage peerMessage = new PeerMessageImpl( recipient, message );
-        //TODO use real IP of peer
-        String ip = "127.0.0.1";//peer.getIp();
+        String ip = peer.getIp();
 
         Map<String, String> params = new HashMap<>();
         params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
@@ -187,22 +194,24 @@ public class PeerImpl implements PeerManager {
     public void processPeerMessage( final String peerId, final String peerMessage ) throws PeerMessageException {
 
         try {
+            UUID peerUUID = UUID.fromString( peerId );
             PeerMessage peerMsg = JsonUtil.fromJson( peerMessage, PeerMessage.class );
 
             for ( PeerMessageListener listener : peerMessageListeners ) {
                 if ( listener.getName().equalsIgnoreCase( peerMsg.getRecipientName() ) ) {
-                    Peer senderPeer = getPeerByUUID( peerId );
+                    Peer senderPeer = getPeerByUUID( peerUUID );
                     try {
                         listener.onMessage( senderPeer, peerMsg.getMessage() );
                     }
                     catch ( Exception e ) {
                         LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                        throw e;
                     }
                     //                break;
                 }
             }
         }
-        catch ( JsonSyntaxException e ) {
+        catch ( IllegalArgumentException | JsonSyntaxException e ) {
             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
