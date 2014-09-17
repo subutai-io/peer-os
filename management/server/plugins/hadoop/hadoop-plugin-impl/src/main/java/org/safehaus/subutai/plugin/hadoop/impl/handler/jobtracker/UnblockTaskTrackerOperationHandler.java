@@ -60,7 +60,7 @@ public class UnblockTaskTrackerOperationHandler extends AbstractOperationHandler
         try {
             manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                     hadoopClusterConfig );
-            productOperation.addLog( "Cluster info saved to DB" );
+            productOperation.addLogDone( "Cluster info saved to DB" );
         }
         catch ( DBException e ) {
             productOperation
@@ -71,7 +71,7 @@ public class UnblockTaskTrackerOperationHandler extends AbstractOperationHandler
 
     private void logCommand( Command command, ProductOperation po ) {
         if ( command.hasSucceeded() ) {
-            po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
+            po.addLog( String.format( "Task's operation %s finished", command.getDescription() ) );
         }
         else if ( command.hasCompleted() ) {
             po.addLogFailed( String.format( "Task's operation %s failed", command.getDescription() ) );

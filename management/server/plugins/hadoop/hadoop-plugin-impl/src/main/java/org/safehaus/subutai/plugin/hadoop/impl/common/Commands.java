@@ -121,7 +121,8 @@ public class Commands extends CommandsSingleton {
     public static Command getRemoveDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
 
         return createCommand( "Remove DataNode from NameNode", new RequestBuilder(
-                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ),
                 Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
@@ -129,7 +130,8 @@ public class Commands extends CommandsSingleton {
     public static Command getRemoveTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
 
         return createCommand( "Remove TaskTrackers from JobTracker", new RequestBuilder(
-                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ),
                 Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
@@ -137,20 +139,21 @@ public class Commands extends CommandsSingleton {
     public static Command getExcludeDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
         return createCommand( "Remove DataNode from dfs blacklist", new RequestBuilder(
                 String.format( ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude clear %s",
-                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        agent.getListIP().get( 0 ) ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
     public static Command getExcludeTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
         return createCommand( "Remove TaskTracker from mapred blacklist", new RequestBuilder(
                 String.format( ". /etc/profile && " + "hadoop-master-slave.sh mapred.exclude clear %s",
-                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        agent.getListIP().get( 0 ) ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
     public static Command getIncludeDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
         return createCommand( "Add DataNode to dfs blacklist", new RequestBuilder(
-                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude %s", agent.getHostname() ) ),
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude %s",
+                                agent.getListIP().get( 0 ) ) ),
                 Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
@@ -158,7 +161,7 @@ public class Commands extends CommandsSingleton {
     public static Command getIncludeTaskTrackerCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
         return createCommand( "Add TaskTracker to mapred blacklist", new RequestBuilder(
                 String.format( ". /etc/profile && " + "hadoop-master-slave.sh mapred.exclude %s",
-                        agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        agent.getListIP().get( 0 ) ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
@@ -171,14 +174,14 @@ public class Commands extends CommandsSingleton {
 
     public static Command getRefreshNameNodeCommand( HadoopClusterConfig hadoopClusterConfig ) {
         return createCommand( "Refresh NameNode",
-                new RequestBuilder( ". /etc/profile && " + "hadoop dfsadmin -refreshNodes" ).withTimeout( 20 ),
+                new RequestBuilder( ". /etc/profile && " + "hadoop dfsadmin -refreshNodes" ).withTimeout( 5 ),
                 Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
     public static Command getRefreshJobTrackerCommand( HadoopClusterConfig hadoopClusterConfig ) {
         return createCommand( "Refresh JobTracker",
-                new RequestBuilder( ". /etc/profile && " + "hadoop mradmin -refreshNodes" ).withTimeout( 20 ),
+                new RequestBuilder( ". /etc/profile && " + "hadoop mradmin -refreshNodes" ).withTimeout( 5 ),
                 Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
@@ -211,16 +214,23 @@ public class Commands extends CommandsSingleton {
     }
 
 
+    public static Command getReportHadoopCommand( HadoopClusterConfig hadoopClusterConfig ) {
+        return createCommand( String.format( "Getting hadoop report" ),
+                new RequestBuilder( String.format( ". /etc/profile && " + "hadoop dfsadmin -report" ) ).withTimeout( 20 ),
+                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+    }
+
+
     public static Command getStartDatanodeCommand( Agent agent ) {
         return createCommand( String.format( "Start DataNode" ),
-                new RequestBuilder( String.format( ". /etc/profile && " + "hadoop-daemon.sh start datanode" ) ).withTimeout( 20 ),
+                new RequestBuilder( String.format( ". /etc/profile && " + "hadoop-daemons.sh start datanode" ) ).withTimeout( 20 ),
                 Sets.newHashSet( agent ) );
     }
 
 
     public static Command getStopDatanodeCommand( Agent agent ) {
         return createCommand( String.format( "Stop DataNode" ),
-                new RequestBuilder( String.format( ". /etc/profile && " + "hadoop-daemon.sh stop datanode" ) ).withTimeout( 20 ),
+                new RequestBuilder( String.format( ". /etc/profile && " + "hadoop-daemons.sh stop datanode" ) ).withTimeout( 20 ),
                 Sets.newHashSet( agent ) );
     }
 

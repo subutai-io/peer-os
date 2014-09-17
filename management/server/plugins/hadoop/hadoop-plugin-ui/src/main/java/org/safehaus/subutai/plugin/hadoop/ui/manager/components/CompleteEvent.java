@@ -3,19 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.common.enums;
+package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
+
+
+import org.safehaus.subutai.common.enums.NodeState;
 
 
 /**
  * @author dilshat
  */
-public enum NodeState
+public interface CompleteEvent
 {
 
-    STOPPED,
-    RUNNING,
-    UNKNOWN,
-    NORMAL,
-    DECOMMISSION_IN_PROGRESS,
-    DECOMMISSIONED,
+    public void onComplete( String operationLog );
+
 }

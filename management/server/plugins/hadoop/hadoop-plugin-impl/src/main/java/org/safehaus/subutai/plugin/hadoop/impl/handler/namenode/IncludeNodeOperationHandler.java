@@ -20,7 +20,7 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
         super( manager, clusterName );
         this.lxcHostName = lxcHostName;
         productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
-                String.format( "Including node again to cluster %s", clusterName ) );
+                String.format( "Including node %s again to cluster %s", lxcHostName, clusterName ) );
     }
 
 
@@ -61,7 +61,7 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
         manager.getCommandRunner().runCommand( startDataNodeCommand );
         logCommand( startDataNodeCommand, productOperation );
 
-        Command refreshDataNodeCommand = Commands.getStartNameNodeCommand( node );
+        Command refreshDataNodeCommand = Commands.getRefreshNameNodeCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshDataNodeCommand );
         logCommand( refreshDataNodeCommand, productOperation );
 
@@ -74,17 +74,17 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
         manager.getCommandRunner().runCommand( includeTaskTrackerCommand );
         logCommand( includeTaskTrackerCommand, productOperation );
 
-        Command stopTaskTrackerCommand = Commands.getStopDatanodeCommand( node );
+        Command stopTaskTrackerCommand = Commands.getStopTaskTrackerCommand( node );
         manager.getCommandRunner().runCommand( stopTaskTrackerCommand );
         logCommand( stopTaskTrackerCommand, productOperation );
 
-        Command startTaskTrackerCommand = Commands.getStartDatanodeCommand( node );
+        Command startTaskTrackerCommand = Commands.getStartTaskTrackerCommand( node );
         manager.getCommandRunner().runCommand( startTaskTrackerCommand );
         logCommand( startTaskTrackerCommand, productOperation );
 
-        Command refreshTaskTrackerCommand = Commands.getStartTaskTrackerCommand( node );
-        manager.getCommandRunner().runCommand( refreshTaskTrackerCommand );
-        logCommand( refreshTaskTrackerCommand, productOperation );
+        Command refreshJobTrackerCommand = Commands.getRefreshJobTrackerCommand( hadoopClusterConfig );
+        manager.getCommandRunner().runCommand( refreshJobTrackerCommand );
+        logCommand( refreshJobTrackerCommand, productOperation );
 
 
         hadoopClusterConfig.getBlockedAgents().remove( node );
@@ -92,7 +92,7 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
         try {
             manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                     hadoopClusterConfig );
-            productOperation.addLog( "Cluster info saved to DB" );
+            productOperation.addLogDone( "Cluster info saved to DB" );
             return;
         }
         catch ( DBException e ) {
@@ -105,7 +105,7 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
 
     private void logCommand( Command command, ProductOperation po ) {
         if ( command.hasSucceeded() ) {
-            po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
+            po.addLog( String.format( "Task's operation %s finished", command.getDescription() ) );
         }
         else if ( command.hasCompleted() ) {
             po.addLogFailed( String.format( "Task's operation %s failed", command.getDescription() ) );

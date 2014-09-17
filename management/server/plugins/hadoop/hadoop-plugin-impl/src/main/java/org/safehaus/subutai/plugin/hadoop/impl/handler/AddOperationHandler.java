@@ -60,7 +60,7 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl> {
                         manager.getCommandRunner().runCommand( command );
 
                         if ( command.hasSucceeded() ) {
-                            productOperation.addLogDone( String.format( "%s succeeded", command.getDescription() ) );
+                            productOperation.addLog( String.format( "%s succeeded", command.getDescription() ) );
                         }
                         else {
                             productOperation.addLogFailed(
@@ -75,7 +75,7 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl> {
                         manager.getPluginDAO()
                                .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                                        hadoopClusterConfig );
-                        productOperation.addLog( "Cluster info saved to DB" );
+                        productOperation.addLogDone( "Cluster info saved to DB" );
                     }
                     catch ( DBException e ) {
                         productOperation.addLogFailed(

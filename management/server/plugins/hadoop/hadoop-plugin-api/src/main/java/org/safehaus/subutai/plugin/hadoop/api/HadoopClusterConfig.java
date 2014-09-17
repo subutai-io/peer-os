@@ -29,15 +29,12 @@ public class HadoopClusterConfig implements ConfigBase {
     private List<Agent> dataNodes, taskTrackers;
     private Integer replicationFactor = 1, countOfSlaveNodes = 1;
     private Set<Agent> blockedAgents;
-    private List<Agent> decommissioningNodes;
-
 
     public HadoopClusterConfig() {
         domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<>();
         taskTrackers = new ArrayList<>();
         blockedAgents = new HashSet<>();
-        decommissioningNodes = new ArrayList<>();
     }
 
 
@@ -85,6 +82,15 @@ public class HadoopClusterConfig implements ConfigBase {
 
         return new ArrayList<>( allAgents );
     }
+
+
+    public void removeNode( Agent agent ) {
+        if ( dataNodes.contains( agent ) )
+            dataNodes.remove( agent );
+        if ( taskTrackers.contains( agent ) )
+            taskTrackers.remove( agent );
+    }
+
 
 
     public String getClusterName() {
@@ -298,8 +304,4 @@ public class HadoopClusterConfig implements ConfigBase {
                 '}';
     }
 
-
-    public List<Agent> getDecommissioningNodes() {
-        return decommissioningNodes;
-    }
 }

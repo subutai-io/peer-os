@@ -1,8 +1,14 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -41,6 +47,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StopJobTracker
 import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StopTaskTrackerOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.UnblockTaskTrackerOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.BlockDataNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.CheckDecommissionStatusOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.ExcludeNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.IncludeNodeOperationHandler;
@@ -54,13 +61,8 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StopDataNodeOper
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StopNameNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.UnblockDataNodeOperationHandler;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public class HadoopImpl implements Hadoop {
@@ -78,8 +80,8 @@ public class HadoopImpl implements Hadoop {
 
 
     public HadoopImpl(AgentManager agentManager, Tracker tracker, CommandRunner commandRunner, DbManager dbManager,
-            NetworkManager networkManager, ContainerManager containerManager,
-            EnvironmentManager environmentManager) {
+                      NetworkManager networkManager, ContainerManager containerManager,
+                      EnvironmentManager environmentManager) {
 
         Preconditions.checkNotNull(commandRunner, "Command Runner is null");
         Preconditions.checkNotNull(agentManager, "Agent Manager is null");
@@ -449,6 +451,20 @@ public class HadoopImpl implements Hadoop {
 
 
     @Override
+    public UUID checkDecomissionStatus( HadoopClusterConfig hadoopClusterConfig ) {
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+
+        AbstractOperationHandler operationHandler =
+                new CheckDecommissionStatusOperationHandler( this, hadoopClusterConfig.getClusterName() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+
+    @Override
     public UUID excludeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
@@ -521,13 +537,13 @@ public class HadoopImpl implements Hadoop {
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po,
-            HadoopClusterConfig hadoopClusterConfig) {
+                                                        HadoopClusterConfig hadoopClusterConfig) {
         return new HadoopSetupStrategy(po, this, hadoopClusterConfig);
     }
 
 
     public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, HadoopClusterConfig hadoopClusterConfig,
-            Environment environment) {
+                                                        Environment environment) {
         return new HadoopSetupStrategy(po, this, hadoopClusterConfig, environment);
     }
 
@@ -551,7 +567,7 @@ public class HadoopImpl implements Hadoop {
         mastersGroup.setNumberOfNodes(HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY);
         mastersGroup.setTemplateName(config.getTemplateName());
         mastersGroup.setPlacementStrategy(PlacementStrategy.MORE_RAM);
-//        mastersGroup.setPhysicalNodes( convertAgent2Hostname() );
+        //        mastersGroup.setPhysicalNodes( convertAgent2Hostname() );
         nodeGroups.add(mastersGroup);
 
         //hadoop slave nodes
@@ -560,7 +576,7 @@ public class HadoopImpl implements Hadoop {
         slavesGroup.setNumberOfNodes(config.getCountOfSlaveNodes());
         slavesGroup.setTemplateName(config.getTemplateName());
         slavesGroup.setPlacementStrategy(PlacementStrategy.MORE_HDD);
-//        slavesGroup.setPhysicalNodes( convertAgent2Hostname() );
+        //        slavesGroup.setPhysicalNodes( convertAgent2Hostname() );
         nodeGroups.add(slavesGroup);
 
         environmentBlueprint.setNodeGroups(nodeGroups);

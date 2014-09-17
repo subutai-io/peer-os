@@ -3,25 +3,15 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
-import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckTask;
-import org.safehaus.subutai.plugin.hadoop.ui.manager.components.StartTask;
-import org.safehaus.subutai.plugin.hadoop.ui.manager.components.StopTask;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
+import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
 
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -32,44 +22,50 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Window;
 
 
 public class Manager {
 
-    private final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
-    private final static String START_ALL_BUTTON_CAPTION = "Start All";
-    private final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
-    private final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    private final static String ADD_NODE_BUTTON_CAPTION = "Add Node";
-    private final static String CHECK_BUTTON_CAPTION = "Check";
-    private final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
-    private static final String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
-    private final static String STOP_NAMENODE_BUTTON_CAPTION = "Stop Namenode";
-    private static final String STOP_JOBTRACKER_BUTTON_CAPTION = "Stop JobTracker";
-    private final static String EXCLUDE_BUTTON_CAPTION = "Exclude";
-    private final static String INCLUDE_BUTTON_CAPTION = "Include";
-    private final static String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
+    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected final static String ADD_NODE_BUTTON_CAPTION = "Add Node";
+    protected final static String CHECK_BUTTON_CAPTION = "Check";
+    protected final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
+    protected static final String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
+    protected final static String STOP_NAMENODE_BUTTON_CAPTION = "Stop Namenode";
+    protected static final String STOP_JOBTRACKER_BUTTON_CAPTION = "Stop JobTracker";
+    protected final static String EXCLUDE_BUTTON_CAPTION = "Exclude";
+    protected final static String INCLUDE_BUTTON_CAPTION = "Include";
+    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected final static String URL_BUTTON_CAPTION = "URL";
 
-    private final static String HOST_COLUMN_CAPTION = "Host";
-    private final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
-    private final static String STATUS_COLUMN_CAPTION = "Status";
-    private final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
 
-    private final GridLayout contentRoot;
-    private final ComboBox clusterList;
-    private final Table masterNodesTable;
-    private final Table slaveNodesTable;
-    private final Label replicationFactor;
-    private final Label domainName;
-    private final Label slaveNodeCount;
-    private Button checkAllButton;
-    private HadoopClusterConfig hadoopCluster;
-    private ProgressBar progressBar;
-    private int processCount = 0;
+    protected final static String HOST_COLUMN_CAPTION = "Host";
+    protected final static String IP_COLUMN_CAPTION = "IP List";
+    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected final static String STATUS_COLUMN_CAPTION = "Status";
+    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String DECOMMISSION_STATUS_CAPTION = "Decommission Status: ";
+    protected static final String START_STOP_BUTTON_DEFAULT_CAPTION = "Start/Stop";
 
+    protected final GridLayout contentRoot;
+    protected final ComboBox clusterList;
+    protected final Table masterNodesTable;
+    protected final Table slaveNodesTable;
+    protected final Label replicationFactor;
+    protected final Label domainName;
+    protected final Label slaveNodeCount;
+    protected Button checkAllButton;
+    protected HadoopClusterConfig hadoopCluster;
+    protected ProgressBar progressBar;
+    protected int processCount = 0;
+    protected String decommissionStatus;
+    protected ManagerListener managerListener;
 
     public Manager() {
+        managerListener = new ManagerListener( this );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -98,8 +94,6 @@ public class Manager {
             public void valueChange( Property.ValueChangeEvent event ) {
                 hadoopCluster = ( HadoopClusterConfig ) event.getProperty().getValue();
                 refreshUI();
-                checkNodesStatus( masterNodesTable );
-                checkNodesStatus( slaveNodesTable );
             }
         } );
 
@@ -110,9 +104,9 @@ public class Manager {
         checkAllButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                refreshClusterList();
-                checkNodesStatus( masterNodesTable );
-                checkNodesStatus( slaveNodesTable );
+                checkAllButton.setEnabled( false );
+                managerListener.refreshClusterList();
+                checkAllStatuses();
             }
         } );
 
@@ -139,76 +133,15 @@ public class Manager {
         } );
         controlsContent.addComponent( stopAllBtn );
 
-        Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( hadoopCluster != null ) {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", hadoopCluster.getClusterName() ),
-                            "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID =
-                                    HadoopUI.getHadoopManager().uninstallCluster( hadoopCluster.getClusterName() );
-                            ProgressWindow window =
-                                    new ProgressWindow( HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID,
-                                            HadoopClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
-                                    checkAllButton.click();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
+        Button destroyClusterButton = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterButton.addStyleName( "default" );
+        destroyClusterButton.addClickListener( managerListener.destroyClusterButtonListener());
 
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
-
-        controlsContent.addComponent( destroyClusterBtn );
+        controlsContent.addComponent( destroyClusterButton );
 
         Button addNodeButton = new Button( ADD_NODE_BUTTON_CAPTION );
         addNodeButton.addStyleName( "default" );
-        addNodeButton.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( hadoopCluster != null ) {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to add slave node to the %s cluster?",
-                                    hadoopCluster.getClusterName() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = HadoopUI.getHadoopManager().addNode( hadoopCluster.getClusterName(), 1 );
-                            ProgressWindow window =
-                                    new ProgressWindow( HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID,
-                                            HadoopClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
-                                    checkAllButton.click();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
+        addNodeButton.addClickListener( managerListener.addNodeButtonListener() );
 
         controlsContent.addComponent( addNodeButton );
 
@@ -241,6 +174,7 @@ public class Manager {
     private Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( STATUS_COLUMN_CAPTION, HorizontalLayout.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
@@ -249,7 +183,7 @@ public class Manager {
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( getTableClickListener( table ) );
+        table.addItemClickListener( managerListener.getTableClickListener( table ) );
 
         return table;
     }
@@ -257,6 +191,7 @@ public class Manager {
 
     private void refreshUI() {
         if ( hadoopCluster != null ) {
+            //            refreshClusterList();
             populateTable( masterNodesTable, getMasterNodeList( hadoopCluster ) );
             populateTable( slaveNodesTable, hadoopCluster.getDataNodes() );
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
@@ -273,35 +208,13 @@ public class Manager {
     }
 
 
-    public void refreshClusterList() {
-        List<HadoopClusterConfig> hadoopClusterList = HadoopUI.getHadoopManager().getClusters();
-        HadoopClusterConfig clusterInfo = ( HadoopClusterConfig ) clusterList.getValue();
-        clusterList.removeAllItems();
-        if ( hadoopClusterList != null && hadoopClusterList.size() > 0 ) {
-            for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
-                clusterList.addItem( hadoopCluster );
-                clusterList.setItemCaption( hadoopCluster, hadoopCluster.getClusterName() );
-            }
-            if ( clusterInfo != null ) {
-                for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
-                    if ( hadoopCluster.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                        clusterList.setValue( hadoopCluster );
-                        return;
-                    }
-                }
-            }
-            else {
-                clusterList.setValue( hadoopClusterList.iterator().next() );
-            }
-        }
-    }
-
 
     public static void checkNodesStatus( Table table ) {
         if ( table != null ) {
             for ( Object o : table.getItemIds() ) {
                 int rowId = ( Integer ) o;
-                HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( table, rowId );
+                Item row = table.getItem( rowId );
+                HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
                 if ( availableOperationsLayout != null ) {
                     Button checkButton = getCheckButton( availableOperationsLayout );
                     if ( checkButton != null ) {
@@ -316,7 +229,8 @@ public class Manager {
     public static void startAllNodes( Table table ) {
         for ( Object o : table.getItemIds() ) {
             int rowId = ( Integer ) o;
-            HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( table, rowId );
+            Item row = table.getItem( rowId );
+            HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
             if ( availableOperationsLayout != null ) {
                 Button startButton = getStartButton( availableOperationsLayout );
                 if ( startButton != null ) {
@@ -330,7 +244,8 @@ public class Manager {
     public static void stopAllNodes( Table table ) {
         for ( Object o : table.getItemIds() ) {
             int rowId = ( Integer ) o;
-            HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( table, rowId );
+            Item row = table.getItem( rowId );
+            HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
             if ( availableOperationsLayout != null ) {
                 Button startButton = getStopButton( availableOperationsLayout );
                 if ( startButton != null ) {
@@ -341,15 +256,14 @@ public class Manager {
     }
 
 
-    private static HorizontalLayout getAvailableOperationsLayout( Table table, int rowId ) {
-        Item row = table.getItem( rowId );
-        HorizontalLayout buttonLayout =
-                ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-        return buttonLayout;
+    protected static HorizontalLayout getAvailableOperationsLayout( Item row ) {
+        if ( row == null )
+            return null;
+        return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
     }
 
 
-    private static Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
+    protected static Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
         }
@@ -365,7 +279,42 @@ public class Manager {
     }
 
 
-    private static Button getStartButton( final HorizontalLayout availableOperationsLayout ) {
+
+    protected static Button getExcludeIncludeButton( final HorizontalLayout availableOperationsLayout ) {
+        if ( availableOperationsLayout == null ) {
+            return null;
+        }
+        else {
+            for ( Component component : availableOperationsLayout ) {
+                if ( component.getCaption().equals( EXCLUDE_BUTTON_CAPTION )
+                        || component.getCaption().equals( INCLUDE_BUTTON_CAPTION ) ) {
+                    return ( Button ) component;
+                }
+            }
+            // If not found
+            return null;
+        }
+    }
+
+
+    protected static Button getDestroyButton( final HorizontalLayout availableOperationsLayout ) {
+        if ( availableOperationsLayout == null ) {
+            return null;
+        }
+        else {
+            for ( Component component : availableOperationsLayout ) {
+                if ( component.getCaption().equals( DESTROY_BUTTON_CAPTION ) ) {
+                    return ( Button ) component;
+                }
+            }
+            // If not found
+            return null;
+        }
+    }
+
+
+
+    protected static Button getStartButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
         }
@@ -399,7 +348,7 @@ public class Manager {
     }
 
 
-    private void show( String notification ) {
+    protected void show( String notification ) {
         Notification.show( notification );
     }
 
@@ -408,453 +357,304 @@ public class Manager {
 
         table.removeAllItems();
 
+        // Add UI components into relevant fields according to its role in cluster
         for ( final Agent agent : agents ) {
-
-            // Layouts to be added to table
-            final HorizontalLayout availableOperations = new HorizontalLayout();
-            final HorizontalLayout statusGroup = new HorizontalLayout();
-
-            availableOperations.addStyleName( "default" );
-            availableOperations.setSpacing( true );
-            statusGroup.addStyleName( "default" );
-            statusGroup.setSpacing( true );
-            // Layouts to be added to table
-
-            // Buttons to be added to availableOperations
-            final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-            final Button destroyButton = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-            final Button startStopButton = new Button( "Start/Stop" );
-            final Button excludeIncludeNodeButton = new Button( "Exclude/Include" );
-
-            checkButton.addStyleName( "default" );
-            startStopButton.addStyleName( "default" );
-            startStopButton.setEnabled( false );
-            excludeIncludeNodeButton.addStyleName( "default" );
-            excludeIncludeNodeButton.setEnabled( false );
-            destroyButton.addStyleName( "default" );
-            // Buttons to be added to availableOperations
-
-
-            // Labels to be added to statusGroup
-            final Label statusDatanode = new Label( "" );
-            final Label statusTaskTracker = new Label( "" );
-
-            statusDatanode.addStyleName( "default" );
-            statusTaskTracker.addStyleName( "default" );
-            // Labels to be added to statusGroup
-
-
-            // Populate table with proper content according to node types
-            startStopButton.setEnabled( false );
-            final HadoopClusterConfig cluster =
-                    HadoopUI.getHadoopManager().getCluster( hadoopCluster.getClusterName() );
-
-
-            // If master node
-            if ( cluster.isMasterNode( agent ) ) {
-                // If Namenode
-                if ( cluster.isNameNode( agent ) ) {
-
-                    checkButton.addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            checkButton.setEnabled( false );
-                            startStopButton.setEnabled( false );
-                            HadoopUI.getExecutor()
-                                    .execute( new CheckTask( NodeType.NAMENODE, hadoopCluster, new CompleteEvent() {
-
-                                        public void onComplete( NodeState state ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                statusDatanode.setValue( "Namenode Running" );
-                                                startStopButton.setCaption( STOP_NAMENODE_BUTTON_CAPTION );
-                                                startStopButton.setEnabled( true );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
-                                                statusDatanode.setValue( "Namenode Stopped" );
-                                                startStopButton.setCaption( START_NAMENODE_BUTTON_CAPTION );
-                                                startStopButton.setEnabled( true );
-                                            }
-                                            else {
-                                                statusDatanode.setValue( "Namenode Not Connected" );
-                                                startStopButton.setCaption( "Not connected" );
-                                            }
-                                            checkButton.setEnabled( true );
-                                        }
-                                    }, null, agent ) );
-                        }
-                    } );
-
-                    startStopButton.addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            startStopButton.setEnabled( false );
-                            enableProgressBar();
-                            boolean isRunning = startStopButton.getCaption().equals( STOP_NAMENODE_BUTTON_CAPTION );
-                            if ( !isRunning ) {
-                                HadoopUI.getExecutor().execute(
-
-                                        new StartTask( NodeType.NAMENODE, hadoopCluster, new CompleteEvent() {
-
-                                            public void onComplete( NodeState state ) {
-                                                try {
-                                                    Thread.sleep( 1000 );
-                                                }
-                                                catch ( InterruptedException e ) {
-                                                    show( "Exception: " + e );
-                                                }
-                                                disableProgressBar();
-                                                checkAllIfNoProcessRunning();
-                                                startStopButton.setEnabled( true );
-                                            }
-                                        }, null, agent ) );
-                            }
-                            else {
-                                HadoopUI.getExecutor().execute(
-
-                                        new StopTask( NodeType.NAMENODE, hadoopCluster, new CompleteEvent() {
-
-                                            public void onComplete( NodeState state ) {
-
-                                                disableProgressBar();
-                                                checkAllIfNoProcessRunning();
-                                                startStopButton.setEnabled( true );
-                                            }
-                                        }, null, agent ) );
-                            }
-                        }
-                    } );
-                }
-                // If Jobtracker
-                else if ( cluster.isJobTracker( agent ) ) {
-
-                    checkButton.addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            startStopButton.setEnabled( false );
-                            checkButton.setEnabled( false );
-                            HadoopUI.getExecutor()
-                                    .execute( new CheckTask( NodeType.JOBTRACKER, hadoopCluster, new CompleteEvent() {
-
-                                                public void onComplete( NodeState state ) {
-                                                    if ( state == NodeState.RUNNING ) {
-                                                        statusTaskTracker.setValue( "JobTracker Running" );
-                                                        startStopButton.setCaption( STOP_JOBTRACKER_BUTTON_CAPTION );
-                                                        startStopButton.setEnabled( true );
-                                                    }
-                                                    else if ( state == NodeState.STOPPED ) {
-                                                        statusTaskTracker.setValue( "JobTracker Stopped" );
-                                                        startStopButton.setCaption( START_JOBTRACKER_BUTTON_CAPTION );
-                                                        startStopButton.setEnabled( true );
-                                                    }
-                                                    else {
-                                                        statusTaskTracker.setValue( "JobTracker Not Connected" );
-                                                        startStopButton.setCaption( "Not connected" );
-                                                    }
-
-                                                    checkButton.setEnabled( true );
-                                                }
-                                            }, null, agent ) );
-                        }
-                    } );
-
-                    startStopButton.addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            startStopButton.setEnabled( false );
-                            enableProgressBar();
-                            boolean isRunning = startStopButton.getCaption().equals( STOP_JOBTRACKER_BUTTON_CAPTION );
-                            if ( !isRunning ) {
-                                startStopButton.setEnabled( false );
-                                HadoopUI.getExecutor().execute(
-                                        new StartTask( NodeType.JOBTRACKER, hadoopCluster, new CompleteEvent() {
-
-                                            public void onComplete( NodeState state ) {
-                                                try {
-                                                    Thread.sleep( 1000 );
-                                                }
-                                                catch ( InterruptedException e ) {
-                                                    show( "Exception: " + e );
-                                                }
-                                                disableProgressBar();
-                                                checkAllIfNoProcessRunning();
-                                                startStopButton.setEnabled( true );
-                                            }
-                                        }, null, agent ) );
-                            }
-                            else {
-                                startStopButton.setEnabled( false );
-                                HadoopUI.getExecutor().execute(
-                                        new StopTask( NodeType.JOBTRACKER, hadoopCluster, new CompleteEvent() {
-
-                                            public void onComplete( NodeState state ) {
-                                                disableProgressBar();
-                                                checkAllIfNoProcessRunning();
-                                                startStopButton.setEnabled( true );
-                                            }
-                                        }, null, agent ) );
-                            }
-                        }
-                    } );
-                }
-                else if ( cluster.isSecondaryNameNode( agent ) ) {
-                    checkButton.addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            checkButton.setEnabled( false );
-                            HadoopUI.getExecutor().execute(
-                                    new CheckTask( NodeType.SECONDARY_NAMENODE, hadoopCluster, new CompleteEvent() {
-
-                                        public void onComplete( NodeState state ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                statusDatanode.setValue( "SecondaryNameNode Running" );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
-                                                statusDatanode.setValue( "SecondaryNameNode Stopped" );
-                                            }
-                                            else {
-                                                statusDatanode.setValue( "SecondaryNameNode Not Connected" );
-                                            }
-
-                                            checkButton.setEnabled( true );
-                                        }
-                                    }, null, agent ) );
-                        }
-                    } );
-                }
-            }
-            // If slave node
-            else {
-                statusGroup.addComponent( statusDatanode );
-                statusGroup.addComponent( statusTaskTracker );
-
-                if ( cluster.getBlockedAgents().contains( agent ) ) {
-                    excludeIncludeNodeButton.setCaption( INCLUDE_BUTTON_CAPTION );
-                    if ( cluster.getDecommissioningNodes().contains( agent ) ) {
-                        destroyButton.setCaption( "Decommissioning" );
-                    }
-                    else {
-                        destroyButton.setCaption( DESTROY_BUTTON_CAPTION );
-                    }
-                }
-                else {
-                    excludeIncludeNodeButton.setCaption( EXCLUDE_BUTTON_CAPTION );
-                    destroyButton.setCaption( DESTROY_BUTTON_CAPTION );
-                }
-
-                checkButton.addClickListener( new Button.ClickListener() {
-                    @Override
-                    public void buttonClick( Button.ClickEvent clickEvent ) {
-                        checkButton.setEnabled( false );
-                        excludeIncludeNodeButton.setEnabled( false );
-                        destroyButton.setEnabled( false );
-                        if ( HadoopUI.getHadoopManager().getCluster( hadoopCluster.getClusterName() )
-                                     .isDataNode( agent ) ) {
-                            HadoopUI.getExecutor()
-                                    .execute( new CheckTask( NodeType.DATANODE, hadoopCluster, new CompleteEvent() {
-
-                                        public void onComplete( NodeState state ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                statusDatanode.setValue( "Datanode Running" );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
-                                                statusDatanode.setValue( "Datanode Stopped" );
-                                            }
-                                            else {
-                                                statusDatanode.setValue( "Not connected" );
-                                            }
-
-                                            if ( cluster.getBlockedAgents().contains( agent ) ) {
-                                                excludeIncludeNodeButton.setCaption( INCLUDE_BUTTON_CAPTION );
-                                                if ( cluster.getDecommissioningNodes().contains( agent ) ) {
-                                                    destroyButton.setCaption( "Decommissioning" );
-                                                }
-                                                else {
-                                                    destroyButton.setCaption( DESTROY_BUTTON_CAPTION );
-                                                }
-                                            }
-                                            else {
-                                                excludeIncludeNodeButton.setCaption( EXCLUDE_BUTTON_CAPTION );
-                                                destroyButton.setCaption( DESTROY_BUTTON_CAPTION );
-                                            }
-
-                                            excludeIncludeNodeButton.setEnabled( true );
-                                            checkButton.setEnabled( true );
-                                            destroyButton.setEnabled( true );
-                                        }
-                                    }, null, agent ) );
-                        }
-                        if ( HadoopUI.getHadoopManager().getCluster( hadoopCluster.getClusterName() )
-                                     .isTaskTracker( agent ) ) {
-                            HadoopUI.getExecutor()
-                                    .execute( new CheckTask( NodeType.TASKTRACKER, hadoopCluster, new CompleteEvent() {
-
-                                        public void onComplete( NodeState state ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                statusTaskTracker.setValue( "Tasktracker Running" );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
-                                                statusTaskTracker.setValue( "Tasktracker Stopped" );
-                                            }
-                                            else {
-                                                statusTaskTracker.setValue( "Not connected" );
-                                            }
-
-                                            if ( cluster.getBlockedAgents().contains( agent ) ) {
-                                                excludeIncludeNodeButton.setCaption( INCLUDE_BUTTON_CAPTION );
-                                                if ( cluster.getDecommissioningNodes().contains( agent ) ) {
-                                                    destroyButton.setCaption( "Decommissioning" );
-                                                }
-                                                else {
-                                                    destroyButton.setCaption( DESTROY_BUTTON_CAPTION );
-                                                }
-                                            }
-                                            else {
-                                                excludeIncludeNodeButton.setCaption( EXCLUDE_BUTTON_CAPTION );
-                                                destroyButton.setCaption( DESTROY_BUTTON_CAPTION );
-                                            }
-                                            excludeIncludeNodeButton.setEnabled( true );
-                                            checkButton.setEnabled( true );
-                                        }
-                                    }, null, agent ) );
-                        }
-                    }
-                } );
-
-                excludeIncludeNodeButton.addClickListener( new Button.ClickListener() {
-                    @Override
-                    public void buttonClick( Button.ClickEvent clickEvent ) {
-
-                        if ( cluster.getBlockedAgents().contains( agent ) ) {
-                            ConfirmationDialog alert = new ConfirmationDialog(
-                                    String.format( "Do you want to include the %s node?", agent.getHostname() ), "Yes",
-                                    "No" );
-                            alert.getOk().addClickListener( new Button.ClickListener() {
-                                @Override
-                                public void buttonClick( Button.ClickEvent clickEvent ) {
-                                    checkButton.setEnabled( false );
-                                    excludeIncludeNodeButton.setEnabled( false );
-                                    UUID trackID = HadoopUI.getHadoopManager().includeNode( hadoopCluster, agent );
-                                    ProgressWindow window =
-                                            new ProgressWindow( HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID,
-                                                    HadoopClusterConfig.PRODUCT_KEY );
-                                    window.getWindow().addCloseListener( new Window.CloseListener() {
-                                        @Override
-                                        public void windowClose( Window.CloseEvent closeEvent ) {
-                                            checkButton.click();
-                                            checkButton.setEnabled( true );
-                                            excludeIncludeNodeButton.setEnabled( true );
-                                        }
-                                    } );
-                                    contentRoot.getUI().addWindow( window.getWindow() );
-                                }
-                            } );
-
-                            contentRoot.getUI().addWindow( alert.getAlert() );
-                        }
-                        else {
-                            ConfirmationDialog alert = new ConfirmationDialog(
-                                    String.format( "Do you want to exclude the %s node?", agent.getHostname() ), "Yes",
-                                    "No" );
-                            alert.getOk().addClickListener( new Button.ClickListener() {
-                                @Override
-                                public void buttonClick( Button.ClickEvent clickEvent ) {
-                                    checkButton.setEnabled( false );
-                                    excludeIncludeNodeButton.setEnabled( false );
-                                    UUID trackID = HadoopUI.getHadoopManager().excludeNode( hadoopCluster, agent );
-                                    ProgressWindow window =
-                                            new ProgressWindow( HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID,
-                                                    HadoopClusterConfig.PRODUCT_KEY );
-                                    window.getWindow().addCloseListener( new Window.CloseListener() {
-                                        @Override
-                                        public void windowClose( Window.CloseEvent closeEvent ) {
-                                            checkButton.click();
-                                            checkButton.setEnabled( true );
-                                            excludeIncludeNodeButton.setEnabled( true );
-                                        }
-                                    } );
-                                    contentRoot.getUI().addWindow( window.getWindow() );
-                                }
-                            } );
-
-                            contentRoot.getUI().addWindow( alert.getAlert() );
-                        }
-                    }
-                } );
-
-
-                destroyButton.addClickListener( new Button.ClickListener() {
-                    @Override
-                    public void buttonClick( Button.ClickEvent clickEvent ) {
-                        String question;
-                        if ( cluster.getDecommissioningNodes().contains( agent ) ) {
-                            question = "Do you want to destroy the decommissioning %s node?";
-                        }
-                        else {
-                            question = "Do you want to destroy the %s node?";
-                        }
-
-                        ConfirmationDialog alert =
-                                new ConfirmationDialog( String.format( question, agent.getHostname() ), "Yes", "No" );
-                        alert.getOk().addClickListener( new Button.ClickListener() {
-                            @Override
-                            public void buttonClick( Button.ClickEvent clickEvent ) {
-                                UUID trackID = HadoopUI.getHadoopManager().destroyNode( hadoopCluster, agent );
-                                ProgressWindow window =
-                                        new ProgressWindow( HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID,
-                                                HadoopClusterConfig.PRODUCT_KEY );
-                                window.getWindow().addCloseListener( new Window.CloseListener() {
-                                    @Override
-                                    public void windowClose( Window.CloseEvent closeEvent ) {
-                                        refreshUI();
-                                    }
-                                } );
-                                contentRoot.getUI().addWindow( window.getWindow() );
-                            }
-                        } );
-
-                        contentRoot.getUI().addWindow( alert.getAlert() );
-                    }
-                } );
-            }
-
-            // Add UI components into relevant fields according to its role in cluster
-            if ( cluster.isMasterNode( agent ) ) {
-                if ( cluster.isNameNode( agent ) ) {
-                    availableOperations.addComponent( checkButton );
-                    availableOperations.addComponent( startStopButton );
-                    statusGroup.addComponent( statusDatanode );
-                }
-                else if ( cluster.isJobTracker( agent ) ) {
-                    availableOperations.addComponent( checkButton );
-                    availableOperations.addComponent( startStopButton );
-                    statusGroup.addComponent( statusTaskTracker );
-                }
-                else if ( cluster.isSecondaryNameNode( agent ) ) {
-                    availableOperations.addComponent( checkButton );
-                    statusGroup.addComponent( statusDatanode );
-                }
-            }
-            else {
-                availableOperations.addComponent( checkButton );
-                availableOperations.addComponent( excludeIncludeNodeButton );
-                availableOperations.addComponent( destroyButton );
-                statusGroup.addComponent( statusDatanode );
-                statusGroup.addComponent( statusTaskTracker );
-            }
-            table.addItem( new Object[] {
-                    agent.getHostname(), cluster.getNodeRoles( agent ).toString(), statusGroup, availableOperations
-            }, null );
+            addRowComponents( agent );
         }
     }
 
 
-    private void enableProgressBar() {
+    private void addRowComponents( final Agent agent ) {
+
+        final HadoopClusterConfig cluster =
+                HadoopUI.getHadoopManager().getCluster( hadoopCluster.getClusterName() );
+        Table table;
+
+        if ( cluster.isMasterNode( agent ) ) {
+            table = masterNodesTable;
+        }
+        else {
+            table = slaveNodesTable;
+
+        }
+        // Layouts to be added to table
+        final HorizontalLayout availableOperations = new HorizontalLayout();
+        final HorizontalLayout statusGroup = new HorizontalLayout();
+
+        availableOperations.addStyleName( "default" );
+        availableOperations.setSpacing( true );
+        statusGroup.addStyleName( "default" );
+        statusGroup.setSpacing( true );
+        // Layouts to be added to table
+
+        // Buttons to be added to availableOperations
+        final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
+        final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
+        final Button startStopButton = new Button( START_STOP_BUTTON_DEFAULT_CAPTION );
+        final Button excludeIncludeNodeButton = new Button( "Exclude/Include" );
+        final Button urlButton = new Button( URL_BUTTON_CAPTION );
+
+        checkButton.addStyleName( "default" );
+        startStopButton.addStyleName( "default" );
+        excludeIncludeNodeButton.addStyleName( "default" );
+        destroyButton.addStyleName( "default" );
+        urlButton.addStyleName( "default" );
+        // Buttons to be added to availableOperations
+
+
+        // Labels to be added to statusGroup
+        final Label statusDatanode = new Label( "" );
+        final Label statusTaskTracker = new Label( "" );
+        final Label statusDecommission = new Label( "" );
+
+        statusDatanode.addStyleName( "default" );
+        statusTaskTracker.addStyleName( "default" );
+        statusDecommission.addStyleName( "default" );
+
+        if ( cluster.isMasterNode( agent ) ) {
+            if ( cluster.isNameNode( agent ) ) {
+                availableOperations.addComponent( checkButton );
+                availableOperations.addComponent( startStopButton );
+                availableOperations.addComponent( urlButton );
+                statusGroup.addComponent( statusDatanode );
+            }
+            else if ( cluster.isJobTracker( agent ) ) {
+                availableOperations.addComponent( checkButton );
+                availableOperations.addComponent( startStopButton );
+                availableOperations.addComponent( urlButton );
+                statusGroup.addComponent( statusTaskTracker );
+            }
+            else if ( cluster.isSecondaryNameNode( agent ) ) {
+                availableOperations.addComponent( checkButton );
+                availableOperations.addComponent( urlButton );
+                statusGroup.addComponent( statusDatanode );
+            }
+        }
+        else {
+            availableOperations.addComponent( checkButton );
+            availableOperations.addComponent( excludeIncludeNodeButton );
+            availableOperations.addComponent( destroyButton );
+            statusGroup.addComponent( statusDatanode );
+            statusGroup.addComponent( statusTaskTracker );
+            statusGroup.addComponent( statusDecommission );
+        }
+        table.addItem( new Object[] {
+                agent.getHostname(), agent.getListIP().toString(), cluster.getNodeRoles( agent ).toString(), statusGroup, availableOperations
+        }, null );
+
+
+        int rowId = getAgentRowId( table, agent );
+        Item row = null;
+        if ( rowId >= 0 ) {
+            row = table.getItem( rowId );
+        }
+        if ( row == null ) {
+            show( "Agent rowId should have been found inside " + table.getCaption() + " but could not find! " );
+            return;
+        }
+
+        // Add listeners according to node type
+
+        // If master node
+        if ( cluster.isMasterNode( agent ) ) {
+
+            // If Namenode
+            if ( cluster.isNameNode( agent ) ) {
+                urlButton.addClickListener( managerListener.nameNodeURLButtonListener( agent ) );
+                checkButton.addClickListener( managerListener.nameNodeCheckButtonListener( row ) );
+                startStopButton.addClickListener( managerListener.nameNodeStartStopButtonListener( row ) );
+
+            }
+            // If Jobtracker
+            else if ( cluster.isJobTracker( agent ) ) {
+                urlButton.addClickListener( jobTrackerURLButtonListener( agent) );
+                checkButton.addClickListener( managerListener.jobTrackerCheckButtonListener( row ) );
+                startStopButton.addClickListener( managerListener.jobTrackerStartStopButtonListener( row ) );
+            }
+            // If SecondaryNameNode
+            else if ( cluster.isSecondaryNameNode( agent ) ) {
+                urlButton.addClickListener( managerListener.secondaryNameNodeURLButtonListener( agent ) );
+                checkButton.addClickListener( managerListener.secondaryNameNodeCheckButtonListener( row ) );
+
+            }
+        }
+        // If slave node
+        else {
+
+            if ( cluster.getBlockedAgents().contains( agent ) ) {
+                excludeIncludeNodeButton.setCaption( INCLUDE_BUTTON_CAPTION );
+            }
+            else {
+                excludeIncludeNodeButton.setCaption( EXCLUDE_BUTTON_CAPTION );
+            }
+            checkButton.addClickListener( managerListener.slaveNodeCheckButtonListener( row ) );
+            excludeIncludeNodeButton.addClickListener( managerListener.slaveNodeExcludeIncludeButtonListener( row ) );
+            destroyButton.addClickListener( managerListener.slaveNodeDestroyButtonListener( row ) );
+        }
+    }
+
+
+    protected Button getStartStopButton( final HorizontalLayout availableOperationsLayout ) {
+        if ( availableOperationsLayout == null ) {
+            return null;
+        }
+        else {
+            for ( Component component : availableOperationsLayout ) {
+                if ( component.getCaption().equals( START_NAMENODE_BUTTON_CAPTION )
+                        || component.getCaption().equals( START_JOBTRACKER_BUTTON_CAPTION )
+                        || component.getCaption().equals( STOP_JOBTRACKER_BUTTON_CAPTION )
+                        || component.getCaption().equals( STOP_NAMENODE_BUTTON_CAPTION )
+                        || component.getCaption().equals( START_STOP_BUTTON_DEFAULT_CAPTION )
+                        ) {
+                    return ( Button ) component;
+                }
+            }
+            // If not found
+            return null;
+        }
+    }
+
+
+    private Button.ClickListener jobTrackerURLButtonListener( final Agent agent ) {
+        return new Button.ClickListener() {
+            @Override
+            public void buttonClick( final Button.ClickEvent event ) {
+                contentRoot.getUI().getPage().open( "http://" + agent.getListIP().get( 0 ) + ":50030",
+                        "JobTracker", false );
+            }
+        } ;
+    }
+
+
+
+
+
+    private int getAgentRowId( final Table table, final Agent agent ) {
+        if ( table != null && agent != null ) {
+            for ( Object o : table.getItemIds() ) {
+                int rowId = ( Integer ) o;
+                Item row = table.getItem( rowId );
+                String hostName = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+                if ( hostName.equals( agent.getHostname() ) ) {
+                    return rowId;
+                }
+            }
+        }
+        return -1;
+
+    }
+
+
+
+
+
+    public Agent getAgentByRow( final Item row ) {
+        if ( row == null ) {
+            return null;
+        }
+        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+        return HadoopUI.getAgentManager().getAgentByHostname( lxcHostname );
+    }
+
+
+    public static HorizontalLayout getStatusGroupByRow( final Item row ) {
+        if ( row == null )
+            return null;
+        return (HorizontalLayout) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
+    }
+
+
+    public Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout ) {
+        if ( statusGroupLayout == null ) {
+            return null;
+        }
+        return (Label) statusGroupLayout.getComponent( 0 );
+    }
+
+
+    public Label getStatusTaskTrackerLabel( final HorizontalLayout statusGroupLayout ) {
+        if ( statusGroupLayout == null ) {
+            return null;
+        }
+        return (Label) statusGroupLayout.getComponent( 1 );
+    }
+
+
+    public Label getStatusDecommissionLabel( final HorizontalLayout statusGroupLayout ) {
+        if ( statusGroupLayout == null ) {
+            return null;
+        }
+        return (Label) statusGroupLayout.getComponent( 2 );
+    }
+
+
+
+    private void checkAllStatuses() {
+        enableProgressBar();
+        HadoopUI.getExecutor()
+                .execute( new CheckDecommissionStatusTask(
+                        hadoopCluster, new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent() {
+
+                    public void onComplete( String operationLog ) {
+                        decommissionStatus = operationLog;
+                        checkNodesStatus( masterNodesTable );
+                        checkNodesStatus( slaveNodesTable );
+                        disableProgressBar();
+                    }
+                }, null ) );
+
+    }
+
+
+
+    protected NodeState getDecommissionStatus( final String operationLog, final Agent agent ) {
+        NodeState decommissionState = NodeState.UNKNOWN;
+        String ipOfNode = agent.getListIP().get( 0 );
+
+        if ( operationLog != null && operationLog.contains( ipOfNode ) ) {
+            String[] array = operationLog.split( "\n" );
+
+            for ( int i = 0; i < array.length; i++ ) {
+                String status = array[i];
+                if ( status.contains( ipOfNode ) ) {
+                    String decommissionStatus = array[i+1];
+                    if ( decommissionStatus.toLowerCase().contains( "normal".toLowerCase() ) ) {
+                        decommissionState = NodeState.NORMAL;
+                        break;
+                    }
+                    else if ( decommissionStatus.toLowerCase().contains( "progress".toLowerCase() ) ) {
+                        decommissionState = NodeState.DECOMMISSION_IN_PROGRESS;
+                        break;
+                    }
+                    else if ( decommissionStatus.toLowerCase().contains( "decommissioned".toLowerCase() ) ) {
+                        decommissionState= NodeState.DECOMMISSIONED;
+                        break;
+                    }
+                    else {
+                        decommissionState = NodeState.UNKNOWN;
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            decommissionState = NodeState.UNKNOWN;
+        }
+
+        if ( decommissionState == NodeState.NORMAL && hadoopCluster.getBlockedAgents().contains( agent ) )
+            decommissionState = NodeState.DECOMMISSIONED;
+
+        return decommissionState;
+    }
+
+
+    protected void enableProgressBar() {
         processCount++;
         progressBar.setVisible( true );
     }
 
 
-    private void disableProgressBar() {
+    protected void disableProgressBar() {
         if ( processCount > 0 ) {
             processCount--;
         }
@@ -864,7 +664,7 @@ public class Manager {
     }
 
 
-    private void checkAllIfNoProcessRunning() {
+    protected void checkAllIfNoProcessRunning() {
         if ( processCount == 0 ) {
             checkAllButton.click();
         }
@@ -885,25 +685,4 @@ public class Manager {
     }
 
 
-    public ItemClickEvent.ItemClickListener getTableClickListener( final Table table ) {
-        return new ItemClickEvent.ItemClickListener() {
-            @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = HadoopUI.getAgentManager().getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), HadoopUI.getExecutor(),
-                                        HadoopUI.getCommandRunner(), HadoopUI.getAgentManager() );
-                        contentRoot.getUI().addWindow( terminal.getWindow() );
-                    }
-                    else {
-                        show( "Agent is not connected for" + lxcHostname );
-                    }
-                }
-            }
-        };
-    }
 }

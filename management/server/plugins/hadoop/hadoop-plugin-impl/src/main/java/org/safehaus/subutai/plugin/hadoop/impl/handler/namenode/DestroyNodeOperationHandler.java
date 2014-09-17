@@ -21,7 +21,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
         super( manager, clusterName );
         this.lxcHostName = lxcHostName;
         productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying node from %s", clusterName ) );
+                String.format( "Destroying %s node and updating cluster information of %s", lxcHostName, clusterName ) );
     }
 
 
@@ -50,30 +50,28 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
         manager.getCommandRunner().runCommand( removeTaskTrackerCommand );
         logCommand( removeTaskTrackerCommand, productOperation );
 
-        Command includeTaskTrackerCommand = Commands.getIncludeTaskTrackerCommand( hadoopClusterConfig, node );
-        manager.getCommandRunner().runCommand( includeTaskTrackerCommand );
-        logCommand( includeTaskTrackerCommand, productOperation );
+        Command excludeTaskTrackerCommand = Commands.getExcludeTaskTrackerCommand( hadoopClusterConfig, node );
+        manager.getCommandRunner().runCommand( excludeTaskTrackerCommand );
+        logCommand( excludeTaskTrackerCommand, productOperation );
 
         Command removeDataNodeCommand = Commands.getRemoveDataNodeCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( removeDataNodeCommand );
         logCommand( removeDataNodeCommand, productOperation );
 
-        Command includeDataNodeCommand = Commands.getIncludeDataNodeCommand( hadoopClusterConfig, node );
-        manager.getCommandRunner().runCommand( includeDataNodeCommand );
-        logCommand( includeDataNodeCommand, productOperation );
+        Command excludeDataNodeCommand = Commands.getExcludeDataNodeCommand( hadoopClusterConfig, node );
+        manager.getCommandRunner().runCommand( excludeDataNodeCommand );
+        logCommand( excludeDataNodeCommand, productOperation );
 
 
         Command refreshJobTrackerCommand = Commands.getRefreshJobTrackerCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshJobTrackerCommand );
-        logCommand( refreshJobTrackerCommand, productOperation );
+        productOperation.addLog( refreshJobTrackerCommand.getDescription() );
 
 
         Command refreshNameNodeCommand = Commands.getRefreshNameNodeCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshNameNodeCommand );
-        logCommand( refreshNameNodeCommand, productOperation );
+        productOperation.addLog( refreshNameNodeCommand.getDescription() );
 
-
-        hadoopClusterConfig.getBlockedAgents().add( node );
         productOperation.addLog( "Destroying lxc container " + lxcHostName + "..." );
 
         try {
@@ -84,23 +82,22 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
             productOperation.addLogFailed( String.format( "Lxc container could not destroyed: %s, ", ex.getMessage() ) );
         }
 
+        hadoopClusterConfig.removeNode( node );
+
         try {
             manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                     hadoopClusterConfig );
-            productOperation.addLog( "Cluster info saved to DB" );
-            return;
+            productOperation.addLogDone( "Cluster info saved to DB" );
         }
         catch ( DBException e ) {
             productOperation
                     .addLogFailed( "Could not save cluster info to DB! Please see logs\n" + "Destroying node aborted" );
-            return;
         }
     }
 
-
     private void logCommand( Command command, ProductOperation po ) {
         if ( command.hasSucceeded() ) {
-            po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
+            po.addLog( String.format( "Task's operation %s succeeded", command.getDescription() ) );
         }
         else if ( command.hasCompleted() ) {
             po.addLogFailed( String.format( "Task's operation %s failed", command.getDescription() ) );

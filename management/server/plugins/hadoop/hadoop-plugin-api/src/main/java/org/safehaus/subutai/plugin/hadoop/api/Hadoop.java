@@ -53,6 +53,8 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig> {
 
     public UUID destroyNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
+    public UUID checkDecomissionStatus( HadoopClusterConfig hadoopClusterConfig );
+
     public UUID excludeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
     public UUID includeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
