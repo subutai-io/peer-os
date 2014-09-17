@@ -71,9 +71,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.dispatcher.impl</Bundle-SymbolicName>
-            <Export-Package>
-              org.apache.http;org.apache.http.*
-            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

@@ -27,7 +27,7 @@ public interface PeerManager {
 
     public void removePeerMessageListener( PeerMessageListener listener );
 
-    public void sendPeerMessage( Peer peer, String recipient, Object message ) throws PeerMessageException;
+    public String sendPeerMessage( Peer peer, String recipient, String message ) throws PeerMessageException;
 
-    public void processPeerMessage( String peerId, String peerMessage ) throws PeerMessageException;
+    public String processPeerMessage( String peerId, String recipient, String message ) throws PeerMessageException;
 }

@@ -13,10 +13,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -135,8 +138,8 @@ public class ResponseSender {
             try {
                 Peer peer = peerManager.getPeerByUUID( request.getPeerId() );
 
-                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME,
-                        new DispatcherMessage( sortedSet, DispatcherMessageType.RESPONSE ) );
+                String message = JsonUtil.toJson( new DispatcherMessage( sortedSet, DispatcherMessageType.RESPONSE ) );
+                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
 
                 //delete sent responses
                 for ( RemoteResponse response : responses ) {
@@ -165,7 +168,7 @@ public class ResponseSender {
                 dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
             }
         }
-        catch ( DBException e ) {
+        catch ( JsonSyntaxException | DBException e ) {
             LOG.log( Level.SEVERE, String.format( "Error in sendResponses: %s", e.getMessage() ) );
         }
     }

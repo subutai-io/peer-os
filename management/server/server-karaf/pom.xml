@@ -287,11 +287,6 @@
       <artifactId>httpmime</artifactId>
       <version>${http.client.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${org.slf4j.version}</version>
-    </dependency>
 
   </dependencies>
   <build>
@@ -344,9 +339,16 @@
             <configuration>
               <descriptors>
                 <descriptor>
-                  mvn:org.apache.karaf.assemblies.features/standard/${karaf.features.version}/xml/features
+                  mvn:org.apache.cxf.karaf/apache-cxf/2.7.11/xml/features
                 </descriptor>
               </descriptors>
+              <features>
+                <feature>war</feature>
+                <feature>ssh</feature>
+                <feature>jndi</feature>
+                <feature>cxf</feature>
+              </features>
+              <repository>target/features-repo</repository>
             </configuration>
           </execution>
         </executions>

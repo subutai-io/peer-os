@@ -2,8 +2,12 @@ package org.safehaus.subutai.core.peer.impl;
 
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,19 +18,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.util.HttpUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.Common;
-import org.safehaus.subutai.core.peer.api.message.PeerMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
-import org.safehaus.subutai.core.peer.api.message.PeerMessageImpl;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
-
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -123,7 +122,7 @@ public class PeerImpl implements PeerManager {
         if ( getSiteId().compareTo( uuid ) == 0 ) {
             Peer peer = new Peer();
             peer.setId( uuid );
-            peer.setIp( "127.0.0.1" );
+            peer.setIp( getLocalIp() );
             peer.setName( "Me" );
             return peer;
         }
@@ -168,20 +167,17 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void sendPeerMessage( final Peer peer, String recipient, final Object message ) throws PeerMessageException {
-        PeerMessage peerMessage = new PeerMessageImpl( recipient, message );
+    public String sendPeerMessage( final Peer peer, String recipient, final String message )
+            throws PeerMessageException {
+
         String ip = peer.getIp();
 
         Map<String, String> params = new HashMap<>();
+        params.put( Common.RECIPIENT_PARAM_NAME, recipient );
         params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
-        params.put( Common.MESSAGE_PARAM_NAME, JsonUtil.toJson( peerMessage ) );
+        params.put( Common.MESSAGE_PARAM_NAME, message );
         try {
-            int responseCode = httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
-            if ( responseCode != HttpUtil.RESPONSE_OK ) {
-                String errMsg = String.format( "REST returned %d response code", responseCode );
-                LOG.log( Level.WARNING, errMsg );
-                throw new PeerMessageException( errMsg );
-            }
+            return httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
         }
         catch ( IOException e ) {
             LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
@@ -191,29 +187,63 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void processPeerMessage( final String peerId, final String peerMessage ) throws PeerMessageException {
+    public String processPeerMessage( final String peerId, final String recipient, final String message )
+            throws PeerMessageException {
 
         try {
             UUID peerUUID = UUID.fromString( peerId );
-            PeerMessage peerMsg = JsonUtil.fromJson( peerMessage, PeerMessage.class );
+            Peer senderPeer = getPeerByUUID( peerUUID );
+            if ( senderPeer != null ) {
 
-            for ( PeerMessageListener listener : peerMessageListeners ) {
-                if ( listener.getName().equalsIgnoreCase( peerMsg.getRecipientName() ) ) {
-                    Peer senderPeer = getPeerByUUID( peerUUID );
-                    try {
-                        listener.onMessage( senderPeer, peerMsg.getMessage() );
+                for ( PeerMessageListener listener : peerMessageListeners ) {
+                    if ( listener.getName().equalsIgnoreCase( recipient ) ) {
+                        try {
+                            return listener.onMessage( senderPeer, message );
+                        }
+                        catch ( Exception e ) {
+                            LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                            throw new PeerMessageException( e.getMessage() );
+                        }
                     }
-                    catch ( Exception e ) {
-                        LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
-                        throw e;
-                    }
-                    //                break;
                 }
+                String err = String.format( "Recipient %s not found", recipient );
+                LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                throw new PeerMessageException( err );
+            }
+            else {
+                String err = String.format( "Peer %s not found", peerId );
+                LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                throw new PeerMessageException( err );
             }
         }
-        catch ( IllegalArgumentException | JsonSyntaxException e ) {
+        catch ( IllegalArgumentException e ) {
             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
+    }
+
+
+    private String getLocalIp() {
+        Enumeration<NetworkInterface> n;
+        try {
+            n = NetworkInterface.getNetworkInterfaces();
+            for (; n.hasMoreElements(); ) {
+                NetworkInterface e = n.nextElement();
+
+                Enumeration<InetAddress> a = e.getInetAddresses();
+                for (; a.hasMoreElements(); ) {
+                    InetAddress addr = a.nextElement();
+                    if ( addr.getHostAddress().startsWith( "172" ) ) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        }
+        catch ( SocketException e ) {
+            LOG.severe( e.getMessage() );
+        }
+
+
+        return "127.0.0.1";
     }
 }
