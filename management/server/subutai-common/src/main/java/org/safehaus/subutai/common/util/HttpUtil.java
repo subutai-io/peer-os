@@ -72,6 +72,7 @@ public class HttpUtil {
 
 
     public String post(String url, Map<String, String> postParams) throws IOException {
+        cleanConnections();
         HttpEntity entity = null;
         try {
             HttpPost req = new HttpPost(url);
