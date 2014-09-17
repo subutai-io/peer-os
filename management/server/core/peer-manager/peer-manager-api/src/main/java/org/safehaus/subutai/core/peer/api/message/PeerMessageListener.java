@@ -14,7 +14,7 @@ public interface PeerMessageListener {
      *
      * @param message message sent by remote counterpart
      */
-    public Object onMessage( Peer peer, PeerMessage message ) throws PeerMessageException;
+    public String onMessage( Peer peer, String message ) throws PeerMessageException;
 
     /**
      * This is a copy of recipient name returned by PeerMessageListener implementations

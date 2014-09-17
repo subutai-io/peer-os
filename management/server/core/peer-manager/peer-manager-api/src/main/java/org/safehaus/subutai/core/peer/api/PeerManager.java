@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.peer.api.message.PeerMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
@@ -28,7 +27,7 @@ public interface PeerManager {
 
     public void removePeerMessageListener( PeerMessageListener listener );
 
-    public PeerMessage sendPeerMessage( Peer peer, String recipient, Object message ) throws PeerMessageException;
+    public String sendPeerMessage( Peer peer, String recipient, String message ) throws PeerMessageException;
 
     public String processPeerMessage( String peerId, String recipient, String peerMessage ) throws PeerMessageException;
 }

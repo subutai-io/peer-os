@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DBException;
@@ -29,11 +30,11 @@ import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.message.PeerMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -107,15 +108,14 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() ) {
-            LOG.severe( request.getKey().toString() );
-            LOG.severe( request.getValue().toString() );
             Peer peer = peerManager.getPeerByUUID( request.getKey() );
 
             try {
-                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME,
-                        new DispatcherMessage( DispatcherMessageType.REQUEST, request.getValue() ) );
+                String message =
+                        JsonUtil.toJson( new DispatcherMessage( DispatcherMessageType.REQUEST, request.getValue() ) );
+                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
             }
-            catch ( PeerMessageException e ) {
+            catch ( JsonSyntaxException | PeerMessageException e ) {
                 String errString = String.format( "Error in sendRequests for peer %s: %s", peer, e.getMessage() );
 
                 LOG.log( Level.SEVERE, errString );
@@ -253,10 +253,10 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public Object onMessage( final Peer peer, final PeerMessage peerMessage ) throws PeerMessageException {
+    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException {
         try {
 
-            DispatcherMessage dispatcherMessage = ( DispatcherMessage ) peerMessage.getMessage();
+            DispatcherMessage dispatcherMessage = JsonUtil.fromJson( peerMessage, DispatcherMessage.class );
 
 
             if ( dispatcherMessage.getDispatcherMessageType() == DispatcherMessageType.REQUEST ) {

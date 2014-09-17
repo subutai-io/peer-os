@@ -24,13 +24,9 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.Common;
-import org.safehaus.subutai.core.peer.api.message.PeerMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
-import org.safehaus.subutai.core.peer.impl.message.PeerMessageImpl;
-
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -172,20 +168,19 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public PeerMessage sendPeerMessage( final Peer peer, String recipient, final Object message )
+    public String sendPeerMessage( final Peer peer, String recipient, final String message )
             throws PeerMessageException {
-        PeerMessage peerMessage = new PeerMessageImpl( message );
+
         String ip = peer.getIp();
 
         Map<String, String> params = new HashMap<>();
         params.put( Common.RECIPIENT_PARAM_NAME, recipient );
         params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
-        params.put( Common.MESSAGE_PARAM_NAME, JsonUtil.toJson( peerMessage ) );
+        params.put( Common.MESSAGE_PARAM_NAME, JsonUtil.toJson( message ) );
         try {
-            String response = httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
-            return JsonUtil.fromJson( response, PeerMessage.class );
+            return httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
         }
-        catch ( JsonSyntaxException | IOException e ) {
+        catch ( IOException e ) {
             LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
@@ -200,13 +195,11 @@ public class PeerImpl implements PeerManager {
             UUID peerUUID = UUID.fromString( peerId );
             Peer senderPeer = getPeerByUUID( peerUUID );
             if ( senderPeer != null ) {
-                PeerMessage peerMsg = JsonUtil.fromJson( peerMessage, PeerMessageImpl.class );
 
                 for ( PeerMessageListener listener : peerMessageListeners ) {
                     if ( listener.getName().equalsIgnoreCase( recipient ) ) {
                         try {
-                            Object response = listener.onMessage( senderPeer, peerMsg );
-                            return JsonUtil.toJson( new PeerMessageImpl( response ) );
+                            return listener.onMessage( senderPeer, peerMessage );
                         }
                         catch ( Exception e ) {
                             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
@@ -224,7 +217,7 @@ public class PeerImpl implements PeerManager {
                 throw new PeerMessageException( err );
             }
         }
-        catch ( IllegalArgumentException | JsonSyntaxException e ) {
+        catch ( IllegalArgumentException e ) {
             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
