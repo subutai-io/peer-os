@@ -23,7 +23,9 @@
     <module>config-point-tracker</module>
     <module>configuration-manager</module>
     <module>db-manager</module>
+
     <!--<module>container-manager</module>-->
+    <!--<module>environment-manager</module>-->
     <!--
     <module>strategy-manager</module>
     <module>lxc-manager</module>
@@ -32,7 +34,7 @@
     <module>monitoring</module>
     <module>git-manager</module>
     <module>package-manager</module>
-    <module>environment-manager</module>
+
     <module>template-registry</module>
     <module>template-manager</module>
     <module>file-tracker</module>
