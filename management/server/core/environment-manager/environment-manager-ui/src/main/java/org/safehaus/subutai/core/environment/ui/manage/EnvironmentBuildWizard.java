@@ -106,7 +106,7 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         VerticalLayout vl = new VerticalLayout();
 
         peersTable = new Table();
-        peersTable.addContainerProperty( "Name", String.class, null );
+        peersTable.addContainerProperty( "Name", Peer.class, null );
         peersTable.addContainerProperty( "Select", CheckBox.class, null );
         peersTable.setPageLength( 10 );
         peersTable.setSelectable( false );
@@ -119,9 +119,11 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         for ( Peer peer : peers )
         {
             CheckBox ch = new CheckBox();
+
             peersTable.addItem( new Object[] {
-                    peer.getName(), ch
+                    peer, ch
             }, null );
+            peersTable.setItemCaption( "Name", peer.getId());
         }
         Button nextButton = new Button( "Next" );
         nextButton.addClickListener( new Button.ClickListener() {
@@ -230,18 +232,16 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             {
                 if ( !buildMessageMap.get( peerName ).containsKey( templateName ) )
                 {
-                    ContainerBuildMessage containerBuildMessage = new ContainerBuildMessage();
-                    containerBuildMessage.setTemplateName( templateName );
-                    containerBuildMessage.setPeerId( peerName );
-                    containerBuildMessage.setCompleteState( false );
-                    containerBuildMessage.setEnvironmentUuid( environmentBuildTask.getUuid().toString() );
-                    //                    containerBuildMessage.setTimestamp( System.currentTimeMillis() );
+                    ContainerBuildMessage cbm = new ContainerBuildMessage();
+                    cbm.setTemplateName( templateName );
+                    cbm.setPeerId( peerName );
+                    cbm.setCompleteState( false );
+                    cbm.setEnvironmentUuid( environmentBuildTask.getUuid().toString() );
+                    buildMessageMap.get( peerName ).put( templateName, cbm );
                 }
                 else
                 {
-                    //                    buildMessageMap.get( peerName ).get( templateName )
-                    // .incrementNumberOfContainers();
-
+                    buildMessageMap.get( peerName ).get( templateName ).incrementNumOfCont();
                 }
 
                 //                buildMessageMapput( peerName, buildBlock );

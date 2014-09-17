@@ -16,6 +16,11 @@ public class ContainerBuildMessage {
     private String peerId;
 
 
+    public ContainerBuildMessage(  ) {
+        this.numberOfContainers = 0;
+
+    }
+
     public String getPeerId() {
         return peerId;
     }
@@ -93,5 +98,10 @@ public class ContainerBuildMessage {
 
     public void setTargetPeerId( final String targetPeerId ) {
         this.targetPeerId = targetPeerId;
+    }
+
+
+    public void incrementNumOfCont() {
+        this.numberOfContainers++;
     }
 }
