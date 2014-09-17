@@ -42,6 +42,7 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
     @Override
     protected Object doExecute() throws Exception
     {
+        containerManager.addListener( this );
         UUID envId = UUID.randomUUID();
         List<Criteria> criteria = getCriteria();
         Set<Agent> set = containerManager.clone( envId, template, nodesCount, strategyId, criteria );
@@ -53,6 +54,7 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
         {
             System.out.println( "Returned clones: " + set.size() );
         }
+        containerManager.removeListener( this );
         return null;
     }
 
