@@ -1,17 +1,22 @@
 package org.safehaus.subutai.core.container.api;
 
 
+import java.util.UUID;
+
+
 /**
  * Created by timur on 9/16/14.
  */
 public class ContainerEvent {
     private ContainerEventType eventType;
+    private UUID envId;
     private String parentHostname;
     private String hostname;
     private long timestamp;
 
-    public ContainerEvent(ContainerEventType eventType,String parentHostname, String hostname) {
+    public ContainerEvent(ContainerEventType eventType, UUID envId, String parentHostname, String hostname) {
         this.eventType = eventType;
+        this.envId = envId;
         this.hostname = hostname;
         this.parentHostname = parentHostname;
         this.timestamp = System.currentTimeMillis();
@@ -62,5 +67,17 @@ public class ContainerEvent {
     public void setHostname( final String hostname )
     {
         this.hostname = hostname;
+    }
+
+
+    public UUID getEnvId()
+    {
+        return envId;
+    }
+
+
+    public void setEnvId( final UUID envId )
+    {
+        this.envId = envId;
     }
 }

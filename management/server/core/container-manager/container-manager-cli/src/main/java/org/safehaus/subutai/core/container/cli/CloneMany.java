@@ -2,11 +2,15 @@ package org.safehaus.subutai.core.container.cli;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.container.api.ContainerEvent;
+import org.safehaus.subutai.core.container.api.ContainerEventListener;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 
@@ -16,7 +20,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command(scope = "container", name = "clone-many")
-public class CloneMany extends OsgiCommandSupport {
+public class CloneMany extends OsgiCommandSupport implements ContainerEventListener {
 
     ContainerManager containerManager;
 
@@ -66,5 +70,16 @@ public class CloneMany extends OsgiCommandSupport {
             }
         }
         return criteria;
+    }
+
+    @Override
+    public void onContainerEvent( final ContainerEvent containerEvent )
+    {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis( containerEvent.getTimestamp() );
+        System.out.println(
+                String.format( "%1$s: %2$s %3$s -< %4$s %5$tm %5$te,%5$tY %5$tT", containerEvent.getEventType(),
+                        containerEvent.getEnvId(), containerEvent.getParentHostname(), containerEvent.getHostname(),
+                        cal ) );
     }
 }

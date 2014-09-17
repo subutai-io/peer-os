@@ -38,7 +38,7 @@ public interface ContainerManager {
     //
 
     // Baha API
-    public Set<Agent> clone(UUID envId, String templateName, int numOfContainers, String strategyId, List<Criteria> criteria);
+    public Set<Agent> clone(UUID envId, String templateName, int numOfContainers, String strategyId, List<Criteria> criteria) throws ContainerCreateException;
 
     public Agent clone( UUID envId, final String hostName, final String templateName, final String cloneName )
             throws ContainerCreateException;

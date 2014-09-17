@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -40,6 +41,7 @@ import org.safehaus.subutai.core.container.api.ContainerEvent;
 import org.safehaus.subutai.core.container.api.ContainerEventListener;
 import org.safehaus.subutai.core.container.api.ContainerEventType;
 import org.safehaus.subutai.core.container.api.ContainerException;
+import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
@@ -126,24 +128,6 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
-    //    public Set<Agent> clone( String templateName, int nodesCount, Collection<Agent> hosts, String strategyId,
-    //                             List<Criteria> criteria ) throws ContainerCreateException
-    //    {
-    //        return clone( null, templateName, nodesCount, hosts, strategyId, criteria );
-    //    }
-    //
-    //
-    //    public void cloneDestroy( final String hostName, final String cloneName ) throws ContainerDestroyException
-    //    {
-    //        boolean result = templateManager.cloneDestroy( hostName, cloneName );
-    //        if ( !result )
-    //        {
-    //            throw new ContainerDestroyException( String.format( "Error destroying containermanager %s",
-    // cloneName ) );
-    //        }
-    //    }
-
-
     @Override
     public Container getContainerByUuid( final UUID uuid )
     {
@@ -219,10 +203,80 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     @Override
     public Set<Agent> clone( final UUID envId, final String templateName, final int numOfContainers,
-                             final String strategyId, final List<Criteria> criteria )
+                             final String strategyId, final List<Criteria> criteria ) throws ContainerCreateException
     {
-        //TODO: Implement me
-        return new HashSet<Agent>();
+        ContainerPlacementStrategy st = findStrategyById( strategyId );
+        if ( st == null )
+        {
+            throw new ContainerCreateException( String.format( "Placement strategy [%s] not found.", strategyId ) );
+        }
+        Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
+        st.calculatePlacement( numOfContainers, metrics, criteria );
+
+        Map<Agent, Integer> slots = st.getPlacementDistribution();
+
+        int totalSlots = 0;
+
+        for ( int slotCount : slots.values() )
+        {
+            totalSlots += slotCount;
+        }
+
+        if ( totalSlots == 0 )
+        {
+            throw new ContainerCreateException( "Container placement strategy returned empty set" );
+        }
+
+        if ( totalSlots < numOfContainers )
+        {
+            throw new ContainerCreateException( String.format( "Only %d containers can be created", totalSlots ) );
+        }
+
+        // clone specified number of instances and store their names
+        Map<Agent, Set<String>> cloneNames = new HashMap<>();
+
+        Set<String> existingContainerNames = getContainerNames( slots.keySet() );
+
+        for ( Map.Entry<Agent, Integer> e : slots.entrySet() )
+        {
+            Set<String> hostCloneNames = new HashSet<>();
+            for ( int i = 0; i < e.getValue(); i++ )
+            {
+                String newContainerName = nextHostName( templateName, existingContainerNames );
+                hostCloneNames.add( newContainerName );
+            }
+            cloneNames.put( e.getKey(), hostCloneNames );
+        }
+
+        Set<Agent> result = new HashSet<Agent>();
+
+        CompletionService completionService = new ExecutorCompletionService<>( executor );
+        final ContainerManager self = this;
+        for ( final Map.Entry<Agent, Set<String>> e : cloneNames.entrySet() )
+        {
+            completionService.submit( new Callable<Set<Agent>>() {
+                @Override
+                public Set<Agent> call() throws Exception
+                {
+                    return self.clone( envId, e.getKey(), templateName, e.getValue() );
+                }
+            } );
+        }
+
+        for ( Agent ignore : cloneNames.keySet() )
+        {
+            try
+            {
+                Future<Set<Agent>> future = completionService.take();
+                Set<Agent> agents = future.get();
+                result.addAll( agents );
+            }
+            catch ( InterruptedException | ExecutionException e )
+            {
+                throw new ContainerCreateException( "Not all containers created successfully." );
+            }
+        }
+        return result;
     }
 
 
@@ -238,10 +292,10 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     public Agent clone( UUID envId, String hostName, String templateName, String cloneName )
             throws ContainerCreateException
     {
-        fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, hostName, cloneName ) );
+        fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, envId, hostName, cloneName ) );
         if ( !templateManager.clone( hostName, templateName, cloneName, envId.toString() ) )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
             throw new ContainerCreateException(
                     String.format( "Couldn't create container %s : %s.", hostName, cloneName ) );
         }
@@ -262,13 +316,13 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             }
             if ( agent == null )
             {
-                fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, hostName, cloneName ) );
+                fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
                 throw new ContainerCreateException(
                         String.format( "Couldn't create container %s : %s.", hostName, cloneName ) );
             }
             else
             {
-                fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, hostName, cloneName ) );
+                fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, envId, hostName, cloneName ) );
                 return agent;
             }
         }
@@ -468,16 +522,25 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     @Override
     public void destroy( String hostName, String cloneName ) throws ContainerDestroyException
     {
-        fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_STARTED, hostName, cloneName ) );
+        UUID envId = null;
+
+        Agent agent = agentManager.getAgentByHostname( cloneName );
+
+        if ( agent != null )
+        {
+            envId = agent.getEnvironmentId();
+        }
+
+        fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_STARTED, envId, hostName, cloneName ) );
         if ( !templateManager.cloneDestroy( hostName, cloneName ) )
         {
-            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_FAILED, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_FAILED, envId, hostName, cloneName ) );
             throw new ContainerDestroyException(
                     String.format( "Could not destroy container %s : %s.", hostName, cloneName ) );
         }
         else
         {
-            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCED, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCED, envId, hostName, cloneName ) );
         }
     }
 
@@ -706,48 +769,20 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
-    private void execute( Agent agent, UUID envId, String templateName, Set<String> cloneNames,
-                          ExecutorService executor, ContainerAction containerAction ) throws ContainerException
+    private String nextHostName( String templateName, Set<String> existingNames )
     {
-
-        //prepare ContainerInfo list for execution
-        List<ContainerInfo> containerInfoList = new ArrayList<>( cloneNames.size() );
-        for ( String cloneName : cloneNames )
+        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
+        if ( i == null )
         {
-            ContainerInfo containerInfo = new ContainerInfo( agent, envId, templateName, cloneName, containerAction );
-            containerInfoList.add( containerInfo );
+            i = sequences.get( templateName );
         }
-
-        CompletionService<ContainerInfo> completer = new ExecutorCompletionService<>( executor );
-
-        //launch destroy commands
-        for ( ContainerInfo containerInfo : containerInfoList )
+        while ( true )
         {
-            completer.submit( new ContainerActor( containerInfo, this ) );
-        }
-
-        //wait for completion
-        try
-        {
-            for ( ContainerInfo ignored : containerInfoList )
+            String name = templateName + i.incrementAndGet();
+            if ( !existingNames.contains( name ) )
             {
-                Future<ContainerInfo> future = completer.take();
-                future.get();
+                return name;
             }
-        }
-        catch ( InterruptedException | ExecutionException ignore )
-        {
-        }
-
-        boolean result = true;
-        for ( ContainerInfo containerInfo : containerInfoList )
-        {
-            result &= containerInfo.isOk();
-        }
-
-        if ( !result )
-        {
-            throw new ContainerException( "Not all actions performed successfully" );
         }
     }
 
@@ -900,6 +935,90 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     //            throw new ContainerDestroyException( "Empty child lxcs provided" );
     //        }
     //    }
+
+
+    private Set<String> getContainerNames( Collection<Agent> hostsToCheck )
+    {
+        Map<String, EnumMap<ContainerState, List<String>>> map = getLxcOnPhysicalServers();
+
+        if ( hostsToCheck != null && !hostsToCheck.isEmpty() )
+        {
+            Iterator<String> it = map.keySet().iterator();
+            while ( it.hasNext() )
+            {
+                String hostname = it.next();
+                boolean hostIncluded = false;
+                for ( Agent agent : hostsToCheck )
+                {
+                    if ( agent.getHostname().equalsIgnoreCase( hostname ) )
+                    {
+                        hostIncluded = true;
+                        break;
+                    }
+                }
+                if ( !hostIncluded )
+                {
+                    it.remove();
+                }
+            }
+        }
+
+        Set<String> lxcHostNames = new HashSet<>();
+        for ( EnumMap<ContainerState, List<String>> lxcsOnOneHost : map.values() )
+        {
+            for ( List<String> hosts : lxcsOnOneHost.values() )
+            {
+                lxcHostNames.addAll( hosts );
+            }
+        }
+        return lxcHostNames;
+    }
+
+
+    private void execute( Agent agent, UUID envId, String templateName, Set<String> cloneNames,
+                          ExecutorService executor, ContainerAction containerAction ) throws ContainerException
+    {
+
+        //prepare ContainerInfo list for execution
+        List<ContainerInfo> containerInfoList = new ArrayList<>( cloneNames.size() );
+        for ( String cloneName : cloneNames )
+        {
+            ContainerInfo containerInfo = new ContainerInfo( agent, envId, templateName, cloneName, containerAction );
+            containerInfoList.add( containerInfo );
+        }
+
+        CompletionService<ContainerInfo> completer = new ExecutorCompletionService<>( executor );
+
+        //launch destroy commands
+        for ( ContainerInfo containerInfo : containerInfoList )
+        {
+            completer.submit( new ContainerActor( containerInfo, this ) );
+        }
+
+        //wait for completion
+        try
+        {
+            for ( ContainerInfo ignored : containerInfoList )
+            {
+                Future<ContainerInfo> future = completer.take();
+                future.get();
+            }
+        }
+        catch ( InterruptedException | ExecutionException ignore )
+        {
+        }
+
+        boolean result = true;
+        for ( ContainerInfo containerInfo : containerInfoList )
+        {
+            result &= containerInfo.isOk();
+        }
+
+        if ( !result )
+        {
+            throw new ContainerException( "Not all actions performed successfully" );
+        }
+    }
 
 
     private ContainerPlacementStrategy findStrategyById( String strategyId )
@@ -1192,62 +1311,6 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         {
             return null;
         }
-    }
-
-
-    private String nextHostName( String templateName, Set<String> existingNames )
-    {
-        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
-        if ( i == null )
-        {
-            i = sequences.get( templateName );
-        }
-        while ( true )
-        {
-            String name = templateName + i.incrementAndGet();
-            if ( !existingNames.contains( name ) )
-            {
-                return name;
-            }
-        }
-    }
-
-
-    private Set<String> getContainerNames( Collection<Agent> hostsToCheck )
-    {
-        Map<String, EnumMap<ContainerState, List<String>>> map = getLxcOnPhysicalServers();
-
-        if ( hostsToCheck != null && !hostsToCheck.isEmpty() )
-        {
-            Iterator<String> it = map.keySet().iterator();
-            while ( it.hasNext() )
-            {
-                String hostname = it.next();
-                boolean hostIncluded = false;
-                for ( Agent agent : hostsToCheck )
-                {
-                    if ( agent.getHostname().equalsIgnoreCase( hostname ) )
-                    {
-                        hostIncluded = true;
-                        break;
-                    }
-                }
-                if ( !hostIncluded )
-                {
-                    it.remove();
-                }
-            }
-        }
-
-        Set<String> lxcHostNames = new HashSet<>();
-        for ( EnumMap<ContainerState, List<String>> lxcsOnOneHost : map.values() )
-        {
-            for ( List<String> hosts : lxcsOnOneHost.values() )
-            {
-                lxcHostNames.addAll( hosts );
-            }
-        }
-        return lxcHostNames;
     }
 
 
