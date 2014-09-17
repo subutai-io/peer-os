@@ -123,7 +123,7 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             CheckBox ch = new CheckBox();
 
             Object id = peersTable.addItem( new Object[] {
-                    peer.getName(), peer.getIp(), ch
+                    peer.getName(), peer.getId(), ch
             }, null );
             peersTable.setItemCaptionPropertyId( "name" );
         }

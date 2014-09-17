@@ -223,15 +223,15 @@ public class PeerRegisterForm extends CustomComponent {
                 String name = nameTextField.getValue();
                 String ip = ipTextField.getValue();
                 String id = idTextField.getValue();
-                peer.setName(name);
-                peer.setIp(ip);
-                peer.setId( UUID.fromString(id));
+//                peer.setName(name);
+//                peer.setIp(ip);
+//                peer.setId( UUID.fromString(id));
                 peerUI.getPeerManager().register(peer);
                 if ( name.length() > 0 && ip.length() > 0 && id.length() > 0 )
                 {
                     peer.setName( name );
                     peer.setIp( ip );
-                    peer.setId( id );
+                    peer.setId( UUID.fromString(id) );
                     peerUI.getPeerManager().register( peer );
                 }
                 else
