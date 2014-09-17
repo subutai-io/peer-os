@@ -7,7 +7,6 @@ import org.safehaus.subutai.server.ui.api.PortalModuleService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 public class PortalModuleServiceImpl implements PortalModuleService {
@@ -17,6 +16,9 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     private List<PortalModuleListener> listeners = Collections.synchronizedList(new ArrayList<PortalModuleListener>());
 
     public void registerModule(PortalModule module) {
+        if (module == null) {
+            return;
+        }
         System.out.println("ModuleServiceImpl: Registering module " + module.getId());
         modules.add(module);
         for (PortalModuleListener listener : listeners) {
@@ -25,6 +27,9 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
     public void unregisterModule(PortalModule module) {
+        if (module == null) {
+            return;
+        }
         System.out.println("ModuleServiceImpl: Unregister module " + module.getId());
         modules.remove(module);
         for (PortalModuleListener listener : listeners) {
@@ -43,10 +48,29 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
     public List<PortalModule> getModules() {
-        return Collections.unmodifiableList(modules);
+        List<PortalModule> pluginModules = new ArrayList<>();
+        for (PortalModule module : modules) {
+            if (!module.isCorePlugin()) {
+                pluginModules.add(module);
+            }
+        }
+        return Collections.unmodifiableList(pluginModules);
+    }
+
+    public List<PortalModule> getCoreModules() {
+        List<PortalModule> coreModules = new ArrayList<>();
+        for (PortalModule module : modules) {
+            if (module.isCorePlugin()) {
+                coreModules.add(module);
+            }
+        }
+        return Collections.unmodifiableList(coreModules);
     }
 
     public synchronized void addListener(PortalModuleListener listener) {
+        if (listener == null) {
+            return;
+        }
         System.out.println("ModuleServiceImpl: Adding listener " + listener);
         listeners.add(listener);
     }

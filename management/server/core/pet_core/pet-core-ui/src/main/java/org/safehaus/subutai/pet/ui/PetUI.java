@@ -1,13 +1,12 @@
 package org.safehaus.subutai.pet.ui;
 
 
-import java.io.File;
-
+import com.vaadin.ui.Component;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.pet.api.PetManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
-import com.vaadin.ui.Component;
+import java.io.File;
 
 
 /**
@@ -57,5 +56,10 @@ public class PetUI implements PortalModule {
     @Override
     public Component createComponent() {
         return new PetForm();
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return false;
     }
 }

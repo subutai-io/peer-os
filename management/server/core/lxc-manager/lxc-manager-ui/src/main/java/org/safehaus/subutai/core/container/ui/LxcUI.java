@@ -1,16 +1,15 @@
 package org.safehaus.subutai.core.container.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class LxcUI implements PortalModule {
@@ -68,5 +67,10 @@ public class LxcUI implements PortalModule {
     @Override
     public Component createComponent() {
         return new LxcForm( agentManager, lxcManager, executor );
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return true;
     }
 }

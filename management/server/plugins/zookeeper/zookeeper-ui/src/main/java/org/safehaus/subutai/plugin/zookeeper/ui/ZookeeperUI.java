@@ -6,19 +6,17 @@
 package org.safehaus.subutai.plugin.zookeeper.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Logger;
-
-import javax.naming.NamingException;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import javax.naming.NamingException;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 
 /**
@@ -73,6 +71,11 @@ public class ZookeeperUI implements PortalModule {
         catch ( NamingException e ) {
             LOG.severe( e.getMessage() );
         }
+        return null;
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
         return null;
     }
 }

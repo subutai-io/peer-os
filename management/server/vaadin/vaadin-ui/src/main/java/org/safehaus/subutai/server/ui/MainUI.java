@@ -35,6 +35,7 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
+import org.safehaus.subutai.server.ui.views.CoreModulesView;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.safehaus.subutai.server.ui.views.MonitorView;
 
@@ -67,6 +68,7 @@ public class MainUI extends UI {
 		{
 			put("/modules", ModulesView.class);
 			put("/monitor", MonitorView.class);
+            put("/core", CoreModulesView.class);
 		}
 	};
 
@@ -299,7 +301,7 @@ public class MainUI extends UI {
 
 		menu.removeAllComponents();
 
-		for (final String view : new String[] {"modules", "monitor"}) {
+		for (final String view : new String[] {"modules", "monitor", "core"}) {
 			Button b = new NativeButton(view.substring(0, 1).toUpperCase()
 					+ view.substring(1).replace('-', ' '));
 			b.addStyleName("icon-" + view);
