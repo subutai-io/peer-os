@@ -24,7 +24,7 @@ public class CloneMany extends OsgiCommandSupport {
     private String template;
     @Argument(index = 1, required = true)
     private int nodesCount;
-    @Argument(index = 2, required = false)
+    @Argument(index = 2, required = true)
     private String strategyId;
     @Argument(index = 3, required = false)
     private String criteriaList;

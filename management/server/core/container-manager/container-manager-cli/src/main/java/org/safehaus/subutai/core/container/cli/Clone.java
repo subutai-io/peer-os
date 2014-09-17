@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.container.cli;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 
@@ -22,8 +23,6 @@ public class Clone extends OsgiCommandSupport {
     private String templateName;
     @Argument( index = 2, required = true )
     private String cloneName;
-    @Argument( index = 3, required = true )
-    private String envId;
 
 
     public void setContainerManager( ContainerManager containerManager )
@@ -36,11 +35,11 @@ public class Clone extends OsgiCommandSupport {
     protected Object doExecute() throws Exception
     {
 
-        UUID envId = UUID.fromString( this.envId );
+        UUID envId = UUID.randomUUID();
         try
         {
-            containerManager.clone( envId, hostname, templateName, cloneName );
-            System.out.println( "Container cloned successfully." );
+            Agent a = containerManager.clone( envId, hostname, templateName, cloneName );
+            System.out.println( String.format("Container cloned successfully. Agent %s", a) );
         }
         catch ( ContainerCreateException cce )
         {
