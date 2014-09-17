@@ -28,7 +28,7 @@ public class StartTask implements Runnable {
         while(!Thread.interrupted()) {
             ProductOperationView po = ElasticsearchUI.getTracker().getProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY, trackID );
             if( po != null ) {
-                if( po.getState() != ProductOperationState.SUCCEEDED ) {
+                if( po.getState() != ProductOperationState.RUNNING ) {
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
