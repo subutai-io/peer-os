@@ -4,7 +4,8 @@ package org.safehaus.subutai.core.container.api;
 import java.util.Set;
 
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.common.command.RequestBuilder;
 
 
 /**
@@ -15,7 +16,9 @@ public interface Container {
     /**
      * Execute command
      */
-    public void execute(Command command);
+    public void execute( Command command );
+
+    public void execute( RequestBuilder requestBuilder ) throws CommandException;
 
     public boolean start();
 
@@ -29,7 +32,6 @@ public interface Container {
 
     /**
      * Destroy container.
-     *
      */
     public void destroy() throws ContainerDestroyException;
 
