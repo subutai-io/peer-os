@@ -61,7 +61,6 @@ import com.google.gson.GsonBuilder;
 public class ContainerManagerImpl extends ContainerManagerBase {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
 
-    private static final Logger logger = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
@@ -189,8 +188,10 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             execute( agent, envId, templateName, cloneNames, executor, ContainerAction.CREATE );
             executor.shutdown();
             for ( Agent a : successfullyClonedContainers )
-                LOG.info(String.format( "Successfully cloned container %s on %s failed.", a.getHostname(),
-                                            a.getParentHostName() ));
+            {
+                LOG.info( String.format( "Successfully cloned container %s on %s failed.", a.getHostname(),
+                        a.getParentHostName() ) );
+            }
         }
         catch ( ContainerException e )
         {
