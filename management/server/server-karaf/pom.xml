@@ -364,7 +364,7 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
+              <outputDirectory>target/dependencies/subutai-server</outputDirectory>
               <artifactItems>
 
                 <artifactItem>
