@@ -8,7 +8,7 @@ import com.google.gson.FieldAttributes;
 
 
 /**
- * Skips fields with null values from (de)serializationby GSON
+ * Skips fields with null values from (de)serialization by GSON
  */
 public class SkipNullsExclusionStrategy implements ExclusionStrategy {
     @Override
