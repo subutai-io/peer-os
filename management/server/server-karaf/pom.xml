@@ -166,6 +166,13 @@
                   <artifactId>file-tracker-impl</artifactId>
                 </artifactItem>
 
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- file-tracker -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>git-manager-api</artifactId>
+                </artifactItem>
+
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
                 <artifactItem>
