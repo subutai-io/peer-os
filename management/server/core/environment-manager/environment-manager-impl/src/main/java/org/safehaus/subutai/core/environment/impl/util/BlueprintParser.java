@@ -18,7 +18,15 @@ public class BlueprintParser {
 
 
     public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) throws JsonSyntaxException {
-        return gson.fromJson( blueprintStr, EnvironmentBlueprint.class );
+        try
+        {
+            EnvironmentBlueprint eb = gson.fromJson( blueprintStr, EnvironmentBlueprint.class );
+            return eb;
+        }
+        catch ( JsonSyntaxException e )
+        {
+            throw new JsonSyntaxException( "Error parsing blueprint" );
+        }
     }
 
 

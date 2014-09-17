@@ -38,10 +38,10 @@ public class PeerImpl implements PeerManager {
 
 
     private final String SOURCE = "PEER_MANAGER";
+    private final HttpUtil httpUtil;
     private UUID id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
-    private final HttpUtil httpUtil;
 
 
     public PeerImpl() {
@@ -73,12 +73,13 @@ public class PeerImpl implements PeerManager {
     @Override
     public String register( final Peer peer ) {
 
-        try {
-            String peerId = peer.getId().toString();
-            peerDAO.saveInfo( SOURCE, peerId, peer );
-            return peerId;
+        try
+        {
+            peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
+            return peer.getId().toString();
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             LOG.info( e.getMessage() );
         }
         return null;
@@ -94,10 +95,12 @@ public class PeerImpl implements PeerManager {
     @Override
     public List<Peer> peers() {
         List<Peer> peers = null;
-        try {
+        try
+        {
             peers = peerDAO.getInfo( SOURCE, Peer.class );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             LOG.info( e.getMessage() );
         }
         return peers;
@@ -106,11 +109,13 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public boolean unregister( final String uuid ) {
-        try {
+        try
+        {
             peerDAO.deleteInfo( SOURCE, uuid );
             return true;
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             LOG.info( e.getMessage() );
         }
         return false;
@@ -119,7 +124,8 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public Peer getPeerByUUID( UUID uuid ) {
-        if ( getSiteId().compareTo( uuid ) == 0 ) {
+        if ( getSiteId().compareTo( uuid ) == 0 )
+        {
             Peer peer = new Peer();
             peer.setId( uuid );
             peer.setIp( getLocalIp() );
@@ -127,29 +133,29 @@ public class PeerImpl implements PeerManager {
             return peer;
         }
 
-        try {
+        try
+        {
             return peerDAO.getInfo( SOURCE, uuid.toString(), Peer.class );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             LOG.info( e.getMessage() );
         }
         return null;
     }
 
 
-    public Collection<PeerMessageListener> getPeerMessageListeners() {
-        return Collections.unmodifiableCollection( peerMessageListeners );
-    }
-
-
     @Override
     public void addPeerMessageListener( PeerMessageListener listener ) {
-        try {
-            if ( !peerMessageListeners.contains( listener ) ) {
+        try
+        {
+            if ( !peerMessageListeners.contains( listener ) )
+            {
                 peerMessageListeners.add( listener );
             }
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in addPeerMessageListener", ex );
         }
     }
@@ -157,10 +163,12 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public void removePeerMessageListener( PeerMessageListener listener ) {
-        try {
+        try
+        {
             peerMessageListeners.remove( listener );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in removePeerMessageListener", ex );
         }
     }
@@ -176,10 +184,12 @@ public class PeerImpl implements PeerManager {
         params.put( Common.RECIPIENT_PARAM_NAME, recipient );
         params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
         params.put( Common.MESSAGE_PARAM_NAME, message );
-        try {
+        try
+        {
             return httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
         }
-        catch ( IOException e ) {
+        catch ( IOException e )
+        {
             LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
@@ -190,60 +200,100 @@ public class PeerImpl implements PeerManager {
     public String processPeerMessage( final String peerId, final String recipient, final String message )
             throws PeerMessageException {
 
-        try {
+        try
+        {
             UUID peerUUID = UUID.fromString( peerId );
             Peer senderPeer = getPeerByUUID( peerUUID );
-            if ( senderPeer != null ) {
+            if ( senderPeer != null )
+            {
 
-                for ( PeerMessageListener listener : peerMessageListeners ) {
-                    if ( listener.getName().equalsIgnoreCase( recipient ) ) {
-                        try {
-                            return listener.onMessage( senderPeer, message );
-                        }
-                        catch ( Exception e ) {
-                            LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
-                            throw new PeerMessageException( e.getMessage() );
+                for ( PeerMessageListener listener : peerMessageListeners )
+                {
+                    try
+                    {
+                        if ( listener.getName().equalsIgnoreCase( recipient ) )
+                        {
+                            try
+                            {
+                                return listener.onMessage( senderPeer, message );
+                            }
+                            catch ( Exception e )
+                            {
+                                LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                                throw new PeerMessageException( e.getMessage() );
+                            }
                         }
                     }
+                    catch ( Exception e )
+                    {
+                        LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                        throw e;
+                    }
+                    //                break;
                 }
                 String err = String.format( "Recipient %s not found", recipient );
                 LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
                 throw new PeerMessageException( err );
             }
-            else {
+            else
+            {
                 String err = String.format( "Peer %s not found", peerId );
                 LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
                 throw new PeerMessageException( err );
             }
         }
-        catch ( IllegalArgumentException e ) {
+        catch ( IllegalArgumentException e )
+        {
             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
     }
 
 
+    @Override
+    public void processPeerMessage( final String peerId, final String peerMessage ) throws PeerMessageException {
+
+    }
+
+
+    @Override
+    public void createContainers( final UUID envId, final String template, final int numberOfNodes,
+                                  final String Strategy, final List<String> criteria ) {
+
+    }
+
+
     private String getLocalIp() {
         Enumeration<NetworkInterface> n;
-        try {
+        try
+        {
             n = NetworkInterface.getNetworkInterfaces();
-            for (; n.hasMoreElements(); ) {
+            for (; n.hasMoreElements(); )
+            {
                 NetworkInterface e = n.nextElement();
 
                 Enumeration<InetAddress> a = e.getInetAddresses();
-                for (; a.hasMoreElements(); ) {
+                for (; a.hasMoreElements(); )
+                {
                     InetAddress addr = a.nextElement();
-                    if ( addr.getHostAddress().startsWith( "172" ) ) {
+                    if ( addr.getHostAddress().startsWith( "172" ) )
+                    {
                         return addr.getHostAddress();
                     }
                 }
             }
         }
-        catch ( SocketException e ) {
+        catch ( SocketException e )
+        {
             LOG.severe( e.getMessage() );
         }
 
 
         return "127.0.0.1";
+    }
+
+
+    public Collection<PeerMessageListener> getPeerMessageListeners() {
+        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 }

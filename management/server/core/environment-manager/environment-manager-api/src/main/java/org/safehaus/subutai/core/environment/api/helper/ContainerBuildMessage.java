@@ -1,18 +1,37 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
+import java.util.UUID;
+
+
 /**
  * Created by bahadyr on 9/14/14.
  */
-public class BuildBlock {
+public class ContainerBuildMessage {
 
-    int numberOfContainers;
-    String templateName;
-    String strategy;
-    String environmentUuid;
-    boolean completeState;
-    int timestamp;
-    String targetPeerId;
+    private int numberOfContainers;
+    private String templateName;
+    private String strategy;
+    private String environmentUuid;
+    private boolean completeState;
+    private int timestamp;
+    private String targetPeerId;
+    private UUID peerId;
+
+
+    public ContainerBuildMessage() {
+        this.numberOfContainers = 0;
+    }
+
+
+    public UUID getPeerId() {
+        return peerId;
+    }
+
+
+    public void setPeerId( final UUID peerId ) {
+        this.peerId = peerId;
+    }
 
 
     public int getNumberOfContainers() {
@@ -82,5 +101,10 @@ public class BuildBlock {
 
     public void setTargetPeerId( final String targetPeerId ) {
         this.targetPeerId = targetPeerId;
+    }
+
+
+    public void incrementNumOfCont() {
+        this.numberOfContainers++;
     }
 }

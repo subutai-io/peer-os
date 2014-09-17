@@ -20,8 +20,8 @@ public abstract class DetailsWindow extends Window {
         setModal(true);
         setClosable(true);
         setVisible(false);
-        setWidth(600, UNITS_PIXELS);
-        setHeight(400, UNITS_PIXELS);
+        setWidth(800, UNITS_PIXELS);
+        setHeight(600, UNITS_PIXELS);
         //        blueprintTxtArea = getTextArea();
         //        verticalLayout.addComponent( blueprintTxtArea );
         setContent(verticalLayout);

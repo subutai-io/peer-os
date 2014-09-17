@@ -6,16 +6,14 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
-import org.safehaus.subutai.core.peer.api.Peer;
 
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintsForm {
 
     private VerticalLayout contentRoot;
@@ -65,8 +63,10 @@ public class BlueprintsForm {
     private void updateTableData() {
         environmentsTable.removeAllItems();
         List<EnvironmentBuildTask> environmentBuildTasks = managerUI.getEnvironmentManager().getBlueprints();
-        if ( environmentBuildTasks.size() > 0 ) {
-            for ( final EnvironmentBuildTask environmentBuildTask : environmentBuildTasks ) {
+        if ( environmentBuildTasks.size() > 0 )
+        {
+            for ( final EnvironmentBuildTask environmentBuildTask : environmentBuildTasks )
+            {
 
                 final Button viewButton = new Button( "View" );
                 viewButton.addClickListener( new Button.ClickListener() {
@@ -84,17 +84,9 @@ public class BlueprintsForm {
                 buildEnvironmentButton.addClickListener( new Button.ClickListener() {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent ) {
-                        //                        EnvironmentManagerUI.getExecutor().execute( new Runnable() {
-                        //                            @Override
-                        //                            public void run() {
-                        WizardWindow wizardWindow = new WizardWindow( "Wizard", managerUI, environmentBuildTask );
-                        wizardWindow.setContent( getPeersTable() );
-                        contentRoot.getUI().addWindow( wizardWindow );
-                        wizardWindow.setVisible( true );
-
-                        //                                environmentManager.buildEnvironment( environmentBuildTask );
-                        //                            }
-                        //                        } );
+                        EnvironmentBuildWizard environmentBuildWizard = new EnvironmentBuildWizard( "Wizard", managerUI, environmentBuildTask );
+                        contentRoot.getUI().addWindow( environmentBuildWizard );
+                        environmentBuildWizard.setVisible( true );
                     }
                 } );
 
@@ -112,7 +104,8 @@ public class BlueprintsForm {
                 }, null );
             }
         }
-        else {
+        else
+        {
             Notification.show( "There is no blueprints", "No blueprints found", Notification.Type.WARNING_MESSAGE );
         }
         environmentsTable.refreshRowCache();
@@ -121,22 +114,5 @@ public class BlueprintsForm {
 
     public VerticalLayout getContentRoot() {
         return this.contentRoot;
-    }
-
-
-    private Table getPeersTable() {
-        Table peersTable = new Table();
-        peersTable.setCaption( "Peers" );
-        peersTable.setImmediate( false );
-        peersTable.setWidth( "780px" );
-        peersTable.setHeight( "283px" );
-
-
-        List<Peer> peers = managerUI.getPeerManager().peers();
-        BeanItemContainer<Peer> ds = new BeanItemContainer<Peer>( Peer.class );
-        ds.addAll( peers );
-        peersTable.setContainerDataSource( ds );
-
-        return peersTable;
     }
 }
