@@ -23,7 +23,7 @@ import com.google.gson.JsonSyntaxException;
 public class EnvironmentDAO {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final Logger logger = Logger.getLogger( EnvironmentDAO.class.getName() );
+    private static final Logger LOG = Logger.getLogger( EnvironmentDAO.class.getName() );
     private final DbManager dbManager;
 
 
@@ -48,7 +48,7 @@ public class EnvironmentDAO {
         }
         catch ( DBException e )
         {
-            logger.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return false;
     }
@@ -83,11 +83,11 @@ public class EnvironmentDAO {
         }
         catch ( JsonSyntaxException ex )
         {
-            logger.info( ex.getMessage() );
+            LOG.info( ex.getMessage() );
         }
         catch ( DBException e )
         {
-            logger.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return list;
     }
@@ -126,11 +126,11 @@ public class EnvironmentDAO {
         }
         catch ( JsonSyntaxException ex )
         {
-            logger.info( ex.getMessage() );
+            LOG.info( ex.getMessage() );
         }
         catch ( DBException e )
         {
-            logger.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return null;
     }
@@ -155,7 +155,7 @@ public class EnvironmentDAO {
         }
         catch ( DBException e )
         {
-            logger.info( e.getMessage() );
+            LOG.severe( e.getMessage() );
         }
         return false;
     }
