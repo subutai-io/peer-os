@@ -97,10 +97,10 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>agent-manager-api</artifactId>
                 </artifactItem>
-                <artifactItem>
+                <!--<artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>agent-manager-impl</artifactId>
-                </artifactItem>
+                </artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- agent-manager -->
@@ -203,6 +203,10 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>peer-manager-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>peer-manager-impl</artifactId>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

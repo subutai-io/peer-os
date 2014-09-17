@@ -25,36 +25,43 @@ public class PeerImpl implements PeerManager {
     private PeerDAO peerDAO;
 
 
-    public void setId( final String id ) {
+    public void setId( final String id )
+    {
         this.id = UUID.fromString( id );
     }
 
 
-    public void init() {
+    public void init()
+    {
         logger.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         this.dbManager = null;
     }
 
 
-    public void setDbManager( final DbManager dbManager ) {
+    public void setDbManager( final DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
     @Override
-    public String register( final Peer peer ) {
+    public String register( final Peer peer )
+    {
 
-        try {
+        try
+        {
             String peerId = peer.getId();
             peerDAO.saveInfo( SOURCE, peerId, peer );
             return peerId;
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return null;
@@ -62,18 +69,22 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public UUID getSiteId() {
+    public UUID getSiteId()
+    {
         return id;
     }
 
 
     @Override
-    public List<Peer> peers() {
+    public List<Peer> peers()
+    {
         List<Peer> peers = null;
-        try {
+        try
+        {
             peers = peerDAO.getInfo( SOURCE, Peer.class );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return peers;
@@ -81,12 +92,15 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public boolean unregister( final String uuid ) {
-        try {
+    public boolean unregister( final String uuid )
+    {
+        try
+        {
             peerDAO.deleteInfo( SOURCE, uuid );
             return true;
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return false;
@@ -94,11 +108,14 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public Peer getPeerByUUID( String uuid ) {
-        try {
+    public Peer getPeerByUUID( String uuid )
+    {
+        try
+        {
             return peerDAO.getInfo( SOURCE, uuid, Peer.class );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             logger.info( e.getMessage() );
         }
         return null;
