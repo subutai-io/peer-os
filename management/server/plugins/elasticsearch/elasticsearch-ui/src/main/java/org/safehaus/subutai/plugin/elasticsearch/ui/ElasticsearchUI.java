@@ -21,7 +21,7 @@ public class ElasticsearchUI implements PortalModule {
     public static final String MODULE_IMAGE = "logo.jpeg";
     protected static final Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
 
-    private static ExecutorService executor;
+    private ExecutorService executor;
     private final ServiceLocator serviceLocator;
 
 

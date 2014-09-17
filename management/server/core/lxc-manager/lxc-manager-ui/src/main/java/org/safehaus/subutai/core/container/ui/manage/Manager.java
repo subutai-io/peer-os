@@ -26,7 +26,7 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class Manager extends VerticalLayout {
 
     private final static String physicalHostLabel = "Physical Host";
@@ -197,8 +197,8 @@ public class Manager extends VerticalLayout {
                             Item row = lxcTable.getItem( aCol );
                             Button startBtn =
                                     ( Button ) ( row.getItemProperty( Buttons.START.getButtonLabel() ).getValue() );
-                            startBtn.addStyleName( "default" );
                             if ( startBtn != null ) {
+                                startBtn.addStyleName( "default" );
                                 startBtn.click();
                             }
                         }
@@ -215,8 +215,8 @@ public class Manager extends VerticalLayout {
                             Item row = lxcTable.getItem( aCol );
                             Button stopBtn =
                                     ( Button ) ( row.getItemProperty( Buttons.STOP.getButtonLabel() ).getValue() );
-                            stopBtn.addStyleName( "default" );
                             if ( stopBtn != null ) {
+                                stopBtn.addStyleName( "default" );
                                 stopBtn.click();
                             }
                         }

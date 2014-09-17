@@ -10,17 +10,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.enums.NodeState;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -41,15 +49,30 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
+
 public class Manager {
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private ZookeeperClusterConfig config;
+    private final Hadoop hadoop;
+    private final Zookeeper zookeeper;
+    private final CommandRunner commandRunner;
+    private final Tracker tracker;
+    private final AgentManager agentManager;
+    private final ExecutorService executorService;
 
 
-    public Manager() {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.executorService = executorService;
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.zookeeper = serviceLocator.getService( Zookeeper.class );
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
@@ -139,10 +162,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = ZookeeperUI.getManager().uninstallCluster( config.getClusterName() );
-                            ProgressWindow window =
-                                    new ProgressWindow( ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID,
-                                            ZookeeperClusterConfig.PRODUCT_KEY );
+                            UUID trackID = zookeeper.uninstallCluster( config.getClusterName() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    ZookeeperClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -176,10 +198,9 @@ public class Manager {
                         alert.getOk().addClickListener( new Button.ClickListener() {
                             @Override
                             public void buttonClick( Button.ClickEvent clickEvent ) {
-                                UUID trackID = ZookeeperUI.getManager().addNode( config.getClusterName() );
-                                ProgressWindow window =
-                                        new ProgressWindow( ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(),
-                                                trackID, ZookeeperClusterConfig.PRODUCT_KEY );
+                                UUID trackID = zookeeper.addNode( config.getClusterName() );
+                                ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                        ZookeeperClusterConfig.PRODUCT_KEY );
                                 window.getWindow().addCloseListener( new Window.CloseListener() {
                                     @Override
                                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -192,13 +213,14 @@ public class Manager {
                     }
                     else if ( config.getSetupType() == SetupType.OVER_HADOOP
                             || config.getSetupType() == SetupType.WITH_HADOOP ) {
-                        HadoopClusterConfig info = ZookeeperUI.getHadoopManager().getCluster( config.getClusterName() );
+                        HadoopClusterConfig info = hadoop.getCluster( config.getClusterName() );
 
                         if ( info != null ) {
                             Set<Agent> nodes = new HashSet<>( info.getAllNodes() );
                             nodes.removeAll( config.getNodes() );
                             if ( !nodes.isEmpty() ) {
-                                AddNodeWindow addNodeWindow = new AddNodeWindow( config, nodes );
+                                AddNodeWindow addNodeWindow =
+                                        new AddNodeWindow( zookeeper, executorService, tracker, config, nodes );
                                 contentRoot.getUI().addWindow( addNodeWindow );
                                 addNodeWindow.addCloseListener( new Window.CloseListener() {
                                     @Override
@@ -250,11 +272,9 @@ public class Manager {
                         show( "Please, specify property name to remove" );
                     }
                     else {
-                        UUID trackID = ZookeeperUI.getManager()
-                                                  .removeProperty( config.getClusterName(), fileName, propertyName );
-                        ProgressWindow window =
-                                new ProgressWindow( ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID,
-                                        ZookeeperClusterConfig.PRODUCT_KEY );
+                        UUID trackID = zookeeper.removeProperty( config.getClusterName(), fileName, propertyName );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                ZookeeperClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener() {
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent ) {
@@ -294,12 +314,10 @@ public class Manager {
                         show( "Please, specify property value to set" );
                     }
                     else {
-                        UUID trackID = ZookeeperUI.getManager()
-                                                  .addProperty( config.getClusterName(), fileName, propertyName,
-                                                          propertyValue );
-                        ProgressWindow window =
-                                new ProgressWindow( ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID,
-                                        ZookeeperClusterConfig.PRODUCT_KEY );
+                        UUID trackID =
+                                zookeeper.addProperty( config.getClusterName(), fileName, propertyName, propertyValue );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                ZookeeperClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener() {
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent ) {
@@ -342,11 +360,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = ZookeeperUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), ZookeeperUI.getExecutor(),
-                                        ZookeeperUI.getCommandRunner(), ZookeeperUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
@@ -370,7 +388,7 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<ZookeeperClusterConfig> mongoClusterInfos = ZookeeperUI.getManager().getClusters();
+        List<ZookeeperClusterConfig> mongoClusterInfos = zookeeper.getClusters();
         ZookeeperClusterConfig clusterInfo = ( ZookeeperClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
@@ -464,22 +482,23 @@ public class Manager {
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    ZookeeperUI.getExecutor().execute(
-                            new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    executorService.execute(
+                            new CheckTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
 
-                                public void onComplete( NodeState state ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( state == NodeState.RUNNING ) {
-                                            stopBtn.setEnabled( true );
+                                        public void onComplete( NodeState state ) {
+                                            synchronized ( progressIcon ) {
+                                                if ( state == NodeState.RUNNING ) {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                else if ( state == NodeState.STOPPED ) {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                destroyBtn.setEnabled( true );
+                                                progressIcon.setVisible( false );
+                                            }
                                         }
-                                        else if ( state == NodeState.STOPPED ) {
-                                            startBtn.setEnabled( true );
-                                        }
-                                        destroyBtn.setEnabled( true );
-                                        progressIcon.setVisible( false );
-                                    }
-                                }
-                            } ) );
+                                    } ) );
                 }
             } );
 
@@ -492,22 +511,23 @@ public class Manager {
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    ZookeeperUI.getExecutor().execute(
-                            new StartTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    executorService.execute(
+                            new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
 
-                                public void onComplete( NodeState state ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( state == NodeState.RUNNING ) {
-                                            stopBtn.setEnabled( true );
+                                        public void onComplete( NodeState state ) {
+                                            synchronized ( progressIcon ) {
+                                                if ( state == NodeState.RUNNING ) {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                else {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                destroyBtn.setEnabled( true );
+                                                progressIcon.setVisible( false );
+                                            }
                                         }
-                                        else {
-                                            startBtn.setEnabled( true );
-                                        }
-                                        destroyBtn.setEnabled( true );
-                                        progressIcon.setVisible( false );
-                                    }
-                                }
-                            } ) );
+                                    } ) );
                 }
             } );
 
@@ -520,22 +540,23 @@ public class Manager {
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    ZookeeperUI.getExecutor().execute(
-                            new StopTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    executorService.execute(
+                            new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
 
-                                public void onComplete( NodeState state ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( state == NodeState.STOPPED ) {
-                                            startBtn.setEnabled( true );
+                                        public void onComplete( NodeState state ) {
+                                            synchronized ( progressIcon ) {
+                                                if ( state == NodeState.STOPPED ) {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                else {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                destroyBtn.setEnabled( true );
+                                                progressIcon.setVisible( false );
+                                            }
                                         }
-                                        else {
-                                            stopBtn.setEnabled( true );
-                                        }
-                                        destroyBtn.setEnabled( true );
-                                        progressIcon.setVisible( false );
-                                    }
-                                }
-                            } ) );
+                                    } ) );
                 }
             } );
 
@@ -548,11 +569,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = ZookeeperUI.getManager()
-                                                      .destroyNode( config.getClusterName(), agent.getHostname() );
-                            ProgressWindow window =
-                                    new ProgressWindow( ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID,
-                                            ZookeeperClusterConfig.PRODUCT_KEY );
+                            UUID trackID = zookeeper.destroyNode( config.getClusterName(), agent.getHostname() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    ZookeeperClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -574,10 +593,11 @@ public class Manager {
         return contentRoot;
     }
 
+
     /**
      * Checks all nodes status on all tables.
      */
-    public void checkAll(){
+    public void checkAll() {
         checkNodesStatus( nodesTable );
     }
 }
