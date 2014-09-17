@@ -29,5 +29,5 @@ public interface PeerManager {
 
     public String sendPeerMessage( Peer peer, String recipient, String message ) throws PeerMessageException;
 
-    public String processPeerMessage( String peerId, String recipient, String peerMessage ) throws PeerMessageException;
+    public String processPeerMessage( String peerId, String recipient, String message ) throws PeerMessageException;
 }

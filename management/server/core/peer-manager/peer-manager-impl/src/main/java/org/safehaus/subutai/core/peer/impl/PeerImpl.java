@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.util.HttpUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -176,7 +175,7 @@ public class PeerImpl implements PeerManager {
         Map<String, String> params = new HashMap<>();
         params.put( Common.RECIPIENT_PARAM_NAME, recipient );
         params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
-        params.put( Common.MESSAGE_PARAM_NAME, JsonUtil.toJson( message ) );
+        params.put( Common.MESSAGE_PARAM_NAME, message );
         try {
             return httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
         }
@@ -188,7 +187,7 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public String processPeerMessage( final String peerId, final String recipient, final String peerMessage )
+    public String processPeerMessage( final String peerId, final String recipient, final String message )
             throws PeerMessageException {
 
         try {
@@ -199,7 +198,7 @@ public class PeerImpl implements PeerManager {
                 for ( PeerMessageListener listener : peerMessageListeners ) {
                     if ( listener.getName().equalsIgnoreCase( recipient ) ) {
                         try {
-                            return listener.onMessage( senderPeer, peerMessage );
+                            return listener.onMessage( senderPeer, message );
                         }
                         catch ( Exception e ) {
                             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
