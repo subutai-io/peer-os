@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.dispatcher.impl;
+package org.safehaus.subutai.common.util;
 
 
 import java.io.IOException;
@@ -30,6 +30,8 @@ import org.apache.http.util.EntityUtils;
  * @author daliev
  */
 public class HttpUtil {
+
+    public static final int RESPONSE_OK = 200;
     private static final Logger LOG = Logger.getLogger( HttpUtil.class.getName() );
 
     private final HttpClient client;
@@ -84,7 +86,7 @@ public class HttpUtil {
             entity = httpResponse.getEntity();
             int resCode = httpResponse.getStatusLine().getStatusCode();
 
-//            LOG.warning( "ENTITY: " + EntityUtils.toString( entity, "utf-8" ).trim() );
+            //            LOG.warning( "ENTITY: " + EntityUtils.toString( entity, "utf-8" ).trim() );
 
             return resCode;
         }

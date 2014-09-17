@@ -1,23 +1,32 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.util.HttpUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageImpl;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -26,13 +35,19 @@ import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 public class PeerImpl implements PeerManager {
 
     private final static Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
-    private final Queue<PeerMessageListener> listeners = new ConcurrentLinkedQueue<>();
+    private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
 
 
     private final String SOURCE = "PEER_MANAGER";
     private UUID id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
+    private final HttpUtil httpUtil;
+
+
+    public PeerImpl() {
+        this.httpUtil = new HttpUtil();
+    }
 
 
     public void setId( final String id ) {
@@ -47,7 +62,7 @@ public class PeerImpl implements PeerManager {
 
 
     public void destroy() {
-        this.dbManager = null;
+        httpUtil.dispose();
     }
 
 
@@ -115,16 +130,16 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    public Collection<PeerMessageListener> getListeners() {
-        return Collections.unmodifiableCollection( listeners );
+    public Collection<PeerMessageListener> getPeerMessageListeners() {
+        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 
 
     @Override
     public void addPeerMessageListener( PeerMessageListener listener ) {
         try {
-            if ( !listeners.contains( listener ) ) {
-                listeners.add( listener );
+            if ( !peerMessageListeners.contains( listener ) ) {
+                peerMessageListeners.add( listener );
             }
         }
         catch ( Exception ex ) {
@@ -136,7 +151,7 @@ public class PeerImpl implements PeerManager {
     @Override
     public void removePeerMessageListener( PeerMessageListener listener ) {
         try {
-            listeners.remove( listener );
+            peerMessageListeners.remove( listener );
         }
         catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in removePeerMessageListener", ex );
@@ -145,13 +160,51 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void sendPeerMessage( final Peer peer, final PeerMessage peerMessage ) throws PeerMessageException {
+    public void sendPeerMessage( final Peer peer, String recipient, final Object message ) throws PeerMessageException {
+        PeerMessage peerMessage = new PeerMessageImpl( recipient, message );
+        //TODO use real IP of peer
+        String ip = "127.0.0.1";//peer.getIp();
 
+        Map<String, String> params = new HashMap<>();
+        params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
+        params.put( Common.MESSAGE_PARAM_NAME, JsonUtil.toJson( peerMessage ) );
+        try {
+            int responseCode = httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
+            if ( responseCode != HttpUtil.RESPONSE_OK ) {
+                String errMsg = String.format( "REST returned %d response code", responseCode );
+                LOG.log( Level.WARNING, errMsg );
+                throw new PeerMessageException( errMsg );
+            }
+        }
+        catch ( IOException e ) {
+            LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
+            throw new PeerMessageException( e.getMessage() );
+        }
     }
 
 
     @Override
-    public void processPeerMessage( final Peer peer, final PeerMessage peerMessage ) throws PeerMessageException {
+    public void processPeerMessage( final String peerId, final String peerMessage ) throws PeerMessageException {
 
+        try {
+            PeerMessage peerMsg = JsonUtil.fromJson( peerMessage, PeerMessage.class );
+
+            for ( PeerMessageListener listener : peerMessageListeners ) {
+                if ( listener.getName().equalsIgnoreCase( peerMsg.getRecipientName() ) ) {
+                    Peer senderPeer = getPeerByUUID( peerId );
+                    try {
+                        listener.onMessage( senderPeer, peerMsg.getMessage() );
+                    }
+                    catch ( Exception e ) {
+                        LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                    }
+                    //                break;
+                }
+            }
+        }
+        catch ( JsonSyntaxException e ) {
+            LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+            throw new PeerMessageException( e.getMessage() );
+        }
     }
 }

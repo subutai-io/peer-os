@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.peer.api.message;
 
 
+import org.safehaus.subutai.core.peer.api.Peer;
+
+
 /**
  * Interested modules should implement this interface to receive messages
  */
@@ -11,7 +14,7 @@ public interface PeerMessageListener {
      *
      * @param message message sent by remote counterpart
      */
-    public void onMessage( Object message );
+    public void onMessage( Peer peer, Object message );
 
     /**
      * This is a copy of recipient name returned by PeerMessageListener implementations

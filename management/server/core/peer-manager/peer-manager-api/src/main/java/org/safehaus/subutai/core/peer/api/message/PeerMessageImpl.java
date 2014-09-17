@@ -6,15 +6,15 @@ import com.google.common.base.Strings;
 
 
 /**
- * Handy abstract peer message implementation which can be extended by "real" messages
+ * Handy peer message implementation
  */
-public class AbstractPeerMessage implements PeerMessage {
+public class PeerMessageImpl implements PeerMessage {
 
     private final String recipientName;
     private final Object message;
 
 
-    public AbstractPeerMessage( final String recipientName, final Object message ) {
+    public PeerMessageImpl( final String recipientName, final Object message ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipientName ), "Recipient name is null or empty" );
         Preconditions.checkNotNull( message, "Message is null" );
 
