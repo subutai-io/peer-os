@@ -8,6 +8,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.ui.PeerUI;
 
 import java.util.List;
+import java.util.UUID;
 
 
 public class PeerRegisterForm extends CustomComponent {
@@ -202,7 +203,7 @@ public class PeerRegisterForm extends CustomComponent {
                 String id = idTextField.getValue();
                 peer.setName(name);
                 peer.setIp(ip);
-                peer.setId(id);
+                peer.setId( UUID.fromString(id));
                 peerUI.getPeerManager().register(peer);
             }
         });

@@ -37,8 +37,16 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-        <groupId>com.eaio.uuid</groupId>
-        <artifactId>uuid</artifactId>
+      <groupId>com.eaio.uuid</groupId>
+      <artifactId>uuid</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
     </dependency>
   </dependencies>
 
