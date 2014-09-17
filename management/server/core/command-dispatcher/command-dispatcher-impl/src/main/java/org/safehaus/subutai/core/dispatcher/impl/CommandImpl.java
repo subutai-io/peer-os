@@ -52,7 +52,9 @@ public class CommandImpl extends AbstractCommand {
         for ( Agent agent : agents ) {
             Request request = requestBuilder.build( agent.getUuid(), commandUUID );
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
+            //TODO remove this after tests
+            if(false){
+//            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
                 requests.add( request );
             }
             else {

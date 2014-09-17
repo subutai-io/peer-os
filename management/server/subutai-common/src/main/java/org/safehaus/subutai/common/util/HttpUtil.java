@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,28 +71,29 @@ public class HttpUtil {
     }
 
 
-    public int post( String url, Map<String, String> postParams ) throws IOException {
+    public String post(String url, Map<String, String> postParams) throws IOException {
         cleanConnections();
         HttpEntity entity = null;
         try {
-            HttpPost req = new HttpPost( url );
+            HttpPost req = new HttpPost(url);
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            for ( Map.Entry<String, String> entry : postParams.entrySet() ) {
+            for (Map.Entry<String, String> entry : postParams.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                nvps.add( new BasicNameValuePair( key, value ) );
+                nvps.add(new BasicNameValuePair(key, value));
             }
-            ( ( HttpPost ) req ).setEntity( new UrlEncodedFormEntity( nvps, Consts.UTF_8 ) );
-            HttpResponse httpResponse = client.execute( req );
+            ((HttpPost) req).setEntity(new UrlEncodedFormEntity(nvps, Consts.UTF_8));
+            HttpResponse httpResponse = client.execute(req);
             entity = httpResponse.getEntity();
             int resCode = httpResponse.getStatusLine().getStatusCode();
+            if (resCode == 200) {
+                return EntityUtils.toString(entity, "utf-8").trim();
+            } else {
+                throw new IOException("Http Error Code " + resCode);
+            }
 
-            //            LOG.warning( "ENTITY: " + EntityUtils.toString( entity, "utf-8" ).trim() );
-
-            return resCode;
-        }
-        finally {
-            EntityUtils.consumeQuietly( entity );
+        } finally {
+            EntityUtils.consumeQuietly(entity);
         }
     }
 }
