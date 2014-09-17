@@ -107,6 +107,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() ) {
+            LOG.severe( request.getKey().toString() );
+            LOG.severe( request.getValue().toString() );
             Peer peer = peerManager.getPeerByUUID( request.getKey() );
 
             try {
