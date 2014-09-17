@@ -6,7 +6,8 @@ package org.safehaus.subutai.core.registry.api;
  */
 public class RegistryException extends Exception {
 
-    public RegistryException( final String message ) {
+    public RegistryException( final String message )
+    {
         super( message );
     }
 }
