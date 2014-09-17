@@ -2,40 +2,45 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
 
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.Runo;
 
 
 /**
  * Created by bahadyr on 9/10/14.
  */
-public class WizardWindow extends DetailsWindow {
+public class EnvironmentBuildWizard extends DetailsWindow {
 
-    private static final Logger LOG = Logger.getLogger( WizardWindow.class.getName() );
+    private static final Logger LOG = Logger.getLogger( EnvironmentBuildWizard.class.getName() );
 
     int step = 0;
     EnvironmentBuildTask environmentBuildTask;
     Table peersTable;
+    Table containerToPeerTable;
     private EnvironmentManagerUI managerUI;
 
 
-    public WizardWindow( final String caption, EnvironmentManagerUI managerUI,
-                         EnvironmentBuildTask environmentBuildTask ) {
+    public EnvironmentBuildWizard( final String caption, EnvironmentManagerUI managerUI,
+                                   EnvironmentBuildTask environmentBuildTask ) {
         super( caption );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
@@ -92,70 +97,6 @@ public class WizardWindow extends DetailsWindow {
     }
 
 
-    private VerticalLayout getTopologyForm() {
-        VerticalLayout layout = new VerticalLayout();
-        Panel panel = new Panel();
-        panel.setContent( new Button( "test" ) );
-        layout.addComponent( panel );
-
-
-        Button next = new Button( "Next" );
-        next.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
-                next();
-            }
-        } );
-
-
-        layout.addComponent( next );
-
-        return layout;
-    }
-
-
-    private VerticalLayout getPeersForm() {
-
-        VerticalLayout layout = new VerticalLayout();
-        Table peersTable = new Table();
-        peersTable.setCaption( "Peers" );
-        peersTable.setImmediate( false );
-        peersTable.setWidth( "600px" );
-        peersTable.setHeight( "400px" );
-
-
-        List<Peer> peers = managerUI.getPeerManager().peers();
-
-        BeanItemContainer<Peer> ds = new BeanItemContainer<Peer>( Peer.class );
-        ds.addAll( peers );
-        peersTable.setContainerDataSource( ds );
-
-        Button back = new Button( "Next" );
-        back.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
-                back();
-            }
-        } );
-
-        layout.addComponent( back );
-
-        Button next = new Button( "Next" );
-        next.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
-                next();
-            }
-        } );
-
-
-        layout.addComponent( next );
-        layout.addComponent( peersTable );
-
-        return layout;
-    }
-
-
     public void back() {
         step--;
     }
@@ -186,7 +127,14 @@ public class WizardWindow extends DetailsWindow {
         nextButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
-                next();
+                if ( selectedPeers().size() > 0 )
+                {
+                    next();
+                }
+                else
+                {
+                    Notification.show( "Please select peers", Notification.Type.HUMANIZED_MESSAGE );
+                }
             }
         } );
 
@@ -197,19 +145,22 @@ public class WizardWindow extends DetailsWindow {
     }
 
 
-    private VerticalLayout genContainerToPeersTable() {
+    private TabSheet genContainerToPeersTable() {
 
+        TabSheet sheet = new TabSheet();
+        sheet.setStyleName( Runo.TABSHEET_SMALL );
+        sheet.setSizeFull();
 
         VerticalLayout vl = new VerticalLayout();
 
-        Table table = new Table();
-        table.addContainerProperty( "Container", String.class, null );
-        table.addContainerProperty( "Put", ComboBox.class, null );
-        table.setPageLength( 10 );
-        table.setSelectable( false );
-        table.setEnabled( true );
-        table.setImmediate( true );
-        table.setSizeFull();
+        containerToPeerTable = new Table();
+        containerToPeerTable.addContainerProperty( "Container", String.class, null );
+        containerToPeerTable.addContainerProperty( "Put", ComboBox.class, null );
+        containerToPeerTable.setPageLength( 10 );
+        containerToPeerTable.setSelectable( false );
+        containerToPeerTable.setEnabled( true );
+        containerToPeerTable.setImmediate( true );
+        containerToPeerTable.setSizeFull();
 
 
         for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
@@ -219,7 +170,7 @@ public class WizardWindow extends DetailsWindow {
                 ComboBox box = new ComboBox( "", selectedPeers() );
                 box.setNullSelectionAllowed( false );
                 box.setTextInputAllowed( false );
-                table.addItem( new Object[] {
+                containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), box
                 }, null );
             }
@@ -234,9 +185,13 @@ public class WizardWindow extends DetailsWindow {
         } );
 
 
-        vl.addComponent( table );
+        vl.addComponent( containerToPeerTable );
         vl.addComponent( nextButton );
-        return vl;
+        sheet.addTab( vl, "Node to Peer" );
+        sheet.addTab( new Button( "test" ), "Blueprint to Peer group" );
+        sheet.addTab( new Button( "test" ), "Node group to Peer group" );
+        sheet.addTab( new Button( "test" ), "Node group to Peer" );
+        return sheet;
     }
 
 
@@ -256,20 +211,47 @@ public class WizardWindow extends DetailsWindow {
 
 
     private void createBackgroundEnvironmentBuildProcess() {
-        BuildProcess buildProcess = new BuildProcess();
-        for ( Object itemId : peersTable.getItemIds() )
+        EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
+
+        Map<String, Map<String, ContainerBuildMessage>> buildMessageMap =
+                new HashMap<String, Map<String, ContainerBuildMessage>>();
+
+        for ( Object itemId : containerToPeerTable.getItemIds() )
         {
-            String name = ( String ) peersTable.getItem( itemId ).getItemProperty( "Name" ).getValue();
-            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
-            LOG.info( name + " " + selection.getValue() );
-            /*if ( selection.getValue() )
+            String templateName =
+                    ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
+            ComboBox selection =
+                    ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
+
+            String peerName = ( String ) selection.getValue();
+
+
+            if ( !buildMessageMap.containsKey( peerName ) )
             {
-                BuildBlock bb = new BuildBlock();
-                bb.setPeerId( name );
-                buildProcess.addBuildBlock( bb );
-            }*/
+                if ( !buildMessageMap.get( peerName ).containsKey( templateName ) )
+                {
+                    ContainerBuildMessage containerBuildMessage = new ContainerBuildMessage();
+                    containerBuildMessage.setTemplateName( templateName );
+                    containerBuildMessage.setPeerId( peerName );
+                    containerBuildMessage.setCompleteState( false );
+                    containerBuildMessage.setEnvironmentUuid( environmentBuildTask.getUuid().toString() );
+                    //                    containerBuildMessage.setTimestamp( System.currentTimeMillis() );
+                }
+                else
+                {
+                    //                    buildMessageMap.get( peerName ).get( templateName )
+                    // .incrementNumberOfContainers();
+
+                }
+
+                //                buildMessageMapput( peerName, buildBlock );
+            }
+            else
+            {
+                //                buildMessageMap.get( templateName ).get
+            }
         }
 
-        //        managerUI.getEnvironmentManager().saveBuildProcess( buildProcess );
+        managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
     }
 }

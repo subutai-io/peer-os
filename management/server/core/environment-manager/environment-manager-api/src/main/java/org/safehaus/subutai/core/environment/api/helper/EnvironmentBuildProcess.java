@@ -9,18 +9,18 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 9/14/14.
  */
-public class BuildProcess {
+public class EnvironmentBuildProcess {
 
     String environmentName;
     private UUID uuid;
     private boolean completeStatus;
     private int timestamp;
-    private List<BuildBlock> buildBlocks;
+    private List<ContainerBuildMessage> containerBuildMessages;
 
 
-    public BuildProcess() {
+    public EnvironmentBuildProcess() {
         this.uuid = UUID.randomUUID();
-        this.buildBlocks = new ArrayList<BuildBlock>();
+        this.containerBuildMessages = new ArrayList<ContainerBuildMessage>();
     }
 
 
@@ -54,18 +54,18 @@ public class BuildProcess {
     }
 
 
-    public List<BuildBlock> getBuildBlocks() {
-        return buildBlocks;
+    public List<ContainerBuildMessage> getContainerBuildMessages() {
+        return containerBuildMessages;
     }
 
 
-    public void setBuildBlocks( final List<BuildBlock> buildBlocks ) {
-        this.buildBlocks = buildBlocks;
+    public void setContainerBuildMessages( final List<ContainerBuildMessage> containerBuildMessages ) {
+        this.containerBuildMessages = containerBuildMessages;
     }
 
 
-    public void addBuildBlock( final BuildBlock buildBlock ) {
-        this.buildBlocks.add( buildBlock );
+    public void addBuildBlock( final ContainerBuildMessage containerBuildMessage ) {
+        this.containerBuildMessages.add( containerBuildMessage );
     }
 
 

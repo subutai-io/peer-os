@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.environment.api.helper;
 /**
  * Created by bahadyr on 9/14/14.
  */
-public class BuildBlock {
+public class ContainerBuildMessage {
 
     private int numberOfContainers;
     private String templateName;

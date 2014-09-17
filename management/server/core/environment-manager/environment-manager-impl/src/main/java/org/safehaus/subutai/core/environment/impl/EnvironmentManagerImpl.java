@@ -17,7 +17,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
-import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
@@ -236,14 +236,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public boolean saveBuildProcess( final BuildProcess buildProgress ) {
+    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress ) {
         return environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
     }
 
 
     @Override
-    public List<BuildProcess> getBuildProcesses() {
-        return environmentDAO.getInfo( "PROCESS", BuildProcess.class );
+    public List<EnvironmentBuildProcess> getBuildProcesses() {
+        return environmentDAO.getInfo( "PROCESS", EnvironmentBuildProcess.class );
     }
 
 

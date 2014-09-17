@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.environment.ui.window;
 
 
-import org.safehaus.subutai.core.environment.api.helper.BuildBlock;
-import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 
 import com.vaadin.ui.TextArea;
 
@@ -17,11 +17,11 @@ public class EnvironmentBuildProcessDetails extends DetailsWindow {
         }
 
 
-        public void setContent(final BuildProcess buildProcess) {
+        public void setContent(final EnvironmentBuildProcess environmentBuildProcess ) {
             StringBuilder sb = new StringBuilder();
-            sb.append(buildProcess.getUuid()).append( "\n" );
-            if (buildProcess.getBuildBlocks() != null) {
-                for (BuildBlock block : buildProcess.getBuildBlocks()) {
+            sb.append( environmentBuildProcess.getUuid()).append( "\n" );
+            if ( environmentBuildProcess.getContainerBuildMessages() != null) {
+                for (ContainerBuildMessage block : environmentBuildProcess.getContainerBuildMessages()) {
                     sb.append(block.isCompleteState()).append( "\n" );
                 }
             }

@@ -4,8 +4,8 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.environment.api.helper.BuildBlock;
-import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 
@@ -54,10 +54,10 @@ public class EnvironmentsBuildProcessForm {
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
 
-                BuildProcess buildProcess = new BuildProcess();
-                buildProcess.addBuildBlock( new BuildBlock() );
+                EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
+                environmentBuildProcess.addBuildBlock( new ContainerBuildMessage() );
 
-                managerUI.getEnvironmentManager().saveBuildProcess( buildProcess );
+                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
         } );
 
@@ -97,8 +97,8 @@ public class EnvironmentsBuildProcessForm {
     private void updateTableData()
     {
         environmentsTable.removeAllItems();
-        List<BuildProcess> environmentList = managerUI.getEnvironmentManager().getBuildProcesses();
-        for ( final BuildProcess buildProcess : environmentList )
+        List<EnvironmentBuildProcess> environmentList = managerUI.getEnvironmentManager().getBuildProcesses();
+        for ( final EnvironmentBuildProcess environmentBuildProcess : environmentList )
         {
             Button viewEnvironmentInfoButton = new Button( "Info" );
             viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {
@@ -107,7 +107,7 @@ public class EnvironmentsBuildProcessForm {
                 {
                     EnvironmentBuildProcessDetails detailsWindow =
                             new EnvironmentBuildProcessDetails( "Environment details" );
-                    detailsWindow.setContent( buildProcess );
+                    detailsWindow.setContent( environmentBuildProcess );
                     contentRoot.getUI().addWindow( detailsWindow );
                     detailsWindow.setVisible( true );
                 }
@@ -127,7 +127,7 @@ public class EnvironmentsBuildProcessForm {
             progressIcon.setVisible( true );
 
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    buildProcess.getUuid(), "$date", progressIcon, viewEnvironmentInfoButton, terminateButton
+                    environmentBuildProcess.getUuid(), "$date", progressIcon, viewEnvironmentInfoButton, terminateButton
             }, null );
         }
         environmentsTable.refreshRowCache();

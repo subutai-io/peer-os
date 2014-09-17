@@ -84,9 +84,9 @@ public class BlueprintsForm {
                 buildEnvironmentButton.addClickListener( new Button.ClickListener() {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent ) {
-                        WizardWindow wizardWindow = new WizardWindow( "Wizard", managerUI, environmentBuildTask );
-                        contentRoot.getUI().addWindow( wizardWindow );
-                        wizardWindow.setVisible( true );
+                        EnvironmentBuildWizard environmentBuildWizard = new EnvironmentBuildWizard( "Wizard", managerUI, environmentBuildTask );
+                        contentRoot.getUI().addWindow( environmentBuildWizard );
+                        environmentBuildWizard.setVisible( true );
                     }
                 } );
 
