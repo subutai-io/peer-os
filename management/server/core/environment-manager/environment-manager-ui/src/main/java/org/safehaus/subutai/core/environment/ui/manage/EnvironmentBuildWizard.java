@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -106,7 +107,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         VerticalLayout vl = new VerticalLayout();
 
         peersTable = new Table();
-        peersTable.addContainerProperty( "Name", Peer.class, null );
+        peersTable.addContainerProperty( "Name", String.class, null );
+        peersTable.addContainerProperty( "ID", UUID.class, null );
         peersTable.addContainerProperty( "Select", CheckBox.class, null );
         peersTable.setPageLength( 10 );
         peersTable.setSelectable( false );
@@ -120,10 +122,10 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         {
             CheckBox ch = new CheckBox();
 
-            peersTable.addItem( new Object[] {
-                    peer, ch
+            Object id = peersTable.addItem( new Object[] {
+                    peer.getName(), peer.getIp(), ch
             }, null );
-            peersTable.setItemCaption( "Name", peer.getId());
+            peersTable.setItemCaptionPropertyId( "name" );
         }
         Button nextButton = new Button( "Next" );
         nextButton.addClickListener( new Button.ClickListener() {
