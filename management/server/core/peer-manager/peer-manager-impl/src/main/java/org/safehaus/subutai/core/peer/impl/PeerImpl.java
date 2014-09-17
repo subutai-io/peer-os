@@ -185,7 +185,7 @@ public class PeerImpl implements PeerManager {
             String response = httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
             return JsonUtil.fromJson( response, PeerMessage.class );
         }
-        catch ( IOException e ) {
+        catch ( JsonSyntaxException | IOException e ) {
             LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
@@ -198,12 +198,12 @@ public class PeerImpl implements PeerManager {
 
         try {
             UUID peerUUID = UUID.fromString( peerId );
-            PeerMessage peerMsg = JsonUtil.fromJson( peerMessage, PeerMessage.class );
+            Peer senderPeer = getPeerByUUID( peerUUID );
+            if ( senderPeer != null ) {
+                PeerMessage peerMsg = JsonUtil.fromJson( peerMessage, PeerMessageImpl.class );
 
-            for ( PeerMessageListener listener : peerMessageListeners ) {
-                if ( listener.getName().equalsIgnoreCase( recipient ) ) {
-                    Peer senderPeer = getPeerByUUID( peerUUID );
-                    if ( senderPeer != null ) {
+                for ( PeerMessageListener listener : peerMessageListeners ) {
+                    if ( listener.getName().equalsIgnoreCase( recipient ) ) {
                         try {
                             Object response = listener.onMessage( senderPeer, peerMsg );
                             return JsonUtil.toJson( new PeerMessageImpl( response ) );
@@ -213,16 +213,16 @@ public class PeerImpl implements PeerManager {
                             throw new PeerMessageException( e.getMessage() );
                         }
                     }
-                    else {
-                        String err = String.format( "Peer %s not found", peerId );
-                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
-                        throw new PeerMessageException( err );
-                    }
                 }
+                String err = String.format( "Recipient %s not found", recipient );
+                LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                throw new PeerMessageException( err );
             }
-            String err = String.format( "Recipient %s not found", recipient );
-            LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
-            throw new PeerMessageException( err );
+            else {
+                String err = String.format( "Peer %s not found", peerId );
+                LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                throw new PeerMessageException( err );
+            }
         }
         catch ( IllegalArgumentException | JsonSyntaxException e ) {
             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
