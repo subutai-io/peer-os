@@ -6,7 +6,5 @@ package org.safehaus.subutai.core.peer.api.message;
  */
 public interface PeerMessage {
 
-    public String getRecipientName();
-
     public Object getMessage();
 }

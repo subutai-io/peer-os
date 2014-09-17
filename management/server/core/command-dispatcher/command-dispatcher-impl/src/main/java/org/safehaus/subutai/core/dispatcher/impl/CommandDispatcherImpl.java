@@ -29,6 +29,7 @@ import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.message.PeerMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
@@ -250,11 +251,10 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public void onMessage( final Peer peer, final Object message ) throws PeerMessageException {
+    public Object onMessage( final Peer peer, final PeerMessage peerMessage ) throws PeerMessageException {
         try {
-            Preconditions.checkArgument( message instanceof DispatcherMessage, "Message is of wrong type" );
 
-            DispatcherMessage dispatcherMessage = ( DispatcherMessage ) message;
+            DispatcherMessage dispatcherMessage = ( DispatcherMessage ) peerMessage.getMessage();
 
 
             if ( dispatcherMessage.getDispatcherMessageType() == DispatcherMessageType.REQUEST ) {
@@ -267,6 +267,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         catch ( RuntimeException e ) {
             throw new PeerMessageException( e.getMessage() );
         }
+        return null;
     }
 
 
