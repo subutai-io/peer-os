@@ -37,5 +37,5 @@ public interface PeerManager {
 
     public Set<Agent> getConnectedAgents( String environmentId ) throws PeerException;
 
-    void createContainers( UUID envId, String template, int numberOfNodes, String Strategy, List<String> criteria );
+    Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String Strategy, List<String> criteria );
 }
