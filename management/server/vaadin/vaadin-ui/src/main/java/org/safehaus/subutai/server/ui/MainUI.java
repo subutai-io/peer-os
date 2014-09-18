@@ -67,7 +67,7 @@ public class MainUI extends UI {
 		{
 			put("/modules", ModulesView.class);
 			put("/monitor", MonitorView.class);
-            put("/schedule", CoreModulesView.class);
+            put("/core", CoreModulesView.class);
 		}
 	};
 
@@ -300,7 +300,7 @@ public class MainUI extends UI {
 
 		menu.removeAllComponents();
 
-		for (final String view : new String[] {"modules", "monitor", "schedule"}) {
+		for (final String view : new String[] {"modules", "monitor", "core"}) {
 			Button b = new NativeButton(view.substring(0, 1).toUpperCase()
 					+ view.substring(1).replace('-', ' '));
 			b.addStyleName("icon-" + view);

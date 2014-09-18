@@ -55,7 +55,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
         titleAndDrafts.addStyleName("drafts");
         editors.addComponent(titleAndDrafts);
 
-        Label draftsTitle = new Label("Modules");
+        Label draftsTitle = new Label("Core modules");
         draftsTitle.addStyleName("h1");
         draftsTitle.setSizeUndefined();
         titleAndDrafts.addComponent(draftsTitle);
