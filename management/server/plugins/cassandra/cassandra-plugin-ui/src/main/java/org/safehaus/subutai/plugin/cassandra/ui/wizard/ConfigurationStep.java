@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
@@ -20,9 +15,6 @@ import com.vaadin.ui.VerticalLayout;
 import java.util.Arrays;
 
 
-/**
- * @author dilshat
- */
 public class ConfigurationStep extends VerticalLayout {
 
     public ConfigurationStep( final Wizard wizard ) {

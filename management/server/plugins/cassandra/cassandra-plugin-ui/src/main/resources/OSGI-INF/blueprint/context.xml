@@ -12,10 +12,6 @@
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.ui.CassandraUI"
         init-method="init" destroy-method="destroy">
-    <argument ref="agentManager" />
-    <argument ref="cassandraManager" />
-    <argument ref="tracker" />
-    <argument ref="commandRunner" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

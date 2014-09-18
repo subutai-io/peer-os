@@ -2,7 +2,14 @@ package org.safehaus.subutai.plugin.elasticsearch.ui.wizard;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
 import java.util.Arrays;
 

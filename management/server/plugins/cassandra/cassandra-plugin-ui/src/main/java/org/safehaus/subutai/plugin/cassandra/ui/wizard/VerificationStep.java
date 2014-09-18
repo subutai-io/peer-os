@@ -1,13 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
@@ -25,7 +23,8 @@ import com.vaadin.ui.Window;
  */
 public class VerificationStep extends VerticalLayout {
 
-    public VerificationStep( final Wizard wizard ) {
+    public VerificationStep( final Cassandra cassandra, final ExecutorService executorService,
+                             final Tracker tracker, final Wizard wizard ) {
 
         setSizeFull();
 
@@ -51,9 +50,9 @@ public class VerificationStep extends VerticalLayout {
         install.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = wizard.getCassandraUI().getCassandraManager().installCluster( wizard.getConfig() );
+                UUID trackID = cassandra.installCluster( wizard.getConfig() );
                 ProgressWindow window =
-                        new ProgressWindow( wizard.getCassandraUI().getExecutor(), wizard.getCassandraUI().getTracker(), trackID,
+                        new ProgressWindow( executorService, tracker, trackID,
                                 CassandraClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override

@@ -9,10 +9,16 @@ package org.safehaus.subutai.plugin.cassandra.ui.manager;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -37,32 +43,35 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
+import javax.naming.NamingException;
 
-public class Manager {
+
+public class Manager
+{
 
     private final Table nodesTable;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private CassandraClusterConfig config;
     private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
-    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private final String message = "No cluster is installed !";
-    private CassandraUI cassandraUI;
+    private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private static final String message = "No cluster is installed !";
+
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final AgentManager agentManager;
+    private final Cassandra cassandra;
+    private final CommandRunner commandRunner;
 
 
-    public CassandraUI getCassandraUI() {
-        return cassandraUI;
-    }
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
 
+        this.cassandra = serviceLocator.getService( Cassandra.class );
+        this.executorService = executorService;
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
 
-    public void setCassandraUI( final CassandraUI cassandraUI ) {
-        this.cassandraUI = cassandraUI;
-    }
-
-
-    public Manager( final CassandraUI cassandraUI ) {
-
-        this.cassandraUI = cassandraUI;
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -121,8 +130,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ) {
                     show( message );
-                }
-                else {
+                } else {
                     checkAllNodes();
                 }
             }
@@ -138,8 +146,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ) {
                     show( message );
-                }
-                else {
+                }  else {
                     startAllNodes();
                 }
             }
@@ -155,8 +162,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ) {
                     show( message );
-                }
-                else {
+                } else {
                     stopAllNodes();
                 }
             }
@@ -180,11 +186,10 @@ public class Manager {
                         public void buttonClick( Button.ClickEvent clickEvent ) {
                             /** before destroying cluster, stop it first to not leave background zombie processes **/
                             stopAllBtn.click();
-                            UUID trackID =
-                                    cassandraUI.getCassandraManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = cassandra.uninstallCluster( config.getClusterName() );
 
                             ProgressWindow window =
-                                    new ProgressWindow( cassandraUI.getExecutor(), cassandraUI.getTracker(), trackID,
+                                    new ProgressWindow( executorService, tracker, trackID,
                                             CassandraClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -240,11 +245,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = cassandraUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), cassandraUI.getExecutor(),
-                                        cassandraUI.getCommandRunner(), cassandraUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService,
+                                        commandRunner, agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
@@ -294,17 +299,17 @@ public class Manager {
                 @Override
                 public void buttonClick( Button.ClickEvent event ) {
                     progressIcon.setVisible( true );
-                    cassandraUI.getExecutor().execute(
-                            new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    startButton.setEnabled( false );
+                    stopButton.setEnabled( false );
+                    executorService.execute(
+                            new CheckTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
                                 public void onComplete( String result ) {
-                                    synchronized ( progressIcon ) {
-                                        String status = parseServiceResult( result );
-                                        resultHolder.setValue( status );
-                                        if ( status.contains( "not" ) ) {
+                                    synchronized( progressIcon ) {
+                                        resultHolder.setValue( result );
+                                        if( result.contains( "not" ) ) {
                                             startButton.setEnabled( true );
                                             stopButton.setEnabled( false );
-                                        }
-                                        else {
+                                        } else {
                                             startButton.setEnabled( false );
                                             stopButton.setEnabled( true );
                                         }
@@ -321,13 +326,12 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
-                    cassandraUI.getExecutor().execute(
-                            new StartTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    executorService.execute(
+                            new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
                                 @Override
                                 public void onComplete( String result ) {
-                                    synchronized ( progressIcon ) {
+                                    synchronized( progressIcon ) {
                                         checkButton.click();
-                                        progressIcon.setVisible( false );
                                     }
                                 }
                             } ) );
@@ -340,13 +344,12 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
-                    cassandraUI.getExecutor().execute(
-                            new StopTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    executorService.execute(
+                            new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
                                 @Override
                                 public void onComplete( String result ) {
-                                    synchronized ( progressIcon ) {
+                                    synchronized( progressIcon ) {
                                         checkButton.click();
-                                        progressIcon.setVisible( false );
                                     }
                                 }
                             } ) );
@@ -429,24 +432,10 @@ public class Manager {
 
 
     /**
-     * Parses output of 'service cassandra status' command
-     */
-    public static String parseServiceResult( String result ) {
-        StringBuilder parsedResult = new StringBuilder();
-        Matcher tracersMatcher = cassandraPattern.matcher( result );
-        if ( tracersMatcher.find() ) {
-            parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
-        }
-
-        return parsedResult.toString();
-    }
-
-
-    /**
      * Refreshes combo box which lists available clusters in DB
      */
     public void refreshClustersInfo() {
-        List<CassandraClusterConfig> info = cassandraUI.getCassandraManager().getClusters();
+        List<CassandraClusterConfig> info = cassandra.getClusters();
         CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( info != null && info.size() > 0 ) {
