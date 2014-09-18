@@ -1,9 +1,15 @@
 package org.safehaus.subutai.core.template.impl;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
@@ -11,15 +17,12 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.registry.api.Template;
 
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 
-public class TemplateManagerImpl extends TemplateManagerBase
-{
+public class TemplateManagerImpl extends TemplateManagerBase {
 
     private static final Logger logger = Logger.getLogger( TemplateManagerImpl.class.getName() );
 
@@ -42,12 +45,12 @@ public class TemplateManagerImpl extends TemplateManagerBase
     @Override
     public boolean clone( String hostName, String templateName, String cloneName, String environmentId )
     {
-        return clone(hostName, templateName, Sets.newHashSet(cloneName), environmentId);
+        return clone( hostName, templateName, Sets.newHashSet( cloneName ), environmentId );
     }
 
 
     @Override
-    public boolean clone( String hostName, String templateName, Set<String> cloneNames, String environmentId)
+    public boolean clone( String hostName, String templateName, Set<String> cloneNames, String environmentId )
     {
         Agent a = agentManager.getAgentByHostname( hostName );
         if ( !prepareTemplates( a, templateName ) )
@@ -58,7 +61,8 @@ public class TemplateManagerImpl extends TemplateManagerBase
         boolean result = true;
         for ( String cloneName : cloneNames )
         {
-            result &= scriptExecutor.execute( a, ActionType.CLONE, templateName, cloneName, String.format(" %s &", environmentId) );
+            result &= scriptExecutor
+                    .execute( a, ActionType.CLONE, templateName, cloneName, String.format( " %s &", environmentId ) );
             // TODO: script does not return w/o redirecting outputs!!!
             // for now, script is run in background
         }
@@ -83,18 +87,20 @@ public class TemplateManagerImpl extends TemplateManagerBase
         Agent a = agentManager.getAgentByHostname( hostName );
 
         StringBuilder cmdBuilder = new StringBuilder();
-        for ( String cloneName : cloneNames )
+        if ( cloneNames != null )
         {
-            if ( cmdBuilder.length() > 0 )
+            for ( final String cloneName : cloneNames )
             {
-                cmdBuilder.append( " & " );
+                if ( cmdBuilder.length() > 0 )
+                {
+                    cmdBuilder.append( " & " );
+                }
+                cmdBuilder.append( ActionType.DESTROY.buildCommand( cloneName ) );
             }
-            cmdBuilder.append( ActionType.DESTROY.buildCommand( cloneName ) );
         }
 
-        Command cmd = getCommandRunner().createCommand(
-            new RequestBuilder( cmdBuilder.toString() ).withTimeout( 180 ),
-            new HashSet<>( Arrays.asList( a ) ) );
+        Command cmd = getCommandRunner().createCommand( new RequestBuilder( cmdBuilder.toString() ).withTimeout( 180 ),
+                new HashSet<>( Arrays.asList( a ) ) );
         getCommandRunner().runCommand( cmd );
 
         return cmd.hasSucceeded();
@@ -151,7 +157,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
                 boolean installed = scriptExecutor.execute( a, ActionType.IMPORT, p.getTemplateName() );
                 if ( !installed )
                 {
-                    logger.log(Level.SEVERE, "Failed to install parent templates: {0}", p.getTemplateName());
+                    logger.log( Level.SEVERE, "Failed to install parent templates: {0}", p.getTemplateName() );
                     return false;
                 }
             }
@@ -184,40 +190,48 @@ public class TemplateManagerImpl extends TemplateManagerBase
             return null;
         }
         // run on each physical server one by one until we get successful result
-        String s = ActionType.GET_PACKAGE_NAME.buildCommand(templateName);
-        s = ActionType.wrapInBash(s);
-        for(Agent phy : phys) {
+        String s = ActionType.GET_PACKAGE_NAME.buildCommand( templateName );
+        s = ActionType.wrapInBash( s );
+        for ( Agent phy : phys )
+        {
 
-            Command cmd = commandRunner.createCommand(new RequestBuilder(s),
-                    new HashSet<>(Arrays.asList(phy)));
-            commandRunner.runCommand(cmd);
+            Command cmd = commandRunner.createCommand( new RequestBuilder( s ), new HashSet<>( Arrays.asList( phy ) ) );
+            commandRunner.runCommand( cmd );
 
-            if(cmd.hasSucceeded())
-                return cmd.getResults().get(phy.getUuid()).getStdOut().trim();
+            if ( cmd.hasSucceeded() )
+            {
+                return cmd.getResults().get( phy.getUuid() ).getStdOut().trim();
+            }
         }
         return null;
     }
 
+
     @Override
-    public String getDebianPackageName(String templateName) {
+    public String getDebianPackageName( String templateName )
+    {
         Set<Agent> phys = agentManager.getPhysicalAgents();
-        if(phys.isEmpty()) {
-            logger.severe("No physical agents connected");
+        if ( phys.isEmpty() )
+        {
+            logger.severe( "No physical agents connected" );
             return null;
         }
         // run on each physical server one by one until we get successful result
-        String s = ActionType.GET_DEB_PACKAGE_NAME.buildCommand(templateName);
-        s = ActionType.wrapInBash(s);
-        for(Agent phy : phys) {
-            Command cmd = commandRunner.createCommand(new RequestBuilder(s),
-                    new HashSet<>(Arrays.asList(phy)));
-            commandRunner.runCommand(cmd);
+        String s = ActionType.GET_DEB_PACKAGE_NAME.buildCommand( templateName );
+        s = ActionType.wrapInBash( s );
+        for ( Agent phy : phys )
+        {
+            Command cmd = commandRunner.createCommand( new RequestBuilder( s ), new HashSet<>( Arrays.asList( phy ) ) );
+            commandRunner.runCommand( cmd );
 
-            if(cmd.hasSucceeded())
-                return cmd.getResults().get(phy.getUuid()).getStdOut().trim();
+            if ( cmd.hasSucceeded() )
+            {
+                return cmd.getResults().get( phy.getUuid() ).getStdOut().trim();
+            }
         }
         return null;
     }
+
 
     private boolean prepareTemplates( Agent a, String templateName )
     {
@@ -232,7 +246,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
                 boolean b = scriptExecutor.execute( a, ActionType.INSTALL, pack );
                 if ( !b )
                 {
-                    logger.log(Level.SEVERE, "Failed to install parent templates: {0}", p.getTemplateName());
+                    logger.log( Level.SEVERE, "Failed to install parent templates: {0}", p.getTemplateName() );
                     return false;
                 }
             }
@@ -243,7 +257,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
             String pack = getPackageName( templateName );
             if ( !scriptExecutor.execute( a, ActionType.INSTALL, pack ) )
             {
-                logger.log(Level.SEVERE, "Failed to install template: {0}", templateName);
+                logger.log( Level.SEVERE, "Failed to install template: {0}", templateName );
                 return false;
             }
         }
@@ -276,5 +290,4 @@ public class TemplateManagerImpl extends TemplateManagerBase
         }
         return null;
     }
-
 }
