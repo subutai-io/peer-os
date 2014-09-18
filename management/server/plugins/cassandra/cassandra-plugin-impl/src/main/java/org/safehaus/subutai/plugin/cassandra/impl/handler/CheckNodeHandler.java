@@ -55,8 +55,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
 
         if ( statusServiceCommand.hasSucceeded() ) {
             productOperation.addLogDone( "Cassandra is running" );
-        }
-        else {
+        } else {
             logStatusResults( productOperation, statusServiceCommand );
         }
     }
@@ -71,8 +70,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
             String status = "UNKNOWN";
             if ( e.getValue().getExitCode() == 0 ) {
                 status = "Cassandra is running";
-            }
-            else if ( e.getValue().getExitCode() == 768 ) {
+            } else if ( e.getValue().getExitCode() == 768 ) {
                 status = "Cassandra is not running";
             }
 

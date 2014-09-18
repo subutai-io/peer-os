@@ -188,8 +188,7 @@ public class CassandraImpl extends CassandraBase {
     public List<CassandraClusterConfig> getClusters() {
         try {
             return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-        }
-        catch ( DBException e ) {
+        } catch ( DBException e ) {
             return Collections.emptyList();
         }
     }
@@ -290,7 +289,7 @@ public class CassandraImpl extends CassandraBase {
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName(String.format("%s-%s", config.getProductKey(), UUID.randomUUID()));
+        environmentBlueprint.setName(String.format("%s-%s", CassandraClusterConfig.getProductKey(), UUID.randomUUID()));
         environmentBlueprint.setLinkHosts(true);
         environmentBlueprint.setDomainName(Common.DEFAULT_DOMAIN_NAME);
         environmentBlueprint.setExchangeSshKeys(true);

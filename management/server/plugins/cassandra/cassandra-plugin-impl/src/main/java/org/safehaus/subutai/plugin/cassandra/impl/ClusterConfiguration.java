@@ -13,9 +13,6 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
-/**
- * Created by bahadyr on 9/1/14.
- */
 public class ClusterConfiguration {
 
     private final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
@@ -40,8 +37,7 @@ public class ClusterConfiguration {
 
         if ( setClusterNameCommand.hasSucceeded() ) {
             po.addLog( "Configure cluster name succeeded" );
-        }
-        else {
+        } else {
             po.addLogFailed( String.format( "Installation failed, %s", setClusterNameCommand.getAllErrors() ) );
             return;
         }
@@ -54,8 +50,7 @@ public class ClusterConfiguration {
 
         if ( setDataDirCommand.hasSucceeded() ) {
             po.addLog( "Configure data directory succeeded" );
-        }
-        else {
+        } else {
             po.addLogFailed( String.format( "Installation failed, %s", setDataDirCommand.getAllErrors() ) );
             return;
         }
@@ -68,8 +63,7 @@ public class ClusterConfiguration {
 
         if ( setCommitDirCommand.hasSucceeded() ) {
             po.addLog( "Configure commit directory succeeded" );
-        }
-        else {
+        } else {
             po.addLogFailed( String.format( "Installation failed, %s", setCommitDirCommand.getAllErrors() ) );
             return;
         }
@@ -82,8 +76,7 @@ public class ClusterConfiguration {
 
         if ( setSavedCacheDirCommand.hasSucceeded() ) {
             po.addLog( "Configure saved cache directory succeeded" );
-        }
-        else {
+        } else {
             po.addLogFailed( String.format( "Installation failed, %s", setSavedCacheDirCommand.getAllErrors() ) );
             return;
         }
@@ -96,8 +89,7 @@ public class ClusterConfiguration {
 
         if ( setRpcAddressCommand.hasSucceeded() ) {
             po.addLog( "Configure rpc address succeeded" );
-        }
-        else {
+        } else {
             po.addLogFailed( String.format( "Installation failed, %s", setRpcAddressCommand.getAllErrors() ) );
             return;
         }
@@ -110,8 +102,7 @@ public class ClusterConfiguration {
 
         if ( setListenAddressCommand.hasSucceeded() ) {
             po.addLog( "Configure listen address succeeded" );
-        }
-        else {
+        } else {
             po.addLogFailed( String.format( "Installation failed, %s", setListenAddressCommand.getAllErrors() ) );
             return;
         }
@@ -131,8 +122,7 @@ public class ClusterConfiguration {
 
         if ( setSeedsCommand.hasSucceeded() ) {
             po.addLog( "Configure seeds succeeded" );
-        }
-        else {
+        } else {
             po.addLogFailed( String.format( "Installation failed, %s", setSeedsCommand.getAllErrors() ) );
             return;
         }
@@ -141,8 +131,7 @@ public class ClusterConfiguration {
             po.addLog( "Cassandra cluster data saved into database" );
             cassandraManager.getPluginDAO()
                             .saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        }
-        catch ( DBException e ) {
+        } catch ( DBException e ) {
             LOG.info(e.getMessage());
         }
     }

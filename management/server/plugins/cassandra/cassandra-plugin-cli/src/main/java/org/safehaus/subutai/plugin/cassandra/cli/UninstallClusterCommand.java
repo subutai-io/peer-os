@@ -15,11 +15,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
+@Command( scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Cassandra cassandraManager;
     private Tracker tracker;

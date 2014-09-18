@@ -22,9 +22,6 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import com.google.common.collect.Sets;
 
 
-/**
- * @author dilshat
- */
 public class Commands extends CommandsSingleton {
 
     public static final String PACKAGE_NAME = "ksks-cassandra";

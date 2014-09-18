@@ -52,8 +52,7 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> 
             AgentResult ar = stopServiceCommand.getResults().get( node.getUuid() );
             productOperation.addLog( ar.getStdOut() );
             productOperation.addLogDone( "Stop succeeded" );
-        }
-        else {
+        } else {
             productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
         }
     }

@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.api;
-
 
 import java.util.Set;
 
@@ -13,9 +7,6 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
 
-/**
- * @author dilshat
- */
 public class CassandraClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Cassandra";
@@ -154,10 +145,5 @@ public class CassandraClusterConfig implements ConfigBase {
                 ", commitLogDirectory='" + commitLogDirectory + '\'' +
                 ", savedCachesDirectory='" + savedCachesDirectory + '\'' +
                 '}';
-    }
-
-
-    public void reset() {
-
     }
 }

@@ -33,8 +33,7 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
         if ( startServiceCommand.hasSucceeded() ) {
             productOperation.addLogDone( "Start succeeded" );
-        }
-        else {
+        } else {
             productOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
         }
     }

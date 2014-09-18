@@ -5,9 +5,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by bahadyr on 7/4/14.
- */
 public class ConfigurationView extends VerticalLayout {
 
     public ConfigurationView() {

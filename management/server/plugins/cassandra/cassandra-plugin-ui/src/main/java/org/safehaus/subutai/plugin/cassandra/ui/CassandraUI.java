@@ -9,7 +9,6 @@ package org.safehaus.subutai.plugin.cassandra.ui;
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -23,9 +22,6 @@ import java.util.logging.Logger;
 public class CassandraUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "cassandra.png";
-    public static final String PRODUCT_KEY = "Cassandra";
-    public static final String PRODUCT_NAME = "Cassandra";
-
     protected Logger LOG = Logger.getLogger( CassandraUI.class.getName() );
 
     private ExecutorService executor;

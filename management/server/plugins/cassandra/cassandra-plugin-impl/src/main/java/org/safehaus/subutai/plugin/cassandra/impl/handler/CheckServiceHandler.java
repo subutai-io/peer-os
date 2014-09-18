@@ -54,12 +54,10 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
             AgentResult ar = statusServiceCommand.getResults().get( agent.getUuid() );
             if ( ar.getStdOut().contains( "is running" ) ) {
                 productOperation.addLogDone( "Cassandra is running" );
-            }
-            else {
+            } else {
                 productOperation.addLogFailed( "Cassandra is not running" );
             }
-        }
-        else {
+        } else {
             productOperation.addLogFailed( "Cassandra is not running" );
         }
     }

@@ -34,8 +34,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl> 
 
         if ( stopServiceCommand.hasSucceeded() ) {
             productOperation.addLogDone( "Stop succeeded" );
-        }
-        else {
+        } else {
             productOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
         }
     }

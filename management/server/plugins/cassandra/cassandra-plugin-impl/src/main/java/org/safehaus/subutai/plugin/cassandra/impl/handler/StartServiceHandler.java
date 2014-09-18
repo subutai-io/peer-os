@@ -54,8 +54,7 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
                 productOperation.addLog( ar.getStdOut() );
                 productOperation.addLogDone( "Start succeeded" );
             }
-        }
-        else {
+        } else {
             productOperation.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
         }
     }

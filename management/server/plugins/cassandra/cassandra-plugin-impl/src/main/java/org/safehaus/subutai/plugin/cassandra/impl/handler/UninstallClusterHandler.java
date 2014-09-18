@@ -33,8 +33,7 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
         try {
             manager.getContainerManager().clonesDestroy( config.getNodes() );
             productOperation.addLog( "Lxc containers successfully destroyed" );
-        }
-        catch ( LxcDestroyException ex ) {
+        } catch ( LxcDestroyException ex ) {
             productOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
 
@@ -43,8 +42,7 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
         try {
             manager.getPluginDAO().deleteInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
             productOperation.addLogDone( "Cluster info deleted from database" );
-        }
-        catch ( DBException e ) {
+        } catch ( DBException e ) {
             productOperation.addLogFailed( String.format( "Error while deleting cluster info from database, %s", e.getMessage() ) );
         }
     }

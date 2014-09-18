@@ -45,8 +45,7 @@ public class InstallClusterHandler extends AbstractOperationHandler<CassandraImp
             clusterSetupStrategy.setup();
 
             po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
-        }
-        catch ( EnvironmentBuildException | ClusterSetupException e ) {
+        } catch ( EnvironmentBuildException | ClusterSetupException e ) {
             po.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }

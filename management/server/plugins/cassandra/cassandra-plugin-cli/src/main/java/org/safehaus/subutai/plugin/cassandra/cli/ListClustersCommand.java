@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "list-clusters", description = "Gets the list of Cassandra clusters")
+@Command( scope = "cassandra", name = "list-clusters", description = "Gets the list of Cassandra clusters" )
 public class ListClustersCommand extends OsgiCommandSupport {
 
     private Cassandra cassandraManager;

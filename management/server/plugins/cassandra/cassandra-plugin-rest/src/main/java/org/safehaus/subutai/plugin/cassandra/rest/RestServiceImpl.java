@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 
-/**
- * Created by bahadyr on 9/4/14.
- */
 public class RestServiceImpl implements RestService {
 
     private Cassandra cassandraManager;

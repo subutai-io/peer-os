@@ -36,8 +36,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
         try {
             config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName,
                     CassandraClusterConfig.class );
-        }
-        catch ( DBException e ) {
+        } catch ( DBException e ) {
             LOG.info( e.getMessage() );
         }
 
@@ -52,8 +51,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
         if ( checkStatusCommand.hasSucceeded() ) {
             productOperation.addLogDone( "All nodes are running." );
-        }
-        else {
+        } else {
             logStatusResults( productOperation, checkStatusCommand );
         }
     }
