@@ -256,7 +256,11 @@
                   <groupId>org.apache.httpcomponents</groupId>
                   <artifactId>httpmime</artifactId>
                 </artifactItem>
-
+                <artifactItem>
+                  <groupId>org.apache.httpcomponents</groupId>
+                  <artifactId>httpcore-osgi</artifactId>
+                  <version>4.3.2</version>
+                </artifactItem>
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
                 <artifactItem>
