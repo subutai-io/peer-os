@@ -156,6 +156,10 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>config-point-tracker-api</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>config-point-tracker-impl</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- configuration-manager -->
@@ -245,25 +249,6 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>tracker-api</artifactId>
                 </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!--Testing dependencies-->
-                <!--<artifactItem>
-                  <groupId>junit</groupId>
-                  <artifactId>junit</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.mockito</groupId>
-                  <artifactId>mockito-core</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.objenesis</groupId>
-                  <artifactId>objenesis</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.hamcrest</groupId>
-                  <artifactId>hamcrest-core</artifactId>
-                </artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
