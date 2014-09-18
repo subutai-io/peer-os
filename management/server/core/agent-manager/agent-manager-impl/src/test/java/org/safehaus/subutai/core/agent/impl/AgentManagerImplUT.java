@@ -17,7 +17,6 @@ import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -37,14 +36,12 @@ public class AgentManagerImplUT {
     private final String TRANSPORT_ID = "transport-id";
     private AgentManagerImpl agentManager;
     private CommunicationManager communicationManager;
-    private PeerManager peerManager;
 
 
     @Before
     public void setUp() {
         communicationManager = mock( CommunicationManager.class );
-        peerManager = mock( PeerManager.class );
-        agentManager = new AgentManagerImpl( communicationManager, peerManager );
+        agentManager = new AgentManagerImpl( communicationManager );
         agentManager.init();
     }
 

@@ -3,14 +3,11 @@
 
   <reference id="communicationService" availability="mandatory"
              interface="org.safehaus.subutai.core.communication.api.CommunicationManager" />
-  <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="agentManager"
         class="org.safehaus.subutai.core.agent.impl.AgentManagerImpl"
         init-method="init" destroy-method="destroy" scope="singleton">
     <argument ref="communicationService" />
-    <argument ref="peerManager" />
   </bean>
 
   <service ref="agentManager" interface="org.safehaus.subutai.core.agent.api.AgentManager" />

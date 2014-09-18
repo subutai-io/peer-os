@@ -4,14 +4,18 @@ package org.safehaus.subutai.core.peer.rest;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -77,6 +81,24 @@ public class RestServiceImpl implements RestService {
         catch ( PeerMessageException e ) {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
+    }
+
+
+    @Override
+    public Response getConnectedAgents( @QueryParam( "envId" ) final String environmentId ) {
+        try {
+            String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
+            return Response.ok( response ).build();
+        }
+        catch ( JsonSyntaxException | PeerException e ) {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response ping() {
+        return Response.ok(  ).build();
     }
 
 

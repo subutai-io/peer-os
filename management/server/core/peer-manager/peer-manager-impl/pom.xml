@@ -41,6 +41,14 @@
             <groupId>org.safehaus.subutai</groupId>
             <artifactId>db-manager-api</artifactId>
         </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>agent-manager-api</artifactId>
+      </dependency>  
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>container-manager-api</artifactId>
+      </dependency>      
     </dependencies>
 
     <build>

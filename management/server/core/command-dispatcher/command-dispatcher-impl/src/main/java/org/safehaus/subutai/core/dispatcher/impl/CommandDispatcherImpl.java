@@ -75,14 +75,15 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     private void executeCommand( CommandImpl command ) {
-        //TODO check if peers are accessible otherwise throw RunCommandException
-        //not implemented yet...
-
-        //TODO check if agents are connected otherwise throw RunCommandException
-        //not implemented yet...
 
         //send remote requests
         if ( !command.getRemoteRequests().isEmpty() ) {
+            //TODO check if peers are accessible otherwise throw RunCommandException
+            //not implemented yet...
+
+            //TODO check if agents are connected otherwise throw RunCommandException
+            //not implemented yet...
+
             LOG.warning( "executing remote requests" );
             sendRequests( command.getRemoteRequests() );
         }
