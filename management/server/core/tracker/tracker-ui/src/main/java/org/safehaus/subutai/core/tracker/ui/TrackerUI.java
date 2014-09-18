@@ -1,15 +1,14 @@
 package org.safehaus.subutai.core.tracker.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class TrackerUI implements PortalModule {
@@ -61,5 +60,10 @@ public class TrackerUI implements PortalModule {
         trackerForm.refreshSources();
         trackerForm.startTracking();
         return trackerForm;
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return true;
     }
 }

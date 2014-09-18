@@ -58,7 +58,24 @@ public class PortalModuleServiceImpl implements PortalModuleService {
 
 
     public List<PortalModule> getModules() {
-        return Collections.unmodifiableList( modules );
+        List<PortalModule> pluginModules = Collections.synchronizedList(new ArrayList<PortalModule>());
+        for (PortalModule module : modules) {
+            if (module.isCorePlugin() == null || !module.isCorePlugin()) {
+                pluginModules.add(module);
+            }
+        }
+        return Collections.unmodifiableList(pluginModules);
+    }
+
+    public List<PortalModule> getCoreModules() {
+        List<PortalModule> coreModules = Collections.synchronizedList(new ArrayList<PortalModule>());
+        for (PortalModule module : modules) {
+//            LOG.log(Level.WARNING, module.getId());
+            if (module.isCorePlugin() != null && module.isCorePlugin()) {
+                coreModules.add(module);
+            }
+        }
+        return Collections.unmodifiableList(coreModules);
     }
 
 

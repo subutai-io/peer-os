@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.HttpUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
@@ -35,10 +36,12 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 
 /**
- * Created by bahadyr on 8/28/14.
+ * PeerManager implementation
  */
 public class PeerImpl implements PeerManager {
 
@@ -207,7 +210,6 @@ public class PeerImpl implements PeerManager {
         {
             if ( isPeerReachable( peer ) )
             {
-                String ip = peer.getIp();
 
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.RECIPIENT_PARAM_NAME, recipient );
@@ -215,8 +217,8 @@ public class PeerImpl implements PeerManager {
                 params.put( Common.MESSAGE_PARAM_NAME, message );
                 try
                 {
-                    return HttpUtil.request( HttpUtil.RequestType.POST, String.format( Common.MESSAGE_REQUEST_URL, ip ),
-                            params );
+                    return HttpUtil.request( HttpUtil.RequestType.POST,
+                            String.format( Common.MESSAGE_REQUEST_URL, peer.getIp() ), params );
                 }
                 catch ( HTTPException e )
                 {
@@ -346,6 +348,34 @@ public class PeerImpl implements PeerManager {
         catch ( IllegalArgumentException e )
         {
             throw new PeerException( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public Set<Agent> getConnectedAgents( final Peer peer, final String environmentId ) throws PeerException {
+        if ( isPeerReachable( peer ) )
+        {
+            try
+            {
+                Map<String, String> params = new HashMap<>();
+                params.put( Common.ENV_ID_PARAM_NAME, environmentId );
+                String response = HttpUtil.request( HttpUtil.RequestType.GET,
+                        String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
+
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {}.getType() );
+            }
+            catch ( JsonSyntaxException | HTTPException e )
+            {
+                LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
+                throw new PeerException( e.getMessage() );
+            }
+        }
+        else
+        {
+            String err = String.format( "Peer is not reachable %s", peer );
+            LOG.log( Level.SEVERE, "Error in getConnectedAgents", err );
+            throw new PeerException( err );
         }
     }
 

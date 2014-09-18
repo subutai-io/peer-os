@@ -6,10 +6,7 @@
 package org.safehaus.subutai.plugin.hbase.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -19,7 +16,9 @@ import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -116,5 +115,10 @@ public class HBaseUI implements PortalModule {
 
     public Component createComponent() {
         return new HBaseForm(this);
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return false;
     }
 }
