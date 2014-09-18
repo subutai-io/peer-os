@@ -180,6 +180,12 @@ public class Manager {
         table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( STATUS_COLUMN_CAPTION, HorizontalLayout.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
+
+        table.setColumnExpandRatio( HOST_COLUMN_CAPTION, 0.1f );
+        table.setColumnExpandRatio( IP_COLUMN_CAPTION, 0.1f );
+        table.setColumnExpandRatio( NODE_ROLE_COLUMN_CAPTION, 0.15f );
+        table.setColumnExpandRatio( STATUS_COLUMN_CAPTION, 0.35f );
+        table.setColumnExpandRatio( AVAILABLE_OPERATIONS_COLUMN_CAPTION, 0.30f );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -544,9 +550,10 @@ public class Manager {
         List<Agent> hadoopNodeList = hadoopCluster.getAllNodes();
         String lxcHostname= row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
 
-        for ( int i = 0; i < hadoopNodeList.size(); i++ ) {
-            if ( hadoopNodeList.get( i ).getHostname().equals( lxcHostname ) )
-                return hadoopNodeList.get( i );
+        for ( Agent agent : hadoopNodeList ) {
+            if ( agent.getHostname().equals( lxcHostname ) ) {
+                return agent;
+            }
         }
         return null;
     }
