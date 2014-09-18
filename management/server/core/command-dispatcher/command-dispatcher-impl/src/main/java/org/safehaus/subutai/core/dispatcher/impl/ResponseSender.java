@@ -29,7 +29,7 @@ public class ResponseSender {
     private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 30;
+    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 15;
     private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
@@ -174,6 +174,7 @@ public class ResponseSender {
                 }
                 else
                 {
+                    request.updateTimestamp();
                     dispatcherDAO.saveRemoteRequest( request );
                 }
             }
