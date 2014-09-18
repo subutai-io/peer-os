@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.peer.rest;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -45,12 +44,14 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Peer registerPeer( String config ) {
-        if ( config != null ) {
+        if ( config != null )
+        {
             Peer peer = GSON.fromJson( config, Peer.class );
             peerManager.register( peer );
             return peer;
         }
-        else {
+        else
+        {
             return null;
         }
     }
@@ -73,24 +74,28 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response processMessage( final String peerId, final String recipient, final String message ) {
-        try {
+        try
+        {
             String response = peerManager.processPeerMessage( peerId, recipient, message );
 
             return Response.ok( response ).build();
         }
-        catch ( PeerMessageException e ) {
+        catch ( PeerMessageException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
 
 
     @Override
-    public Response getConnectedAgents( @QueryParam( "envId" ) final String environmentId ) {
-        try {
+    public Response getConnectedAgents( final String environmentId ) {
+        try
+        {
             String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
             return Response.ok( response ).build();
         }
-        catch ( JsonSyntaxException | PeerException e ) {
+        catch ( JsonSyntaxException | PeerException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -98,7 +103,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response ping() {
-        return Response.ok(  ).build();
+        return Response.ok().build();
     }
 
 
