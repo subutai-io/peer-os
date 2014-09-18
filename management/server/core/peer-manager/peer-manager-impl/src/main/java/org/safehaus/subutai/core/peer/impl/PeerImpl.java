@@ -56,37 +56,44 @@ public class PeerImpl implements PeerManager {
     private ContainerManager containerManager;
 
 
-    public void init() {
+    public void init()
+    {
         peerDAO = new PeerDAO( dbManager );
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
     }
 
 
-    public void setDbManager( final DbManager dbManager ) {
+    public void setDbManager( final DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void setContainerManager( final ContainerManager containerManager ) {
+    public void setContainerManager( final ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
 
     @Override
-    public String register( final Peer peer ) {
+    public String register( final Peer peer )
+    {
 
         try
         {
@@ -103,13 +110,15 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public UUID getSiteId() {
+    public UUID getSiteId()
+    {
         return UUIDUtil.generateMACBasedUUID();
     }
 
 
     @Override
-    public List<Peer> peers() {
+    public List<Peer> peers()
+    {
         List<Peer> peers = null;
         try
         {
@@ -124,7 +133,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public boolean unregister( final String uuid ) {
+    public boolean unregister( final String uuid )
+    {
         try
         {
             peerDAO.deleteInfo( SOURCE, uuid );
@@ -139,7 +149,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public Peer getPeerByUUID( UUID uuid ) {
+    public Peer getPeerByUUID( UUID uuid )
+    {
         if ( getSiteId().compareTo( uuid ) == 0 )
         {
             Peer peer = new Peer();
@@ -162,7 +173,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void addPeerMessageListener( PeerMessageListener listener ) {
+    public void addPeerMessageListener( PeerMessageListener listener )
+    {
         try
         {
             if ( !peerMessageListeners.contains( listener ) )
@@ -178,7 +190,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void removePeerMessageListener( PeerMessageListener listener ) {
+    public void removePeerMessageListener( PeerMessageListener listener )
+    {
         try
         {
             peerMessageListeners.remove( listener );
@@ -191,8 +204,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public String sendPeerMessage( final Peer peer, String recipient, final String message )
-            throws PeerMessageException {
+    public String sendPeerMessage( final Peer peer, String recipient, final String message ) throws PeerMessageException
+    {
         if ( peer == null )
         {
             throw new PeerMessageException( "Peer is null" );
@@ -243,7 +256,8 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public String processPeerMessage( final String peerId, final String recipient, final String message )
-            throws PeerMessageException {
+            throws PeerMessageException
+    {
         if ( Strings.isNullOrEmpty( peerId ) )
         {
             throw new PeerMessageException( "Peer id is null or empty" );
@@ -314,7 +328,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public boolean isPeerReachable( final Peer peer ) throws PeerException {
+    public boolean isPeerReachable( final Peer peer ) throws PeerException
+    {
         if ( peer == null )
         {
             throw new PeerException( "Peer is null" );
@@ -339,7 +354,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public Set<Agent> getConnectedAgents( String environmentId ) throws PeerException {
+    public Set<Agent> getConnectedAgents( String environmentId ) throws PeerException
+    {
         try
         {
             UUID envId = UUID.fromString( environmentId );
@@ -353,7 +369,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public Set<Agent> getConnectedAgents( final Peer peer, final String environmentId ) throws PeerException {
+    public Set<Agent> getConnectedAgents( final Peer peer, final String environmentId ) throws PeerException
+    {
         if ( isPeerReachable( peer ) )
         {
             try
@@ -363,7 +380,8 @@ public class PeerImpl implements PeerManager {
                 String response = HttpUtil.request( HttpUtil.RequestType.GET,
                         String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
 
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {}.getType() );
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -382,7 +400,8 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public Set<Agent> createContainers( final UUID envId, final String template, final int numberOfNodes,
-                                        final String strategy, final List<String> criteria ) {
+                                        final String strategy, final List<String> criteria )
+    {
 
         try
         {
@@ -397,7 +416,8 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    private String getLocalIp() {
+    private String getLocalIp()
+    {
         Enumeration<NetworkInterface> n;
         try
         {
@@ -427,7 +447,8 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    public Collection<PeerMessageListener> getPeerMessageListeners() {
+    public Collection<PeerMessageListener> getPeerMessageListeners()
+    {
         return Collections.unmodifiableCollection( peerMessageListeners );
     }
 }

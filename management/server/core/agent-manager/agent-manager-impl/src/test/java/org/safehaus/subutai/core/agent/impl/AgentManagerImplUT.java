@@ -39,7 +39,8 @@ public class AgentManagerImplUT {
 
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         communicationManager = mock( CommunicationManager.class );
         agentManager = new AgentManagerImpl( communicationManager );
         agentManager.init();
@@ -47,20 +48,23 @@ public class AgentManagerImplUT {
 
 
     @After
-    public void tearDown() {
+    public void tearDown()
+    {
         agentManager.destroy();
     }
 
 
     @Test
-    public void shouldRegisterWithCommManager() {
+    public void shouldRegisterWithCommManager()
+    {
 
         verify( communicationManager ).addListener( agentManager );
     }
 
 
     @Test
-    public void shouldUnregisterFromCommManager() {
+    public void shouldUnregisterFromCommManager()
+    {
 
         agentManager.destroy();
 
@@ -69,7 +73,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldReturnRegisteredLxcAgent() {
+    public void shouldReturnRegisteredLxcAgent()
+    {
         agentManager.onResponse( MockUtils.getRegistrationRequestFromLxcAgent() );
 
         assertFalse( agentManager.getLxcAgents().isEmpty() );
@@ -78,7 +83,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldReturnRegisteredPhysicalAgent() {
+    public void shouldReturnRegisteredPhysicalAgent()
+    {
 
         agentManager.onResponse( MockUtils.getRegistrationRequestFromPhysicalAgent() );
 
@@ -88,7 +94,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldReturnAgentWithMissingHostnameByUUID() {
+    public void shouldReturnAgentWithMissingHostnameByUUID()
+    {
 
         UUID agentUUID = UUID.randomUUID();
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
@@ -103,7 +110,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldReturnAgentByHostname() {
+    public void shouldReturnAgentByHostname()
+    {
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
         when( response.getHostname() ).thenReturn( LXC_HOSTNAME );
 
@@ -114,7 +122,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldNotReturnAgentsWithMissingUUID() {
+    public void shouldNotReturnAgentsWithMissingUUID()
+    {
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
         when( response.getUuid() ).thenReturn( null );
 
@@ -125,7 +134,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldReturnAgentByUUID() {
+    public void shouldReturnAgentByUUID()
+    {
         UUID agentUUID = UUID.randomUUID();
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
         when( response.getUuid() ).thenReturn( agentUUID );
@@ -137,7 +147,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldReturnAgentsByParentHostname() {
+    public void shouldReturnAgentsByParentHostname()
+    {
 
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
         when( response.getHostname() ).thenReturn( LXC_HOSTNAME );
@@ -149,7 +160,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldSendRegistrationAckToAgent() {
+    public void shouldSendRegistrationAckToAgent()
+    {
 
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
 
@@ -160,7 +172,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldDeleteAgentOnDisconnect() {
+    public void shouldDeleteAgentOnDisconnect()
+    {
 
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
         when( response.getTransportId() ).thenReturn( TRANSPORT_ID );
@@ -178,7 +191,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldAddAgentListener() {
+    public void shouldAddAgentListener()
+    {
         agentManager.addListener( mock( AgentListener.class ) );
 
         assertFalse( agentManager.getListeners().isEmpty() );
@@ -186,7 +200,8 @@ public class AgentManagerImplUT {
 
 
     @Test
-    public void shouldRemoveAgentListener() {
+    public void shouldRemoveAgentListener()
+    {
 
         AgentListener listener = mock( AgentListener.class );
 

@@ -18,20 +18,25 @@ import java.util.logging.Logger;
  */
 public class SysUtil {
 
-    public static String getMacAddress() {
-        try {
+    public static String getMacAddress()
+    {
+        try
+        {
             //            String mac = null;
             InetAddress ip = InetAddress.getLocalHost();
 
             Enumeration e = NetworkInterface.getNetworkInterfaces();
 
-            while ( e.hasMoreElements() ) {
+            while ( e.hasMoreElements() )
+            {
 
                 NetworkInterface n = ( NetworkInterface ) e.nextElement();
                 Enumeration ee = n.getInetAddresses();
-                while ( ee.hasMoreElements() ) {
+                while ( ee.hasMoreElements() )
+                {
                     InetAddress i = ( InetAddress ) ee.nextElement();
-                    if ( !i.isLoopbackAddress() && !i.isLinkLocalAddress() && i.isSiteLocalAddress() ) {
+                    if ( !i.isLoopbackAddress() && !i.isLinkLocalAddress() && i.isSiteLocalAddress() )
+                    {
                         ip = i;
                     }
                 }
@@ -41,69 +46,85 @@ public class SysUtil {
             byte[] mac_byte = network.getHardwareAddress();
 
             StringBuilder sb = new StringBuilder();
-            for ( int i = 0; i < mac_byte.length; i++ ) {
+            for ( int i = 0; i < mac_byte.length; i++ )
+            {
                 sb.append( String.format( "%02X%s", mac_byte[i], ( i < mac_byte.length - 1 ) ? "-" : "" ) );
             }
             return sb.toString();
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             Logger.getLogger( SysUtil.class.getName() ).log( Level.SEVERE, null, ex );
         }
         return null;
     }
 
 
-    public static String getMacAddress2() {
-        try {
+    public static String getMacAddress2()
+    {
+        try
+        {
 
             Enumeration<NetworkInterface> networks = NetworkInterface.getNetworkInterfaces();
-            while ( networks.hasMoreElements() ) {
+            while ( networks.hasMoreElements() )
+            {
                 NetworkInterface network = networks.nextElement();
                 byte[] mac = network.getHardwareAddress();
 
-                if ( mac != null ) {
+                if ( mac != null )
+                {
 
                     StringBuilder sb = new StringBuilder();
-                    for ( int i = 0; i < mac.length; i++ ) {
+                    for ( int i = 0; i < mac.length; i++ )
+                    {
                         sb.append( String.format( "%02X%s", mac[i], ( i < mac.length - 1 ) ? "-" : "" ) );
                     }
                     return sb.toString();
                 }
             }
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             Logger.getLogger( SysUtil.class.getName() ).log( Level.SEVERE, null, ex );
         }
         return null;
     }
 
 
-    public static String getHostName() {
-        try {
+    public static String getHostName()
+    {
+        try
+        {
             return InetAddress.getLocalHost().getHostName();
         }
-        catch ( UnknownHostException ex ) {
+        catch ( UnknownHostException ex )
+        {
             Logger.getLogger( SysUtil.class.getName() ).log( Level.SEVERE, null, ex );
         }
         return null;
     }
 
 
-    public static List<String> getIps() {
+    public static List<String> getIps()
+    {
 
         List<String> ips = new ArrayList<String>();
-        try {
+        try
+        {
             Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
-            for (; n.hasMoreElements(); ) {
+            for (; n.hasMoreElements(); )
+            {
                 NetworkInterface e = n.nextElement();
                 Enumeration<InetAddress> a = e.getInetAddresses();
-                for (; a.hasMoreElements(); ) {
+                for (; a.hasMoreElements(); )
+                {
                     InetAddress addr = a.nextElement();
                     ips.add( addr.getHostAddress() );
                 }
             }
         }
-        catch ( SocketException ex ) {
+        catch ( SocketException ex )
+        {
             Logger.getLogger( SysUtil.class.getName() ).log( Level.SEVERE, null, ex );
         }
 
@@ -111,14 +132,16 @@ public class SysUtil {
     }
 
 
-    public static String getJarLocation() {
+    public static String getJarLocation()
+    {
         String fullPath = getJarFullPath();
         String jarName = new File( fullPath ).getName();
         return fullPath.replace( "/" + jarName, "" );
     }
 
 
-    public static String getJarFullPath() {
+    public static String getJarFullPath()
+    {
         return SysUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
     }
 }
