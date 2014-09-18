@@ -356,6 +356,10 @@
                   <groupId>org.codehaus.jackson</groupId>
                   <artifactId>jackson-mapper-asl</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.codehaus.jackson</groupId>
+                  <artifactId>jackson-core-asl</artifactId>
+                </artifactItem>
 
               </artifactItems>
             </configuration>
