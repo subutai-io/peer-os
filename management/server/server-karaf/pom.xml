@@ -248,7 +248,7 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!--Testing dependencies-->
-                <artifactItem>
+                <!--<artifactItem>
                   <groupId>junit</groupId>
                   <artifactId>junit</artifactId>
                 </artifactItem>
@@ -263,7 +263,7 @@
                 <artifactItem>
                   <groupId>org.hamcrest</groupId>
                   <artifactId>hamcrest-core</artifactId>
-                </artifactItem>
+                </artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
