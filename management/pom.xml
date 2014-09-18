@@ -115,8 +115,8 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-      <groupId>${project.groupId}</groupId>
-        <artifactId>communication-manager-impl</artifactId>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>config-point-tracker-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 

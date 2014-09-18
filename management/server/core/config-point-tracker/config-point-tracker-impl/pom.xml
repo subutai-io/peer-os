@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>config-point-tracker-impl</artifactId>
-  <name>Subutai Config Point Tracker Impl</name>
+  <name>:: Subutai Config Point Tracker Impl</name>
   <packaging>bundle</packaging>
 
   <dependencies>
