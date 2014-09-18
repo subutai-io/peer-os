@@ -1,97 +1,73 @@
 package org.safehaus.subutai.plugin.flume.ui;
 
-import com.vaadin.ui.Component;
+
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.plugin.flume.api.Flume;
-import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 public class FlumeUI implements PortalModule {
+    protected static final Logger LOG = Logger.getLogger( FlumeUI.class.getName() );
 
-	public static final String MODULE_IMAGE = "flume.png";
+    public static final String MODULE_IMAGE = "flume.png";
 
-	private static AgentManager agentManager;
-	private static Tracker tracker;
-	private static Flume manager;
-	private static Hadoop hadoopManager;
-	private static ExecutorService executor;
-	private static CommandRunner commandRunner;
 
-	public FlumeUI(
-			AgentManager agentManager,
-			Tracker tracker,
-			Flume manager,
-			CommandRunner commandRunner,
-			Hadoop hadoopManager) {
-		FlumeUI.agentManager = agentManager;
-		FlumeUI.tracker = tracker;
-		FlumeUI.manager = manager;
-		FlumeUI.commandRunner = commandRunner;
-		FlumeUI.hadoopManager = hadoopManager;
-	}
+    private ExecutorService executor;
+    private final ServiceLocator serviceLocator;
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
+    public FlumeUI() {
+        this.serviceLocator = new ServiceLocator();
+    }
 
-	public static Flume getManager() {
-		return manager;
-	}
 
-	public static Hadoop getHadoopManager() {
-		return hadoopManager;
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+    public void destroy() {
+        executor.shutdown();
+    }
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
-
-	public void destroy() {
-		agentManager = null;
-		tracker = null;
-		manager = null;
-		hadoopManager = null;
-		commandRunner = null;
-		executor.shutdown();
-	}
-
-	@Override
-	public String getId() {
-        return FlumeConfig.PRODUCT_KEY;
-	}
-
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(FlumeUI.MODULE_IMAGE, this);
-	}
 
     @Override
-	public String getName() {
+    public String getId() {
         return FlumeConfig.PRODUCT_KEY;
-	}
+    }
+
 
     @Override
-	public Component createComponent() {
-		return new FlumeForm();
-	}
+    public File getImage() {
+        return FileUtil.getFile( FlumeUI.MODULE_IMAGE, this );
+    }
 
+
+    @Override
+    public String getName() {
+        return FlumeConfig.PRODUCT_KEY;
+    }
+
+
+    @Override
+    public Component createComponent() {
+        try {
+            return new FlumeForm( executor, serviceLocator );
+        }
+        catch ( NamingException e ) {
+            LOG.severe( e.getMessage() );
+        }
+
+        return null;
+    }
 }

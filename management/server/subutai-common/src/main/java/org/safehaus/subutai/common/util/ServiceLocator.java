@@ -20,11 +20,9 @@ import com.google.common.base.Preconditions;
 public class ServiceLocator {
 
     private final Map<String, Object> cache;
-    private final InitialContext ctx;
 
 
-    public ServiceLocator() throws NamingException {
-        this.ctx = new InitialContext();
+    public ServiceLocator() {
         this.cache = new ConcurrentHashMap<>();
     }
 
@@ -42,6 +40,7 @@ public class ServiceLocator {
         String serviceName = clazz.getName();
         Object cachedObj = cache.get( serviceName );
         if ( cachedObj == null ) {
+            InitialContext ctx = new InitialContext();
             String jndiName = "osgi:service/" + serviceName;
             cachedObj = ctx.lookup( jndiName );
             cache.put( serviceName, cachedObj );

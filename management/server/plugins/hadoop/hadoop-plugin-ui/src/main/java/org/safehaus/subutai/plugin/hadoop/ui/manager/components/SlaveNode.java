@@ -2,12 +2,14 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
 
 /**
@@ -17,10 +19,17 @@ public class SlaveNode extends ClusterNode {
 
     private Agent agent;
     private boolean isDataNode;
+    private final ExecutorService executorService;
+    private final Hadoop hadoop;
+    private  final  Tracker tracker;
 
 
-    public SlaveNode( HadoopClusterConfig cluster, Agent agent, boolean isDataNode ) {
+    public SlaveNode(Hadoop hadoop, Tracker tracker, ExecutorService executorService, HadoopClusterConfig cluster, Agent agent, boolean isDataNode ) {
+
         super( cluster );
+        this.hadoop = hadoop;
+        this.tracker = tracker;
+        this.executorService = executorService;
         this.agent = agent;
         this.isDataNode = isDataNode;
 
@@ -38,7 +47,7 @@ public class SlaveNode extends ClusterNode {
     protected void getStatus( UUID trackID ) {
         setLoading( true );
 
-        HadoopUI.getExecutor().execute( new CheckTask( cluster, new CompleteEvent() {
+        executorService.execute( new CheckTask(hadoop, tracker, cluster, new CompleteEvent() {
 
             public void onComplete( NodeState state ) {
                 synchronized ( progressButton ) {

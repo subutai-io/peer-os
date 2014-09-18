@@ -1,84 +1,72 @@
 package org.safehaus.subutai.core.container.ui;
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.io.File;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 public class ContainerUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "lxc.png";
-	public static final String MODULE_NAME = "Container";
-	private static ExecutorService executor;
-    private static ExecutorService agentExecutor;
-    private static CompletionService completionService;
-	private AgentManager agentManager;
-	private ContainerManager containerManager;
+    protected static final Logger LOG = Logger.getLogger( ContainerUI.class.getName() );
+
+    public static final String MODULE_IMAGE = "lxc.png";
+    public static final String MODULE_NAME = "Container";
+    private ExecutorService executor;
+    private final ServiceLocator serviceLocator;
 
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
-
-    public static ExecutorService getAgentExecutor() {
-        return agentExecutor;
+    public ContainerUI()  {
+        this.serviceLocator = new ServiceLocator();
     }
 
-    public static CompletionService getCompletionService() {
-        return completionService;
+
+    public void init() {
+        executor = Executors.newFixedThreadPool( 5 );
     }
 
-    public AgentManager getAgentManager() {
-		return agentManager;
-	}
 
-	public void setAgentManager(AgentManager agentManager) {
-		this.agentManager = agentManager;
-	}
-
-	public void setContainerManager(ContainerManager containerManager) {
-		this.containerManager = containerManager;
-	}
+    public void destroy() {
+        executor.shutdown();
+    }
 
 
-	public void init() {
-		executor = Executors.newFixedThreadPool(5);
-        agentExecutor = Executors.newCachedThreadPool();
-        completionService = new ExecutorCompletionService(agentExecutor);
-	}
+    @Override
+    public String getId() {
+        return MODULE_NAME;
+    }
 
 
-	public void destroy() {
-		executor.shutdown();
-        agentExecutor.shutdown();
-	}
+    @Override
+    public String getName() {
+        return MODULE_NAME;
+    }
 
 
-	@Override
-	public String getId() {
-		return MODULE_NAME;
-	}
-
-	@Override
-	public String getName() {
-		return MODULE_NAME;
-	}
-
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(ContainerUI.MODULE_IMAGE, this);
-	}
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( ContainerUI.MODULE_IMAGE, this );
+    }
 
 
-	@Override
-	public Component createComponent() {
-		return new ContainerForm(agentManager, containerManager);
-	}
+    @Override
+    public Component createComponent() {
+        try {
+            return new ContainerForm( executor, serviceLocator );
+        }
+        catch ( NamingException e ) {
+            LOG.severe( e.getMessage() );
+        }
+
+        return null;
+    }
 }

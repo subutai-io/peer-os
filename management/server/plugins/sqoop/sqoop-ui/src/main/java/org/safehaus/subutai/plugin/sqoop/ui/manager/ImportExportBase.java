@@ -1,161 +1,212 @@
 package org.safehaus.subutai.plugin.sqoop.ui.manager;
 
-import com.vaadin.ui.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
-import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
+
+import com.vaadin.ui.AbstractTextField;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.VerticalLayout;
+
 
 public abstract class ImportExportBase extends VerticalLayout {
 
     protected String clusterName;
     protected Agent agent;
     protected List<Field> fields = new ArrayList<>();
-    AbstractTextField connStringField = UIUtil.getTextField("Connection string:", 300);
-    AbstractTextField tableField = UIUtil.getTextField("Table name:", 300);
-    AbstractTextField usernameField = UIUtil.getTextField("Username:", 300);
-    AbstractTextField passwordField = UIUtil.getTextField("Password:", 300, true);
-    AbstractTextField optionalParams = UIUtil.getTextField("Optional parameters:", 300);
-    TextArea logTextArea = UIUtil.getTextArea("Logs:", 600, 200);
+    AbstractTextField connStringField = UIUtil.getTextField( "Connection string:", 300 );
+    AbstractTextField tableField = UIUtil.getTextField( "Table name:", 300 );
+    AbstractTextField usernameField = UIUtil.getTextField( "Username:", 300 );
+    AbstractTextField passwordField = UIUtil.getTextField( "Password:", 300, true );
+    AbstractTextField optionalParams = UIUtil.getTextField( "Optional parameters:", 300 );
+    TextArea logTextArea = UIUtil.getTextArea( "Logs:", 600, 200 );
+    private final Tracker tracker;
+
+
+    protected ImportExportBase( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
 
     public String getClusterName() {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+
+    public void setClusterName( String clusterName ) {
         this.clusterName = clusterName;
     }
+
 
     public Agent getAgent() {
         return agent;
     }
 
-    public void setAgent(Agent agent) {
+
+    public void setAgent( Agent agent ) {
         this.agent = agent;
         reset();
     }
 
+
     void reset() {
-        for(Field f : this.fields) {
-            if(f instanceof AbstractTextField) f.setValue("");
-            else if(f instanceof CheckBox) f.setValue(false);
+        for ( Field f : this.fields ) {
+            if ( f instanceof AbstractTextField ) {
+                f.setValue( "" );
+            }
+            else if ( f instanceof CheckBox ) {
+                f.setValue( false );
+            }
         }
     }
+
 
     abstract CommonSetting makeSettings();
 
-    void init() {
-        logTextArea.setValue("");
-        logTextArea.setHeight(100, Unit.PERCENTAGE);
 
-        fields.add(connStringField);
-        fields.add(tableField);
-        fields.add(usernameField);
-        fields.add(passwordField);
-        fields.add(optionalParams);
-        fields.add(logTextArea);
+    void init() {
+        logTextArea.setValue( "" );
+        logTextArea.setHeight( 100, Unit.PERCENTAGE );
+
+        fields.add( connStringField );
+        fields.add( tableField );
+        fields.add( usernameField );
+        fields.add( passwordField );
+        fields.add( optionalParams );
+        fields.add( logTextArea );
     }
 
-    void addComponents(List<Component> components) {
-        GridLayout grid = new GridLayout(2, components.size());
-        grid.setSpacing(true);
-        grid.setMargin(true);
-        for(int i = 0; i < components.size(); i++) {
-            grid.addComponent(components.get(i), 0, i);
+
+    void addComponents( List<Component> components ) {
+        GridLayout grid = new GridLayout( 2, components.size() );
+        grid.setSpacing( true );
+        grid.setMargin( true );
+        for ( int i = 0; i < components.size(); i++ ) {
+            grid.addComponent( components.get( i ), 0, i );
         }
         String title = "<h1>Hostname: " + agent.getHostname() + "</h1>";
-        grid.addComponent(UIUtil.getLabel(title, 100, Unit.PERCENTAGE), 1, 0);
-        grid.addComponent(logTextArea, 1, 1, 1, components.size() - 1 - 1);
+        grid.addComponent( UIUtil.getLabel( title, 100, Unit.PERCENTAGE ), 1, 0 );
+        grid.addComponent( logTextArea, 1, 1, 1, components.size() - 1 - 1 );
 
-        addComponent(grid);
+        addComponent( grid );
     }
 
+
     boolean checkFields() {
-        if(!hasValue(connStringField, "Connection string not specified"))
+        if ( !hasValue( connStringField, "Connection string not specified" ) ) {
             return false;
+        }
         // table check is done in subclasses
-        if(!hasValue(usernameField, "Username not specified"))
+        if ( !hasValue( usernameField, "Username not specified" ) ) {
             return false;
-        if(!hasValue(passwordField, "Password not specified"))
+        }
+        if ( !hasValue( passwordField, "Password not specified" ) ) {
             return false;
+        }
         // fields have value
         return true;
     }
 
-    boolean hasValue(Field f, String errMessage) {
-        if(f.getValue() == null || f.getValue().toString().isEmpty()) {
-            appendLogMessage(errMessage);
+
+    boolean hasValue( Field f, String errMessage ) {
+        if ( f.getValue() == null || f.getValue().toString().isEmpty() ) {
+            appendLogMessage( errMessage );
             return false;
         }
         return true;
     }
 
-    void appendLogMessage(String m) {
-        if(m != null && m.length() > 0) {
-            logTextArea.setValue(logTextArea.getValue() + "\n" + m);
-            logTextArea.setCursorPosition(logTextArea.getValue().length());
+
+    void appendLogMessage( String m ) {
+        if ( m != null && m.length() > 0 ) {
+            logTextArea.setValue( logTextArea.getValue() + "\n" + m );
+            logTextArea.setCursorPosition( logTextArea.getValue().length() );
         }
     }
 
-    void setFieldsEnabled(boolean enabled) {
-        for(Field f : this.fields) f.setEnabled(enabled);
+
+    void setFieldsEnabled( boolean enabled ) {
+        for ( Field f : this.fields ) {
+            f.setEnabled( enabled );
+        }
     }
+
 
     void clearLogMessages() {
-        logTextArea.setValue("");
+        logTextArea.setValue( "" );
     }
 
+
     void detachFromParent() {
-        ComponentContainer parent = (ComponentContainer)getParent();
-        parent.removeComponent(this);
+        ComponentContainer parent = ( ComponentContainer ) getParent();
+        parent.removeComponent( this );
     }
+
 
     protected interface OperationCallback {
 
         void onComplete();
     }
 
+
     protected class OperationWatcher implements Runnable {
 
         private final UUID trackId;
         private OperationCallback callback;
 
-        public OperationWatcher(UUID trackId) {
+
+        public OperationWatcher( UUID trackId ) {
             this.trackId = trackId;
         }
 
-        public void setCallback(OperationCallback callback) {
+
+        public void setCallback( OperationCallback callback ) {
             this.callback = callback;
         }
+
 
         @Override
         public void run() {
             String m = "";
-            while(true) {
-                ProductOperationView po = SqoopUI.getTracker().getProductOperation(
-                        SqoopConfig.PRODUCT_KEY, trackId);
-                if(po == null) break;
+            while ( true ) {
+                ProductOperationView po = tracker.getProductOperation( SqoopConfig.PRODUCT_KEY, trackId );
+                if ( po == null ) {
+                    break;
+                }
 
-                if(po.getLog() != null) {
-                    String logText = po.getLog().replace(m, "");
+                if ( po.getLog() != null ) {
+                    String logText = po.getLog().replace( m, "" );
                     m = po.getLog();
-                    if(!logText.isEmpty()) appendLogMessage(logText);
-                    if(po.getState() != ProductOperationState.RUNNING) break;
+                    if ( !logText.isEmpty() ) {
+                        appendLogMessage( logText );
+                    }
+                    if ( po.getState() != ProductOperationState.RUNNING ) {
+                        break;
+                    }
                 }
                 try {
-                    Thread.sleep(300);
-                } catch(InterruptedException ex) {
+                    Thread.sleep( 300 );
+                }
+                catch ( InterruptedException ex ) {
                     break;
                 }
             }
-            if(callback != null) callback.onComplete();
+            if ( callback != null ) {
+                callback.onComplete();
+            }
         }
-
     }
-
 }

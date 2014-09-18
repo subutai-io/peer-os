@@ -12,13 +12,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ContiguousSet;
@@ -47,7 +48,7 @@ public class ConfigurationStep extends Panel {
     private Property.ValueChangeListener gcNodeComboChangeListener;
 
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Hadoop hadoop, final Zookeeper zookeeper, final Wizard wizard ) {
 
         List<Integer> nodesCountRange =
                 ContiguousSet.create( Range.closed( 1, 50 ), DiscreteDomain.integers() ).asList();
@@ -73,9 +74,9 @@ public class ConfigurationStep extends Panel {
                     UiUtil.getTwinSelect( "Slaves", "hostname", "Available Nodes", "Selected Nodes", 4 );
 
             //get existing hadoop clusters
-            List<HadoopClusterConfig> hadoopClusters = AccumuloUI.getHadoopManager().getClusters();
+            List<HadoopClusterConfig> hadoopClusters = hadoop.getClusters();
             //get existing zk clusters
-            final List<ZookeeperClusterConfig> zkClusters = AccumuloUI.getZookeeperManager().getClusters();
+            final List<ZookeeperClusterConfig> zkClusters = zookeeper.getClusters();
 
 
             //fill zkClustersCombo with zk cluster infos
@@ -87,7 +88,7 @@ public class ConfigurationStep extends Panel {
             }
             //try to find zk cluster info based on one saved in the configuration
             ZookeeperClusterConfig zookeeperClusterConfig =
-                    AccumuloUI.getZookeeperManager().getCluster( wizard.getConfig().getZookeeperClusterName() );
+                    zookeeper.getCluster( wizard.getConfig().getZookeeperClusterName() );
 
             //select if saved found
             if ( zookeeperClusterConfig != null ) {
@@ -123,8 +124,7 @@ public class ConfigurationStep extends Panel {
             }
 
             //try to find hadoop cluster info based on one saved in the configuration
-            HadoopClusterConfig hadoopClusterConfig =
-                    AccumuloUI.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
+            HadoopClusterConfig hadoopClusterConfig = hadoop.getCluster( wizard.getConfig().getHadoopClusterName() );
 
             //select if saved found
             if ( hadoopClusterConfig != null ) {

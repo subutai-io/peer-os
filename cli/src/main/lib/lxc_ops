@@ -181,7 +181,6 @@ function lxc_clone {
   lxc_assert_name "$child"
   
   local environmentId="$3"
-  lxc_assert_name "$environmentId"
   
   local usage="$4"
 

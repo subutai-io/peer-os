@@ -6,6 +6,13 @@
 package org.safehaus.subutai.plugin.solr.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
 import com.vaadin.ui.Component;
@@ -19,9 +26,16 @@ public class Wizard {
     private final GridLayout grid;
     private int step = 1;
     private SolrClusterConfig solrClusterConfig = new SolrClusterConfig();
+    private final Solr solr;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
 
 
-    public Wizard() {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+        this.executorService = executorService;
+        this.solr = serviceLocator.getService( Solr.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
         grid.setSizeFull();
@@ -72,7 +86,7 @@ public class Wizard {
                 break;
             }
             case 3: {
-                component = new VerificationStep( this );
+                component = new VerificationStep( solr, executorService, tracker, this );
                 break;
             }
             default: {

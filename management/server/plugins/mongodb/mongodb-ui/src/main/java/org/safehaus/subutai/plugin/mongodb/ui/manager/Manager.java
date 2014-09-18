@@ -9,16 +9,23 @@ package org.safehaus.subutai.plugin.mongodb.ui.manager;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
-import org.safehaus.subutai.plugin.mongodb.ui.MongoUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.enums.NodeState;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
@@ -55,8 +62,20 @@ public class Manager {
     private final Label dataNodePort;
     private MongoClusterConfig mongoClusterConfig;
 
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final Mongo mongo;
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
 
-    public Manager() {
+
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+
+        this.executorService = executorService;
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.mongo = serviceLocator.getService( Mongo.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -150,11 +169,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID =
-                                    MongoUI.getMongoManager().uninstallCluster( mongoClusterConfig.getClusterName() );
-                            ProgressWindow window =
-                                    new ProgressWindow( MongoUI.getExecutor(), MongoUI.getTracker(), trackID,
-                                            MongoClusterConfig.PRODUCT_KEY );
+                            UUID trackID = mongo.uninstallCluster( mongoClusterConfig.getClusterName() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    MongoClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -187,11 +204,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = MongoUI.getMongoManager()
-                                                  .addNode( mongoClusterConfig.getClusterName(), NodeType.ROUTER_NODE );
-                            ProgressWindow window =
-                                    new ProgressWindow( MongoUI.getExecutor(), MongoUI.getTracker(), trackID,
-                                            MongoClusterConfig.PRODUCT_KEY );
+                            UUID trackID = mongo.addNode( mongoClusterConfig.getClusterName(), NodeType.ROUTER_NODE );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    MongoClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -222,11 +237,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = MongoUI.getMongoManager()
-                                                  .addNode( mongoClusterConfig.getClusterName(), NodeType.DATA_NODE );
-                            ProgressWindow window =
-                                    new ProgressWindow( MongoUI.getExecutor(), MongoUI.getTracker(), trackID,
-                                            MongoClusterConfig.PRODUCT_KEY );
+                            UUID trackID = mongo.addNode( mongoClusterConfig.getClusterName(), NodeType.DATA_NODE );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    MongoClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -295,11 +308,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), MongoUI.getExecutor(),
-                                        MongoUI.getCommandRunner(), MongoUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
@@ -337,7 +350,7 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<MongoClusterConfig> mongoClusterInfos = MongoUI.getMongoManager().getClusters();
+        List<MongoClusterConfig> mongoClusterInfos = mongo.getClusters();
         MongoClusterConfig clusterInfo = ( MongoClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
@@ -414,8 +427,8 @@ public class Manager {
             progressIcon.setVisible( false );
 
             table.addItem( new Object[] {
-                            agent.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
-                    }, null );
+                    agent.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
+            }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
                 @Override
@@ -425,8 +438,8 @@ public class Manager {
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    MongoUI.getExecutor().execute(
-                            new CheckTask( mongoClusterConfig.getClusterName(), agent.getHostname(),
+                    executorService.execute(
+                            new CheckTask( mongo, tracker, mongoClusterConfig.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
 
                                         public void onComplete( NodeState state ) {
@@ -453,23 +466,23 @@ public class Manager {
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    MongoUI.getExecutor().execute(
-                            new StartTask( nodeType, mongoClusterConfig.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                    executorService.execute(
+                            new StartTask( mongo, tracker, nodeType, mongoClusterConfig.getClusterName(),
+                                    agent.getHostname(), new CompleteEvent() {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
-                                                    stopBtn.setEnabled( true );
-                                                }
-                                                else {
-                                                    startBtn.setEnabled( true );
-                                                }
-                                                destroyBtn.setEnabled( true );
-                                                progressIcon.setVisible( false );
-                                            }
+                                public void onComplete( NodeState state ) {
+                                    synchronized ( progressIcon ) {
+                                        if ( state == NodeState.RUNNING ) {
+                                            stopBtn.setEnabled( true );
                                         }
-                                    } ) );
+                                        else {
+                                            startBtn.setEnabled( true );
+                                        }
+                                        destroyBtn.setEnabled( true );
+                                        progressIcon.setVisible( false );
+                                    }
+                                }
+                            } ) );
                 }
             } );
 
@@ -481,8 +494,8 @@ public class Manager {
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    MongoUI.getExecutor().execute(
-                            new StopTask( mongoClusterConfig.getClusterName(), agent.getHostname(),
+                    executorService.execute(
+                            new StopTask( mongo, tracker, mongoClusterConfig.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
 
                                         public void onComplete( NodeState state ) {
@@ -509,11 +522,10 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = MongoUI.getMongoManager().destroyNode( mongoClusterConfig.getClusterName(),
-                                    agent.getHostname() );
-                            ProgressWindow window =
-                                    new ProgressWindow( MongoUI.getExecutor(), MongoUI.getTracker(), trackID,
-                                            MongoClusterConfig.PRODUCT_KEY );
+                            UUID trackID =
+                                    mongo.destroyNode( mongoClusterConfig.getClusterName(), agent.getHostname() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    MongoClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {

@@ -7,7 +7,6 @@ package org.safehaus.subutai.core.environment.impl;
 
 
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -18,8 +17,8 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
-import org.safehaus.subutai.core.environment.api.helper.BuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
@@ -28,6 +27,7 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -154,23 +154,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask ) {
-        return build( environmentBuildTask );
-    }
-
-
-    private boolean build( EnvironmentBuildTask environmentBuildTask ) {
-
-        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
-                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) ) {
-            try {
-                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
-                return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-            }
-            catch ( EnvironmentBuildException e ) {
-                LOG.info( e.getMessage() );
-            }
-        }
-        return false;
+        LOG.info( "saved to " );
+        //        return build( environmentBuildTask );
+        //TODO build environment in background
+        return true;
     }
 
 
@@ -189,20 +176,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public Environment getEnvironmentInfo( final String environmentName ) {
-        return environmentDAO.getInfo( ENVIRONMENT, environmentName, Environment.class );
+    public Environment getEnvironmentInfo( final String uuid ) {
+        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
 
 
     @Override
-    public boolean destroyEnvironment( final String environmentName ) {
-        Environment environment = getEnvironmentInfo( environmentName );
-        try {
+    public boolean destroyEnvironment( final String uuid ) {
+        Environment environment = getEnvironmentInfo( uuid );
+        try
+        {
             environmentBuilder.destroy( environment );
-            return environmentDAO.deleteInfo( ENVIRONMENT, environmentName );
+            return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
         }
-        catch ( EnvironmentDestroyException e ) {
-            LOG.info( e.getMessage() );
+        catch ( EnvironmentDestroyException e )
+        {
+            LOG.severe( e.getMessage() );
         }
         return false;
     }
@@ -210,12 +199,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
+        try
+        {
+            EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
 
-        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-        environmentBuildTask.setEnvironmentBlueprint( blueprint );
+            EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+            environmentBuildTask.setEnvironmentBlueprint( blueprint );
 
-        return environmentDAO.saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
+            return environmentDAO
+                    .saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
+        }
+        catch ( JsonSyntaxException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
+        return false;
     }
 
 
@@ -238,23 +236,48 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
-        UUID uuid = lxcBuildMessage.getEnvironmentId();
-        String templateName = lxcBuildMessage.getTemplateName();
-        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
-        String strategyName = lxcBuildMessage.getStrategyName();
-        //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
-    }
-
-
-    @Override
-    public boolean saveBuildProcess( final BuildProcess buildProgress ) {
+    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress ) {
         return environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
     }
 
 
     @Override
-    public List<BuildProcess> getBuildProcesses() {
-        return environmentDAO.getInfo( "PROCESS", BuildProcess.class );
+    public List<EnvironmentBuildProcess> getBuildProcesses() {
+        return environmentDAO.getInfo( "PROCESS", EnvironmentBuildProcess.class );
+    }
+
+
+    @Override
+    public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
+        //        UUID uuid = lxcBuildMessage.getEnvironmentId();
+        //        String templateName = lxcBuildMessage.getTemplateName();
+        //        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
+        //        String strategyName = lxcBuildMessage.getStrategyName();
+        //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
+    }
+
+
+    @Override
+    public void saveEnvironment( final Environment environment ) {
+        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+    }
+
+
+    private boolean build( EnvironmentBuildTask environmentBuildTask ) {
+
+        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
+                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) )
+        {
+            try
+            {
+                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
+                return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+            }
+            catch ( EnvironmentBuildException e )
+            {
+                LOG.severe( e.getMessage() );
+            }
+        }
+        return false;
     }
 }

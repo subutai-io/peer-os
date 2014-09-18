@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.peer.api;
 
 
+import java.util.UUID;
+
+
 /**
  * Created by bahadyr on 9/6/14.
  */
@@ -9,7 +12,7 @@ public class Peer {
 
     private String name;
     private String ip;
-    private String id;
+    private UUID id;
 
 
     public String getName() {
@@ -17,7 +20,7 @@ public class Peer {
     }
 
 
-    public void setName(final String name) {
+    public void setName( final String name ) {
         this.name = name;
     }
 
@@ -27,17 +30,17 @@ public class Peer {
     }
 
 
-    public void setIp(final String ip) {
+    public void setIp( final String ip ) {
         this.ip = ip;
     }
 
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
 
-    public void setId(final String id) {
+    public void setId( final UUID id ) {
         this.id = id;
     }
 

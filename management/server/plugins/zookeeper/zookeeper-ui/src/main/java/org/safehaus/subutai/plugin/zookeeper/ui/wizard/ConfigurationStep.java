@@ -13,11 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -38,7 +38,7 @@ import com.vaadin.ui.TwinColSelect;
  */
 public class ConfigurationStep extends Panel {
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard ) {
 
         if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE ) {
 
@@ -143,7 +143,7 @@ public class ConfigurationStep extends Panel {
             hadoopClustersCombo.setRequired( true );
             hadoopClustersCombo.setNullSelectionAllowed( false );
 
-            List<HadoopClusterConfig> hadoopClusterConfigs = ZookeeperUI.getHadoopManager().getClusters();
+            List<HadoopClusterConfig> hadoopClusterConfigs = hadoop.getClusters();
             if ( hadoopClusterConfigs.size() > 0 ) {
                 for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusterConfigs ) {
                     hadoopClustersCombo.addItem( hadoopClusterInfo );
@@ -151,8 +151,7 @@ public class ConfigurationStep extends Panel {
                 }
             }
 
-            HadoopClusterConfig info =
-                    ZookeeperUI.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
+            HadoopClusterConfig info = hadoop.getCluster( wizard.getConfig().getHadoopClusterName() );
 
             if ( info != null ) {
                 hadoopClustersCombo.setValue( info );

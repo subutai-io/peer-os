@@ -18,5 +18,6 @@
         <module>container-manager-api</module>
         <module>container-manager-impl</module>
         <module>container-manager-ui</module>
+        <module>container-manager-cli</module>
     </modules>
 </project>

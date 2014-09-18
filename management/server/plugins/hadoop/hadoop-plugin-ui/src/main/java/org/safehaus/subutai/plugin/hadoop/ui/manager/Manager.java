@@ -1,6 +1,14 @@
 package org.safehaus.subutai.plugin.hadoop.ui.manager;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -19,10 +27,17 @@ public class Manager extends VerticalLayout {
     private Embedded indicator;
     private Button refreshButton;
     private HadoopTable table;
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
 
 
-    public Manager() {
+    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
         setSizeFull();
+
+        this.executorService = executorService;
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
 
         GridLayout grid = new GridLayout();
         grid.setColumns( 1 );
@@ -97,7 +112,7 @@ public class Manager extends VerticalLayout {
 
     private HadoopTable getHadoopTable() {
         if ( table == null ) {
-            table = new HadoopTable( "Hadoop Clusters", indicator );
+            table = new HadoopTable( hadoop, tracker, executorService, "Hadoop Clusters", indicator );
             table.setMultiSelect( false );
             table.setSizeFull();
         }

@@ -1,34 +1,59 @@
 package org.safehaus.subutai.plugin.pig.ui.manager;
 
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.pig.api.Config;
+import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
 import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.pig.api.Config;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.plugin.pig.ui.PigUI;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
 
 
-public class Manager
-{
+public class Manager {
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private Config config;
 
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
+    private final Pig pig;
 
-    public Manager()
-    {
+
+    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+        this.pig = serviceLocator.getService( Pig.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.executorService = executorService;
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -51,11 +76,9 @@ public class Manager
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 config = ( Config ) event.getProperty().getValue();
                 refreshUI();
             }
@@ -65,11 +88,9 @@ public class Manager
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener()
-        {
+        refreshClustersBtn.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 refreshClustersInfo();
             }
         } );
@@ -81,8 +102,7 @@ public class Manager
     }
 
 
-    private Table createTableTemplate( String caption )
-    {
+    private Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
@@ -91,25 +111,20 @@ public class Manager
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
-        {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
             @Override
-            public void itemClick( ItemClickEvent event )
-            {
-                if ( event.isDoubleClick() )
-                {
+            public void itemClick( ItemClickEvent event ) {
+                if ( event.isDoubleClick() ) {
                     String lxcHostname =
-                        ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = PigUI.getAgentManager().getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null )
-                    {
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+                    if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                            new TerminalWindow( Sets.newHashSet( lxcAgent ), PigUI.getExecutor(),
-                                PigUI.getCommandRunner(), PigUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else
-                    {
+                    else {
                         show( "Agent is not connected" );
                     }
                 }
@@ -119,92 +134,71 @@ public class Manager
     }
 
 
-    private void refreshUI()
-    {
-        if ( config != null )
-        {
+    private void refreshUI() {
+        if ( config != null ) {
             populateTable( nodesTable, config.getNodes() );
         }
-        else
-        {
+        else {
             nodesTable.removeAllItems();
         }
     }
 
 
-    public void refreshClustersInfo()
-    {
-        List<Config> clustersInfo = PigUI.getPigManager().getClusters();
+    public void refreshClustersInfo() {
+        List<Config> clustersInfo = pig.getClusters();
         Config clusterInfo = ( Config ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
-        {
-            for ( Config mongoClusterInfo : clustersInfo )
-            {
+        if ( clustersInfo != null && clustersInfo.size() > 0 ) {
+            for ( Config mongoClusterInfo : clustersInfo ) {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
             }
-            if ( clusterInfo != null )
-            {
-                for ( Config mongoClusterInfo : clustersInfo )
-                {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
-                    {
+            if ( clusterInfo != null ) {
+                for ( Config mongoClusterInfo : clustersInfo ) {
+                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
                         clusterCombo.setValue( mongoClusterInfo );
                         return;
                     }
                 }
             }
-            else
-            {
+            else {
                 clusterCombo.setValue( clustersInfo.iterator().next() );
             }
         }
     }
 
 
-    private void show( String notification )
-    {
+    private void show( String notification ) {
         Notification.show( notification );
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents )
-    {
+    private void populateTable( final Table table, Set<Agent> agents ) {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents )
-        {
+        for ( final Agent agent : agents ) {
             final Button destroyBtn = new Button( "Destroy" );
             destroyBtn.addStyleName( "default" );
 
             table.addItem( new Object[] {
-                agent.getHostname(), destroyBtn
+                    agent.getHostname(), destroyBtn
             }, null );
 
-            destroyBtn.addClickListener( new Button.ClickListener()
-            {
+            destroyBtn.addClickListener( new Button.ClickListener() {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
+                public void buttonClick( Button.ClickEvent clickEvent ) {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
+                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID =
-                                PigUI.getPigManager().destroyNode( config.getClusterName(), agent.getHostname() );
+                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                            UUID trackID = pig.destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
-                                new ProgressWindow( PigUI.getExecutor(), PigUI.getTracker(), trackID,
-                                    Config.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
+                                    new ProgressWindow( executorService, tracker, trackID, Config.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
+                                public void windowClose( Window.CloseEvent closeEvent ) {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -219,8 +213,7 @@ public class Manager
     }
 
 
-    public Component getContent()
-    {
+    public Component getContent() {
         return contentRoot;
     }
 }

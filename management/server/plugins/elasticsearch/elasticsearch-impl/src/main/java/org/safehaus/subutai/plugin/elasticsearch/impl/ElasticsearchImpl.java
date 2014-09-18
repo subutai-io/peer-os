@@ -357,7 +357,7 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
 
-        String log = "";
+        StringBuilder log = new StringBuilder();
 
         for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
 
@@ -369,10 +369,10 @@ public class ElasticsearchImpl implements Elasticsearch {
                 status = "NOT RUNNING";
             }
 
-            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );
         }
 
-        po.addLogDone( log );
+        po.addLogDone( log.toString() );
     }
 
 

@@ -5,94 +5,74 @@
  */
 package org.safehaus.subutai.plugin.zookeeper.ui;
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 /**
  * @author dilshat
  */
 public class ZookeeperUI implements PortalModule {
+    protected static final Logger LOG = Logger.getLogger( ZookeeperUI.class.getName() );
 
-	public static final String MODULE_IMAGE = "zookeeper.png";
+    public static final String MODULE_IMAGE = "zookeeper.png";
 
-	private static Zookeeper manager;
-	private static AgentManager agentManager;
-	private static Tracker tracker;
-	private static Hadoop hadoopManager;
-	private static CommandRunner commandRunner;
-	private static ExecutorService executor;
 
-	public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager, Hadoop hadoopManager, CommandRunner commandRunner) {
-		ZookeeperUI.agentManager = agentManager;
-		ZookeeperUI.tracker = tracker;
-		ZookeeperUI.manager = manager;
-		ZookeeperUI.hadoopManager = hadoopManager;
-		ZookeeperUI.commandRunner = commandRunner;
-	}
+    private ExecutorService executor;
+    private final ServiceLocator serviceLocator;
 
-	public static Hadoop getHadoopManager() {
-		return hadoopManager;
-	}
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
+    public ZookeeperUI() {
+        this.serviceLocator = new ServiceLocator();
+    }
 
-	public static Zookeeper getManager() {
-		return manager;
-	}
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+    public void destroy() {
+        executor.shutdown();
+    }
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
 
-	public void destroy() {
-		manager = null;
-		agentManager = null;
-		tracker = null;
-		hadoopManager = null;
-		executor.shutdown();
-	}
+    @Override
+    public String getId() {
+        return ZookeeperClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public String getId() {
-		return ZookeeperClusterConfig.PRODUCT_KEY;
-	}
 
-	public String getName() {
-		return ZookeeperClusterConfig.PRODUCT_KEY;
-	}
+    public String getName() {
+        return ZookeeperClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(ZookeeperUI.MODULE_IMAGE, this);
-	}
 
-	public Component createComponent() {
-		return new ZookeeperForm();
-	}
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( ZookeeperUI.MODULE_IMAGE, this );
+    }
 
+
+    public Component createComponent() {
+        try {
+            return new ZookeeperForm( executor, serviceLocator );
+        }
+        catch ( NamingException e ) {
+            LOG.severe( e.getMessage() );
+        }
+        return null;
+    }
 }
