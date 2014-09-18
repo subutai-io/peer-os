@@ -22,6 +22,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.HttpUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -48,6 +50,7 @@ public class PeerImpl implements PeerManager {
     private DbManager dbManager;
     private AgentManager agentManager;
     private PeerDAO peerDAO;
+    private ContainerManager containerManager;
 
 
     public void init() {
@@ -55,7 +58,8 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    public void destroy() {}
+    public void destroy() {
+    }
 
 
     public void setDbManager( final DbManager dbManager ) {
@@ -65,6 +69,16 @@ public class PeerImpl implements PeerManager {
 
     public void setAgentManager( final AgentManager agentManager ) {
         this.agentManager = agentManager;
+    }
+
+
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager ) {
+        this.containerManager = containerManager;
     }
 
 
@@ -141,11 +155,6 @@ public class PeerImpl implements PeerManager {
             LOG.info( e.getMessage() );
         }
         return null;
-    }
-
-
-    public Collection<PeerMessageListener> getPeerMessageListeners() {
-        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 
 
@@ -342,9 +351,19 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void createContainers( final UUID envId, final String template, final int numberOfNodes,
-                                  final String Strategy, final List<String> criteria ) {
+    public Set<Agent> createContainers( final UUID envId, final String template, final int numberOfNodes,
+                                        final String strategy, final List<String> criteria ) {
 
+        try
+        {
+            // TODO remote subutai or local
+            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
+        }
+        catch ( ContainerCreateException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
+        return null;
     }
 
 
@@ -375,5 +394,10 @@ public class PeerImpl implements PeerManager {
 
 
         return "127.0.0.1";
+    }
+
+
+    public Collection<PeerMessageListener> getPeerMessageListeners() {
+        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 }
