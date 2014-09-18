@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>agent-manager-rest</artifactId>
-  <name>:: Subutai Agent Manager Rest</name>
+  <name>Subutai Agent Manager Rest</name>
   <description>Subutai Agent Manager Rest</description>
   <packaging>bundle</packaging>
 

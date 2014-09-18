@@ -308,14 +308,14 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- REST -->
-                <artifactItem>
+                <!--<artifactItem>
                 <groupId>javax.ws.rs</groupId>
                   <artifactId>jsr311-api</artifactId>
                 </artifactItem>
                 <artifactItem>
                 <groupId>javax.xml.bind</groupId>
                   <artifactId>jaxb-api-osgi</artifactId>
-                </artifactItem>
+                </artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
