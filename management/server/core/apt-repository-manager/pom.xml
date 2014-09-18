@@ -17,6 +17,6 @@
   <modules>
     <module>apt-repository-api</module>
     <module>apt-repository-impl</module>
-    <!--<module>apt-repository-cli</module>-->
+    <module>apt-repository-cli</module>
   </modules>
 </project>
