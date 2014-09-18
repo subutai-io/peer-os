@@ -14,7 +14,7 @@
   </bean>
 
   <bean id="strategyManager" scope="singleton"
-        class="org.safehaus.subutai.core.container.impl.StrategyManagerImpl"
+        class="org.safehaus.subutai.core.strategy.impl.StrategyManagerImpl"
         init-method="init" destroy-method="destroy">
   </bean>
 
