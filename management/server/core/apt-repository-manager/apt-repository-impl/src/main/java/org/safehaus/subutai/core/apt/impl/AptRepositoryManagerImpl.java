@@ -44,7 +44,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     private CommandRunner commandRunner;
 
 
-    public AptRepositoryManagerImpl( final CommandRunner commandRunner ) {
+    public AptRepositoryManagerImpl( final CommandRunner commandRunner )
+    {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
 
         this.commandRunner = commandRunner;
@@ -60,7 +61,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
      * @return - list of packages {@code PackageInfo}
      */
     @Override
-    public List<PackageInfo> listPackages( Agent agent, final String pattern ) throws AptRepoException {
+    public List<PackageInfo> listPackages( Agent agent, final String pattern ) throws AptRepoException
+    {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( pattern ), "Pattern is null or empty" );
         List<PackageInfo> packages = new LinkedList<>();
@@ -73,12 +75,15 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         StringTokenizer lines =
                 new StringTokenizer( command.getResults().get( agent.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
-        while ( lines.hasMoreTokens() ) {
+        while ( lines.hasMoreTokens() )
+        {
             String line = lines.nextToken();
 
-            if ( line != null ) {
+            if ( line != null )
+            {
                 String[] packageFields = line.split( "\\s{2,}" );
-                if ( packageFields.length == 3 ) {
+                if ( packageFields.length == 3 )
+                {
                     packages.add( new PackageInfo( packageFields[0], packageFields[1], packageFields[2] ) );
                 }
             }
@@ -88,22 +93,27 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     private void runCommand( Command command, Agent host, AptCommand aptCommand, boolean output )
-            throws AptRepoException {
+            throws AptRepoException
+    {
         commandRunner.runCommand( command );
 
-        if ( !command.hasSucceeded() ) {
-            if ( command.hasCompleted() ) {
+        if ( !command.hasSucceeded() )
+        {
+            if ( command.hasCompleted() )
+            {
                 AgentResult agentResult = command.getResults().get( host.getUuid() );
                 throw new AptRepoException(
                         String.format( "Error while performing %s: %s%n%s, exit code %s", aptCommand.getCommand(),
                                 agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
             }
-            else {
+            else
+            {
                 throw new AptRepoException(
                         String.format( "Error while performing %s: Command timed out", aptCommand.getCommand() ) );
             }
         }
-        else if ( output ) {
+        else if ( output )
+        {
             AgentResult agentResult = command.getResults().get( host.getUuid() );
             LOG.info( agentResult.getStdOut() );
             //            System.out.println( agentResult.getStdOut() );
@@ -121,7 +131,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
      */
     @Override
     public void addPackageByPath( Agent agent, final String pathToPackageFile, boolean deleteSourcePackage )
-            throws AptRepoException {
+            throws AptRepoException
+    {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package file is null or empty" );
@@ -149,7 +160,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
      * @param packageName - name of package to delete
      */
     @Override
-    public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException {
+    public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException
+    {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
 
@@ -173,7 +185,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
      */
     @Override
     public List<String> readFileContents( Agent agent, final String pathToPackageFile,
-                                          final List<String> pathsToFilesInsidePackage ) throws AptRepoException {
+                                          final List<String> pathsToFilesInsidePackage ) throws AptRepoException
+    {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package file is null or empty" );
@@ -183,16 +196,20 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkArgument( pathsToFilesInsidePackage != null && !pathsToFilesInsidePackage.isEmpty(),
                 "PathsToFilesInsidePackage is null or empty" );
         StringBuilder filesSB = new StringBuilder();
+
         long nano = System.nanoTime();
 
-        for ( int i = 0; i < pathsToFilesInsidePackage.size(); i++ ) {
+        assert pathsToFilesInsidePackage != null;
+        for ( int i = 0; i < pathsToFilesInsidePackage.size(); i++ )
+        {
             final String path = pathsToFilesInsidePackage.get( i );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( path ),
                     "One of the paths to files inside package is null or empty" );
 
             filesSB.append( " cat " ).append( Common.TMP_DEB_PACKAGE_UNPACK_PATH ).append( "/" ).append( nano )
                    .append( "/" ).append( path );
-            if ( i < pathsToFilesInsidePackage.size() - 1 ) {
+            if ( i < pathsToFilesInsidePackage.size() - 1 )
+            {
                 filesSB.append( " && echo '<<<" ).append( nano ).append( ">>>' && " );
             }
         }
@@ -205,10 +222,12 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
                 .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
                         Sets.newHashSet( agent ) );
 
-        try {
+        try
+        {
             runCommand( command, agent, AptCommand.READ_FILE_INSIDE_PACKAGE, false );
         }
-        finally {
+        finally
+        {
 
             commandRunner.runCommandAsync( commandRunner.createCommand(
                     new RequestBuilder( String.format( "rm -rf %s/%s", Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano ) ),
@@ -224,13 +243,15 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     }
 
 
-    private void runCommand( Command command, Agent host, AptCommand aptCommand ) throws AptRepoException {
+    private void runCommand( Command command, Agent host, AptCommand aptCommand ) throws AptRepoException
+    {
         runCommand( command, host, aptCommand, true );
     }
 
 
     //sends broadcase command to all currently connected agents
-    private void broadcastAptGetUpdateCommand() {
+    private void broadcastAptGetUpdateCommand()
+    {
         Command command =
                 commandRunner.createBroadcastCommand( new RequestBuilder( "apt-get update" ).withTimeout( 90 ) );
         commandRunner.runCommandAsync( command );
