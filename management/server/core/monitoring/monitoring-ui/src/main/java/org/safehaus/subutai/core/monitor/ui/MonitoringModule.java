@@ -2,9 +2,9 @@ package org.safehaus.subutai.core.monitor.ui;
 
 
 import com.vaadin.ui.Component;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.monitor.api.Monitor;
-import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.io.File;
@@ -41,8 +41,13 @@ public class MonitoringModule implements PortalModule {
 		return new ModuleView(monitor, agentManager);
 	}
 
+    @Override
+    public Boolean isCorePlugin() {
+        return true;
+    }
 
-	public void setMonitor(Monitor monitor) {
+
+    public void setMonitor(Monitor monitor) {
 		this.monitor = monitor;
 	}
 

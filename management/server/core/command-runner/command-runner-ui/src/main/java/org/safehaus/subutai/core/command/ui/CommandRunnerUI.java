@@ -2,10 +2,10 @@ package org.safehaus.subutai.core.command.ui;
 
 
 import com.vaadin.ui.Component;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 
@@ -56,4 +56,9 @@ public class CommandRunnerUI implements PortalModule {
 	public Component createComponent() {
 		return new TerminalForm(commandRunner, agentManager);
 	}
+
+    @Override
+    public Boolean isCorePlugin() {
+        return true;
+    }
 }

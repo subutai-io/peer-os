@@ -8,6 +8,8 @@ public interface PortalModuleService {
 
 	public List<PortalModule> getModules();
 
+    public List<PortalModule> getCoreModules();
+
 	public void addListener(final PortalModuleListener listener);
 
 	public void removeListener(final PortalModuleListener listener);
