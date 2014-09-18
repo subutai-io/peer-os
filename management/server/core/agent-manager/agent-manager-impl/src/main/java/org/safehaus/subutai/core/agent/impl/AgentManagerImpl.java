@@ -268,6 +268,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     @Override
     public Agent waitForRegistration( final String hostname, final long timeInMillis )
     {
+        LOG.info( String.format("=====> Waiting in thread %s", Thread.currentThread()) );
         Agent result = getAgentByHostname( hostname );
         long threshold = System.currentTimeMillis() + timeInMillis;
         while ( result == null && System.currentTimeMillis() < threshold )
