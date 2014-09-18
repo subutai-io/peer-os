@@ -98,4 +98,12 @@ public class AgentManagerFake implements AgentManager {
     public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId ) {
         return null;
     }
+
+
+    @Override
+    public Agent waitForRegistration( final String hostname, final long timeInMillis )
+    {
+        //TODO: Implement me
+        return null;
+    }
 }
