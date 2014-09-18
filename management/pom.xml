@@ -251,17 +251,22 @@
         <artifactId>template-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+      <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>template-manager-impl</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- template-registry -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>template-registry-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>template-registry-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 

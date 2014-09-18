@@ -16,7 +16,7 @@
 
   <modules>
     <module>template-registry-api</module>
-    <!--<module>template-registry-impl</module>-->
+    <module>template-registry-impl</module>
     <!--<module>template-registry-cli</module>-->
     <!--<module>template-registry-ui</module>-->
     <!--<module>template-registry-rest</module>-->

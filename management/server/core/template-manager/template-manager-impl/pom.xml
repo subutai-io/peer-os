@@ -11,7 +11,7 @@
 
   <artifactId>template-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>:: Subutai Template Manager</name>
+  <name>Subutai Template Manager</name>
   <description>Subutai Template Manager Impl</description>
 
   <dependencies>

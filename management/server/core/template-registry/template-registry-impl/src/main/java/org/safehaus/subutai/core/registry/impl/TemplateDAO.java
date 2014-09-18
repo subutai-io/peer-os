@@ -26,7 +26,8 @@ public class TemplateDAO {
     private DbManager dbManager;
 
 
-    public TemplateDAO( final DbManager dbManager ) {
+    public TemplateDAO( final DbManager dbManager )
+    {
         Preconditions.checkNotNull( dbManager, "DB Manager is null" );
         this.dbManager = dbManager;
     }
@@ -37,22 +38,28 @@ public class TemplateDAO {
      *
      * @return {@code List<Template>}
      */
-    public List<Template> getAllTemplates() throws DBException {
+    public List<Template> getAllTemplates() throws DBException
+    {
         List<Template> list = new ArrayList<>();
-        try {
+        try
+        {
             ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info" );
-            if ( rs != null ) {
-                for ( Row row : rs ) {
+            if ( rs != null )
+            {
+                for ( Row row : rs )
+                {
                     String info = row.getString( "info" );
                     Template template = gson.fromJson( info, Template.class );
-                    if ( template != null ) {
+                    if ( template != null )
+                    {
 
                         list.add( template );
                     }
                 }
             }
         }
-        catch ( JsonSyntaxException ex ) {
+        catch ( JsonSyntaxException ex )
+        {
             throw new DBException( String.format( "Error in getAllTemplates %s", ex ) );
         }
 
@@ -68,24 +75,31 @@ public class TemplateDAO {
      *
      * @return {@code List<Template>}
      */
-    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) throws DBException {
+    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) throws DBException
+    {
         List<Template> list = new ArrayList<>();
-        if ( parentTemplateName != null && lxcArch != null ) {
-            try {
+        if ( parentTemplateName != null && lxcArch != null )
+        {
+            try
+            {
                 ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where parent = ?",
                         String.format( "%s-%s", parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
-                if ( rs != null ) {
-                    for ( Row row : rs ) {
+                if ( rs != null )
+                {
+                    for ( Row row : rs )
+                    {
                         String info = row.getString( "info" );
                         Template template = gson.fromJson( info, Template.class );
-                        if ( template != null ) {
+                        if ( template != null )
+                        {
 
                             list.add( template );
                         }
                     }
                 }
             }
-            catch ( JsonSyntaxException ex ) {
+            catch ( JsonSyntaxException ex )
+            {
                 throw new DBException( String.format( "Error in getAllTemplates %s", ex ) );
             }
         }
@@ -101,21 +115,27 @@ public class TemplateDAO {
      *
      * @return {@code Template}
      */
-    public Template getTemplateByName( String templateName, String lxcArch ) throws DBException {
-        if ( templateName != null && lxcArch != null ) {
-            try {
+    public Template getTemplateByName( String templateName, String lxcArch ) throws DBException
+    {
+        if ( templateName != null && lxcArch != null )
+        {
+            try
+            {
                 ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where template = ?",
                         String.format( "%s-%s", templateName.toLowerCase(), lxcArch.toLowerCase() ) );
-                if ( rs != null ) {
+                if ( rs != null )
+                {
                     Row row = rs.one();
-                    if ( row != null ) {
+                    if ( row != null )
+                    {
                         String info = row.getString( "info" );
 
                         return gson.fromJson( info, Template.class );
                     }
                 }
             }
-            catch ( JsonSyntaxException ex ) {
+            catch ( JsonSyntaxException ex )
+            {
                 throw new DBException( String.format( "Error in getTemplateByName %s", ex ) );
             }
         }
@@ -128,7 +148,8 @@ public class TemplateDAO {
      *
      * @param template - template to save
      */
-    public void saveTemplate( Template template ) throws DBException {
+    public void saveTemplate( Template template ) throws DBException
+    {
 
         dbManager.executeUpdate2( "insert into template_registry_info(template, parent, info) values(?,?,?)",
                 String.format( "%s-%s", template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() ),
@@ -143,7 +164,8 @@ public class TemplateDAO {
      *
      * @param template - template to delete
      */
-    public void removeTemplate( Template template ) throws DBException {
+    public void removeTemplate( Template template ) throws DBException
+    {
 
         dbManager.executeUpdate2( "delete from template_registry_info where template = ?",
                 String.format( "%s-%s", template.getTemplateName().toLowerCase(),
