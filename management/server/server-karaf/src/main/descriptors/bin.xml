@@ -41,15 +41,15 @@
         <!-- Copy over jar files -->
 
         <fileSet>
-            <directory>target/dependencies/kiskis-server</directory>
+            <directory>target/dependencies/subutai-server</directory>
             <includes>
                 <include>*.jar</include>
             </includes>
-            <outputDirectory>system/kiskis-server</outputDirectory>
+            <outputDirectory>system/subutai-server</outputDirectory>
         </fileSet>
 
         <fileSet>
-            <directory>target/dependencies/kiskis-server</directory>
+            <directory>target/dependencies/subutai-server</directory>
             <includes>
                 <include>*.war</include>
             </includes>
