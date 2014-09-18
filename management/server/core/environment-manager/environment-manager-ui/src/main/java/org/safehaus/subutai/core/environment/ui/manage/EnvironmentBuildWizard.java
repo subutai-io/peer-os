@@ -240,8 +240,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
                 cbm.setTemplateName( templateName );
                 cbm.setPeerId( peerUuid );
                 cbm.setCompleteState( false );
-                cbm.setEnvironmentUuid( environmentBuildTask.getUuid().toString() );
-                //                buildMessageMap.put( peerUuid ).put( templateName, cbm );
+                cbm.setEnvironmentUuid( environmentBuildTask.getUuid() );
+//                buildMessageMap.put(  ).put( templateName, cbm );
             }
             else
             {
