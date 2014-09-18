@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>tracker-impl</artifactId>
-  <name>:: Subutai Tracker</name>
+  <name>Subutai Tracker</name>
   <description>tracker impl</description>
 
   <packaging>bundle</packaging>
