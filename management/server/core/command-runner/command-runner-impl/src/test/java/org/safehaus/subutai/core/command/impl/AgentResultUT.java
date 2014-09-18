@@ -22,67 +22,73 @@ import static org.mockito.Mockito.when;
  */
 public class AgentResultUT {
 
-	private final String SOME_DUMMY_OUTPUT = "some dummy output";
-	private final Integer OK_EXIT_CODE = 0;
-	private final UUID agentUUID = UUID.randomUUID();
-	private final AgentResultImpl agentResult = new AgentResultImpl(agentUUID);
+    private final String SOME_DUMMY_OUTPUT = "some dummy output";
+    private final Integer OK_EXIT_CODE = 0;
+    private final UUID agentUUID = UUID.randomUUID();
+    private final AgentResultImpl agentResult = new AgentResultImpl( agentUUID );
 
 
-	@Test (expected = NullPointerException.class)
-	public void constructorShouldFailNullAgentUUID() {
-		new AgentResultImpl(null);
-	}
+    @Test( expected = NullPointerException.class )
+    public void constructorShouldFailNullAgentUUID()
+    {
+        new AgentResultImpl( null );
+    }
 
 
-	@Test
-	public void shouldNotAppendNullResponse() {
+    @Test
+    public void shouldNotAppendNullResponse()
+    {
 
-		agentResult.appendResults(null);
+        agentResult.appendResults( null );
 
-		assertTrue(agentResult.getStdOut().isEmpty());
-	}
-
-
-	@Test
-	public void shouldNotAppendAlienResponse() {
-		Response response = MockUtils.getIntermediateResponse(UUID.randomUUID(), UUID.randomUUID());
-		when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
-
-		agentResult.appendResults(response);
-
-		assertTrue(agentResult.getStdOut().isEmpty());
-	}
+        assertTrue( agentResult.getStdOut().isEmpty() );
+    }
 
 
-	@Test
-	public void shouldAppendOwnResponse() {
-		Response response = MockUtils.getIntermediateResponse(agentUUID, UUID.randomUUID());
-		when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
+    @Test
+    public void shouldNotAppendAlienResponse()
+    {
+        Response response = MockUtils.getIntermediateResponse( UUID.randomUUID(), UUID.randomUUID() );
+        when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
 
-		agentResult.appendResults(response);
+        agentResult.appendResults( response );
 
-		assertEquals(SOME_DUMMY_OUTPUT, agentResult.getStdOut());
-	}
-
-
-	@Test
-	public void shouldAppendExitCode() {
-		Response response = MockUtils.getSucceededResponse(agentUUID, UUID.randomUUID());
-
-		agentResult.appendResults(response);
-
-		assertEquals(OK_EXIT_CODE, agentResult.getExitCode());
-	}
+        assertTrue( agentResult.getStdOut().isEmpty() );
+    }
 
 
-	@Test
-	public void shouldNotAppendIfExitCodeAlreadySet() {
-		Response response = MockUtils.getSucceededResponse(agentUUID, UUID.randomUUID());
+    @Test
+    public void shouldAppendOwnResponse()
+    {
+        Response response = MockUtils.getIntermediateResponse( agentUUID, UUID.randomUUID() );
+        when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
 
-		agentResult.appendResults(response);
-		when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
-		agentResult.appendResults(response);
+        agentResult.appendResults( response );
 
-		assertTrue(agentResult.getStdOut().isEmpty());
-	}
+        assertEquals( SOME_DUMMY_OUTPUT, agentResult.getStdOut() );
+    }
+
+
+    @Test
+    public void shouldAppendExitCode()
+    {
+        Response response = MockUtils.getSucceededResponse( agentUUID, UUID.randomUUID() );
+
+        agentResult.appendResults( response );
+
+        assertEquals( OK_EXIT_CODE, agentResult.getExitCode() );
+    }
+
+
+    @Test
+    public void shouldNotAppendIfExitCodeAlreadySet()
+    {
+        Response response = MockUtils.getSucceededResponse( agentUUID, UUID.randomUUID() );
+
+        agentResult.appendResults( response );
+        when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
+        agentResult.appendResults( response );
+
+        assertTrue( agentResult.getStdOut().isEmpty() );
+    }
 }
