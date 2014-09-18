@@ -1,8 +1,13 @@
 package org.safehaus.subutai.core.strategy.api;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.safehaus.subutai.common.protocol.Agent;
 
-import java.util.*;
 
 /**
  * This class should be extended by all container placement strategies
@@ -43,7 +48,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
 
     @Override
     public List<Criteria> getCriteria() {
-        return Collections.unmodifiableList(criteria);
+        return Collections.unmodifiableList( criteria );
     }
 
 

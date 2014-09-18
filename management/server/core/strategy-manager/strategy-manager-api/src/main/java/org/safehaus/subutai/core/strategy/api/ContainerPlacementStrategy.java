@@ -32,5 +32,4 @@ public interface ContainerPlacementStrategy {
 
     public Map<Agent, Integer> getPlacementDistribution();
 
-//    public PlacementStrategy getStrategy();
 }
