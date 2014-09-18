@@ -1,12 +1,9 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
@@ -18,8 +15,11 @@ import java.util.logging.Logger;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
-import com.google.common.base.Preconditions;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -28,20 +28,18 @@ import com.google.common.base.Preconditions;
 public class ResponseSender {
     private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
 
-    private static final int RESPONSE_OK = 200;
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
     private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 15;
     private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
-    private final HttpUtil httpUtil;
+    private final PeerManager peerManager;
 
 
-    public ResponseSender( final DispatcherDAO dispatcherDAO, HttpUtil httpUtil ) {
-        Preconditions.checkNotNull( dispatcherDAO, "DispatcherDAO is null" );
+    public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager ) {
 
         this.dispatcherDAO = dispatcherDAO;
-        this.httpUtil = httpUtil;
+        this.peerManager = peerManager;
     }
 
 
@@ -136,43 +134,33 @@ public class ResponseSender {
             for ( RemoteResponse response : responses ) {
                 sortedSet.add( response.getResponse() );
             }
-            //fill http params
-            Map<String, String> params = new HashMap<>();
-            params.put( "responses", JsonUtil.toJson( sortedSet ) );
-            //try to send responses to PEER
-            int responseCode = 0;
+
             try {
-                responseCode = httpUtil.post( String.format( Common.RESPONSE_URL, request.getIp() ), params );
-                if ( responseCode == RESPONSE_OK ) {
-                    //delete sent responses
-                    for ( RemoteResponse response : responses ) {
+                Peer peer = peerManager.getPeerByUUID( request.getPeerId() );
 
-                        dispatcherDAO.deleteRemoteResponse( response );
+                String message = JsonUtil.toJson( new DispatcherMessage( sortedSet, DispatcherMessageType.RESPONSE ) );
+                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
 
-                        if ( response.getResponse().isFinal() ) {
-                            request.incrementCompletedRequestsCount();
-                        }
+                //delete sent responses
+                for ( RemoteResponse response : responses ) {
+
+                    dispatcherDAO.deleteRemoteResponse( response );
+
+                    if ( response.getResponse().isFinal() ) {
+                        request.incrementCompletedRequestsCount();
                     }
-                    //if final response was sent, delete request
-                    if ( request.isCompleted() ) {
-                        dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
-                    }
-                    else {
-                        dispatcherDAO.saveRemoteRequest( request );
-                    }
+                }
+                //if final response was sent, delete request
+                if ( request.isCompleted() ) {
+                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
                 }
                 else {
-
-                    LOG.log( Level.WARNING,
-                            String.format( "Error sending response to %s: error code = %s", request.getIp(),
-                                    responseCode ) );
+                    dispatcherDAO.saveRemoteRequest( request );
                 }
             }
-            catch ( IOException e ) {
-                LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
-            }
 
-            if ( responseCode != RESPONSE_OK ) {
+            catch ( PeerMessageException e ) {
+                LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
                 //increment attempts
                 request.incrementAttempts();
                 dispatcherDAO.saveRemoteRequest( request );
@@ -180,7 +168,7 @@ public class ResponseSender {
                 dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
             }
         }
-        catch ( DBException e ) {
+        catch ( JsonSyntaxException | DBException e ) {
             LOG.log( Level.SEVERE, String.format( "Error in sendResponses: %s", e.getMessage() ) );
         }
     }

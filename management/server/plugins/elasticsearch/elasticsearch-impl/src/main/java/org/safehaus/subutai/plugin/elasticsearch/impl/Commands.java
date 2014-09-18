@@ -30,8 +30,7 @@ public class Commands extends CommandsSingleton {
 
 
 	public static Command getConfigureCommand(Set<Agent> agents, String param) {
-		return createCommand(new RequestBuilder(String.format(" . /etc/profile && es-conf.sh %s ", param)), agents
-		);
+		return createCommand(new RequestBuilder(String.format(" . /etc/profile && es-conf.sh %s ", param)), agents );
 	}
 
 

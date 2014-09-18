@@ -1,12 +1,13 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import java.util.UUID;
+
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import java.util.UUID;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
@@ -23,7 +24,7 @@ public class RegisterCommand extends OsgiCommandSupport {
     }
 
 
-    public void setPeerManager(final PeerManager peerManager) {
+    public void setPeerManager( final PeerManager peerManager ) {
         this.peerManager = peerManager;
     }
 
@@ -32,17 +33,17 @@ public class RegisterCommand extends OsgiCommandSupport {
     protected Object doExecute() throws Exception {
         Peer peer = getSamplePeer();
 
-        String result = peerManager.register(peer);
-        System.out.println(result);
+        String result = peerManager.register( peer );
+        System.out.println( result );
         return null;
     }
 
 
     private Peer getSamplePeer() {
         Peer peer = new Peer();
-        peer.setName("Peer name");
-        peer.setIp("10.10.10.10");
-        peer.setId(UUID.randomUUID().toString());
+        peer.setName( "Peer name" );
+        peer.setIp( "10.10.10.10" );
+        peer.setId( UUID.randomUUID() );
         return peer;
     }
 }

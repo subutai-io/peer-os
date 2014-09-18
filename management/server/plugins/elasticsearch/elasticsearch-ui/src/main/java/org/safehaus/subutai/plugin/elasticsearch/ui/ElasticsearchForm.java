@@ -32,9 +32,20 @@ public class ElasticsearchForm extends CustomComponent {
 		wizard = new Wizard(executorService, serviceLocator);
 		sheet.addTab(wizard.getContent(), "Install");
 		sheet.addTab(manager.getContent(), "Manage");
-		verticalLayout.addComponent(sheet);
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) ) {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( sheet );
+        verticalLayout.addComponent( sheet );
+		verticalLayout.addComponent( sheet );
 
 		manager.refreshClustersInfo();
 	}
-
 }

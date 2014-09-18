@@ -1,13 +1,7 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,7 +19,6 @@ import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -35,22 +28,24 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
  * Implementation of CommandDispatcher interface
  */
-public class CommandDispatcherImpl extends AbstractCommandRunner implements CommandDispatcher {
+public class CommandDispatcherImpl extends AbstractCommandRunner implements CommandDispatcher, PeerMessageListener {
 
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
     private final DispatcherDAO dispatcherDAO;
     private final ResponseSender responseSender;
-    private final HttpUtil httpUtil;
     private final PeerManager peerManager;
 
 
@@ -60,20 +55,21 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.dispatcherDAO = new DispatcherDAO( dbManager );
-        this.httpUtil = new HttpUtil();
         this.peerManager = peerManager;
-        this.responseSender = new ResponseSender( dispatcherDAO, httpUtil );
+        this.responseSender = new ResponseSender( dispatcherDAO, peerManager );
     }
 
 
     public void init() {
+
+        peerManager.addPeerMessageListener( this );
         responseSender.init();
     }
 
 
     public void destroy() {
+        peerManager.removePeerMessageListener( this );
         responseSender.dispose();
-        httpUtil.dispose();
         super.dispose();
     }
 
@@ -115,29 +111,24 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() ) {
-            //TODO use PeerManager to figure out IP of target peer by UUID
-            //not implemented yet...
-            String peerIP = getLocalIp();
+            Peer peer = peerManager.getPeerByUUID( request.getKey() );
 
-            //send requests in batch to each peer
-            Map<String, String> params = new HashMap<>();
-            params.put( "requests", JsonUtil.toJson( request.getValue() ) );
             try {
-                httpUtil.post( String.format( Common.REQUEST_URL, peerIP ), params );
+                String message =
+                        JsonUtil.toJson( new DispatcherMessage( DispatcherMessageType.REQUEST, request.getValue() ) );
+                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
             }
-            catch ( IOException e ) {
-                String errString =
-                        String.format( "Error in sendRequests for peer %s: %s", request.getKey(), e.getMessage() );
-                LOG.log( Level.SEVERE, errString );
+            catch ( JsonSyntaxException | PeerMessageException e ) {
+                String errString = String.format( "Error in sendRequests for peer %s: %s", peer, e.getMessage() );
 
+                LOG.log( Level.SEVERE, errString );
                 throw new RunCommandException( errString );
             }
         }
     }
 
 
-    @Override
-    public void processResponses( final Set<Response> responses ) {
+    private void processResponses( final Set<Response> responses ) {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( responses ), "Responses are null or empty" );
 
         Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
@@ -156,9 +147,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    @Override
-    public void executeRequests( final String ip, final Set<BatchRequest> requests ) {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "IP is null or empty" );
+    private void executeRequests( final Peer peer, final Set<BatchRequest> requests ) throws PeerMessageException {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 
         try {
@@ -171,7 +160,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             RemoteRequest remoteRequest = dispatcherDAO.getRemoteRequest( commandId );
             //if no request exists, create a new one
             if ( remoteRequest == null ) {
-                remoteRequest = new RemoteRequest( ip, commandId, requestsCount );
+                remoteRequest = new RemoteRequest( peer.getId(), commandId, requestsCount );
                 //save request to db
                 dispatcherDAO.saveRemoteRequest( remoteRequest );
 
@@ -196,13 +185,13 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                 } );
             }
             else {
-                throw new RunCommandException(
+                throw new PeerMessageException(
                         String.format( "Command %s is already queued for processing", commandId ) );
             }
         }
         catch ( CommandException | DBException e ) {
             LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ) );
-            throw new RunCommandException( e.getMessage() );
+            throw new PeerMessageException( e.getMessage() );
         }
     }
 
@@ -266,26 +255,29 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private String getLocalIp() {
-        Enumeration<NetworkInterface> n;
+    @Override
+    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException {
         try {
-            n = NetworkInterface.getNetworkInterfaces();
-            for (; n.hasMoreElements(); ) {
-                NetworkInterface e = n.nextElement();
 
-                Enumeration<InetAddress> a = e.getInetAddresses();
-                for (; a.hasMoreElements(); ) {
-                    InetAddress addr = a.nextElement();
-                    if ( addr.getHostAddress().startsWith( "172" ) ) {
-                        return addr.getHostAddress();
-                    }
-                }
+            DispatcherMessage dispatcherMessage = JsonUtil.fromJson( peerMessage, DispatcherMessage.class );
+
+
+            if ( dispatcherMessage.getDispatcherMessageType() == DispatcherMessageType.REQUEST ) {
+                executeRequests( peer, dispatcherMessage.getBatchRequests() );
+            }
+            else {
+                processResponses( dispatcherMessage.getResponses() );
             }
         }
-        catch ( SocketException ignore ) {
+        catch ( RuntimeException e ) {
+            throw new PeerMessageException( e.getMessage() );
         }
+        return null;
+    }
 
 
-        return "172.16.192.64";
+    @Override
+    public String getName() {
+        return Common.DISPATCHER_NAME;
     }
 }

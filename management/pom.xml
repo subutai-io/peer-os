@@ -16,20 +16,26 @@
 
   <description>Parent project for the Subutai Project Artifacts</description>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <quiet>true</quiet>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <quiet>true</quiet>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
   <repositories>
+
+    <repository>
+      <id>Central</id>
+      <name>central-mirror</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
     <repository>
       <id>apache-repo</id>
       <name>apache-repo</name>
@@ -685,37 +691,37 @@
         <version>${project.version}</version>
       </dependency>
 
-        <!-- Strategy Manager -->
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>strategy-manager-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <!-- Strategy Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>strategy-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>strategy-manager-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>strategy-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-        <!-- Container Manager -->
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>container-manager-ui</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>container-manager-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>container-manager-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <!-- Container Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>container-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>container-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>container-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-        <!-- LXC Manager -->
+      <!-- LXC Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>lxc-manager-ui</artifactId>

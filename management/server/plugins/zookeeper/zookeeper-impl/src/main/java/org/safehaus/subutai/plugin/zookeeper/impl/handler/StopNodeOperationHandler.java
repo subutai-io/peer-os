@@ -2,53 +2,51 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
-import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
+import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 import java.util.UUID;
 
 /**
  * Handles stop node operation
  */
-public class StopNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
-    private final ProductOperation po;
+public class StopNodeOperationHandler  extends AbstractOperationHandler<ZookeeperImpl> {
     private final String lxcHostname;
 
     public StopNodeOperationHandler(ZookeeperImpl manager, String clusterName, String lxcHostname) {
         super(manager, clusterName);
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format("Stopping node %s in %s", lxcHostname, clusterName));
     }
 
     @Override
     public UUID getTrackerId() {
-        return po.getId();
+        return productOperation.getId();
     }
 
     @Override
     public void run() {
         ZookeeperClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
-            po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
         if (node == null) {
-            po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
+            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
         if (!config.getNodes().contains(node)) {
-            po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
+            productOperation.addLogFailed( String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
-        po.addLog("Stopping node...");
+        productOperation.addLog( "Stopping node..." );
 
         Command stopCommand = Commands.getStopCommand(node);
         manager.getCommandRunner().runCommand(stopCommand);
@@ -61,11 +59,11 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
         }
 
         if (NodeState.STOPPED.equals(state)) {
-            po.addLogDone(String.format("Node on %s stopped", lxcHostname));
+            productOperation.addLogDone( String.format( "Node on %s stopped", lxcHostname ) );
         } else {
-            po.addLogFailed(String.format("Failed to stop node %s, %s",
+            productOperation.addLogFailed( String.format( "Failed to stop node %s, %s",
                     lxcHostname, stopCommand.getAllErrors()
-            ));
+            ) );
         }
     }
 }
