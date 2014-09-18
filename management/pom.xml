@@ -252,7 +252,7 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-      <groupId>${project.groupId}</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>template-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -267,6 +267,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>template-registry-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>template-registry-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
