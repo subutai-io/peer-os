@@ -17,7 +17,8 @@ public class NetwokManagerImpl implements NetworkManager {
     private final Commands commands;
 
 
-    public NetwokManagerImpl( final CommandRunner commandRunner ) {
+    public NetwokManagerImpl( final CommandRunner commandRunner )
+    {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
 
         this.commands = new Commands( commandRunner );
@@ -25,25 +26,29 @@ public class NetwokManagerImpl implements NetworkManager {
 
 
     @Override
-    public boolean configSshOnAgents( List<Agent> agentList ) {
+    public boolean configSshOnAgents( List<Agent> agentList )
+    {
         return new SshManager( commands, agentList ).execute();
     }
 
 
     @Override
-    public boolean configSshOnAgents( List<Agent> agentList, Agent agent ) {
+    public boolean configSshOnAgents( List<Agent> agentList, Agent agent )
+    {
         return new SshManager( commands, agentList ).execute( agent );
     }
 
 
     @Override
-    public boolean configHostsOnAgents( List<Agent> agentList, String domainName ) {
+    public boolean configHostsOnAgents( List<Agent> agentList, String domainName )
+    {
         return new HostManager( commands, agentList, domainName ).execute();
     }
 
 
     @Override
-    public boolean configHostsOnAgents( List<Agent> agentList, Agent agent, String domainName ) {
+    public boolean configHostsOnAgents( List<Agent> agentList, Agent agent, String domainName )
+    {
         return new HostManager( commands, agentList, domainName ).execute( agent );
     }
 }

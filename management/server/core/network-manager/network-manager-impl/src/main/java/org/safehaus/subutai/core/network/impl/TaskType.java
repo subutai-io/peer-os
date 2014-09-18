@@ -5,11 +5,12 @@
  */
 package org.safehaus.subutai.core.network.impl;
 
+
 /**
  * @author dilshat
  */
 public enum TaskType {
 
-	CREATE_SSH, READ_SSH, WRITE_SSH, CONFIG_SSH,
-	READ_HOST, WRITE_HOST
+    CREATE_SSH, READ_SSH, WRITE_SSH, CONFIG_SSH,
+    READ_HOST, WRITE_HOST
 }

@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>monitoring-cli</artifactId>
-  <name>:: Subutai Monitoring CLI</name>
+  <name>Subutai Monitoring CLI</name>
   <packaging>bundle</packaging>
 
   <dependencies>

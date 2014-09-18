@@ -2,20 +2,20 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mgmt-server-core-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.subutai</groupId>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>network-manager-parent</artifactId>
-    <name>Subutai Network Manager Parent</name>
-    <description>Subutai Network Manager Parent</description>
-    <packaging>pom</packaging>
+  <artifactId>network-manager-parent</artifactId>
+  <name>Subutai Network Manager Parent</name>
+  <description>Subutai Network Manager Parent</description>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>network-manager-api</module>
-        <!--<module>network-manager-impl</module>-->
-    </modules>
+  <modules>
+    <module>network-manager-api</module>
+    <module>network-manager-impl</module>
+  </modules>
 </project>

@@ -25,17 +25,23 @@ public class SshManager {
     private Commands commands;
 
 
-    public SshManager( Commands commands, List<Agent> agentList ) {
+    public SshManager( Commands commands, List<Agent> agentList )
+    {
         this.agentList = agentList;
         this.commands = commands;
     }
 
 
-    public boolean execute() {
-        if ( agentList != null && !agentList.isEmpty() ) {
-            if ( create() ) {
-                if ( read() ) {
-                    if ( write() ) {
+    public boolean execute()
+    {
+        if ( agentList != null && !agentList.isEmpty() )
+        {
+            if ( create() )
+            {
+                if ( read() )
+                {
+                    if ( write() )
+                    {
                         return config();
                     }
                 }
@@ -46,12 +52,15 @@ public class SshManager {
     }
 
 
-    private boolean create() {
+    private boolean create()
+    {
         Command command = commands.getCreateSSHCommand( agentList );
-        try {
+        try
+        {
             command.execute();
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
 
@@ -59,41 +68,45 @@ public class SshManager {
     }
 
 
-    private boolean read() {
+    private boolean read()
+    {
         Command command = commands.getReadSSHCommand( agentList );
-        try {
+        try
+        {
             command.execute();
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
 
         StringBuilder value = new StringBuilder();
-        if ( command.hasCompleted() ) {
-            for ( Agent agent : agentList ) {
+        if ( command.hasCompleted() )
+        {
+            for ( Agent agent : agentList )
+            {
                 AgentResult result = command.getResults().get( agent.getUuid() );
-                if ( !Strings.isNullOrEmpty( result.getStdOut() ) ) {
+                if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
+                {
                     value.append( result.getStdOut() );
                 }
             }
         }
         keys = value.toString();
 
-        if ( !Strings.isNullOrEmpty( keys ) && command.hasSucceeded() ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
     }
 
 
-    private boolean write() {
+    private boolean write()
+    {
         Command command = commands.getWriteSSHCommand( agentList, keys );
-        try {
+        try
+        {
             command.execute();
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
 
@@ -102,12 +115,15 @@ public class SshManager {
     }
 
 
-    private boolean config() {
+    private boolean config()
+    {
         Command command = commands.getConfigSSHCommand( agentList );
-        try {
+        try
+        {
             command.execute();
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
 
@@ -116,13 +132,18 @@ public class SshManager {
     }
 
 
-    public boolean execute( Agent agent ) {
-        if ( agentList != null && !agentList.isEmpty() && agent != null ) {
-            if ( create( agent ) ) {
+    public boolean execute( Agent agent )
+    {
+        if ( agentList != null && !agentList.isEmpty() && agent != null )
+        {
+            if ( create( agent ) )
+            {
                 agentList.add( agent );
 
-                if ( read() ) {
-                    if ( write() ) {
+                if ( read() )
+                {
+                    if ( write() )
+                    {
                         return config();
                     }
                 }
@@ -133,15 +154,17 @@ public class SshManager {
     }
 
 
-    private boolean create( Agent agent ) {
+    private boolean create( Agent agent )
+    {
         Command command = commands.getCreateSSHCommand( Arrays.asList( agent ) );
-        try {
+        try
+        {
             command.execute();
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
-        ;
 
         return command.hasSucceeded();
     }

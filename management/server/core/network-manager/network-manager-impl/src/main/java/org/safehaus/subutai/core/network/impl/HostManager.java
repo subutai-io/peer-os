@@ -22,30 +22,31 @@ public class HostManager {
     private Commands commands;
 
 
-    public HostManager( Commands commands, List<Agent> agentList, String domainName ) {
+    public HostManager( Commands commands, List<Agent> agentList, String domainName )
+    {
         this.agentList = agentList;
         this.domainName = domainName;
         this.commands = commands;
     }
 
 
-    public boolean execute() {
-        if ( agentList != null && !agentList.isEmpty() ) {
-            return write();
-        }
-
-        return false;
+    public boolean execute()
+    {
+        return agentList != null && !agentList.isEmpty() && write();
     }
 
 
-    private boolean write() {
+    private boolean write()
+    {
         //        String hosts = prepareHost();
         //        Command command = commands.getWriteHostsCommand(agentList, hosts);
         Command command = commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( agentList ) );
-        try {
+        try
+        {
             command.execute();
         }
-        catch ( CommandException e ) {
+        catch ( CommandException e )
+        {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
 
@@ -53,8 +54,10 @@ public class HostManager {
     }
 
 
-    public boolean execute( Agent agent ) {
-        if ( agentList != null && !agentList.isEmpty() && agent != null ) {
+    public boolean execute( Agent agent )
+    {
+        if ( agentList != null && !agentList.isEmpty() && agent != null )
+        {
             agentList.add( agent );
             return write();
         }
