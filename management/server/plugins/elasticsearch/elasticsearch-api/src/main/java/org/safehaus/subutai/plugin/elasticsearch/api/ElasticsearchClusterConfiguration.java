@@ -31,88 +31,89 @@ public class ElasticsearchClusterConfiguration implements ConfigBase {
 
     @Override
     public String getClusterName() {
-		return clusterName;
-	}
+        return clusterName;
+    }
 
 
     public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+        this.clusterName = clusterName;
+    }
 
 
     @Override
     public String getProductName() {
-		return PRODUCT_KEY;
-	}
+        return PRODUCT_KEY;
+    }
 
 
     public int getNumberOfNodes() {
-		return numberOfNodes;
-	}
+        return numberOfNodes;
+    }
 
 
     public void setNumberOfNodes(int numberOfNodes) {
-		this.numberOfNodes = numberOfNodes;
-	}
+        this.numberOfNodes = numberOfNodes;
+    }
 
 
     public int getNumberOfShards() {
-		return numberOfShards;
-	}
+        return numberOfShards;
+    }
 
 
     public void setNumberOfShards(final int numberOfShards) {
-		this.numberOfShards = numberOfShards;
-	}
+        this.numberOfShards = numberOfShards;
+    }
 
 
     public int getNumberOfReplicas() {
-		return numberOfReplicas;
-	}
+        return numberOfReplicas;
+    }
 
 
     public void setNumberOfReplicas(final int numberOfReplicas) {
-		this.numberOfReplicas = numberOfReplicas;
-	}
+        this.numberOfReplicas = numberOfReplicas;
+    }
 
 
     public int getNumberOfMasterNodes() {
-		return numberOfMasterNodes;
-	}
+        return numberOfMasterNodes;
+    }
 
 
     public void setNumberOfMasterNodes(int numberOfSeeds) {
-		this.numberOfMasterNodes = numberOfSeeds;
-	}
+        this.numberOfMasterNodes = numberOfSeeds;
+    }
 
     public int getNumberOfDataNodes() {
-		return numberOfDataNodes;
-	}
+		    return numberOfDataNodes;
+	  }
 
 
     public void setNumberOfDataNodes(int numberOfDataNodes) {
-		this.numberOfDataNodes = numberOfDataNodes;
-	}
+		    this.numberOfDataNodes = numberOfDataNodes;
+	  }
 
 
-	public Set<Agent> getNodes() {
-		return nodes;
-	}
+    public Set<Agent> getNodes() {
+		    return nodes;
+	  }
 
 
-	public Set<Agent> getMasterNodes() {
-		return masterNodes;
-	}
+    public Set<Agent> getMasterNodes() {
+        return masterNodes;
+    }
 
 
-	public void setMasterNodes(Set<Agent> seedNodes) {
-		this.masterNodes = seedNodes;
-	}
+    public void setMasterNodes(Set<Agent> seedNodes) {
+		    this.masterNodes = seedNodes;
+	  }
 
 
-	public Set<Agent> getDataNodes() {
-		return dataNodes;
-	}
+    public Set<Agent> getDataNodes() {
+		    return dataNodes;
+	  }
+
 
     public static String getTemplateName() {
         return templateName;
