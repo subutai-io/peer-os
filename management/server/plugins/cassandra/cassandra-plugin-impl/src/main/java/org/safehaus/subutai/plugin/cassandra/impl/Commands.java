@@ -27,6 +27,8 @@ import com.google.common.collect.Sets;
  */
 public class Commands extends CommandsSingleton {
 
+    public static final String PACKAGE_NAME = "ksks-cassandra";
+
     public Commands( CommandRunner commandRunner ) {
         init( commandRunner );
     }
@@ -34,7 +36,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand( Set<Agent> agents ) {
 
-        return createCommand( new RequestBuilder( "sleep 10; apt-get --force-yes --assume-yes install ksks-cassandra" )
+        return createCommand( new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
                 .withTimeout( 360 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 

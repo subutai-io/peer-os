@@ -1,32 +1,38 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.exception.HTTPException;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.HttpUtil;
-import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.Common;
-import org.safehaus.subutai.core.peer.api.message.PeerMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
-import org.safehaus.subutai.core.peer.api.message.PeerMessageImpl;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 
-import com.google.gson.JsonSyntaxException;
+import com.google.common.base.Strings;
 
 
 /**
@@ -39,8 +45,8 @@ public class PeerImpl implements PeerManager {
 
 
     private final String SOURCE = "PEER_MANAGER";
-    private UUID id;
     private DbManager dbManager;
+    private AgentManager agentManager;
     private PeerDAO peerDAO;
     private final HttpUtil httpUtil;
 
@@ -50,13 +56,7 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    public void setId( final String id ) {
-        this.id = UUID.fromString( id );
-    }
-
-
     public void init() {
-        LOG.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
@@ -68,6 +68,11 @@ public class PeerImpl implements PeerManager {
 
     public void setDbManager( final DbManager dbManager ) {
         this.dbManager = dbManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
     }
 
 
@@ -88,7 +93,7 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public UUID getSiteId() {
-        return id;
+        return UUIDUtil.generateMACBasedUUID();
     }
 
 
@@ -123,7 +128,7 @@ public class PeerImpl implements PeerManager {
         if ( getSiteId().compareTo( uuid ) == 0 ) {
             Peer peer = new Peer();
             peer.setId( uuid );
-            peer.setIp( "127.0.0.1" );
+            peer.setIp( getLocalIp() );
             peer.setName( "Me" );
             return peer;
         }
@@ -168,22 +173,42 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void sendPeerMessage( final Peer peer, String recipient, final Object message ) throws PeerMessageException {
-        PeerMessage peerMessage = new PeerMessageImpl( recipient, message );
-        String ip = peer.getIp();
+    public String sendPeerMessage( final Peer peer, String recipient, final String message )
+            throws PeerMessageException {
+        if ( peer == null ) {
+            throw new PeerMessageException( "Peer is null" );
+        }
+        if ( Strings.isNullOrEmpty( recipient ) ) {
+            throw new PeerMessageException( "Recipient is null or empty" );
+        }
+        if ( Strings.isNullOrEmpty( message ) ) {
+            throw new PeerMessageException( "Message is null or empty" );
+        }
 
-        Map<String, String> params = new HashMap<>();
-        params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
-        params.put( Common.MESSAGE_PARAM_NAME, JsonUtil.toJson( peerMessage ) );
         try {
-            int responseCode = httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
-            if ( responseCode != HttpUtil.RESPONSE_OK ) {
-                String errMsg = String.format( "REST returned %d response code", responseCode );
-                LOG.log( Level.WARNING, errMsg );
-                throw new PeerMessageException( errMsg );
+            if ( isPeerReachable( peer ) ) {
+                String ip = peer.getIp();
+
+                Map<String, String> params = new HashMap<>();
+                params.put( Common.RECIPIENT_PARAM_NAME, recipient );
+                params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
+                params.put( Common.MESSAGE_PARAM_NAME, message );
+                try {
+                    return httpUtil.request( HttpUtil.RequestType.POST, String.format( Common.MESSAGE_REQUEST_URL, ip ),
+                            params );
+                }
+                catch ( HTTPException e ) {
+                    LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
+                    throw new PeerMessageException( e.getMessage() );
+                }
+            }
+            else {
+                String err = "Peer is not reachable";
+                LOG.log( Level.SEVERE, "Error in sendPeerMessage", err );
+                throw new PeerMessageException( err );
             }
         }
-        catch ( IOException e ) {
+        catch ( PeerException e ) {
             LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
@@ -191,29 +216,122 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void processPeerMessage( final String peerId, final String peerMessage ) throws PeerMessageException {
-
+    public String processPeerMessage( final String peerId, final String recipient, final String message )
+            throws PeerMessageException {
+        if ( Strings.isNullOrEmpty( peerId ) ) {
+            throw new PeerMessageException( "Peer id is null or empty" );
+        }
+        if ( Strings.isNullOrEmpty( recipient ) ) {
+            throw new PeerMessageException( "Recipient is null or empty" );
+        }
+        if ( Strings.isNullOrEmpty( message ) ) {
+            throw new PeerMessageException( "Message is null or empty" );
+        }
         try {
             UUID peerUUID = UUID.fromString( peerId );
-            PeerMessage peerMsg = JsonUtil.fromJson( peerMessage, PeerMessage.class );
-
-            for ( PeerMessageListener listener : peerMessageListeners ) {
-                if ( listener.getName().equalsIgnoreCase( peerMsg.getRecipientName() ) ) {
-                    Peer senderPeer = getPeerByUUID( peerUUID );
-                    try {
-                        listener.onMessage( senderPeer, peerMsg.getMessage() );
+            Peer senderPeer = getPeerByUUID( peerUUID );
+            if ( senderPeer != null ) {
+                try {
+                    if ( isPeerReachable( senderPeer ) ) {
+                        for ( PeerMessageListener listener : peerMessageListeners ) {
+                            if ( listener.getName().equalsIgnoreCase( recipient ) ) {
+                                try {
+                                    return listener.onMessage( senderPeer, message );
+                                }
+                                catch ( Exception e ) {
+                                    LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                                    throw new PeerMessageException( e.getMessage() );
+                                }
+                            }
+                        }
+                        String err = String.format( "Recipient %s not found", recipient );
+                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                        throw new PeerMessageException( err );
                     }
-                    catch ( Exception e ) {
-                        LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
-                        throw e;
+                    else {
+                        String err = "Peer is not reachable";
+                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                        throw new PeerMessageException( err );
                     }
-                    //                break;
+                }
+                catch ( PeerException e ) {
+                    LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                    throw new PeerMessageException( e.getMessage() );
                 }
             }
+            else {
+                String err = String.format( "Peer %s not found", peerId );
+                LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                throw new PeerMessageException( err );
+            }
         }
-        catch ( IllegalArgumentException | JsonSyntaxException e ) {
+        catch ( IllegalArgumentException e ) {
             LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
+    }
+
+
+    @Override
+    public boolean isPeerReachable( final Peer peer ) throws PeerException {
+        if ( peer == null ) {
+            throw new PeerException( "Peer is null" );
+        }
+        if ( getPeerByUUID( peer.getId() ) != null ) {
+            try {
+                httpUtil.request( HttpUtil.RequestType.GET, String.format( Common.PING_URL, peer.getIp() ), null );
+                return true;
+            }
+            catch ( HTTPException e ) {
+                return false;
+            }
+        }
+        else {
+            throw new PeerException( "Peer not found" );
+        }
+    }
+
+
+    @Override
+    public Set<Agent> getConnectedAgents( String environmentId ) throws PeerException {
+        try {
+            UUID envId = UUID.fromString( environmentId );
+            return agentManager.getAgentsByEnvironmentId( envId );
+        }
+        catch ( IllegalArgumentException e ) {
+            throw new PeerException( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public void createContainers( final UUID envId, final String template, final int numberOfNodes,
+                                  final String Strategy, final List<String> criteria ) {
+
+    }
+
+
+    private String getLocalIp() {
+        Enumeration<NetworkInterface> n;
+        try {
+            n = NetworkInterface.getNetworkInterfaces();
+            for (; n.hasMoreElements(); ) {
+                NetworkInterface e = n.nextElement();
+
+                Enumeration<InetAddress> a = e.getInetAddresses();
+                for (; a.hasMoreElements(); ) {
+                    InetAddress addr = a.nextElement();
+                    if ( addr.getHostAddress().startsWith( "172" ) ) {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        }
+        catch ( SocketException e ) {
+            LOG.severe( e.getMessage() );
+        }
+
+
+        return "127.0.0.1";
     }
 }

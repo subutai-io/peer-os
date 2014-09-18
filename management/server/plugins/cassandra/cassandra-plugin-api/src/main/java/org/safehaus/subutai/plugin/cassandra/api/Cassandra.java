@@ -25,7 +25,7 @@ public interface Cassandra extends ApiBase<CassandraClusterConfig> {
 
     UUID stopService(String clusterName, String lxchostname);
 
-    UUID statusService(String clusterName, String agentUUID);
+    UUID statusService(String clusterName, String lxchostname);
 
     UUID addNode(String clusterName, String lxchostname, String nodetype);
 

@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DBException;
@@ -33,6 +34,7 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -59,25 +61,29 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     public void init() {
+
+        peerManager.addPeerMessageListener( this );
         responseSender.init();
     }
 
 
     public void destroy() {
+        peerManager.removePeerMessageListener( this );
         responseSender.dispose();
         super.dispose();
     }
 
 
     private void executeCommand( CommandImpl command ) {
-        //TODO check if peers are accessible otherwise throw RunCommandException
-        //not implemented yet...
-
-        //TODO check if agents are connected otherwise throw RunCommandException
-        //not implemented yet...
 
         //send remote requests
         if ( !command.getRemoteRequests().isEmpty() ) {
+            //TODO check if peers are accessible otherwise throw RunCommandException
+            //not implemented yet...
+
+            //TODO check if agents are connected otherwise throw RunCommandException
+            //not implemented yet...
+
             LOG.warning( "executing remote requests" );
             sendRequests( command.getRemoteRequests() );
         }
@@ -109,10 +115,11 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             Peer peer = peerManager.getPeerByUUID( request.getKey() );
 
             try {
-                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME,
-                        new DispatcherMessage( DispatcherMessageType.REQUEST, request.getValue() ) );
+                String message =
+                        JsonUtil.toJson( new DispatcherMessage( DispatcherMessageType.REQUEST, request.getValue() ) );
+                peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
             }
-            catch ( PeerMessageException e ) {
+            catch ( JsonSyntaxException | PeerMessageException e ) {
                 String errString = String.format( "Error in sendRequests for peer %s: %s", peer, e.getMessage() );
 
                 LOG.log( Level.SEVERE, errString );
@@ -250,11 +257,10 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public void onMessage( final Peer peer, final Object message ) throws PeerMessageException {
+    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException {
         try {
-            Preconditions.checkArgument( message instanceof DispatcherMessage, "Message is of wrong type" );
 
-            DispatcherMessage dispatcherMessage = ( DispatcherMessage ) message;
+            DispatcherMessage dispatcherMessage = JsonUtil.fromJson( peerMessage, DispatcherMessage.class );
 
 
             if ( dispatcherMessage.getDispatcherMessageType() == DispatcherMessageType.REQUEST ) {
@@ -267,6 +273,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         catch ( RuntimeException e ) {
             throw new PeerMessageException( e.getMessage() );
         }
+        return null;
     }
 
 

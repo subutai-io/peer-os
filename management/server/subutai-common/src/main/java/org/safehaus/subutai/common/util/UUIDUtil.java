@@ -19,4 +19,9 @@ public class UUIDUtil {
     public static UUID generateCassandraUUID() {
         return UUID.fromString( new com.eaio.uuid.UUID().toString() );
     }
+
+
+    public static UUID generateMACBasedUUID() {
+        return UUID.nameUUIDFromBytes( SysUtil.getMacAddress().getBytes() );
+    }
 }

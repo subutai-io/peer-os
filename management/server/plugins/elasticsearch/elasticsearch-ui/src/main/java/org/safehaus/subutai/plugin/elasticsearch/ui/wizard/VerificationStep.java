@@ -4,8 +4,9 @@ package org.safehaus.subutai.plugin.elasticsearch.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
@@ -24,7 +25,6 @@ public class VerificationStep extends VerticalLayout {
                              final Tracker tracker, final Wizard wizard ) {
 
         setSizeFull();
-
         GridLayout grid = new GridLayout( 1, 5 );
         grid.setSpacing( true );
         grid.setMargin( true );
@@ -47,11 +47,8 @@ public class VerificationStep extends VerticalLayout {
         installButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-
                 UUID trackID = elasticsearch.installCluster( wizard.getConfig() );
-
-                ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, Config.PRODUCT_KEY );
-
+                ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, ElasticsearchClusterConfiguration.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {

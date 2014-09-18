@@ -11,6 +11,7 @@ import java.util.UUID;
 public class EnvironmentBuildTask {
 
     private UUID uuid;
+    private String peerUuid;
     private EnvironmentBlueprint environmentBlueprint;
     private Set<String> physicalNodes;
 
@@ -20,12 +21,22 @@ public class EnvironmentBuildTask {
     }
 
 
+    public String getPeerUuid() {
+        return peerUuid;
+    }
+
+
+    public void setPeerUuid( final String peerUuid ) {
+        this.peerUuid = peerUuid;
+    }
+
+
     public UUID getUuid() {
         return uuid;
     }
 
 
-    public void setUuid(final UUID uuid) {
+    public void setUuid( final UUID uuid ) {
         this.uuid = uuid;
     }
 
@@ -35,7 +46,7 @@ public class EnvironmentBuildTask {
     }
 
 
-    public void setEnvironmentBlueprint(final EnvironmentBlueprint environmentBlueprint) {
+    public void setEnvironmentBlueprint( final EnvironmentBlueprint environmentBlueprint ) {
         this.environmentBlueprint = environmentBlueprint;
     }
 
@@ -45,7 +56,7 @@ public class EnvironmentBuildTask {
     }
 
 
-    public void setPhysicalNodes(final Set<String> physicalNodes) {
+    public void setPhysicalNodes( final Set<String> physicalNodes ) {
         this.physicalNodes = physicalNodes;
     }
 }

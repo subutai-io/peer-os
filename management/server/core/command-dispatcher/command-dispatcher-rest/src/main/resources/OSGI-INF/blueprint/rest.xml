@@ -7,23 +7,23 @@
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
-  <cxf:bus id="cxfBusCommandDispatcher">
-    <cxf:features>
-      <cxf:logging />
-    </cxf:features>
-  </cxf:bus>
+  <!--<cxf:bus id="cxfBusCommandDispatcher">-->
+    <!--<cxf:features>-->
+      <!--<cxf:logging />-->
+    <!--</cxf:features>-->
+  <!--</cxf:bus>-->
 
-  <reference id="dispatcher" availability="mandatory"
-             interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />
+  <!--<reference id="dispatcher" availability="mandatory"-->
+             <!--interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />-->
 
-  <bean id="dispatcherRestServiceimpl" class="org.safehaus.subutai.core.dispatcher.rest.RestServiceImpl">
-    <argument ref="dispatcher" />
-  </bean>
+  <!--<bean id="dispatcherRestServiceimpl" class="org.safehaus.subutai.core.dispatcher.rest.RestServiceImpl">-->
+    <!--<argument ref="dispatcher" />-->
+  <!--</bean>-->
 
-  <jaxrs:server address="/dispatcher" id="dispatcherRestService">
-    <jaxrs:serviceBeans>
-      <ref component-id="dispatcherRestServiceimpl" />
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
+  <!--<jaxrs:server address="/dispatcher" id="dispatcherRestService">-->
+    <!--<jaxrs:serviceBeans>-->
+      <!--<ref component-id="dispatcherRestServiceimpl" />-->
+    <!--</jaxrs:serviceBeans>-->
+  <!--</jaxrs:server>-->
 
 </blueprint>

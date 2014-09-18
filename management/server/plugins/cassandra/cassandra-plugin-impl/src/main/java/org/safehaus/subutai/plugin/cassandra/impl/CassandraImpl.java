@@ -247,8 +247,8 @@ public class CassandraImpl extends CassandraBase {
 
 
     @Override
-    public UUID statusService(final String clusterName, final String agentUUID) {
-        AbstractOperationHandler operationHandler = new CheckServiceHandler(this, clusterName, agentUUID);
+    public UUID statusService(final String clusterName, final String lxchostname ) {
+        AbstractOperationHandler operationHandler = new CheckServiceHandler(this, clusterName, lxchostname );
         executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }

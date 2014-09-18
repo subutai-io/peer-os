@@ -4,16 +4,18 @@ package org.safehaus.subutai.core.peer.rest;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.ws.rs.FormParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -70,16 +72,33 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response processMessage( @FormParam( Common.PEER_ID_PARAM_NAME ) final String peerId,
-                                    @FormParam( Common.MESSAGE_PARAM_NAME ) final String message ) {
+    public Response processMessage( final String peerId, final String recipient, final String message ) {
         try {
-            peerManager.processPeerMessage( peerId, message );
+            String response = peerManager.processPeerMessage( peerId, recipient, message );
 
-            return Response.ok().build();
+            return Response.ok( response ).build();
         }
         catch ( PeerMessageException e ) {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
+    }
+
+
+    @Override
+    public Response getConnectedAgents( @QueryParam( "envId" ) final String environmentId ) {
+        try {
+            String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
+            return Response.ok( response ).build();
+        }
+        catch ( JsonSyntaxException | PeerException e ) {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response ping() {
+        return Response.ok(  ).build();
     }
 
 

@@ -15,13 +15,13 @@ import java.util.UUID;
 
 public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl> {
 
-    private String agentUUID;
+    private String lxcHostname;
     private String clusterName;
 
 
     public CheckServiceHandler( final CassandraImpl manager, final String clusterName, final String agentUUID ) {
         super( manager, clusterName );
-        this.agentUUID = agentUUID;
+        this.lxcHostname = agentUUID;
         this.clusterName = clusterName;
         this.productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
@@ -30,7 +30,24 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
 
     @Override
     public void run() {
-        Agent agent = manager.getAgentManager().getAgentByUUID( UUID.fromString( agentUUID ) );
+        CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
+        if ( cassandraConfig == null ) {
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            return;
+        }
+
+        final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        if ( node == null ) {
+            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            return;
+        }
+        if ( !cassandraConfig.getNodes().contains( node ) ) {
+            productOperation.addLogFailed(
+                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+            return;
+        }
+
+        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( statusServiceCommand );
         if ( statusServiceCommand.hasSucceeded() ) {
