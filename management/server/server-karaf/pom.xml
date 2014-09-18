@@ -287,6 +287,11 @@
       <artifactId>httpmime</artifactId>
       <version>${http.client.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>fluent-hc</artifactId>
+      <version>${http.client.version}</version>
+    </dependency>
 
   </dependencies>
   <build>
@@ -383,6 +388,12 @@
                   <artifactId>httpmime</artifactId>
                   <version>${http.client.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.httpcomponents</groupId>
+                  <artifactId>fluent-hc</artifactId>
+                  <version>${http.client.version}</version>
+                </artifactItem>
+
                 <artifactItem>
                   <groupId>org.doomdark</groupId>
                   <artifactId>com.springsource.org.doomdark.uuid</artifactId>
