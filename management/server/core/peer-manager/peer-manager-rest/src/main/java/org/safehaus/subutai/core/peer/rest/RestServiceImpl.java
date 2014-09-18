@@ -6,12 +6,15 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -41,12 +44,14 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Peer registerPeer( String config ) {
-        if ( config != null ) {
+        if ( config != null )
+        {
             Peer peer = GSON.fromJson( config, Peer.class );
             peerManager.register( peer );
             return peer;
         }
-        else {
+        else
+        {
             return null;
         }
     }
@@ -69,14 +74,36 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response processMessage( final String peerId, final String recipient, final String message ) {
-        try {
+        try
+        {
             String response = peerManager.processPeerMessage( peerId, recipient, message );
 
             return Response.ok( response ).build();
         }
-        catch ( PeerMessageException e ) {
+        catch ( PeerMessageException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
+    }
+
+
+    @Override
+    public Response getConnectedAgents( final String environmentId ) {
+        try
+        {
+            String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
+            return Response.ok( response ).build();
+        }
+        catch ( JsonSyntaxException | PeerException e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response ping() {
+        return Response.ok().build();
     }
 
 

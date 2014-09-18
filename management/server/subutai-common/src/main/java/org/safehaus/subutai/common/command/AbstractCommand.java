@@ -11,6 +11,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
@@ -23,6 +24,7 @@ import com.google.common.base.Strings;
  * Provides command Command functionality
  */
 public abstract class AbstractCommand implements Command {
+    protected static final Logger LOG = Logger.getLogger( AbstractCommand.class.getName() );
 
     //lock used to synchronize update of command state between command executor thread and cache evictor thread
     private final Lock updateLock = new ReentrantLock( true );
@@ -156,9 +158,11 @@ public abstract class AbstractCommand implements Command {
     @Override
     public String getAllErrors() {
         StringBuilder errors = new StringBuilder();
-        for ( Map.Entry<UUID, AgentResult> result : results.entrySet() ) {
+        for ( Map.Entry<UUID, AgentResult> result : results.entrySet() )
+        {
             AgentResult agentResult = result.getValue();
-            if ( !Strings.isNullOrEmpty( agentResult.getStdErr() ) || agentResult.getExitCode() != null ) {
+            if ( !Strings.isNullOrEmpty( agentResult.getStdErr() ) || agentResult.getExitCode() != null )
+            {
                 errors.append( agentResult.getAgentUUID() ).
                         append( ": " ).
                               append( agentResult.getStdErr() ).
@@ -186,26 +190,33 @@ public abstract class AbstractCommand implements Command {
      * Updates relevant {@code AgentResult} for agent associated with this response
      */
     public void appendResult( Response response ) {
-        if ( response != null && response.getUuid() != null ) {
+        if ( response != null && response.getUuid() != null )
+        {
 
             AgentResultImpl agentResult = ( AgentResultImpl ) results.get( response.getUuid() );
-            if ( agentResult == null ) {
+            if ( agentResult == null )
+            {
                 agentResult = new AgentResultImpl( response.getUuid() );
                 results.put( agentResult.getAgentUUID(), agentResult );
             }
 
             agentResult.appendResults( response );
 
-            if ( response.isFinal() ) {
+            if ( response.isFinal() )
+            {
                 incrementCompletedRequestsCount();
-                if ( response.hasSucceeded() ) {
+                if ( response.hasSucceeded() )
+                {
                     incrementSucceededRequestsCount();
                 }
-                if ( getRequestsCompleted() == getRequestsCount() ) {
-                    if ( getRequestsCompleted() == getRequestsSucceeded() ) {
+                if ( getRequestsCompleted() == getRequestsCount() )
+                {
+                    if ( getRequestsCompleted() == getRequestsSucceeded() )
+                    {
                         setCommandStatus( CommandStatus.SUCCEEDED );
                     }
-                    else {
+                    else
+                    {
                         setCommandStatus( CommandStatus.FAILED );
                     }
                 }
@@ -264,10 +275,12 @@ public abstract class AbstractCommand implements Command {
      * Blocks caller until command has completed or timed out
      */
     public void waitCompletion() {
-        try {
+        try
+        {
             completionSemaphore.acquire();
         }
-        catch ( InterruptedException ignore ) {
+        catch ( InterruptedException ignore )
+        {
         }
     }
 
@@ -346,29 +359,38 @@ public abstract class AbstractCommand implements Command {
 
 
     private void executeCommand( final CommandCallback callback, boolean async ) throws CommandException {
-        if ( this.commandStatus != CommandStatus.NEW ) {
+        if ( this.commandStatus != CommandStatus.NEW )
+        {
             throw new CommandException( String.format( "Command status must be %s", CommandStatus.NEW.name() ) );
         }
 
-        try {
-            if ( async ) {
-                if ( callback == null ) {
+        try
+        {
+            if ( async )
+            {
+                if ( callback == null )
+                {
                     commandRunner.runCommandAsync( this );
                 }
-                else {
+                else
+                {
                     commandRunner.runCommandAsync( this, callback );
                 }
             }
-            else {
-                if ( callback == null ) {
+            else
+            {
+                if ( callback == null )
+                {
                     commandRunner.runCommand( this );
                 }
-                else {
+                else
+                {
                     commandRunner.runCommand( this, callback );
                 }
             }
         }
-        catch ( RuntimeException e ) {
+        catch ( RuntimeException e )
+        {
             throw new CommandException( e.getMessage() );
         }
     }

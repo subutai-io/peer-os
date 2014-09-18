@@ -57,10 +57,8 @@ public class EnvironmentsBuildProcessForm {
                 message.setNumberOfContainers( 4 );
                 message.setTemplateName( "master" );
                 message.setStrategy( "ROUND_ROBIN" );
-                message.setEnvironmentUuid( UUID.randomUUID().toString() );
-
-                environmentBuildProcess.addBuildBlock( new ContainerBuildMessage() );
-
+                message.setEnvironmentUuid( UUID.randomUUID() );
+                environmentBuildProcess.addBuildBlock( message );
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
         } );
@@ -77,7 +75,7 @@ public class EnvironmentsBuildProcessForm {
         table.addContainerProperty( "Date", String.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
         table.addContainerProperty( "Info", Button.class, null );
-        table.addContainerProperty( "Destroy", Button.class, null );
+        table.addContainerProperty( "Action", Button.class, null );
         //        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
         //        table.setHeight( size, Sizeable.UNITS_PIXELS );
         table.setPageLength( 10 );
@@ -112,7 +110,7 @@ public class EnvironmentsBuildProcessForm {
                     Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
                     String json = gson.toJson( environmentBuildProcess, EnvironmentBuildProcess.class );
                     detailsWindow.setContent( json );
-                    contentRoot.getUI().addWindow( detailsWindow);
+                    contentRoot.getUI().addWindow( detailsWindow );
                     detailsWindow.setVisible( true );
                 }
             } );
@@ -126,12 +124,12 @@ public class EnvironmentsBuildProcessForm {
                 {
                     processButton = new Button( "Build" );
                     progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-                    progressIcon.setVisible( true );
+                    progressIcon.setVisible( false );
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
                             // TODO create build thred
-                            //                            managerUI.getPeerManager().createContainers();
+                            managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
                         }
                     } );
                     break;
@@ -153,7 +151,7 @@ public class EnvironmentsBuildProcessForm {
                 case FAILED:
                 {
                     processButton = new Button( "Destroy" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/cancel.png" ) );
                     progressIcon.setVisible( true );
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
@@ -167,7 +165,7 @@ public class EnvironmentsBuildProcessForm {
                 case SUCCESSFUL:
                 {
                     processButton = new Button( "Configure" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/ok.png" ) );
                     progressIcon.setVisible( true );
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override

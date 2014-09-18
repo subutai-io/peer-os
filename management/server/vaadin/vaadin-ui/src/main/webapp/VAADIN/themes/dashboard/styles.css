@@ -400,10 +400,10 @@
     content: "\2302";
 }
 
-.icon-reports.v-nativebutton:before,
-.icon-reports > .v-button-wrap:before,
-.icon-reports.v-label:before,
-.v-menubar-menuitem-icon-reports:before {
+.icon-core.v-nativebutton:before,
+.icon-core > .v-button-wrap:before,
+.icon-core.v-label:before,
+.v-menubar-menuitem-icon-core:before {
     content: "\e7a2";
 }
 

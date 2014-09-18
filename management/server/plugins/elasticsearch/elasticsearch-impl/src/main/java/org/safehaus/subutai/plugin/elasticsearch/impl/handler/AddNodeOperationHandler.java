@@ -1,16 +1,18 @@
-package org.safehaus.subutai.plugin.elasticsearch.impl;
+package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.collect.Sets;
+import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
+import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 
-public class AddNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+public class AddNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl >
 {
     private final String lxcHostname;
 
@@ -19,7 +21,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
             String.format( "Adding node to %s", clusterName ) );
     }
 
@@ -27,8 +29,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
     @Override
     public void run()
     {
-        Config config = manager.getCluster( clusterName );
-        if ( config == null )
+        ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
+        if ( elasticsearchClusterConfiguration == null )
         {
             productOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
@@ -44,7 +46,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
             return;
         }
 
-        if ( config.getNodes().contains( agent ) )
+        if ( elasticsearchClusterConfiguration.getNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
@@ -73,10 +75,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
             return;
         }
 
-        config.getNodes().add( agent );
+        elasticsearchClusterConfiguration.getNodes().add( agent );
         productOperation.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
+        if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
         {
             productOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
             //install mahout

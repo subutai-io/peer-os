@@ -39,4 +39,9 @@ public class UUIDUtil {
     {
         return Generators.nameBasedGenerator().generate( id );
     }
+
+
+    public static UUID generateMACBasedUUID() {
+        return UUID.nameUUIDFromBytes( SysUtil.getMacAddress().getBytes() );
+    }
 }

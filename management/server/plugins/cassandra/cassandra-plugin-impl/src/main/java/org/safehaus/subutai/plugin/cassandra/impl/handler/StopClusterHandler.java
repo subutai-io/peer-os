@@ -22,25 +22,21 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl> 
 
     @Override
     public void run() {
-        manager.getExecutor().execute( new Runnable() {
-            public void run() {
-                CassandraClusterConfig config = manager.getCluster( clusterName );
-                if ( config == null ) {
-                    productOperation.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
+        CassandraClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null ) {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            return;
+        }
 
-                Command stopServiceCommand = Commands.getStopCommand( config.getNodes() );
-                manager.getCommandRunner().runCommand( stopServiceCommand );
+        Command stopServiceCommand = Commands.getStopCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( stopServiceCommand );
 
-                if ( stopServiceCommand.hasSucceeded() ) {
-                    productOperation.addLogDone( "Stop succeeded" );
-                }
-                else {
-                    productOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
-                }
-            }
-        } );
+        if ( stopServiceCommand.hasSucceeded() ) {
+            productOperation.addLogDone( "Stop succeeded" );
+        }
+        else {
+            productOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
+        }
     }
 }

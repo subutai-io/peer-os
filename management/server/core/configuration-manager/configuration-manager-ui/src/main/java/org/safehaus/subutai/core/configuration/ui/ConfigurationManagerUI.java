@@ -1,15 +1,14 @@
 package org.safehaus.subutai.core.configuration.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.configuration.api.ConfigManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class ConfigurationManagerUI implements PortalModule {
@@ -73,5 +72,10 @@ public class ConfigurationManagerUI implements PortalModule {
     @Override
     public Component createComponent() {
         return new ConfigurationManagerForm( configManager );
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return true;
     }
 }

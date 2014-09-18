@@ -1,19 +1,17 @@
 package org.safehaus.subutai.plugin.storm.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Logger;
-
-import javax.naming.NamingException;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import javax.naming.NamingException;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 
 public class StormUI implements PortalModule {
@@ -70,5 +68,10 @@ public class StormUI implements PortalModule {
         }
 
         return null;
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return false;
     }
 }

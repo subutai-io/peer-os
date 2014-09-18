@@ -48,22 +48,39 @@ public class CommandImpl extends AbstractCommand {
         this.commandUUID = UUIDUtil.generateTimeBasedUUID();
         this.requestsCount = agents.size();
         this.timeout = requestBuilder.getTimeout();
+        UUID environmentId = null;
 
-        for ( Agent agent : agents ) {
+        for ( Agent agent : agents )
+        {
+            //check that all agents belong to the same environment
+            if ( environmentId == null )
+            {
+                environmentId = agent.getEnvironmentId();
+            }
+            else
+            {
+                Preconditions.checkState( environmentId.compareTo( agent.getEnvironmentId() ) == 0 );
+            }
             Request request = requestBuilder.build( agent.getUuid(), commandUUID );
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
+            //TODO remove below line
+            if ( false )
+            {
+                //            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
                 requests.add( request );
             }
-            else {
+            else
+            {
                 Set<BatchRequest> batchRequests = remoteRequests.get( agent.getSiteId() );
-                if ( batchRequests == null ) {
+                if ( batchRequests == null )
+                {
                     batchRequests = new HashSet<>();
                     remoteRequests.put( agent.getSiteId(), batchRequests );
-                    batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
+                    batchRequests.add( new BatchRequest( request, agent.getUuid(), agent.getEnvironmentId() ) );
                 }
-                else {
-                    batchRequests.iterator().next().addTargetUUID( agent.getUuid() );
+                else
+                {
+                    batchRequests.iterator().next().addAgentId( agent.getUuid() );
                 }
             }
         }
@@ -82,12 +99,15 @@ public class CommandImpl extends AbstractCommand {
                 "Batch Requests are null or empty" );
 
         Set<Request> requests = new HashSet<>();
-        for ( BatchRequest batchRequest : batchRequests ) {
+        for ( BatchRequest batchRequest : batchRequests )
+        {
             requests.addAll( batchRequest.getRequests() );
         }
         int timeout = 0;
-        for ( Request request : requests ) {
-            if ( request.getTimeout() > timeout ) {
+        for ( Request request : requests )
+        {
+            if ( request.getTimeout() > timeout )
+            {
                 timeout = request.getTimeout();
             }
         }
@@ -109,8 +129,10 @@ public class CommandImpl extends AbstractCommand {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are null or empty" );
         this.requestsCount = requests.size();
         int timeout = 0;
-        for ( Request request : requests ) {
-            if ( request.getTimeout() > timeout ) {
+        for ( Request request : requests )
+        {
+            if ( request.getTimeout() > timeout )
+            {
                 timeout = request.getTimeout();
             }
         }
@@ -139,23 +161,38 @@ public class CommandImpl extends AbstractCommand {
         this.requestsCount = requestBuilders.size();
 
         int maxTimeout = 0;
-        for ( AgentRequestBuilder requestBuilder : requestBuilders ) {
+        UUID environmentId = null;
+        for ( AgentRequestBuilder requestBuilder : requestBuilders )
+        {
             Agent agent = requestBuilder.getAgent();
+            //check that all agents belong to the same environment
+            if ( environmentId == null )
+            {
+                environmentId = agent.getEnvironmentId();
+            }
+            else
+            {
+                Preconditions.checkState( environmentId == agent.getEnvironmentId() );
+            }
             Request request = requestBuilder.build( commandUUID );
-            if ( requestBuilder.getTimeout() > maxTimeout ) {
+            if ( requestBuilder.getTimeout() > maxTimeout )
+            {
                 maxTimeout = requestBuilder.getTimeout();
             }
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
+            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 )
+            {
                 requests.add( request );
             }
-            else {
+            else
+            {
                 Set<BatchRequest> batchRequests = remoteRequests.get( agent.getSiteId() );
-                if ( batchRequests == null ) {
+                if ( batchRequests == null )
+                {
                     batchRequests = new HashSet<>();
                     remoteRequests.put( agent.getSiteId(), batchRequests );
                 }
-                batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
+                batchRequests.add( new BatchRequest( request, agent.getUuid(), agent.getEnvironmentId() ) );
             }
         }
 

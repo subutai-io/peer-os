@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public class JsonUtil {
 
     public static String toJson( Object key, Object value ) {
 
-        Map<Object, Object> map = new HashMap<>();
+        Map map = new HashMap();
         map.put( key, value );
 
         return GSON.toJson( map );
@@ -34,5 +35,11 @@ public class JsonUtil {
     public static <T> T fromJson( String value, Class<T> clazz ) {
 
         return GSON.fromJson( value, clazz );
+    }
+
+
+    public static <T> T fromJson( String value, Type type ) {
+
+        return GSON.fromJson( value, type );
     }
 }
