@@ -309,8 +309,9 @@
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- REST -->
                 <dependency>
-                  <groupId>org.jboss.resteasy</groupId>
-                  <artifactId>resteasy-jaxrs</artifactId>
+                  <groupId>org.glassfish.jersey.core</groupId>
+                  <artifactId>jersey-client</artifactId>
+                  <version>2.12</version>
                 </dependency>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
