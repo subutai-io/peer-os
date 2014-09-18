@@ -313,7 +313,11 @@
                   <artifactId>cxf-rt-frontend-jaxrs</artifactId>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>javax.ws.rs</groupId>
+                  <groupId>org.apache.cxf</groupId>
+                  <artifactId>cxf-bundle-jaxrs</artifactId>
+                </artifactItem>
+                <artifactItem>
+                <groupId>javax.ws.rs</groupId>
                   <artifactId>javax.ws.rs-api</artifactId>
                 </artifactItem>
 
