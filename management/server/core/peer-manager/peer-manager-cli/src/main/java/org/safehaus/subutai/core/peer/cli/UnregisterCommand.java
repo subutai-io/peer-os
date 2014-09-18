@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
@@ -23,18 +23,21 @@ public class UnregisterCommand extends OsgiCommandSupport {
     private PeerManager peerManager;
 
 
-    public PeerManager getPeerManager() {
+    public PeerManager getPeerManager()
+    {
         return peerManager;
     }
 
 
-    public void setPeerManager( final PeerManager peerManager ) {
+    public void setPeerManager( final PeerManager peerManager )
+    {
         this.peerManager = peerManager;
     }
 
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
 
         boolean result = peerManager.unregister( uuid );
         System.out.println( result );
@@ -42,7 +45,8 @@ public class UnregisterCommand extends OsgiCommandSupport {
     }
 
 
-    private Peer getSamplePeer() {
+    private Peer getSamplePeer()
+    {
         Peer peer = new Peer();
         peer.setName( "Peer name" );
         peer.setIp( "10.10.10.10" );

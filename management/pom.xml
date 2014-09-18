@@ -238,6 +238,11 @@
         <artifactId>peer-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>peer-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- template-manager -->

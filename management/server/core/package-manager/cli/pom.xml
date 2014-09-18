@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>package-manager-cli</artifactId>
-  <name>:: Subutai Package Manager CLI</name>
+  <name>Subutai Package Manager CLI</name>
   <description>Subutai Package Manager CLI</description>
   <packaging>bundle</packaging>
 
