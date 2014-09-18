@@ -15,7 +15,7 @@
 
   <cm:property-placeholder persistent-id="SubutaiConfig" update-strategy="reload">
     <cm:default-properties>
-      <cm:property name="id" value="${id}" />
+      <cm:property name="id" />
     </cm:default-properties>
   </cm:property-placeholder>
 
