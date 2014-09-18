@@ -73,7 +73,7 @@ public class Manager {
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
         contentRoot.setSizeFull();
-        contentRoot.setRows( 11 );
+        contentRoot.setRows( 40 );
         contentRoot.setColumns( 1 );
 
         //tables go here
@@ -166,8 +166,8 @@ public class Manager {
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( configContent, 0, 1 );
-        contentRoot.addComponent( masterNodesTable, 0, 2, 0, 3 );
-        contentRoot.addComponent( slaveNodesTable, 0, 4, 0, 9 );
+        contentRoot.addComponent( masterNodesTable, 0, 2, 0, 10 );
+        contentRoot.addComponent( slaveNodesTable, 0, 11, 0, 38 );
 
         checkAllButton.click();
     }
