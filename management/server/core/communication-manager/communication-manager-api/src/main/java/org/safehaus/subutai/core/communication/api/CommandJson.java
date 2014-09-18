@@ -32,14 +32,18 @@ public class CommandJson {
      *
      * @return request
      */
-    public static Request getRequest( String json ) {
-        try {
+    public static Request getRequest( String json )
+    {
+        try
+        {
             Command cmd = gson.fromJson( escape( json ), CommandImpl.class );
-            if ( cmd.getRequest() != null ) {
+            if ( cmd.getRequest() != null )
+            {
                 return cmd.getRequest();
             }
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getRequest", ex );
         }
 
@@ -54,11 +58,14 @@ public class CommandJson {
      *
      * @return escaped json string
      */
-    private static String escape( String s ) {
+    private static String escape( String s )
+    {
         StringBuilder sb = new StringBuilder();
-        for ( int i = 0; i < s.length(); i++ ) {
+        for ( int i = 0; i < s.length(); i++ )
+        {
             char ch = s.charAt( i );
-            switch ( ch ) {
+            switch ( ch )
+            {
                 case '"':
                     sb.append( "\"" );
                     break;
@@ -85,15 +92,18 @@ public class CommandJson {
                     break;
                 default:
                     if ( ( ch >= '\u0000' && ch <= '\u001F' ) || ( ch >= '\u007F' && ch <= '\u009F' ) || (
-                            ch >= '\u2000' && ch <= '\u20FF' ) ) {
+                            ch >= '\u2000' && ch <= '\u20FF' ) )
+                    {
                         String ss = Integer.toHexString( ch );
                         sb.append( "\\u" );
-                        for ( int k = 0; k < 4 - ss.length(); k++ ) {
+                        for ( int k = 0; k < 4 - ss.length(); k++ )
+                        {
                             sb.append( '0' );
                         }
                         sb.append( ss.toUpperCase() );
                     }
-                    else {
+                    else
+                    {
                         sb.append( ch );
                     }
             }
@@ -109,14 +119,18 @@ public class CommandJson {
      *
      * @return response
      */
-    public static Response getResponse( String json ) {
-        try {
+    public static Response getResponse( String json )
+    {
+        try
+        {
             Command cmd = gson.fromJson( escape( json ), CommandImpl.class );
-            if ( cmd.getResponse() != null ) {
+            if ( cmd.getResponse() != null )
+            {
                 return cmd.getResponse();
             }
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getResponse", ex );
         }
 
@@ -131,11 +145,14 @@ public class CommandJson {
      *
      * @return command
      */
-    public static Command getCommand( String json ) {
-        try {
+    public static Command getCommand( String json )
+    {
+        try
+        {
             return gson.fromJson( escape( json ), CommandImpl.class );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getCommand", ex );
         }
 
@@ -150,11 +167,14 @@ public class CommandJson {
      *
      * @return request in json format
      */
-    public static String getJson( Request cmd ) {
-        try {
+    public static String getJson( Request cmd )
+    {
+        try
+        {
             return gson.toJson( new CommandImpl( cmd ) );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getJson", ex );
         }
         return null;
@@ -168,11 +188,14 @@ public class CommandJson {
      *
      * @return response in json format
      */
-    public static String getResponse( Response cmd ) {
-        try {
+    public static String getResponse( Response cmd )
+    {
+        try
+        {
             return gson.toJson( new CommandImpl( cmd ) );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getResponse", ex );
         }
         return null;
@@ -186,11 +209,14 @@ public class CommandJson {
      *
      * @return request in command format
      */
-    public static String getJson( Command cmd ) {
-        try {
+    public static String getJson( Command cmd )
+    {
+        try
+        {
             return gson.toJson( cmd );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getJson", ex );
         }
         return null;
@@ -243,24 +269,29 @@ public class CommandJson {
         Response response;
 
 
-        public CommandImpl( Object message ) {
-            if ( message instanceof Request ) {
+        public CommandImpl( Object message )
+        {
+            if ( message instanceof Request )
+            {
                 this.command = ( Request ) message;
             }
-            else if ( message instanceof Response ) {
+            else if ( message instanceof Response )
+            {
                 this.response = ( Response ) message;
             }
         }
 
 
         @Override
-        public Request getRequest() {
+        public Request getRequest()
+        {
             return command;
         }
 
 
         @Override
-        public Response getResponse() {
+        public Response getResponse()
+        {
             return response;
         }
     }

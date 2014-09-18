@@ -18,58 +18,69 @@ public class EnvironmentBlueprint {
     private boolean exchangeSshKeys;
 
 
-    public String getDomainName() {
+    public String getDomainName()
+    {
         return domainName;
     }
 
 
-    public void setDomainName( final String domainName ) {
+    public void setDomainName( final String domainName )
+    {
         this.domainName = domainName;
     }
 
 
-    public boolean isLinkHosts() {
+    public boolean isLinkHosts()
+    {
         return linkHosts;
     }
 
 
-    public void setLinkHosts( final boolean linkHosts ) {
+    public void setLinkHosts( final boolean linkHosts )
+    {
         this.linkHosts = linkHosts;
     }
 
 
-    public boolean isExchangeSshKeys() {
+    public boolean isExchangeSshKeys()
+    {
         return exchangeSshKeys;
     }
 
 
-    public void setExchangeSshKeys( final boolean exchangeSshKeys ) {
+    public void setExchangeSshKeys( final boolean exchangeSshKeys )
+    {
         this.exchangeSshKeys = exchangeSshKeys;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
 
-    public void setName( final String name ) {
+    public void setName( final String name )
+    {
         this.name = name;
     }
 
 
-    public Set<NodeGroup> getNodeGroups() {
+    public Set<NodeGroup> getNodeGroups()
+    {
         return nodeGroups;
     }
 
 
-    public void setNodeGroups( final Set<NodeGroup> nodeGroups ) {
+    public void setNodeGroups( final Set<NodeGroup> nodeGroups )
+    {
         this.nodeGroups = nodeGroups;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "EnvironmentBlueprint{" +
                 "name='" + name + '\'' +
                 ", nodeGroups=" + nodeGroups +

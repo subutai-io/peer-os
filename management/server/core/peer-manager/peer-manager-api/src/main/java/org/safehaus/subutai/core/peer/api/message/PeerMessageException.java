@@ -6,7 +6,8 @@ package org.safehaus.subutai.core.peer.api.message;
  */
 public class PeerMessageException extends Exception {
 
-    public PeerMessageException( final String message ) {
+    public PeerMessageException( final String message )
+    {
         super( message );
     }
 }

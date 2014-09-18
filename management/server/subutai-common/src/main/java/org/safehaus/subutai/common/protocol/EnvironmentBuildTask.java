@@ -16,47 +16,56 @@ public class EnvironmentBuildTask {
     private Set<String> physicalNodes;
 
 
-    public EnvironmentBuildTask() {
+    public EnvironmentBuildTask()
+    {
         this.uuid = UUID.randomUUID();
     }
 
 
-    public String getPeerUuid() {
+    public String getPeerUuid()
+    {
         return peerUuid;
     }
 
 
-    public void setPeerUuid( final String peerUuid ) {
+    public void setPeerUuid( final String peerUuid )
+    {
         this.peerUuid = peerUuid;
     }
 
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
 
-    public void setUuid( final UUID uuid ) {
+    public void setUuid( final UUID uuid )
+    {
         this.uuid = uuid;
     }
 
 
-    public EnvironmentBlueprint getEnvironmentBlueprint() {
+    public EnvironmentBlueprint getEnvironmentBlueprint()
+    {
         return environmentBlueprint;
     }
 
 
-    public void setEnvironmentBlueprint( final EnvironmentBlueprint environmentBlueprint ) {
+    public void setEnvironmentBlueprint( final EnvironmentBlueprint environmentBlueprint )
+    {
         this.environmentBlueprint = environmentBlueprint;
     }
 
 
-    public Set<String> getPhysicalNodes() {
+    public Set<String> getPhysicalNodes()
+    {
         return physicalNodes;
     }
 
 
-    public void setPhysicalNodes( final Set<String> physicalNodes ) {
+    public void setPhysicalNodes( final Set<String> physicalNodes )
+    {
         this.physicalNodes = physicalNodes;
     }
 }

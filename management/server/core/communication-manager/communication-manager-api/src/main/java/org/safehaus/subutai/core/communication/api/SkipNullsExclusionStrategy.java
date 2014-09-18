@@ -12,13 +12,15 @@ import com.google.gson.FieldAttributes;
  */
 public class SkipNullsExclusionStrategy implements ExclusionStrategy {
     @Override
-    public boolean shouldSkipField( final FieldAttributes fieldAttributes ) {
+    public boolean shouldSkipField( final FieldAttributes fieldAttributes )
+    {
         return fieldAttributes.getAnnotation( SkipNull.class ) != null;
     }
 
 
     @Override
-    public boolean shouldSkipClass( final Class<?> aClass ) {
+    public boolean shouldSkipClass( final Class<?> aClass )
+    {
         return false;
     }
 }

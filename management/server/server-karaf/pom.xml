@@ -98,7 +98,7 @@
                   <artifactId>agent-manager-api</artifactId>
                 </artifactItem>
                 <artifactItem>
-                <groupId>${project.groupId}</groupId>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>agent-manager-impl</artifactId>
                 </artifactItem>
 
@@ -247,6 +247,10 @@
                 <artifactItem>
                   <groupId>org.apache.commons</groupId>
                   <artifactId>commons-lang3</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.httpcomponents</groupId>
+                  <artifactId>httpclient</artifactId>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

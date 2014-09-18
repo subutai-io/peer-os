@@ -44,34 +44,40 @@ public class PeerImpl implements PeerManager {
     private PeerDAO peerDAO;
 
 
-    public PeerImpl() {
+    public PeerImpl()
+    {
         this.httpUtil = new HttpUtil();
     }
 
 
-    public void setId( final String id ) {
+    public void setId( final String id )
+    {
         this.id = UUID.fromString( id );
     }
 
 
-    public void init() {
+    public void init()
+    {
         LOG.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         httpUtil.dispose();
     }
 
 
-    public void setDbManager( final DbManager dbManager ) {
+    public void setDbManager( final DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
     @Override
-    public String register( final Peer peer ) {
+    public String register( final Peer peer )
+    {
 
         try
         {
@@ -87,13 +93,15 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public UUID getSiteId() {
+    public UUID getSiteId()
+    {
         return id;
     }
 
 
     @Override
-    public List<Peer> peers() {
+    public List<Peer> peers()
+    {
         List<Peer> peers = null;
         try
         {
@@ -108,7 +116,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public boolean unregister( final String uuid ) {
+    public boolean unregister( final String uuid )
+    {
         try
         {
             peerDAO.deleteInfo( SOURCE, uuid );
@@ -123,7 +132,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public Peer getPeerByUUID( UUID uuid ) {
+    public Peer getPeerByUUID( UUID uuid )
+    {
         if ( getSiteId().compareTo( uuid ) == 0 )
         {
             Peer peer = new Peer();
@@ -146,7 +156,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void addPeerMessageListener( PeerMessageListener listener ) {
+    public void addPeerMessageListener( PeerMessageListener listener )
+    {
         try
         {
             if ( !peerMessageListeners.contains( listener ) )
@@ -162,7 +173,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void removePeerMessageListener( PeerMessageListener listener ) {
+    public void removePeerMessageListener( PeerMessageListener listener )
+    {
         try
         {
             peerMessageListeners.remove( listener );
@@ -175,8 +187,8 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public String sendPeerMessage( final Peer peer, String recipient, final String message )
-            throws PeerMessageException {
+    public String sendPeerMessage( final Peer peer, String recipient, final String message ) throws PeerMessageException
+    {
 
         String ip = peer.getIp();
 
@@ -198,7 +210,8 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public String processPeerMessage( final String peerId, final String recipient, final String message )
-            throws PeerMessageException {
+            throws PeerMessageException
+    {
 
         try
         {
@@ -251,19 +264,22 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public void processPeerMessage( final String peerId, final String peerMessage ) throws PeerMessageException {
+    public void processPeerMessage( final String peerId, final String peerMessage ) throws PeerMessageException
+    {
 
     }
 
 
     @Override
     public void createContainers( final UUID envId, final String template, final int numberOfNodes,
-                                  final String Strategy, final List<String> criteria ) {
+                                  final String Strategy, final List<String> criteria )
+    {
 
     }
 
 
-    private String getLocalIp() {
+    private String getLocalIp()
+    {
         Enumeration<NetworkInterface> n;
         try
         {
@@ -293,7 +309,8 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    public Collection<PeerMessageListener> getPeerMessageListeners() {
+    public Collection<PeerMessageListener> getPeerMessageListeners()
+    {
         return Collections.unmodifiableCollection( peerMessageListeners );
     }
 }
