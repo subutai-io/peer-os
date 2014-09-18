@@ -78,6 +78,7 @@ public class PortalModuleServiceImpl implements PortalModuleService {
         return Collections.unmodifiableList(coreModules);
     }
 
+
     public synchronized void addListener( PortalModuleListener listener ) {
         System.out.println( "ModuleServiceImpl: Adding listener " + listener );
         listeners.add( listener );
