@@ -42,6 +42,7 @@ public class Manager
     private final String message = "No cluster is installed !";
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
+    private static final Pattern nodeIsNotConnected = Pattern.compile( ".*(not connected.+?g).*" );
 
 
     public Manager( )
@@ -385,14 +386,16 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent event ) {
                     progressIcon.setVisible( true );
+                    startButton.setEnabled(false);
+                    stopButton.setEnabled(false);
                     ElasticsearchUI.getExecutor().execute(
                             new CheckTask( elasticsearchClusterConfiguration.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
                                         public void onComplete( String result ) {
                                             synchronized( progressIcon ) {
-                                                String status = parseServiceResult( result );
-                                                resultHolder.setValue( status );
-                                                if( status.contains( "not" ) ) {
+//                                                String status = parseServiceResult( result );
+                                                resultHolder.setValue( result );
+                                                if( result.contains( "not" ) ) {
                                                     startButton.setEnabled( true );
                                                     stopButton.setEnabled( false );
                                                 } else {
@@ -419,7 +422,7 @@ public class Manager
                                         public void onComplete( String result ) {
                                             synchronized( progressIcon ) {
                                                 checkButton.click();
-                                                progressIcon.setVisible( false );
+//                                                progressIcon.setVisible( false );
                                             }
                                         }
                                     } ) );
@@ -439,7 +442,7 @@ public class Manager
                                         public void onComplete( String result ) {
                                             synchronized( progressIcon ) {
                                                 checkButton.click();
-                                                progressIcon.setVisible( false );
+//                                                progressIcon.setVisible( false );
                                             }
                                         }
                                     } ) );
@@ -458,8 +461,11 @@ public class Manager
         Matcher tracersMatcher = elasticsearchPattern.matcher( result );
         if ( tracersMatcher.find() ) {
             parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
+            return parsedResult.toString();
         }
 
+        tracersMatcher = nodeIsNotConnected.matcher( result );
+        parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
         return parsedResult.toString();
     }
 

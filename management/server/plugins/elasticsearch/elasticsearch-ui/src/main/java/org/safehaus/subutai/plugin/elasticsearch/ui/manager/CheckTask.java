@@ -35,7 +35,7 @@ public class CheckTask implements Runnable {
 			ProductOperationView po = ElasticsearchUI.getTracker().getProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY, trackID );
 			if (po != null) {
 				if (po.getState() != ProductOperationState.RUNNING) {
-					completeEvent.onComplete( po.getLog() );
+                    completeEvent.onComplete( po.getLog() );
 					break;
 				}
 			}

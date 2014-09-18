@@ -38,7 +38,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null ) {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            productOperation.addLogFailed( "Agent is not connected !");
             return;
         }
         if ( !elasticsearchClusterConfiguration.getNodes().contains( node ) ) {
@@ -72,7 +72,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
                 status = "elasticsearch is not running";
             }
 
-            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+            log += String.format( "%s\n", status );
         }
 
         po.addLogDone( log );
