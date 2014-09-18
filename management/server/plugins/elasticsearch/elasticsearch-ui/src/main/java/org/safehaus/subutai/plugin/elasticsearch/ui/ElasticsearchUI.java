@@ -19,7 +19,7 @@ import com.vaadin.ui.Component;
 public class ElasticsearchUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "logo.jpeg";
-    protected static final Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
+    protected Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
 
     private ExecutorService executor;
     private final ServiceLocator serviceLocator;
@@ -36,7 +36,6 @@ public class ElasticsearchUI implements PortalModule {
 
 
     public void destroy() {
-
         executor.shutdown();
     }
 
@@ -61,11 +60,9 @@ public class ElasticsearchUI implements PortalModule {
     public Component createComponent() {
         try {
             return new ElasticsearchForm( executor, serviceLocator );
+        } catch ( NamingException e ) {
+            LOG.severe ( e.getMessage() ); ;
         }
-        catch ( NamingException e ) {
-            LOG.severe( e.getMessage() );
-        }
-
         return null;
     }
 }

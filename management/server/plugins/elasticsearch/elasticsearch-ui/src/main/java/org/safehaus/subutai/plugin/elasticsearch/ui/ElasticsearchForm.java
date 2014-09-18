@@ -48,5 +48,4 @@ public class ElasticsearchForm extends CustomComponent {
 
 		manager.refreshClustersInfo();
 	}
-
 }

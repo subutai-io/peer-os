@@ -18,7 +18,6 @@ import com.vaadin.ui.VerticalLayout;
 
 public class Wizard {
 
-    private static final int MAX_STEPS = 3;
     private final VerticalLayout verticalLayout;
     GridLayout grid;
     private int step = 1;

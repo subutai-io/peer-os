@@ -26,7 +26,6 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -45,7 +44,6 @@ public class Manager {
     private final Table nodesTable;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
-    private HorizontalLayout controlsContent;
     private ElasticsearchClusterConfiguration config;
     private final String message = "No cluster is installed !";
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );

@@ -2,8 +2,12 @@ package org.safehaus.subutai.plugin.elasticsearch.ui.wizard;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
 
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI;
 
@@ -24,7 +28,7 @@ public class StepStart extends VerticalLayout {
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new FileResource( FileUtil.getFile( ElasticsearchUI.MODULE_IMAGE, this )));
+        logoImg.setIcon( new FileResource( FileUtil.getFile( ElasticsearchUI.MODULE_IMAGE, this )));
         logoImg.setContentMode(ContentMode.HTML);
         logoImg.setHeight(150, Unit.PIXELS);
         logoImg.setWidth(220, Unit.PIXELS);

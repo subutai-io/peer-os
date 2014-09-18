@@ -7,11 +7,9 @@ import com.vaadin.ui.*;
 import java.util.Arrays;
 
 
-public class ConfigurationStep extends VerticalLayout
-{
+public class ConfigurationStep extends VerticalLayout {
 
-    public ConfigurationStep( final Wizard wizard )
-    {
+    public ConfigurationStep( final Wizard wizard ) {
 
         setSizeFull();
 
@@ -24,11 +22,9 @@ public class ConfigurationStep extends VerticalLayout
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setMaxLength( 20 );
         clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
-        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -39,11 +35,9 @@ public class ConfigurationStep extends VerticalLayout
         nodesCountCombo.setNullSelectionAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
 
-        nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 wizard.getConfig().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -55,11 +49,9 @@ public class ConfigurationStep extends VerticalLayout
         mastersCountCombo.setNullSelectionAllowed( false );
         mastersCountCombo.setValue( wizard.getConfig() );
 
-        mastersCountCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        mastersCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 wizard.getConfig().setNumberOfMasterNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -71,11 +63,9 @@ public class ConfigurationStep extends VerticalLayout
         dataNodesCountCombo.setNullSelectionAllowed( false );
         dataNodesCountCombo.setValue( wizard.getConfig() );
 
-        dataNodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        dataNodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 wizard.getConfig().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -87,11 +77,9 @@ public class ConfigurationStep extends VerticalLayout
         numberOfShardsCombo.setNullSelectionAllowed( false );
         numberOfShardsCombo.setValue( wizard.getConfig() );
 
-        numberOfShardsCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        numberOfShardsCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 wizard.getConfig().setNumberOfShards( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -103,28 +91,21 @@ public class ConfigurationStep extends VerticalLayout
         numberOfReplicasCombo.setNullSelectionAllowed( false );
         numberOfReplicasCombo.setValue( wizard.getConfig() );
 
-        numberOfReplicasCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        numberOfReplicasCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
+            public void valueChange( Property.ValueChangeEvent event ) {
                 wizard.getConfig().setNumberOfReplicas( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener()
-        {
+        next.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
-                {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                     show( "Please provide cluster name" );
-                }
-                else
-                {
+                } else {
                     wizard.next();
                 }
             }
@@ -132,11 +113,9 @@ public class ConfigurationStep extends VerticalLayout
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener()
-        {
+        back.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 wizard.back();
             }
         } );
@@ -159,12 +138,10 @@ public class ConfigurationStep extends VerticalLayout
         content.addComponent( buttons );
 
         addComponent( layout );
-
     }
 
 
-    private void show( String notification )
-    {
+    private void show( String notification ) {
         Notification.show( notification );
     }
 

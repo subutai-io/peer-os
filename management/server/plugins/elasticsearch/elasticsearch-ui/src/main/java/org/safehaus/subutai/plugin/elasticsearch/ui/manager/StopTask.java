@@ -5,7 +5,6 @@ import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI;
 
 import java.util.UUID;
 
