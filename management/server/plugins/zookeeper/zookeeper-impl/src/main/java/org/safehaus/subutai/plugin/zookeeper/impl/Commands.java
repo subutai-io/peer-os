@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
 import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -24,6 +25,12 @@ import com.google.common.collect.Sets;
  */
 public class Commands extends CommandsSingleton {
 
+    public static final String PACKAGE_NAME = "ksks-zookeeper";
+
+    public Commands(CommandRunner commandRunner) {
+        init(commandRunner);
+    }
+
     public static Command getCheckInstalledCommand( Set<Agent> agents ) {
         return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
     }
@@ -31,7 +38,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-zookeeper" ).withTimeout( 90 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 90 )
                                                                                                .withStdOutRedirection(
                                                                                                        OutputRedirection.NO ),
                 agents );
@@ -40,7 +47,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getUninstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-zookeeper" ).withTimeout( 90 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 90 )
                                                                                              .withStdOutRedirection(
                                                                                                      OutputRedirection.NO ),
                 agents );
