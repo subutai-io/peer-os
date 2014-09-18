@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>template-registry-cli</artifactId>
-  <name>:: Subutai Template Registry CLI</name>
+  <name>Subutai Template Registry CLI</name>
   <description>Subutai Template Registry CLI</description>
   <packaging>bundle</packaging>
 

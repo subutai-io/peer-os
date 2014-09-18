@@ -53,7 +53,8 @@ public class ProductOperationImpl implements ProductOperation {
     private ProductOperationState state;
 
 
-    public ProductOperationImpl( String source, String description, TrackerImpl tracker ) {
+    public ProductOperationImpl( String source, String description, TrackerImpl tracker )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
         Preconditions.checkNotNull( tracker, "Tracker is null" );
@@ -68,50 +69,61 @@ public class ProductOperationImpl implements ProductOperation {
     }
 
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
 
-    public UUID getId() {
+    public UUID getId()
+    {
         return id;
     }
 
 
-    public String getLog() {
+    public String getLog()
+    {
         return log.toString();
     }
 
 
-    public Date createDate() {
+    public Date createDate()
+    {
         return ( Date ) createDate.clone();
     }
 
 
-    public ProductOperationState getState() {
+    public ProductOperationState getState()
+    {
         return state;
     }
 
 
-    public void addLog( String logString ) {
+    public void addLog( String logString )
+    {
         addLog( logString, state );
     }
 
 
-    public void addLogDone( String logString ) {
+    public void addLogDone( String logString )
+    {
         addLog( logString, ProductOperationState.SUCCEEDED );
     }
 
 
-    public void addLogFailed( String logString ) {
+    public void addLogFailed( String logString )
+    {
         addLog( logString, ProductOperationState.FAILED );
     }
 
 
-    private void addLog( String logString, ProductOperationState state ) {
-        if ( !Strings.isNullOrEmpty( logString ) ) {
+    private void addLog( String logString, ProductOperationState state )
+    {
+        if ( !Strings.isNullOrEmpty( logString ) )
+        {
 
-            if ( log.length() > 0 ) {
+            if ( log.length() > 0 )
+            {
                 log.append( "\n" );
             }
             log.append( logString );
@@ -122,17 +134,21 @@ public class ProductOperationImpl implements ProductOperation {
 
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return 7;
     }
 
 
     @Override
-    public boolean equals( Object obj ) {
-        if ( obj == null ) {
+    public boolean equals( Object obj )
+    {
+        if ( obj == null )
+        {
             return false;
         }
-        if ( getClass() != obj.getClass() ) {
+        if ( getClass() != obj.getClass() )
+        {
             return false;
         }
         final ProductOperationImpl other = ( ProductOperationImpl ) obj;
