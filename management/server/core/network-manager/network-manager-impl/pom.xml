@@ -11,7 +11,7 @@
 
   <artifactId>network-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>:: Subutai Network Manager</name>
+  <name>Subutai Network Manager</name>
   <description>Subutai Network Manager Impl</description>
 
   <dependencies>

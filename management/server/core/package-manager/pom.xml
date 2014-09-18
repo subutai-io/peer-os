@@ -16,7 +16,7 @@
 
   <modules>
     <module>api</module>
-    <!--<module>deb-impl</module>-->
+    <module>deb-impl</module>
     <!--<module>cli</module>-->
   </modules>
 </project>
