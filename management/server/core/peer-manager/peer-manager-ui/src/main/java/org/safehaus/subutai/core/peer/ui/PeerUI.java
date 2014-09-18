@@ -59,4 +59,9 @@ public class PeerUI implements PortalModule {
     public Component createComponent() {
         return new PeerForm(this);
     }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return true;
+    }
 }
