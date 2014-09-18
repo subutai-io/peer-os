@@ -37,7 +37,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
     private final AgentManager agentManager;
 
 
-    public CommandRunnerImpl( CommunicationManager communicationManager, AgentManager agentManager ) {
+    public CommandRunnerImpl( CommunicationManager communicationManager, AgentManager agentManager )
+    {
         super();
 
         Preconditions.checkNotNull( communicationManager, "Communication Manager is null" );
@@ -51,7 +52,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
     /**
      * Initialized command runner
      */
-    public void init() {
+    public void init()
+    {
         communicationManager.addListener( this );
     }
 
@@ -59,7 +61,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
     /**
      * Disposes command runner
      */
-    public void destroy() {
+    public void destroy()
+    {
         communicationManager.removeListener( this );
         super.dispose();
     }
@@ -73,7 +76,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      * @return - {@code Command}
      */
     @Override
-    public Command createBroadcastCommand( RequestBuilder requestBuilder ) {
+    public Command createBroadcastCommand( RequestBuilder requestBuilder )
+    {
         Set<Agent> agents = agentManager.getAgents();
         return new CommandImpl( requestBuilder, agents.size(), this );
     }
@@ -87,7 +91,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      * @param commandCallback - callback to trigger on every response
      */
     @Override
-    public void runCommandAsync( final Command command, CommandCallback commandCallback ) {
+    public void runCommandAsync( final Command command, CommandCallback commandCallback )
+    {
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkArgument( command instanceof AbstractCommand, "Command is of wrong type" );
         Preconditions.checkNotNull( commandCallback, "Callback is null" );
@@ -103,15 +108,19 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
         boolean queued = commandExecutors.put( commandImpl.getCommandUUID(), commandExecutor,
                 Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 2000, new CommandExecutorExpiryCallback() );
 
-        if ( queued ) {
+        if ( queued )
+        {
             //set command status to RUNNING
             commandImpl.setCommandStatus( CommandStatus.RUNNING );
             //execute command
-            if ( commandImpl.isBroadcastCommand() ) {
+            if ( commandImpl.isBroadcastCommand() )
+            {
                 communicationManager.sendBroadcastRequest( commandImpl.getRequests().iterator().next() );
             }
-            else {
-                for ( Request request : commandImpl.getRequests() ) {
+            else
+            {
+                for ( Request request : commandImpl.getRequests() )
+                {
                     communicationManager.sendRequest( request );
                 }
             }
@@ -125,7 +134,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      * @param requestBuilder - request builder
      * @param agents - target agents
      */
-    public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents ) {
+    public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents )
+    {
         return new CommandImpl( null, requestBuilder, agents, this );
     }
 
@@ -138,7 +148,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      * @param agents - target agents
      */
     @Override
-    public Command createCommand( String description, RequestBuilder requestBuilder, Set<Agent> agents ) {
+    public Command createCommand( String description, RequestBuilder requestBuilder, Set<Agent> agents )
+    {
         return new CommandImpl( description, requestBuilder, agents, this );
     }
 
@@ -149,7 +160,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      * @param agentRequestBuilders - agent request builders
      */
     @Override
-    public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders ) {
+    public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders )
+    {
         return new CommandImpl( null, agentRequestBuilders, this );
     }
 
@@ -161,7 +173,8 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      * @param agentRequestBuilders - agent request builders
      */
     @Override
-    public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders ) {
+    public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders )
+    {
         return new CommandImpl( description, agentRequestBuilders, this );
     }
 }
