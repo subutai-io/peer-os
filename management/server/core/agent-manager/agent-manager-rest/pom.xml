@@ -36,13 +36,13 @@
       <artifactId>template-manager-api</artifactId>
     </dependency>
     <dependency>
-    <groupId>org.apache.servicemix.bundles</groupId>
+      <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.junit</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
     </dependency>
   </dependencies>
 
