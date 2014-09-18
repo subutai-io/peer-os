@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>git-manager-cli</artifactId>
-  <name>:: Subutai Git Manager CLI</name>
+  <name>Subutai Git Manager CLI</name>
   <description>Subutai Git Manager CLI</description>
   <packaging>bundle</packaging>
 
