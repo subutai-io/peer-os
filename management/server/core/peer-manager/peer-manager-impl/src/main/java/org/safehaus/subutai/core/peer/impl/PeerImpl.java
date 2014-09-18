@@ -162,6 +162,15 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
+    public String getRemoteId( final String baseUrl ) {
+        RemotePeerClient client = new RemotePeerClient();
+        client.setBaseUrl( baseUrl );
+        String response = client.callRemoteRest();
+        return response;
+    }
+
+
+    @Override
     public void addPeerMessageListener( PeerMessageListener listener ) {
         try
         {
@@ -363,7 +372,8 @@ public class PeerImpl implements PeerManager {
                 String response = HttpUtil.request( HttpUtil.RequestType.GET,
                         String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
 
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {}.getType() );
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
