@@ -57,7 +57,7 @@ public class EnvironmentsBuildProcessForm {
                 message.setNumberOfContainers( 4 );
                 message.setTemplateName( "master" );
                 message.setStrategy( "ROUND_ROBIN" );
-                message.setEnvironmentUuid( UUID.randomUUID().toString() );
+                message.setEnvironmentUuid( UUID.randomUUID() );
                 environmentBuildProcess.addBuildBlock( message );
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
@@ -124,12 +124,12 @@ public class EnvironmentsBuildProcessForm {
                 {
                     processButton = new Button( "Build" );
                     progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-                    progressIcon.setVisible( true );
+                    progressIcon.setVisible( false );
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
                             // TODO create build thred
-                            //                            managerUI.getPeerManager().createContainers();
+                            managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
                         }
                     } );
                     break;
@@ -151,7 +151,7 @@ public class EnvironmentsBuildProcessForm {
                 case FAILED:
                 {
                     processButton = new Button( "Destroy" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/cancel.png" ) );
                     progressIcon.setVisible( true );
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
@@ -165,7 +165,7 @@ public class EnvironmentsBuildProcessForm {
                 case SUCCESSFUL:
                 {
                     processButton = new Button( "Configure" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                    progressIcon = new Embedded( "", new ThemeResource( "img/ok.png" ) );
                     progressIcon.setVisible( true );
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
