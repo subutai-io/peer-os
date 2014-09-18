@@ -159,7 +159,7 @@ public class ElasticsearchImpl implements Elasticsearch {
         executor.execute( new Runnable() {
 
             public void run() {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = dbManager.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName, ElasticsearchClusterConfiguration.class );
+                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
