@@ -33,6 +33,15 @@
       <name>apache-repo</name>
       <url>https://repository.apache.org/content/groups/public</url>
     </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+    <repository>
+      <id>vaadin-addons</id>
+      <url>http://maven.vaadin.com/vaadin-addons</url>
+    </repository>
   </repositories>
 
   <dependencyManagement>
