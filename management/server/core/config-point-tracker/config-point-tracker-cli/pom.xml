@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>config-point-tracker-cli</artifactId>
-  <name>:: Subutai Config Point Tracker CLI</name>
+  <name>Subutai Config Point Tracker CLI</name>
   <packaging>bundle</packaging>
 
   <dependencies>
