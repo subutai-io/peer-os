@@ -11,7 +11,7 @@
 
   <artifactId>package-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>:: Subutai Debian Package Manager</name>
+  <name>Subutai Debian Package Manager</name>
   <description>Subutai Debian Package Manager Impl</description>
 
   <dependencies>
