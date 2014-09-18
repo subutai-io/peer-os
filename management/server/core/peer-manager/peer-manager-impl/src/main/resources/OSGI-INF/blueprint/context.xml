@@ -10,7 +10,7 @@
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerImpl">
     <property name="dbManager" ref="dbManager" />
-    <property name="id" value="${id}"></property>
+    <property name="id" value="${id}" />
   </bean>
 
   <cm:property-placeholder persistent-id="SubutaiConfig" update-strategy="reload">
