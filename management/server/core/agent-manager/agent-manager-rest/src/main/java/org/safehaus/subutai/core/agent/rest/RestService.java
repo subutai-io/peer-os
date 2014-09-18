@@ -17,8 +17,8 @@ public interface RestService {
      * Returns list of agents available in container in JSON format with HTTP response status 200
      */
     @GET
-    @Path( "agents" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path("agents")
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response getAgents();
 
     //should return Set<Agent> in Json format
@@ -27,8 +27,8 @@ public interface RestService {
      * Returns list of physical agents available in container in JSON format with HTTP response status 200
      */
     @GET
-    @Path( "agents/physical" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path("agents/physical")
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response getPhysicalAgents();
 
     //Set<Agent>
@@ -37,8 +37,8 @@ public interface RestService {
      * Returns list of lxc agents available in container in JSON format with HTTP response status 200
      */
     @GET
-    @Path( "agents/lxc" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path("agents/lxc")
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response getLxcAgents();
 
     //Agent
@@ -48,9 +48,9 @@ public interface RestService {
      * host agents with HTTP response status 200
      */
     @GET
-    @Path( "agents/by-hostname/{hostname}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getAgentByHostname( @PathParam( "hostname" ) String hostname );
+    @Path("agents/by-hostname/{hostname}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getAgentByHostname( @PathParam("hostname") String hostname );
 
     //Agent
 
@@ -59,9 +59,9 @@ public interface RestService {
      * response status 200
      */
     @GET
-    @Path( "agents/by-agent-id/{uuid}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getAgentByUUID( @PathParam( "uuid" ) String uuid );
+    @Path("agents/by-agent-id/{uuid}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getAgentByUUID( @PathParam("uuid") String uuid );
 
     //Set<Agent>
 
@@ -70,12 +70,12 @@ public interface RestService {
      * remote and host agents with HTTP response status 200
      */
     @GET
-    @Path( "agents/{parentHostname}/children" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getLxcAgentsByParentHostname( @PathParam( "parentHostname" ) String parentHostname );
+    @Path("agents/{parentHostname}/children")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getLxcAgentsByParentHostname( @PathParam("parentHostname") String parentHostname );
 
     @GET
-    @Path( "agents/by-environment-id/{envId}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getAgentsByEnvironmentId( @PathParam( "envId" ) String environmentId );
+    @Path("agents/by-environment-id/{envId}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getAgentsByEnvironmentId( @PathParam("envId") String environmentId );
 }
