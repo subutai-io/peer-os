@@ -249,7 +249,7 @@ public class PeerImpl implements PeerManager {
                         throw new PeerMessageException( err );
                     }
                     else {
-                        String err = "Peer is not reachable";
+                        String err = String.format( "Peer is not reachable %s", senderPeer);
                         LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
                         throw new PeerMessageException( err );
                     }

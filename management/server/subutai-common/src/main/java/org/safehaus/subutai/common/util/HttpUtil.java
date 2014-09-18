@@ -48,8 +48,8 @@ public class HttpUtil {
 
     public HttpUtil() {
         conMan = new PoolingClientConnectionManager( SchemeRegistryFactory.createDefault(), 3, TimeUnit.MINUTES );
-        conMan.setMaxTotal( 2 );
-        conMan.setDefaultMaxPerRoute( 1 );
+        conMan.setMaxTotal( 10 );
+        conMan.setDefaultMaxPerRoute( 10 );
 
         client = new DefaultHttpClient( conMan );
 
