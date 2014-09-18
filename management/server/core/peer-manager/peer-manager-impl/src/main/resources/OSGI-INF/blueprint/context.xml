@@ -18,5 +18,4 @@
       <cm:property name="id" value="local" />
     </cm:default-properties>
   </cm:property-placeholder>
-
 </blueprint>
