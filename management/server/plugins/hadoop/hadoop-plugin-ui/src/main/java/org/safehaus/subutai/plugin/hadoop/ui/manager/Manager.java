@@ -33,9 +33,9 @@ public class Manager {
     protected final static String ADD_NODE_BUTTON_CAPTION = "Add Node";
     protected final static String CHECK_BUTTON_CAPTION = "Check";
     protected final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
-    protected static final String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
+    protected final static String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
     protected final static String STOP_NAMENODE_BUTTON_CAPTION = "Stop Namenode";
-    protected static final String STOP_JOBTRACKER_BUTTON_CAPTION = "Stop JobTracker";
+    protected final static  String STOP_JOBTRACKER_BUTTON_CAPTION = "Stop JobTracker";
     protected final static String EXCLUDE_BUTTON_CAPTION = "Exclude";
     protected final static String INCLUDE_BUTTON_CAPTION = "Include";
     protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
@@ -47,9 +47,9 @@ public class Manager {
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
-    protected static final String DECOMMISSION_STATUS_CAPTION = "Decommission Status: ";
-    protected static final String START_STOP_BUTTON_DEFAULT_CAPTION = "Start/Stop";
-    private static final String EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION = "Exclude/Include";
+    protected final static String DECOMMISSION_STATUS_CAPTION = "Decommission Status: ";
+    protected final static String START_STOP_BUTTON_DEFAULT_CAPTION = "Start/Stop";
+    protected final static  String EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION = "Exclude/Include";
 
     protected final GridLayout contentRoot;
     protected final ComboBox clusterList;
@@ -64,6 +64,7 @@ public class Manager {
     protected int processCount = 0;
     protected String decommissionStatus;
     protected ManagerListener managerListener;
+
 
     public Manager() {
         managerListener = new ManagerListener( this );
@@ -209,7 +210,7 @@ public class Manager {
     }
 
 
-    public static void checkNodesStatus( Table table ) {
+    private void checkNodesStatus( Table table ) {
         if ( table != null ) {
             for ( Object o : table.getItemIds() ) {
                 int rowId = ( Integer ) o;
@@ -226,7 +227,7 @@ public class Manager {
     }
 
 
-    public static void startAllNodes( Table table ) {
+    private void startAllNodes( Table table ) {
         for ( Object o : table.getItemIds() ) {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
@@ -241,7 +242,7 @@ public class Manager {
     }
 
 
-    public static void stopAllNodes( Table table ) {
+    private void stopAllNodes( Table table ) {
         for ( Object o : table.getItemIds() ) {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
@@ -256,14 +257,14 @@ public class Manager {
     }
 
 
-    protected static HorizontalLayout getAvailableOperationsLayout( Item row ) {
+    protected HorizontalLayout getAvailableOperationsLayout( Item row ) {
         if ( row == null )
             return null;
         return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
     }
 
 
-    protected static Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
+    protected Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
         }
@@ -279,8 +280,7 @@ public class Manager {
     }
 
 
-
-    protected static Button getExcludeIncludeButton( final HorizontalLayout availableOperationsLayout ) {
+    protected Button getExcludeIncludeButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
         }
@@ -298,7 +298,7 @@ public class Manager {
     }
 
 
-    protected static Button getDestroyButton( final HorizontalLayout availableOperationsLayout ) {
+    protected Button getDestroyButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
         }
@@ -314,8 +314,7 @@ public class Manager {
     }
 
 
-
-    protected static Button getStartButton( final HorizontalLayout availableOperationsLayout ) {
+    protected Button getStartButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
         }
@@ -332,7 +331,7 @@ public class Manager {
     }
 
 
-    private static Button getStopButton( final HorizontalLayout availableOperationsLayout ) {
+    protected Button getStopButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
         }
@@ -521,9 +520,6 @@ public class Manager {
     }
 
 
-
-
-
     private int getAgentRowId( final Table table, final Agent agent ) {
         if ( table != null && agent != null ) {
             for ( Object o : table.getItemIds() ) {
@@ -540,10 +536,7 @@ public class Manager {
     }
 
 
-
-
-
-    public Agent getAgentByRow( final Item row ) {
+    protected Agent getAgentByRow( final Item row ) {
         if ( row == null ) {
             return null;
         }
@@ -559,14 +552,14 @@ public class Manager {
     }
 
 
-    public static HorizontalLayout getStatusGroupByRow( final Item row ) {
+    protected HorizontalLayout getStatusGroupByRow( final Item row ) {
         if ( row == null )
             return null;
         return (HorizontalLayout) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
     }
 
 
-    public Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout ) {
+    protected Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout ) {
         if ( statusGroupLayout == null ) {
             return null;
         }
@@ -574,7 +567,7 @@ public class Manager {
     }
 
 
-    public Label getStatusTaskTrackerLabel( final HorizontalLayout statusGroupLayout ) {
+    protected Label getStatusTaskTrackerLabel( final HorizontalLayout statusGroupLayout ) {
         if ( statusGroupLayout == null ) {
             return null;
         }
@@ -582,13 +575,12 @@ public class Manager {
     }
 
 
-    public Label getStatusDecommissionLabel( final HorizontalLayout statusGroupLayout ) {
+    protected Label getStatusDecommissionLabel( final HorizontalLayout statusGroupLayout ) {
         if ( statusGroupLayout == null ) {
             return null;
         }
         return (Label) statusGroupLayout.getComponent( 2 );
     }
-
 
 
     private void checkAllStatuses() {
@@ -606,7 +598,6 @@ public class Manager {
                 }, null ) );
 
     }
-
 
 
     protected NodeState getDecommissionStatus( final String operationLog, final Agent agent ) {
@@ -685,6 +676,5 @@ public class Manager {
         masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
         return masterNodeList;
     }
-
 
 }
