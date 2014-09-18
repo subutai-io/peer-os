@@ -10,7 +10,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -19,7 +19,7 @@ import com.vaadin.ui.Component;
 public class ElasticsearchUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "logo.jpeg";
-    protected static final Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
+    protected Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
 
     private ExecutorService executor;
     private final ServiceLocator serviceLocator;
@@ -36,19 +36,18 @@ public class ElasticsearchUI implements PortalModule {
 
 
     public void destroy() {
-
         executor.shutdown();
     }
 
 
     @Override
     public String getId() {
-        return Config.PRODUCT_KEY;
+        return ElasticsearchClusterConfiguration.PRODUCT_KEY;
     }
 
 
     public String getName() {
-        return Config.PRODUCT_KEY;
+        return ElasticsearchClusterConfiguration.PRODUCT_KEY;
     }
 
 
@@ -61,11 +60,9 @@ public class ElasticsearchUI implements PortalModule {
     public Component createComponent() {
         try {
             return new ElasticsearchForm( executor, serviceLocator );
+        } catch ( NamingException e ) {
+            LOG.severe ( e.getMessage() ); ;
         }
-        catch ( NamingException e ) {
-            LOG.severe( e.getMessage() );
-        }
-
         return null;
     }
 }

@@ -7,7 +7,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 
 import com.vaadin.ui.Alignment;
@@ -18,11 +18,10 @@ import com.vaadin.ui.VerticalLayout;
 
 public class Wizard {
 
-    private static final int MAX_STEPS = 3;
     private final VerticalLayout verticalLayout;
     GridLayout grid;
     private int step = 1;
-    private Config config = new Config();
+    private ElasticsearchClusterConfiguration config = new ElasticsearchClusterConfiguration();
 
     private final ExecutorService executorService;
     private final Tracker tracker;
@@ -94,14 +93,14 @@ public class Wizard {
     }
 
 
-    public Config getConfig() {
+    public ElasticsearchClusterConfiguration getConfig() {
         return config;
     }
 
 
     public void init() {
         step = 1;
-        config = new Config();
+        config = new ElasticsearchClusterConfiguration();
         putForm();
     }
 }

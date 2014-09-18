@@ -1,9 +1,13 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.common.exception.*;
 import org.safehaus.subutai.common.tracker.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class ClusterConfiguration {
@@ -18,14 +22,14 @@ public class ClusterConfiguration {
     }
 
 
-    public void configureCluster( final Config config ) throws ClusterConfigurationException {
+    public void configureCluster( final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration ) throws ClusterConfigurationException {
 
         // Setting cluster name
 
-        po.addLog( "Setting cluster name: " + config.getClusterName() );
+        po.addLog( "Setting cluster name: " + elasticsearchClusterConfiguration.getClusterName() );
 
         Command setClusterNameCommand =
-                Commands.getConfigureCommand( config.getNodes(), "cluster.name " + config.getClusterName() );
+                Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(), "cluster.name " + elasticsearchClusterConfiguration.getClusterName() );
         manager.getCommandRunner().runCommand( setClusterNameCommand );
 
         if ( setClusterNameCommand.hasSucceeded() ) {
@@ -36,10 +40,16 @@ public class ClusterConfiguration {
         }
 
         // Setting master nodes
-
         po.addLog( "Setting master nodes..." );
-
-        Command setMasterNodesCommand = Commands.getConfigureCommand( config.getMasterNodes(), "node.master true" );
+        Set<Agent > masterNodes = new HashSet();
+        for (Agent agent : elasticsearchClusterConfiguration.getNodes()) {
+            masterNodes.add(agent);
+            if (masterNodes.size() == elasticsearchClusterConfiguration.getNumberOfMasterNodes()) {
+                break;
+            }
+        }
+        elasticsearchClusterConfiguration.setMasterNodes(masterNodes);
+        Command setMasterNodesCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getMasterNodes(), "node.master true" );
         manager.getCommandRunner().runCommand( setMasterNodesCommand );
 
         if ( setMasterNodesCommand.hasSucceeded() ) {
@@ -50,10 +60,16 @@ public class ClusterConfiguration {
         }
 
         // Setting data nodes
-
         po.addLog( "Setting data nodes..." );
+        for (Agent agent : elasticsearchClusterConfiguration.getNodes()) {
+            elasticsearchClusterConfiguration.getDataNodes().add(agent);
+            if ( elasticsearchClusterConfiguration.getDataNodes().size() == elasticsearchClusterConfiguration.getNumberOfDataNodes() ) {
+                break;
+            }
+        }
+        elasticsearchClusterConfiguration.setMasterNodes( elasticsearchClusterConfiguration.getNodes() );
 
-        Command dataNodesCommand = Commands.getConfigureCommand( config.getDataNodes(), "node.data true" );
+        Command dataNodesCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getDataNodes(), "node.data true" );
         manager.getCommandRunner().runCommand( dataNodesCommand );
 
         if ( dataNodesCommand.hasSucceeded() ) {
@@ -67,8 +83,8 @@ public class ClusterConfiguration {
 
         po.addLog( "Setting number of shards..." );
 
-        Command shardsCommand = Commands.getConfigureCommand( config.getNodes(),
-                "index.number_of_shards " + config.getNumberOfShards() );
+        Command shardsCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+                "index.number_of_shards " + elasticsearchClusterConfiguration.getNumberOfShards() );
         manager.getCommandRunner().runCommand( shardsCommand );
 
         if ( !shardsCommand.hasSucceeded() ) {
@@ -79,8 +95,8 @@ public class ClusterConfiguration {
 
         po.addLog( "Setting number of replicas..." );
 
-        Command numberOfReplicasCommand = Commands.getConfigureCommand( config.getNodes(),
-                "index.number_of_replicas " + config.getNumberOfReplicas() );
+        Command numberOfReplicasCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+                "index.number_of_replicas " + elasticsearchClusterConfiguration.getNumberOfReplicas() );
         manager.getCommandRunner().runCommand( numberOfReplicasCommand );
 
         if ( !numberOfReplicasCommand.hasSucceeded() ) {

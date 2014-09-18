@@ -22,25 +22,20 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
     @Override
     public void run() {
-        manager.getExecutor().execute( new Runnable() {
+        CassandraClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null ) {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            return;
+        }
+        Command startServiceCommand = Commands.getStartCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( startServiceCommand );
 
-            public void run() {
-                CassandraClusterConfig config = manager.getCluster( clusterName );
-                if ( config == null ) {
-                    productOperation.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
-                Command startServiceCommand = Commands.getStartCommand( config.getNodes() );
-                manager.getCommandRunner().runCommand( startServiceCommand );
-
-                if ( startServiceCommand.hasSucceeded() ) {
-                    productOperation.addLogDone( "Start succeeded" );
-                }
-                else {
-                    productOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
-                }
-            }
-        } );
+        if ( startServiceCommand.hasSucceeded() ) {
+            productOperation.addLogDone( "Start succeeded" );
+        }
+        else {
+            productOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+        }
     }
 }

@@ -383,6 +383,7 @@
                   <artifactId>httpmime</artifactId>
                   <version>${http.client.version}</version>
                 </artifactItem>
+
                 <artifactItem>
                   <groupId>org.doomdark</groupId>
                   <artifactId>com.springsource.org.doomdark.uuid</artifactId>
