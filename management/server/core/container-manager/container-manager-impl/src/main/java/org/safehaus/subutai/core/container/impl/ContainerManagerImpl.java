@@ -52,15 +52,13 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {
-    private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
+//    private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
     /**
@@ -135,8 +133,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             executor.shutdown();
             for ( Agent a : successfullyClonedContainers )
             {
-                LOG.info( String.format( "Successfully cloned container %s on %s failed.", a.getHostname(),
-                        a.getParentHostName() ) );
+//                LOG.info( String.format( "Successfully cloned container %s on %s failed.", a.getHostname(),
+//                        a.getParentHostName() ) );
             }
         }
         catch ( ContainerException e )
@@ -149,8 +147,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
                 }
                 catch ( ContainerDestroyException cde )
                 {
-                    LOG.error( String.format( "Destroying container %s on %s failed.", a.getHostname(),
-                            a.getParentHostName() ) );
+//                    LOG.error( String.format( "Destroying container %s on %s failed.", a.getHostname(),
+//                            a.getParentHostName() ) );
                 }
             }
             successfullyClonedContainers.clear();
@@ -302,7 +300,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             catch ( Exception e )
             {
                 it.remove();
-                LOG.error( "Error notifying container event listeners, removing faulting listener", e );
+//                LOG.error( "Error notifying container event listeners, removing faulting listener", e );
             }
         }
     }
@@ -475,7 +473,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error on adding container event listener", ex );
+            //LOG.error( "Error on adding container event listener", ex );
         }
     }
 
@@ -494,7 +492,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error on removing container event listener", ex );
+            //LOG.error( "Error on removing container event listener", ex );
         }
     }
 
