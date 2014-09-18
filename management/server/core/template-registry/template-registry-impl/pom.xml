@@ -11,7 +11,7 @@
 
   <artifactId>template-registry-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>:: Subutai Template Registry</name>
+  <name>Subutai Template Registry</name>
   <description>Subutai Template Registry Impl</description>
 
   <dependencies>
