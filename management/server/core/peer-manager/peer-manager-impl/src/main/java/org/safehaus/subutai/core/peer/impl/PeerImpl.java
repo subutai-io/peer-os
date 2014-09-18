@@ -55,6 +55,9 @@ public class PeerImpl implements PeerManager {
     }
 
 
+    public void destroy() {}
+
+
     public void setDbManager( final DbManager dbManager ) {
         this.dbManager = dbManager;
     }
