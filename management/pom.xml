@@ -166,11 +166,11 @@
         <artifactId>git-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--<dependency>
-        <groupId>${project.groupId}</groupId>
+      <dependency>
+      <groupId>${project.groupId}</groupId>
         <artifactId>git-manager-impl</artifactId>
         <version>${project.version}</version>
-      </dependency>-->
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- monitoring -->

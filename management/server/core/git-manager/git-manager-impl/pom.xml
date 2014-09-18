@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>git-manager-impl</artifactId>
-  <name>Subutai Git Manager</name>
+  <name>:: Subutai Git Manager</name>
   <description>git manager impl</description>
 
   <packaging>bundle</packaging>
@@ -35,11 +35,6 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
