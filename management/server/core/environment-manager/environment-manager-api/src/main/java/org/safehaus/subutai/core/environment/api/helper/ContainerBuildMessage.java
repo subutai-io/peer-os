@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -12,15 +13,26 @@ public class ContainerBuildMessage {
     private int numberOfContainers;
     private String templateName;
     private String strategy;
-    private String environmentUuid;
+    private UUID environmentUuid;
     private boolean completeState;
     private int timestamp;
     private String targetPeerId;
     private UUID peerId;
+    private List<String> criteria;
 
 
     public ContainerBuildMessage() {
         this.numberOfContainers = 0;
+    }
+
+
+    public List<String> getCriteria() {
+        return criteria;
+    }
+
+
+    public void setCriteria( final List<String> criteria ) {
+        this.criteria = criteria;
     }
 
 
@@ -64,12 +76,12 @@ public class ContainerBuildMessage {
     }
 
 
-    public String getEnvironmentUuid() {
+    public UUID getEnvironmentUuid() {
         return environmentUuid;
     }
 
 
-    public void setEnvironmentUuid( final String environmentUuid ) {
+    public void setEnvironmentUuid( final UUID environmentUuid ) {
         this.environmentUuid = environmentUuid;
     }
 

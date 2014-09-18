@@ -27,10 +27,10 @@ import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -52,7 +52,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * reference to communication manager
      */
     private final CommunicationManager communicationService;
-    private final PeerManager peerManager;
     /**
      * executor for notifying agent listeners
      */
@@ -66,12 +65,10 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     private volatile boolean notifyAgentListeners = true;
 
 
-    public AgentManagerImpl( final CommunicationManager communicationService, final PeerManager peerManager ) {
+    public AgentManagerImpl( final CommunicationManager communicationService ) {
         Preconditions.checkNotNull( communicationService, "Communication Manager is null" );
-        Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
 
         this.communicationService = communicationService;
-        this.peerManager = peerManager;
     }
 
 
@@ -346,7 +343,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId(), peerManager.getSiteId(), response.getEnvironmentId() );
+                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(), response.getEnvironmentId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );

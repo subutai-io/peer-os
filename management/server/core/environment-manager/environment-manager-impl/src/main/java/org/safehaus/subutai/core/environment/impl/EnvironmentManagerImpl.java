@@ -7,8 +7,10 @@ package org.safehaus.subutai.core.environment.impl;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -17,6 +19,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
+import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
@@ -24,6 +27,7 @@ import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
@@ -48,9 +52,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private DbManager dbManager;
+    private PeerManager peerManager;
 
 
     public EnvironmentManagerImpl() {
+    }
+
+
+    public PeerManager getPeerManager() {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager ) {
+        this.peerManager = peerManager;
     }
 
 
@@ -70,6 +85,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         this.agentManager = null;
         this.networkManager = null;
         this.dbManager = null;
+        this.peerManager = null;
     }
 
 
@@ -157,6 +173,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         LOG.info( "saved to " );
         //        return build( environmentBuildTask );
         //TODO build environment in background
+
+
         return true;
     }
 
@@ -260,6 +278,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public void saveEnvironment( final Environment environment ) {
         environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+    }
+
+
+    @Override
+    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess ) {
+        for ( ContainerBuildMessage cbm : environmentBuildProcess.getContainerBuildMessages() )
+        {
+            LOG.info( "Sending build message to" + cbm.getTargetPeerId() );
+
+            Set<Agent> agents = peerManager
+                    .createContainers( cbm.getEnvironmentUuid(), cbm.getTemplateName(), cbm.getNumberOfContainers(),
+                            cbm.getStrategy(), cbm.getCriteria() );
+            for ( Agent agent : agents )
+            {
+                LOG.info( agent.getUuid().toString() );
+            }
+        }
     }
 
 

@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager"/>
+  <service ref="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-    <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.db.api.DbManager"/>
+  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.db.api.DbManager" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+  <reference id="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager" />  
 
-    <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
-          class="org.safehaus.subutai.core.peer.impl.PeerImpl">
-        <property name="dbManager" ref="dbManager"/>
-        <property name="id" value="${id}"></property>
-    </bean>
-
-    <cm:property-placeholder persistent-id="SubutaiConfig" update-strategy="reload">
-        <cm:default-properties>
-            <cm:property name="id" value="someId"/>
-        </cm:default-properties>
-    </cm:property-placeholder>
+  <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
+        class="org.safehaus.subutai.core.peer.impl.PeerImpl">
+    <property name="dbManager" ref="dbManager" />
+    <property name="agentManager" ref="agentManager" />
+    <property name="containerManager" ref="containerManager" />
+  </bean>
 
 </blueprint>
