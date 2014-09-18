@@ -42,6 +42,7 @@ public class PeerImpl implements PeerManager {
     private final static Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
 
+
     private final String SOURCE = "PEER_MANAGER";
     private UUID id;
     private DbManager dbManager;
@@ -275,39 +276,13 @@ public class PeerImpl implements PeerManager {
         }
     }
 
-
     @Override
-    public boolean isPeerReachable( final Peer peer ) throws PeerException {
-        if ( peer == null ) {
-            throw new PeerException( "Peer is null" );
-        }
-        if ( getPeerByUUID( peer.getId() ) != null ) {
-            try {
-                HttpUtil.request( HttpUtil.RequestType.GET, String.format( Common.PING_URL, peer.getIp() ), null );
-                return true;
-            }
-            catch ( IOException e ) {
-                return false;
-            }
-        }
-        else {
-            throw new PeerException( "Peer not found" );
-        }
+    public void createContainers( final UUID envId, final String template, final int numberOfNodes,
+                                  final String Strategy, final List<String> criteria ) {
+
     }
-
-
-    @Override
-    public Set<Agent> getConnectedAgents( String environmentId ) throws PeerException {
-        try {
-            UUID envId = UUID.fromString( environmentId );
-            return agentManager.getAgentsByEnvironmentId( envId );
-        }
-        catch ( IllegalArgumentException e ) {
-            throw new PeerException( e.getMessage() );
-        }
-    }
-
-
+    
+    
     private String getLocalIp() {
         Enumeration<NetworkInterface> n;
         try {

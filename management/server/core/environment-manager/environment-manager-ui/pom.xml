@@ -26,6 +26,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
@@ -53,6 +54,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>strategy-manager-api</artifactId>
     </dependency>
   </dependencies>
 
