@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.HttpUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -44,7 +45,6 @@ public class PeerImpl implements PeerManager {
 
 
     private final String SOURCE = "PEER_MANAGER";
-    private UUID id;
     private DbManager dbManager;
     private AgentManager agentManager;
     private PeerDAO peerDAO;
@@ -56,13 +56,7 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    public void setId( final String id ) {
-        this.id = UUID.fromString( id );
-    }
-
-
     public void init() {
-        LOG.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
@@ -99,7 +93,7 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public UUID getSiteId() {
-        return id;
+        return UUIDUtil.generateMACBasedUUID();
     }
 
 
