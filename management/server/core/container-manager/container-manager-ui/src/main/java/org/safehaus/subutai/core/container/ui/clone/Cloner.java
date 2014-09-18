@@ -25,6 +25,9 @@ import org.safehaus.subutai.core.container.ui.executor.AgentExecutorImpl;
 import org.safehaus.subutai.core.container.ui.executor.CloneCommandFactory;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.StrategyException;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.google.common.base.Strings;
@@ -80,9 +83,10 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
     Map<ContainerPlacementStrategy, BeanItemContainer<Criteria>> criteriaBeansMap =
             new HashMap<ContainerPlacementStrategy, BeanItemContainer<Criteria>>();
     List<ContainerPlacementStrategy> placementStrategies;
+    private StrategyManager strategyManager;
 
 
-    public Cloner( final ContainerManager containerManager, AgentTree agentTree ) {
+    public Cloner( final ContainerManager containerManager, final StrategyManager strategyManager, AgentTree agentTree ) {
         setSpacing( true );
         setMargin( true );
 
@@ -90,8 +94,9 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
 
         this.containerManager = containerManager;
 
+        this.strategyManager = strategyManager;
 
-        placementStrategies = containerManager.getPlacementStrategies();
+        placementStrategies = strategyManager.getPlacementStrategies();
         for ( ContainerPlacementStrategy st : placementStrategies ) {
             BeanItemContainer<Criteria> beanItems = new BeanItemContainer<Criteria>( Criteria.class );
             beanItems.addAll( st.getCriteria() );
@@ -258,21 +263,32 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
                     LOG.info( String.format( "%s %s %s", c.getId(), c.getTitle(), c.getValue() ) );
                 }
             }
-            Map<Agent, Integer> bestServers =
-                    containerManager.getPlacementDistribution( ( int ) count, selectedStrategy.getId(), criteria );
-            if ( bestServers.isEmpty() ) {
-                show( "No servers available to accommodate new lxc containers" );
-                return;
-            }
-            int numOfLxcSlots = 0;
-            for ( Map.Entry<Agent, Integer> srv : bestServers.entrySet() ) {
-                numOfLxcSlots += srv.getValue();
-            }
+            Map<Agent, ServerMetric> metrics=containerManager.getPhysicalServerMetrics();
 
-            if ( numOfLxcSlots < count ) {
-                show( String.format( "Only %s lxc containers can be created", numOfLxcSlots ) );
+            Map<Agent, Integer> bestServers = null;
+            try
+            {
+                bestServers = strategyManager.getPlacementDistribution( metrics, ( int ) count, selectedStrategy
+                    .getId(), criteria );
+            }
+            catch ( StrategyException e )
+            {
+                show(e.getMessage());
                 return;
             }
+//            if ( bestServers.isEmpty() ) {
+//                show( "No servers available to accommodate new lxc containers" );
+//                return;
+//            }
+//            int numOfLxcSlots = 0;
+//            for ( Map.Entry<Agent, Integer> srv : bestServers.entrySet() ) {
+//                numOfLxcSlots += srv.getValue();
+//            }
+//
+//            if ( numOfLxcSlots < count ) {
+//                show( String.format( "Only %s lxc containers can be created", numOfLxcSlots ) );
+//                return;
+//            }
             for ( int i = 1; i <= count; i++ ) {
                 Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
                 final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
