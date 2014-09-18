@@ -1,6 +1,5 @@
 package org.safehaus.subutai.plugin.spark.ui.manager;
 
-
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.NodeState;
@@ -11,7 +10,7 @@ import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-public class StopTask implements Runnable {
+public class CheckTaskMaster implements Runnable {
 
     private final String clusterName, lxcHostname;
     private final boolean master;
@@ -20,8 +19,8 @@ public class StopTask implements Runnable {
     private final Tracker tracker;
 
 
-    public StopTask( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname, boolean master,
-                     CompleteEvent completeEvent ) {
+    public CheckTaskMaster( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname, boolean master,
+                           CompleteEvent completeEvent ) {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
@@ -33,19 +32,14 @@ public class StopTask implements Runnable {
 
     @Override
     public void run() {
-
-        UUID trackID = spark.stopNode( clusterName, lxcHostname, master );
+        UUID trackID = spark.checkMasterNode( clusterName, lxcHostname );
 
         long start = System.currentTimeMillis();
-        NodeState state = NodeState.UNKNOWN;
-
         while ( !Thread.interrupted() ) {
             ProductOperationView po = tracker.getProductOperation( SparkClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null ) {
                 if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( po.getState() == ProductOperationState.SUCCEEDED ) {
-                        state = NodeState.STOPPED;
-                    }
+                    completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }

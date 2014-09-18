@@ -9,11 +9,11 @@ import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
-public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImpl> {
+public class CheckSlaveNodeOperationHandler extends AbstractOperationHandler<SparkImpl> {
 
     private final String lxcHostname;
 
-    public CheckNodeOperationHandler(SparkImpl manager, String clusterName, String lxcHostname) {
+    public CheckSlaveNodeOperationHandler( SparkImpl manager, String clusterName, String lxcHostname ) {
         super(manager, clusterName);
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation(SparkClusterConfig.PRODUCT_KEY,
@@ -40,9 +40,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImp
             return;
         }
 
-        po.addLog("Checking node...");
-
-        Command checkNodeCommand = Commands.getStatusAllCommand(node);
+        Command checkNodeCommand = Commands.getStatusSlaveCommand(node);
         manager.getCommandRunner().runCommand(checkNodeCommand);
 
         AgentResult res = checkNodeCommand.getResults().get(node.getUuid());

@@ -48,7 +48,26 @@ public interface Spark extends ApiBase<SparkClusterConfig> {
      * @param lxcHostName - hostname of node
      * @return - UUID of operation to track
      */
-    public UUID checkNode(String clusterName, String lxcHostName);
+    public UUID checkMasterNode(String clusterName, String lxcHostName);
+
+
+    /**
+     * Checks status of the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
+     * @return - UUID of operation to track
+     */
+    public UUID checkSlaveNode(String clusterName, String lxcHostName);
+
+
+    /**
+     * Checks status of the specified node
+     *
+     * @param clusterName - name of cluster
+     * @return - UUID of operation to track
+     */
+    public UUID checkAllNodes( String clusterName );
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint(SparkClusterConfig config);
 

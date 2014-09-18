@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.handler.CheckNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.CheckSlaveNodeOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class CheckNodeOperationHandlerTest {
     @Before
     public void setUp() {
         mock = new SparkImplMock();
-        handler = new CheckNodeOperationHandler(mock, "test-cluster", "test-host");
+        handler = new CheckSlaveNodeOperationHandler(mock, "test-cluster", "test-host");
     }
 
     @Test

@@ -118,9 +118,30 @@ public class SparkImpl extends SparkBase implements Spark {
     }
 
     @Override
-    public UUID checkNode(final String clusterName, final String lxcHostname) {
+    public UUID checkSlaveNode(final String clusterName, final String lxcHostname) {
 
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
+        AbstractOperationHandler operationHandler = new CheckSlaveNodeOperationHandler(this, clusterName, lxcHostname);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID checkMasterNode(final String clusterName, final String lxcHostname) {
+
+        AbstractOperationHandler operationHandler = new CheckMasterNodeOperationHandler(this, clusterName, lxcHostname);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
+    }
+
+    @Override
+    public UUID checkAllNodes(final String clusterName ) {
+
+        AbstractOperationHandler operationHandler = new CheckAllOperationHandler(this, clusterName );
 
         executor.execute(operationHandler);
 

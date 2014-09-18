@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.spark.ui.manager;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -12,7 +11,7 @@ import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-public class CheckTask implements Runnable {
+public class CheckTaskSlave implements Runnable {
 
     private final String clusterName, lxcHostname;
     private final boolean master;
@@ -21,8 +20,8 @@ public class CheckTask implements Runnable {
     private final Tracker tracker;
 
 
-    public CheckTask( final Tracker tracker, final Spark spark, String clusterName, String lxcHostname, boolean master,
-                      CompleteEvent completeEvent ) {
+    public CheckTaskSlave( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname, boolean master,
+                           CompleteEvent completeEvent ) {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
@@ -34,29 +33,14 @@ public class CheckTask implements Runnable {
 
     @Override
     public void run() {
+        UUID trackID = spark.checkSlaveNode( clusterName, lxcHostname );
 
-        UUID trackID = spark.checkNode( clusterName, lxcHostname );
-
-        NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() ) {
             ProductOperationView po = tracker.getProductOperation( SparkClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null ) {
                 if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( master ) {
-                        if ( po.getLog().contains( "Spark Master is running" ) ) {
-                            state = NodeState.RUNNING;
-                        }
-                        else if ( po.getLog().contains( "Spark Master is NOT running" ) ) {
-                            state = NodeState.STOPPED;
-                        }
-                    }
-                    else if ( po.getLog().contains( "Spark Worker is running" ) ) {
-                        state = NodeState.RUNNING;
-                    }
-                    else if ( po.getLog().contains( "Spark Worker is NOT running" ) ) {
-                        state = NodeState.STOPPED;
-                    }
+                    completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
@@ -70,7 +54,5 @@ public class CheckTask implements Runnable {
                 break;
             }
         }
-
-        completeEvent.onComplete( state );
     }
 }

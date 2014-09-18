@@ -18,9 +18,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -219,7 +217,7 @@ public class Manager {
                 }
                 set.removeAll( config.getAllNodes() );
                 if ( set.isEmpty() ) {
-                    show( "All nodes in Hadoop cluster have Hive installed" );
+                    show( "All nodes in Hadoop cluster have Spark installed" );
                     return;
                 }
 
@@ -235,6 +233,7 @@ public class Manager {
         } );
 
         controlsContent.addComponent( addNodeBtn );
+        controlsContent.addComponent( progressIcon );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -245,12 +244,12 @@ public class Manager {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
+        table.addContainerProperty( "Master/Slave", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
-//        table.addContainerProperty( "Action", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
-        table.addContainerProperty( "Status", Embedded.class, null );
+        table.addContainerProperty( "Status", Label.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -316,6 +315,19 @@ public class Manager {
     }
 
 
+    /**
+     * @param agent agent
+     *
+     * @return Yes if give agent is among seeds, otherwise returns No
+     */
+    public String checkIfMaster( Agent agent ) {
+        if ( config.getMasterNode().equals( agent ) ) {
+            return "Master";
+        }
+        return "Slave";
+    }
+
+
     public void checkAllNodesStatus() {
         for ( Object o : nodesTable.getItemIds() ) {
             int rowId = ( Integer ) o;
@@ -356,15 +368,13 @@ public class Manager {
         table.removeAllItems();
 
         for ( final Agent agent : agents ) {
+            final Label resultHolder = new Label();
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
             startBtn.addStyleName( "default" );
             final Button stopBtn = new Button( "Stop" );
             stopBtn.addStyleName( "default" );
-
-//            final Button setMasterBtn = new Button( "Set As Master" );
-//            setMasterBtn.addStyleName( "default" );
 
             final Button destroyBtn = new Button( "Destroy" );
             destroyBtn.addStyleName( "default" );
@@ -373,8 +383,7 @@ public class Manager {
             progressIcon.setVisible( false );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), String.format( " (%s)", agent.getListIP().get( 0 ) ), checkBtn, startBtn,
-                    stopBtn, /* master.equals( agent ) ? null : setMasterBtn,*/ destroyBtn
+                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), checkBtn, startBtn, stopBtn, destroyBtn, resultHolder
             }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
@@ -383,25 +392,24 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
-//                    setMasterBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
                     executor.execute(
-                            new CheckTask( tracker, spark, config.getClusterName(), agent.getHostname(), false,
+                            new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(), false,
                                     new CompleteEvent() {
-
                                         @Override
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                resultHolder.setValue( result );
+                                                if( result.contains( "not" ) ) {
+                                                    startBtn.setEnabled( true );
+                                                    stopBtn.setEnabled( false );
+                                                } else {
+                                                    startBtn.setEnabled( false );
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else if ( state == NodeState.STOPPED ) {
-                                                    startBtn.setEnabled( true );
-                                                }
-//                                                setMasterBtn.setEnabled( true );
-                                                destroyBtn.setEnabled( true );
                                                 progressIcon.setVisible( false );
+                                                destroyBtn.setEnabled( true );
                                             }
                                         }
                                     } ) );
@@ -414,25 +422,15 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
-//                    setMasterBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
                     executor.execute(
-                            new StartTask( tracker, spark, config.getClusterName(), agent.getHostname(), false,
+                            new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
                                     new CompleteEvent() {
-
                                         @Override
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
-                                                    stopBtn.setEnabled( true );
-                                                }
-                                                else if ( state == NodeState.STOPPED ) {
-                                                    startBtn.setEnabled( true );
-                                                }
-//                                                setMasterBtn.setEnabled( true );
-                                                destroyBtn.setEnabled( true );
-                                                progressIcon.setVisible( false );
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                checkBtn.click();
                                             }
                                         }
                                     } ) );
@@ -445,84 +443,19 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
-//                    setMasterBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    executor.execute( new StopTask( tracker, spark, config.getClusterName(), agent.getHostname(), false,
+                    executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
                                     new CompleteEvent() {
-
                                         @Override
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
-                                                    stopBtn.setEnabled( true );
-                                                }
-                                                else if ( state == NodeState.STOPPED ) {
-                                                    startBtn.setEnabled( true );
-                                                }
-//                                                setMasterBtn.setEnabled( true );
-                                                destroyBtn.setEnabled( true );
-                                                progressIcon.setVisible( false );
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                checkBtn.click();
                                             }
                                         }
                                     } ) );
                 }
             } );
-
-//            setMasterBtn.addClickListener( new Button.ClickListener() {
-//
-//                @Override
-//                public void buttonClick( Button.ClickEvent event ) {
-//                    ConfirmationDialog alert = new ConfirmationDialog(
-//                            String.format( "Do you want to set %s as master node?", agent.getHostname() ), "Yes",
-//                            "No" );
-//                    alert.getOk().addClickListener( new Button.ClickListener() {
-//                        @Override
-//                        public void buttonClick( Button.ClickEvent clickEvent ) {
-//                            ConfirmationDialog alert =
-//                                    new ConfirmationDialog( "Do you want to have a slave on the master node?", "Yes",
-//                                            "No" );
-//                            alert.getOk().addClickListener( new Button.ClickListener() {
-//                                @Override
-//                                public void buttonClick( Button.ClickEvent clickEvent ) {
-//                                    UUID trackID = spark.changeMasterNode( config.getClusterName(), agent.getHostname(),
-//                                            true );
-//                                    ProgressWindow window = new ProgressWindow( executor, tracker, trackID,
-//                                            SparkClusterConfig.PRODUCT_KEY );
-//                                    window.getWindow().addCloseListener( new Window.CloseListener() {
-//                                        @Override
-//                                        public void windowClose( Window.CloseEvent closeEvent ) {
-//                                            refreshClustersInfo();
-//                                        }
-//                                    } );
-//                                    contentRoot.getUI().addWindow( window.getWindow() );
-//                                }
-//                            } );
-//
-//                            alert.getCancel().addClickListener( new Button.ClickListener() {
-//                                @Override
-//                                public void buttonClick( Button.ClickEvent clickEvent ) {
-//                                    UUID trackID = spark.changeMasterNode( config.getClusterName(), agent.getHostname(),
-//                                            false );
-//                                    ProgressWindow window = new ProgressWindow( executor, tracker, trackID,
-//                                            SparkClusterConfig.PRODUCT_KEY );
-//                                    window.getWindow().addCloseListener( new Window.CloseListener() {
-//                                        @Override
-//                                        public void windowClose( Window.CloseEvent closeEvent ) {
-//                                            refreshClustersInfo();
-//                                        }
-//                                    } );
-//                                    contentRoot.getUI().addWindow( window.getWindow() );
-//                                }
-//                            } );
-//
-//                            contentRoot.getUI().addWindow( alert.getAlert() );
-//                        }
-//                    } );
-//
-//                    contentRoot.getUI().addWindow( alert.getAlert() );
-//                }
-//            } );
 
             destroyBtn.addClickListener( new Button.ClickListener() {
                 @Override
@@ -551,6 +484,7 @@ public class Manager {
         }
 
         //add master here
+        final Label resultHolder = new Label();
         final Button checkBtn = new Button( "Check" );
         checkBtn.addStyleName( "default" );
         final Button startBtn = new Button( "Start" );
@@ -563,8 +497,7 @@ public class Manager {
         progressIcon.setVisible( false );
 
         table.addItem( new Object[] {
-                MASTER_PREFIX + master.getHostname() + String.format( " (%s)", master.getListIP().get( 0 ) ), checkBtn,
-                startBtn, stopBtn, null, null, progressIcon
+                master.getHostname(), master.getListIP().get( 0 ), checkIfMaster( master ), checkBtn, startBtn, stopBtn, null, resultHolder
         }, null );
 
         checkBtn.addClickListener( new Button.ClickListener() {
@@ -574,17 +507,18 @@ public class Manager {
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
-                executor.execute( new CheckTask( tracker, spark, config.getClusterName(), master.getHostname(), true,
+                executor.execute( new CheckTaskMaster( spark, tracker, config.getClusterName(), master.getHostname(), true,
                                 new CompleteEvent() {
-
                                     @Override
-                                    public void onComplete( NodeState state ) {
-                                        synchronized ( progressIcon ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                stopBtn.setEnabled( true );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
+                                    public void onComplete( String result ) {
+                                        synchronized( progressIcon ) {
+                                            resultHolder.setValue( result );
+                                            if( result.contains( "not" ) ) {
                                                 startBtn.setEnabled( true );
+                                                stopBtn.setEnabled( false );
+                                            } else {
+                                                startBtn.setEnabled( false );
+                                                stopBtn.setEnabled( true );
                                             }
                                             progressIcon.setVisible( false );
                                         }
@@ -605,19 +539,12 @@ public class Manager {
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
-                executor.execute( new StartTask( tracker, spark, config.getClusterName(), master.getHostname(), true,
+                executor.execute( new StartTask( spark, tracker, config.getClusterName(), master.getHostname(), true,
                                 new CompleteEvent() {
-
                                     @Override
-                                    public void onComplete( NodeState state ) {
-                                        synchronized ( progressIcon ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                stopBtn.setEnabled( true );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
-                                                startBtn.setEnabled( true );
-                                            }
-                                            progressIcon.setVisible( false );
+                                    public void onComplete( String result ) {
+                                        synchronized( progressIcon ) {
+                                            checkBtn.click();
                                         }
                                     }
                                 } ) );
@@ -636,26 +563,18 @@ public class Manager {
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
-                executor.execute( new StopTask( tracker, spark, config.getClusterName(), master.getHostname(), true,
+                executor.execute( new StopTask( spark, tracker, config.getClusterName(), master.getHostname(), true,
                                 new CompleteEvent() {
-
                                     @Override
-                                    public void onComplete( NodeState state ) {
-                                        synchronized ( progressIcon ) {
-                                            if ( state == NodeState.RUNNING ) {
-                                                stopBtn.setEnabled( true );
-                                            }
-                                            else if ( state == NodeState.STOPPED ) {
-                                                startBtn.setEnabled( true );
-                                            }
-                                            progressIcon.setVisible( false );
+                                    public void onComplete( String result ) {
+                                        synchronized( progressIcon ) {
+                                            checkBtn.click();
                                         }
                                     }
                                 } ) );
             }
         } );
     }
-
 
     public Component getContent() {
         return contentRoot;
