@@ -29,7 +29,8 @@ public class ResponseSender {
     private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 15;
+    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
+    private static final int RETRY_ATTEMPT_WIDENING_INTERVAL_SEC = 30;
     private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
@@ -182,11 +183,16 @@ public class ResponseSender {
             catch ( PeerMessageException e )
             {
                 LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
-                //increment attempts
-                request.incrementAttempts();
-                dispatcherDAO.saveRemoteRequest( request );
-                //delete previous request (workaround until we change Cassandra to another DB)
-                dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+
+                //increment attempts based on widening intervals
+                if ( System.currentTimeMillis() - request.getTimestamp()
+                        > request.getAttempts() * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC * 1000 )
+                {
+                    request.incrementAttempts();
+                    dispatcherDAO.saveRemoteRequest( request );
+                    //delete previous request (workaround until we change Cassandra to another DB)
+                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                }
             }
         }
         catch ( JsonSyntaxException | DBException e )
