@@ -308,19 +308,10 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- REST -->
-                <artifactItem>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-frontend-jaxws</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-transports-http</artifactId>
-                </artifactItem>
-                <!-- Jetty is needed if you're using the CXFServlet -->
-                <artifactItem>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                </artifactItem>
+                <dependency>
+                  <groupId>org.jboss.resteasy</groupId>
+                  <artifactId>resteasy-jaxrs</artifactId>
+                </dependency>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
