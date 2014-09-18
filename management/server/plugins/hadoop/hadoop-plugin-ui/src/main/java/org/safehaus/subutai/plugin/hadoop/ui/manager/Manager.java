@@ -49,6 +49,7 @@ public class Manager {
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected static final String DECOMMISSION_STATUS_CAPTION = "Decommission Status: ";
     protected static final String START_STOP_BUTTON_DEFAULT_CAPTION = "Start/Stop";
+    private static final String EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION = "Exclude/Include";
 
     protected final GridLayout contentRoot;
     protected final ComboBox clusterList;
@@ -208,7 +209,6 @@ public class Manager {
     }
 
 
-
     public static void checkNodesStatus( Table table ) {
         if ( table != null ) {
             for ( Object o : table.getItemIds() ) {
@@ -287,7 +287,8 @@ public class Manager {
         else {
             for ( Component component : availableOperationsLayout ) {
                 if ( component.getCaption().equals( EXCLUDE_BUTTON_CAPTION )
-                        || component.getCaption().equals( INCLUDE_BUTTON_CAPTION ) ) {
+                        || component.getCaption().equals( INCLUDE_BUTTON_CAPTION )
+                        || component.getCaption().equals( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION ) ) {
                     return ( Button ) component;
                 }
             }
@@ -391,7 +392,7 @@ public class Manager {
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
         final Button startStopButton = new Button( START_STOP_BUTTON_DEFAULT_CAPTION );
-        final Button excludeIncludeNodeButton = new Button( "Exclude/Include" );
+        final Button excludeIncludeNodeButton = new Button( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION );
         final Button urlButton = new Button( URL_BUTTON_CAPTION );
 
         checkButton.addStyleName( "default" );
@@ -481,12 +482,6 @@ public class Manager {
         // If slave node
         else {
 
-            if ( cluster.getBlockedAgents().contains( agent ) ) {
-                excludeIncludeNodeButton.setCaption( INCLUDE_BUTTON_CAPTION );
-            }
-            else {
-                excludeIncludeNodeButton.setCaption( EXCLUDE_BUTTON_CAPTION );
-            }
             checkButton.addClickListener( managerListener.slaveNodeCheckButtonListener( row ) );
             excludeIncludeNodeButton.addClickListener( managerListener.slaveNodeExcludeIncludeButtonListener( row ) );
             destroyButton.addClickListener( managerListener.slaveNodeDestroyButtonListener( row ) );
@@ -552,8 +547,15 @@ public class Manager {
         if ( row == null ) {
             return null;
         }
-        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-        return HadoopUI.getAgentManager().getAgentByHostname( lxcHostname );
+
+        List<Agent> hadoopNodeList = hadoopCluster.getAllNodes();
+        String lxcHostname= row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+
+        for ( int i = 0; i < hadoopNodeList.size(); i++ ) {
+            if ( hadoopNodeList.get( i ).getHostname().equals( lxcHostname ) )
+                return hadoopNodeList.get( i );
+        }
+        return null;
     }
 
 
@@ -648,13 +650,13 @@ public class Manager {
     }
 
 
-    protected void enableProgressBar() {
+    protected synchronized void enableProgressBar() {
         processCount++;
         progressBar.setVisible( true );
     }
 
 
-    protected void disableProgressBar() {
+    protected synchronized void disableProgressBar() {
         if ( processCount > 0 ) {
             processCount--;
         }

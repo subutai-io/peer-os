@@ -43,7 +43,7 @@ public class StartDataNodeOperationHandler extends AbstractOperationHandler<Hado
             return;
         }
 
-        Command startCommand = Commands.getStartDatanodeCommand( node );
+        Command startCommand = Commands.getStartDataNodeCommand( node );
         manager.getCommandRunner().runCommand( startCommand );
         Command statusCommand = Commands.getNameNodeCommand( node, "status" );
         manager.getCommandRunner().runCommand( statusCommand );

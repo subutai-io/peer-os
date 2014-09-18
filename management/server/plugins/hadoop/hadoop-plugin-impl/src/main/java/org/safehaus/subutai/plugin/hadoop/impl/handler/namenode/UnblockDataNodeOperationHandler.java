@@ -52,7 +52,7 @@ public class UnblockDataNodeOperationHandler extends AbstractOperationHandler<Ha
         manager.getCommandRunner().runCommand( includeCommand );
         logCommand( includeCommand, productOperation );
 
-        Command refreshCommand = Commands.getStartNameNodeCommand( node );
+        Command refreshCommand = Commands.getStartDataNodeCommand( node );
         manager.getCommandRunner().runCommand( refreshCommand );
         logCommand( refreshCommand, productOperation );
 

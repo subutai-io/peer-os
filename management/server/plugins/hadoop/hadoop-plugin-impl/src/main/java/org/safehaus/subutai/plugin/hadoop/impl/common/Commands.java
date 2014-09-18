@@ -186,7 +186,7 @@ public class Commands extends CommandsSingleton {
     }
 
 
-    public static Command getStartNameNodeCommand( Agent agent ) {
+    public static Command getStartDataNodeCommand( Agent agent ) {
         return createCommand( "Start DataNode",
                 new RequestBuilder( ". /etc/profile && " + "hadoop-daemons.sh start datanode" ).withTimeout( 20 ),
                 Sets.newHashSet( agent ) );
@@ -218,13 +218,6 @@ public class Commands extends CommandsSingleton {
         return createCommand( String.format( "Getting hadoop report" ),
                 new RequestBuilder( String.format( ". /etc/profile && " + "hadoop dfsadmin -report" ) ).withTimeout( 20 ),
                 Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
-    }
-
-
-    public static Command getStartDatanodeCommand( Agent agent ) {
-        return createCommand( String.format( "Start DataNode" ),
-                new RequestBuilder( String.format( ". /etc/profile && " + "hadoop-daemons.sh start datanode" ) ).withTimeout( 20 ),
-                Sets.newHashSet( agent ) );
     }
 
 

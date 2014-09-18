@@ -57,7 +57,7 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
         manager.getCommandRunner().runCommand( stopDataNodeCommand );
         logCommand( stopDataNodeCommand, productOperation );
 
-        Command startDataNodeCommand = Commands.getStartDatanodeCommand( node );
+        Command startDataNodeCommand = Commands.getStartDataNodeCommand( node );
         manager.getCommandRunner().runCommand( startDataNodeCommand );
         logCommand( startDataNodeCommand, productOperation );
 
