@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.util.UUIDUtil;
+
 
 /**
  * Created by bahadyr on 6/24/14.
@@ -18,8 +20,9 @@ public class Environment {
     private String peerUuid;
 
 
-    public Environment( String name, String peerUuid ) {
-        this.uuid = UUID.randomUUID();
+    public Environment( String name, String peerUuid )
+    {
+        this.uuid = UUIDUtil.generateCassandraUUID();
         this.nodes = new HashSet<>();
         this.name = name;
         this.containers = new HashSet<>();
@@ -27,38 +30,45 @@ public class Environment {
     }
 
 
-    public void addContainer( String containerUuid ) {
+    public void addContainer( String containerUuid )
+    {
         this.containers.add( containerUuid );
     }
 
 
-    public Set<String> getContainers() {
+    public Set<String> getContainers()
+    {
         return containers;
     }
 
 
-    public void setContainers( final Set<String> containers ) {
+    public void setContainers( final Set<String> containers )
+    {
         this.containers = containers;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
 
-    public Set<Node> getNodes() {
+    public Set<Node> getNodes()
+    {
         return nodes;
     }
 
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Environment{" +
                 "uuid=" + uuid +
                 ", nodes=" + nodes +

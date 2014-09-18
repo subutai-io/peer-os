@@ -9,19 +9,22 @@ public class EnvironmentManagerException extends Exception {
     private String message;
 
 
-    public EnvironmentManagerException(String message) {
-        super(message);
+    public EnvironmentManagerException( String message )
+    {
+        super( message );
         this.message = message;
     }
 
 
-    public String getMessage() {
+    public String getMessage()
+    {
         return message;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "EnvironmentManagerException{" +
                 "message='" + message + '\'' +
                 '}';

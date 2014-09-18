@@ -15,30 +15,35 @@ public class Node {
     private String nodeGroupName;
 
 
-    public Node(final Agent agent, final Template template, final String nodeGroupName) {
+    public Node( final Agent agent, final Template template, final String nodeGroupName )
+    {
         this.agent = agent;
         this.template = template;
         this.nodeGroupName = nodeGroupName;
     }
 
 
-    public String getNodeGroupName() {
+    public String getNodeGroupName()
+    {
         return nodeGroupName;
     }
 
 
-    public Agent getAgent() {
+    public Agent getAgent()
+    {
         return agent;
     }
 
 
-    public Template getTemplate() {
+    public Template getTemplate()
+    {
         return template;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Node{" +
                 "agent=" + agent +
                 ", template=" + template +

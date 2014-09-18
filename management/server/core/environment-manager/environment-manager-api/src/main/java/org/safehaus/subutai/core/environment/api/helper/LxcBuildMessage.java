@@ -15,42 +15,50 @@ public class LxcBuildMessage {
     private UUID environmentId;
 
 
-    public int getNumberOfContainers() {
+    public int getNumberOfContainers()
+    {
         return numberOfContainers;
     }
 
 
-    public void setNumberOfContainers( final int numberOfContainers ) {
+    public void setNumberOfContainers( final int numberOfContainers )
+    {
         this.numberOfContainers = numberOfContainers;
     }
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName( final String templateName )
+    {
         this.templateName = templateName;
     }
 
 
-    public String getStrategyName() {
+    public String getStrategyName()
+    {
         return strategyName;
     }
 
 
-    public void setStrategyName( final String strategyName ) {
+    public void setStrategyName( final String strategyName )
+    {
         this.strategyName = strategyName;
     }
 
 
-    public UUID getEnvironmentId() {
+    public UUID getEnvironmentId()
+    {
         return environmentId;
     }
 
 
-    public void setEnvironmentId( final UUID environmentId ) {
+    public void setEnvironmentId( final UUID environmentId )
+    {
         this.environmentId = environmentId;
     }
 }
