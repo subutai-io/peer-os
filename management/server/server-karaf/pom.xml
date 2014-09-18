@@ -309,22 +309,18 @@
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- REST -->
                 <artifactItem>
-                  <groupId>org.apache.cxf.karaf</groupId>
-                  <artifactId>apache-cxf</artifactId>
-                  <version>3.0.1</version>
-                </artifactItem>
-                <!--<artifactItem>
                   <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                  <artifactId>cxf-rt-frontend-jaxws</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-bundle-jaxrs</artifactId>
+                  <artifactId>cxf-rt-transports-http</artifactId>
                 </artifactItem>
+                <!-- Jetty is needed if you're using the CXFServlet -->
                 <artifactItem>
-                  <groupId>javax.ws.rs</groupId>
-                  <artifactId>javax.ws.rs-api</artifactId>
-                </artifactItem>-->
+                  <groupId>org.apache.cxf</groupId>
+                  <artifactId>cxf-rt-transports-http-jetty</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
