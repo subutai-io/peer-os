@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -18,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.HttpUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -194,9 +194,10 @@ public class PeerImpl implements PeerManager {
                 params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
                 params.put( Common.MESSAGE_PARAM_NAME, message );
                 try {
-                    return httpUtil.post( String.format( Common.MESSAGE_REQUEST_URL, ip ), params );
+                    return httpUtil.request( HttpUtil.RequestType.POST, String.format( Common.MESSAGE_REQUEST_URL, ip ),
+                            params );
                 }
-                catch ( IOException e ) {
+                catch ( HTTPException e ) {
                     LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
                     throw new PeerMessageException( e.getMessage() );
                 }
@@ -249,7 +250,7 @@ public class PeerImpl implements PeerManager {
                     }
                     else {
                         String err = "Peer is not reachable";
-                        LOG.log( Level.SEVERE, "Error in sendPeerMessage", err );
+                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
                         throw new PeerMessageException( err );
                     }
                 }
@@ -278,10 +279,10 @@ public class PeerImpl implements PeerManager {
         }
         if ( getPeerByUUID( peer.getId() ) != null ) {
             try {
-                HttpUtil.request( HttpUtil.RequestType.GET, String.format( Common.PING_URL, peer.getIp() ), null );
+                httpUtil.request( HttpUtil.RequestType.GET, String.format( Common.PING_URL, peer.getIp() ), null );
                 return true;
             }
-            catch ( IOException e ) {
+            catch ( HTTPException e ) {
                 return false;
             }
         }
