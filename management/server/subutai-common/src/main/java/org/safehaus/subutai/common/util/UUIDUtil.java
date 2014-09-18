@@ -31,7 +31,12 @@ public class UUIDUtil {
 
     public static UUID generateCassandraUUID()
     {
-
         return Generators.randomBasedGenerator().generate();
+    }
+
+
+    public static UUID generateStringUUID( String id )
+    {
+        return Generators.nameBasedGenerator().generate( id );
     }
 }

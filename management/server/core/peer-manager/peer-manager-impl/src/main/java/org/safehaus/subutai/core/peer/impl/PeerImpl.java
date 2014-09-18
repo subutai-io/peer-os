@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.util.HttpUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -52,7 +53,7 @@ public class PeerImpl implements PeerManager {
 
     public void setId( final String id )
     {
-        this.id = UUID.fromString( id );
+        this.id = UUIDUtil.generateStringUUID( id );
     }
 
 
