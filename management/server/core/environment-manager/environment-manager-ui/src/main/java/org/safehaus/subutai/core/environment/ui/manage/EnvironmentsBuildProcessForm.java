@@ -58,9 +58,7 @@ public class EnvironmentsBuildProcessForm {
                 message.setTemplateName( "master" );
                 message.setStrategy( "ROUND_ROBIN" );
                 message.setEnvironmentUuid( UUID.randomUUID().toString() );
-
-                environmentBuildProcess.addBuildBlock( new ContainerBuildMessage() );
-
+                environmentBuildProcess.addBuildBlock( message );
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
         } );
@@ -77,7 +75,7 @@ public class EnvironmentsBuildProcessForm {
         table.addContainerProperty( "Date", String.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
         table.addContainerProperty( "Info", Button.class, null );
-        table.addContainerProperty( "Destroy", Button.class, null );
+        table.addContainerProperty( "Action", Button.class, null );
         //        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
         //        table.setHeight( size, Sizeable.UNITS_PIXELS );
         table.setPageLength( 10 );
@@ -112,7 +110,7 @@ public class EnvironmentsBuildProcessForm {
                     Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
                     String json = gson.toJson( environmentBuildProcess, EnvironmentBuildProcess.class );
                     detailsWindow.setContent( json );
-                    contentRoot.getUI().addWindow( detailsWindow);
+                    contentRoot.getUI().addWindow( detailsWindow );
                     detailsWindow.setVisible( true );
                 }
             } );

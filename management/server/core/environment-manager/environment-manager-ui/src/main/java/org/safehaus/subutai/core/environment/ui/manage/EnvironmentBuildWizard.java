@@ -241,7 +241,7 @@ public class EnvironmentBuildWizard extends DetailsWindow {
                 cbm.setPeerId( peerUuid );
                 cbm.setCompleteState( false );
                 cbm.setEnvironmentUuid( environmentBuildTask.getUuid().toString() );
-//                buildMessageMap.put( peerUuid ).put( templateName, cbm );
+                //                buildMessageMap.put( peerUuid ).put( templateName, cbm );
             }
             else
             {
