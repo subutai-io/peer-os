@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>git-manager-impl</artifactId>
-  <name>:: Subutai Git Manager</name>
+  <name>Subutai Git Manager</name>
   <description>git manager impl</description>
 
   <packaging>bundle</packaging>
