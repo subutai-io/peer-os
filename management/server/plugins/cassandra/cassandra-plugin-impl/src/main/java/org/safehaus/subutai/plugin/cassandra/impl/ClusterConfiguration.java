@@ -1,8 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-import java.util.logging.Logger;
-
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -11,6 +9,8 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+
+import java.util.logging.Logger;
 
 
 public class ClusterConfiguration {
@@ -128,11 +128,12 @@ public class ClusterConfiguration {
         }
 
         try {
-            po.addLog( "Cassandra cluster data saved into database" );
             cassandraManager.getPluginDAO()
                             .saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLog( "Cassandra cluster data saved into database" );
         } catch ( DBException e ) {
             LOG.info(e.getMessage());
+            po.addLogFailed( "Cassandra cluster information could NOT be saved into database" );
         }
     }
 }
