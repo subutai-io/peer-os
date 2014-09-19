@@ -35,7 +35,6 @@ public class ContainerForm extends CustomComponent implements Disposable {
         this.containerManager = serviceLocator.getService( ContainerManager.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
         this.strategyManager = serviceLocator.getService( StrategyManager.class );
-
         setHeight( 100, Unit.PERCENTAGE );
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
@@ -51,7 +50,7 @@ public class ContainerForm extends CustomComponent implements Disposable {
         commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
         commandsSheet.setSizeFull();
         final Manager manager = new Manager( executorService, agentManager, containerManager );
-        commandsSheet.addTab( new Cloner( containerManager, strategyManager,  agentTree ), "Clone" );
+        commandsSheet.addTab( new Cloner( containerManager, strategyManager, agentTree ), "Clone" );
         commandsSheet.addTab( manager, managerTabCaption );
         commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
             @Override

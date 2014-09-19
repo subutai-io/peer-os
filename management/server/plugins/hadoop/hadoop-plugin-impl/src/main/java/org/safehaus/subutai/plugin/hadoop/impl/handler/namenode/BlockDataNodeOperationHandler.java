@@ -57,15 +57,9 @@ public class BlockDataNodeOperationHandler extends AbstractOperationHandler<Hado
         logCommand( refreshCommand, productOperation );
 
         hadoopClusterConfig.getBlockedAgents().add( node );
-        try {
-            manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                    hadoopClusterConfig );
-            productOperation.addLog( "Cluster info saved to DB" );
-        }
-        catch ( DBException e ) {
-            productOperation
-                    .addLogFailed( "Could not save cluster info to DB! Please see logs\n" + "Blocking node aborted" );
-        }
+        manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                hadoopClusterConfig );
+        productOperation.addLog( "Cluster info saved to DB" );
     }
 
 

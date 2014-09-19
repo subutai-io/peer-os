@@ -13,12 +13,15 @@ import org.safehaus.subutai.core.db.api.DbManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
  * PluginDAO is used to manage cluster configuration information in database
  */
 public class PluginDAO {
+
+    private static final Logger LOG = Logger.getLogger( PluginDAO.class.getName() );
     private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DbManager dbManager;
 
@@ -29,14 +32,21 @@ public class PluginDAO {
     }
 
 
-    public void saveInfo(String source, String key, Object info) throws DBException {
+    public void saveInfo(String source, String key, Object info)  {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(source), "Source is null or empty");
         Preconditions.checkArgument(!Strings.isNullOrEmpty(key), "Key is null or empty");
         Preconditions.checkNotNull(info, "Info is null");
 
-        dbManager.executeUpdate2("insert into product_info(source,key,info) values (?,?,?)", source.toLowerCase(),
-                key.toLowerCase(),
-                gson.toJson(info));
+        try
+        {
+            dbManager.executeUpdate2("insert into product_info(source,key,info) values (?,?,?)", source.toLowerCase(),
+                    key.toLowerCase(),
+                    gson.toJson(info));
+        }
+        catch ( DBException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
     }
 
 
@@ -47,14 +57,22 @@ public class PluginDAO {
      * @param clazz  - class of POJO
      * @return - list of POJOs
      */
-    public <T> List<T> getInfo(String source, Class<T> clazz) throws DBException {
+    public <T> List<T> getInfo(String source, Class<T> clazz)  {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(source), "Source is null or empty");
         Preconditions.checkNotNull(clazz, "Class is null");
 
         List<T> list = new ArrayList<>();
         try {
-            ResultSet rs = dbManager
-                    .executeQuery2("select info from product_info where source = ?", source.toLowerCase());
+            ResultSet rs = null;
+            try
+            {
+                rs = dbManager
+                        .executeQuery2( "select info from product_info where source = ?", source.toLowerCase() );
+            }
+            catch ( DBException e )
+            {
+                LOG.severe( e.getMessage() );
+            }
             if (rs != null) {
                 for (Row row : rs) {
                     String info = row.getString("info");
@@ -62,7 +80,7 @@ public class PluginDAO {
                 }
             }
         } catch (JsonSyntaxException ex) {
-            throw new DBException(ex.getMessage());
+
         }
         return list;
     }
@@ -76,16 +94,24 @@ public class PluginDAO {
      * @param clazz  - class of POJO
      * @return - POJO
      */
-    public <T> T getInfo(String source, String key, Class<T> clazz) throws DBException {
+    public <T> T getInfo(String source, String key, Class<T> clazz)  {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(source), "Source is null or empty");
         Preconditions.checkArgument(!Strings.isNullOrEmpty(key), "Key is null or empty");
         Preconditions.checkNotNull(clazz, "Class is null");
 
         try {
 
-            ResultSet rs = dbManager
-                    .executeQuery2("select info from product_info where source = ? and key = ?", source.toLowerCase(),
-                            key.toLowerCase());
+            ResultSet rs = null;
+            try
+            {
+                rs = dbManager
+                        .executeQuery2( "select info from product_info where source = ? and key = ?",
+                                source.toLowerCase(), key.toLowerCase() );
+            }
+            catch ( DBException e )
+            {
+                LOG.severe( e.getMessage() );
+            }
             if (rs != null) {
                 Row row = rs.one();
                 if (row != null) {
@@ -95,7 +121,7 @@ public class PluginDAO {
                 }
             }
         } catch (JsonSyntaxException ex) {
-            throw new DBException(ex.getMessage());
+            LOG.severe( ex.getMessage() );
         }
         return null;
     }
@@ -107,11 +133,18 @@ public class PluginDAO {
      * @param source - source key
      * @param key    - POJO key
      */
-    public void deleteInfo(String source, String key) throws DBException {
+    public void deleteInfo(String source, String key) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(source), "Source is null or empty");
         Preconditions.checkArgument(!Strings.isNullOrEmpty(key), "Key is null or empty");
 
-        dbManager.executeUpdate2("delete from product_info where source = ? and key = ?", source.toLowerCase(),
-                key.toLowerCase());
+        try
+        {
+            dbManager.executeUpdate2("delete from product_info where source = ? and key = ?", source.toLowerCase(),
+                    key.toLowerCase());
+        }
+        catch ( DBException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
     }
 }

@@ -84,13 +84,5 @@ public interface AgentManager {
 
     public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
 
-    /**
-     * Waits and returns Agent
-     *
-     * @param containerName container host name
-     * @param timeInMillis wait period for registration
-     *
-     * @return
-     */
-    public Agent waitForRegistration( String hostname, long timeInMillis );
+    public Agent waitForRegistration(String hostname, long timeout);
 }

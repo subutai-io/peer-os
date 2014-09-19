@@ -97,17 +97,10 @@ public class ClusterConfiguration {
                                     }
 
                                     po.addLog( "Updating information in database..." );
-                                    try {
-                                        accumuloManager.getPluginDAO().saveInfo( AccumuloClusterConfig.PRODUCT_KEY,
-                                                accumuloClusterConfig.getClusterName(), accumuloClusterConfig );
+                                    accumuloManager.getPluginDAO().saveInfo( AccumuloClusterConfig.PRODUCT_KEY,
+                                            accumuloClusterConfig.getClusterName(), accumuloClusterConfig );
 
-                                        po.addLog( "Updated information in database" );
-                                    }
-                                    catch ( DBException e ) {
-                                        throw new ClusterConfigurationException(
-                                                String.format( "Failed to update information in database, %s",
-                                                        e.getMessage() ) );
-                                    }
+                                    po.addLog( "Updated information in database" );
                                 }
                                 else {
                                     throw new ClusterConfigurationException(
@@ -240,17 +233,10 @@ public class ClusterConfiguration {
                                 }
 
                                 po.addLog( "Updating information in database..." );
-                                try {
-                                    accumuloManager.getPluginDAO().saveInfo( AccumuloClusterConfig.PRODUCT_KEY,
-                                            accumuloClusterConfig.getClusterName(), accumuloClusterConfig );
+                                accumuloManager.getPluginDAO().saveInfo( AccumuloClusterConfig.PRODUCT_KEY,
+                                        accumuloClusterConfig.getClusterName(), accumuloClusterConfig );
 
-                                    po.addLog( "Updated information in database" );
-                                }
-                                catch ( DBException e ) {
-                                    throw new ClusterConfigurationException(
-                                            String.format( "Failed to update information in database, %s",
-                                                    e.getMessage() ) );
-                                }
+                                po.addLog( "Updated information in database" );
                             }
                             else {
                                 throw new ClusterConfigurationException( String.format( "Setting ZK cluster failed, %s",
@@ -326,16 +312,10 @@ public class ClusterConfiguration {
 
             po.addLog( "Updating database..." );
 
-            try {
-                accumuloManager.getPluginDAO()
-                               .saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
-                                       accumuloClusterConfig );
-                po.addLog( "Database information updated" );
-            }
-            catch ( DBException e ) {
-                throw new ClusterConfigurationException(
-                        String.format( "Failed to update database information, %s", e.getMessage() ) );
-            }
+            accumuloManager.getPluginDAO()
+                           .saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
+                                   accumuloClusterConfig );
+            po.addLog( "Database information updated" );
         }
         else {
             throw new ClusterConfigurationException(
@@ -375,15 +355,9 @@ public class ClusterConfiguration {
         }
 
         po.addLog( "Updating database..." );
-        try {
-            accumuloManager.getPluginDAO()
-                           .deleteInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName() );
+        accumuloManager.getPluginDAO()
+                       .deleteInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName() );
 
-            po.addLog( "Database information updated" );
-        }
-        catch ( DBException e ) {
-            throw new ClusterConfigurationException(
-                    String.format( "Failed to update database information, %s", e.getMessage() ) );
-        }
+        po.addLog( "Database information updated" );
     }
 }

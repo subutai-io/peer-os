@@ -29,7 +29,8 @@ public class ResponseSender {
     private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 15;
+    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
+    private static final int RETRY_ATTEMPT_WIDENING_INTERVAL_SEC = 30;
     private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
@@ -48,12 +49,15 @@ public class ResponseSender {
             @Override
             public void run() {
 
-                while ( !Thread.interrupted() ) {
+                while ( !Thread.interrupted() )
+                {
 
-                    try {
+                    try
+                    {
                         Thread.sleep( SLEEP_BETWEEN_ITERATIONS_SEC * 1000 );
                     }
-                    catch ( InterruptedException e ) {
+                    catch ( InterruptedException e )
+                    {
                         break;
                     }
 
@@ -72,28 +76,34 @@ public class ResponseSender {
 
     private void send() {
 
-        try {
+        try
+        {
             Set<RemoteRequest> requests = dispatcherDAO.getRemoteRequests( 10, 20 );
 
-            if ( !requests.isEmpty() ) {
+            if ( !requests.isEmpty() )
+            {
 
                 List<Callable<Object>> todo = new ArrayList<>( requests.size() );
 
 
-                for ( final RemoteRequest request : requests ) {
-                    try {
+                for ( final RemoteRequest request : requests )
+                {
+                    try
+                    {
                         final Set<RemoteResponse> responses =
                                 dispatcherDAO.getRemoteResponses( request.getCommandId() );
 
                         //if no responses arrived to this request, increment is attempts number
                         if ( responses.isEmpty() && ( System.currentTimeMillis() - request.getTimestamp()
-                                > AGENT_CHUNK_SEND_INTERVAL_SEC * 1000 + 2000 ) ) {
+                                > ( AGENT_CHUNK_SEND_INTERVAL_SEC + 5 ) * 1000 ) )
+                        {
                             request.incrementAttempts();
                             dispatcherDAO.saveRemoteRequest( request );
                             //delete previous request (workaround until we change Cassandra to another DB)
                             dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
                         }
-                        else if ( !responses.isEmpty() ) {
+                        else if ( !responses.isEmpty() )
+                        {
 
                             //add task to send responses
                             todo.add( Executors.callable( new Runnable() {
@@ -104,24 +114,28 @@ public class ResponseSender {
                             } ) );
                         }
                     }
-                    catch ( DBException e ) {
+                    catch ( DBException e )
+                    {
                         LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
                     }
                 }
 
-                if ( !todo.isEmpty() ) {
+                if ( !todo.isEmpty() )
+                {
                     httpRequestsExecutor.invokeAll( todo );
                 }
             }
         }
-        catch ( InterruptedException | DBException e ) {
+        catch ( InterruptedException | DBException e )
+        {
             LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
         }
     }
 
 
     private void sendResponses( RemoteRequest request, Set<RemoteResponse> responses ) {
-        try {
+        try
+        {
             //sort responses by responseNumber
             Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
                 @Override
@@ -131,44 +145,58 @@ public class ResponseSender {
                            o1.getResponseSequenceNumber().compareTo( o2.getResponseSequenceNumber() ) : compareAgents;
                 }
             } );
-            for ( RemoteResponse response : responses ) {
+            for ( RemoteResponse response : responses )
+            {
                 sortedSet.add( response.getResponse() );
             }
 
-            try {
+            try
+            {
                 Peer peer = peerManager.getPeerByUUID( request.getPeerId() );
 
                 String message = JsonUtil.toJson( new DispatcherMessage( sortedSet, DispatcherMessageType.RESPONSE ) );
                 peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
 
                 //delete sent responses
-                for ( RemoteResponse response : responses ) {
+                for ( RemoteResponse response : responses )
+                {
 
                     dispatcherDAO.deleteRemoteResponse( response );
 
-                    if ( response.getResponse().isFinal() ) {
+                    if ( response.getResponse().isFinal() )
+                    {
                         request.incrementCompletedRequestsCount();
                     }
                 }
                 //if final response was sent, delete request
-                if ( request.isCompleted() ) {
+                if ( request.isCompleted() )
+                {
                     dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
                 }
-                else {
+                else
+                {
+                    request.updateTimestamp();
                     dispatcherDAO.saveRemoteRequest( request );
                 }
             }
 
-            catch ( PeerMessageException e ) {
+            catch ( PeerMessageException e )
+            {
                 LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
-                //increment attempts
-                request.incrementAttempts();
-                dispatcherDAO.saveRemoteRequest( request );
-                //delete previous request (workaround until we change Cassandra to another DB)
-                dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+
+                //increment attempts based on widening intervals
+                if ( System.currentTimeMillis() - request.getTimestamp()
+                        > request.getAttempts() * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC * 1000 )
+                {
+                    request.incrementAttempts();
+                    dispatcherDAO.saveRemoteRequest( request );
+                    //delete previous request (workaround until we change Cassandra to another DB)
+                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                }
             }
         }
-        catch ( JsonSyntaxException | DBException e ) {
+        catch ( JsonSyntaxException | DBException e )
+        {
             LOG.log( Level.SEVERE, String.format( "Error in sendResponses: %s", e.getMessage() ) );
         }
     }

@@ -36,18 +36,15 @@ public class EnvironmentsBuildProcessForm {
         environmentsTable = createTable( "Environments Build Process", 300 );
 
         Button getEnvironmentsButton = new Button( "View" );
-
         getEnvironmentsButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                 updateTableData();
             }
         } );
-
         contentRoot.addComponent( getEnvironmentsButton );
 
         Button saveBuildProcessButton = new Button( "Add" );
-
         saveBuildProcessButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
@@ -64,7 +61,6 @@ public class EnvironmentsBuildProcessForm {
         } );
 
         contentRoot.addComponent( saveBuildProcessButton );
-
         contentRoot.addComponent( environmentsTable );
     }
 
@@ -72,25 +68,15 @@ public class EnvironmentsBuildProcessForm {
     private Table createTable( String caption, int size ) {
         Table table = new Table( caption );
         table.addContainerProperty( "Name", UUID.class, null );
-        table.addContainerProperty( "Date", String.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
         table.addContainerProperty( "Info", Button.class, null );
         table.addContainerProperty( "Action", Button.class, null );
-        //        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        //        table.setHeight( size, Sizeable.UNITS_PIXELS );
+        table.addContainerProperty( "Destroy", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
         table.setImmediate( true );
         table.setSizeFull();
-        //        table.addListener( new ItemClickEvent.ItemClickListener() {
-        //
-        //            public void itemClick( ItemClickEvent event ) {
-        //                if ( event.isDoubleClick() ) {
-        //
-        //                }
-        //            }
-        //        } );
         return table;
     }
 
@@ -117,6 +103,7 @@ public class EnvironmentsBuildProcessForm {
 
             Button processButton = null;
             Embedded progressIcon = null;
+            Button destroyButton = null;
 
             switch ( environmentBuildProcess.getProcessStatusEnum() )
             {
@@ -128,10 +115,19 @@ public class EnvironmentsBuildProcessForm {
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
-                            // TODO create build thred
+                            // TODO create build task
                             managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
                         }
                     } );
+
+                    destroyButton = new Button( "Destroy" );
+                    destroyButton.addClickListener( new Button.ClickListener() {
+                        @Override
+                        public void buttonClick( final Button.ClickEvent clickEvent ) {
+                            managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+                        }
+                    } );
+
                     break;
                 }
                 case IN_PROGRESS:
@@ -142,7 +138,7 @@ public class EnvironmentsBuildProcessForm {
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
-                            // TODO create build thred
+                            // TODO create terminate task
 
                         }
                     } );
@@ -156,7 +152,7 @@ public class EnvironmentsBuildProcessForm {
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
-                            // TODO create build thred
+                            // TODO create destroy task
 
                         }
                     } );
@@ -170,7 +166,7 @@ public class EnvironmentsBuildProcessForm {
                     processButton.addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
-                            // TODO create build thred
+                            // TODO create configure logic
 
                         }
                     } );
@@ -180,7 +176,8 @@ public class EnvironmentsBuildProcessForm {
 
 
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    environmentBuildProcess.getUuid(), "$date", progressIcon, viewEnvironmentInfoButton, processButton
+                    environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
+                    destroyButton
             }, null );
         }
         environmentsTable.refreshRowCache();

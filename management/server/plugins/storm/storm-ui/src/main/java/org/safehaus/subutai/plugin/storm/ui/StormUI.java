@@ -17,13 +17,10 @@ import com.vaadin.ui.Component;
 
 
 public class StormUI implements PortalModule {
-    protected static final Logger LOG = Logger.getLogger( StormUI.class.getName() );
-
     public static final String MODULE_IMAGE = "storm.png";
-
-
-    private ExecutorService executor;
+    protected static final Logger LOG = Logger.getLogger( StormUI.class.getName() );
     private final ServiceLocator serviceLocator;
+    private ExecutorService executor;
 
 
     public StormUI() {
@@ -62,13 +59,21 @@ public class StormUI implements PortalModule {
 
     @Override
     public Component createComponent() {
-        try {
+        try
+        {
             return new StormForm( executor, serviceLocator );
         }
-        catch ( NamingException e ) {
+        catch ( NamingException e )
+        {
             LOG.severe( e.getMessage() );
         }
 
         return null;
+    }
+
+
+    @Override
+    public Boolean isCorePlugin() {
+        return false;
     }
 }

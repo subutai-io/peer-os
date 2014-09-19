@@ -266,21 +266,21 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
 
 
     @Override
-    public Agent waitForRegistration( final String hostname, final long timeInMillis )
+    public Agent waitForRegistration( final String hostname, final long timeout )
     {
-        LOG.info( String.format("=====> Waiting in thread %s", Thread.currentThread()) );
+        long threshold = System.currentTimeMillis() + timeout;
         Agent result = getAgentByHostname( hostname );
-        long threshold = System.currentTimeMillis() + timeInMillis;
+        LOG.info( Thread.currentThread().toString() );
         while ( result == null && System.currentTimeMillis() < threshold )
         {
             try
             {
                 Thread.sleep( 2000 );
-                result = getAgentByHostname( hostname );
             }
             catch ( InterruptedException ignore )
             {
             }
+            result = getAgentByHostname( hostname );
         }
         return result;
     }
@@ -289,8 +289,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Initialized agent manager
      */
-    public void init()
-    {
+    public void init() {
         try
         {
 
@@ -422,7 +421,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(), response.getEnvironmentId() );
+                        //TODO pass proper environmentId
+                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(), UUIDUtil.generateMACBasedUUID() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
@@ -454,8 +454,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Removes agent from the cache of connected agents
      */
-    private void removeAgent( Response response )
-    {
+    private void removeAgent( Response response ) {
         try
         {
             if ( response != null && response.getTransportId() != null )

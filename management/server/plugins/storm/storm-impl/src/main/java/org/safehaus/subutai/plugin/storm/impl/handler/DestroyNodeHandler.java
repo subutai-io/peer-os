@@ -56,10 +56,6 @@ public class DestroyNodeHandler extends AbstractHandler {
         } catch(LxcDestroyException ex) {
             po.addLogFailed("Failed to destroy node: " + ex.getMessage());
             manager.getLogger().error("Destroy failed", ex);
-        } catch(DBException ex) {
-            String m = "Failed to save cluster info";
-            manager.getLogger().error(m, ex);
-            po.addLogFailed(m);
         }
     }
 

@@ -60,12 +60,8 @@ class WithHadoopSetupStrategy extends LuceneSetupStrategy {
         }
 
         po.addLog("Saving to db...");
-        try {
-            manager.getPluginDao().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config);
-            po.addLog("Cluster info successfully saved");
-        } catch(DBException ex) {
-            throw new ClusterSetupException("Failed to save cluster info: " + ex.getMessage());
-        }
+        manager.getPluginDao().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config);
+        po.addLog("Cluster info successfully saved");
 
         return config;
     }

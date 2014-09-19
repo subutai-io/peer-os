@@ -72,7 +72,7 @@ public class AgentManagerMock implements AgentManager {
 
 
     @Override
-    public Agent waitForRegistration( final String hostname, final long timeInMillis )
+    public Agent waitForRegistration( final String hostname, final long timeout )
     {
         return null;
     }

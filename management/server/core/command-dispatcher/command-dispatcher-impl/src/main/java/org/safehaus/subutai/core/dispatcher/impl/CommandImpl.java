@@ -25,7 +25,8 @@ import com.google.common.base.Preconditions;
 /**
  * Command which can contain both local and remote requests
  */
-public class CommandImpl extends AbstractCommand {
+public class CommandImpl extends AbstractCommand
+{
 
     private final Map<UUID, Set<BatchRequest>> remoteRequests = new HashMap<>();
 
@@ -39,7 +40,8 @@ public class CommandImpl extends AbstractCommand {
      * @param agents - target agents
      */
     public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents, PeerManager peerManager,
-                        CommandRunnerBase commandRunner ) {
+                        CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
@@ -48,24 +50,37 @@ public class CommandImpl extends AbstractCommand {
         this.commandUUID = UUIDUtil.generateTimeBasedUUID();
         this.requestsCount = agents.size();
         this.timeout = requestBuilder.getTimeout();
+        UUID environmentId = null;
 
-        for ( Agent agent : agents ) {
+        for ( Agent agent : agents )
+        {
+            //check that all agents belong to the same environment
+            if ( environmentId == null )
+            {
+                environmentId = agent.getEnvironmentId();
+            }
+            else
+            {
+                Preconditions.checkState( environmentId.compareTo( agent.getEnvironmentId() ) == 0 );
+            }
             Request request = requestBuilder.build( agent.getUuid(), commandUUID );
             //this is a local agent
-            //TODO remove below line
-            if(false){
-//            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
+            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 )
+            {
                 requests.add( request );
             }
-            else {
+            else
+            {
                 Set<BatchRequest> batchRequests = remoteRequests.get( agent.getSiteId() );
-                if ( batchRequests == null ) {
+                if ( batchRequests == null )
+                {
                     batchRequests = new HashSet<>();
                     remoteRequests.put( agent.getSiteId(), batchRequests );
-                    batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
+                    batchRequests.add( new BatchRequest( request, agent.getUuid(), agent.getEnvironmentId() ) );
                 }
-                else {
-                    batchRequests.iterator().next().addTargetUUID( agent.getUuid() );
+                else
+                {
+                    batchRequests.iterator().next().addAgentId( agent.getUuid() );
                 }
             }
         }
@@ -78,18 +93,22 @@ public class CommandImpl extends AbstractCommand {
      *
      * @param batchRequests - requests to execute
      */
-    protected CommandImpl( Set<BatchRequest> batchRequests, CommandRunnerBase commandRunner ) {
+    protected CommandImpl( Set<BatchRequest> batchRequests, CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( batchRequests ),
                 "Batch Requests are null or empty" );
 
         Set<Request> requests = new HashSet<>();
-        for ( BatchRequest batchRequest : batchRequests ) {
+        for ( BatchRequest batchRequest : batchRequests )
+        {
             requests.addAll( batchRequest.getRequests() );
         }
         int timeout = 0;
-        for ( Request request : requests ) {
-            if ( request.getTimeout() > timeout ) {
+        for ( Request request : requests )
+        {
+            if ( request.getTimeout() > timeout )
+            {
                 timeout = request.getTimeout();
             }
         }
@@ -106,13 +125,16 @@ public class CommandImpl extends AbstractCommand {
      *
      * @param requests - requests to execute
      */
-    protected CommandImpl( Collection<Request> requests, CommandRunnerBase commandRunner ) {
+    protected CommandImpl( Collection<Request> requests, CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are null or empty" );
         this.requestsCount = requests.size();
         int timeout = 0;
-        for ( Request request : requests ) {
-            if ( request.getTimeout() > timeout ) {
+        for ( Request request : requests )
+        {
+            if ( request.getTimeout() > timeout )
+            {
                 timeout = request.getTimeout();
             }
         }
@@ -131,7 +153,8 @@ public class CommandImpl extends AbstractCommand {
      * @param requestBuilders - request builder used to produce request
      */
     public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders, PeerManager peerManager,
-                        CommandRunnerBase commandRunner ) {
+                        CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
                 "Request Builders are null or empty" );
@@ -141,23 +164,38 @@ public class CommandImpl extends AbstractCommand {
         this.requestsCount = requestBuilders.size();
 
         int maxTimeout = 0;
-        for ( AgentRequestBuilder requestBuilder : requestBuilders ) {
+        UUID environmentId = null;
+        for ( AgentRequestBuilder requestBuilder : requestBuilders )
+        {
             Agent agent = requestBuilder.getAgent();
+            //check that all agents belong to the same environment
+            if ( environmentId == null )
+            {
+                environmentId = agent.getEnvironmentId();
+            }
+            else
+            {
+                Preconditions.checkState( environmentId == agent.getEnvironmentId() );
+            }
             Request request = requestBuilder.build( commandUUID );
-            if ( requestBuilder.getTimeout() > maxTimeout ) {
+            if ( requestBuilder.getTimeout() > maxTimeout )
+            {
                 maxTimeout = requestBuilder.getTimeout();
             }
             //this is a local agent
-            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
+            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 )
+            {
                 requests.add( request );
             }
-            else {
+            else
+            {
                 Set<BatchRequest> batchRequests = remoteRequests.get( agent.getSiteId() );
-                if ( batchRequests == null ) {
+                if ( batchRequests == null )
+                {
                     batchRequests = new HashSet<>();
                     remoteRequests.put( agent.getSiteId(), batchRequests );
                 }
-                batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
+                batchRequests.add( new BatchRequest( request, agent.getUuid(), agent.getEnvironmentId() ) );
             }
         }
 
@@ -170,7 +208,8 @@ public class CommandImpl extends AbstractCommand {
      *
      * @return - remote requests of command
      */
-    public Map<UUID, Set<BatchRequest>> getRemoteRequests() {
+    public Map<UUID, Set<BatchRequest>> getRemoteRequests()
+    {
         return Collections.unmodifiableMap( remoteRequests );
     }
 }

@@ -151,11 +151,7 @@ public class HadoopImpl implements Hadoop {
 
     @Override
     public List<HadoopClusterConfig> getClusters() {
-        try {
-            return pluginDAO.getInfo(HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class);
-        } catch (DBException e) {
-            return Collections.emptyList();
-        }
+        return pluginDAO.getInfo(HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class);
     }
 
 
@@ -163,11 +159,7 @@ public class HadoopImpl implements Hadoop {
     public HadoopClusterConfig getCluster(String clusterName) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(clusterName), "Cluster name is null or empty");
 
-        try {
-            return pluginDAO.getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
-        } catch (DBException e) {
-            return null;
-        }
+        return pluginDAO.getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
     }
 
 

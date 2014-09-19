@@ -52,13 +52,15 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {
-//    private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
     /**
@@ -245,6 +247,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         else
         {
+            LOG.info( Thread.currentThread().toString() );
 
             Agent agent = agentManager.waitForRegistration( cloneName, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 );
             if ( agent == null )

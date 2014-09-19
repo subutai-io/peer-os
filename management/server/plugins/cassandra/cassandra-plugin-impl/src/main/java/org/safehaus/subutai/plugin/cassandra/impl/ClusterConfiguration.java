@@ -137,13 +137,8 @@ public class ClusterConfiguration {
             return;
         }
 
-        try {
-            po.addLog( "Cassandra cluster data saved into database" );
-            cassandraManager.getPluginDAO()
-                            .saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        }
-        catch ( DBException e ) {
-            LOG.info(e.getMessage());
-        }
+        po.addLog( "Cassandra cluster data saved into database" );
+        cassandraManager.getPluginDAO()
+                        .saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
     }
 }

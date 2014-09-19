@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -13,30 +14,44 @@ import com.google.common.base.Preconditions;
 /**
  * Batch request
  */
-public class BatchRequest {
+class BatchRequest {
 
     private final Request request;
-    private final Set<UUID> targetUUIDs = new HashSet<>();
+    private final Set<UUID> agentIds = new HashSet<>();
+    //assume that environment id is the same for all requests in the batch
+    private final UUID environmentId;
 
 
-    public BatchRequest( final Request request, UUID targetUUID ) {
+    public BatchRequest( final Request request, UUID agentId, UUID environmentId ) {
         Preconditions.checkNotNull( request, "Request is null" );
-        Preconditions.checkNotNull( targetUUID, "Target UUID is null" );
+        Preconditions.checkNotNull( agentId, "Agent id is null" );
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
+        this.environmentId = environmentId;
         this.request = request;
-        targetUUIDs.add( targetUUID );
+        agentIds.add( agentId );
     }
 
 
-    public void addTargetUUID( UUID targetUUID ) {
-        Preconditions.checkNotNull( targetUUID, "Target UUID is null" );
+    public UUID getEnvironmentId() {
+        return environmentId;
+    }
 
-        targetUUIDs.add( targetUUID );
+
+    public void addAgentId( UUID agentId ) {
+        Preconditions.checkNotNull( agentId, "Agent id is null" );
+
+        agentIds.add( agentId );
+    }
+
+
+    public Set<UUID> getAgentIds() {
+        return Collections.unmodifiableSet( agentIds );
     }
 
 
     public int getRequestsCount() {
-        return targetUUIDs.size();
+        return agentIds.size();
     }
 
 
@@ -47,8 +62,9 @@ public class BatchRequest {
 
     public Set<Request> getRequests() {
         Set<Request> requests = new HashSet<>();
-        for ( UUID targetUUID : targetUUIDs ) {
-            Request req = new Request( request.getSource(), request.getType(), targetUUID, request.getTaskUuid(),
+        for ( UUID agentId : agentIds )
+        {
+            Request req = new Request( request.getSource(), request.getType(), agentId, request.getTaskUuid(),
                     request.getRequestSequenceNumber(), request.getWorkingDirectory(), request.getProgram(),
                     request.getStdOut(), request.getStdErr(), request.getStdOutPath(), request.getStdErrPath(),
                     request.getRunAs(), request.getArgs(), request.getEnvironment(), request.getPid(),

@@ -33,13 +33,8 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
     @Override
     public void run() {
         CassandraClusterConfig config = null;
-        try {
-            config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName,
-                    CassandraClusterConfig.class );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
+        config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName,
+                CassandraClusterConfig.class );
 
         if ( config == null ) {
             productOperation.addLogFailed(

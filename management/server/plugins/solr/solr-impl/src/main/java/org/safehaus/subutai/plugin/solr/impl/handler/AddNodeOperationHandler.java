@@ -43,14 +43,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> 
 
             productOperation.addLog( "Lxc container created successfully\nSaving information to database..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( SolrClusterConfig.PRODUCT_KEY, clusterName, solrClusterConfig );
-                productOperation.addLogDone( "Information saved to database" );
-            }
-            catch ( DBException e ) {
-                productOperation
-                        .addLogFailed( String.format( "Failed to save information to database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().saveInfo( SolrClusterConfig.PRODUCT_KEY, clusterName, solrClusterConfig );
+            productOperation.addLogDone( "Information saved to database" );
         }
         catch ( LxcCreateException ex ) {
             productOperation.addLogFailed( ex.getMessage() );

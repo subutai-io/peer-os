@@ -22,12 +22,12 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
@@ -39,11 +39,10 @@ import com.google.gson.JsonSyntaxException;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager {
 
-    private final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
-
-    private String ENVIRONMENT = "ENVIRONMENT";
-    private String BLUEPRINT = "BLUEPRINT";
-
+    private static final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
+    private static final String ENVIRONMENT = "ENVIRONMENT";
+    private static final String PROCESS = "PROCESS";
+    private static final String BLUEPRINT = "BLUEPRINT";
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;
@@ -255,23 +254,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress ) {
-        return environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
+        return environmentDAO.saveInfo( PROCESS, buildProgress.getUuid().toString(), buildProgress );
     }
 
 
     @Override
     public List<EnvironmentBuildProcess> getBuildProcesses() {
-        return environmentDAO.getInfo( "PROCESS", EnvironmentBuildProcess.class );
-    }
-
-
-    @Override
-    public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
-        //        UUID uuid = lxcBuildMessage.getEnvironmentId();
-        //        String templateName = lxcBuildMessage.getTemplateName();
-        //        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
-        //        String strategyName = lxcBuildMessage.getStrategyName();
-        //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
+        return environmentDAO.getInfo( PROCESS, EnvironmentBuildProcess.class );
     }
 
 
@@ -287,14 +276,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         {
             LOG.info( "Sending build message to" + cbm.getTargetPeerId() );
 
+            CreateContainersMessage ccm = new CreateContainersMessage();
+            ccm.setTemplate( cbm.getTemplateName() );
+            ccm.setTargetPeerId( cbm.getTargetPeerId() );
+            ccm.setNumberOfNodes( cbm.getNumberOfContainers() );
+            ccm.setEnvId( cbm.getEnvironmentUuid() );
+            ccm.setStrategy( cbm.getStrategy() );
+            ccm.setCriteria( cbm.getCriteria() );
+
             Set<Agent> agents = peerManager
-                    .createContainers( cbm.getEnvironmentUuid(), cbm.getTemplateName(), cbm.getNumberOfContainers(),
-                            cbm.getStrategy(), cbm.getCriteria() );
+                    .createContainers(ccm);
             for ( Agent agent : agents )
             {
                 LOG.info( agent.getUuid().toString() );
             }
         }
+    }
+
+
+    @Override
+    public void deleteBuildProcess( final EnvironmentBuildProcess environmentBuildProcess ) {
+        environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getUuid().toString() );
     }
 
 

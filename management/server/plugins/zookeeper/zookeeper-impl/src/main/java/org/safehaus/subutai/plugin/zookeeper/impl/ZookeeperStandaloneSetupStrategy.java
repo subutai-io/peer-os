@@ -102,16 +102,10 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
         po.addLog( "Saving cluster information to database..." );
 
-        try {
-            zookeeperManager.getPluginDAO()
-                            .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
-                                    zookeeperClusterConfig );
-            po.addLog( "Cluster information saved to database" );
-        }
-        catch ( DBException e ) {
-            throw new ClusterSetupException(
-                    String.format( "Failed to save cluster information to database, %s", e.getMessage() ) );
-        }
+        zookeeperManager.getPluginDAO()
+                        .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
+                                zookeeperClusterConfig );
+        po.addLog( "Cluster information saved to database" );
 
 
         return zookeeperClusterConfig;

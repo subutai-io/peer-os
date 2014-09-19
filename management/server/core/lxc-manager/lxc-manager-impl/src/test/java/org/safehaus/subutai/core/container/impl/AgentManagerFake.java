@@ -101,9 +101,8 @@ public class AgentManagerFake implements AgentManager {
 
 
     @Override
-    public Agent waitForRegistration( final String hostname, final long timeInMillis )
+    public Agent waitForRegistration( final String hostname, final long timeout )
     {
-        //TODO: Implement me
         return null;
     }
 }

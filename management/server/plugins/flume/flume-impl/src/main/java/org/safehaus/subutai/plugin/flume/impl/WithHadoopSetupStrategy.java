@@ -51,18 +51,14 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy {
         config.setHadoopNodes(allNodes);
 
         for(Agent a : config.getNodes()) {
-            if(manager.agentManager.getAgentByHostname(a.getHostname()) == null)
+            if(manager.getAgentManager().getAgentByHostname(a.getHostname()) == null)
                 throw new ClusterSetupException("Node is not connected: " + a.getHostname());
         }
 
         po.addLog("Saving to db...");
-        try {
-            manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info successfully saved");
-        } catch(DBException ex) {
-            throw new ClusterSetupException("Failed to save cluster info: " + ex.getMessage());
-        }
+        manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
+                config.getClusterName(), config);
+        po.addLog("Cluster info successfully saved");
 
         return config;
     }

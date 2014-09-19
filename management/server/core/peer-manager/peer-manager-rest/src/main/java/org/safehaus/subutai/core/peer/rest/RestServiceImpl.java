@@ -1,16 +1,18 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
 import com.google.gson.Gson;
@@ -24,8 +26,8 @@ import com.google.gson.JsonSyntaxException;
 
 public class RestServiceImpl implements RestService {
 
-    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
 
 
@@ -45,14 +47,38 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Peer registerPeer( String config ) {
-        if ( config != null ) {
+        if ( config != null )
+        {
             Peer peer = GSON.fromJson( config, Peer.class );
             peerManager.register( peer );
             return peer;
         }
-        else {
+        else
+        {
             return null;
         }
+    }
+
+
+    @Override
+    public String createContainers( final String createContainersMsg ) {
+        CreateContainersMessage ccm = GSON.fromJson( createContainersMsg, CreateContainersMessage.class );
+
+        Set<Agent> list = ( Set<Agent> ) peerManager.createContainers( ccm );
+
+        return JsonUtil.toJson( list );
+    }
+
+
+    @Override
+    public String getCreateContainersMsgJsonFormat() {
+        CreateContainersMessage ccm = new CreateContainersMessage();
+        ccm.setStrategy( "ROUND_ROBIN" );
+        ccm.setEnvId( UUID.randomUUID() );
+        ccm.setNumberOfNodes( 2 );
+        ccm.setTargetPeerId( UUID.randomUUID() );
+        ccm.setTemplate( "master" );
+        return GSON.toJson( ccm );
     }
 
 
@@ -73,24 +99,28 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response processMessage( final String peerId, final String recipient, final String message ) {
-        try {
+        try
+        {
             String response = peerManager.processPeerMessage( peerId, recipient, message );
 
             return Response.ok( response ).build();
         }
-        catch ( PeerMessageException e ) {
+        catch ( PeerMessageException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
 
 
     @Override
-    public Response getConnectedAgents( @QueryParam( "envId" ) final String environmentId ) {
-        try {
+    public Response getConnectedAgents( final String environmentId ) {
+        try
+        {
             String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
             return Response.ok( response ).build();
         }
-        catch ( JsonSyntaxException | PeerException e ) {
+        catch ( JsonSyntaxException | PeerException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -98,7 +128,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response ping() {
-        return Response.ok(  ).build();
+        return Response.ok().build();
     }
 
 
