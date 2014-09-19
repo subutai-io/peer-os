@@ -317,15 +317,7 @@
                 <!-- REST -->
                 <artifactItem>
                   <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-bundle-jaxrs</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-bundle</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-core</artifactId>
+                  <artifactId>cxf-rt-frontend-jaxrs</artifactId>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

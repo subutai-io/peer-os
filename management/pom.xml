@@ -347,18 +347,8 @@
       <!--REST dependencies-->
       <dependency>
         <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-bundle-jaxrs</artifactId>
-        <version>2.7.12</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-bundle</artifactId>
-        <version>2.7.12</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-core</artifactId>
-        <version>2.7.12</version>
+        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        <version>3.0.1</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

@@ -41,12 +41,8 @@
       <artifactId>httpmime</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-bundle-jaxrs</artifactId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>
   </dependencies>
 
