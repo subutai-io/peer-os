@@ -136,11 +136,7 @@ public class MongoImpl implements Mongo {
 
     public List<MongoClusterConfig> getClusters() {
 
-        try {
-            return pluginDAO.getInfo(MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class);
-        } catch (DBException e) {
-            return Collections.emptyList();
-        }
+        return pluginDAO.getInfo(MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class);
     }
 
 
@@ -148,11 +144,7 @@ public class MongoImpl implements Mongo {
     public MongoClusterConfig getCluster(String clusterName) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(clusterName), "Cluster name is null or empty");
 
-        try {
-            return pluginDAO.getInfo(MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class);
-        } catch (DBException e) {
-            return null;
-        }
+        return pluginDAO.getInfo(MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class);
     }
 
 

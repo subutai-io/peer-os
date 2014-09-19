@@ -120,13 +120,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         //update db
         productOperation.addLog( "Updating cluster information in database..." );
 
-        try {
-            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            productOperation.addLogDone( "Cluster information updated in database" );
-        }
-        catch ( DBException e ) {
-            productOperation.addLogFailed(
-                    String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
-        }
+        manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        productOperation.addLogDone( "Cluster information updated in database" );
     }
 }

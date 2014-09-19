@@ -25,6 +25,8 @@ public interface PeerManager {
 
     Peer getPeerByUUID( UUID uuid );
 
+    String getRemoteId(String baseUrl);
+
     public void addPeerMessageListener( PeerMessageListener listener );
 
     public void removePeerMessageListener( PeerMessageListener listener );

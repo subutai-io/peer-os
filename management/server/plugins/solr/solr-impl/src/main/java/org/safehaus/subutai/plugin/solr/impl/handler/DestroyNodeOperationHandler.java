@@ -76,14 +76,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
         // Update db
         productOperation.addLog( "Saving information to database..." );
 
-        try {
-            manager.getPluginDAO()
-                   .saveInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName(), solrClusterConfig );
-            productOperation.addLogDone( "Saved information to database" );
-        }
-        catch ( DBException e ) {
-            productOperation
-                    .addLogFailed( String.format( "Failed to save infomation to database, %s", e.getMessage() ) );
-        }
+        manager.getPluginDAO()
+               .saveInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName(), solrClusterConfig );
+        productOperation.addLogDone( "Saved information to database" );
     }
 }

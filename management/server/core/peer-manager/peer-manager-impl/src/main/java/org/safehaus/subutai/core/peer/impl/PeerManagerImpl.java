@@ -43,13 +43,11 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerImpl implements PeerManager {
+public class PeerManagerImpl implements PeerManager {
 
-    private final static Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
+    private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
+    private static final String SOURCE = "PEER_MANAGER";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
-
-
-    private final String SOURCE = "PEER_MANAGER";
     private DbManager dbManager;
     private AgentManager agentManager;
     private PeerDAO peerDAO;
@@ -158,6 +156,15 @@ public class PeerImpl implements PeerManager {
             LOG.info( e.getMessage() );
         }
         return null;
+    }
+
+
+    @Override
+    public String getRemoteId( final String baseUrl ) {
+        RemotePeerClient client = new RemotePeerClient();
+        client.setBaseUrl( baseUrl );
+        String response = client.callRemoteRest();
+        return response;
     }
 
 
@@ -363,7 +370,8 @@ public class PeerImpl implements PeerManager {
                 String response = HttpUtil.request( HttpUtil.RequestType.GET,
                         String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
 
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {}.getType() );
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {

@@ -41,13 +41,8 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
         if(ok) {
             po.addLog("Updating db...");
-            try {
-                manager.getPluginDao().deleteInfo(FlumeConfig.PRODUCT_KEY, clusterName);
-                po.addLogDone("Cluster info deleted from DB\nDone");
-            } catch(DBException ex) {
-                po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
-                manager.getLogger().error("Failed to delete cluster info", ex);
-            }
+            manager.getPluginDao().deleteInfo(FlumeConfig.PRODUCT_KEY, clusterName);
+            po.addLogDone( "Cluster info deleted from DB\nDone" );
         } else po.addLogFailed(null);
     }
 
@@ -99,7 +94,6 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
         } catch(LxcDestroyException ex) {
             String m = "Failed to destroy container(s)";
             po.addLog(m);
-            manager.getLogger().error(m, ex);
         }
         return true;
     }
