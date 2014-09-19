@@ -16,7 +16,7 @@ public class ContainerBuildMessage {
     private UUID environmentUuid;
     private boolean completeState;
     private int timestamp;
-    private String targetPeerId;
+    private UUID targetPeerId;
     private UUID peerId;
     private List<String> criteria;
 
@@ -106,12 +106,12 @@ public class ContainerBuildMessage {
     }
 
 
-    public String getTargetPeerId() {
+    public UUID getTargetPeerId() {
         return targetPeerId;
     }
 
 
-    public void setTargetPeerId( final String targetPeerId ) {
+    public void setTargetPeerId( final UUID targetPeerId ) {
         this.targetPeerId = targetPeerId;
     }
 

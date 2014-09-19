@@ -27,6 +27,7 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
@@ -275,9 +276,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         {
             LOG.info( "Sending build message to" + cbm.getTargetPeerId() );
 
+            CreateContainersMessage ccm = new CreateContainersMessage();
+            ccm.setTemplate( cbm.getTemplateName() );
+            ccm.setTargetPeerId( cbm.getTargetPeerId() );
+            ccm.setNumberOfNodes( cbm.getNumberOfContainers() );
+            ccm.setEnvId( cbm.getEnvironmentUuid() );
+            ccm.setStrategy( cbm.getStrategy() );
+            ccm.setCriteria( cbm.getCriteria() );
+
             Set<Agent> agents = peerManager
-                    .createContainers( cbm.getEnvironmentUuid(), cbm.getTemplateName(), cbm.getNumberOfContainers(),
-                            cbm.getStrategy(), cbm.getCriteria() );
+                    .createContainers(ccm);
             for ( Agent agent : agents )
             {
                 LOG.info( agent.getUuid().toString() );
