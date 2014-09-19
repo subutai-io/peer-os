@@ -289,8 +289,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Initialized agent manager
      */
-    public void init()
-    {
+    public void init() {
         try
         {
 
@@ -455,8 +454,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Removes agent from the cache of connected agents
      */
-    private void removeAgent( Response response )
-    {
+    private void removeAgent( Response response ) {
         try
         {
             if ( response != null && response.getTransportId() != null )

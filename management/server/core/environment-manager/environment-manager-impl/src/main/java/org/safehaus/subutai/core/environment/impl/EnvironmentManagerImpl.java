@@ -40,6 +40,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     private static final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
     private static final String ENVIRONMENT = "ENVIRONMENT";
+    private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
@@ -252,13 +253,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress ) {
-        return environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
+        return environmentDAO.saveInfo( PROCESS, buildProgress.getUuid().toString(), buildProgress );
     }
 
 
     @Override
     public List<EnvironmentBuildProcess> getBuildProcesses() {
-        return environmentDAO.getInfo( "PROCESS", EnvironmentBuildProcess.class );
+        return environmentDAO.getInfo( PROCESS, EnvironmentBuildProcess.class );
     }
 
 
@@ -282,6 +283,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 LOG.info( agent.getUuid().toString() );
             }
         }
+    }
+
+
+    @Override
+    public void deleteBuildProcess( final EnvironmentBuildProcess environmentBuildProcess ) {
+        environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getUuid().toString() );
     }
 
 
