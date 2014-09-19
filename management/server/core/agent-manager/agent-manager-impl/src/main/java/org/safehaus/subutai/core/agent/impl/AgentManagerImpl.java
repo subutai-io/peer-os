@@ -41,8 +41,7 @@ import com.google.common.cache.CacheBuilder;
 /**
  * Implementation of Agent Manager Interface
  */
-public class AgentManagerImpl implements ResponseListener, AgentManager
-{
+public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     private static final Logger LOG = Logger.getLogger( AgentManagerImpl.class.getName() );
     /**
@@ -266,11 +265,31 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     }
 
 
+    @Override
+    public Agent waitForRegistration( final String hostname, final long timeout )
+    {
+        long threshold = System.currentTimeMillis() + timeout;
+        Agent result = getAgentByHostname( hostname );
+        LOG.info( Thread.currentThread().toString() );
+        while ( result == null && System.currentTimeMillis() < threshold )
+        {
+            try
+            {
+                Thread.sleep( 2000 );
+            }
+            catch ( InterruptedException ignore )
+            {
+            }
+            result = getAgentByHostname( hostname );
+        }
+        return result;
+    }
+
+
     /**
      * Initialized agent manager
      */
-    public void init()
-    {
+    public void init() {
         try
         {
 
@@ -283,8 +302,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
             communicationService.addListener( this );
 
             exec = Executors.newSingleThreadExecutor();
-            exec.execute( new Runnable()
-            {
+            exec.execute( new Runnable() {
 
                 public void run()
                 {
@@ -404,9 +422,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
                         //TODO pass proper environmentId
-                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(),
-                        response.getEnvironmentId() == null ? UUIDUtil.generateMACBasedUUID() :
-                        response.getEnvironmentId() );
+                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(), UUIDUtil.generateMACBasedUUID() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
@@ -438,8 +454,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     /**
      * Removes agent from the cache of connected agents
      */
-    private void removeAgent( Response response )
-    {
+    private void removeAgent( Response response ) {
         try
         {
             if ( response != null && response.getTransportId() != null )

@@ -6,8 +6,10 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.monitor.api.Monitor;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ public abstract class ContainerManagerBase implements ContainerManager {
 	TemplateManager templateManager;
 	TemplateRegistryManager templateRegistry;
 	DbManager dbManager;
+    Monitor monitor;
+    StrategyManager strategyManager;
     List<ContainerPlacementStrategy> placementStrategies = Collections.synchronizedList(new ArrayList<ContainerPlacementStrategy>());
 
 	public AgentManager getAgentManager() {
@@ -71,6 +75,30 @@ public abstract class ContainerManagerBase implements ContainerManager {
 
     public void setPlacementStrategies(List<ContainerPlacementStrategy> placementStrategies) {
         this.placementStrategies = placementStrategies;
+    }
+
+
+    public Monitor getMonitor()
+    {
+        return monitor;
+    }
+
+
+    public void setMonitor( final Monitor monitor )
+    {
+        this.monitor = monitor;
+    }
+
+
+    public StrategyManager getStrategyManager()
+    {
+        return strategyManager;
+    }
+
+
+    public void setStrategyManager( final StrategyManager strategyManager )
+    {
+        this.strategyManager = strategyManager;
     }
 
 

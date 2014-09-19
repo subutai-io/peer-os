@@ -11,6 +11,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.ui.clone.Cloner;
 import org.safehaus.subutai.core.container.ui.manage.Manager;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.vaadin.ui.CustomComponent;
@@ -25,6 +26,7 @@ public class ContainerForm extends CustomComponent implements Disposable {
     private final static String managerTabCaption = "Manage";
     private final AgentTree agentTree;
     private final ContainerManager containerManager;
+    private final StrategyManager strategyManager;
     private final AgentManager agentManager;
 
 
@@ -32,7 +34,7 @@ public class ContainerForm extends CustomComponent implements Disposable {
 
         this.containerManager = serviceLocator.getService( ContainerManager.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
-
+        this.strategyManager = serviceLocator.getService( StrategyManager.class );
         setHeight( 100, Unit.PERCENTAGE );
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
@@ -48,7 +50,7 @@ public class ContainerForm extends CustomComponent implements Disposable {
         commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
         commandsSheet.setSizeFull();
         final Manager manager = new Manager( executorService, agentManager, containerManager );
-        commandsSheet.addTab( new Cloner( containerManager, agentTree ), "Clone" );
+        commandsSheet.addTab( new Cloner( containerManager, strategyManager, agentTree ), "Clone" );
         commandsSheet.addTab( manager, managerTabCaption );
         commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
             @Override

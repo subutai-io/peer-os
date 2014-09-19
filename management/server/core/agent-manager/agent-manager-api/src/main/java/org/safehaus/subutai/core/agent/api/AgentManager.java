@@ -84,4 +84,6 @@ public interface AgentManager
 
 
     public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
+
+    public Agent waitForRegistration(String hostname, long timeout);
 }

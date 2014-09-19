@@ -29,6 +29,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
@@ -365,14 +366,30 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( final UUID envId, final String template, final int numberOfNodes,
-                                        final String strategy, final List<String> criteria )
-    {
+    public Set<Agent> createContainers( CreateContainersMessage ccm ) {
 
         try
         {
             // TODO remote subutai or local
-            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
+
+            if ( getSiteId().equals( ccm.getTargetPeerId() ) )
+            {
+
+                UUID envId = ccm.getEnvId();
+                String template = ccm.getTemplate();
+                int numberOfNodes = ccm.getNumberOfNodes();
+                String strategy = ccm.getStrategy();
+                return containerManager.clone( envId, template, numberOfNodes, strategy, null );
+            }
+            else
+            {
+                RemotePeerClient client = new RemotePeerClient();
+                Peer remotePeer = getPeerByUUID( ccm.getTargetPeerId() );
+                String baseUrl = "http://" + remotePeer + ":8181/cxf";
+                client.setBaseUrl( baseUrl );
+                String response = client.createRemoteContainers( ccm );
+                LOG.info( "REMOTE CONTAINERS CREATE COMMAND SENT" + response );
+            }
         }
         catch ( ContainerCreateException e )
         {
