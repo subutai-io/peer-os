@@ -112,25 +112,25 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- agent-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>apt-repository-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>apt-repository-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>apt-repository-cli</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>apt-repository-api</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>apt-repository-impl</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>apt-repository-cli</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- command-dispatcher -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-dispatcher-api</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>command-dispatcher-api</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- command-runner -->
@@ -145,14 +145,14 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>communication-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>communication-manager-impl</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>communication-manager-api</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>communication-manager-impl</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- config-point-tracker -->
