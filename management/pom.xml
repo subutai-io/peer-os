@@ -16,6 +16,14 @@
 
   <description>Parent project for the Subutai Project Artifacts</description>
 
+  <repositories>
+    <repository>
+      <id>maven-restlet</id>
+      <name>Restlet repository</name>
+      <url>http://maven.restlet.com</url>
+    </repository>
+  </repositories>
+
   <properties>
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,6 +33,8 @@
     <aries.blueprint.version>1.1.0</aries.blueprint.version>
     <aries.proxy.version>1.0.1</aries.proxy.version>
     <aries.util.version>1.1.0</aries.util.version>
+    <!-- REST -->
+    <restlet-version>2.2.2</restlet-version>
   </properties>
 
   <dependencyManagement>
@@ -346,14 +356,14 @@
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--REST dependencies-->
       <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-        <version>2.7.12</version>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet</artifactId>
+        <version>${restlet-version}</version>
       </dependency>
       <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>javax.ws.rs-api</artifactId>
-        <version>2.0.1</version>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet.ext.jackson</artifactId>
+        <version>${restlet-version}</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
