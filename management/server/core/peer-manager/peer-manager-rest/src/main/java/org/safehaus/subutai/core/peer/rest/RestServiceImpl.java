@@ -1,15 +1,18 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
 import com.google.gson.Gson;
@@ -23,8 +26,8 @@ import com.google.gson.JsonSyntaxException;
 
 public class RestServiceImpl implements RestService {
 
-    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
 
 
@@ -54,6 +57,28 @@ public class RestServiceImpl implements RestService {
         {
             return null;
         }
+    }
+
+
+    @Override
+    public String createContainers( final String createContainersMsg ) {
+        CreateContainersMessage ccm = GSON.fromJson( createContainersMsg, CreateContainersMessage.class );
+
+        Set<Agent> list = ( Set<Agent> ) peerManager.createContainers( ccm );
+
+        return JsonUtil.toJson( list );
+    }
+
+
+    @Override
+    public String getCreateContainersMsgJsonFormat() {
+        CreateContainersMessage ccm = new CreateContainersMessage();
+        ccm.setStrategy( "ROUND_ROBIN" );
+        ccm.setEnvId( UUID.randomUUID() );
+        ccm.setNumberOfNodes( 2 );
+        ccm.setTargetPeerId( UUID.randomUUID() );
+        ccm.setTemplate( "master" );
+        return GSON.toJson( ccm );
     }
 
 
