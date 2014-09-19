@@ -36,12 +36,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
 
 
 /**
  * Implementation of Agent Manager Interface
  */
-public class AgentManagerImpl implements ResponseListener, AgentManager {
+public class AgentManagerImpl implements ResponseListener, AgentManager
+{
 
     private static final Logger LOG = Logger.getLogger( AgentManagerImpl.class.getName() );
     /**
@@ -86,7 +88,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      */
     public Set<Agent> getAgents()
     {
-        return new HashSet( agents.asMap().values() );
+        return Sets.newHashSet( agents.asMap().values() );
     }
 
 
@@ -282,7 +284,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             communicationService.addListener( this );
 
             exec = Executors.newSingleThreadExecutor();
-            exec.execute( new Runnable() {
+            exec.execute( new Runnable()
+            {
 
                 public void run()
                 {
@@ -296,7 +299,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                             {
                                 lastNotify = System.currentTimeMillis();
                                 notifyAgentListeners = false;
-                                Set<Agent> freshAgents = new HashSet( agents.asMap().values() );
+                                Set<Agent> freshAgents = Sets.newHashSet( agents.asMap().values() );
                                 for ( Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); )
                                 {
                                     AgentListener listener = it.next();

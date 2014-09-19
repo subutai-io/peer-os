@@ -1,18 +1,16 @@
 package org.safehaus.subutai.core.peer.api;
 
 
-import java.util.UUID;
-
-
 /**
  * Created by bahadyr on 9/6/14.
  */
 //@XmlRootElement(name = "Peer")
-public class Peer {
+public class Peer
+{
 
     private String name;
     private String ip;
-    private UUID id;
+    private String id;
 
 
     public String getName()
@@ -39,13 +37,13 @@ public class Peer {
     }
 
 
-    public UUID getId()
+    public String getId()
     {
         return id;
     }
 
 
-    public void setId( final UUID id )
+    public void setId( final String id )
     {
         this.id = id;
     }
