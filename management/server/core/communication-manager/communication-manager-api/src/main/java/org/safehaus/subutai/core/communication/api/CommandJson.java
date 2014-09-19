@@ -18,7 +18,8 @@ import com.google.gson.GsonBuilder;
 /**
  * This is simple utility class for serializing/deserializing object to/from json.
  */
-public class CommandJson {
+public class CommandJson
+{
 
     private static final Logger LOG = Logger.getLogger( CommandJson.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().addDeserializationExclusionStrategy(
@@ -263,7 +264,8 @@ public class CommandJson {
     }*/
 
 
-    private static class CommandImpl implements Command {
+    private static class CommandImpl implements Command
+    {
 
         Request command;
         Response response;

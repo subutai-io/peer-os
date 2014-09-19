@@ -14,7 +14,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command( scope = "agent", name = "get-agents", description = "get the list of agents" )
-public class GetAgentsCommand extends OsgiCommandSupport {
+public class GetAgentsCommand extends OsgiCommandSupport
+{
 
     private AgentManager agentManager;
 

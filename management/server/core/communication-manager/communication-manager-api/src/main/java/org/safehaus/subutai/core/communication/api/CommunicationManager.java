@@ -8,7 +8,8 @@ import org.safehaus.subutai.common.protocol.ResponseListener;
 /**
  * Interface for communication manager implementations.
  */
-public interface CommunicationManager {
+public interface CommunicationManager
+{
 
     /**
      * Sends request to agent

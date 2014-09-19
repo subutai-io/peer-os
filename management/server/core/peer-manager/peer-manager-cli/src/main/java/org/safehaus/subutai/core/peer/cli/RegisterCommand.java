@@ -1,8 +1,7 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
-import java.util.UUID;
-
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -14,7 +13,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Created by bahadyr on 8/28/14.
  */
 @Command( scope = "peer", name = "register" )
-public class RegisterCommand extends OsgiCommandSupport {
+public class RegisterCommand extends OsgiCommandSupport
+{
 
     private PeerManager peerManager;
 
@@ -36,15 +36,8 @@ public class RegisterCommand extends OsgiCommandSupport {
     {
         Peer peer = getSamplePeer();
 
-        if ( peerManager.register( peer ) )
-        {
-            System.out.println( "Peer registered." );
-        }
-        else
-        {
-            System.out.println( "Failed to register peer." );
-        }
-
+        String result = peerManager.register( peer );
+        System.out.println( result );
         return null;
     }
 
@@ -54,7 +47,7 @@ public class RegisterCommand extends OsgiCommandSupport {
         Peer peer = new Peer();
         peer.setName( "Peer name" );
         peer.setIp( "10.10.10.10" );
-        peer.setId( UUID.randomUUID() );
+        peer.setId( UUIDUtil.generateCassandraUUID().toString() );
         return peer;
     }
 }

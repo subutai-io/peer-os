@@ -20,7 +20,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is used internally by CommunicationManagerImpl for sending requests to agents.
  */
-class CommandProducer implements Runnable {
+class CommandProducer implements Runnable
+{
 
     private static final Logger LOG = LoggerFactory.getLogger( CommandProducer.class.getName() );
     private final Request command;
@@ -28,13 +29,15 @@ class CommandProducer implements Runnable {
     private final boolean isBroadcast;
 
 
-    public CommandProducer( Request command, CommunicationManagerImpl communicationManagerImpl ) {
+    public CommandProducer( Request command, CommunicationManagerImpl communicationManagerImpl )
+    {
         this( command, communicationManagerImpl, false );
     }
 
 
     public CommandProducer( final Request command, final CommunicationManagerImpl communicationManagerImpl,
-                            final boolean isBroadcast ) {
+                            final boolean isBroadcast )
+    {
         this.command = command;
         this.communicationManagerImpl = communicationManagerImpl;
         this.isBroadcast = isBroadcast;
@@ -44,11 +47,13 @@ class CommandProducer implements Runnable {
     /**
      * Called by executor to send message to agent
      */
-    public void run() {
+    public void run()
+    {
         Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
-        try {
+        try
+        {
             connection = communicationManagerImpl.createConnection();
             connection.start();
             session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
@@ -60,7 +65,8 @@ class CommandProducer implements Runnable {
             producer.setTimeToLive( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec() * 1000 );
             String json = CommandJson.getJson( command );
 
-            if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) ) {
+            if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) )
+            {
                 //                LOG.log( Level.INFO, "\nSending: {0}", json );
                 LOG.info( "\nSending: {}", json );
             }
@@ -68,29 +74,40 @@ class CommandProducer implements Runnable {
             TextMessage message = session.createTextMessage( json );
             producer.send( message );
         }
-        catch ( JMSException e ) {
+        catch ( JMSException e )
+        {
             LOG.error( "Error to send a message: ", e );
         }
-        finally {
-            if ( producer != null ) {
-                try {
+        finally
+        {
+            if ( producer != null )
+            {
+                try
+                {
                     producer.close();
                 }
-                catch ( Exception e ) {
+                catch ( Exception e )
+                {
                 }
             }
-            if ( session != null ) {
-                try {
+            if ( session != null )
+            {
+                try
+                {
                     session.close();
                 }
-                catch ( Exception e ) {
+                catch ( Exception e )
+                {
                 }
             }
-            if ( connection != null ) {
-                try {
+            if ( connection != null )
+            {
+                try
+                {
                     connection.close();
                 }
-                catch ( Exception e ) {
+                catch ( Exception e )
+                {
                 }
             }
         }

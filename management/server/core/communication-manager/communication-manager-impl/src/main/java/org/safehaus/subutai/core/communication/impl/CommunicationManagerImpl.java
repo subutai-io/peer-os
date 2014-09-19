@@ -28,7 +28,8 @@ import com.google.common.base.Strings;
 /**
  * This class is implementation of Communication Manager.
  */
-public class CommunicationManagerImpl implements CommunicationManager {
+public class CommunicationManagerImpl implements CommunicationManager
+{
 
     private static final Logger LOG = Logger.getLogger( CommunicationManagerImpl.class.getName() );
     /**

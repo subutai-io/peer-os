@@ -29,7 +29,8 @@ import com.google.common.collect.Sets;
 /**
  * This is an implementation of GitManager interface
  */
-public class GitManagerImpl implements GitManager {
+public class GitManagerImpl implements GitManager
+{
 
     private static final String MASTER_BRANCH = "master";
     private static final String LINE_SEPARATOR = "\n";

@@ -13,7 +13,8 @@ import org.safehaus.subutai.common.protocol.Response;
  * Implementations of this interface are wrappers for Request and Response objects. Used for serializing POJOs to json
  * commands for sending via communication manager.
  */
-public interface Command {
+public interface Command
+{
 
     /**
      * Returns contained request object if any

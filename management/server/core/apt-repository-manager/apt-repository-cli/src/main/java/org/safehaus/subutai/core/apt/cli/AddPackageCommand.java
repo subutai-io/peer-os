@@ -12,7 +12,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "apt", name = "add-package", description = "Add package to apt repository by path" )
-public class AddPackageCommand extends OsgiCommandSupport {
+public class AddPackageCommand extends OsgiCommandSupport
+{
     @Argument( index = 0, name = "package path", required = true, multiValued = false,
             description = "path to package" )
     String packagePath;

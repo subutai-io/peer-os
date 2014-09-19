@@ -13,7 +13,8 @@ import java.util.UUID;
 /**
  * Command to execute on agent(s)
  */
-public interface Command {
+public interface Command
+{
 
     /**
      * Shows if command has completed. The same as checking command.getCommandStatus == CommandStatus.SUCCEEDED ||
@@ -78,13 +79,4 @@ public interface Command {
      * @return - description of command or null
      */
     public String getDescription();
-
-
-    public void execute( CommandCallback callback ) throws CommandException;
-
-    public void executeAsync( CommandCallback callback ) throws CommandException;
-
-    public void execute() throws CommandException;
-
-    public void executeAsync() throws CommandException;
 }

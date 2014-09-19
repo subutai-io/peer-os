@@ -18,9 +18,11 @@ import org.safehaus.subutai.common.protocol.ResponseListener;
 /**
  * Test utilities
  */
-public class TestUtils {
+public class TestUtils
+{
 
-    public static Request getRequestTemplate( UUID uuid ) {
+    public static Request getRequestTemplate( UUID uuid )
+    {
         return new Request( "SOURCE", RequestType.EXECUTE_REQUEST, // type
                 uuid, //                        !! agent uuid
                 UUID.randomUUID(), //                        !! task uuid
@@ -38,11 +40,14 @@ public class TestUtils {
     }
 
 
-    public static ResponseListener getResponseListener() {
+    public static ResponseListener getResponseListener()
+    {
 
-        return new ResponseListener() {
+        return new ResponseListener()
+        {
 
-            public void onResponse( Response response ) {
+            public void onResponse( Response response )
+            {
 
             }
         };

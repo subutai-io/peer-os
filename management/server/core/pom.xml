@@ -20,22 +20,22 @@
     <module>command-dispatcher</module>
     <module>command-runner</module>
     <module>communication-manager</module>
-    <module>config-point-tracker</module>
-    <module>configuration-manager</module>
+    <!--<module>config-point-tracker</module>-->
+    <!--<module>configuration-manager</module>-->
     <!--<module>container-manager</module>-->
-    <module>environment-manager</module>
-    <module>db-manager</module>
-    <module>file-tracker</module>
-    <module>git-manager</module>
+    <!--<module>environment-manager</module>-->
+    <!--<module>db-manager</module>-->
+    <!--<module>file-tracker</module>-->
+    <!--<module>git-manager</module>-->
     <!--<module>lxc-manager</module>-->
-    <module>monitoring</module>
-    <module>network-manager</module>
-    <module>package-manager</module>
-    <module>peer-manager</module>
+    <!--<module>monitoring</module>-->
+    <!--<module>network-manager</module>-->
+    <!--<module>package-manager</module>-->
+    <!--<module>peer-manager</module>-->
     <!--<module>strategy-manager</module>-->
-    <module>template-manager</module>
-    <module>template-registry</module>
-    <module>tracker</module>
+    <!--<module>template-manager</module>-->
+    <!--<module>template-registry</module>-->
+    <!--<module>tracker</module>-->
     <!--
     <module>pet_core</module>
     -->

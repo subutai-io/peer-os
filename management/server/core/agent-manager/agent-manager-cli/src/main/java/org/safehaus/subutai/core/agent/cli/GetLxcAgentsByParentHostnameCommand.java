@@ -16,7 +16,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  */
 @Command( scope = "agent", name = "get-lxc-agents-by-parent-hostname",
         description = "get LXC agents by parent hostname" )
-public class GetLxcAgentsByParentHostnameCommand extends OsgiCommandSupport {
+public class GetLxcAgentsByParentHostnameCommand extends OsgiCommandSupport
+{
 
     @Argument( index = 0, name = "parentHostname", required = true, multiValued = false,
             description = "Parent hostname" )

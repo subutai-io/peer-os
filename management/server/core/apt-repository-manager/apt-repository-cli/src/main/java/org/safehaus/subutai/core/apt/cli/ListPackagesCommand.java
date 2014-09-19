@@ -15,7 +15,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "apt", name = "list-packages", description = "List packages in apt repository by pattern" )
-public class ListPackagesCommand extends OsgiCommandSupport {
+public class ListPackagesCommand extends OsgiCommandSupport
+{
     @Argument( index = 0, name = "pattern", required = true, multiValued = false, description = "search pattern" )
     String pattern;
 

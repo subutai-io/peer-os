@@ -22,7 +22,8 @@ import com.google.common.base.Preconditions;
 /**
  * This is implementation of Command interface
  */
-public class CommandImpl extends AbstractCommand {
+public class CommandImpl extends AbstractCommand
+{
 
 
     /**
@@ -34,7 +35,6 @@ public class CommandImpl extends AbstractCommand {
      */
     public CommandImpl( RequestBuilder requestBuilder, int requestsCount, CommandRunnerBase commandRunner )
     {
-        super( commandRunner );
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( requestsCount > 0, "Request Count <= 0" );
 
@@ -58,7 +58,6 @@ public class CommandImpl extends AbstractCommand {
     public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents,
                         CommandRunnerBase commandRunner )
     {
-        super( commandRunner );
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
 
@@ -83,7 +82,6 @@ public class CommandImpl extends AbstractCommand {
      */
     public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders, CommandRunnerBase commandRunner )
     {
-        super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
                 "Request Builders are null or empty" );
 

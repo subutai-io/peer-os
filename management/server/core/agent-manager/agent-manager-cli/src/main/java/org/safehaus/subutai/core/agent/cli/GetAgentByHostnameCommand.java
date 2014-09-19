@@ -13,7 +13,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command( scope = "agent", name = "get-agent-by-hostname", description = "get agent by hostname" )
-public class GetAgentByHostnameCommand extends OsgiCommandSupport {
+public class GetAgentByHostnameCommand extends OsgiCommandSupport
+{
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;

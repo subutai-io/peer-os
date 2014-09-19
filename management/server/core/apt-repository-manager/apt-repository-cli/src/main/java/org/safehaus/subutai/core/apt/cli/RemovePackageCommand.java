@@ -12,7 +12,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command( scope = "apt", name = "remove-package", description = "Remove package from apt repository by name" )
-public class RemovePackageCommand extends OsgiCommandSupport {
+public class RemovePackageCommand extends OsgiCommandSupport
+{
     @Argument( index = 0, name = "package name", required = true, multiValued = false, description = "name of package" )
     String packageName;
 

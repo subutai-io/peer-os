@@ -10,7 +10,8 @@ import com.google.gson.FieldAttributes;
 /**
  * Skips fields with null values from (de)serialization by GSON
  */
-public class SkipNullsExclusionStrategy implements ExclusionStrategy {
+public class SkipNullsExclusionStrategy implements ExclusionStrategy
+{
     @Override
     public boolean shouldSkipField( final FieldAttributes fieldAttributes )
     {

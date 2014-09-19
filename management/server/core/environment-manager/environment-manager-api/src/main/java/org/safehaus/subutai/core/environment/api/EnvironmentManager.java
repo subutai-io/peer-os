@@ -14,13 +14,13 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 
 
 /**
  *
  */
-public interface EnvironmentManager {
+public interface EnvironmentManager
+{
 
     /**
      * Builds the environment with a given blueprint descriptor.

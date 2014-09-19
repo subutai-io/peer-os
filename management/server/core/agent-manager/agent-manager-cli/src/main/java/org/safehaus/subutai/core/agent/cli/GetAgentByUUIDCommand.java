@@ -15,7 +15,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command( scope = "agent", name = "get-agent-by-uuid", description = "get agent by uuid" )
-public class GetAgentByUUIDCommand extends OsgiCommandSupport {
+public class GetAgentByUUIDCommand extends OsgiCommandSupport
+{
 
     @Argument( index = 0, name = "uuid", required = true, multiValued = false, description = "agent UUID" )
     String uuid;

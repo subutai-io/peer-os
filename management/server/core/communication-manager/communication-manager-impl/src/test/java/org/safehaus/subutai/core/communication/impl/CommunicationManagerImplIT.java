@@ -36,13 +36,15 @@ import static org.junit.Assert.assertTrue;
  * Test for CommunicationManager class <p/> TODO Add embedded broker for unit tests
  */
 @Ignore
-public class CommunicationManagerImplIT {
+public class CommunicationManagerImplIT
+{
 
     private static CommunicationManagerImpl communicationManagerImpl = null;
 
 
     @BeforeClass
-    public static void setUpClass() {
+    public static void setUpClass()
+    {
         communicationManagerImpl = new CommunicationManagerImpl();
         communicationManagerImpl.setAmqMaxMessageToAgentTtlSec( 5 );
         communicationManagerImpl.setAmqUrl( "some-url" );
@@ -54,13 +56,15 @@ public class CommunicationManagerImplIT {
 
 
     @AfterClass
-    public static void tearDownClass() {
+    public static void tearDownClass()
+    {
         communicationManagerImpl.destroy();
     }
 
 
     @Test
-    public void testAddListener() {
+    public void testAddListener()
+    {
         ResponseListener listener = TestUtils.getResponseListener();
 
         communicationManagerImpl.addListener( listener );
@@ -70,7 +74,8 @@ public class CommunicationManagerImplIT {
 
 
     @Test
-    public void testRemoveListener() {
+    public void testRemoveListener()
+    {
         ResponseListener listener = TestUtils.getResponseListener();
 
         communicationManagerImpl.addListener( listener );
@@ -82,7 +87,8 @@ public class CommunicationManagerImplIT {
 
 
     @Test
-    public void testSendRequest() throws JMSException {
+    public void testSendRequest() throws JMSException
+    {
         Connection connection;
         UUID uuid = UUID.randomUUID();
         //setup listener
@@ -105,7 +111,8 @@ public class CommunicationManagerImplIT {
 
 
     @Test
-    public void testMessageReception() throws JMSException, InterruptedException {
+    public void testMessageReception() throws JMSException, InterruptedException
+    {
         Connection connection;
 
         TestResponseListener responseListener = new TestResponseListener();
@@ -121,19 +128,24 @@ public class CommunicationManagerImplIT {
 
         final Response response = new Response();
 
-        Thread t = new Thread( new Runnable() {
+        Thread t = new Thread( new Runnable()
+        {
 
-            public void run() {
-                try {
+            public void run()
+            {
+                try
+                {
                     producer.send( session.createTextMessage( CommandJson.getResponse( response ) ) );
                 }
-                catch ( JMSException ex ) {
+                catch ( JMSException ex )
+                {
                     Logger.getLogger( CommunicationManagerImplIT.class.getName() ).log( Level.SEVERE, null, ex );
                 }
             }
         } );
         t.start();
-        synchronized ( responseListener.signal ) {
+        synchronized ( responseListener.signal )
+        {
             responseListener.signal.wait();
         }
 
@@ -141,17 +153,20 @@ public class CommunicationManagerImplIT {
     }
 
 
-    private static class TestResponseListener implements ResponseListener {
+    private static class TestResponseListener implements ResponseListener
+    {
 
         private final Object signal = new Object();
         private Response response;
 
 
-        public void onResponse( Response response ) {
+        public void onResponse( Response response )
+        {
 
             this.response = response;
 
-            synchronized ( signal ) {
+            synchronized ( signal )
+            {
                 signal.notify();
             }
         }
