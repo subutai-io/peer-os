@@ -59,20 +59,16 @@ public class EnvironmentBuildWizard extends DetailsWindow {
 
 
     private void putForm() {
-        switch ( step )
-        {
-            case 1:
-            {
+        switch ( step ) {
+            case 1: {
                 setContent( genPeersTable() );
                 break;
             }
-            case 2:
-            {
+            case 2: {
                 setContent( genContainerToPeersTable() );
                 break;
             }
-            case 3:
-            {
+            case 3: {
                 managerUI.getEnvironmentManager().buildEnvironment( environmentBuildTask );
                 close();
                 break;
@@ -121,8 +117,7 @@ public class EnvironmentBuildWizard extends DetailsWindow {
 
 
         List<Peer> peers = managerUI.getPeerManager().peers();
-        for ( Peer peer : peers )
-        {
+        for ( Peer peer : peers ) {
             CheckBox ch = new CheckBox();
 
             Object id = peersTable.addItem( new Object[] {
@@ -134,12 +129,9 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         nextButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
-                if ( selectedPeers().size() > 0 )
-                {
+                if ( selectedPeers().size() > 0 ) {
                     next();
-                }
-                else
-                {
+                } else {
                     Notification.show( "Please select peers", Notification.Type.HUMANIZED_MESSAGE );
                 }
             }
@@ -170,10 +162,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         containerToPeerTable.setSizeFull();
 
 
-        for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
-        {
-            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
-            {
+        for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() ) {
+            for ( int i = 0; i < ng.getNumberOfNodes(); i++ ) {
                 ComboBox box = new ComboBox( "", selectedPeers() );
                 box.setNullSelectionAllowed( false );
                 box.setTextInputAllowed( false );
@@ -204,12 +194,10 @@ public class EnvironmentBuildWizard extends DetailsWindow {
 
     private List<UUID> selectedPeers() {
         List<UUID> uuids = new ArrayList<>();
-        for ( Object itemId : peersTable.getItemIds() )
-        {
+        for ( Object itemId : peersTable.getItemIds() ) {
             UUID uuid = ( UUID ) peersTable.getItem( itemId ).getItemProperty( "ID" ).getValue();
             CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
-            if ( selection.getValue() )
-            {
+            if ( selection.getValue() ) {
                 uuids.add( uuid );
             }
         }
@@ -223,8 +211,7 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         Map<UUID, Map<String, ContainerBuildMessage>> buildMessageMap =
                 new HashMap<UUID, Map<String, ContainerBuildMessage>>();
 
-        for ( Object itemId : containerToPeerTable.getItemIds() )
-        {
+        for ( Object itemId : containerToPeerTable.getItemIds() ) {
             String templateName =
                     ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
             ComboBox selection =
@@ -233,18 +220,15 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             UUID peerUuid = ( UUID ) selection.getValue();
 
 
-            if ( !buildMessageMap.containsKey( peerUuid ) )
-            {
+            if ( !buildMessageMap.containsKey( peerUuid ) ) {
 
                 ContainerBuildMessage cbm = new ContainerBuildMessage();
                 cbm.setTemplateName( templateName );
                 cbm.setPeerId( peerUuid );
                 cbm.setCompleteState( false );
                 cbm.setEnvironmentUuid( environmentBuildTask.getUuid() );
-//                buildMessageMap.put(  ).put( templateName, cbm );
-            }
-            else
-            {
+                //                buildMessageMap.put(  ).put( templateName, cbm );
+            } else {
                 buildMessageMap.get( peerUuid ).get( templateName ).incrementNumOfCont();
             }
         }

@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
@@ -21,6 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings("serial")
 public class EnvironmentsBuildProcessForm {
 
+    private final static Logger LOG = Logger.getLogger( EnvironmentsBuildProcessForm.class.getName() );
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
@@ -51,10 +53,12 @@ public class EnvironmentsBuildProcessForm {
 
                 EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
                 ContainerBuildMessage message = new ContainerBuildMessage();
-                message.setNumberOfContainers( 4 );
+                message.setNumberOfContainers( 2 );
                 message.setTemplateName( "master" );
                 message.setStrategy( "ROUND_ROBIN" );
                 message.setEnvironmentUuid( UUID.randomUUID() );
+//                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
+                message.setTargetPeerId( UUID.fromString( "6b6b9033-2673-38dc-8761-8feacc777385" ) );
                 environmentBuildProcess.addBuildBlock( message );
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
@@ -85,8 +89,7 @@ public class EnvironmentsBuildProcessForm {
         environmentsTable.removeAllItems();
         List<EnvironmentBuildProcess> environmentBuildProcessList =
                 managerUI.getEnvironmentManager().getBuildProcesses();
-        for ( final EnvironmentBuildProcess environmentBuildProcess : environmentBuildProcessList )
-        {
+        for ( final EnvironmentBuildProcess environmentBuildProcess : environmentBuildProcessList ) {
             Button viewEnvironmentInfoButton = new Button( "Info" );
             viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {
                 @Override
@@ -105,10 +108,8 @@ public class EnvironmentsBuildProcessForm {
             Embedded progressIcon = null;
             Button destroyButton = null;
 
-            switch ( environmentBuildProcess.getProcessStatusEnum() )
-            {
-                case NEW_PROCESS:
-                {
+            switch ( environmentBuildProcess.getProcessStatusEnum() ) {
+                case NEW_PROCESS: {
                     processButton = new Button( "Build" );
                     progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
                     progressIcon.setVisible( false );
@@ -116,7 +117,11 @@ public class EnvironmentsBuildProcessForm {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
                             // TODO create build task
-                            managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
+                            try {
+                                managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
+                            } catch ( NullPointerException e ) {
+                                LOG.severe( e.getMessage() );
+                            }
                         }
                     } );
 
@@ -130,8 +135,7 @@ public class EnvironmentsBuildProcessForm {
 
                     break;
                 }
-                case IN_PROGRESS:
-                {
+                case IN_PROGRESS: {
                     processButton = new Button( "Terminate" );
                     progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
                     progressIcon.setVisible( true );
@@ -144,8 +148,7 @@ public class EnvironmentsBuildProcessForm {
                     } );
                     break;
                 }
-                case FAILED:
-                {
+                case FAILED: {
                     processButton = new Button( "Destroy" );
                     progressIcon = new Embedded( "", new ThemeResource( "img/cancel.png" ) );
                     progressIcon.setVisible( true );
@@ -158,8 +161,7 @@ public class EnvironmentsBuildProcessForm {
                     } );
                     break;
                 }
-                case SUCCESSFUL:
-                {
+                case SUCCESSFUL: {
                     processButton = new Button( "Configure" );
                     progressIcon = new Embedded( "", new ThemeResource( "img/ok.png" ) );
                     progressIcon.setVisible( true );

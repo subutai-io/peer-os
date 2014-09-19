@@ -201,13 +201,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean destroyEnvironment( final String uuid ) {
         Environment environment = getEnvironmentInfo( uuid );
-        try
-        {
+        try {
             environmentBuilder.destroy( environment );
             return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
-        }
-        catch ( EnvironmentDestroyException e )
-        {
+        } catch ( EnvironmentDestroyException e ) {
             LOG.severe( e.getMessage() );
         }
         return false;
@@ -216,8 +213,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
-        try
-        {
+        try {
             EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
 
             EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
@@ -225,9 +221,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
             return environmentDAO
                     .saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
-        }
-        catch ( JsonSyntaxException e )
-        {
+        } catch ( JsonSyntaxException e ) {
             LOG.severe( e.getMessage() );
         }
         return false;
@@ -272,9 +266,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess ) {
-        for ( ContainerBuildMessage cbm : environmentBuildProcess.getContainerBuildMessages() )
-        {
-            LOG.info( "Sending build message to" + cbm.getTargetPeerId() );
+        for ( ContainerBuildMessage cbm : environmentBuildProcess.getContainerBuildMessages() ) {
+
+            LOG.info( "Sending build message to " + cbm.getTargetPeerId() );
 
             CreateContainersMessage ccm = new CreateContainersMessage();
             ccm.setTemplate( cbm.getTemplateName() );
@@ -284,10 +278,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             ccm.setStrategy( cbm.getStrategy() );
             ccm.setCriteria( cbm.getCriteria() );
 
-            Set<Agent> agents = peerManager
-                    .createContainers(ccm);
-            for ( Agent agent : agents )
-            {
+            Set<Agent> agents = peerManager.createContainers( ccm );
+            for ( Agent agent : agents ) {
                 LOG.info( agent.getUuid().toString() );
             }
         }
@@ -303,15 +295,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private boolean build( EnvironmentBuildTask environmentBuildTask ) {
 
         if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
-                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) )
-        {
-            try
-            {
+                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) ) {
+            try {
                 Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
                 return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-            }
-            catch ( EnvironmentBuildException e )
-            {
+            } catch ( EnvironmentBuildException e ) {
                 LOG.severe( e.getMessage() );
             }
         }

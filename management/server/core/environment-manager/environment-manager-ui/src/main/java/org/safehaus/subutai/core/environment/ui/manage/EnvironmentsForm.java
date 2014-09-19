@@ -19,7 +19,7 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings("serial")
 public class EnvironmentsForm {
 
-    private final static Logger logger = Logger.getLogger( EnvironmentsForm.class.getName() );
+    private final static Logger LOG = Logger.getLogger( EnvironmentsForm.class.getName() );
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;
@@ -69,21 +69,11 @@ public class EnvironmentsForm {
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Info", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
-        //        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        //        table.setHeight( size, Sizeable.UNITS_PIXELS );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
         table.setImmediate( true );
         table.setSizeFull();
-        //        table.addListener( new ItemClickEvent.ItemClickListener() {
-        //
-        //            public void itemClick( ItemClickEvent event ) {
-        //                if ( event.isDoubleClick() ) {
-        //
-        //                }
-        //            }
-        //        } );
         return table;
     }
 

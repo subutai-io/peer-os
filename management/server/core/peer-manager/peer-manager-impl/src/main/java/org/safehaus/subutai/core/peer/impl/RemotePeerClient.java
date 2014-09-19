@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.impl;
 
 
+import java.util.logging.Logger;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -16,6 +18,8 @@ import com.google.gson.GsonBuilder;
  * Created by bahadyr on 9/18/14.
  */
 public class RemotePeerClient {
+
+    private final static Logger LOG = Logger.getLogger( RemotePeerClient.class.getName() );
 
 
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -40,6 +44,7 @@ public class RemotePeerClient {
 
 
     public String createRemoteContainers( CreateContainersMessage ccm ) {
+
         WebClient client = WebClient.create( baseUrl );
         String ccmString = GSON.toJson( ccm, CreateContainersMessage.class );
 
