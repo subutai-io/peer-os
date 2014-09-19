@@ -39,11 +39,9 @@ import com.google.gson.JsonSyntaxException;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager {
 
-    private final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
-
-    private String ENVIRONMENT = "ENVIRONMENT";
-    private String BLUEPRINT = "BLUEPRINT";
-
+    private static final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
+    private static final String ENVIRONMENT = "ENVIRONMENT";
+    private static final String BLUEPRINT = "BLUEPRINT";
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;

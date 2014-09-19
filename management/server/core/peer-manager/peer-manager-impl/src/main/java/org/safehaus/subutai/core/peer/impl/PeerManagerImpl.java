@@ -43,13 +43,11 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerImpl implements PeerManager {
+public class PeerManagerImpl implements PeerManager {
 
-    private final static Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
+    private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
+    private static final String SOURCE = "PEER_MANAGER";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
-
-
-    private final String SOURCE = "PEER_MANAGER";
     private DbManager dbManager;
     private AgentManager agentManager;
     private PeerDAO peerDAO;
