@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.impl;
 
 import java.util.logging.Logger;
 
+import javax.ws.rs.client.ClientException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -44,12 +45,18 @@ public class RemotePeerClient {
 
 
     public String createRemoteContainers( CreateContainersMessage ccm ) {
+        try {
+            WebClient client = WebClient.create( baseUrl );
+            String ccmString = GSON.toJson( ccm, CreateContainersMessage.class );
 
-        WebClient client = WebClient.create( baseUrl );
-        String ccmString = GSON.toJson( ccm, CreateContainersMessage.class );
+            Response response = client.path( "peer/containers" ).type( MediaType.TEXT_PLAIN )
+                                      .accept( MediaType.APPLICATION_JSON ).post( ccmString );
 
-        Response response = client.path( "peer/container" ).accept( MediaType.APPLICATION_JSON ).post( ccmString );
+            return response.toString();
+        } catch ( Exception e ) {
+            LOG.severe( e.getMessage() );
+        }
 
-        return response.toString();
+        return null;
     }
 }

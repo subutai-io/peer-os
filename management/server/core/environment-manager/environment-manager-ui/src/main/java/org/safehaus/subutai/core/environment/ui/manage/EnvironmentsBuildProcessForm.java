@@ -1,9 +1,12 @@
 package org.safehaus.subutai.core.environment.ui.manage;
 
 
+import java.awt.TextField;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import javax.ws.rs.client.ClientException;
 
 import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
@@ -58,7 +61,7 @@ public class EnvironmentsBuildProcessForm {
                 message.setStrategy( "ROUND_ROBIN" );
                 message.setEnvironmentUuid( UUID.randomUUID() );
 //                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
-                message.setTargetPeerId( UUID.fromString( "6b6b9033-2673-38dc-8761-8feacc777385" ) );
+                message.setTargetPeerId( UUID.fromString( "66ccf4d9-8ab4-3286-bb9a-8fe14bd19ea5" ) );
                 environmentBuildProcess.addBuildBlock( message );
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
