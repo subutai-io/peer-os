@@ -5,6 +5,10 @@
 
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
+
+  <reference id="strategyManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.strategy.api.StrategyManager"/>
+
     <reference id="containerManager" availability="mandatory"
                interface="org.safehaus.subutai.core.container.api.ContainerManager"/>
 
