@@ -93,18 +93,18 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- agent-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-cli</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>agent-manager-api</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>agent-manager-impl</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>agent-manager-cli</artifactId>-->
+                <!--</artifactItem>-->
                 <!--<artifactItem>-->
                 <!--<groupId>${project.groupId}</groupId>-->
                 <!--<artifactId>agent-manager-rest</artifactId>-->
@@ -319,6 +319,14 @@
                   <groupId>org.apache.cxf</groupId>
                   <artifactId>cxf-bundle-jaxrs</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.cxf</groupId>
+                  <artifactId>cxf-bundle</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.cxf</groupId>
+                  <artifactId>cxf-rt-core</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
@@ -349,10 +357,6 @@
                 <artifactItem>
                   <groupId>org.apache.httpcomponents</groupId>
                   <artifactId>httpcore-osgi</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-frontend-jaxrs</artifactId>
                 </artifactItem>
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
