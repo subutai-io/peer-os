@@ -10,7 +10,8 @@ import com.fasterxml.uuid.Generators;
 /**
  * Created by dilshat on 8/25/14.
  */
-public class UUIDUtil {
+public class UUIDUtil
+{
 
     public static UUID generateTimeBasedUUID()
     {

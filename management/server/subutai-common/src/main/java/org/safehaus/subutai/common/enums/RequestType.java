@@ -1,7 +1,8 @@
 package org.safehaus.subutai.common.enums;
 
 
-public enum RequestType {
+public enum RequestType
+{
     EXECUTE_REQUEST,
     HEARTBEAT_REQUEST,
     TERMINATE_REQUEST,

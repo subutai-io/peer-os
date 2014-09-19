@@ -79,4 +79,13 @@ public interface Command
      * @return - description of command or null
      */
     public String getDescription();
+
+
+    public void execute( CommandCallback callback ) throws CommandException;
+
+    public void executeAsync( CommandCallback callback ) throws CommandException;
+
+    public void execute() throws CommandException;
+
+    public void executeAsync() throws CommandException;
 }

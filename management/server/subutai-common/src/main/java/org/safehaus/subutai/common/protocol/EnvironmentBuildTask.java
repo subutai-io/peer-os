@@ -8,7 +8,8 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 9/9/14.
  */
-public class EnvironmentBuildTask {
+public class EnvironmentBuildTask
+{
 
     private UUID uuid;
     private String peerUuid;

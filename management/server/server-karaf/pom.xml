@@ -315,6 +315,10 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- REST -->
+                <artifactItem>
+                  <groupId>org.apache.cxf</groupId>
+                  <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                </artifactItem>
                 <!--<artifactItem>
                 <groupId>javax.ws.rs</groupId>
                   <artifactId>jsr311-api</artifactId>
@@ -353,6 +357,10 @@
                 <artifactItem>
                   <groupId>org.apache.httpcomponents</groupId>
                   <artifactId>httpcore-osgi</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.cxf</groupId>
+                  <artifactId>cxf-rt-frontend-jaxrs</artifactId>
                 </artifactItem>
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->

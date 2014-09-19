@@ -97,10 +97,8 @@ public class FileUtil
     {
         // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
-        URLClassLoader classLoader =
-                new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
 
-        return classLoader;
+        return new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
     }
 
 

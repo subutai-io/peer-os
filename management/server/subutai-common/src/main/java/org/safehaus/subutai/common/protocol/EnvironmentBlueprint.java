@@ -9,7 +9,8 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * Environment Blueprint class
  */
-public class EnvironmentBlueprint {
+public class EnvironmentBlueprint
+{
 
     Set<NodeGroup> nodeGroups;
     private String name;

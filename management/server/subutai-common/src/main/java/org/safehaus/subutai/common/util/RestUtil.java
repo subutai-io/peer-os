@@ -1,4 +1,3 @@
-/*
 package org.safehaus.subutai.common.util;
 
 
@@ -117,4 +116,3 @@ public class RestUtil
         }
     }
 }
-*/

@@ -1,24 +1,20 @@
 package org.safehaus.subutai.common.util;
 
 
-import com.google.common.base.Strings;
-
-
 /**
  * Provides utility functions for working with Strings
  */
-public class StringUtil {
+public class StringUtil
+{
 
-    public static boolean isStringNullOrEmpty( String str ) {
-        return str == null || str.trim().isEmpty();
-    }
-
-
-    public static int countNumberOfOccurences( String strToSearch, String strToCount ) {
+    public static int countNumberOfOccurences( String strToSearch, String strToCount )
+    {
         int count = 0;
-        if ( !Strings.isNullOrEmpty( strToSearch ) && !Strings.isNullOrEmpty( strToCount ) ) {
+        if ( !isStringNullOrEmpty( strToSearch ) && !isStringNullOrEmpty( strToCount ) )
+        {
             int idx = strToSearch.indexOf( strToCount );
-            while ( idx > -1 ) {
+            while ( idx > -1 )
+            {
                 count++;
                 idx = strToSearch.indexOf( strToCount, idx + 1 );
             }
@@ -27,23 +23,35 @@ public class StringUtil {
     }
 
 
-    public static boolean isNumeric( String str ) {
-        try {
+    public static boolean isStringNullOrEmpty( String str )
+    {
+        return str == null || str.trim().isEmpty();
+    }
+
+
+    public static boolean isNumeric( String str )
+    {
+        try
+        {
             Double.parseDouble( str );
             return true;
         }
-        catch ( NumberFormatException e ) {
+        catch ( NumberFormatException e )
+        {
         }
 
         return false;
     }
 
 
-    public static boolean areStringsEqual( String str1, String str2 ) {
-        if ( str1 == null ) {
+    public static boolean areStringsEqual( String str1, String str2 )
+    {
+        if ( str1 == null )
+        {
             return false;
         }
-        if ( str2 == null ) {
+        if ( str2 == null )
+        {
             return false;
         }
 

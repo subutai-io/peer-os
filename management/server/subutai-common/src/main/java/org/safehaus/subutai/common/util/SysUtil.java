@@ -16,7 +16,8 @@ import java.util.logging.Logger;
 /**
  * @author dilshat
  */
-public class SysUtil {
+public class SysUtil
+{
 
     public static String getMacAddress()
     {

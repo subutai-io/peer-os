@@ -14,7 +14,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class Response implements Serializable {
+public class Response implements Serializable
+{
 
     private String source;
     private ResponseType type;
