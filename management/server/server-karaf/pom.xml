@@ -317,20 +317,8 @@
                 <!-- REST -->
                 <artifactItem>
                   <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                  <artifactId>cxf-bundle-jaxrs</artifactId>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-core</artifactId>
-                </artifactItem>
-                <!--<artifactItem>
-                <groupId>javax.ws.rs</groupId>
-                  <artifactId>jsr311-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api-osgi</artifactId>
-                </artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->

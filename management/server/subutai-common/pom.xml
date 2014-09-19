@@ -44,11 +44,9 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore-osgi</artifactId>
     </dependency>
-
-    <!--CXF-->
     <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+      <artifactId>cxf-bundle-jaxrs</artifactId>
     </dependency>
   </dependencies>
 
