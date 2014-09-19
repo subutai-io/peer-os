@@ -23,6 +23,19 @@ public interface RestService {
     @Consumes(MediaType.TEXT_PLAIN)
     public Peer registerPeer( String peer );
 
+    @POST
+    @Path( "containers" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.TEXT_PLAIN )
+    public String createContainers( String createContainersMsg );
+
+
+    @GET
+    @Path( "containers/format" )
+    @Produces( MediaType.APPLICATION_JSON )
+    public String getCreateContainersMsgJsonFormat();
+
+
     @GET
     @Path("json")
     @Produces(MediaType.APPLICATION_JSON)
@@ -41,11 +54,11 @@ public interface RestService {
                                     @FormParam("message") String message );
 
     @GET
-    @Path( "agents" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getConnectedAgents( @QueryParam( "envId" ) String environmentId );
+    @Path("agents")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConnectedAgents( @QueryParam("envId") String environmentId );
 
     @GET
-    @Path( "ping" )
+    @Path("ping")
     public Response ping();
 }
