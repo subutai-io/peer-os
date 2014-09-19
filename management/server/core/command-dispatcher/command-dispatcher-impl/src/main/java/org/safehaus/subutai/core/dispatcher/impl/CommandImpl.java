@@ -25,7 +25,8 @@ import com.google.common.base.Preconditions;
 /**
  * Command which can contain both local and remote requests
  */
-public class CommandImpl extends AbstractCommand {
+public class CommandImpl extends AbstractCommand
+{
 
     private final Map<UUID, Set<BatchRequest>> remoteRequests = new HashMap<>();
 
@@ -39,7 +40,8 @@ public class CommandImpl extends AbstractCommand {
      * @param agents - target agents
      */
     public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents, PeerManager peerManager,
-                        CommandRunnerBase commandRunner ) {
+                        CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
@@ -63,10 +65,8 @@ public class CommandImpl extends AbstractCommand {
             }
             Request request = requestBuilder.build( agent.getUuid(), commandUUID );
             //this is a local agent
-            //TODO remove below line
-            if ( false )
+            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 )
             {
-                //            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
                 requests.add( request );
             }
             else
@@ -93,7 +93,8 @@ public class CommandImpl extends AbstractCommand {
      *
      * @param batchRequests - requests to execute
      */
-    protected CommandImpl( Set<BatchRequest> batchRequests, CommandRunnerBase commandRunner ) {
+    protected CommandImpl( Set<BatchRequest> batchRequests, CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( batchRequests ),
                 "Batch Requests are null or empty" );
@@ -124,7 +125,8 @@ public class CommandImpl extends AbstractCommand {
      *
      * @param requests - requests to execute
      */
-    protected CommandImpl( Collection<Request> requests, CommandRunnerBase commandRunner ) {
+    protected CommandImpl( Collection<Request> requests, CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are null or empty" );
         this.requestsCount = requests.size();
@@ -151,7 +153,8 @@ public class CommandImpl extends AbstractCommand {
      * @param requestBuilders - request builder used to produce request
      */
     public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders, PeerManager peerManager,
-                        CommandRunnerBase commandRunner ) {
+                        CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
                 "Request Builders are null or empty" );
@@ -205,7 +208,8 @@ public class CommandImpl extends AbstractCommand {
      *
      * @return - remote requests of command
      */
-    public Map<UUID, Set<BatchRequest>> getRemoteRequests() {
+    public Map<UUID, Set<BatchRequest>> getRemoteRequests()
+    {
         return Collections.unmodifiableMap( remoteRequests );
     }
 }
