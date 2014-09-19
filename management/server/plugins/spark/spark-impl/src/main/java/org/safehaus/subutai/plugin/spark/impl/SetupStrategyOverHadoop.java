@@ -96,28 +96,23 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
     private void configure() throws ClusterSetupException {
         po.addLog("Updating db...");
         //save to db
-        try {
-            manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY, config.getClusterName(),
-                    config);
-            po.addLog("Cluster info saved to DB\nInstalling Spark...");
-            //install spark
-            Command installCommand = Commands.getInstallCommand(config.getAllNodes());
-            manager.getCommandRunner().runCommand(installCommand);
+        manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY, config.getClusterName(),
+                config);
+        po.addLog("Cluster info saved to DB\nInstalling Spark...");
+        //install spark
+        Command installCommand = Commands.getInstallCommand(config.getAllNodes());
+        manager.getCommandRunner().runCommand(installCommand);
 
-            if(installCommand.hasSucceeded()) {
-                po.addLog("Installation succeeded");
+        if(installCommand.hasSucceeded()) {
+            po.addLog("Installation succeeded");
 
-                SetupHelper helper = new SetupHelper(manager, config, po);
-                helper.configureMasterIP(config.getSlaveNodes());
-                helper.registerSlaves();
-                helper.startCluster();
+            SetupHelper helper = new SetupHelper(manager, config, po);
+            helper.configureMasterIP(config.getSlaveNodes());
+            helper.registerSlaves();
+            helper.startCluster();
 
-            } else
-                throw new ClusterSetupException("Installation failed: "
-                        + installCommand.getAllErrors());
-        } catch(DBException e) {
-            throw new ClusterSetupException(
-                    "Could not save cluster info to DB! Please see logs\nInstallation aborted");
-        }
+        } else
+            throw new ClusterSetupException("Installation failed: "
+                    + installCommand.getAllErrors());
     }
 }

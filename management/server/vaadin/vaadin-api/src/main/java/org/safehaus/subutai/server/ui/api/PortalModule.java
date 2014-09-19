@@ -39,4 +39,10 @@ public interface PortalModule {
 	 */
 	Component createComponent();
 
+    /**
+     * Function to differentiate core plugins from plugins
+     * needed to show-up in different tabs in main dashboard
+     * @return
+     */
+    Boolean isCorePlugin();
 }

@@ -54,14 +54,9 @@ public class AddNodeHandler extends AbstractHandler {
             return;
         }
 
-        try {
-            manager.getPluginDao().saveInfo(StormConfig.PRODUCT_NAME,
-                    clusterName, config);
-            po.addLogDone("Cluster info successfully saved");
-        } catch(DBException ex) {
-            manager.getLogger().error("Failed to save in db", ex);
-            po.addLogFailed("Failed to save cluster info");
-        }
+        manager.getPluginDao().saveInfo(StormConfig.PRODUCT_NAME,
+                clusterName, config);
+        po.addLogDone("Cluster info successfully saved");
     }
 
 }

@@ -1,14 +1,13 @@
 package org.safehaus.subutai.core.registry.ui;
 
 
-import java.io.File;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.io.File;
 
 
 public class TemplateRegistryUI implements PortalModule {
@@ -60,5 +59,10 @@ public class TemplateRegistryUI implements PortalModule {
     @Override
     public Component createComponent() {
         return new TemplateRegistryForm( agentManager, registryManager );
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return true;
     }
 }

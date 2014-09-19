@@ -87,14 +87,8 @@ public class AddNodeHandler extends AbstractHandler {
         }
 
         po.addLog("Update cluster info...");
-        try {
-            manager.getPluginDao().saveInfo(HiveConfig.PRODUCT_KEY, config.getClusterName(), config);
-            po.addLogDone("Cluster info updated");
-        } catch(DBException ex) {
-            String m = "Failed to update cluster info";
-            manager.getLogger().error(m, ex);
-            po.addLogFailed(m);
-        }
+        manager.getPluginDao().saveInfo(HiveConfig.PRODUCT_KEY, config.getClusterName(), config);
+        po.addLogDone("Cluster info updated");
     }
 
 }

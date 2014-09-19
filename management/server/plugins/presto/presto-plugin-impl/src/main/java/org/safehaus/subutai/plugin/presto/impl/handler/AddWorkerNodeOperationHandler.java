@@ -71,9 +71,6 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         } catch(LxcCreateException ex) {
             po.addLog(ex.getMessage());
             po.addLogFailed("Add worker node failed");
-        } catch(DBException ex) {
-            po.addLog(ex.getMessage());
-            po.addLogFailed("Failed to save cluster info");
         }
     }
 

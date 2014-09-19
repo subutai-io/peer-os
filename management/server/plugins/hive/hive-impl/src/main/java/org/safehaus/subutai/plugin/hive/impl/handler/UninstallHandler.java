@@ -58,14 +58,8 @@ public class UninstallHandler extends AbstractHandler {
 
         if(ok) {
             po.addLog("Updating DB...");
-            try {
-                manager.getPluginDao().deleteInfo(HiveConfig.PRODUCT_KEY, clusterName);
-                po.addLogDone("Cluster info deleted from DB");
-            } catch(DBException ex) {
-                String m = "Failed to delete cluster info";
-                manager.getLogger().error(m, ex);
-                po.addLogFailed(m);
-            }
+            manager.getPluginDao().deleteInfo(HiveConfig.PRODUCT_KEY, clusterName);
+            po.addLogDone("Cluster info deleted from DB");
         } else po.addLogFailed(null);
     }
 
@@ -120,7 +114,6 @@ public class UninstallHandler extends AbstractHandler {
         } catch(LxcDestroyException ex) {
             String m = "Failed to destroy container(s)";
             po.addLog(m);
-            manager.getLogger().error(m, ex);
         }
         return true;
     }

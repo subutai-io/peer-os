@@ -184,14 +184,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 
         po.addLog( "Saving cluster information to database..." );
 
-        try {
-            mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster information saved to database" );
-        }
-        catch ( DBException e ) {
-            throw new ClusterSetupException(
-                    String.format( "Error saving cluster information to database, %s", e.getMessage() ) );
-        }
+        mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster information saved to database" );
 
 
         return config;

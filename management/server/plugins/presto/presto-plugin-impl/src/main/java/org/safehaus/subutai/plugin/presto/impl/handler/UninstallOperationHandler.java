@@ -45,13 +45,9 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
 
         if(ok) {
             po.addLog("Updating db...");
-            try {
-                manager.getPluginDAO().deleteInfo(PrestoClusterConfig.PRODUCT_KEY,
-                        config.getClusterName());
-                po.addLogDone("Cluster info deleted from DB\nDone");
-            } catch(DBException e) {
-                po.addLogFailed("Failed to delete cluster info from DB");
-            }
+            manager.getPluginDAO().deleteInfo(PrestoClusterConfig.PRODUCT_KEY,
+                    config.getClusterName());
+            po.addLogDone("Cluster info deleted from DB\nDone");
         } else
             po.addLogFailed("Failed to destroy cluster");
     }

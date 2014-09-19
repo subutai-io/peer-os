@@ -51,14 +51,9 @@ public class SetupStrategyWithHadoop extends SetupBase implements ClusterSetupSt
         checkConnected();
 
         po.addLog("Saving cluster info...");
-        try {
-            manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info saved to DB");
-        } catch (DBException e) {
-            throw new ClusterSetupException("Failed to save cluster info: "
-                    + e.getMessage());
-        }
+        manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY,
+                config.getClusterName(), config);
+        po.addLog("Cluster info saved to DB");
 
         SetupHelper helper = new SetupHelper(manager, config, po);
         helper.configureMasterIP(config.getSlaveNodes());

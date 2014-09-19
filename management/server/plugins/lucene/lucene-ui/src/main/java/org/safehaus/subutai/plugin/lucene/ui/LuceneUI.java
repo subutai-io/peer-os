@@ -6,19 +6,17 @@
 package org.safehaus.subutai.plugin.lucene.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Logger;
-
-import javax.naming.NamingException;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.lucene.api.Config;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import javax.naming.NamingException;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 
 /**
@@ -74,5 +72,10 @@ public class LuceneUI implements PortalModule {
         }
 
         return null;
+    }
+
+    @Override
+    public Boolean isCorePlugin() {
+        return false;
     }
 }

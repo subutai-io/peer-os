@@ -1,13 +1,3 @@
-/**
- * DISCLAIMER
- *
- * The quality of the code is such that you should not copy any of it as best
- * practice how to build Vaadin applications.
- *
- * @author jouni@vaadin.com
- *
- */
-
 package org.safehaus.subutai.server.ui.views;
 
 
@@ -23,7 +13,7 @@ import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
 import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -33,7 +23,10 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class ModulesView extends VerticalLayout implements View, PortalModuleListener {
+/**
+ * Created by talas on 9/17/14.
+ */
+public class CoreModulesView extends VerticalLayout implements View, PortalModuleListener {
 
     private static final Logger LOG = Logger.getLogger( MainUI.class.getName() );
     private TabSheet editors;
@@ -43,7 +36,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
 
     @Override
-    public void enter( ViewChangeEvent event ) {
+    public void enter( ViewChangeListener.ViewChangeEvent event ) {
         setSizeFull();
         addStyleName( "reports" );
 
@@ -73,7 +66,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         titleAndDrafts.addStyleName( "drafts" );
         editors.addComponent( titleAndDrafts );
 
-        Label draftsTitle = new Label( "Modules" );
+        Label draftsTitle = new Label( "Core modules" );
         draftsTitle.addStyleName( "h1" );
         draftsTitle.setSizeUndefined();
         titleAndDrafts.addComponent( draftsTitle );
@@ -84,7 +77,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         modulesLayout.addStyleName( "catalog" );
         titleAndDrafts.addComponent( modulesLayout );
 
-        for ( PortalModule module : getPortalModuleService().getModules() )
+        for ( PortalModule module : getPortalModuleService().getCoreModules() )
         {
             addModule( module );
         }
@@ -138,7 +131,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
     @Override
     public void moduleRegistered( PortalModule module ) {
-        if ( !module.isCorePlugin() )
+        if ( module.isCorePlugin() )
         {
             addModule( module );
         }
@@ -159,4 +152,3 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         }
     }
 }
-

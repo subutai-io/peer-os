@@ -13,7 +13,7 @@ public class RemoteRequest {
 
     private final UUID peerId;
     private final UUID commandId;
-    private final long timestamp;
+    private long timestamp;
     private final int requestCount;
     private int attempts;
     private int requestsCompleted;
@@ -58,6 +58,11 @@ public class RemoteRequest {
 
     public UUID getCommandId() {
         return commandId;
+    }
+
+
+    public void updateTimestamp() {
+        this.timestamp = System.currentTimeMillis();
     }
 
 

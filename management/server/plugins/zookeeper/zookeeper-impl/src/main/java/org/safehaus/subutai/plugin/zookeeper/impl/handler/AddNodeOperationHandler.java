@@ -141,14 +141,8 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             //update db
             productOperation.addLog( "Updating cluster information in database..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                productOperation.addLogDone( "Cluster information updated in database" );
-            }
-            catch ( DBException e ) {
-                productOperation.addLogFailed(
-                        String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLogDone( "Cluster information updated in database" );
         }
         else {
             addOverHadoop( config );
@@ -231,14 +225,8 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             //update db
             productOperation.addLog( "Updating cluster information in database..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                productOperation.addLogDone( "Cluster information updated in database" );
-            }
-            catch ( DBException e ) {
-                productOperation.addLogFailed(
-                        String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLogDone( "Cluster information updated in database" );
         }
         else {
             productOperation.addLogFailed( String.format( "Installation failed, %s\nUse Terminal Module to cleanup",
@@ -276,14 +264,8 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             //update db
             productOperation.addLog( "Updating cluster information in database..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                productOperation.addLogDone( "Cluster information updated in database" );
-            }
-            catch ( DBException e ) {
-                productOperation.addLogFailed(
-                        String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLogDone( "Cluster information updated in database" );
         }
         catch ( LxcCreateException ex ) {
             productOperation.addLogFailed( ex.getMessage() );

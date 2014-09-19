@@ -52,13 +52,8 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         if(ok) {
             po.addLog("Updating db...");
             config.getNodes().remove(agent);
-            try {
-                manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY, config.getClusterName(), config);
-                po.addLogDone("Cluster info updated");
-            } catch(DBException ex) {
-                po.addLogFailed("Failed to save cluster info");
-                manager.getLogger().error("Failed to save cluster info", ex);
-            }
+            manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY, config.getClusterName(), config);
+            po.addLogDone("Cluster info updated");
         } else po.addLogFailed(null);
     }
 

@@ -25,6 +25,8 @@ public interface PeerManager {
 
     Peer getPeerByUUID( UUID uuid );
 
+    String getRemoteId(String baseUrl);
+
     public void addPeerMessageListener( PeerMessageListener listener );
 
     public void removePeerMessageListener( PeerMessageListener listener );
@@ -37,5 +39,8 @@ public interface PeerManager {
 
     public Set<Agent> getConnectedAgents( String environmentId ) throws PeerException;
 
-    Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String Strategy, List<String> criteria );
+    public Set<Agent> getConnectedAgents( Peer peer, String environmentId ) throws PeerException;
+
+    Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String Strategy,
+                                 List<String> criteria );
 }
