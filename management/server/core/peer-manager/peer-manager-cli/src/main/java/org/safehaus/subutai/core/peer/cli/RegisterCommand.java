@@ -13,7 +13,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 8/28/14.
  */
-@Command(scope = "peer", name = "register")
+@Command( scope = "peer", name = "register" )
 public class RegisterCommand extends OsgiCommandSupport {
 
     private PeerManager peerManager;
@@ -33,8 +33,15 @@ public class RegisterCommand extends OsgiCommandSupport {
     protected Object doExecute() throws Exception {
         Peer peer = getSamplePeer();
 
-        String result = peerManager.register( peer );
-        System.out.println( result );
+        if ( peerManager.register( peer ) )
+        {
+            System.out.println( "Peer registered." );
+        }
+        else
+        {
+            System.out.println( "Failed to register peer." );
+        }
+
         return null;
     }
 
