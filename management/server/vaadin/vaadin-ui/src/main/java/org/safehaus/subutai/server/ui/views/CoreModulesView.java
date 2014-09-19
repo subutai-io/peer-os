@@ -140,10 +140,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
 
     @Override
     public void moduleUnregistered( PortalModule module ) {
-        if ( module.isCorePlugin() )
-        {
-            removeModule( module );
-        }
+        removeModule( module );
     }
 
 
