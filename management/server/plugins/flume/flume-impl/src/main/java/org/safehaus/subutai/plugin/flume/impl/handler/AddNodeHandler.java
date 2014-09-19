@@ -91,15 +91,10 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             config.getNodes().add(agent);
 
             po.addLog("Updating db...");
-            try {
-                manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
-                        config.getClusterName(), config);
-                po.addLog("Cluster info updated");
-                return true;
-            } catch(DBException ex) {
-                po.addLog("Failed to update cluster info: " + ex.getMessage());
-                return false;
-            }
+            manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
+                    config.getClusterName(), config);
+            po.addLog("Cluster info updated");
+            return true;
         }
         return false;
     }

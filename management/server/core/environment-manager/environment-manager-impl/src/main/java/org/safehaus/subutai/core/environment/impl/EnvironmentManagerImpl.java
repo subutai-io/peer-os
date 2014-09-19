@@ -22,7 +22,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
@@ -260,16 +259,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public List<EnvironmentBuildProcess> getBuildProcesses() {
         return environmentDAO.getInfo( "PROCESS", EnvironmentBuildProcess.class );
-    }
-
-
-    @Override
-    public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
-        //        UUID uuid = lxcBuildMessage.getEnvironmentId();
-        //        String templateName = lxcBuildMessage.getTemplateName();
-        //        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
-        //        String strategyName = lxcBuildMessage.getStrategyName();
-        //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
     }
 
 

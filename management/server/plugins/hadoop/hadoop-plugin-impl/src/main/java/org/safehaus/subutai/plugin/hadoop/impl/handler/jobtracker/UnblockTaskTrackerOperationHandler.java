@@ -25,7 +25,7 @@ public class UnblockTaskTrackerOperationHandler extends AbstractOperationHandler
 
 
     @Override
-    public void run() {
+    public void run()  {
         HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null ) {
@@ -57,15 +57,9 @@ public class UnblockTaskTrackerOperationHandler extends AbstractOperationHandler
         logCommand( refreshCommand, productOperation );
 
         hadoopClusterConfig.getBlockedAgents().remove( node );
-        try {
-            manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                    hadoopClusterConfig );
-            productOperation.addLog( "Cluster info saved to DB" );
-        }
-        catch ( DBException e ) {
-            productOperation
-                    .addLogFailed( "Could not save cluster info to DB! Please see logs\n" + "Blocking node aborted" );
-        }
+        manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                hadoopClusterConfig );
+        productOperation.addLog( "Cluster info saved to DB" );
     }
 
 

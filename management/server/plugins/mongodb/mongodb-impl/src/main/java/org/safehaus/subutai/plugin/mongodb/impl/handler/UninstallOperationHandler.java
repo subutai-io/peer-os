@@ -49,11 +49,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<MongoImp
 
 		po.addLog("Deleting cluster information from database..");
 
-		try {
-			manager.getPluginDAO().deleteInfo(MongoClusterConfig.PRODUCT_KEY, config.getClusterName());
-			po.addLogDone("Cluster info deleted from database");
-		} catch (DBException e) {
-			po.addLogFailed(String.format("Error while deleting cluster info from database, %s", e.getMessage()));
-		}
-	}
+        manager.getPluginDAO().deleteInfo(MongoClusterConfig.PRODUCT_KEY, config.getClusterName());
+        po.addLogDone("Cluster info deleted from database");
+    }
 }

@@ -51,14 +51,9 @@ public class SetupStrategyWithHadoop extends SetupHelper implements ClusterSetup
         startNodes(config.getAllNodes());
 
         po.addLog("Saving cluster info...");
-        try {
-            manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info saved to DB");
-        } catch(DBException e) {
-            throw new ClusterSetupException("Failed to save cluster info: "
-                    + e.getMessage());
-        }
+        manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
+                config.getClusterName(), config);
+        po.addLog("Cluster info saved to DB");
         return config;
     }
 

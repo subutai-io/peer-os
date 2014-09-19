@@ -25,7 +25,7 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl> {
 
 
     @Override
-    public void run() {
+    public void run()  {
         HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
         if ( hadoopClusterConfig == null ) {
@@ -65,16 +65,10 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl> {
                 hadoopClusterConfig.getTaskTrackers().add( agent );
                 hadoopClusterConfig.getDataNodes().add( agent );
 
-                try {
-                    manager.getPluginDAO()
-                           .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                                   hadoopClusterConfig );
-                    productOperation.addLog( "Cluster info saved to DB" );
-                }
-                catch ( DBException e ) {
-                    productOperation.addLogFailed(
-                            "Could not save cluster info to DB! Please see logs\n" + "Adding new node aborted" );
-                }
+                manager.getPluginDAO()
+                       .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                               hadoopClusterConfig );
+                productOperation.addLog( "Cluster info saved to DB" );
             }
             else {
                 productOperation.addLogFailed( "Could not configure network! Please see logs\nLXC creation aborted" );

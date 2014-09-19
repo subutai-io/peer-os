@@ -47,20 +47,12 @@ public class SparkImpl extends SparkBase implements Spark {
 
     @Override
     public List<SparkClusterConfig> getClusters() {
-        try {
-            return pluginDAO.getInfo(SparkClusterConfig.PRODUCT_KEY, SparkClusterConfig.class);
-        } catch (DBException e) {
-            return Collections.emptyList();
-        }
+        return pluginDAO.getInfo(SparkClusterConfig.PRODUCT_KEY, SparkClusterConfig.class);
     }
 
     @Override
     public SparkClusterConfig getCluster(String clusterName) {
-        try {
-            return pluginDAO.getInfo(SparkClusterConfig.PRODUCT_KEY, clusterName, SparkClusterConfig.class);
-        } catch (DBException e) {
-            return null;
-        }
+        return pluginDAO.getInfo(SparkClusterConfig.PRODUCT_KEY, clusterName, SparkClusterConfig.class);
     }
 
     @Override
