@@ -12,7 +12,8 @@ import com.google.gson.GsonBuilder;
 /**
  * Provides utility functions for working with JSON <-> POJO conversions
  */
-public class JsonUtil {
+public class JsonUtil
+{
 
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 

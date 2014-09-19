@@ -29,7 +29,8 @@ import org.apache.http.util.EntityUtils;
 /**
  * @author daliev
  */
-public class HttpUtil {
+public class HttpUtil
+{
 
     public static final int RESPONSE_OK = 200;
     private static final Logger LOG = Logger.getLogger( HttpUtil.class.getName() );
@@ -58,18 +59,6 @@ public class HttpUtil {
         try
         {
             conMan.shutdown();
-        }
-        catch ( Exception e )
-        {
-        }
-    }
-
-
-    public void cleanConnections()
-    {
-        try
-        {
-            conMan.closeExpiredConnections();
         }
         catch ( Exception e )
         {
@@ -107,6 +96,18 @@ public class HttpUtil {
         finally
         {
             EntityUtils.consumeQuietly( entity );
+        }
+    }
+
+
+    public void cleanConnections()
+    {
+        try
+        {
+            conMan.closeExpiredConnections();
+        }
+        catch ( Exception e )
+        {
         }
     }
 }
