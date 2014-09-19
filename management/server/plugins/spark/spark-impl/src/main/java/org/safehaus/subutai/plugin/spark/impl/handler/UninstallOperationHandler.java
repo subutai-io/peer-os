@@ -37,24 +37,25 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
         }
 
         boolean ok = false;
-        if (config.getSetupType() == SetupType.OVER_HADOOP)
-            ok = uninstall(config);
-        else if (config.getSetupType() == SetupType.WITH_HADOOP)
-            ok = destroyNodes(config);
-        else
-            po.addLog("Undefined setup type");
+        if (config.getSetupType() == SetupType.OVER_HADOOP) {
+            ok = uninstall( config );
+        } else if (config.getSetupType() == SetupType.WITH_HADOOP) {
+            ok = destroyNodes( config );
+        } else {
+            po.addLog( "Undefined setup type" );
+        }
 
         if (ok) {
             po.addLog("Updating db...");
             try {
-                manager.getPluginDAO().deleteInfo(SparkClusterConfig.PRODUCT_KEY,
-                        config.getClusterName());
+                manager.getPluginDAO().deleteInfo(SparkClusterConfig.PRODUCT_KEY, config.getClusterName());
                 po.addLogDone("Cluster info deleted from DB\nDone");
             } catch (DBException e) {
                 po.addLogFailed("Failed to delete cluster info from DB");
             }
-        } else
-            po.addLogFailed("Failed to destroy cluster");
+        } else {
+            po.addLogFailed( "Failed to destroy cluster" );
+        }
     }
 
     private boolean uninstall(SparkClusterConfig config) {
@@ -76,10 +77,10 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
         productOperation.addLog("Destroying node(s)...");
         try {
             manager.getContainerManager().clonesDestroy(config.getAllNodes());
-            productOperation.addLog("Destroying node(s) completed");
+            productOperation.addLogDone("Destroying node(s) completed");
             return true;
         } catch (LxcDestroyException ex) {
-            productOperation.addLog("Failed to destroy node(s): " + ex.getMessage());
+            productOperation.addLogFailed("Failed to destroy node(s): " + ex.getMessage());
             return false;
         }
     }

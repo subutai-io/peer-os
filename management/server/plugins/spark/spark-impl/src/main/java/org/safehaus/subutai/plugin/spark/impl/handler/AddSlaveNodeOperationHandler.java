@@ -153,7 +153,6 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
                                 stop();
                             }
                         }
-
                     });
 
                     if(ok.get())
