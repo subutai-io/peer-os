@@ -65,7 +65,8 @@ public class CliTest extends OsgiCommandSupport implements ResponseListener {
 
 	@Override
 	public void onResponse(Response response) {
-		System.out.println("Response: " + response);
+
+
 	}
 
 }
