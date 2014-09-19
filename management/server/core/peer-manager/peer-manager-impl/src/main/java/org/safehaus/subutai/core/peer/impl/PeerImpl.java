@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.HttpUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -198,8 +197,9 @@ public class PeerImpl implements PeerManager {
                 params.put( Common.PEER_ID_PARAM_NAME, getSiteId().toString() );
                 params.put( Common.MESSAGE_PARAM_NAME, message );
                 try {
-                    return HttpUtil.request( HttpUtil.RequestType.POST,
-                            String.format( Common.MESSAGE_REQUEST_URL, peer.getIp() ), params );
+                    //                    return HttpUtil.request( HttpUtil.RequestType.POST,
+                    //                            String.format( Common.MESSAGE_REQUEST_URL, peer.getIp() ), params );
+                    return RestUtil.post( String.format( Common.MESSAGE_REQUEST_URL, peer.getIp() ), params );
                 }
                 catch ( HTTPException e ) {
                     LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
