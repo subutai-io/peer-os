@@ -164,12 +164,19 @@ public class Manager extends VerticalLayout {
         executorService.execute( new Runnable() {
 
             public void run() {
-                Map<String, EnumMap<ContainerState, List<String>>> agentFamilies;
+                final Map<String, EnumMap<ContainerState, List<String>>> agentFamilies;
                 agentFamilies = containerManager.getContainersOnPhysicalServers();
-                populateTable( agentFamilies );
-                clearEmptyParents();
-                lxcTable.setEnabled( true );
-                indicator.setVisible( false );
+                getUI().access(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        populateTable( agentFamilies );
+                        clearEmptyParents();
+                        lxcTable.setEnabled( true );
+                        indicator.setVisible( false );
+                    }
+                }) ;
+
             }
         } );
     }

@@ -1,37 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
-    <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
-    <reference id="monitor" availability="mandatory"
-               interface="org.safehaus.subutai.core.monitor.api.Monitor"/>
-    <reference id="templateManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.template.api.TemplateManager"/>
-    <reference id="templateRegistry" availability="mandatory"
-               interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager"/>
-    <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.db.api.DbManager"/>
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+  <reference id="monitor" availability="mandatory"
+             interface="org.safehaus.subutai.core.monitor.api.Monitor" />
+  <reference id="templateManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.template.api.TemplateManager" />
+  <reference id="templateRegistry" availability="mandatory"
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager" />
+  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.db.api.DbManager" />
+  <reference id="strategyManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
 
-    <reference-list id="placementStrategies"
-                    interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy"
-                    availability="optional">
-        <reference-listener ref="containerManager"
-                            bind-method="registerStrategy" unbind-method="unregisterStrategy"/>
-    </reference-list>
+  <!--
+  <reference-list id="placementStrategies"
+                  interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy"
+                  availability="optional">
+    <reference-listener ref="containerManager"
+                        bind-method="registerStrategy" unbind-method="unregisterStrategy" />
+  </reference-list>
+  -->
+  <bean id="containerManager" scope="singleton"
+        class="org.safehaus.subutai.core.container.impl.ContainerManagerImpl"
+        init-method="init" destroy-method="destroy">
+    <argument ref="agentManager" />
+    <argument ref="commandRunner" />
+    <argument ref="monitor" />
+    <argument ref="templateManager" />
+    <argument ref="templateRegistry" />
+    <argument ref="dbManager" />
+    <argument ref="strategyManager" />
+  </bean>
 
-    <bean id="containerManager" scope="singleton"
-          class="org.safehaus.subutai.core.container.impl.ContainerManagerImpl"
-          init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="commandRunner"/>
-        <argument ref="monitor"/>
-        <argument ref="templateManager"/>
-        <argument ref="templateRegistry"/>
-        <argument ref="dbManager"/>
-    </bean>
-
-    <service ref="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager"/>
+  <service ref="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager" />
 
 </blueprint>

@@ -25,6 +25,7 @@
                         bind-method="registerStrategy" unbind-method="unregisterStrategy" />
   </reference-list>
 
+  <service ref="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager"/>
   <service ref="roundRobinStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy" />
   <service ref="defaultStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy" />
   <service ref="bestServerStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy" />
