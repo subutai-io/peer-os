@@ -25,7 +25,6 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -84,19 +83,8 @@ public class PeerManagerImpl implements PeerManager {
 
 
     @Override
-    public String register( final Peer peer ) {
-
-        try
-        {
-            String peerId = peer.getId().toString();
-            peerDAO.saveInfo( SOURCE, peerId, peer );
-            return peerId;
-        }
-        catch ( DBException e )
-        {
-            LOG.info( e.getMessage() );
-        }
-        return null;
+    public boolean register( final Peer peer ) {
+        return peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
     }
 
 
@@ -108,31 +96,13 @@ public class PeerManagerImpl implements PeerManager {
 
     @Override
     public List<Peer> peers() {
-        List<Peer> peers = null;
-        try
-        {
-            peers = peerDAO.getInfo( SOURCE, Peer.class );
-        }
-        catch ( DBException e )
-        {
-            LOG.info( e.getMessage() );
-        }
-        return peers;
+        return peerDAO.getInfo( SOURCE, Peer.class );
     }
 
 
     @Override
     public boolean unregister( final String uuid ) {
-        try
-        {
-            peerDAO.deleteInfo( SOURCE, uuid );
-            return true;
-        }
-        catch ( DBException e )
-        {
-            LOG.info( e.getMessage() );
-        }
-        return false;
+        return peerDAO.deleteInfo( SOURCE, uuid );
     }
 
 
@@ -147,15 +117,7 @@ public class PeerManagerImpl implements PeerManager {
             return peer;
         }
 
-        try
-        {
-            return peerDAO.getInfo( SOURCE, uuid.toString(), Peer.class );
-        }
-        catch ( DBException e )
-        {
-            LOG.info( e.getMessage() );
-        }
-        return null;
+        return peerDAO.getInfo( SOURCE, uuid.toString(), Peer.class );
     }
 
 
