@@ -27,21 +27,28 @@ public class PeerDAO {
     private final DbManager dbManager;
 
 
-    public PeerDAO( final DbManager dbManager )
-    {
+    public PeerDAO( final DbManager dbManager ) {
         Preconditions.checkNotNull( dbManager, "Db Manager is null" );
         this.dbManager = dbManager;
     }
 
 
-    public void saveInfo( String source, String key, Object info ) throws DBException
-    {
+    public boolean saveInfo( String source, String key, Object info ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( info, "Info is null" );
 
-        dbManager.executeUpdate2( "insert into peer_info(source,key,info) values (?,?,?)", source.toLowerCase(),
-                key.toLowerCase(), gson.toJson( info ) );
+        try
+        {
+            dbManager.executeUpdate2( "insert into peer_info(source,key,info) values (?,?,?)", source.toLowerCase(),
+                    key.toLowerCase(), gson.toJson( info ) );
+            return true;
+        }
+        catch ( DBException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
+        return false;
     }
 
 
@@ -53,8 +60,7 @@ public class PeerDAO {
      *
      * @return - list of POJOs
      */
-    public <T> List<T> getInfo( String source, Class<T> clazz ) throws DBException
-    {
+    public <T> List<T> getInfo( String source, Class<T> clazz ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
@@ -74,7 +80,11 @@ public class PeerDAO {
         }
         catch ( JsonSyntaxException ex )
         {
-            throw new DBException( ex.getMessage() );
+            LOG.severe( ex.getMessage() );
+        }
+        catch ( DBException e )
+        {
+            LOG.severe( e.getMessage() );
         }
         return list;
     }
@@ -89,8 +99,7 @@ public class PeerDAO {
      *
      * @return - POJO
      */
-    public <T> T getInfo( String source, String key, Class<T> clazz ) throws DBException
-    {
+    public <T> T getInfo( String source, String key, Class<T> clazz ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
@@ -114,7 +123,11 @@ public class PeerDAO {
         }
         catch ( JsonSyntaxException ex )
         {
-            throw new DBException( ex.getMessage() );
+            LOG.severe( ex.getMessage() );
+        }
+        catch ( DBException e )
+        {
+            LOG.severe( e.getMessage() );
         }
         return null;
     }
@@ -126,12 +139,21 @@ public class PeerDAO {
      * @param source - source key
      * @param key - POJO key
      */
-    public void deleteInfo( String source, String key ) throws DBException
-    {
+    public boolean deleteInfo( String source, String key ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
 
-        dbManager.executeUpdate2( "delete from peer_info where source = ? and key = ?", source.toLowerCase(),
-                key.toLowerCase() );
+        try
+        {
+            dbManager.executeUpdate2( "delete from peer_info where source = ? and key = ?", source.toLowerCase(),
+                    key.toLowerCase() );
+            return true;
+        }
+        catch ( DBException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
+
+        return false;
     }
 }

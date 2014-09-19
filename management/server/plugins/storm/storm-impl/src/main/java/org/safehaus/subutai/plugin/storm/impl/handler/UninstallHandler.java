@@ -65,11 +65,8 @@ public class UninstallHandler extends AbstractHandler {
 
             manager.getPluginDao().deleteInfo(StormConfig.PRODUCT_NAME, clusterName);
             po.addLogDone("Cluster info deleted");
-        } catch(DBException ex) {
-            String m = "Failed to delete cluster info";
-            manager.getLogger().error(m, ex);
-            po.addLogFailed(m);
-        } catch(LxcDestroyException ex) {
+        }
+        catch(LxcDestroyException ex) {
             String m = "Failed to destroy node(s)";
             po.addLog(m + ex.getMessage());
             manager.getLogger().error(m, ex);

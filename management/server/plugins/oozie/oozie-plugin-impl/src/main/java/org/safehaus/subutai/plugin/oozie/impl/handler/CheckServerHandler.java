@@ -42,31 +42,26 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl> {
 
             public void run() {
                 OozieClusterConfig config = null;
-                try {
-                    config = manager.getPluginDAO()
-                                    .getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
+                config = manager.getPluginDAO()
+                                .getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
 
-                    Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
-                    if ( serverAgent == null ) {
-                        po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
-                        return;
-                    }
-                    Set<Agent> servers = new HashSet<Agent>();
-                    servers.add( serverAgent );
-                    Command statusServiceCommand = Commands.getStatusServerCommand( servers );
-                    manager.getCommandRunner().runCommand( statusServiceCommand );
-
-                    if ( statusServiceCommand.hasCompleted() ) {
-
-                        po.addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
-                    }
-                    else {
-                        po.addLogFailed(
-                                String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
-                    }
+                Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+                if ( serverAgent == null ) {
+                    po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
+                    return;
                 }
-                catch ( DBException e ) {
-                    logger.info( e.getMessage() );
+                Set<Agent> servers = new HashSet<Agent>();
+                servers.add( serverAgent );
+                Command statusServiceCommand = Commands.getStatusServerCommand( servers );
+                manager.getCommandRunner().runCommand( statusServiceCommand );
+
+                if ( statusServiceCommand.hasCompleted() ) {
+
+                    po.addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
+                }
+                else {
+                    po.addLogFailed(
+                            String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
                 }
             }
         } );

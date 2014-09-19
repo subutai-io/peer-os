@@ -116,7 +116,6 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         {
             AgentResult agentResult = command.getResults().get( host.getUuid() );
             LOG.info( agentResult.getStdOut() );
-            //            System.out.println( agentResult.getStdOut() );
         }
     }
 

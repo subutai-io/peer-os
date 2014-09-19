@@ -62,9 +62,9 @@ public interface EnvironmentManager {
 
     List<EnvironmentBuildProcess> getBuildProcesses();
 
-    void createContainers( LxcBuildMessage lxcBuildMessage );
-
     void saveEnvironment( Environment environment );
 
     void buildEnvironment( EnvironmentBuildProcess environmentBuildProcess );
+
+    void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 }

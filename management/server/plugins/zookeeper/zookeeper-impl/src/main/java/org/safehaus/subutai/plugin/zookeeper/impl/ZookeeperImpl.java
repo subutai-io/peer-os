@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -16,7 +15,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -149,25 +147,14 @@ public class ZookeeperImpl implements Zookeeper {
 
     public List<ZookeeperClusterConfig> getClusters() {
 
-        try {
-            return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, ZookeeperClusterConfig.class );
-        }
-        catch ( DBException e ) {
-            return Collections.emptyList();
-        }
+        return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, ZookeeperClusterConfig.class );
     }
 
 
     @Override
     public ZookeeperClusterConfig getCluster( String clusterName ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-
-        try {
-            return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class );
-        }
-        catch ( DBException e ) {
-            return null;
-        }
+        return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class );
     }
 
 
@@ -175,11 +162,8 @@ public class ZookeeperImpl implements Zookeeper {
         Preconditions.checkNotNull( config, "Accumulo configuration is null" );
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop configuration is null" );
 
-
         AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config, hadoopClusterConfig );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -190,9 +174,7 @@ public class ZookeeperImpl implements Zookeeper {
 
 
         AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -203,9 +185,7 @@ public class ZookeeperImpl implements Zookeeper {
 
 
         AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -216,9 +196,7 @@ public class ZookeeperImpl implements Zookeeper {
 
 
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -228,9 +206,7 @@ public class ZookeeperImpl implements Zookeeper {
 
 
         AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -241,9 +217,7 @@ public class ZookeeperImpl implements Zookeeper {
 
 
         AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -254,9 +228,7 @@ public class ZookeeperImpl implements Zookeeper {
 
 
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -271,9 +243,7 @@ public class ZookeeperImpl implements Zookeeper {
 
         AbstractOperationHandler operationHandler =
                 new AddPropertyOperationHandler( this, clusterName, fileName, propertyName, propertyValue );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -286,9 +256,7 @@ public class ZookeeperImpl implements Zookeeper {
 
         AbstractOperationHandler operationHandler =
                 new RemovePropertyOperationHandler( this, clusterName, fileName, propertyName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -299,19 +267,23 @@ public class ZookeeperImpl implements Zookeeper {
                                                          final ProductOperation po ) {
         Preconditions.checkNotNull( config, "Zookeeper cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );
-        if ( config.getSetupType() != SetupType.OVER_HADOOP ) {
+        if ( config.getSetupType() != SetupType.OVER_HADOOP )
+        {
             Preconditions.checkNotNull( environment, "Environment is null" );
         }
 
-        if ( config.getSetupType() == SetupType.STANDALONE ) {
+        if ( config.getSetupType() == SetupType.STANDALONE )
+        {
             //this is a standalone ZK cluster setup
             return new ZookeeperStandaloneSetupStrategy( environment, config, po, this );
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             //this is a with-Hadoop ZK cluster setup
             return new ZookeeperWithHadoopSetupStrategy( environment, config, po, this );
         }
-        else {
+        else
+        {
             //this is an over-Hadoop ZK cluster setup
             return new ZookeeperOverHadoopSetupStrategy( config, po, this );
         }
@@ -332,7 +304,6 @@ public class ZookeeperImpl implements Zookeeper {
         nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
         nodesGroup.setTemplateName( config.getTemplateName() );
         nodesGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
-
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
 

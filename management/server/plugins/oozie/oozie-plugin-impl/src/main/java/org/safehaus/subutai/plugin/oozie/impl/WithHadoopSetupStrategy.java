@@ -110,13 +110,8 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy {
         if ( cmd.hasSucceeded() ) {
             po.addLog( "Installation of clients succeeded" );
             po.addLog( "Saving to db..." );
-            try {
-                oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                po.addLog( "Cluster info successfully saved" );
-            }
-            catch ( DBException ex ) {
-                throw new ClusterSetupException( "Failed to save cluster info: " + ex.getMessage() );
-            }
+            oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLog( "Cluster info successfully saved" );
         }
         else {
             throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );

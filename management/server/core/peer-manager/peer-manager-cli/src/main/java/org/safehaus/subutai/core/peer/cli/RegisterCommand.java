@@ -36,8 +36,15 @@ public class RegisterCommand extends OsgiCommandSupport {
     {
         Peer peer = getSamplePeer();
 
-        String result = peerManager.register( peer );
-        System.out.println( result );
+        if ( peerManager.register( peer ) )
+        {
+            System.out.println( "Peer registered." );
+        }
+        else
+        {
+            System.out.println( "Failed to register peer." );
+        }
+
         return null;
     }
 

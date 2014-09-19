@@ -25,12 +25,12 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy {
 
         //check if node agents are connected
         for(Agent a : config.getNodes()) {
-            if(manager.agentManager.getAgentByHostname(a.getHostname()) == null)
+            if(manager.getAgentManager().getAgentByHostname(a.getHostname()) == null)
                 throw new ClusterSetupException(String.format(
                         "Node %s is not connected", a.getHostname()));
         }
 
-        HadoopClusterConfig hc = manager.hadoopManager.getCluster(config.getHadoopClusterName());
+        HadoopClusterConfig hc = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
         if(hc == null)
             throw new ClusterSetupException("Could not find Hadoop cluster "
                     + config.getHadoopClusterName());
@@ -71,13 +71,9 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy {
         if(cmd.hasSucceeded()) {
             po.addLog("Installation succeeded");
             po.addLog("Saving to db...");
-            try {
-                manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
-                        config.getClusterName(), config);
-                po.addLog("Cluster info successfully saved");
-            } catch(DBException ex) {
-                throw new ClusterSetupException("Failed to save cluster info: " + ex.getMessage());
-            }
+            manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
+                    config.getClusterName(), config);
+            po.addLog("Cluster info successfully saved");
         } else
             throw new ClusterSetupException("Installation failed: " + cmd.getAllErrors());
 

@@ -7,72 +7,66 @@ import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Needed mostly for testing FileTracker
  */
-@Command( scope = "file-tracker", name = "test" )
+@Command (scope = "file-tracker", name = "test")
 public class CliTest extends OsgiCommandSupport implements ResponseListener {
 
-    private static final String CONFIG_POINTS[] = {
-            "/etc", "/etc/ksks-agent"
-    };
+	private static final String CONFIG_POINTS[] = {
+			"/etc",
+			"/etc/ksks-agent"
+	};
 
-    private AgentManager agentManager;
+	private AgentManager agentManager;
 
-    private FileTracker fileTracker;
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
+	private FileTracker fileTracker;
 
 
-    public void setFileTracker( FileTracker fileTracker )
-    {
-        this.fileTracker = fileTracker;
-    }
+	public void setAgentManager(AgentManager agentManager) {
+		this.agentManager = agentManager;
+	}
 
 
-    protected Object doExecute()
-    {
-
-        fileTracker.addListener( this );
-
-        Agent agent = getAgent();
-
-        fileTracker.createConfigPoints( agent, CONFIG_POINTS );
-
-        //        fileTracker.removeConfigPoints( agent, CONFIG_POINTS );
-
-        //        fileTracker.listConfigPoints( agent );
-
-        return null;
-    }
+	public void setFileTracker(FileTracker fileTracker) {
+		this.fileTracker = fileTracker;
+	}
 
 
-    private Agent getAgent()
-    {
+	protected Object doExecute() {
 
-        for ( Agent agent : agentManager.getAgents() )
-        {
-            if ( "management".equals( agent.getHostname() ) )
-            {
-                return agent;
-            }
-        }
+		fileTracker.addListener(this);
 
-        return null;
-    }
+		Agent agent = getAgent();
+
+		fileTracker.createConfigPoints(agent, CONFIG_POINTS);
+
+//        fileTracker.removeConfigPoints( agent, CONFIG_POINTS );
+
+//        fileTracker.listConfigPoints( agent );
+
+		return null;
+	}
+
+	private Agent getAgent() {
+
+		for (Agent agent : agentManager.getAgents()) {
+			if ("management".equals(agent.getHostname())) {
+				return agent;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void onResponse(Response response) {
 
 
-    @Override
-    public void onResponse( Response response )
-    {
-        System.out.println( "Response: " + response );
-    }
+	}
+
 }
