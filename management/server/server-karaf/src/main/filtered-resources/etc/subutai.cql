@@ -1,6 +1,6 @@
-CREATE KEYSPACE kiskis WITH replication = {'class': 'SimpleStrategy','replication_factor': '1'};
+CREATE KEYSPACE subutai WITH replication = {'class': 'SimpleStrategy','replication_factor': '1'};
 
-USE kiskis;
+USE subutai;
 
 create table product_info
 (

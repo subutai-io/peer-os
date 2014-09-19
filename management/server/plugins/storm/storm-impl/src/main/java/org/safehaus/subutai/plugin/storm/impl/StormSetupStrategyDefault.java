@@ -103,16 +103,9 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy {
 
         configure();
 
-        try {
-            manager.getPluginDao().saveInfo(StormConfig.PRODUCT_NAME,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info successfully saved");
-        } catch(DBException ex) {
-            String m = "Failed to save cluster info";
-            po.addLogFailed(m);
-            manager.getLogger().error(m, ex);
-            throw new ClusterSetupException(m + ": " + ex.getMessage());
-        }
+        manager.getPluginDao().saveInfo(StormConfig.PRODUCT_NAME,
+                config.getClusterName(), config);
+        po.addLog("Cluster info successfully saved");
 
         return config;
     }

@@ -40,13 +40,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HadoopIm
 
         productOperation.addLog( "Updating db..." );
 
-        try {
-            manager.getPluginDAO().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
-            productOperation.addLogDone( "Information updated in database" );
-        }
-        catch ( DBException e ) {
-            productOperation
-                    .addLogFailed( String.format( "Failed to update information in database, %s", e.getMessage() ) );
-        }
+        manager.getPluginDAO().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
+        productOperation.addLogDone( "Information updated in database" );
     }
 }

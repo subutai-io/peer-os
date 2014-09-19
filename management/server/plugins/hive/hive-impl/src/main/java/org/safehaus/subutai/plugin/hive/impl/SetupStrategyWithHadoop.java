@@ -66,13 +66,9 @@ class SetupStrategyWithHadoop extends HiveSetupStrategy {
         configureClients();
 
         po.addLog("Saving to db...");
-        try {
-            manager.getPluginDao().saveInfo(HiveConfig.PRODUCT_KEY,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info successfully saved");
-        } catch(DBException ex) {
-            throw new ClusterSetupException("Failed to save cluster info: " + ex.getMessage());
-        }
+        manager.getPluginDao().saveInfo(HiveConfig.PRODUCT_KEY,
+                config.getClusterName(), config);
+        po.addLog("Cluster info successfully saved");
 
         return config;
     }

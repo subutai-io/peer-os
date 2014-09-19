@@ -49,22 +49,12 @@ public class SqoopImpl extends SqoopBase {
 
     @Override
     public List<SqoopConfig> getClusters() {
-        try {
-            return pluginDao.getInfo(SqoopConfig.PRODUCT_KEY, SqoopConfig.class);
-        } catch(DBException ex) {
-            logger.error("Failed to get installation infos", ex);
-        }
-        return Collections.emptyList();
+        return pluginDao.getInfo( SqoopConfig.PRODUCT_KEY, SqoopConfig.class );
     }
 
     @Override
     public SqoopConfig getCluster(String clusterName) {
-        try {
-            return pluginDao.getInfo(SqoopConfig.PRODUCT_KEY, clusterName, SqoopConfig.class);
-        } catch(DBException ex) {
-            logger.error("Failed to get installation info for ", clusterName, ex);
-        }
-        return null;
+        return pluginDao.getInfo(SqoopConfig.PRODUCT_KEY, clusterName, SqoopConfig.class);
     }
 
     @Override

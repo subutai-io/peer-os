@@ -73,17 +73,11 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
     private void install() throws ClusterSetupException {
         po.addLog("Updating db...");
         //save to db
-        try {
-            manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
-                    config.getClusterName(),
-                    config);
+        manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
+                config.getClusterName(),
+                config);
 
-            po.addLog("Cluster info saved to DB");
-
-        } catch(DBException e) {
-            throw new ClusterSetupException(
-                    "Could not save cluster info to DB! Please see logs\nInstallation aborted");
-        }
+        po.addLog("Cluster info saved to DB");
 
         //install presto
         po.addLog("Installing Presto...");

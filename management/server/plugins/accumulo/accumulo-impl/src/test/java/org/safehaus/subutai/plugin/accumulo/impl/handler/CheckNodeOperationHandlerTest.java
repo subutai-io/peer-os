@@ -1,5 +1,7 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
+import java.util.logging.Logger;
+
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
@@ -10,6 +12,8 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class CheckNodeOperationHandlerTest {
+
+    private static final Logger LOG = Logger.getLogger( CheckNodeOperationHandlerTest.class.getName() );
 
     @Test
     public void testWithoutCluster() {
@@ -26,7 +30,6 @@ public class CheckNodeOperationHandlerTest {
     public void testAgentNotConnected() {
         AccumuloImpl accumuloImpl = new AccumuloImplMock().setClusterAccumuloClusterConfig( new AccumuloClusterConfig() );
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( accumuloImpl, "test-cluster", "test-node" );
-        System.out.println( operationHandler );
         operationHandler.run();
 
         assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );

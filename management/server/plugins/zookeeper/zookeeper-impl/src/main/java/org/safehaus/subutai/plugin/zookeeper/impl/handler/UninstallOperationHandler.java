@@ -54,14 +54,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
 
             productOperation.addLog( "Deleting cluster information from database..." );
 
-            try {
-                manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
-                productOperation.addLogDone( "Cluster information deleted from database" );
-            }
-            catch ( DBException e ) {
-                productOperation.addLogFailed(
-                        String.format( "Error while deleting cluster information from database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+            productOperation.addLogDone( "Cluster information deleted from database" );
         }
         else {
             //just uninstall nodes
@@ -80,14 +74,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
 
                 productOperation.addLog( "Deleting cluster information from database..." );
 
-                try {
-                    manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
-                    productOperation.addLogDone( "Cluster information deleted from database" );
-                }
-                catch ( DBException e ) {
-                    productOperation.addLogFailed( String.format( "Error while deleting cluster information from database, %s",
-                            e.getMessage() ) );
-                }
+                manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                productOperation.addLogDone( "Cluster information deleted from database" );
             }
             else {
                 productOperation.addLogFailed( "Uninstallation failed, command timed out" );

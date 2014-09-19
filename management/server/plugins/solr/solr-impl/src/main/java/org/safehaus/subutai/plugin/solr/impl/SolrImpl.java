@@ -107,20 +107,12 @@ public class SolrImpl implements Solr {
     public SolrClusterConfig getCluster(String clusterName) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(clusterName), "Cluster name is null or empty");
 
-        try {
-            return pluginDAO.getInfo(SolrClusterConfig.PRODUCT_KEY, clusterName, SolrClusterConfig.class);
-        } catch (DBException e) {
-            return null;
-        }
+        return pluginDAO.getInfo(SolrClusterConfig.PRODUCT_KEY, clusterName, SolrClusterConfig.class);
     }
 
 
     public List<SolrClusterConfig> getClusters() {
-        try {
-            return pluginDAO.getInfo(SolrClusterConfig.PRODUCT_KEY, SolrClusterConfig.class);
-        } catch (DBException e) {
-            return Collections.emptyList();
-        }
+        return pluginDAO.getInfo(SolrClusterConfig.PRODUCT_KEY, SolrClusterConfig.class);
     }
 
 

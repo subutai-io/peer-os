@@ -112,12 +112,8 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
                 po.addLog("Updating db...");
                 //update db
-                try {
-                    manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY, clusterName, config);
-                    po.addLogDone("Cluster info updated in DB\nDone");
-                } catch(DBException e) {
-                    po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
-                }
+                manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY, clusterName, config);
+                po.addLogDone("Cluster info updated in DB\nDone");
             } else
                 po.addLogFailed(String.format("Failed to configure workers, %s\nOperation aborted",
                         configureWorkersCommand.getAllErrors()));

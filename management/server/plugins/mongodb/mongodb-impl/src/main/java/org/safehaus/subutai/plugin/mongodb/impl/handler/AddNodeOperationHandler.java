@@ -95,14 +95,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             if ( result ) {
                 po.addLog( "Updating cluster information in database..." );
 
-                try {
-                    manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                    po.addLogDone( "Cluster information updated in database" );
-                }
-                catch ( DBException e ) {
-                    po.addLogFailed( String.format( "Error while updating cluster information in database, %s",
-                            e.getMessage() ) );
-                }
+                manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                po.addLogDone( "Cluster information updated in database" );
             }
             else {
                 po.addLogFailed( "Node addition failed" );

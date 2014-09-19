@@ -38,13 +38,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
 
         productOperation.addLog( "Updating db..." );
 
-        try {
-            manager.getPluginDAO().deleteInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName() );
-            productOperation.addLogDone( "Information updated in database" );
-        }
-        catch ( DBException e ) {
-            productOperation
-                    .addLogFailed( String.format( "Failed to update information in database, %s", e.getMessage() ) );
-        }
+        manager.getPluginDAO().deleteInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName() );
+        productOperation.addLogDone( "Information updated in database" );
     }
 }

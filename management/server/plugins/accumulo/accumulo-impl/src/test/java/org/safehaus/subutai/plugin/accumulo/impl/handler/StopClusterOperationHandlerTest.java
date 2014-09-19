@@ -26,7 +26,6 @@ public class StopClusterOperationHandlerTest {
     public void testAgentNotConnected() {
         AccumuloImpl accumuloImpl = new AccumuloImplMock().setClusterAccumuloClusterConfig( new AccumuloClusterConfig() );
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( accumuloImpl, "test-cluster", "test-node" );
-        System.out.println( operationHandler );
         operationHandler.run();
 
         assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );

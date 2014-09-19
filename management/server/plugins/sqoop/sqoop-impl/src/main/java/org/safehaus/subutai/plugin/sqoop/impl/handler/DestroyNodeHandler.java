@@ -49,24 +49,17 @@ public class DestroyNodeHandler extends AbstractHandler {
             po.addLog("Sqoop successfully removed from " + hostname);
             config.getNodes().remove(agent);
 
-            try {
-                PluginDAO dao = manager.getPluginDao();
-                if(config.getNodes().isEmpty()) {
+            PluginDAO dao = manager.getPluginDao();
+            if(config.getNodes().isEmpty()) {
 
-                    destroyNodes(config);
+                destroyNodes(config);
 
-                    dao.deleteInfo(SqoopConfig.PRODUCT_KEY, config.getClusterName());
-                    po.addLogDone("Installation info deleted");
-                } else {
-                    dao.saveInfo(SqoopConfig.PRODUCT_KEY, config.getClusterName(), config);
-                    po.addLogDone("Installation info updated");
-                }
-            } catch(DBException ex) {
-                String m = "Failed to update installation info";
-                po.addLogFailed(m);
-                manager.getLogger().error(m, ex);
+                dao.deleteInfo(SqoopConfig.PRODUCT_KEY, config.getClusterName());
+                po.addLogDone("Installation info deleted");
+            } else {
+                dao.saveInfo(SqoopConfig.PRODUCT_KEY, config.getClusterName(), config);
+                po.addLogDone("Installation info updated");
             }
-
         } else {
             po.addLog(cmd.getAllErrors());
             po.addLogFailed("Failed to remove Sqoop from node");

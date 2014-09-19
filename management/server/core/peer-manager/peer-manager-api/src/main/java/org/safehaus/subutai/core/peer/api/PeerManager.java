@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
  */
 public interface PeerManager {
 
-    String register( Peer peer );
+    boolean register( Peer peer );
 
     UUID getSiteId();
 
@@ -24,6 +24,8 @@ public interface PeerManager {
     boolean unregister( String uuid );
 
     Peer getPeerByUUID( UUID uuid );
+
+    String getRemoteId(String baseUrl);
 
     public void addPeerMessageListener( PeerMessageListener listener );
 
