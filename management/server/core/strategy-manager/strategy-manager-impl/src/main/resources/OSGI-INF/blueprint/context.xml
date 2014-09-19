@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean id="placementStrategyFactory"
-          class="org.safehaus.subutai.core.strategy.impl.PlacementStrategyFactoryImpl">
-    </bean>
-
     <bean id="roundRobinStrategy"
           class="org.safehaus.subutai.core.strategy.impl.RoundRobinStrategy">
     </bean>
@@ -17,7 +13,6 @@
           class="org.safehaus.subutai.core.strategy.impl.BestServerStrategy">
     </bean>
 
-    <service ref="placementStrategyFactory" interface="org.safehaus.subutai.core.strategy.api.PlacementStrategyFactory"/>
     <service ref="roundRobinStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy"/>
     <service ref="defaultStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy"/>
     <service ref="bestServerStrategy" interface="org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy"/>
