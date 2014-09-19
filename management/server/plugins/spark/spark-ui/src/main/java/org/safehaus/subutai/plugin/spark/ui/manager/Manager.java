@@ -42,7 +42,6 @@ import java.util.concurrent.ExecutorService;
 
 public class Manager {
 
-    public static final String MASTER_PREFIX = "Master: ";
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
@@ -55,6 +54,24 @@ public class Manager {
     private final CommandRunner commandRunner;
     private final String message = "No cluster is installed !";
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+
+    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected final static String CHECK_BUTTON_CAPTION = "Check";
+    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
+    protected final static String START_BUTTON_CAPTION = "Start";
+    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected final static String STOP_BUTTON_CAPTION = "Stop";
+    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected final static String HOST_COLUMN_CAPTION = "Host";
+    protected final static String IP_COLUMN_CAPTION = "IP List";
+    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected final static String STATUS_COLUMN_CAPTION = "Status";
+    protected final static String ADD_NODE_CAPTION = "Add Node";
+
+    final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
+
 
     public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException {
         Preconditions.checkNotNull( executor, "Executor is null" );
@@ -99,8 +116,27 @@ public class Manager {
 
         controlsContent.addComponent( clusterCombo );
 
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
+
+        startAllNodesBtn = new Button( START_ALL_BUTTON_CAPTION );
+        startAllNodesBtn.addStyleName( "default" );
+
+        stopAllNodesBtn = new Button( STOP_ALL_BUTTON_CAPTION );
+        stopAllNodesBtn.addStyleName( "default" );
+
+        checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
+        checkAllBtn.addStyleName( "default" );
+
+        destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.addStyleName( "default" );
+
+        addNodeBtn = new Button( ADD_NODE_CAPTION );
+        addNodeBtn.addStyleName( "default" );
+
+
+
+        /** Refresh Cluster button */
         refreshClustersBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -109,8 +145,8 @@ public class Manager {
         } );
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button checkAllBtn = new Button( "Check All" );
-        checkAllBtn.addStyleName( "default" );
+
+        /** Check All button */
         checkAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -123,43 +159,69 @@ public class Manager {
         } );
         controlsContent.addComponent( checkAllBtn );
 
-        Button startAllNodesBtn = new Button( "Start All" );
-        startAllNodesBtn.addStyleName( "default" );
+        /** Start all button */
         startAllNodesBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ){
                     show( message );
                 } else {
-                    startAllNodes();
+                    progressIcon.setVisible( true );
+                    disableOREnableAllTopButtons( false );
+                    disableOREnableAllButtonsOnTable( nodesTable, false);
+                    executor.execute(
+                            new StartAllTask( spark, tracker, config.getClusterName(), config.getMasterNode().getHostname(),
+                                    new CompleteEvent() {
+                                        @Override
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                                checkAllNodesStatus();
+                                                disableOREnableAllTopButtons( true );
+                                            }
+                                        }
+                                    } ) );
                 }
             }
         } );
         controlsContent.addComponent( startAllNodesBtn );
 
-        final Button stopAllNodesBtn = new Button( "Stop All" );
-        stopAllNodesBtn.addStyleName( "default" );
+
+        /** Stop all button */
         stopAllNodesBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ){
                     show( message );
                 } else {
-                    stopAllNodes();
+                    progressIcon.setVisible( true );
+                    disableOREnableAllTopButtons( false );
+                    disableOREnableAllButtonsOnTable( nodesTable, false );
+                    executor.execute(
+                            new StopAllTask( spark, tracker, config.getClusterName(), config.getMasterNode().getHostname(),
+                                    new CompleteEvent() {
+                                        @Override
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                                checkAllNodesStatus();
+                                                disableOREnableAllTopButtons( true );
+                                            }
+                                        }
+                                    } ) );
                 }
             }
         } );
         controlsContent.addComponent( stopAllNodesBtn );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
-        destroyClusterBtn.addStyleName( "default" );
+
+        /** Destroy Cluster button */
         destroyClusterBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config != null ) {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
-                            "No" );
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -176,7 +238,6 @@ public class Manager {
                             contentRoot.getUI().addWindow( window.getWindow() );
                         }
                     } );
-
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
                 else {
@@ -184,11 +245,10 @@ public class Manager {
                 }
             }
         } );
-
         controlsContent.addComponent( destroyClusterBtn );
 
-        Button addNodeBtn = new Button( "Add Node" );
-        addNodeBtn.addStyleName( "default" );
+
+        /** Add Node button */
         addNodeBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -239,23 +299,45 @@ public class Manager {
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
 
+    public void disableOREnableAllTopButtons( boolean value ){
+        refreshClustersBtn.setEnabled( value );
+        startAllNodesBtn.setEnabled( value );
+        stopAllNodesBtn.setEnabled( value );
+        checkAllBtn.setEnabled( value );
+        destroyClusterBtn.setEnabled( value );
+        addNodeBtn.setEnabled( value );
+    }
+
+
+    public void disableOREnableAllButtonsOnTable( Table table, boolean value ){
+        if ( table != null ) {
+            for ( Object o : table.getItemIds() ) {
+                int rowId = ( Integer ) o;
+                Item row = table.getItem( rowId );
+                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null ) {
+                    for ( Component component : availableOperationsLayout ) {
+                        component.setEnabled( value );
+                    }
+                }
+            }
+        }
+    }
+
 
     private Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
-        table.addContainerProperty( "Host", String.class, null );
-        table.addContainerProperty( "IP", String.class, null );
-        table.addContainerProperty( "Master/Slave", String.class, null );
-        table.addContainerProperty( "Check", Button.class, null );
-        table.addContainerProperty( "Start", Button.class, null );
-        table.addContainerProperty( "Stop", Button.class, null );
-        table.addContainerProperty( "Destroy", Button.class, null );
-        table.addContainerProperty( "Status", Label.class, null );
+        table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null  );
+
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
         table.setColumnCollapsingAllowed( true );
-        table.setColumnCollapsed( "Check", true );
 
         table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
             @Override
@@ -328,32 +410,34 @@ public class Manager {
     }
 
 
+    protected Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
+        if ( availableOperationsLayout == null ) {
+            return null;
+        }
+        else {
+            for ( Component component : availableOperationsLayout ) {
+                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) ) {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
+
     public void checkAllNodesStatus() {
-        for ( Object o : nodesTable.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    public void startAllNodes() {
-        for ( Object o : nodesTable.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    public void stopAllNodes() {
-        for ( Object o : nodesTable.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
-            checkBtn.click();
+        if ( nodesTable != null ) {
+            for ( Object o : nodesTable.getItemIds() ) {
+                int rowId = ( Integer ) o;
+                Item row = nodesTable.getItem( rowId );
+                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null ) {
+                    Button checkBtn = getCheckButton( availableOperationsLayout );
+                    if ( checkBtn != null ) {
+                        checkBtn.click();
+                    }
+                }
+            }
         }
     }
 
@@ -369,21 +453,30 @@ public class Manager {
 
         for ( final Agent agent : agents ) {
             final Label resultHolder = new Label();
-            final Button checkBtn = new Button( "Check" );
+            final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
             checkBtn.addStyleName( "default" );
-            final Button startBtn = new Button( "Start" );
+            final Button startBtn = new Button( START_BUTTON_CAPTION );
             startBtn.addStyleName( "default" );
-            final Button stopBtn = new Button( "Stop" );
+            final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             stopBtn.addStyleName( "default" );
 
-            final Button destroyBtn = new Button( "Destroy" );
+            final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
             destroyBtn.addStyleName( "default" );
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
             progressIcon.setVisible( false );
 
+            final HorizontalLayout availableOperations = new HorizontalLayout( );
+            availableOperations.addStyleName( "default" );
+            availableOperations.setSpacing( true );
+
+            availableOperations.addComponent( checkBtn );
+            availableOperations.addComponent( startBtn );
+            availableOperations.addComponent( stopBtn );
+            availableOperations.addComponent( destroyBtn );
+
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), checkBtn, startBtn, stopBtn, destroyBtn, resultHolder
+                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder, availableOperations
             }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
@@ -392,16 +485,17 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
+                    checkBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
                     executor.execute(
-                            new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(), false,
+                            new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
                                         @Override
                                         public void onComplete( String result ) {
                                             synchronized( progressIcon ) {
                                                 resultHolder.setValue( result );
-                                                if( result.contains( "not" ) ) {
+                                                if( result.contains( "NOT" ) ) {
                                                     startBtn.setEnabled( true );
                                                     stopBtn.setEnabled( false );
                                                 } else {
@@ -410,6 +504,7 @@ public class Manager {
                                                 }
                                                 progressIcon.setVisible( false );
                                                 destroyBtn.setEnabled( true );
+                                                checkBtn.setEnabled( true );
                                             }
                                         }
                                     } ) );
@@ -423,6 +518,7 @@ public class Manager {
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
+                    checkBtn.setEnabled( false );
 
                     executor.execute(
                             new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
@@ -444,6 +540,7 @@ public class Manager {
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
+                    checkBtn.setEnabled( false );
 
                     executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
                                     new CompleteEvent() {
@@ -485,19 +582,31 @@ public class Manager {
 
         //add master here
         final Label resultHolder = new Label();
-        final Button checkBtn = new Button( "Check" );
+
+        final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
         checkBtn.addStyleName( "default" );
-        final Button startBtn = new Button( "Start" );
+
+        final Button startBtn = new Button( START_BUTTON_CAPTION );
         startBtn.addStyleName( "default" );
-        final Button stopBtn = new Button( "Stop" );
+
+        final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
         stopBtn.addStyleName( "default" );
-        final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+
         stopBtn.setEnabled( false );
         startBtn.setEnabled( false );
         progressIcon.setVisible( false );
 
+        final HorizontalLayout availableOperations = new HorizontalLayout( );
+        availableOperations.addStyleName( "default" );
+        availableOperations.setSpacing( true );
+
+        availableOperations.addComponent( checkBtn );
+        availableOperations.addComponent( startBtn );
+        availableOperations.addComponent( stopBtn );
+
+
         table.addItem( new Object[] {
-                master.getHostname(), master.getListIP().get( 0 ), checkIfMaster( master ), checkBtn, startBtn, stopBtn, null, resultHolder
+                master.getHostname(), master.getListIP().get( 0 ), checkIfMaster( master ), resultHolder, availableOperations
         }, null );
 
         checkBtn.addClickListener( new Button.ClickListener() {
@@ -506,14 +615,15 @@ public class Manager {
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
+                checkBtn.setEnabled( false );
 
-                executor.execute( new CheckTaskMaster( spark, tracker, config.getClusterName(), master.getHostname(), true,
+                executor.execute( new CheckTaskMaster( spark, tracker, config.getClusterName(), master.getHostname(),
                                 new CompleteEvent() {
                                     @Override
                                     public void onComplete( String result ) {
                                         synchronized( progressIcon ) {
                                             resultHolder.setValue( result );
-                                            if( result.contains( "not" ) ) {
+                                            if( result.contains( "NOT" ) ) {
                                                 startBtn.setEnabled( true );
                                                 stopBtn.setEnabled( false );
                                             } else {
@@ -521,6 +631,7 @@ public class Manager {
                                                 stopBtn.setEnabled( true );
                                             }
                                             progressIcon.setVisible( false );
+                                            checkBtn.setEnabled( true );
                                         }
                                     }
                                 } ) );
@@ -530,14 +641,10 @@ public class Manager {
         startBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-
-                if ( !stopBtn.isEnabled() ) {
-                    Notification.show( "Node already started" );
-                }
-
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
+                checkBtn.setEnabled( false );
 
                 executor.execute( new StartTask( spark, tracker, config.getClusterName(), master.getHostname(), true,
                                 new CompleteEvent() {
@@ -554,14 +661,10 @@ public class Manager {
         stopBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-
-                if ( !startBtn.isEnabled() ) {
-                    Notification.show( "Node already stopped" );
-                }
-
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
+                checkBtn.setEnabled( false );
 
                 executor.execute( new StopTask( spark, tracker, config.getClusterName(), master.getHostname(), true,
                                 new CompleteEvent() {

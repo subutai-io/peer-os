@@ -1,10 +1,8 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
-import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -19,10 +17,9 @@ public class CheckAllOperationHandler extends AbstractOperationHandler<SparkImpl
 
     @Override
     public void run() {
-        ProductOperation po = productOperation;
         SparkClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
-            po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+            productOperation.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
             return;
         }
 

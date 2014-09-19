@@ -43,8 +43,6 @@ public class ElasticsearchForm extends CustomComponent {
             }
         } );
         verticalLayout.addComponent( sheet );
-        verticalLayout.addComponent( sheet );
-		verticalLayout.addComponent( sheet );
 
 		manager.refreshClustersInfo();
 	}

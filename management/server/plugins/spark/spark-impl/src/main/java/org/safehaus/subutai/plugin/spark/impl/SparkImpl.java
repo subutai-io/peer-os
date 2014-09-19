@@ -106,6 +106,14 @@ public class SparkImpl extends SparkBase implements Spark {
         return operationHandler.getTrackerId();
     }
 
+
+    @Override
+    public UUID startCluster(final String clusterName, final String lxcHostname ) {
+        AbstractOperationHandler operationHandler = new StartClusterOperationHandler(this, clusterName );
+        executor.execute(operationHandler);
+        return operationHandler.getTrackerId();
+    }
+
     @Override
     public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
 
@@ -114,6 +122,14 @@ public class SparkImpl extends SparkBase implements Spark {
 
         executor.execute(operationHandler);
 
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID stopCluster(final String clusterName, final String lxcHostname ) {
+        AbstractOperationHandler operationHandler  = new StopClusterOperationHandler(this, clusterName );
+        executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
 
@@ -130,21 +146,15 @@ public class SparkImpl extends SparkBase implements Spark {
 
     @Override
     public UUID checkMasterNode(final String clusterName, final String lxcHostname) {
-
         AbstractOperationHandler operationHandler = new CheckMasterNodeOperationHandler(this, clusterName, lxcHostname);
-
         executor.execute(operationHandler);
-
         return operationHandler.getTrackerId();
     }
 
     @Override
     public UUID checkAllNodes(final String clusterName ) {
-
         AbstractOperationHandler operationHandler = new CheckAllOperationHandler(this, clusterName );
-
         executor.execute(operationHandler);
-
         return operationHandler.getTrackerId();
     }
 

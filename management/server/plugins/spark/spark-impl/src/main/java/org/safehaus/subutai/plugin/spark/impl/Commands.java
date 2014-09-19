@@ -58,14 +58,14 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getStartMasterCommand(Agent masterNode) {
-        return createCommand(new RequestBuilder("service spark-master start").withTimeout(90),
+        return createCommand(new RequestBuilder("service spark-master start &").withTimeout(90),
                 Sets.newHashSet(masterNode));
     }
 
 
     public static Command getRestartMasterCommand(Agent masterNode) {
         return createCommand(
-                new RequestBuilder("service spark-master stop && service spark-master start").withTimeout(60),
+                new RequestBuilder("service spark-master stop && service spark-master start &").withTimeout(60),
                 Sets.newHashSet(masterNode));
     }
 
@@ -83,7 +83,7 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getStartSlaveCommand(Agent slaveNode) {
-        return createCommand(new RequestBuilder("service spark-slave start").withTimeout(90),
+        return createCommand(new RequestBuilder("service spark-slave start &").withTimeout(90),
                 Sets.newHashSet(slaveNode));
     }
 

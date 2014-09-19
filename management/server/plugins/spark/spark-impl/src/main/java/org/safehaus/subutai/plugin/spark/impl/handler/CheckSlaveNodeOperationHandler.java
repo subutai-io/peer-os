@@ -22,21 +22,20 @@ public class CheckSlaveNodeOperationHandler extends AbstractOperationHandler<Spa
 
     @Override
     public void run() {
-        ProductOperation po = productOperation;
         SparkClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
-            po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
+            productOperation.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
         if (node == null) {
-            po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+            productOperation.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
             return;
         }
 
         if (!config.getAllNodes().contains(node)) {
-            po.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
+            productOperation.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
             return;
         }
 
@@ -45,8 +44,8 @@ public class CheckSlaveNodeOperationHandler extends AbstractOperationHandler<Spa
 
         AgentResult res = checkNodeCommand.getResults().get(node.getUuid());
         if (checkNodeCommand.hasSucceeded())
-            po.addLogDone(String.format("%s", res.getStdOut()));
+            productOperation.addLogDone(String.format("%s", res.getStdOut()));
         else
-            po.addLogFailed(String.format("Faied to check status, %s", checkNodeCommand.getAllErrors()));
+            productOperation.addLogFailed(String.format("Failed to check status, %s", checkNodeCommand.getAllErrors()));
     }
 }

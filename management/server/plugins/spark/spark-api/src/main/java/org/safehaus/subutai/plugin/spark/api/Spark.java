@@ -30,6 +30,16 @@ public interface Spark extends ApiBase<SparkClusterConfig> {
      */
     public UUID startNode(String clusterName, String lxcHostName, boolean master);
 
+
+    /**
+     * Stops the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - master node name
+     * @return - UUID of operation to track
+     */
+    public UUID startCluster( String clusterName, String lxcHostName );
+
     /**
      * Stops the specified node
      *
@@ -40,6 +50,16 @@ public interface Spark extends ApiBase<SparkClusterConfig> {
      * @return - UUID of operation to track
      */
     public UUID stopNode(String clusterName, String lxcHostName, boolean master);
+
+
+    /**
+     * Stops the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - master node name
+     * @return - UUID of operation to track
+     */
+    public UUID stopCluster( String clusterName, String lxcHostName );
 
     /**
      * Checks status of the specified node
