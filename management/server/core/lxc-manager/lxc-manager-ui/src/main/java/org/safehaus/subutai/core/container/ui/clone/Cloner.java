@@ -33,7 +33,8 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout {
+public class Cloner extends VerticalLayout
+{
 
     private final AgentTree agentTree;
     private final Button cloneBtn;
@@ -53,7 +54,8 @@ public class Cloner extends VerticalLayout {
     private final Executor executor;
 
 
-    public Cloner( final LxcManager lxcManager, AgentTree agentTree, Executor executor ) {
+    public Cloner( final LxcManager lxcManager, AgentTree agentTree, Executor executor )
+    {
         setSpacing( true );
         setMargin( true );
 
@@ -69,36 +71,45 @@ public class Cloner extends VerticalLayout {
         slider.setImmediate( true );
         cloneBtn = new Button( "Clone" );
         cloneBtn.addStyleName( "default" );
-        cloneBtn.addClickListener( new Button.ClickListener() {
+        cloneBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 startCloneTask();
             }
         } );
 
         Button clearBtn = new Button( "Clear" );
         clearBtn.addStyleName( "default" );
-        clearBtn.addClickListener( new Button.ClickListener() {
+        clearBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 //clear completed
-                for ( Object rowId : lxcTable.getItemIds() ) {
+                for ( Object rowId : lxcTable.getItemIds() )
+                {
                     Item row = lxcTable.getItem( rowId );
-                    if ( row != null ) {
+                    if ( row != null )
+                    {
                         Embedded statusIcon = ( Embedded ) ( row.getItemProperty( statusLabel ).getValue() );
                         if ( statusIcon != null && (
                                 okIconSource.equals( ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() )
                                         || errorIconSource
-                                        .equals( ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() ) ) ) {
+                                        .equals( ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() ) ) )
+                        {
                             lxcTable.removeItem( rowId );
                         }
                     }
                 }
                 //clear empty parents
-                for ( Object rowId : lxcTable.getItemIds() ) {
+                for ( Object rowId : lxcTable.getItemIds() )
+                {
                     Item row = lxcTable.getItem( rowId );
                     if ( row != null && row.getItemProperty( physicalHostLabel ).getValue() != null && (
-                            lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) ) {
+                            lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) )
+                    {
                         lxcTable.removeItem( rowId );
                     }
                 }
@@ -130,51 +141,64 @@ public class Cloner extends VerticalLayout {
     }
 
 
-    private void startCloneTask() {
+    private void startCloneTask()
+    {
         Set<Agent> physicalAgents = AgentUtil.filterPhysicalAgents( agentTree.getSelectedAgents() );
         final String productName = textFieldLxcName.getValue().trim();
 
-        if ( !Strings.isNullOrEmpty( productName ) && !productName.matches( hostValidatorRegex ) ) {
+        if ( !Strings.isNullOrEmpty( productName ) && !productName.matches( hostValidatorRegex ) )
+        {
             show( "Please, use only letters, digits, dots and hyphens in product name" );
         }
-        else if ( physicalAgents.isEmpty() ) {
+        else if ( physicalAgents.isEmpty() )
+        {
             indicator.setVisible( true );
             final double count = ( Double ) slider.getValue();
-            executor.execute( new Runnable() {
-                public void run() {
+            executor.execute( new Runnable()
+            {
+                public void run()
+                {
                     Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
-                    if ( bestServers.isEmpty() ) {
+                    if ( bestServers.isEmpty() )
+                    {
                         show( "No servers available to accommodate new lxc containers" );
                         indicator.setVisible( false );
                     }
-                    else {
+                    else
+                    {
                         int numOfLxcSlots = 0;
-                        for ( Map.Entry<Agent, Integer> srv : bestServers.entrySet() ) {
+                        for ( Map.Entry<Agent, Integer> srv : bestServers.entrySet() )
+                        {
                             numOfLxcSlots += srv.getValue();
                         }
 
-                        if ( numOfLxcSlots < count ) {
+                        if ( numOfLxcSlots < count )
+                        {
                             show( String.format( "Only %s lxc containers can be created", numOfLxcSlots ) );
                             indicator.setVisible( false );
                         }
-                        else {
+                        else
+                        {
 
                             Map<Agent, List<String>> agentFamilies = new HashMap<>();
                             int numOfLxcsToClone = ( int ) count;
                             final AtomicInteger countProcessed = new AtomicInteger( numOfLxcsToClone );
 
-                            for ( int i = 1; i <= numOfLxcsToClone; i++ ) {
+                            for ( int i = 1; i <= numOfLxcsToClone; i++ )
+                            {
                                 Map<Agent, Integer> sortedBestServers =
                                         CollectionUtil.sortMapByValueDesc( bestServers );
                                 final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
                                 bestServers.put( entry.getKey(), entry.getValue() - 1 );
                                 List<String> lxcHostNames = agentFamilies.get( entry.getKey() );
-                                if ( lxcHostNames == null ) {
+                                if ( lxcHostNames == null )
+                                {
                                     lxcHostNames = new ArrayList<>();
                                     agentFamilies.put( entry.getKey(), lxcHostNames );
                                 }
                                 final StringBuilder lxcHost = new StringBuilder();
-                                if ( !Strings.isNullOrEmpty( productName ) ) {
+                                if ( !Strings.isNullOrEmpty( productName ) )
+                                {
                                     lxcHost.append( productName );
                                     lxcHost.append( lxcHostNames.size() + 1 );
                                     lxcHost.append( "-" );
@@ -183,22 +207,28 @@ public class Cloner extends VerticalLayout {
                                 lxcHostNames.add( lxcHost.toString() );
 
                                 //start clone task
-                                executor.execute( new Runnable() {
-                                    public void run() {
+                                executor.execute( new Runnable()
+                                {
+                                    public void run()
+                                    {
                                         boolean result =
                                                 lxcManager.cloneLxcOnHost( entry.getKey(), lxcHost.toString() );
                                         Item row = lxcTable.getItem( lxcHost.toString() );
-                                        if ( row != null ) {
-                                            if ( result ) {
+                                        if ( row != null )
+                                        {
+                                            if ( result )
+                                            {
                                                 row.getItemProperty( "Status" )
                                                    .setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
                                             }
-                                            else {
+                                            else
+                                            {
                                                 row.getItemProperty( "Status" ).setValue(
                                                         new Embedded( "", new ThemeResource( errorIconSource ) ) );
                                             }
                                         }
-                                        if ( countProcessed.decrementAndGet() == 0 ) {
+                                        if ( countProcessed.decrementAndGet() == 0 )
+                                        {
                                             indicator.setVisible( false );
                                         }
                                     }
@@ -211,15 +241,19 @@ public class Cloner extends VerticalLayout {
                 }
             } );
         }
-        else {
+        else
+        {
 
             Map<Agent, List<String>> agentFamilies = new HashMap<>();
             double count = ( Double ) slider.getValue();
-            for ( Agent physAgent : physicalAgents ) {
+            for ( Agent physAgent : physicalAgents )
+            {
                 List<String> lxcHostNames = new ArrayList<>();
-                for ( int i = 1; i <= count; i++ ) {
+                for ( int i = 1; i <= count; i++ )
+                {
                     StringBuilder lxcHost = new StringBuilder();
-                    if ( !Strings.isNullOrEmpty( productName ) ) {
+                    if ( !Strings.isNullOrEmpty( productName ) )
+                    {
                         lxcHost.append( productName ).append( i ).append( "-" );
                     }
                     lxcHost.append( UUIDUtil.generateTimeBasedUUID().toString() );
@@ -231,23 +265,31 @@ public class Cloner extends VerticalLayout {
             populateLxcTable( agentFamilies );
             indicator.setVisible( true );
             final AtomicInteger countProcessed = new AtomicInteger( ( int ) ( count * physicalAgents.size() ) );
-            for ( final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet() ) {
-                for ( final String lxcHostname : agg.getValue() ) {
-                    executor.execute( new Runnable() {
-                        public void run() {
+            for ( final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet() )
+            {
+                for ( final String lxcHostname : agg.getValue() )
+                {
+                    executor.execute( new Runnable()
+                    {
+                        public void run()
+                        {
                             boolean result = lxcManager.cloneLxcOnHost( agg.getKey(), lxcHostname );
                             Item row = lxcTable.getItem( lxcHostname );
-                            if ( row != null ) {
-                                if ( result ) {
+                            if ( row != null )
+                            {
+                                if ( result )
+                                {
                                     row.getItemProperty( "Status" )
                                        .setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
                                 }
-                                else {
+                                else
+                                {
                                     row.getItemProperty( "Status" )
                                        .setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
                                 }
                             }
-                            if ( countProcessed.decrementAndGet() == 0 ) {
+                            if ( countProcessed.decrementAndGet() == 0 )
+                            {
                                 indicator.setVisible( false );
                             }
                         }
@@ -258,34 +300,25 @@ public class Cloner extends VerticalLayout {
     }
 
 
-    private TreeTable createLxcTable( String caption, int size ) {
-        TreeTable table = new TreeTable( caption );
-        table.addContainerProperty( physicalHostLabel, String.class, null );
-        table.addContainerProperty( "Lxc Host", String.class, null );
-        table.addContainerProperty( statusLabel, Embedded.class, null );
-        table.setWidth( 100, Unit.PERCENTAGE );
-        table.setHeight( size, Unit.PIXELS );
-        table.setPageLength( 10 );
-        table.setSelectable( false );
-        table.setImmediate( true );
-        return table;
-    }
-
-
-    private void show( String msg ) {
+    private void show( String msg )
+    {
         Notification.show( msg );
     }
 
 
-    private void populateLxcTable( Map<Agent, List<String>> agents ) {
+    private void populateLxcTable( Map<Agent, List<String>> agents )
+    {
 
-        for ( final Map.Entry<Agent, List<String>> entry : agents.entrySet() ) {
+        for ( final Map.Entry<Agent, List<String>> entry : agents.entrySet() )
+        {
             Agent agent = entry.getKey();
-            if ( lxcTable.getItem( agent.getHostname() ) == null ) {
+            if ( lxcTable.getItem( agent.getHostname() ) == null )
+            {
                 lxcTable.addItem( new Object[] { agent.getHostname(), null, null }, agent.getHostname() );
             }
             lxcTable.setCollapsed( agent.getHostname(), false );
-            for ( String lxc : entry.getValue() ) {
+            for ( String lxc : entry.getValue() )
+            {
                 Embedded progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
 
                 lxcTable.addItem( new Object[] {
@@ -296,5 +329,20 @@ public class Cloner extends VerticalLayout {
                 lxcTable.setChildrenAllowed( lxc, false );
             }
         }
+    }
+
+
+    private TreeTable createLxcTable( String caption, int size )
+    {
+        TreeTable table = new TreeTable( caption );
+        table.addContainerProperty( physicalHostLabel, String.class, null );
+        table.addContainerProperty( "Lxc Host", String.class, null );
+        table.addContainerProperty( statusLabel, Embedded.class, null );
+        table.setWidth( 100, Unit.PERCENTAGE );
+        table.setHeight( size, Unit.PIXELS );
+        table.setPageLength( 10 );
+        table.setSelectable( false );
+        table.setImmediate( true );
+        return table;
     }
 }

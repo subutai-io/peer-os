@@ -9,7 +9,8 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 9/14/14.
  */
-public class EnvironmentBuildProcess {
+public class EnvironmentBuildProcess
+{
 
     String environmentName;
     private UUID uuid;
@@ -19,74 +20,88 @@ public class EnvironmentBuildProcess {
     private List<ContainerBuildMessage> containerBuildMessages;
 
 
-    public EnvironmentBuildProcess() {
+    public EnvironmentBuildProcess()
+    {
         this.uuid = UUID.randomUUID();
         this.containerBuildMessages = new ArrayList<ContainerBuildMessage>();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
     }
 
 
-    public ProcessStatusEnum getProcessStatusEnum() {
+    public ProcessStatusEnum getProcessStatusEnum()
+    {
         return processStatusEnum;
     }
 
 
-    public void setProcessStatusEnum( final ProcessStatusEnum processStatusEnum ) {
+    public void setProcessStatusEnum( final ProcessStatusEnum processStatusEnum )
+    {
         this.processStatusEnum = processStatusEnum;
     }
 
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
 
-    public void setUuid( final UUID uuid ) {
+    public void setUuid( final UUID uuid )
+    {
         this.uuid = uuid;
     }
 
 
-    public int getTimestamp() {
+    public int getTimestamp()
+    {
         return timestamp;
     }
 
 
-    public void setTimestamp( final int timestamp ) {
+    public void setTimestamp( final int timestamp )
+    {
         this.timestamp = timestamp;
     }
 
 
-    public boolean isCompleteStatus() {
+    public boolean isCompleteStatus()
+    {
         return completeStatus;
     }
 
 
-    public void setCompleteStatus( final boolean completeStatus ) {
+    public void setCompleteStatus( final boolean completeStatus )
+    {
         this.completeStatus = completeStatus;
     }
 
 
-    public List<ContainerBuildMessage> getContainerBuildMessages() {
+    public List<ContainerBuildMessage> getContainerBuildMessages()
+    {
         return containerBuildMessages;
     }
 
 
-    public void setContainerBuildMessages( final List<ContainerBuildMessage> containerBuildMessages ) {
+    public void setContainerBuildMessages( final List<ContainerBuildMessage> containerBuildMessages )
+    {
         this.containerBuildMessages = containerBuildMessages;
     }
 
 
-    public void addBuildBlock( final ContainerBuildMessage containerBuildMessage ) {
+    public void addBuildBlock( final ContainerBuildMessage containerBuildMessage )
+    {
         this.containerBuildMessages.add( containerBuildMessage );
     }
 
 
-    public String getEnvironmentName() {
+    public String getEnvironmentName()
+    {
         return environmentName;
     }
 
 
-    public void setEnvironmentName( final String environmentName ) {
+    public void setEnvironmentName( final String environmentName )
+    {
         this.environmentName = environmentName;
     }
 }

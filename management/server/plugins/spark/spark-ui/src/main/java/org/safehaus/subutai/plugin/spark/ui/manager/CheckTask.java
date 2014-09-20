@@ -12,7 +12,8 @@ import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-public class CheckTask implements Runnable {
+public class CheckTask implements Runnable
+{
 
     private final String clusterName, lxcHostname;
     private final boolean master;
@@ -22,7 +23,8 @@ public class CheckTask implements Runnable {
 
 
     public CheckTask( final Tracker tracker, final Spark spark, String clusterName, String lxcHostname, boolean master,
-                      CompleteEvent completeEvent ) {
+                      CompleteEvent completeEvent )
+    {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
@@ -33,40 +35,52 @@ public class CheckTask implements Runnable {
 
 
     @Override
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = spark.checkNode( clusterName, lxcHostname );
 
         NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( SparkClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( master ) {
-                        if ( po.getLog().contains( "Spark Master is running" ) ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
+                    if ( master )
+                    {
+                        if ( po.getLog().contains( "Spark Master is running" ) )
+                        {
                             state = NodeState.RUNNING;
                         }
-                        else if ( po.getLog().contains( "Spark Master is NOT running" ) ) {
+                        else if ( po.getLog().contains( "Spark Master is NOT running" ) )
+                        {
                             state = NodeState.STOPPED;
                         }
                     }
-                    else if ( po.getLog().contains( "Spark Worker is running" ) ) {
+                    else if ( po.getLog().contains( "Spark Worker is running" ) )
+                    {
                         state = NodeState.RUNNING;
                     }
-                    else if ( po.getLog().contains( "Spark Worker is NOT running" ) ) {
+                    else if ( po.getLog().contains( "Spark Worker is NOT running" ) )
+                    {
                         state = NodeState.STOPPED;
                     }
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > 30 * 1000 ) {
+            if ( System.currentTimeMillis() - start > 30 * 1000 )
+            {
                 break;
             }
         }

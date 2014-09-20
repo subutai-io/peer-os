@@ -11,14 +11,16 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings("serial")
-public class BlueprintLoadForm {
+public class BlueprintLoadForm
+{
 
     private final VerticalLayout contentRoot;
     private TextArea blueprintTxtArea;
     private EnvironmentManagerUI managerUI;
 
 
-    public BlueprintLoadForm( EnvironmentManagerUI managerUI ) {
+    public BlueprintLoadForm( EnvironmentManagerUI managerUI )
+    {
         this.managerUI = managerUI;
 
         contentRoot = new VerticalLayout();
@@ -30,9 +32,11 @@ public class BlueprintLoadForm {
 
         Button loadBlueprintButton = new Button( "Save blueprint" );
 
-        loadBlueprintButton.addClickListener( new Button.ClickListener() {
+        loadBlueprintButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 uploadBlueprint();
             }
         } );
@@ -42,7 +46,8 @@ public class BlueprintLoadForm {
     }
 
 
-    private TextArea getTextArea() {
+    private TextArea getTextArea()
+    {
         blueprintTxtArea = new TextArea( "Blueprint" );
         blueprintTxtArea.setSizeFull();
         blueprintTxtArea.setRows( 20 );
@@ -52,7 +57,8 @@ public class BlueprintLoadForm {
     }
 
 
-    private void uploadBlueprint() {
+    private void uploadBlueprint()
+    {
 
         try
         {
@@ -82,7 +88,8 @@ public class BlueprintLoadForm {
     }
 
 
-    public VerticalLayout getContentRoot() {
+    public VerticalLayout getContentRoot()
+    {
         return this.contentRoot;
     }
 }

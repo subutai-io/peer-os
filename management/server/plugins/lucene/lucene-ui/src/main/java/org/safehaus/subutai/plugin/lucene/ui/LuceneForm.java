@@ -22,9 +22,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class LuceneForm extends CustomComponent {
+public class LuceneForm extends CustomComponent
+{
 
-    public LuceneForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public LuceneForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

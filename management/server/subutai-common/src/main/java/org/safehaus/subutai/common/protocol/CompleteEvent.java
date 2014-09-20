@@ -8,6 +8,7 @@ package org.safehaus.subutai.common.protocol;
 
 import org.safehaus.subutai.common.enums.NodeState;
 
+
 public interface CompleteEvent
 {
     public void onComplete( NodeState state );

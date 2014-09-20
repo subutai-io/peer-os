@@ -12,33 +12,34 @@ import java.util.UUID;
 /**
  * Represents result of command execution on agent
  */
-public interface AgentResult {
+public interface AgentResult
+{
 
-	/**
-	 * Returns exit code or null if command has not completed
-	 *
-	 * @return - exit code or null if command has not completed
-	 */
-	public Integer getExitCode();
+    /**
+     * Returns exit code or null if command has not completed
+     *
+     * @return - exit code or null if command has not completed
+     */
+    public Integer getExitCode();
 
-	/**
-	 * Returns std out of command or empty string
-	 *
-	 * @return - std out of command or empty string
-	 */
-	public String getStdOut();
+    /**
+     * Returns std out of command or empty string
+     *
+     * @return - std out of command or empty string
+     */
+    public String getStdOut();
 
-	/**
-	 * Returns std err of command or empty string
-	 *
-	 * @return - std err of command or empty string
-	 */
-	public String getStdErr();
+    /**
+     * Returns std err of command or empty string
+     *
+     * @return - std err of command or empty string
+     */
+    public String getStdErr();
 
-	/**
-	 * Returns agent UUID
-	 *
-	 * @return - agent UUID
-	 */
-	public UUID getAgentUUID();
+    /**
+     * Returns agent UUID
+     *
+     * @return - agent UUID
+     */
+    public UUID getAgentUUID();
 }

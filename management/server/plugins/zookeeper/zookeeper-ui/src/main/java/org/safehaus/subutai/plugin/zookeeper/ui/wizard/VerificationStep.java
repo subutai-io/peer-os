@@ -28,10 +28,12 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class VerificationStep extends Panel {
+public class VerificationStep extends Panel
+{
 
     public VerificationStep( final Zookeeper zookeeper, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard ) {
+                             final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -46,16 +48,20 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE ) {
+        if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE )
+        {
             cfgView.addStringCfg( "Number of nodes", wizard.getConfig().getNumberOfNodes() + "" );
         }
-        else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP ) {
+        else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
+        {
             cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
-            for ( Agent node : wizard.getConfig().getNodes() ) {
+            for ( Agent node : wizard.getConfig().getNodes() )
+            {
                 cfgView.addStringCfg( "Nodes to install", node.getHostname() );
             }
         }
-        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
+        {
             cfgView.addStringCfg( "Zookeeper cluster name", wizard.getConfig().getClusterName() );
             cfgView.addStringCfg( "Number of Zookeeper cluster nodes", wizard.getConfig().getNumberOfNodes() + "" );
             cfgView.addStringCfg( "Hadoop cluster name", wizard.getHadoopClusterConfig().getClusterName() );
@@ -68,19 +74,23 @@ public class VerificationStep extends Panel {
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 UUID trackID = wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ?
                                zookeeper.installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig() ) :
                                zookeeper.installCluster( wizard.getConfig() );
 
                 ProgressWindow window =
                         new ProgressWindow( executorService, tracker, trackID, ZookeeperClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -90,9 +100,11 @@ public class VerificationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.back();
             }
         } );

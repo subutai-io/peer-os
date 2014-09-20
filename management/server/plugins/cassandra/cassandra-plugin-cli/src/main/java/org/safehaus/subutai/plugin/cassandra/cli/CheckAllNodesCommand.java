@@ -19,59 +19,72 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command(scope = "cassandra", name = "check-cluster", description = "Command to check Cassandra cluster")
-public class CheckAllNodesCommand extends OsgiCommandSupport {
+public class CheckAllNodesCommand extends OsgiCommandSupport
+{
 
-    private Cassandra cassandraManager;
-    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
 
 
-    public Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager()
+    {
         return cassandraManager;
     }
 
 
-    public void setCassandraManager( Cassandra cassandraManager ) {
+    public void setCassandraManager( Cassandra cassandraManager )
+    {
         this.cassandraManager = cassandraManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    protected Object doExecute() throws IOException {
+    protected Object doExecute() throws IOException
+    {
 
         UUID uuid = cassandraManager.checkCluster( clusterName );
         int logSize = 0;
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( CassandraClusterConfig.PRODUCT_KEY, uuid );
-            if ( po != null ) {
-                if ( logSize != po.getLog().length() ) {
+            if ( po != null )
+            {
+                if ( logSize != po.getLog().length() )
+                {
                     System.out.print( po.getLog().substring( logSize, po.getLog().length() ) );
                     System.out.flush();
                     logSize = po.getLog().length();
                 }
-                if ( po.getState() != ProductOperationState.RUNNING ) {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
                     break;
                 }
             }
-            else {
+            else
+            {
                 System.out.println( "Product operation not found. Check logs" );
                 break;
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
         }

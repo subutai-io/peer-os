@@ -12,14 +12,15 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command(scope = "config", name = "cat", description = "Executes cat command on given host")
-public class CatCommand extends OsgiCommandSupport {
+public class CatCommand extends OsgiCommandSupport
+{
 
-    //    private static AgentManager agentManager;
-    private TextInjector textInjector;
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "Agent hostname")
     String hostname;
     @Argument(index = 1, name = "pathToFile", required = true, multiValued = false, description = "Path to file")
     String pathToFile;
+    //    private static AgentManager agentManager;
+    private TextInjector textInjector;
 
 
     //    public AgentManager getAgentManager() {
@@ -27,7 +28,8 @@ public class CatCommand extends OsgiCommandSupport {
     //    }
 
 
-    public TextInjector getTextInjector() {
+    public TextInjector getTextInjector()
+    {
         return textInjector;
     }
 
@@ -37,12 +39,14 @@ public class CatCommand extends OsgiCommandSupport {
     //    }
 
 
-    public void setTextInjector( final TextInjector textInjector ) {
+    public void setTextInjector( final TextInjector textInjector )
+    {
         this.textInjector = textInjector;
     }
 
 
-    protected Object doExecute() {
+    protected Object doExecute()
+    {
 
         //        Agent agent = agentManager.getAgentByHostname( hostname );
         String fileContent = textInjector.catFile( hostname, pathToFile );

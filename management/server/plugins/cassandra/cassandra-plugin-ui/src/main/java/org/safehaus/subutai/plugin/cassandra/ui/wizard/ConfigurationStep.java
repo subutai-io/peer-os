@@ -6,6 +6,8 @@
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
+import java.util.Arrays;
+
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -17,15 +19,15 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import java.util.Arrays;
-
 
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends VerticalLayout {
+public class ConfigurationStep extends VerticalLayout
+{
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -38,9 +40,11 @@ public class ConfigurationStep extends VerticalLayout {
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
-        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -50,9 +54,11 @@ public class ConfigurationStep extends VerticalLayout {
         domainNameTxtFld.setInputPrompt( "intra.lan" );
         domainNameTxtFld.setRequired( true );
         domainNameTxtFld.setValue( wizard.getConfig().getClusterName() );
-        domainNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        domainNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setDomainName( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -61,9 +67,11 @@ public class ConfigurationStep extends VerticalLayout {
         dataDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/data" );
         dataDirectoryTxtFld.setRequired( true );
         dataDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
-        dataDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        dataDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setDataDirectory( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -72,9 +80,11 @@ public class ConfigurationStep extends VerticalLayout {
         commitLogDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/commitlog" );
         commitLogDirectoryTxtFld.setRequired( true );
         commitLogDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
-        commitLogDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        commitLogDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setCommitLogDirectory( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -83,9 +93,11 @@ public class ConfigurationStep extends VerticalLayout {
         savedCachesDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/saved_caches" );
         savedCachesDirectoryTxtFld.setRequired( true );
         savedCachesDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
-        savedCachesDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        savedCachesDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setSavedCachesDirectory( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -96,13 +108,15 @@ public class ConfigurationStep extends VerticalLayout {
         //        nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setTextInputAllowed( true );
-        nodesCountCombo.setImmediate(true);
+        nodesCountCombo.setImmediate( true );
         nodesCountCombo.setNullSelectionAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
 
-        nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -113,32 +127,40 @@ public class ConfigurationStep extends VerticalLayout {
         //        seedsCountCombo.setMultiSelect(false);
         seedsCountCombo.setImmediate( true );
         seedsCountCombo.setTextInputAllowed( true );
-        seedsCountCombo.setImmediate(true);
+        seedsCountCombo.setImmediate( true );
         seedsCountCombo.setNullSelectionAllowed( false );
         seedsCountCombo.setValue( wizard.getConfig() );
 
-        seedsCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        seedsCountCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setNumberOfSeeds( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                {
                     show( "Please provide cluster name !" );
                 }
-                else if ( Strings.isNullOrEmpty( wizard.getConfig().getDomainName() ) ) {
+                else if ( Strings.isNullOrEmpty( wizard.getConfig().getDomainName() ) )
+                {
                     show( "Please provide domain name !" );
                 }
-                else if ( ( int ) nodesCountCombo.getValue()  <= ( int ) seedsCountCombo.getValue() ){
-                    show( "Number of seeds should be smaller than total number nodes in the cluster !");
+                else if ( ( int ) nodesCountCombo.getValue() <= ( int ) seedsCountCombo.getValue() )
+                {
+                    show( "Number of seeds should be smaller than total number nodes in the cluster !" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -146,9 +168,11 @@ public class ConfigurationStep extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -175,7 +199,8 @@ public class ConfigurationStep extends VerticalLayout {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

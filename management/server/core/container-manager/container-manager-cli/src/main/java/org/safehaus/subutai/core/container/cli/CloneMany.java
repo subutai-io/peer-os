@@ -20,7 +20,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command(scope = "container", name = "clone-many")
-public class CloneMany extends OsgiCommandSupport implements ContainerEventListener {
+public class CloneMany extends OsgiCommandSupport implements ContainerEventListener
+{
 
     ContainerManager containerManager;
 
@@ -38,6 +39,7 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
     {
         this.containerManager = containerManager;
     }
+
 
     @Override
     protected Object doExecute() throws Exception
@@ -73,6 +75,7 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
         }
         return criteria;
     }
+
 
     @Override
     public void onContainerEvent( final ContainerEvent containerEvent )

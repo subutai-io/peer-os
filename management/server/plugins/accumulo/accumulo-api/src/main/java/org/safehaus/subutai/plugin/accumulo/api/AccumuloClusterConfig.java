@@ -16,7 +16,8 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 /**
  * @author dilshat
  */
-public class AccumuloClusterConfig implements ConfigBase {
+public class AccumuloClusterConfig implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "Accumulo2";
     public static final int DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY = 3;
@@ -37,82 +38,100 @@ public class AccumuloClusterConfig implements ConfigBase {
     private String templateName;
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName( final String templateName )
+    {
         this.templateName = templateName;
     }
 
 
-    public String getHadoopClusterName() {
+    public String getHadoopClusterName()
+    {
         return hadoopClusterName;
     }
 
 
-    public void setHadoopClusterName( final String hadoopClusterName ) {
+    public void setHadoopClusterName( final String hadoopClusterName )
+    {
         this.hadoopClusterName = hadoopClusterName;
     }
 
 
-    public String getZookeeperClusterName() {
+    public String getZookeeperClusterName()
+    {
         return zookeeperClusterName;
     }
 
 
-    public void setZookeeperClusterName( final String zookeeperClusterName ) {
+    public void setZookeeperClusterName( final String zookeeperClusterName )
+    {
         this.zookeeperClusterName = zookeeperClusterName;
     }
 
 
-    public SetupType getSetupType() {
+    public SetupType getSetupType()
+    {
         return setupType;
     }
 
 
-    public void setSetupType( final SetupType setupType ) {
+    public void setSetupType( final SetupType setupType )
+    {
         this.setupType = setupType;
     }
 
 
-    public int getNumberOfTracers() {
+    public int getNumberOfTracers()
+    {
         return numberOfTracers;
     }
 
 
-    public void setNumberOfTracers( final int numberOfTracers ) {
+    public void setNumberOfTracers( final int numberOfTracers )
+    {
         this.numberOfTracers = numberOfTracers;
     }
 
 
-    public int getNumberOfSlaves() {
+    public int getNumberOfSlaves()
+    {
         return numberOfSlaves;
     }
 
 
-    public void setNumberOfSlaves( final int numberOfSlaves ) {
+    public void setNumberOfSlaves( final int numberOfSlaves )
+    {
         this.numberOfSlaves = numberOfSlaves;
     }
 
 
-    public Set<Agent> getAllNodes() {
+    public Set<Agent> getAllNodes()
+    {
         Set<Agent> allNodes = new HashSet<>();
 
-        if ( masterNode != null ) {
+        if ( masterNode != null )
+        {
             allNodes.add( masterNode );
         }
-        if ( gcNode != null ) {
+        if ( gcNode != null )
+        {
             allNodes.add( gcNode );
         }
-        if ( monitor != null ) {
+        if ( monitor != null )
+        {
             allNodes.add( monitor );
         }
-        if ( tracers != null ) {
+        if ( tracers != null )
+        {
             allNodes.addAll( tracers );
         }
-        if ( slaves != null ) {
+        if ( slaves != null )
+        {
             allNodes.addAll( slaves );
         }
 
@@ -120,94 +139,112 @@ public class AccumuloClusterConfig implements ConfigBase {
     }
 
 
-    public Agent getMasterNode() {
+    public Agent getMasterNode()
+    {
         return masterNode;
     }
 
 
-    public void setMasterNode( Agent masterNode ) {
+    public void setMasterNode( Agent masterNode )
+    {
         this.masterNode = masterNode;
     }
 
 
-    public Agent getGcNode() {
+    public Agent getGcNode()
+    {
         return gcNode;
     }
 
 
-    public void setGcNode( Agent gcNode ) {
+    public void setGcNode( Agent gcNode )
+    {
         this.gcNode = gcNode;
     }
 
 
-    public Agent getMonitor() {
+    public Agent getMonitor()
+    {
         return monitor;
     }
 
 
-    public void setMonitor( Agent monitor ) {
+    public void setMonitor( Agent monitor )
+    {
         this.monitor = monitor;
     }
 
 
-    public Set<Agent> getTracers() {
+    public Set<Agent> getTracers()
+    {
         return tracers;
     }
 
 
-    public void setTracers( Set<Agent> tracers ) {
+    public void setTracers( Set<Agent> tracers )
+    {
         this.tracers = tracers;
     }
 
 
-    public Set<Agent> getSlaves() {
+    public Set<Agent> getSlaves()
+    {
         return slaves;
     }
 
 
-    public void setSlaves( Set<Agent> slaves ) {
+    public void setSlaves( Set<Agent> slaves )
+    {
         this.slaves = slaves;
     }
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public void setClusterName( String clusterName ) {
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
 
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_NAME;
     }
 
 
-    public String getInstanceName() {
+    public String getInstanceName()
+    {
         return instanceName;
     }
 
 
-    public void setInstanceName( String instanceName ) {
+    public void setInstanceName( String instanceName )
+    {
         this.instanceName = instanceName;
     }
 
 
-    public String getPassword() {
+    public String getPassword()
+    {
         return password;
     }
 
 
-    public void setPassword( String password ) {
+    public void setPassword( String password )
+    {
         this.password = password;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "AccumuloClusterConfig{" +
                 "clusterName='" + clusterName + '\'' +
                 ", instanceName='" + instanceName + '\'' +

@@ -19,7 +19,8 @@
  */
 /* Tabsheet scroller styles */
 
-.v-tabsheet-scroller {
+.v-tabsheet-scroller
+{
     height: 31px;
     margin-top: -31px;
     padding: 0 3px 0 4px;
@@ -31,14 +32,16 @@
     width: 36px;
 }
 
-.v-tabsheet-scroller button {
+.v-tabsheet-scroller button
+{
     margin-top: 7px;
 }
 
 .v-tabsheet-scrollerPrev,
 .v-tabsheet-scrollerNext,
 .v-tabsheet-scrollerPrev-disabled,
-.v-tabsheet-scrollerNext-disabled {
+.v-tabsheet-scrollerNext-disabled
+{
     border: none;
     background: transparent;
     background-image: url(img/tab-prev.png); /** sprite-ref: verticals */
@@ -47,31 +50,37 @@
     overflow: hidden;
 }
 
-.v-tabsheet-scroller button::-moz-focus-inner {
+.v-tabsheet-scroller button::-moz-focus-inner
+{
     border: none;
 }
 
-.v-tabsheet-scrollerNext {
+.v-tabsheet-scrollerNext
+{
     background-image: url(img/tab-next.png); /** sprite-ref: verticals */
 }
 
-.v-tabsheet-scrollerPrev:active {
+.v-tabsheet-scrollerPrev:active
+{
     background-image: url(img/tab-prev-pressed.png); /** sprite-ref: verticals */
 }
 
-.v-tabsheet-scrollerNext:active {
+.v-tabsheet-scrollerNext:active
+{
     background-image: url(img/tab-next-pressed.png); /** sprite-ref: verticals */
 }
 
 .v-tabsheet-scrollerPrev-disabled,
-.v-tabsheet-scrollerPrev-disabled:active {
+.v-tabsheet-scrollerPrev-disabled:active
+{
     background-image: url(img/tab-prev-disabled.png); /** sprite-ref: verticals */
     opacity: 1;
     filter: none;
 }
 
 .v-tabsheet-scrollerNext-disabled,
-.v-tabsheet-scrollerNext-disabled:active {
+.v-tabsheet-scrollerNext-disabled:active
+{
     background-image: url(img/tab-next-disabled.png); /** sprite-ref: verticals; sprite-margin-bottom: 1px */
     opacity: 1;
     filter: none;

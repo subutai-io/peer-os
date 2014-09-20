@@ -14,13 +14,15 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class FlumeForm extends CustomComponent {
+public class FlumeForm extends CustomComponent
+{
 
     private final Wizard wizard;
     private final Manager manager;
 
 
-    public FlumeForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public FlumeForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -29,8 +31,8 @@ public class FlumeForm extends CustomComponent {
 
         TabSheet tabSheet = new TabSheet();
         tabSheet.setSizeFull();
-        manager = new Manager(executorService, serviceLocator);
-        wizard = new Wizard(executorService, serviceLocator);
+        manager = new Manager( executorService, serviceLocator );
+        wizard = new Wizard( executorService, serviceLocator );
         tabSheet.addTab( wizard.getContent(), "Install" );
         tabSheet.addTab( manager.getContent(), "Manage" );
 

@@ -20,20 +20,23 @@ import com.google.gson.JsonSyntaxException;
 /**
  * PluginDAO is used to manage cluster configuration information in database
  */
-public class PeerDAO {
+public class PeerDAO
+{
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final Logger LOG = Logger.getLogger( PeerDAO.class.getName() );
     private final DbManager dbManager;
 
 
-    public PeerDAO( final DbManager dbManager ) {
+    public PeerDAO( final DbManager dbManager )
+    {
         Preconditions.checkNotNull( dbManager, "Db Manager is null" );
         this.dbManager = dbManager;
     }
 
 
-    public boolean saveInfo( String source, String key, Object info ) {
+    public boolean saveInfo( String source, String key, Object info )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( info, "Info is null" );
@@ -60,7 +63,8 @@ public class PeerDAO {
      *
      * @return - list of POJOs
      */
-    public <T> List<T> getInfo( String source, Class<T> clazz ) {
+    public <T> List<T> getInfo( String source, Class<T> clazz )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
 
@@ -99,7 +103,8 @@ public class PeerDAO {
      *
      * @return - POJO
      */
-    public <T> T getInfo( String source, String key, Class<T> clazz ) {
+    public <T> T getInfo( String source, String key, Class<T> clazz )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
@@ -139,7 +144,8 @@ public class PeerDAO {
      * @param source - source key
      * @param key - POJO key
      */
-    public boolean deleteInfo( String source, String key ) {
+    public boolean deleteInfo( String source, String key )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
 

@@ -17,10 +17,12 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class MahoutForm extends CustomComponent {
+public class MahoutForm extends CustomComponent
+{
 
 
-    public MahoutForm(MahoutUI mahoutUi) {
+    public MahoutForm( MahoutUI mahoutUi )
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -29,8 +31,8 @@ public class MahoutForm extends CustomComponent {
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        Manager manager = new Manager(mahoutUi);
-        Wizard wizard = new Wizard(mahoutUi);
+        Manager manager = new Manager( mahoutUi );
+        Wizard wizard = new Wizard( mahoutUi );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
         verticalLayout.addComponent( mongoSheet );

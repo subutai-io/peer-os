@@ -4,10 +4,12 @@
  */
 package org.safehaus.subutai.common.enums;
 
+
 /**
  * @author Dilshat
  */
-public enum OutputRedirection {
+public enum OutputRedirection
+{
 
-	CAPTURE, CAPTURE_AND_RETURN, RETURN, NO
+    CAPTURE, CAPTURE_AND_RETURN, RETURN, NO
 }

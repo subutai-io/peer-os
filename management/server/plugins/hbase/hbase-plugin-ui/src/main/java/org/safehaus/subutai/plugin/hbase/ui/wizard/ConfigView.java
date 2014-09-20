@@ -13,12 +13,14 @@ import com.vaadin.ui.TreeTable;
 /**
  * @author dilshat
  */
-public class ConfigView {
+public class ConfigView
+{
 
     private final TreeTable configTbl;
 
 
-    public ConfigView( String cfgCaption ) {
+    public ConfigView( String cfgCaption )
+    {
         configTbl = new TreeTable();
         configTbl.setWidth( "100%" );
         configTbl.setHeight( "350px" );
@@ -26,9 +28,11 @@ public class ConfigView {
     }
 
 
-    public void addStringCfg( String cfgCategory, String cfgValue ) {
+    public void addStringCfg( String cfgCategory, String cfgValue )
+    {
         Item ctg = configTbl.getItem( cfgCategory );
-        if ( ctg == null ) {
+        if ( ctg == null )
+        {
             configTbl.addItem( new Object[] { cfgCategory }, cfgCategory );
         }
         configTbl.addItem( new Object[] { cfgValue }, cfgCategory + "_" + cfgValue );
@@ -38,7 +42,8 @@ public class ConfigView {
     }
 
 
-    public TreeTable getCfgTable() {
+    public TreeTable getCfgTable()
+    {
         return configTbl;
     }
 }

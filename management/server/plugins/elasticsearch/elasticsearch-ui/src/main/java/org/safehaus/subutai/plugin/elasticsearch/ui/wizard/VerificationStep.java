@@ -4,10 +4,9 @@ package org.safehaus.subutai.plugin.elasticsearch.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -19,10 +18,12 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-public class VerificationStep extends VerticalLayout {
+public class VerificationStep extends VerticalLayout
+{
 
     public VerificationStep( final Elasticsearch elasticsearch, final ExecutorService executorService,
-                             final Tracker tracker, final Wizard wizard ) {
+                             final Tracker tracker, final Wizard wizard )
+    {
 
         setSizeFull();
         GridLayout grid = new GridLayout( 1, 5 );
@@ -44,14 +45,19 @@ public class VerificationStep extends VerticalLayout {
 
         Button installButton = new Button( "Install" );
         installButton.addStyleName( "default" );
-        installButton.addClickListener( new Button.ClickListener() {
+        installButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 UUID trackID = elasticsearch.installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, ElasticsearchClusterConfiguration.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                        ElasticsearchClusterConfiguration.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -61,9 +67,11 @@ public class VerificationStep extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );

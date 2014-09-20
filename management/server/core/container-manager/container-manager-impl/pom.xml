@@ -36,8 +36,8 @@
       <artifactId>template-manager-api</artifactId>
     </dependency>
     <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>template-registry-api</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>template-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

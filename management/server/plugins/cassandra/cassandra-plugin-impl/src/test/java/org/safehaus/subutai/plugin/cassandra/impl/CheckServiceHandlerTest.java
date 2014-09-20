@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -20,12 +21,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CheckServiceHandlerTest {
+
+public class CheckServiceHandlerTest
+{
 
     CassandraImpl cassandraMock;
 
+
     @Before
-    public void setup() throws DBException {
+    public void setup() throws DBException
+    {
         cassandraMock = mock( CassandraImpl.class );
         when( cassandraMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
         when( cassandraMock.getCommandRunner() ).thenReturn( mock( CommandRunner.class ) );
@@ -33,14 +38,17 @@ public class CheckServiceHandlerTest {
         when( cassandraMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
         when( cassandraMock.getCluster( anyString() ) ).thenReturn( null );
         when( cassandraMock.getPluginDAO() ).thenReturn( mock( PluginDAO.class ) );
-        when( cassandraMock.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), "Cassandra", CassandraClusterConfig.class ) ).thenReturn( null );
+        when( cassandraMock.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), "Cassandra",
+                CassandraClusterConfig.class ) ).thenReturn( null );
     }
 
 
     @Test
-    public void testWithoutCluster(){
+    public void testWithoutCluster()
+    {
 
-        AbstractOperationHandler operationHandler = new CheckServiceHandler( cassandraMock, "test-cluster", "test-uuid" );
+        AbstractOperationHandler operationHandler =
+                new CheckServiceHandler( cassandraMock, "test-cluster", "test-uuid" );
         operationHandler.run();
 
         assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
@@ -49,7 +57,8 @@ public class CheckServiceHandlerTest {
 
 
     @Test
-    public void testWithNotConnectedAgents(){
+    public void testWithNotConnectedAgents()
+    {
         when( cassandraMock.getCluster( anyString() ) ).thenReturn( new CassandraClusterConfig() );
         when( cassandraMock.getAgentManager().getAgentByHostname( anyString() ) ).thenReturn( null );
         AbstractOperationHandler operationHandler = new CheckNodeHandler( cassandraMock, "test-cluster", "test-node" );

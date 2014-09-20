@@ -9,14 +9,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
     private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
-
-    private final CommandDispatcher dispatcher;
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final CommandDispatcher dispatcher;
 
 
-    public RestServiceImpl( final CommandDispatcher dispatcher ) {
+    public RestServiceImpl( final CommandDispatcher dispatcher )
+    {
         this.dispatcher = dispatcher;
     }
 }

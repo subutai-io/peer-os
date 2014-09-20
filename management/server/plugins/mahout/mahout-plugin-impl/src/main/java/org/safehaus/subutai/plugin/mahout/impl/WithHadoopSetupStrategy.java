@@ -11,28 +11,33 @@ import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 /**
  * Created by bahadyr on 9/4/14.
  */
-public class WithHadoopSetupStrategy extends MahoutSetupStrategy {
+public class WithHadoopSetupStrategy extends MahoutSetupStrategy
+{
 
     private Environment environment;
 
 
-    public WithHadoopSetupStrategy( MahoutImpl manager, ProductOperation po, MahoutClusterConfig config ) {
+    public WithHadoopSetupStrategy( MahoutImpl manager, ProductOperation po, MahoutClusterConfig config )
+    {
         super( manager, po, config );
     }
 
 
-    public Environment getEnvironment() {
+    public Environment getEnvironment()
+    {
         return environment;
     }
 
 
-    public void setEnvironment( final Environment environment ) {
+    public void setEnvironment( final Environment environment )
+    {
         this.environment = environment;
     }
 
 
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
 
 
         return config;

@@ -1,9 +1,9 @@
 package org.safehaus.subutai.core.agent.api;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-
 import java.util.Set;
+
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -11,7 +11,8 @@ import java.util.Set;
  * onAgent event happens when an agent connects or disconnects from the mgmt server. The freshAgents argument supplies
  * the set of agents currently connected to the mgmt server.
  */
-public interface AgentListener {
+public interface AgentListener
+{
 
-    public void onAgent(Set<Agent> freshAgents);
+    public void onAgent( Set<Agent> freshAgents );
 }

@@ -17,7 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-.v-ff2 .v-button .v-button-caption {
+.v-ff2 .v-button .v-button-caption
+{
     display: -moz-inline-box;
     padding-top: 6px;
     height: 20px;

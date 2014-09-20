@@ -24,29 +24,34 @@ import com.google.gson.JsonSyntaxException;
  * Created by bahadyr on 5/6/14.
  */
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
 
 
-    public RestServiceImpl() {
+    public RestServiceImpl()
+    {
     }
 
 
-    public PeerManager getPeerManager() {
+    public PeerManager getPeerManager()
+    {
         return peerManager;
     }
 
 
-    public void setPeerManager( PeerManager peerManager ) {
+    public void setPeerManager( PeerManager peerManager )
+    {
         this.peerManager = peerManager;
     }
 
 
     @Override
-    public Peer registerPeer( String config ) {
+    public Peer registerPeer( String config )
+    {
         if ( config != null )
         {
             Peer peer = GSON.fromJson( config, Peer.class );
@@ -61,7 +66,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String createContainers( final String createContainersMsg ) {
+    public String createContainers( final String createContainersMsg )
+    {
         CreateContainersMessage ccm = GSON.fromJson( createContainersMsg, CreateContainersMessage.class );
 
         Set<Agent> list = ( Set<Agent> ) peerManager.createContainers( ccm );
@@ -71,7 +77,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String getCreateContainersMsgJsonFormat() {
+    public String getCreateContainersMsgJsonFormat()
+    {
         CreateContainersMessage ccm = new CreateContainersMessage();
         ccm.setStrategy( "ROUND_ROBIN" );
         ccm.setEnvId( UUID.randomUUID() );
@@ -83,14 +90,16 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String getPeerJsonFormat() {
+    public String getPeerJsonFormat()
+    {
         Peer peer = getSamplePeer();
         return GSON.toJson( peer );
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
 
         UUID id = peerManager.getSiteId();
         return GSON.toJson( id );
@@ -98,7 +107,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response processMessage( final String peerId, final String recipient, final String message ) {
+    public Response processMessage( final String peerId, final String recipient, final String message )
+    {
         try
         {
             String response = peerManager.processPeerMessage( peerId, recipient, message );
@@ -113,7 +123,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response getConnectedAgents( final String environmentId ) {
+    public Response getConnectedAgents( final String environmentId )
+    {
         try
         {
             String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
@@ -127,12 +138,14 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response ping() {
+    public Response ping()
+    {
         return Response.ok().build();
     }
 
 
-    private Peer getSamplePeer() {
+    private Peer getSamplePeer()
+    {
         Peer peer = new Peer();
         peer.setName( "Peer name" );
         peer.setIp( "10.10.10.10" );

@@ -3,32 +3,36 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.plugin.solr.impl.handler.mock.MockBuilder;
 import org.safehaus.subutai.plugin.solr.impl.handler.mock.SolrImplMock;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 
 @Ignore
-public class InstallOperationHandlerTest {
+public class InstallOperationHandlerTest
+{
 
     @Test(expected = NullPointerException.class)
-    public void testWithNullConfig() {
+    public void testWithNullConfig()
+    {
         new SolrImplMock().installCluster( null );
     }
 
 
     @Test
-    public void testWithMalformedConfiguration() {
+    public void testWithMalformedConfiguration()
+    {
         SolrClusterConfig solrClusterConfig = new SolrClusterConfig();
         solrClusterConfig.setClusterName( "test" );
         solrClusterConfig.setNumberOfNodes( -1 );
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( new SolrImplMock(), solrClusterConfig );
+        AbstractOperationHandler operationHandler =
+                new InstallOperationHandler( new SolrImplMock(), solrClusterConfig );
 
         operationHandler.run();
 
@@ -38,7 +42,8 @@ public class InstallOperationHandlerTest {
 
 
     @Test
-    public void testWithClusterExists() {
+    public void testWithClusterExists()
+    {
         SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig() );
         SolrClusterConfig solrClusterConfig = new SolrClusterConfig().setClusterName( "test-cluster" );
         AbstractOperationHandler operationHandler = new InstallOperationHandler( solrImpl, solrClusterConfig );
@@ -52,7 +57,8 @@ public class InstallOperationHandlerTest {
 
 
     @Test
-    public void testSuccess() {
+    public void testSuccess()
+    {
         AbstractOperationHandler operationHandler = MockBuilder.getInstallOperationWithResult( true );
 
         operationHandler.run();
@@ -63,7 +69,8 @@ public class InstallOperationHandlerTest {
 
 
     @Test
-    public void testFail() {
+    public void testFail()
+    {
         AbstractOperationHandler operationHandler = MockBuilder.getInstallOperationWithResult( false );
 
         operationHandler.run();

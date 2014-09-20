@@ -22,7 +22,8 @@ import com.google.common.base.Preconditions;
 /**
  * This is implementation of Command interface
  */
-public class CommandImpl extends AbstractCommand {
+public class CommandImpl extends AbstractCommand
+{
 
 
     /**
@@ -32,7 +33,8 @@ public class CommandImpl extends AbstractCommand {
      * @param requestBuilder - request builder used to produce request
      * @param requestsCount - number of request to send
      */
-    public CommandImpl( RequestBuilder requestBuilder, int requestsCount, CommandRunnerBase commandRunner ) {
+    public CommandImpl( RequestBuilder requestBuilder, int requestsCount, CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( requestsCount > 0, "Request Count <= 0" );
@@ -55,7 +57,8 @@ public class CommandImpl extends AbstractCommand {
      * @param agents - target agents
      */
     public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents,
-                        CommandRunnerBase commandRunner ) {
+                        CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
@@ -65,7 +68,8 @@ public class CommandImpl extends AbstractCommand {
         this.requestsCount = agents.size();
         this.timeout = requestBuilder.getTimeout();
 
-        for ( Agent agent : agents ) {
+        for ( Agent agent : agents )
+        {
             requests.add( requestBuilder.build( agent.getUuid(), commandUUID ) );
         }
     }
@@ -78,8 +82,8 @@ public class CommandImpl extends AbstractCommand {
      * @param description - command description
      * @param requestBuilders - request builder used to produce request
      */
-    public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders,
-                        CommandRunnerBase commandRunner ) {
+    public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders, CommandRunnerBase commandRunner )
+    {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
                 "Request Builders are null or empty" );
@@ -89,9 +93,11 @@ public class CommandImpl extends AbstractCommand {
         this.requestsCount = requestBuilders.size();
 
         int maxTimeout = 0;
-        for ( AgentRequestBuilder requestBuilder : requestBuilders ) {
+        for ( AgentRequestBuilder requestBuilder : requestBuilders )
+        {
             requests.add( requestBuilder.build( commandUUID ) );
-            if ( requestBuilder.getTimeout() > maxTimeout ) {
+            if ( requestBuilder.getTimeout() > maxTimeout )
+            {
                 maxTimeout = requestBuilder.getTimeout();
             }
         }

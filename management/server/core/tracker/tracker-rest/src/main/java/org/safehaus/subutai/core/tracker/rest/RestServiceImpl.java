@@ -21,7 +21,8 @@ import com.google.gson.GsonBuilder;
  *
  */
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
 
     private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
 
@@ -29,24 +30,29 @@ public class RestServiceImpl implements RestService {
     private Tracker tracker;
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
     @Override
-    public Response getProductOperation( final String source, final String uuid ) {
-        try {
+    public Response getProductOperation( final String source, final String uuid )
+    {
+        try
+        {
             UUID poUUID = UUID.fromString( uuid );
 
             ProductOperationView productOperationView = tracker.getProductOperation( source, poUUID );
 
-            if ( productOperationView != null ) {
+            if ( productOperationView != null )
+            {
                 return Response.ok().entity( gson.toJson( productOperationView ) ).build();
             }
             return null;
         }
-        catch ( IllegalArgumentException e ) {
+        catch ( IllegalArgumentException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -54,8 +60,10 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response getProductOperations( final String source, final String fromDate, final String toDate,
-                                          final int limit ) {
-        try {
+                                          final int limit )
+    {
+        try
+        {
             SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
             Date fromDat = df.parse( fromDate + " 00:00:00" );
             Date toDat = df.parse( toDate + " 23:59:59" );
@@ -64,14 +72,16 @@ public class RestServiceImpl implements RestService {
 
             return Response.ok().entity( gson.toJson( pos ) ).build();
         }
-        catch ( ParseException e ) {
+        catch ( ParseException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
 
 
     @Override
-    public Response getProductOperationSources() {
+    public Response getProductOperationSources()
+    {
         return Response.ok().entity( gson.toJson( tracker.getProductOperationSources() ) ).build();
     }
 }

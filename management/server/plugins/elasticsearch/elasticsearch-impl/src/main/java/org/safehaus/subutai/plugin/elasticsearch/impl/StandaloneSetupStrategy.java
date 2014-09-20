@@ -18,7 +18,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class StandaloneSetupStrategy implements ClusterSetupStrategy {
+public class StandaloneSetupStrategy implements ClusterSetupStrategy
+{
 
     private final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration;
     private final ElasticsearchImpl elasticsearchManager;
@@ -28,7 +29,8 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
 
     public StandaloneSetupStrategy( final Environment environment,
                                     final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,
-                                    ProductOperation po, ElasticsearchImpl elasticsearchManager ) {
+                                    ProductOperation po, ElasticsearchImpl elasticsearchManager )
+    {
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -42,7 +44,8 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public ElasticsearchClusterConfiguration setup() throws ClusterSetupException {
+    public ElasticsearchClusterConfiguration setup() throws ClusterSetupException
+    {
         if ( Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getClusterName() ) ||
                 Strings.isNullOrEmpty( ElasticsearchClusterConfiguration.getTemplateName() ) ||
                 elasticsearchClusterConfiguration.getNumberOfNodes() <= 0 )

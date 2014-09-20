@@ -23,7 +23,8 @@ import com.google.common.base.Strings;
  * Represents command to agent. This class is used when the same command should be run on a set of agents
  * simultaneously
  */
-public class RequestBuilder {
+public class RequestBuilder
+{
 
     //source of command
     private final static String source = "COMMAND-RUNNER";
@@ -76,7 +77,8 @@ public class RequestBuilder {
      *
      * @param command - command to run
      */
-    public RequestBuilder( String command ) {
+    public RequestBuilder( String command )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( command ), "Command is null or empty" );
 
         this.command = command;
@@ -88,12 +90,14 @@ public class RequestBuilder {
      *
      * @return - timeout {@code Integer}
      */
-    public Integer getTimeout() {
+    public Integer getTimeout()
+    {
         return timeout;
     }
 
 
-    public RequestBuilder withCwd( String cwd ) {
+    public RequestBuilder withCwd( String cwd )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( cwd ), "Current working directory is null or empty" );
 
         this.cwd = cwd;
@@ -107,7 +111,8 @@ public class RequestBuilder {
      *
      * @param type - {@code RequestType}
      */
-    public RequestBuilder withType( RequestType type ) {
+    public RequestBuilder withType( RequestType type )
+    {
         Preconditions.checkNotNull( type, "Request Type is null" );
 
         this.type = type;
@@ -121,7 +126,8 @@ public class RequestBuilder {
      *
      * @param outputRedirection - {@code OutputRedirection}
      */
-    public RequestBuilder withStdOutRedirection( OutputRedirection outputRedirection ) {
+    public RequestBuilder withStdOutRedirection( OutputRedirection outputRedirection )
+    {
         Preconditions.checkNotNull( outputRedirection, "Std Out Redirection is null" );
 
         this.outputRedirection = outputRedirection;
@@ -135,7 +141,8 @@ public class RequestBuilder {
      *
      * @param errRedirection - {@code OutputRedirection}
      */
-    public RequestBuilder withStdErrRedirection( OutputRedirection errRedirection ) {
+    public RequestBuilder withStdErrRedirection( OutputRedirection errRedirection )
+    {
         Preconditions.checkNotNull( errRedirection, "Std Err Redirection is null" );
 
         this.errRedirection = errRedirection;
@@ -149,7 +156,8 @@ public class RequestBuilder {
      *
      * @param timeout - command timeout in seconds
      */
-    public RequestBuilder withTimeout( int timeout ) {
+    public RequestBuilder withTimeout( int timeout )
+    {
         Preconditions.checkArgument( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC,
                 String.format( "Timeout is not in range 1 to %s", Common.MAX_COMMAND_TIMEOUT_SEC ) );
 
@@ -165,7 +173,8 @@ public class RequestBuilder {
      *
      * @param stdOutPath - path to file to redirect std output
      */
-    public RequestBuilder withStdOutPath( String stdOutPath ) {
+    public RequestBuilder withStdOutPath( String stdOutPath )
+    {
 
         this.stdOutPath = stdOutPath;
 
@@ -179,7 +188,8 @@ public class RequestBuilder {
      *
      * @param stdErrPath - path to file to redirect err output
      */
-    public RequestBuilder withErrPath( String stdErrPath ) {
+    public RequestBuilder withErrPath( String stdErrPath )
+    {
 
         this.stdErrPath = stdErrPath;
 
@@ -192,7 +202,8 @@ public class RequestBuilder {
      *
      * @param runAs - user
      */
-    public RequestBuilder withRunAs( String runAs ) {
+    public RequestBuilder withRunAs( String runAs )
+    {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( runAs ), "Run As is null or empty" );
 
@@ -207,7 +218,8 @@ public class RequestBuilder {
      *
      * @param cmdArgs - command line arguments
      */
-    public RequestBuilder withCmdArgs( List<String> cmdArgs ) {
+    public RequestBuilder withCmdArgs( List<String> cmdArgs )
+    {
 
         this.cmdArgs = cmdArgs;
 
@@ -220,7 +232,8 @@ public class RequestBuilder {
      *
      * @param envVars - environment variables
      */
-    public RequestBuilder withEnvVars( Map<String, String> envVars ) {
+    public RequestBuilder withEnvVars( Map<String, String> envVars )
+    {
 
         this.envVars = envVars;
 
@@ -233,7 +246,8 @@ public class RequestBuilder {
      *
      * @param pid - pid of process to terminate
      */
-    public RequestBuilder withPid( int pid ) {
+    public RequestBuilder withPid( int pid )
+    {
         Preconditions.checkArgument( pid > 0, "PID is less then or equal to 0" );
 
         this.pid = pid;
@@ -246,7 +260,8 @@ public class RequestBuilder {
      * Sets configuration points to track. This is actual for command with type INOTIFY_CREATE_REQUEST or
      * INOTIFY_REMOVE_REQUEST
      */
-    public RequestBuilder withConfPoints( String confPoints[] ) {
+    public RequestBuilder withConfPoints( String confPoints[] )
+    {
 
         this.confPoints = confPoints.clone();
 
@@ -260,7 +275,8 @@ public class RequestBuilder {
      * @param agentUUID - target agent UUID
      * @param taskUUID - command UUID
      */
-    public Request build( UUID agentUUID, UUID taskUUID ) {
+    public Request build( UUID agentUUID, UUID taskUUID )
+    {
 
         return new Request( source, type, agentUUID, taskUUID, requestSequenceNumber, cwd, command, outputRedirection,
                 errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout )

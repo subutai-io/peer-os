@@ -27,9 +27,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class StepSetRegion extends VerticalLayout {
+public class StepSetRegion extends VerticalLayout
+{
 
-    public StepSetRegion( final Wizard wizard ) {
+    public StepSetRegion( final Wizard wizard )
+    {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         verticalLayout.setHeight( 100, Unit.PERCENTAGE );
@@ -70,14 +72,18 @@ public class StepSetRegion extends VerticalLayout {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.getConfig().setRegion( ( Set<String> ) select.getValue() );
-                if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getRegion() ) ) {
+                if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getRegion() ) )
+                {
                     show( "Please add region servers" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -85,9 +91,11 @@ public class StepSetRegion extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -105,7 +113,8 @@ public class StepSetRegion extends VerticalLayout {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

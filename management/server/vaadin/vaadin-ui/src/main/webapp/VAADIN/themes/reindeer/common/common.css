@@ -18,7 +18,8 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 .v-generated-body,
-.v-app {
+.v-app
+{
     background: #f5f5f5;
 }
 
@@ -45,7 +46,8 @@
 .v-Notification,
 .v-menubar-submenu,
 .v-drag-element,
-.v-table-header-drag {
+.v-table-header-drag
+{
     font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
     font-size: 12px;
     line-height: normal;
@@ -56,33 +58,39 @@
 .v-app .black,
 .v-window-black,
 .v-window .black,
-.v-popupview-popup .black {
+.v-popupview-popup .black
+{
     color: #c9ccce;
     text-shadow: #000 0 0 1px;
 }
 
-.v-errorindicator {
+.v-errorindicator
+{
     width: 13px;
     height: 16px;
     background: transparent url(../common/icons/error.png) no-repeat 50%;
 }
 
-.v-ie6 .v-errorindicator {
+.v-ie6 .v-errorindicator
+{
     background-image: url(../common/icons/error-ie6.png);
 }
 
-.v-tooltip {
+.v-tooltip
+{
     background-color: #fffcdd;
     border: 1px solid #b8b295;
     font-size: 11px;
     color: #222;
 }
 
-.v-tooltip-text {
+.v-tooltip-text
+{
     padding: 2px 4px;
 }
 
-.v-tooltip .v-errormessage {
+.v-tooltip .v-errormessage
+{
     padding: 3px 4px;
     background: #ffecc6;
     color: #b74100;
@@ -90,20 +98,23 @@
     border-top: 1px solid #fff3dc;
 }
 
-.v-tooltip .v-errormessage h2 {
+.v-tooltip .v-errormessage h2
+{
     font-size: 16px;
     font-weight: normal;
     color: #ab3101;
     margin: 2px 0 8px 0;
 }
 
-.v-tooltip .v-errormessage h3 {
+.v-tooltip .v-errormessage h3
+{
     font-size: 13px;
     font-weight: bold;
     margin: 1px 0 4px 0;
 }
 
-.v-contextmenu {
+.v-contextmenu
+{
     background: #f8f8f9;
     border: none;
     border-radius: 3px;
@@ -114,7 +125,8 @@
     padding: 4px 0;
 }
 
-.v-contextmenu .gwt-MenuItem {
+.v-contextmenu .gwt-MenuItem
+{
     padding: 1px 12px 1px 8px;
     height: 16px;
     user-select: none;
@@ -123,29 +135,34 @@
     cursor: default;
 }
 
-.v-contextmenu .gwt-MenuItem .v-icon {
+.v-contextmenu .gwt-MenuItem .v-icon
+{
     margin-right: 3px;
 }
 
-.v-contextmenu .gwt-MenuItem-selected {
+.v-contextmenu .gwt-MenuItem-selected
+{
     background: transparent repeat-x;
     background-image: url(img/sel-bg.png); /** sprite-ref: verticals; sprite-alignment: repeat */
     color: #fff;
     text-shadow: #3b5a7a 0 1px 0;
 }
 
-.v-ie .v-contextmenu .gwt-MenuItem-selected {
+.v-ie .v-contextmenu .gwt-MenuItem-selected
+{
     background-image: url(img/sel-bg.png);
     background-position: left top;
 }
 
-.v-contextmenu .gwt-MenuItem-selected div {
+.v-contextmenu .gwt-MenuItem-selected div
+{
     background: transparent;
     cursor: default;
 }
 
 /* Fixes for Liferay 6.0 */
-.portlet .v-app {
+.portlet .v-app
+{
     background: transparent;
 }
 
@@ -154,7 +171,8 @@
 .portlet .v-popupview-popup .v-radiobutton input,
 .portlet .v-app .v-checkbox input,
 .portlet .v-window .v-checkbox input,
-.portlet .v-popupview-popup .v-checkbox input {
+.portlet .v-popupview-popup .v-checkbox input
+{
     margin-right: 3px;
     background: transparent;
 }

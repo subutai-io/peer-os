@@ -11,41 +11,53 @@ import java.util.logging.Logger;
 /**
  * Created by bahadyr on 7/19/14.
  */
-public class FileContentReader {
+public class FileContentReader
+{
 
     private final Logger LOG = Logger.getLogger( FileContentReader.class.getName() );
 
 
-    public String readFile( String pathToFile ) {
+    public String readFile( String pathToFile )
+    {
         StringBuilder sb = new StringBuilder();
         File file = new File( pathToFile );
         FileReader fileReader = null;
         BufferedReader bufferedReader = null;
-        try {
+        try
+        {
             fileReader = new FileReader( file );
             bufferedReader = new BufferedReader( fileReader );
 
-            for ( String line; ( line = bufferedReader.readLine() ) != null; ) {
+            for ( String line; ( line = bufferedReader.readLine() ) != null; )
+            {
                 sb.append( line ).append( System.getProperty( "line.separator" ) );
             }
         }
-        catch ( IOException e ) {
+        catch ( IOException e )
+        {
             LOG.info( e.getMessage() );
         }
-        finally {
-            try {
-                if ( bufferedReader != null ) {
+        finally
+        {
+            try
+            {
+                if ( bufferedReader != null )
+                {
                     bufferedReader.close();
                 }
             }
-            catch ( IOException ignore ) {
+            catch ( IOException ignore )
+            {
             }
-            try {
-                if ( fileReader != null ) {
+            try
+            {
+                if ( fileReader != null )
+                {
                     fileReader.close();
                 }
             }
-            catch ( IOException ignore ) {
+            catch ( IOException ignore )
+            {
             }
         }
 

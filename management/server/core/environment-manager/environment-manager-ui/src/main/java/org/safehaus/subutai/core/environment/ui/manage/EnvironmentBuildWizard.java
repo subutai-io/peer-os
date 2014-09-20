@@ -31,7 +31,8 @@ import com.vaadin.ui.themes.Runo;
 /**
  * Created by bahadyr on 9/10/14.
  */
-public class EnvironmentBuildWizard extends DetailsWindow {
+public class EnvironmentBuildWizard extends DetailsWindow
+{
 
     private static final Logger LOG = Logger.getLogger( EnvironmentBuildWizard.class.getName() );
 
@@ -44,7 +45,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
 
 
     public EnvironmentBuildWizard( final String caption, EnvironmentManagerUI managerUI,
-                                   EnvironmentBuildTask environmentBuildTask ) {
+                                   EnvironmentBuildTask environmentBuildTask )
+    {
         super( caption );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
@@ -52,23 +54,29 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    public void next() {
+    public void next()
+    {
         step++;
         putForm();
     }
 
 
-    private void putForm() {
-        switch ( step ) {
-            case 1: {
+    private void putForm()
+    {
+        switch ( step )
+        {
+            case 1:
+            {
                 setContent( genPeersTable() );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 setContent( genContainerToPeersTable() );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 managerUI.getEnvironmentManager().buildEnvironment( environmentBuildTask );
                 close();
                 break;
@@ -77,32 +85,38 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    public EnvironmentManagerUI getManagerUI() {
+    public EnvironmentManagerUI getManagerUI()
+    {
         return managerUI;
     }
 
 
-    public void setManagerUI( final EnvironmentManagerUI managerUI ) {
+    public void setManagerUI( final EnvironmentManagerUI managerUI )
+    {
         this.managerUI = managerUI;
     }
 
 
-    public EnvironmentBuildTask getEnvironmentBuildTask() {
+    public EnvironmentBuildTask getEnvironmentBuildTask()
+    {
         return environmentBuildTask;
     }
 
 
-    public void setEnvironmentBuildTask( final EnvironmentBuildTask environmentBuildTask ) {
+    public void setEnvironmentBuildTask( final EnvironmentBuildTask environmentBuildTask )
+    {
         this.environmentBuildTask = environmentBuildTask;
     }
 
 
-    public void back() {
+    public void back()
+    {
         step--;
     }
 
 
-    private VerticalLayout genPeersTable() {
+    private VerticalLayout genPeersTable()
+    {
         VerticalLayout vl = new VerticalLayout();
 
         peersTable = new Table();
@@ -117,7 +131,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
 
 
         List<Peer> peers = managerUI.getPeerManager().peers();
-        for ( Peer peer : peers ) {
+        for ( Peer peer : peers )
+        {
             CheckBox ch = new CheckBox();
 
             Object id = peersTable.addItem( new Object[] {
@@ -126,12 +141,17 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             peersTable.setItemCaptionPropertyId( "name" );
         }
         Button nextButton = new Button( "Next" );
-        nextButton.addClickListener( new Button.ClickListener() {
+        nextButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
-                if ( selectedPeers().size() > 0 ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                if ( selectedPeers().size() > 0 )
+                {
                     next();
-                } else {
+                }
+                else
+                {
                     Notification.show( "Please select peers", Notification.Type.HUMANIZED_MESSAGE );
                 }
             }
@@ -144,7 +164,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    private TabSheet genContainerToPeersTable() {
+    private TabSheet genContainerToPeersTable()
+    {
 
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
@@ -162,8 +183,10 @@ public class EnvironmentBuildWizard extends DetailsWindow {
         containerToPeerTable.setSizeFull();
 
 
-        for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() ) {
-            for ( int i = 0; i < ng.getNumberOfNodes(); i++ ) {
+        for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
+        {
+            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
+            {
                 ComboBox box = new ComboBox( "", selectedPeers() );
                 box.setNullSelectionAllowed( false );
                 box.setTextInputAllowed( false );
@@ -173,9 +196,11 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             }
         }
         Button nextButton = new Button( "Build" );
-        nextButton.addClickListener( new Button.ClickListener() {
+        nextButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 createBackgroundEnvironmentBuildProcess();
                 close();
             }
@@ -192,12 +217,15 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    private List<UUID> selectedPeers() {
+    private List<UUID> selectedPeers()
+    {
         List<UUID> uuids = new ArrayList<>();
-        for ( Object itemId : peersTable.getItemIds() ) {
+        for ( Object itemId : peersTable.getItemIds() )
+        {
             UUID uuid = ( UUID ) peersTable.getItem( itemId ).getItemProperty( "ID" ).getValue();
             CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
-            if ( selection.getValue() ) {
+            if ( selection.getValue() )
+            {
                 uuids.add( uuid );
             }
         }
@@ -205,13 +233,15 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    private void createBackgroundEnvironmentBuildProcess() {
+    private void createBackgroundEnvironmentBuildProcess()
+    {
         EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
 
         Map<UUID, Map<String, ContainerBuildMessage>> buildMessageMap =
                 new HashMap<UUID, Map<String, ContainerBuildMessage>>();
 
-        for ( Object itemId : containerToPeerTable.getItemIds() ) {
+        for ( Object itemId : containerToPeerTable.getItemIds() )
+        {
             String templateName =
                     ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
             ComboBox selection =
@@ -220,7 +250,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             UUID peerUuid = ( UUID ) selection.getValue();
 
 
-            if ( !buildMessageMap.containsKey( peerUuid ) ) {
+            if ( !buildMessageMap.containsKey( peerUuid ) )
+            {
 
                 ContainerBuildMessage cbm = new ContainerBuildMessage();
                 cbm.setTemplateName( templateName );
@@ -228,7 +259,9 @@ public class EnvironmentBuildWizard extends DetailsWindow {
                 cbm.setCompleteState( false );
                 cbm.setEnvironmentUuid( environmentBuildTask.getUuid() );
                 //                buildMessageMap.put(  ).put( templateName, cbm );
-            } else {
+            }
+            else
+            {
                 buildMessageMap.get( peerUuid ).get( templateName ).incrementNumOfCont();
             }
         }

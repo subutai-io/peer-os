@@ -48,7 +48,8 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class Manager {
+public class Manager
+{
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
@@ -60,16 +61,16 @@ public class Manager {
     private final Label cfgSrvPort;
     private final Label routerPort;
     private final Label dataNodePort;
-    private MongoClusterConfig mongoClusterConfig;
-
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Mongo mongo;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
+    private MongoClusterConfig mongoClusterConfig;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
@@ -100,9 +101,11 @@ public class Manager {
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 mongoClusterConfig = ( MongoClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
@@ -112,9 +115,11 @@ public class Manager {
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 refreshClustersInfo();
             }
         } );
@@ -123,9 +128,11 @@ public class Manager {
 
         Button checkAllBtn = new Button( "Check all" );
         checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener() {
+        checkAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 checkNodesStatus( configServersTable );
                 checkNodesStatus( routersTable );
                 checkNodesStatus( dataNodesTable );
@@ -135,9 +142,11 @@ public class Manager {
 
         Button startAllBtn = new Button( "Start all" );
         startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
+        startAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 startAllNodes( configServersTable );
                 startAllNodes( routersTable );
                 startAllNodes( dataNodesTable );
@@ -147,9 +156,11 @@ public class Manager {
 
         Button stopAllBtn = new Button( "Stop all" );
         stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
+        stopAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 stopAllNodes( configServersTable );
                 stopAllNodes( routersTable );
                 stopAllNodes( dataNodesTable );
@@ -159,22 +170,29 @@ public class Manager {
 
         Button destroyClusterBtn = new Button( "Destroy cluster" );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( mongoClusterConfig != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( mongoClusterConfig != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s cluster?",
                                     mongoClusterConfig.getClusterName() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = mongo.uninstallCluster( mongoClusterConfig.getClusterName() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     MongoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -184,7 +202,8 @@ public class Manager {
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -194,22 +213,29 @@ public class Manager {
 
         Button addRouterBtn = new Button( "Add Router" );
         addRouterBtn.addStyleName( "default" );
-        addRouterBtn.addClickListener( new Button.ClickListener() {
+        addRouterBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( mongoClusterConfig != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( mongoClusterConfig != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to add ROUTER to the %s cluster?",
                                     mongoClusterConfig.getClusterName() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = mongo.addNode( mongoClusterConfig.getClusterName(), NodeType.ROUTER_NODE );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     MongoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -219,7 +245,8 @@ public class Manager {
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -227,22 +254,29 @@ public class Manager {
 
         Button addDataNodeBtn = new Button( "Add Data Node" );
         addDataNodeBtn.addStyleName( "default" );
-        addDataNodeBtn.addClickListener( new Button.ClickListener() {
+        addDataNodeBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( mongoClusterConfig != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( mongoClusterConfig != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to add DATA_NODE to the %s cluster?",
                                     mongoClusterConfig.getClusterName() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = mongo.addNode( mongoClusterConfig.getClusterName(), NodeType.DATA_NODE );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     MongoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -252,7 +286,8 @@ public class Manager {
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -289,7 +324,8 @@ public class Manager {
     }
 
 
-    private Table createTableTemplate( String caption ) {
+    private Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
@@ -302,20 +338,25 @@ public class Manager {
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
@@ -325,8 +366,16 @@ public class Manager {
     }
 
 
-    private void refreshUI() {
-        if ( mongoClusterConfig != null ) {
+    private void show( String notification )
+    {
+        Notification.show( notification );
+    }
+
+
+    private void refreshUI()
+    {
+        if ( mongoClusterConfig != null )
+        {
             populateTable( configServersTable, mongoClusterConfig.getConfigServers(), NodeType.CONFIG_NODE );
             populateTable( routersTable, mongoClusterConfig.getRouterServers(), NodeType.ROUTER_NODE );
             populateTable( dataNodesTable, mongoClusterConfig.getDataNodes(), NodeType.DATA_NODE );
@@ -336,7 +385,8 @@ public class Manager {
             routerPort.setValue( mongoClusterConfig.getRouterPort() + "" );
             dataNodePort.setValue( mongoClusterConfig.getDataNodePort() + "" );
         }
-        else {
+        else
+        {
             configServersTable.removeAllItems();
             routersTable.removeAllItems();
             dataNodesTable.removeAllItems();
@@ -349,70 +399,13 @@ public class Manager {
     }
 
 
-    public void refreshClustersInfo() {
-        List<MongoClusterConfig> mongoClusterInfos = mongo.getClusters();
-        MongoClusterConfig clusterInfo = ( MongoClusterConfig ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
-            for ( MongoClusterConfig mongoClusterInfo : mongoClusterInfos ) {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
-            }
-            if ( clusterInfo != null ) {
-                for ( MongoClusterConfig mongoClusterInfo : mongoClusterInfos ) {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                        clusterCombo.setValue( mongoClusterInfo );
-                        return;
-                    }
-                }
-            }
-            else {
-                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
-            }
-        }
-    }
-
-
-    public static void checkNodesStatus( Table table ) {
-        for ( Object o : table.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    public static void startAllNodes( Table table ) {
-        for ( Object o : table.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    public static void stopAllNodes( Table table ) {
-        for ( Object o : table.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    private void show( String notification ) {
-        Notification.show( notification );
-    }
-
-
-    private void populateTable( final Table table, Set<Agent> agents, final NodeType nodeType ) {
+    private void populateTable( final Table table, Set<Agent> agents, final NodeType nodeType )
+    {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
@@ -430,9 +423,11 @@ public class Manager {
                     agent.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
             }, null );
 
-            checkBtn.addClickListener( new Button.ClickListener() {
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -440,14 +435,19 @@ public class Manager {
 
                     executorService.execute(
                             new CheckTask( mongo, tracker, mongoClusterConfig.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else if ( state == NodeState.STOPPED ) {
+                                                else if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 destroyBtn.setEnabled( true );
@@ -458,9 +458,11 @@ public class Manager {
                 }
             } );
 
-            startBtn.addClickListener( new Button.ClickListener() {
+            startBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -468,14 +470,19 @@ public class Manager {
 
                     executorService.execute(
                             new StartTask( mongo, tracker, nodeType, mongoClusterConfig.getClusterName(),
-                                    agent.getHostname(), new CompleteEvent() {
+                                    agent.getHostname(), new CompleteEvent()
+                            {
 
-                                public void onComplete( NodeState state ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( state == NodeState.RUNNING ) {
+                                public void onComplete( NodeState state )
+                                {
+                                    synchronized ( progressIcon )
+                                    {
+                                        if ( state == NodeState.RUNNING )
+                                        {
                                             stopBtn.setEnabled( true );
                                         }
-                                        else {
+                                        else
+                                        {
                                             startBtn.setEnabled( true );
                                         }
                                         destroyBtn.setEnabled( true );
@@ -486,9 +493,11 @@ public class Manager {
                 }
             } );
 
-            stopBtn.addClickListener( new Button.ClickListener() {
+            stopBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -496,14 +505,19 @@ public class Manager {
 
                     executorService.execute(
                             new StopTask( mongo, tracker, mongoClusterConfig.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.STOPPED ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
-                                                else {
+                                                else
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
                                                 destroyBtn.setEnabled( true );
@@ -514,21 +528,27 @@ public class Manager {
                 }
             } );
 
-            destroyBtn.addClickListener( new Button.ClickListener() {
+            destroyBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID =
                                     mongo.destroyNode( mongoClusterConfig.getClusterName(), agent.getHostname() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     MongoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -543,7 +563,75 @@ public class Manager {
     }
 
 
-    public Component getContent() {
+    public void refreshClustersInfo()
+    {
+        List<MongoClusterConfig> mongoClusterInfos = mongo.getClusters();
+        MongoClusterConfig clusterInfo = ( MongoClusterConfig ) clusterCombo.getValue();
+        clusterCombo.removeAllItems();
+        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 )
+        {
+            for ( MongoClusterConfig mongoClusterInfo : mongoClusterInfos )
+            {
+                clusterCombo.addItem( mongoClusterInfo );
+                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+            }
+            if ( clusterInfo != null )
+            {
+                for ( MongoClusterConfig mongoClusterInfo : mongoClusterInfos )
+                {
+                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    {
+                        clusterCombo.setValue( mongoClusterInfo );
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
+            }
+        }
+    }
+
+
+    public static void checkNodesStatus( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
+            checkBtn.click();
+        }
+    }
+
+
+    public static void startAllNodes( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
+            checkBtn.click();
+        }
+    }
+
+
+    public static void stopAllNodes( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
+            checkBtn.click();
+        }
+    }
+
+
+    public Component getContent()
+    {
         return contentRoot;
     }
 }

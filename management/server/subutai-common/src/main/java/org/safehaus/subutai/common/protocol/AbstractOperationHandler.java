@@ -9,13 +9,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public abstract class AbstractOperationHandler<T extends ApiBase> implements Runnable {
+public abstract class AbstractOperationHandler<T extends ApiBase> implements Runnable
+{
     protected final T manager;
     protected final String clusterName;
     protected ProductOperation productOperation;
 
 
-    public AbstractOperationHandler( T manager, String clusterName ) {
+    public AbstractOperationHandler( T manager, String clusterName )
+    {
         Preconditions.checkNotNull( manager, "Manager is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         this.manager = manager;
@@ -23,17 +25,20 @@ public abstract class AbstractOperationHandler<T extends ApiBase> implements Run
     }
 
 
-    public UUID getTrackerId() {
+    public UUID getTrackerId()
+    {
         return productOperation.getId();
     }
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public ProductOperation getProductOperation() {
+    public ProductOperation getProductOperation()
+    {
         return productOperation;
     }
 }

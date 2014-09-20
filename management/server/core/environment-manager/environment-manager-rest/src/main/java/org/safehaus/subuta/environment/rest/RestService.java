@@ -10,14 +10,15 @@ import javax.ws.rs.core.MediaType;
 
 
 @WebService(serviceName = "peerServices")
-public interface RestService {
+public interface RestService
+{
 
 
     @POST
     @Path("/environment")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.TEXT_PLAIN)
-    public String buildNodeGroup(String peer);
+    public String buildNodeGroup( String peer );
 
     /*@GET
     @Path("/json")

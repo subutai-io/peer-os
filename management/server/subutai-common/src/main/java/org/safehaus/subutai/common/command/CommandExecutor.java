@@ -15,14 +15,16 @@ import com.google.common.base.Preconditions;
 /**
  * This class holds command together with associated executor and callback
  */
-public class CommandExecutor {
+public class CommandExecutor
+{
 
     final private AbstractCommand command;
     final private ExecutorService executor;
     final private CommandCallback callback;
 
 
-    public CommandExecutor( AbstractCommand command, CommandCallback callback ) {
+    public CommandExecutor( AbstractCommand command, CommandCallback callback )
+    {
 
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkNotNull( callback, "Callback is null" );
@@ -38,7 +40,8 @@ public class CommandExecutor {
      *
      * @return {@code Command}
      */
-    public AbstractCommand getCommand() {
+    public AbstractCommand getCommand()
+    {
         return command;
     }
 
@@ -48,7 +51,8 @@ public class CommandExecutor {
      *
      * @return {@code ExecutorService}
      */
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
@@ -58,7 +62,8 @@ public class CommandExecutor {
      *
      * @return {@code CommandCallback}
      */
-    public CommandCallback getCallback() {
+    public CommandCallback getCallback()
+    {
         return callback;
     }
 }

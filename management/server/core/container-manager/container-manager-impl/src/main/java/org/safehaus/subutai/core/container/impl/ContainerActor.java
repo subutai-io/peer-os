@@ -11,7 +11,8 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 /**
  * Handles parallel container creation/destruction
  */
-public class ContainerActor implements Callable<ContainerInfo> {
+public class ContainerActor implements Callable<ContainerInfo>
+{
     private final ContainerInfo containerInfo;
     private final ContainerManager containerManager;
 

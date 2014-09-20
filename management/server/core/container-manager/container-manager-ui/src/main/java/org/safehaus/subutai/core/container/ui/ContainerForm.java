@@ -21,7 +21,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 
-public class ContainerForm extends CustomComponent implements Disposable {
+public class ContainerForm extends CustomComponent implements Disposable
+{
 
     private final static String managerTabCaption = "Manage";
     private final AgentTree agentTree;
@@ -30,7 +31,8 @@ public class ContainerForm extends CustomComponent implements Disposable {
     private final AgentManager agentManager;
 
 
-    public ContainerForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public ContainerForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.containerManager = serviceLocator.getService( ContainerManager.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
@@ -52,12 +54,15 @@ public class ContainerForm extends CustomComponent implements Disposable {
         final Manager manager = new Manager( executorService, agentManager, containerManager );
         commandsSheet.addTab( new Cloner( containerManager, strategyManager, agentTree ), "Clone" );
         commandsSheet.addTab( manager, managerTabCaption );
-        commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+        commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
             @Override
-            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
                 TabSheet tabsheet = event.getTabSheet();
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if ( caption.equals( managerTabCaption ) ) {
+                if ( caption.equals( managerTabCaption ) )
+                {
                     manager.getLxcInfo();
                 }
             }
@@ -69,7 +74,8 @@ public class ContainerForm extends CustomComponent implements Disposable {
     }
 
 
-    public void dispose() {
+    public void dispose()
+    {
         agentTree.dispose();
     }
 }

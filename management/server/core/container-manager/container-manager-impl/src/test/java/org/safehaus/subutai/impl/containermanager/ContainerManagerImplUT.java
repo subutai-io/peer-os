@@ -12,12 +12,13 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 /**
  * Test for ContainerManagerImpl class
  */
-public class ContainerManagerImplUT {
+public class ContainerManagerImplUT
+{
 
-	private ContainerManager lxcManager;
+    private ContainerManager lxcManager;
 
 /*
-	@Before
+    @Before
 	public void setUpMethod() {
 		Monitor monitor = mock(Monitor.class);
 		when(monitor.getData(any(String.class), any(Metric.class), any(Date.class), any(Date.class)))

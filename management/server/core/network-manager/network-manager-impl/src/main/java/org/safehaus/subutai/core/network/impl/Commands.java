@@ -19,18 +19,21 @@ import com.google.common.base.Preconditions;
 /**
  * Created by daralbaev on 03.04.14.
  */
-public class Commands {
+public class Commands
+{
 
     private final CommandRunner commandRunner;
 
 
-    public Commands( final CommandRunner commandRunner ) {
+    public Commands( final CommandRunner commandRunner )
+    {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
         this.commandRunner = commandRunner;
     }
 
 
-    public Command getCreateSSHCommand( List<Agent> agentList ) {
+    public Command getCreateSSHCommand( List<Agent> agentList )
+    {
         return commandRunner.createCommand( new RequestBuilder( "rm -Rf /root/.ssh && " +
                 "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
@@ -38,13 +41,15 @@ public class Commands {
     }
 
 
-    public Command getReadSSHCommand( List<Agent> agentList ) {
+    public Command getReadSSHCommand( List<Agent> agentList )
+    {
         return commandRunner
                 .createCommand( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ), new HashSet<>( agentList ) );
     }
 
 
-    public Command getWriteSSHCommand( List<Agent> agentList, String key ) {
+    public Command getWriteSSHCommand( List<Agent> agentList, String key )
+    {
         return commandRunner.createCommand( new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' > /root/.ssh/authorized_keys && " +
@@ -52,32 +57,38 @@ public class Commands {
     }
 
 
-    public Command getConfigSSHCommand( List<Agent> agentList ) {
+    public Command getConfigSSHCommand( List<Agent> agentList )
+    {
         return commandRunner.createCommand( new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
                 "echo '    StrictHostKeyChecking no' >> /root/.ssh/config && " +
                 "chmod 644 /root/.ssh/config" ), new HashSet<>( agentList ) );
     }
 
 
-    public Command getReadHostsCommand( List<Agent> agentList ) {
+    public Command getReadHostsCommand( List<Agent> agentList )
+    {
         return commandRunner.createCommand( new RequestBuilder( "cat /etc/hosts" ), new HashSet<>( agentList ) );
     }
 
 
-    public Command getWriteHostsCommand( List<Agent> agentList, String hosts ) {
+    public Command getWriteHostsCommand( List<Agent> agentList, String hosts )
+    {
         return commandRunner.createCommand( new RequestBuilder( String.format( "echo '%s' > /etc/hosts", hosts ) ),
                 new HashSet<>( agentList ) );
     }
 
 
-    public Command getAddIpHostToEtcHostsCommand( String domainName, Set<Agent> agents ) {
+    public Command getAddIpHostToEtcHostsCommand( String domainName, Set<Agent> agents )
+    {
         Set<AgentRequestBuilder> requestBuilders = new HashSet<>();
 
-        for ( Agent agent : agents ) {
+        for ( Agent agent : agents )
+        {
             StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
             StringBuilder appendHosts = new StringBuilder();
 
-            for ( Agent otherAgent : agents ) {
+            for ( Agent otherAgent : agents )
+            {
                 String ip = AgentUtil.getAgentIpByMask( otherAgent, Common.IP_MASK );
                 String hostname = otherAgent.getHostname();
                 cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
@@ -88,7 +99,8 @@ public class Commands {
                                    append( "' >> '/etc/hosts'; " );
             }
 
-            if ( cleanHosts.length() > 0 ) {
+            if ( cleanHosts.length() > 0 )
+            {
                 //drop pipe | symbol
                 cleanHosts.setLength( cleanHosts.length() - 1 );
                 cleanHosts.insert( 0, "egrep -v '" );

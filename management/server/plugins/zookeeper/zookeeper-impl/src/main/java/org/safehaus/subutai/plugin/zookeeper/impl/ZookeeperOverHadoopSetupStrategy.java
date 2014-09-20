@@ -3,15 +3,14 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -20,7 +19,8 @@ import com.google.common.base.Strings;
 /**
  * ZK cluster setup strategy over an existing Hadoop cluster
  */
-public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
+public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
+{
 
     private final ZookeeperClusterConfig zookeeperClusterConfig;
     private final ProductOperation po;
@@ -28,7 +28,8 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
 
     public ZookeeperOverHadoopSetupStrategy( final ZookeeperClusterConfig zookeeperClusterConfig,
-                                             final ProductOperation po, final ZookeeperImpl zookeeperManager ) {
+                                             final ProductOperation po, final ZookeeperImpl zookeeperManager )
+    {
         Preconditions.checkNotNull( zookeeperClusterConfig, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
         Preconditions.checkNotNull( zookeeperManager, "ZK manager is null" );
@@ -40,32 +41,39 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public ZookeeperClusterConfig setup() throws ClusterSetupException {
+    public ZookeeperClusterConfig setup() throws ClusterSetupException
+    {
         if ( Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
-                zookeeperClusterConfig.getNodes() == null || zookeeperClusterConfig.getNodes().isEmpty() ) {
+                zookeeperClusterConfig.getNodes() == null || zookeeperClusterConfig.getNodes().isEmpty() )
+        {
             throw new ClusterSetupException( "Malformed configuration" );
         }
 
-        if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null ) {
+        if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null )
+        {
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists", zookeeperClusterConfig.getClusterName() ) );
         }
 
         //check if node agent is connected
-        for ( Agent node : zookeeperClusterConfig.getNodes() ) {
-            if ( zookeeperManager.getAgentManager().getAgentByHostname( node.getHostname() ) == null ) {
+        for ( Agent node : zookeeperClusterConfig.getNodes() )
+        {
+            if ( zookeeperManager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
+            {
                 throw new ClusterSetupException( String.format( "Node %s is not connected", node.getHostname() ) );
             }
         }
 
         HadoopClusterConfig hadoopClusterConfig =
                 zookeeperManager.getHadoopManager().getCluster( zookeeperClusterConfig.getHadoopClusterName() );
-        if ( hadoopClusterConfig == null ) {
+        if ( hadoopClusterConfig == null )
+        {
             throw new ClusterSetupException(
                     String.format( "Hadoop cluster %s not found", zookeeperClusterConfig.getHadoopClusterName() ) );
         }
 
-        if ( !hadoopClusterConfig.getAllNodes().containsAll( zookeeperClusterConfig.getNodes() ) ) {
+        if ( !hadoopClusterConfig.getAllNodes().containsAll( zookeeperClusterConfig.getNodes() ) )
+        {
             throw new ClusterSetupException( String.format( "Not all specified ZK nodes belong to %s Hadoop cluster",
                     hadoopClusterConfig.getClusterName() ) );
         }
@@ -76,18 +84,22 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( zookeeperClusterConfig.getNodes() );
         zookeeperManager.getCommandRunner().runCommand( checkInstalledCommand );
 
-        if ( !checkInstalledCommand.hasCompleted() ) {
+        if ( !checkInstalledCommand.hasCompleted() )
+        {
             throw new ClusterSetupException( "Failed to check presence of installed subutai packages" );
         }
 
-        for ( Agent node : zookeeperClusterConfig.getNodes() ) {
+        for ( Agent node : zookeeperClusterConfig.getNodes() )
+        {
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) ) {
+            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
+            {
                 throw new ClusterSetupException(
                         String.format( "Node %s already has Zookeeper installed", node.getHostname() ) );
             }
-            else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
+            else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+            {
                 throw new ClusterSetupException(
                         String.format( "Node %s has no Hadoop installed", node.getHostname() ) );
             }
@@ -99,14 +111,17 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
         Command installCommand = Commands.getInstallCommand( zookeeperClusterConfig.getNodes() );
         zookeeperManager.getCommandRunner().runCommand( installCommand );
 
-        if ( installCommand.hasSucceeded() ) {
+        if ( installCommand.hasSucceeded() )
+        {
             po.addLog( "Installation succeeded\nConfiguring cluster..." );
 
 
-            try {
+            try
+            {
                 new ClusterConfiguration( zookeeperManager, po ).configureCluster( zookeeperClusterConfig );
             }
-            catch ( ClusterConfigurationException e ) {
+            catch ( ClusterConfigurationException e )
+            {
                 throw new ClusterSetupException( e.getMessage() );
             }
 
@@ -117,7 +132,8 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
                                     zookeeperClusterConfig );
             po.addLog( "Cluster information saved to database" );
         }
-        else {
+        else
+        {
             throw new ClusterSetupException(
                     String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }

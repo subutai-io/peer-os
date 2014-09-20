@@ -7,12 +7,6 @@ package org.safehaus.subutai.common.util;
 public class StringUtil
 {
 
-    public static boolean isStringNullOrEmpty( String str )
-    {
-        return str == null || str.trim().isEmpty();
-    }
-
-
     public static int countNumberOfOccurences( String strToSearch, String strToCount )
     {
         int count = 0;
@@ -26,6 +20,12 @@ public class StringUtil
             }
         }
         return count;
+    }
+
+
+    public static boolean isStringNullOrEmpty( String str )
+    {
+        return str == null || str.trim().isEmpty();
     }
 
 

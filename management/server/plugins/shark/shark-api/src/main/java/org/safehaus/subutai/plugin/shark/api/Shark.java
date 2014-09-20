@@ -5,19 +5,21 @@
  */
 package org.safehaus.subutai.plugin.shark.api;
 
-import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.ApiBase;
+
 
 /**
  * @author dilshat
  */
-public interface Shark extends ApiBase<SharkClusterConfig > {
+public interface Shark extends ApiBase<SharkClusterConfig>
+{
 
-	public UUID addNode(String clusterName, String lxcHostname);
+    public UUID addNode( String clusterName, String lxcHostname );
 
-	public UUID destroyNode(String clusterName, String lxcHostname);
+    public UUID destroyNode( String clusterName, String lxcHostname );
 
-	public UUID actualizeMasterIP(String clusterName);
-
+    public UUID actualizeMasterIP( String clusterName );
 }

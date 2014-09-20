@@ -1,56 +1,65 @@
 package org.safehaus.subutai.core.monitor.impl;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class HttpPost {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	private static final Logger LOG = LoggerFactory.getLogger(HttpPost.class);
+import org.apache.commons.io.IOUtils;
 
-	private static final String URL = "http://127.0.0.1:9200/_all/logs/_search";
 
-	static String execute(String params) throws IOException {
+class HttpPost
+{
 
-		HttpURLConnection connect = getConnect();
+    private static final Logger LOG = LoggerFactory.getLogger( HttpPost.class );
 
-		writeParams(connect, params);
+    private static final String URL = "http://127.0.0.1:9200/_all/logs/_search";
 
-		return readResponse(connect);
-	}
 
-	private static HttpURLConnection getConnect() throws IOException {
+    static String execute( String params ) throws IOException
+    {
 
-		URL url = new URL(URL);
+        HttpURLConnection connect = getConnect();
 
-		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
-		connect.setRequestMethod("POST");
-		connect.setDoOutput(true);
+        writeParams( connect, params );
 
-		return connect;
-	}
+        return readResponse( connect );
+    }
 
-	private static void writeParams(HttpURLConnection connect, String params) throws IOException {
 
-		DataOutputStream outputStream = new DataOutputStream(connect.getOutputStream());
-		outputStream.writeBytes(params);
-		outputStream.flush();
-		outputStream.close();
-	}
+    private static HttpURLConnection getConnect() throws IOException
+    {
 
-	private static String readResponse(HttpURLConnection connect) throws IOException {
+        URL url = new URL( URL );
 
-		int responseCode = connect.getResponseCode();
-		LOG.info("responseCode: {}", responseCode);
+        HttpURLConnection connect = ( HttpURLConnection ) url.openConnection();
+        connect.setRequestMethod( "POST" );
+        connect.setDoOutput( true );
 
-		return responseCode == HttpURLConnection.HTTP_OK
-				? IOUtils.toString(connect.getInputStream(), "UTF-8")
-				: "";
-	}
+        return connect;
+    }
 
+
+    private static void writeParams( HttpURLConnection connect, String params ) throws IOException
+    {
+
+        DataOutputStream outputStream = new DataOutputStream( connect.getOutputStream() );
+        outputStream.writeBytes( params );
+        outputStream.flush();
+        outputStream.close();
+    }
+
+
+    private static String readResponse( HttpURLConnection connect ) throws IOException
+    {
+
+        int responseCode = connect.getResponseCode();
+        LOG.info( "responseCode: {}", responseCode );
+
+        return responseCode == HttpURLConnection.HTTP_OK ? IOUtils.toString( connect.getInputStream(), "UTF-8" ) : "";
+    }
 }

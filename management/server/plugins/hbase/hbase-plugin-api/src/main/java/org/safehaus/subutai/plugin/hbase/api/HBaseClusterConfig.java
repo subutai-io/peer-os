@@ -11,7 +11,8 @@ import org.safehaus.subutai.common.settings.Common;
 import com.google.common.collect.Sets;
 
 
-public class HBaseClusterConfig implements ConfigBase {
+public class HBaseClusterConfig implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "HBase";
     public static final String PRODUCT_NAME = "HBase";
@@ -30,67 +31,80 @@ public class HBaseClusterConfig implements ConfigBase {
     private SetupType setupType;
 
 
-    public HBaseClusterConfig() {
+    public HBaseClusterConfig()
+    {
         this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
     }
 
 
-    public static String getProductKey() {
+    public static String getProductKey()
+    {
         return PRODUCT_KEY;
     }
 
 
-    public SetupType getSetupType() {
+    public SetupType getSetupType()
+    {
         return setupType;
     }
 
 
-    public void setSetupType( final SetupType setupType ) {
+    public void setSetupType( final SetupType setupType )
+    {
         this.setupType = setupType;
     }
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName( final String templateName )
+    {
         this.templateName = templateName;
     }
 
 
-    public String getDomainName() {
+    public String getDomainName()
+    {
         return domainName;
     }
 
 
-    public void setDomainName( final String domainName ) {
+    public void setDomainName( final String domainName )
+    {
         this.domainName = domainName;
     }
 
 
-    public String getHadoopNameNode() {
+    public String getHadoopNameNode()
+    {
         return hadoopNameNode;
     }
 
 
-    public void setHadoopNameNode( String hadoopNameNode ) {
+    public void setHadoopNameNode( String hadoopNameNode )
+    {
         this.hadoopNameNode = hadoopNameNode;
     }
 
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
 
-    public void setUuid( UUID uuid ) {
+    public void setUuid( UUID uuid )
+    {
         this.uuid = uuid;
     }
 
 
-    public void reset() {
+    public void reset()
+    {
         this.master = null;
         this.region = null;
         this.quorum = null;
@@ -100,84 +114,100 @@ public class HBaseClusterConfig implements ConfigBase {
     }
 
 
-    public String getMaster() {
+    public String getMaster()
+    {
         return master;
     }
 
 
-    public void setMaster( String master ) {
+    public void setMaster( String master )
+    {
         this.master = master;
     }
 
 
-    public Set<String> getRegion() {
+    public Set<String> getRegion()
+    {
         return region;
     }
 
 
-    public void setRegion( Set<String> region ) {
+    public void setRegion( Set<String> region )
+    {
         this.region = region;
     }
 
 
-    public Set<String> getQuorum() {
+    public Set<String> getQuorum()
+    {
         return quorum;
     }
 
 
-    public void setQuorum( Set<String> quorum ) {
+    public void setQuorum( Set<String> quorum )
+    {
         this.quorum = quorum;
     }
 
 
-    public String getBackupMasters() {
+    public String getBackupMasters()
+    {
         return backupMasters;
     }
 
 
-    public void setBackupMasters( String backupMasters ) {
+    public void setBackupMasters( String backupMasters )
+    {
         this.backupMasters = backupMasters;
     }
 
 
-    public Set<String> getNodes() {
+    public Set<String> getNodes()
+    {
         return nodes;
     }
 
 
-    public void setNodes( Set<String> nodes ) {
+    public void setNodes( Set<String> nodes )
+    {
         this.nodes = nodes;
     }
 
 
-    public int getNumberOfNodes() {
+    public int getNumberOfNodes()
+    {
         return numberOfNodes;
     }
 
 
-    public void setNumberOfNodes( int numberOfNodes ) {
+    public void setNumberOfNodes( int numberOfNodes )
+    {
         this.numberOfNodes = numberOfNodes;
     }
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public void setClusterName( String clusterName ) {
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
 
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_KEY;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "HBaseConfig{" +
                 "numberOfNodes=" + numberOfNodes +
                 ", uuid=" + uuid +
