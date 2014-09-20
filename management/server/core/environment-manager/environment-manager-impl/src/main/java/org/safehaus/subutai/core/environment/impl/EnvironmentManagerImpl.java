@@ -318,6 +318,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             ccm.setEnvId( cbm.getEnvironmentUuid() );
             ccm.setStrategy( cbm.getStrategy() );
             ccm.setCriteria( cbm.getCriteria() );
+            LOG.info( "SENDING MESSAGE TO " + ccm.getTargetPeerId() );
 
             Set<Agent> agents = peerManager.createContainers( ccm );
         }
