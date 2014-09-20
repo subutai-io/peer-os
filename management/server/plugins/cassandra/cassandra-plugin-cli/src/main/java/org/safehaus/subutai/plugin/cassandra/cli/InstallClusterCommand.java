@@ -20,8 +20,6 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 public class InstallClusterCommand extends OsgiCommandSupport
 {
 
-    private Cassandra cassandraManager;
-    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
@@ -34,6 +32,8 @@ public class InstallClusterCommand extends OsgiCommandSupport
     @Argument(index = 3, name = "numberOfSeeds", description = "Number of seeds in cluster.", required = true,
             multiValued = false)
     String numberOfSeeds = null;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
 
 
     public Cassandra getCassandraManager()

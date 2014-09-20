@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -171,14 +170,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         config.getSlaveNodes().remove( agent );
         po.addLog( "Updating db..." );
 
-        try
-        {
-            manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLogDone( "Cluster info updated in DB\nDone" );
-        }
-        catch ( DBException ex )
-        {
-            po.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
-        }
+        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLogDone( "Cluster info updated in DB\nDone" );
     }
 }

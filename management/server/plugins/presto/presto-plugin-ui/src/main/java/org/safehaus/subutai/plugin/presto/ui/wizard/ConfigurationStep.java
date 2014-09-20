@@ -34,12 +34,12 @@ import com.vaadin.ui.VerticalLayout;
 public class ConfigurationStep extends Panel
 {
 
+    private final Hadoop hadoop;
     Property.ValueChangeListener coordinatorComboChangeListener;
     Property.ValueChangeListener workersSelectChangeListener;
     private ComboBox hadoopClustersCombo;
     private TwinColSelect workersSelect;
     private ComboBox coordinatorNodeCombo;
-    private final Hadoop hadoop;
 
 
     public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )

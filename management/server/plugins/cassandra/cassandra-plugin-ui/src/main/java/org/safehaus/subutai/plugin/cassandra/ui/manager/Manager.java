@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 
@@ -46,10 +47,12 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
+    private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
     private final Table nodesTable;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private CassandraClusterConfig config;
+
     private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String message = "No cluster is installed !";
 
@@ -86,7 +89,6 @@ public class Manager
         this.tracker = serviceLocator.getService( Tracker.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
         this.commandRunner = serviceLocator.getService( CommandRunner.class );
-
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -331,6 +333,17 @@ public class Manager
 
 
     /**
+     * Shows notification with the given argument
+     *
+     * @param notification notification which will shown.
+     */
+    private void show( String notification )
+    {
+        Notification.show( notification );
+    }
+
+
+    /**
      * Fill out the table in which all nodes in the cluster are listed.
      *
      * @param table table to be filled
@@ -459,17 +472,6 @@ public class Manager
                 }
             } );
         }
-    }
-
-
-    /**
-     * Shows notification with the given argument
-     *
-     * @param notification notification which will shown.
-     */
-    private void show( String notification )
-    {
-        Notification.show( notification );
     }
 
 

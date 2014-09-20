@@ -25,7 +25,8 @@ import com.vaadin.ui.Component;
 /**
  * @author dilshat
  */
-public class OozieUI implements PortalModule {
+public class OozieUI implements PortalModule
+{
 
 
     public static final String MODULE_IMAGE = "oozie.png";
@@ -37,70 +38,85 @@ public class OozieUI implements PortalModule {
     ExecutorService executor;
 
 
-    public OozieUI() {}
+    public OozieUI()
+    {
+    }
 
 
-    public Oozie getOozieManager() {
+    public Oozie getOozieManager()
+    {
         return oozieManager;
     }
 
 
-    public void setOozieManager( final Oozie oozieManager ) {
+    public void setOozieManager( final Oozie oozieManager )
+    {
         this.oozieManager = oozieManager;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( final Tracker tracker ) {
+    public void setTracker( final Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public void setHadoopManager( final Hadoop hadoopManager ) {
+    public void setHadoopManager( final Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void setCommandRunner( final CommandRunner commandRunner ) {
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         oozieManager = null;
         agentManager = null;
         tracker = null;
@@ -110,23 +126,34 @@ public class OozieUI implements PortalModule {
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return OozieClusterConfig.PRODUCT_KEY;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return OozieClusterConfig.PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( OozieUI.MODULE_IMAGE, this );
     }
 
 
-    public Component createComponent() {
+    public Component createComponent()
+    {
         return new OozieForm( this );
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return false;
     }
 }

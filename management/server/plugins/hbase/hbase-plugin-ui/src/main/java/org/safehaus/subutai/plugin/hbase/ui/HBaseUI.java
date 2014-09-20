@@ -25,7 +25,8 @@ import com.vaadin.ui.Component;
 /**
  * @author dilshat
  */
-public class HBaseUI implements PortalModule {
+public class HBaseUI implements PortalModule
+{
 
     public static final String MODULE_IMAGE = "hbase.png";
 
@@ -38,7 +39,8 @@ public class HBaseUI implements PortalModule {
 
 
     public HBaseUI( AgentManager agentManager, Tracker tracker, HBase hbaseManager, CommandRunner commandRunner,
-                    Hadoop hadoopManager ) {
+                    Hadoop hadoopManager )
+    {
         this.agentManager = agentManager;
         this.tracker = tracker;
         this.hbaseManager = hbaseManager;
@@ -47,47 +49,56 @@ public class HBaseUI implements PortalModule {
     }
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public void setHadoopManager( final Hadoop hadoopManager ) {
+    public void setHadoopManager( final Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public HBase getHbaseManager() {
+    public HBase getHbaseManager()
+    {
         return hbaseManager;
     }
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         hbaseManager = null;
         hadoopManager = null;
         agentManager = null;
@@ -98,23 +109,34 @@ public class HBaseUI implements PortalModule {
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return HBaseClusterConfig.PRODUCT_KEY;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return HBaseClusterConfig.PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( HBaseUI.MODULE_IMAGE, this );
     }
 
 
-    public Component createComponent() {
-        return new HBaseForm(this);
+    public Component createComponent()
+    {
+        return new HBaseForm( this );
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return false;
     }
 }

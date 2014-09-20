@@ -23,18 +23,20 @@ import com.vaadin.ui.GridLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private final GridLayout grid;
-    private int step = 1;
-    private SharkClusterConfig config = new SharkClusterConfig();
     private final ExecutorService executor;
     private final Tracker tracker;
     private final Spark spark;
     private final Shark shark;
+    private int step = 1;
+    private SharkClusterConfig config = new SharkClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.executor = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
@@ -49,58 +51,70 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         grid.removeComponent( 0, 1 );
         Component component = null;
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 component = new WelcomeStep( this );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 component = new ConfigurationStep( spark, this );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 component = new VerificationStep( shark, executor, tracker, this );
                 break;
             }
-            default: {
+            default:
+            {
                 break;
             }
         }
 
-        if ( component != null ) {
+        if ( component != null )
+        {
             grid.addComponent( component, 0, 1, 0, 19 );
         }
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         config = new SharkClusterConfig();
         putForm();
     }
 
 
-    public SharkClusterConfig getConfig() {
+    public SharkClusterConfig getConfig()
+    {
         return config;
     }
 }

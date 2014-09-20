@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -19,7 +18,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -220,14 +218,7 @@ public class CassandraImpl extends CassandraBase
     @Override
     public List<CassandraClusterConfig> getClusters()
     {
-        try
-        {
-            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-        }
-        catch ( DBException e )
-        {
-            return Collections.emptyList();
-        }
+        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
     }
 
 
@@ -235,14 +226,7 @@ public class CassandraImpl extends CassandraBase
     public CassandraClusterConfig getCluster( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        try
-        {
-            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
-        }
-        catch ( DBException e )
-        {
-            return null;
-        }
+        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
     }
 
 
@@ -343,6 +327,7 @@ public class CassandraImpl extends CassandraBase
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
                 .setName( String.format( "%s-%s", CassandraClusterConfig.getProductKey(), UUID.randomUUID() ) );
+
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         environmentBlueprint.setExchangeSshKeys( true );

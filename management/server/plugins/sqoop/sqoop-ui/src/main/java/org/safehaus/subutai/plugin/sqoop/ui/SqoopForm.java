@@ -17,7 +17,8 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class SqoopForm extends CustomComponent {
+public class SqoopForm extends CustomComponent
+{
 
     private final Wizard wizard;
     private final Manager manager;
@@ -25,7 +26,8 @@ public class SqoopForm extends CustomComponent {
     private final TabSheet tabSheet;
 
 
-    public SqoopForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public SqoopForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         manager = new Manager( executorService, serviceLocator, this );
         wizard = new Wizard( executorService, serviceLocator );
 
@@ -45,12 +47,15 @@ public class SqoopForm extends CustomComponent {
     }
 
 
-    public void addTab( ImportExportBase component ) {
+    public void addTab( ImportExportBase component )
+    {
         TabSheet.Tab tab = tabSheet.addTab( component );
-        if ( component instanceof ExportPanel ) {
+        if ( component instanceof ExportPanel )
+        {
             tab.setCaption( "Export" );
         }
-        else if ( component instanceof ImportPanel ) {
+        else if ( component instanceof ImportPanel )
+        {
             tab.setCaption( "Import" );
         }
         tabSheet.setSelectedTab( component );

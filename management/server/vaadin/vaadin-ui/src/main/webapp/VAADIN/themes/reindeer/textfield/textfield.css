@@ -19,7 +19,8 @@
  */
 /* Textfield on blue background */
 .blue .v-textfield,
-.blue .v-textarea {
+.blue .v-textarea
+{
     border-color: #92a2aa;
     border-top-color: #7c8a90;
     border-bottom-color: #a1b3bc;
@@ -29,7 +30,8 @@
 .v-textfield,
 .v-textarea,
 .white .v-textfield,
-.white .v-textarea {
+.white .v-textarea
+{
     border: 1px solid #bcbdbe;
     border-top-color: #a2a3a4;
     border-bottom-color: #d2d3d4;
@@ -45,7 +47,8 @@
 }
 
 .v-textarea,
-.white .v-textarea {
+.white .v-textarea
+{
     background-image: none;
     height: auto;
 }
@@ -54,7 +57,8 @@
 .v-app input.v-textfield,
 .v-window input.v-textfield,
 .v-app textarea.v-textarea,
-.v-window textarea.v-textarea {
+.v-window textarea.v-textarea
+{
     padding: 3px 3px 4px;
 }
 
@@ -63,7 +67,8 @@
 .v-popupview-popup .v-textfield-focus,
 .v-app .v-textarea-focus,
 .v-window .v-textarea-focus,
-.v-popupview-popup .v-textarea-focus {
+.v-popupview-popup .v-textarea-focus
+{
     border-color: #5b97d0;
     border-top-color: #4f83b4;
     border-bottom-color: #5ca0df;
@@ -72,47 +77,55 @@
 }
 
 input.v-textfield-prompt,
-textarea.v-textarea-prompt {
+textarea.v-textarea-prompt
+{
     font-style: normal;
     color: #999;
 }
 
 /* Small style textfield */
-.v-app input.v-textfield-small {
+.v-app input.v-textfield-small
+{
     font-size: 11px;
     line-height: normal;
     height: auto;
     padding: 2px;
 }
 
-.v-app textarea.v-textarea-small {
+.v-app textarea.v-textarea-small
+{
     font-size: 11px;
 }
 
-.v-table input.v-textfield {
+.v-table input.v-textfield
+{
     padding: 1px 2px;
     height: auto;
     line-height: normal;
 }
 
-.v-table-cell-wrapper > input.v-textfield {
+.v-table-cell-wrapper > input.v-textfield
+{
     margin-top: -2px;
     margin-bottom: -2px;
 }
 
-.v-ie6 .v-table-cell-wrapper input.v-textfield {
+.v-ie6 .v-table-cell-wrapper input.v-textfield
+{
     margin-top: -2px;
     margin-bottom: -2px;
 }
 
-.v-ie6 .v-table-cell-wrapper div input.v-textfield {
+.v-ie6 .v-table-cell-wrapper div input.v-textfield
+{
     margin-top: 0;
     margin-bottom: 0;
 }
 
 /* Textfield on black background */
 .black .v-textfield,
-.black .v-textarea {
+.black .v-textarea
+{
     border-color: #38393a;
     border-top-color: #2c2d2e;
     border-bottom-color: #3e3f3f;
@@ -122,7 +135,8 @@ textarea.v-textarea-prompt {
     text-shadow: #000 0 0 1px;
 }
 
-.black .v-textarea {
+.black .v-textarea
+{
     background-image: none;
 }
 
@@ -133,14 +147,16 @@ textarea.v-textarea-prompt {
 .v-app .black .v-textarea-focus,
 .v-window-black .v-textarea-focus,
 .v-window .black .v-textarea-focus,
-.v-popupview-popup .black .v-textarea-focus {
+.v-popupview-popup .black .v-textarea-focus
+{
     border-color: #4b7192;
     border-top-color: #3b5a75;
     border-bottom-color: #507596;
     background-color: #151717;
 }
 
-.black input.v-textfield-prompt {
+.black input.v-textfield-prompt
+{
     color: #5f6366;
 }
 
@@ -148,7 +164,8 @@ textarea.v-textarea-prompt {
 input.v-textfield-readonly,
 .black input.v-textfield-readonly,
 textarea.v-textarea-readonly,
-.black textarea.v-textarea-readonly {
+.black textarea.v-textarea-readonly
+{
     border: none;
     background: transparent;
 }

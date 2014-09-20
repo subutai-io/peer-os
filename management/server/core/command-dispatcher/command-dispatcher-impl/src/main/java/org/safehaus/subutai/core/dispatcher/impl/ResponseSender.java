@@ -25,35 +25,45 @@ import com.google.gson.JsonSyntaxException;
 /**
  * Sends responses produced by remote requests back to owner
  */
-public class ResponseSender {
+public class ResponseSender
+{
     private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 15;
+    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
+    private static final int RETRY_ATTEMPT_WIDENING_INTERVAL_SEC = 30;
+    private static final int SELECT_RECORDS_LIMIT = 50;
     private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
     private final PeerManager peerManager;
 
 
-    public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager ) {
+    public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager )
+    {
 
         this.dispatcherDAO = dispatcherDAO;
         this.peerManager = peerManager;
     }
 
 
-    public void init() {
-        mainLoopExecutor.submit( new Runnable() {
+    public void init()
+    {
+        mainLoopExecutor.submit( new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
 
-                while ( !Thread.interrupted() ) {
+                while ( !Thread.interrupted() )
+                {
 
-                    try {
+                    try
+                    {
                         Thread.sleep( SLEEP_BETWEEN_ITERATIONS_SEC * 1000 );
                     }
-                    catch ( InterruptedException e ) {
+                    catch ( InterruptedException e )
+                    {
                         break;
                     }
 
@@ -64,111 +74,169 @@ public class ResponseSender {
     }
 
 
-    public void dispose() {
+    public void dispose()
+    {
         mainLoopExecutor.shutdown();
         httpRequestsExecutor.shutdown();
     }
 
 
-    private void send() {
+    private int calculateOfAttempts()
+    {
+        int attempts = 0;
+        int inactivity_interval_sec = org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
+        while ( inactivity_interval_sec > 0 )
+        {
+            attempts++;
+            inactivity_interval_sec -= attempts * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC;
+        }
+        return attempts;
+    }
 
-        try {
-            Set<RemoteRequest> requests = dispatcherDAO.getRemoteRequests( 10, 20 );
 
-            if ( !requests.isEmpty() ) {
+    private void send()
+    {
+
+        try
+        {
+            Set<RemoteRequest> requests =
+                    dispatcherDAO.getRemoteRequests( calculateOfAttempts(), SELECT_RECORDS_LIMIT );
+
+            if ( !requests.isEmpty() )
+            {
 
                 List<Callable<Object>> todo = new ArrayList<>( requests.size() );
 
 
-                for ( final RemoteRequest request : requests ) {
-                    try {
+                for ( final RemoteRequest request : requests )
+                {
+                    try
+                    {
                         final Set<RemoteResponse> responses =
                                 dispatcherDAO.getRemoteResponses( request.getCommandId() );
 
-                        //if no responses arrived to this request, increment is attempts number
-                        if ( responses.isEmpty() && ( System.currentTimeMillis() - request.getTimestamp()
-                                > AGENT_CHUNK_SEND_INTERVAL_SEC * 1000 + 2000 ) ) {
-                            request.incrementAttempts();
-                            dispatcherDAO.saveRemoteRequest( request );
-                            //delete previous request (workaround until we change Cassandra to another DB)
-                            dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                        if ( responses.isEmpty() )
+                        {
+                            //delete request and responses after inactivity timeout reached
+                            if ( System.currentTimeMillis() - request.getTimestamp()
+                                    > org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC
+                                    * 1000 )
+                            {
+                                dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
+                                dispatcherDAO.deleteRemoteResponses( request.getCommandId() );
+                            }
+
+                            //if no responses arrived to this request within agent notification response interval,
+                            // increment its attempts' number
+                            else if ( ( System.currentTimeMillis() - request.getTimestamp()
+                                    > ( AGENT_CHUNK_SEND_INTERVAL_SEC + 5 ) * 1000 ) )
+                            {
+                                request.incrementAttempts();
+                                dispatcherDAO.saveRemoteRequest( request );
+                                //delete previous request (workaround until we change Cassandra to another DB)
+                                dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                            }
                         }
-                        else if ( !responses.isEmpty() ) {
+                        else
+                        {
 
                             //add task to send responses
-                            todo.add( Executors.callable( new Runnable() {
+                            todo.add( Executors.callable( new Runnable()
+                            {
                                 @Override
-                                public void run() {
+                                public void run()
+                                {
                                     sendResponses( request, responses );
                                 }
                             } ) );
                         }
                     }
-                    catch ( DBException e ) {
+                    catch ( DBException e )
+                    {
                         LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
                     }
                 }
 
-                if ( !todo.isEmpty() ) {
+                if ( !todo.isEmpty() )
+                {
                     httpRequestsExecutor.invokeAll( todo );
                 }
             }
         }
-        catch ( InterruptedException | DBException e ) {
+        catch ( InterruptedException | DBException e )
+        {
             LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
         }
     }
 
 
-    private void sendResponses( RemoteRequest request, Set<RemoteResponse> responses ) {
-        try {
+    private void sendResponses( RemoteRequest request, Set<RemoteResponse> responses )
+    {
+        try
+        {
             //sort responses by responseNumber
-            Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
+            Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>()
+            {
                 @Override
-                public int compare( final Response o1, final Response o2 ) {
+                public int compare( final Response o1, final Response o2 )
+                {
                     int compareAgents = o1.getUuid().compareTo( o2.getUuid() );
                     return compareAgents == 0 ?
                            o1.getResponseSequenceNumber().compareTo( o2.getResponseSequenceNumber() ) : compareAgents;
                 }
             } );
-            for ( RemoteResponse response : responses ) {
+            for ( RemoteResponse response : responses )
+            {
                 sortedSet.add( response.getResponse() );
             }
 
-            try {
+            try
+            {
                 Peer peer = peerManager.getPeerByUUID( request.getPeerId() );
 
                 String message = JsonUtil.toJson( new DispatcherMessage( sortedSet, DispatcherMessageType.RESPONSE ) );
                 peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
 
                 //delete sent responses
-                for ( RemoteResponse response : responses ) {
+                for ( RemoteResponse response : responses )
+                {
 
                     dispatcherDAO.deleteRemoteResponse( response );
 
-                    if ( response.getResponse().isFinal() ) {
+                    if ( response.getResponse().isFinal() )
+                    {
                         request.incrementCompletedRequestsCount();
                     }
                 }
                 //if final response was sent, delete request
-                if ( request.isCompleted() ) {
-                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
+                if ( request.isCompleted() )
+                {
+                    dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
                 }
-                else {
+                else
+                {
+                    request.updateTimestamp();
                     dispatcherDAO.saveRemoteRequest( request );
                 }
             }
 
-            catch ( PeerMessageException e ) {
+            catch ( PeerMessageException e )
+            {
                 LOG.log( Level.SEVERE, String.format( "Error in send: %s", e.getMessage() ) );
-                //increment attempts
-                request.incrementAttempts();
-                dispatcherDAO.saveRemoteRequest( request );
-                //delete previous request (workaround until we change Cassandra to another DB)
-                dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+
+                //increment attempts based on widening intervals
+                if ( System.currentTimeMillis() - request.getTimestamp()
+                        > request.getAttempts() * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC * 1000 )
+                {
+                    request.incrementAttempts();
+                    dispatcherDAO.saveRemoteRequest( request );
+                    //delete previous request (workaround until we change Cassandra to another DB)
+                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                }
             }
         }
-        catch ( JsonSyntaxException | DBException e ) {
+        catch ( JsonSyntaxException | DBException e )
+        {
             LOG.log( Level.SEVERE, String.format( "Error in sendResponses: %s", e.getMessage() ) );
         }
     }

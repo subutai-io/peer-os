@@ -33,6 +33,7 @@ public class CassandraForm extends CustomComponent
 
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
+
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );

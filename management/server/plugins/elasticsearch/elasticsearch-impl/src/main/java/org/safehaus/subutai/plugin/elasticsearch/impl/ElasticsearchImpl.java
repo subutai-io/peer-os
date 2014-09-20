@@ -1,12 +1,12 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
@@ -22,7 +22,6 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -45,7 +44,7 @@ import com.google.common.collect.Sets;
 
 public class ElasticsearchImpl implements Elasticsearch
 {
-
+    private static final Logger LOG = Logger.getLogger( ElasticsearchImpl.class.getName() );
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
@@ -203,17 +202,9 @@ public class ElasticsearchImpl implements Elasticsearch
                 }
                 po.addLog( "Updating db..." );
 
-                try
-                {
-                    pluginDAO.deleteInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                            elasticsearchClusterConfiguration.getClusterName() );
-                    po.addLogDone( "Cluster info deleted from DB\nDone" );
-                }
-                catch ( DBException e )
-                {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
-                    e.printStackTrace();
-                }
+                pluginDAO.deleteInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+                        elasticsearchClusterConfiguration.getClusterName() );
+                po.addLogDone( "Cluster info deleted from DB\nDone" );
             }
         } );
 
@@ -224,15 +215,8 @@ public class ElasticsearchImpl implements Elasticsearch
     @Override
     public List<ElasticsearchClusterConfiguration> getClusters()
     {
-        try
-        {
-            return pluginDAO
-                    .getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, ElasticsearchClusterConfiguration.class );
-        }
-        catch ( DBException e )
-        {
-            return Collections.emptyList();
-        }
+        return pluginDAO
+                .getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, ElasticsearchClusterConfiguration.class );
     }
 
 
@@ -240,15 +224,8 @@ public class ElasticsearchImpl implements Elasticsearch
     public ElasticsearchClusterConfiguration getCluster( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        try
-        {
-            return pluginDAO.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName,
-                    ElasticsearchClusterConfiguration.class );
-        }
-        catch ( DBException e )
-        {
-            return null;
-        }
+        return pluginDAO.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName,
+                ElasticsearchClusterConfiguration.class );
     }
 
 

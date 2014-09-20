@@ -15,10 +15,12 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StopServerHandler extends AbstractOperationHandler<OozieImpl> {
+public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
+{
 
 
-    public StopServerHandler( final OozieImpl manager, final String clusterName ) {
+    public StopServerHandler( final OozieImpl manager, final String clusterName )
+    {
         super( manager, clusterName );
         productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping cluster %s...", clusterName ) );
@@ -26,19 +28,24 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl> {
 
 
     @Override
-    public void run() {
-        manager.getExecutor().execute( new Runnable() {
+    public void run()
+    {
+        manager.getExecutor().execute( new Runnable()
+        {
 
-            public void run() {
+            public void run()
+            {
                 OozieClusterConfig config = manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
                         OozieClusterConfig.class );
-                if ( config == null ) {
+                if ( config == null )
+                {
                     productOperation.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
                 Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
-                if ( serverAgent == null ) {
+                if ( serverAgent == null )
+                {
                     productOperation
                             .addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
@@ -48,10 +55,12 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl> {
                 Command stopServiceCommand = Commands.getStopServerCommand( servers );
                 manager.getCommandRunner().runCommand( stopServiceCommand );
 
-                if ( stopServiceCommand.hasSucceeded() ) {
+                if ( stopServiceCommand.hasSucceeded() )
+                {
                     productOperation.addLogDone( "Stop succeeded" );
                 }
-                else {
+                else
+                {
                     productOperation
                             .addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
                 }

@@ -12,7 +12,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -131,32 +130,24 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
     {
         po.addLog( "Updating db..." );
         //save to db
-        try
+        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster info saved to DB\nInstalling Spark..." );
+        //install spark
+        Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
+        manager.getCommandRunner().runCommand( installCommand );
+
+        if ( installCommand.hasSucceeded() )
         {
-            manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster info saved to DB\nInstalling Spark..." );
-            //install spark
-            Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
-            manager.getCommandRunner().runCommand( installCommand );
+            po.addLog( "Installation succeeded" );
 
-            if ( installCommand.hasSucceeded() )
-            {
-                po.addLog( "Installation succeeded" );
-
-                SetupHelper helper = new SetupHelper( manager, config, po );
-                helper.configureMasterIP( config.getSlaveNodes() );
-                helper.registerSlaves();
-                helper.startCluster();
-            }
-            else
-            {
-                throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
-            }
+            SetupHelper helper = new SetupHelper( manager, config, po );
+            helper.configureMasterIP( config.getSlaveNodes() );
+            helper.registerSlaves();
+            helper.startCluster();
         }
-        catch ( DBException e )
+        else
         {
-            throw new ClusterSetupException(
-                    "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+            throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
         }
     }
 }

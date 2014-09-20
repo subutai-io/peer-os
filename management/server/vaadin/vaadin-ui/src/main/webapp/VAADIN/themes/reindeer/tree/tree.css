@@ -17,34 +17,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-.v-tree-node {
+.v-tree-node
+{
     background: transparent url(img/arrows.png) no-repeat 6px -10px;
 }
 
-.v-ie6 .v-tree-node {
+.v-ie6 .v-tree-node
+{
     background-image: url(img/arrows-ie6.png);
     background-repeat: no-repeat;
 }
 
-.v-ie6 div.v-tree-node-leaf {
+.v-ie6 div.v-tree-node-leaf
+{
     background: transparent;
 }
 
-.v-tree-node-expanded {
+.v-tree-node-expanded
+{
     background-position: -7px 5px;
 }
 
-.v-tree-node-caption {
+.v-tree-node-caption
+{
     margin-left: 16px;
     padding-bottom: 1px;
 }
 
-.v-tree-node span {
+.v-tree-node span
+{
     padding: 1px 2px;
     display: inline-block;
 }
 
-.v-tree-node-selected span {
+.v-tree-node-selected span
+{
     background: #4d749f repeat-x;
     background-image: url(../common/img/sel-bg.png); /* sprite-ref: verticals; sprite-alignment: repeat */
     color: #fff;
@@ -55,47 +62,56 @@
     display: inline-block;
 }
 
-.v-tree-node-children {
+.v-tree-node-children
+{
     padding-left: 16px;
 }
 
 /* IMPORTANT keep the offsetWidth (width + padding) of this element the same as the margin-left of v-tree-node-caption */
-.v-ie6 .v-tree-node-ie6compatnode {
+.v-ie6 .v-tree-node-ie6compatnode
+{
     width: 14px;
     height: 10px;
     padding: 1px;
 }
 
-.v-tree-node-caption.v-tree-node-focused span {
+.v-tree-node-caption.v-tree-node-focused span
+{
     padding-left: 1px;
     padding-top: 0px;
     padding-bottom: 0px;
 }
 
-.v-tree-node-focused span {
+.v-tree-node-focused span
+{
     border: 1px dotted black;
 }
 
-.v-ie6 .v-tree-node-ie6compatnode.v-tree-node-focused {
+.v-ie6 .v-tree-node-ie6compatnode.v-tree-node-focused
+{
     padding-left: 0px;
 }
 
 /***************************************
  * Drag'n'drop styles
  ***************************************/
-.v-tree .v-tree-node-drag-top {
+.v-tree .v-tree-node-drag-top
+{
     background-position: 6px -11px;
 }
 
-.v-tree .v-tree-node-drag-top.v-tree-node-expanded {
+.v-tree .v-tree-node-drag-top.v-tree-node-expanded
+{
     background-position: -7px 4px;
 }
 
 .v-tree-connectors .v-tree-node-drag-top,
-.v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top {
+.v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top
+{
     background-position: 2px -53px;
 }
 
-.v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf {
+.v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf
+{
     background-position: 2px 50%;
 }

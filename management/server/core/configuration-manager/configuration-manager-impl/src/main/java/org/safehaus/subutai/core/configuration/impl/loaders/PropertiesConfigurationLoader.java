@@ -23,25 +23,28 @@ import com.google.gson.JsonObject;
 /**
  * Created by bahadyr on 7/16/14.
  */
-public class PropertiesConfigurationLoader implements ConfigurationLoader {
+public class PropertiesConfigurationLoader implements ConfigurationLoader
+{
 
-    private final Logger LOG = Logger.getLogger( PropertiesConfigurationLoader.class.getName() );
-
+    private static final Logger LOG = Logger.getLogger( PropertiesConfigurationLoader.class.getName() );
     private TextInjector textInjector;
 
 
-    public PropertiesConfigurationLoader( final TextInjector textInjector ) {
+    public PropertiesConfigurationLoader( final TextInjector textInjector )
+    {
         this.textInjector = textInjector;
     }
 
 
     @Override
-    public JsonObject getConfiguration( String hostname, String configPathFilename ) {
+    public JsonObject getConfiguration( String hostname, String configPathFilename )
+    {
 
         TextInjectorImpl configurationInjector = new TextInjectorImpl();
         String content = configurationInjector.catFile( hostname, configPathFilename );
 
-        try {
+        try
+        {
             IniParser iniParser = null;
             iniParser = new IniParser( content );
             PropertiesConfiguration propertiesConfiguration = iniParser.getConfig();
@@ -50,7 +53,8 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             ConfigBuilder configBuilder = new ConfigBuilder();
             JsonObject jo = configBuilder.getConfigJsonObject( configPathFilename, ConfigTypeEnum.PROPERTIES );
             List<JsonObject> fields = new ArrayList<>();
-            while ( iterator.hasNext() ) {
+            while ( iterator.hasNext() )
+            {
                 String key = iterator.next();
                 String value = iniParser.getStringProperty( key );
                 JsonObject field = configBuilder.buildFieldJsonObject( key, "", true, "", true, value );
@@ -58,25 +62,29 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             }
             return configBuilder.addJsonArrayToConfig( jo, fields );
         }
-        catch ( ConfigurationException e ) {
-            LOG.info( e.getMessage() );
+        catch ( ConfigurationException e )
+        {
+            LOG.severe( e.getMessage() );
         }
         return null;
     }
 
 
     @Override
-    public boolean setConfiguration( final String hostname, String configFilePath, String jsonObjectConfig ) {
+    public boolean setConfiguration( final String hostname, String configFilePath, String jsonObjectConfig )
+    {
         // TODO Read config from instance, set values from Config, inject Config
 
         String content = textInjector.catFile( hostname, configFilePath );
         Gson gson = new Gson();
 
-        try {
+        try
+        {
             IniParser iniParser = new IniParser( content );
             JsonObject config = gson.fromJson( jsonObjectConfig, JsonObject.class );
             JsonArray jsonArray2 = config.getAsJsonArray( "configFields" );
-            for ( int i = 0; i < jsonArray2.size(); i++ ) {
+            for ( int i = 0; i < jsonArray2.size(); i++ )
+            {
                 JsonObject jo1 = ( JsonObject ) jsonArray2.get( i );
                 String fieldName = jo1.getAsJsonPrimitive( "fieldName" ).getAsString();
                 String value = jo1.getAsJsonPrimitive( "value" ).getAsString();
@@ -86,8 +94,9 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             textInjector.echoTextIntoAgent( hostname, configFilePath, content );
             return true;
         }
-        catch ( ConfigurationException e ) {
-            LOG.info( e.getMessage() );
+        catch ( ConfigurationException e )
+        {
+            LOG.severe( e.getMessage() );
         }
         return false;
     }

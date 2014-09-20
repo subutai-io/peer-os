@@ -17,16 +17,18 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings("serial")
-public class EnvironmentsForm {
+public class EnvironmentsForm
+{
 
-    private final static Logger logger = Logger.getLogger( EnvironmentsForm.class.getName() );
+    private final static Logger LOG = Logger.getLogger( EnvironmentsForm.class.getName() );
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
 
 
-    public EnvironmentsForm( final EnvironmentManagerUI managerUI ) {
+    public EnvironmentsForm( final EnvironmentManagerUI managerUI )
+    {
         this.managerUI = managerUI;
 
         contentRoot = new VerticalLayout();
@@ -37,17 +39,21 @@ public class EnvironmentsForm {
 
         Button getEnvironmentsButton = new Button( "View" );
 
-        getEnvironmentsButton.addClickListener( new Button.ClickListener() {
+        getEnvironmentsButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 updateTableData();
             }
         } );
 
         Button addEnvironmentButton = new Button( "Add" );
-        addEnvironmentButton.addClickListener( new Button.ClickListener() {
+        addEnvironmentButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 String siteId = managerUI.getPeerManager().getSiteId().toString();
                 Environment environment = new Environment( "environment", siteId );
                 environment.addContainer( "Container 1" );
@@ -64,39 +70,33 @@ public class EnvironmentsForm {
     }
 
 
-    private Table createTable( String caption, int size ) {
+    private Table createTable( String caption, int size )
+    {
         Table table = new Table( caption );
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Info", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
-        //        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        //        table.setHeight( size, Sizeable.UNITS_PIXELS );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
         table.setImmediate( true );
         table.setSizeFull();
-        //        table.addListener( new ItemClickEvent.ItemClickListener() {
-        //
-        //            public void itemClick( ItemClickEvent event ) {
-        //                if ( event.isDoubleClick() ) {
-        //
-        //                }
-        //            }
-        //        } );
         return table;
     }
 
 
-    private void updateTableData() {
+    private void updateTableData()
+    {
         environmentsTable.removeAllItems();
         List<Environment> environmentList = managerUI.getEnvironmentManager().getEnvironments();
         for ( final Environment environment : environmentList )
         {
             Button viewEnvironmentInfoButton = new Button( "Info" );
-            viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {
+            viewEnvironmentInfoButton.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                public void buttonClick( final Button.ClickEvent clickEvent )
+                {
                     EnvironmentDetails detailsWindow = new EnvironmentDetails( "Environment details" );
                     detailsWindow.setContent( genContainersTable() );
                     contentRoot.getUI().addWindow( detailsWindow );
@@ -104,7 +104,8 @@ public class EnvironmentsForm {
                 }
 
 
-                private VerticalLayout genContainersTable() {
+                private VerticalLayout genContainersTable()
+                {
                     VerticalLayout vl = new VerticalLayout();
 
                     Table containersTable = new Table();
@@ -133,9 +134,11 @@ public class EnvironmentsForm {
             } );
 
             Button destroyEnvironment = new Button( "Destroy" );
-            destroyEnvironment.addClickListener( new Button.ClickListener() {
+            destroyEnvironment.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                public void buttonClick( final Button.ClickEvent clickEvent )
+                {
                     try
                     {
                         managerUI.getEnvironmentManager().destroyEnvironment( environment.getUuid().toString() );
@@ -154,7 +157,8 @@ public class EnvironmentsForm {
     }
 
 
-    public VerticalLayout getContentRoot() {
+    public VerticalLayout getContentRoot()
+    {
         return this.contentRoot;
     }
 }

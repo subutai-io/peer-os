@@ -53,7 +53,6 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
 
         Command checkNodeCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( checkNodeCommand );
-
         if ( checkNodeCommand.hasCompleted() )
         {
             po.addLogDone( String.format( "%s", checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );

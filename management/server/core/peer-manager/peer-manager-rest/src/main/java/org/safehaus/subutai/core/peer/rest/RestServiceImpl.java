@@ -1,16 +1,18 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
 import com.google.gson.Gson;
@@ -22,49 +24,82 @@ import com.google.gson.JsonSyntaxException;
  * Created by bahadyr on 5/6/14.
  */
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
 
-    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
 
 
-    public RestServiceImpl() {
+    public RestServiceImpl()
+    {
     }
 
 
-    public PeerManager getPeerManager() {
+    public PeerManager getPeerManager()
+    {
         return peerManager;
     }
 
 
-    public void setPeerManager( PeerManager peerManager ) {
+    public void setPeerManager( PeerManager peerManager )
+    {
         this.peerManager = peerManager;
     }
 
 
     @Override
-    public Peer registerPeer( String config ) {
-        if ( config != null ) {
+    public Peer registerPeer( String config )
+    {
+        if ( config != null )
+        {
             Peer peer = GSON.fromJson( config, Peer.class );
             peerManager.register( peer );
             return peer;
         }
-        else {
+        else
+        {
             return null;
         }
     }
 
 
     @Override
-    public String getPeerJsonFormat() {
+    public String createContainers( final String createContainersMsg )
+    {
+        CreateContainersMessage ccm = GSON.fromJson( createContainersMsg, CreateContainersMessage.class );
+
+        Set<Agent> list = ( Set<Agent> ) peerManager.createContainers( ccm );
+
+        return JsonUtil.toJson( list );
+    }
+
+
+    @Override
+    public String getCreateContainersMsgJsonFormat()
+    {
+        CreateContainersMessage ccm = new CreateContainersMessage();
+        ccm.setStrategy( "ROUND_ROBIN" );
+        ccm.setEnvId( UUID.randomUUID() );
+        ccm.setNumberOfNodes( 2 );
+        ccm.setTargetPeerId( UUID.randomUUID() );
+        ccm.setTemplate( "master" );
+        return GSON.toJson( ccm );
+    }
+
+
+    @Override
+    public String getPeerJsonFormat()
+    {
         Peer peer = getSamplePeer();
         return GSON.toJson( peer );
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
 
         UUID id = peerManager.getSiteId();
         return GSON.toJson( id );
@@ -72,37 +107,45 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response processMessage( final String peerId, final String recipient, final String message ) {
-        try {
+    public Response processMessage( final String peerId, final String recipient, final String message )
+    {
+        try
+        {
             String response = peerManager.processPeerMessage( peerId, recipient, message );
 
             return Response.ok( response ).build();
         }
-        catch ( PeerMessageException e ) {
+        catch ( PeerMessageException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
 
 
     @Override
-    public Response getConnectedAgents( @QueryParam( "envId" ) final String environmentId ) {
-        try {
+    public Response getConnectedAgents( final String environmentId )
+    {
+        try
+        {
             String response = JsonUtil.toJson( peerManager.getConnectedAgents( environmentId ) );
             return Response.ok( response ).build();
         }
-        catch ( JsonSyntaxException | PeerException e ) {
+        catch ( JsonSyntaxException | PeerException e )
+        {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
 
 
     @Override
-    public Response ping() {
-        return Response.ok(  ).build();
+    public Response ping()
+    {
+        return Response.ok().build();
     }
 
 
-    private Peer getSamplePeer() {
+    private Peer getSamplePeer()
+    {
         Peer peer = new Peer();
         peer.setName( "Peer name" );
         peer.setIp( "10.10.10.10" );

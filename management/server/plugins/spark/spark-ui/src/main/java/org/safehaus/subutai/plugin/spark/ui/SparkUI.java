@@ -21,9 +21,8 @@ public class SparkUI implements PortalModule
 
     public static final String MODULE_IMAGE = "spark.png";
     protected static final Logger LOG = Logger.getLogger( SparkUI.class.getName() );
-
-    private ExecutorService executor;
     private final ServiceLocator serviceLocator;
+    private ExecutorService executor;
 
 
     public SparkUI()
@@ -77,5 +76,12 @@ public class SparkUI implements PortalModule
             LOG.severe( e.getMessage() );
         }
         return null;
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return false;
     }
 }

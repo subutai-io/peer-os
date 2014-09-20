@@ -47,23 +47,21 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
-import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.StrategyException;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
-public class ContainerManagerImpl extends ContainerManagerBase {
+public class ContainerManagerImpl extends ContainerManagerBase
+{
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
-
-    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
     /**
@@ -73,12 +71,11 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     // number sequences for template names used for new clone name generation
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
-    private Monitor monitor;
 
 
     public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitor monitor,
                                  TemplateManager templateManager, TemplateRegistryManager templateRegistry,
-                                 DbManager dbManager )
+                                 DbManager dbManager, StrategyManager strategyManager )
     {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
@@ -86,7 +83,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         this.templateManager = templateManager;
         this.templateRegistry = templateRegistry;
         this.dbManager = dbManager;
-        Commands.init( commandRunner );
+        this.strategyManager = strategyManager;
     }
 
 
@@ -98,6 +95,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
         sequences = new ConcurrentHashMap<>();
         executor = Executors.newCachedThreadPool();
+        Commands.init( commandRunner );
     }
 
 
@@ -105,24 +103,6 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     {
         sequences.clear();
         executor.shutdown();
-    }
-
-
-    public synchronized void registerStrategy( ContainerPlacementStrategy containerPlacementStrategy )
-    {
-        LOG.info( String.format( "Registering container placement strategy: %s", containerPlacementStrategy.getId() ) );
-        placementStrategies.add( containerPlacementStrategy );
-    }
-
-
-    public synchronized void unregisterStrategy( ContainerPlacementStrategy containerPlacementStrategy )
-    {
-        if ( containerPlacementStrategy != null )
-        {
-            LOG.info( String.format( "Unregistering container placement strategy: %s",
-                    containerPlacementStrategy.getId() ) );
-            placementStrategies.remove( containerPlacementStrategy );
-        }
     }
 
 
@@ -142,21 +122,6 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
 
     @Override
-    public Map<Agent, Integer> getPlacementDistribution( int nodesCount, String strategyId, List<Criteria> criteria )
-    {
-        ContainerPlacementStrategy containerPlacementStrategy = findStrategyById( strategyId );
-        if ( containerPlacementStrategy == null )
-        {
-            //TODO: add throw exception
-            return null;
-        }
-        containerPlacementStrategy.calculatePlacement( nodesCount, getPhysicalServerMetrics(), criteria );
-
-        return containerPlacementStrategy.getPlacementDistribution();
-    }
-
-
-    @Override
     public Set<Agent> clone( final UUID envId, final Agent agent, final String templateName,
                              final Set<String> cloneNames ) throws ContainerCreateException
     {
@@ -171,8 +136,9 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             executor.shutdown();
             for ( Agent a : successfullyClonedContainers )
             {
-                LOG.info( String.format( "Successfully cloned container %s on %s failed.", a.getHostname(),
-                        a.getParentHostName() ) );
+                //                LOG.info( String.format( "Successfully cloned container %s on %s failed.",
+                // a.getHostname(),
+                //                        a.getParentHostName() ) );
             }
         }
         catch ( ContainerException e )
@@ -185,8 +151,9 @@ public class ContainerManagerImpl extends ContainerManagerBase {
                 }
                 catch ( ContainerDestroyException cde )
                 {
-                    LOG.error( String.format( "Destroying container %s on %s failed.", a.getHostname(),
-                            a.getParentHostName() ) );
+                    //                    LOG.error( String.format( "Destroying container %s on %s failed.",
+                    // a.getHostname(),
+                    //                            a.getParentHostName() ) );
                 }
             }
             successfullyClonedContainers.clear();
@@ -203,31 +170,16 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     public Set<Agent> clone( final UUID envId, final String templateName, final int numOfContainers,
                              final String strategyId, final List<Criteria> criteria ) throws ContainerCreateException
     {
-        ContainerPlacementStrategy st = findStrategyById( strategyId );
-        if ( st == null )
+
+        Map<Agent, Integer> slots = null;
+        try
         {
-            throw new ContainerCreateException( String.format( "Placement strategy [%s] not found.", strategyId ) );
+            slots = strategyManager
+                    .getPlacementDistribution( getPhysicalServerMetrics(), numOfContainers, strategyId, criteria );
         }
-        Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
-        st.calculatePlacement( numOfContainers, metrics, criteria );
-
-        Map<Agent, Integer> slots = st.getPlacementDistribution();
-
-        int totalSlots = 0;
-
-        for ( int slotCount : slots.values() )
+        catch ( StrategyException e )
         {
-            totalSlots += slotCount;
-        }
-
-        if ( totalSlots == 0 )
-        {
-            throw new ContainerCreateException( "Container placement strategy returned empty set" );
-        }
-
-        if ( totalSlots < numOfContainers )
-        {
-            throw new ContainerCreateException( String.format( "Only %d containers can be created", totalSlots ) );
+            throw new ContainerCreateException( e.getMessage() );
         }
 
         // clone specified number of instances and store their names
@@ -250,7 +202,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         final ContainerManager self = this;
         for ( final Map.Entry<Agent, Set<String>> e : cloneNames.entrySet() )
         {
-            completionService.submit( new Callable<Set<Agent>>() {
+            completionService.submit( new Callable<Set<Agent>>()
+            {
                 @Override
                 public Set<Agent> call() throws Exception
                 {
@@ -258,7 +211,6 @@ public class ContainerManagerImpl extends ContainerManagerBase {
                 }
             } );
         }
-
 
         Set<Agent> result = new HashSet<Agent>();
 
@@ -300,19 +252,9 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         else
         {
-            long thresholdTime = System.currentTimeMillis() + Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000;
-            Agent agent = agentManager.getAgentByHostname( cloneName );
-            while ( agent == null && thresholdTime > System.currentTimeMillis() )
-            {
-                try
-                {
-                    Thread.sleep( 1000 );
-                }
-                catch ( InterruptedException ignore )
-                {
-                }
-                agent = agentManager.getAgentByHostname( cloneName );
-            }
+            LOG.info( Thread.currentThread().toString() );
+
+            Agent agent = agentManager.waitForRegistration( cloneName, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 );
             if ( agent == null )
             {
                 fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
@@ -349,7 +291,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         else
         {
-            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCED, envId, hostName, cloneName ) );
+            fireEvent( new ContainerEvent( ContainerEventType.DESTROYING_SUCCEED, envId, hostName, cloneName ) );
         }
     }
 
@@ -366,7 +308,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             catch ( Exception e )
             {
                 it.remove();
-                LOG.error( "Error notifying container event listeners, removing faulting listener", e );
+                //                LOG.error( "Error notifying container event listeners, removing faulting listener",
+                // e );
             }
         }
     }
@@ -434,6 +377,78 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
 
         return agentFamilies;
+    }
+
+
+    /**
+     * Returns metrics of all physical servers connected to the management server
+     *
+     * @return map of metrics where key is a physical agent and value is a metric
+     */
+    @Override
+    public Map<Agent, ServerMetric> getPhysicalServerMetrics()
+    {
+        final Map<Agent, ServerMetric> serverMetrics = new HashMap<>();
+        Set<Agent> agents = agentManager.getPhysicalAgents();
+        //omit management server
+        for ( Iterator<Agent> it = agents.iterator(); it.hasNext(); )
+        {
+            Agent agent = it.next();
+            if ( !agent.getHostname().matches( "^py.*" ) )
+            {
+                it.remove();
+            }
+        }
+
+        if ( agents.isEmpty() )
+        {
+            return serverMetrics;
+        }
+
+        Command getMetricsCommand = Commands.getMetricsCommand( agents );
+        commandRunner.runCommand( getMetricsCommand );
+
+        if ( getMetricsCommand.hasCompleted() )
+        {
+            for ( AgentResult result : getMetricsCommand.getResults().values() )
+            {
+                String[] metrics = result.getStdOut().split( "\n" );
+                ServerMetric serverMetric = gatherMetrics( metrics );
+                if ( serverMetric != null )
+                {
+                    Agent agent = agentManager.getAgentByUUID( result.getAgentUUID() );
+                    Map<Metric, Double> averageMetrics = gatherAvgMetrics( agent );
+                    serverMetric.setAverageMetrics( averageMetrics );
+                    serverMetrics.put( agent, serverMetric );
+                }
+            }
+        }
+
+        if ( !serverMetrics.isEmpty() )
+        {
+            //get number of lxcs currently present on servers
+            Map<String, EnumMap<ContainerState, List<String>>> lxcInfo = getContainersOnPhysicalServers();
+            for ( Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext(); )
+            {
+                Map.Entry<Agent, ServerMetric> entry = it.next();
+                EnumMap<ContainerState, List<String>> info = lxcInfo.get( entry.getKey().getHostname() );
+                if ( info != null )
+                {
+                    int numOfExistingLxcs =
+                            ( info.get( ContainerState.RUNNING ) != null ? info.get( ContainerState.RUNNING ).size() :
+                              0 ) + ( info.get( ContainerState.STOPPED ) != null ?
+                                      info.get( ContainerState.STOPPED ).size() : 0 ) + (
+                                    info.get( ContainerState.FROZEN ) != null ?
+                                    info.get( ContainerState.FROZEN ).size() : 0 );
+                    entry.getValue().setNumOfLxcs( numOfExistingLxcs );
+                }
+                else
+                {
+                    it.remove();
+                }
+            }
+        }
+        return serverMetrics;
     }
 
 
@@ -539,7 +554,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error on adding container event listener", ex );
+            //LOG.error( "Error on adding container event listener", ex );
         }
     }
 
@@ -558,261 +573,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error on removing container event listener", ex );
+            //LOG.error( "Error on removing container event listener", ex );
         }
-    }
-
-
-    private String nextHostName( String templateName, Set<String> existingNames )
-    {
-        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
-        if ( i == null )
-        {
-            i = sequences.get( templateName );
-        }
-        while ( true )
-        {
-            String name = templateName + i.incrementAndGet();
-            if ( !existingNames.contains( name ) )
-            {
-                return name;
-            }
-        }
-    }
-
-
-    private Set<String> getContainerNames( Collection<Agent> hostsToCheck )
-    {
-        Map<String, EnumMap<ContainerState, List<String>>> map = getLxcOnPhysicalServers();
-
-        if ( hostsToCheck != null && !hostsToCheck.isEmpty() )
-        {
-            Iterator<String> it = map.keySet().iterator();
-            while ( it.hasNext() )
-            {
-                String hostname = it.next();
-                boolean hostIncluded = false;
-                for ( Agent agent : hostsToCheck )
-                {
-                    if ( agent.getHostname().equalsIgnoreCase( hostname ) )
-                    {
-                        hostIncluded = true;
-                        break;
-                    }
-                }
-                if ( !hostIncluded )
-                {
-                    it.remove();
-                }
-            }
-        }
-
-        Set<String> lxcHostNames = new HashSet<>();
-        for ( EnumMap<ContainerState, List<String>> lxcsOnOneHost : map.values() )
-        {
-            for ( List<String> hosts : lxcsOnOneHost.values() )
-            {
-                lxcHostNames.addAll( hosts );
-            }
-        }
-        return lxcHostNames;
-    }
-
-
-    private void execute( Agent agent, UUID envId, String templateName, Set<String> cloneNames,
-                          ExecutorService executor, ContainerAction containerAction ) throws ContainerException
-    {
-
-        //prepare ContainerInfo list for execution
-        List<ContainerInfo> containerInfoList = new ArrayList<>( cloneNames.size() );
-        for ( String cloneName : cloneNames )
-        {
-            ContainerInfo containerInfo = new ContainerInfo( agent, envId, templateName, cloneName, containerAction );
-            containerInfoList.add( containerInfo );
-        }
-
-        CompletionService<ContainerInfo> completer = new ExecutorCompletionService<>( executor );
-
-        //launch destroy commands
-        for ( ContainerInfo containerInfo : containerInfoList )
-        {
-            completer.submit( new ContainerActor( containerInfo, this ) );
-        }
-
-        //wait for completion
-        try
-        {
-            for ( ContainerInfo ignored : containerInfoList )
-            {
-                Future<ContainerInfo> future = completer.take();
-                future.get();
-            }
-        }
-        catch ( InterruptedException | ExecutionException ignore )
-        {
-        }
-
-        boolean result = true;
-        for ( ContainerInfo containerInfo : containerInfoList )
-        {
-            result &= containerInfo.isOk();
-        }
-
-        if ( !result )
-        {
-            throw new ContainerException( "Not all actions performed successfully" );
-        }
-    }
-
-
-    private ContainerPlacementStrategy findStrategyById( String strategyId )
-    {
-        ContainerPlacementStrategy placementStrategy = null;
-        for ( int i = 0; i < placementStrategies.size() && placementStrategy == null; i++ )
-        {
-            if ( strategyId.equals( placementStrategies.get( i ).getId() ) )
-            {
-                placementStrategy = placementStrategies.get( i );
-            }
-        }
-        return placementStrategy;
-    }
-
-
-    /**
-     * Returns metrics of all physical servers connected to the management server
-     *
-     * @return map of metrics where key is a physical agent and value is a metric
-     */
-    public Map<Agent, ServerMetric> getPhysicalServerMetrics()
-    {
-        final Map<Agent, ServerMetric> serverMetrics = new HashMap<>();
-        Set<Agent> agents = agentManager.getPhysicalAgents();
-        //omit management server
-        for ( Iterator<Agent> it = agents.iterator(); it.hasNext(); )
-        {
-            Agent agent = it.next();
-            if ( !agent.getHostname().matches( "^py.*" ) )
-            {
-                it.remove();
-            }
-        }
-
-        if ( agents.isEmpty() )
-        {
-            return serverMetrics;
-        }
-
-        Command getMetricsCommand = Commands.getMetricsCommand( agents );
-        commandRunner.runCommand( getMetricsCommand );
-
-        if ( getMetricsCommand.hasCompleted() )
-        {
-            for ( AgentResult result : getMetricsCommand.getResults().values() )
-            {
-                String[] metrics = result.getStdOut().split( "\n" );
-                ServerMetric serverMetric = gatherMetrics( metrics );
-                if ( serverMetric != null )
-                {
-                    Agent agent = agentManager.getAgentByUUID( result.getAgentUUID() );
-                    Map<Metric, Double> averageMetrics = gatherAvgMetrics( agent );
-                    serverMetric.setAverageMetrics( averageMetrics );
-                    serverMetrics.put( agent, serverMetric );
-                }
-            }
-        }
-
-        if ( !serverMetrics.isEmpty() )
-        {
-            //get number of lxcs currently present on servers
-            Map<String, EnumMap<ContainerState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
-            for ( Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator(); it.hasNext(); )
-            {
-                Map.Entry<Agent, ServerMetric> entry = it.next();
-                EnumMap<ContainerState, List<String>> info = lxcInfo.get( entry.getKey().getHostname() );
-                if ( info != null )
-                {
-                    int numOfExistingLxcs =
-                            ( info.get( ContainerState.RUNNING ) != null ? info.get( ContainerState.RUNNING ).size() :
-                              0 ) + ( info.get( ContainerState.STOPPED ) != null ?
-                                      info.get( ContainerState.STOPPED ).size() : 0 ) + (
-                                    info.get( ContainerState.FROZEN ) != null ?
-                                    info.get( ContainerState.FROZEN ).size() : 0 );
-                    entry.getValue().setNumOfLxcs( numOfExistingLxcs );
-                }
-                else
-                {
-                    it.remove();
-                }
-            }
-        }
-        return serverMetrics;
-    }
-
-
-    /**
-     * Returns information about what lxc containers each physical servers has at present
-     *
-     * @return map where key is a hostname of physical server and value is a map where key is state of lxc and value is
-     * a list of lxc hostnames
-     */
-    public Map<String, EnumMap<ContainerState, List<String>>> getLxcOnPhysicalServers()
-    {
-        final Map<String, EnumMap<ContainerState, List<String>>> agentFamilies = new HashMap<>();
-        Set<Agent> pAgents = agentManager.getPhysicalAgents();
-        for ( Iterator<Agent> it = pAgents.iterator(); it.hasNext(); )
-        {
-            Agent agent = it.next();
-            if ( !agent.getHostname().matches( "^py.*" ) )
-            {
-                it.remove();
-            }
-        }
-        if ( !pAgents.isEmpty() )
-        {
-
-            Command getLxcListCommand = Commands.getLxcListCommand( pAgents );
-            commandRunner.runCommand( getLxcListCommand );
-
-            if ( getLxcListCommand.hasCompleted() )
-            {
-                for ( AgentResult result : getLxcListCommand.getResults().values() )
-                {
-                    Agent agent = agentManager.getAgentByUUID( result.getAgentUUID() );
-
-                    String parentHostname =
-                            agent == null ? String.format( "Offline[%s]", result.getAgentUUID() ) : agent.getHostname();
-                    EnumMap<ContainerState, List<String>> lxcs = new EnumMap<>( ContainerState.class );
-                    String[] lxcStrs = result.getStdOut().split( "\\n" );
-
-                    for ( int i = 2; i < lxcStrs.length; i++ )
-                    {
-                        String[] lxcProperties = lxcStrs[i].split( "\\s+" );
-                        if ( lxcProperties.length > 1 )
-                        {
-                            String lxcHostname = lxcProperties[0];
-                            if ( !( Common.BASE_CONTAINER_NAME.equalsIgnoreCase( lxcHostname )
-                                    || Common.MASTER_TEMPLATE_NAME.equalsIgnoreCase( lxcHostname ) ) )
-                            {
-                                String lxcStatus = lxcProperties[1];
-
-                                ContainerState state = ContainerState.parseState( lxcStatus );
-
-                                if ( lxcs.get( state ) == null )
-                                {
-                                    lxcs.put( state, new ArrayList<String>() );
-                                }
-                                lxcs.get( state ).add( lxcHostname );
-                            }
-                        }
-                    }
-
-                    agentFamilies.put( parentHostname, lxcs );
-                }
-            }
-        }
-
-        return agentFamilies;
     }
 
 
@@ -958,6 +720,108 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
+    private String nextHostName( String templateName, Set<String> existingNames )
+    {
+        AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
+        if ( i == null )
+        {
+            i = sequences.get( templateName );
+        }
+        while ( true )
+        {
+            String name = templateName + i.incrementAndGet();
+            if ( !existingNames.contains( name ) )
+            {
+                return name;
+            }
+        }
+    }
+
+
+    private Set<String> getContainerNames( Collection<Agent> hostsToCheck )
+    {
+        Map<String, EnumMap<ContainerState, List<String>>> map = getContainersOnPhysicalServers();
+
+        if ( hostsToCheck != null && !hostsToCheck.isEmpty() )
+        {
+            Iterator<String> it = map.keySet().iterator();
+            while ( it.hasNext() )
+            {
+                String hostname = it.next();
+                boolean hostIncluded = false;
+                for ( Agent agent : hostsToCheck )
+                {
+                    if ( agent.getHostname().equalsIgnoreCase( hostname ) )
+                    {
+                        hostIncluded = true;
+                        break;
+                    }
+                }
+                if ( !hostIncluded )
+                {
+                    it.remove();
+                }
+            }
+        }
+
+        Set<String> lxcHostNames = new HashSet<>();
+        for ( EnumMap<ContainerState, List<String>> lxcsOnOneHost : map.values() )
+        {
+            for ( List<String> hosts : lxcsOnOneHost.values() )
+            {
+                lxcHostNames.addAll( hosts );
+            }
+        }
+        return lxcHostNames;
+    }
+
+
+    private void execute( Agent agent, UUID envId, String templateName, Set<String> cloneNames,
+                          ExecutorService executor, ContainerAction containerAction ) throws ContainerException
+    {
+
+        //prepare ContainerInfo list for execution
+        List<ContainerInfo> containerInfoList = new ArrayList<>( cloneNames.size() );
+        for ( String cloneName : cloneNames )
+        {
+            ContainerInfo containerInfo = new ContainerInfo( agent, envId, templateName, cloneName, containerAction );
+            containerInfoList.add( containerInfo );
+        }
+
+        CompletionService<ContainerInfo> completer = new ExecutorCompletionService<>( executor );
+
+        //launch destroy commands
+        for ( ContainerInfo containerInfo : containerInfoList )
+        {
+            completer.submit( new ContainerActor( containerInfo, this ) );
+        }
+
+        //wait for completion
+        try
+        {
+            for ( ContainerInfo ignored : containerInfoList )
+            {
+                Future<ContainerInfo> future = completer.take();
+                future.get();
+            }
+        }
+        catch ( InterruptedException | ExecutionException ignore )
+        {
+        }
+
+        boolean result = true;
+        for ( ContainerInfo containerInfo : containerInfoList )
+        {
+            result &= containerInfo.isOk();
+        }
+
+        if ( !result )
+        {
+            throw new ContainerException( "Not all actions performed successfully" );
+        }
+    }
+
+
     @Override
     public void destroy( final String hostName, final Set<String> cloneNames ) throws ContainerDestroyException
     {
@@ -971,7 +835,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
-    private class ContainerEventListenerImpl implements ContainerEventListener {
+    private class ContainerEventListenerImpl implements ContainerEventListener
+    {
         private Set<Agent> successfullyClonedContainers;
 
 

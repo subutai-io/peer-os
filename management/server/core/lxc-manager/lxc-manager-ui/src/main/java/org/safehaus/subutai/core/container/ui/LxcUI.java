@@ -13,7 +13,8 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class LxcUI implements PortalModule {
+public class LxcUI implements PortalModule
+{
 
     public static final String MODULE_IMAGE = "lxc.png";
     public static final String MODULE_NAME = "LXC";
@@ -22,51 +23,67 @@ public class LxcUI implements PortalModule {
     private LxcManager lxcManager;
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( AgentManager agentManager ) {
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public void setLxcManager( LxcManager lxcManager ) {
+    public void setLxcManager( LxcManager lxcManager )
+    {
         this.lxcManager = lxcManager;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( LxcUI.MODULE_IMAGE, this );
     }
 
 
     @Override
-    public Component createComponent() {
+    public Component createComponent()
+    {
         return new LxcForm( agentManager, lxcManager, executor );
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return true;
     }
 }

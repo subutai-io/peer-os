@@ -1,56 +1,63 @@
 package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 
+import java.util.UUID;
+
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-
-import java.util.UUID;
 
 
 /**
  * Handles install mongo cluster operation
  */
-public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl> {
+public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
+{
 
-	private final ProductOperation po;
-	private final MongoClusterConfig config;
-
-
-	public InstallOperationHandler(final MongoImpl manager, final MongoClusterConfig config) {
-		super(manager, config.getClusterName());
-		this.config = config;
-		po = manager.getTracker().createProductOperation(MongoClusterConfig.PRODUCT_KEY,
-				String.format("Setting up %s cluster...", config.getClusterName()));
-	}
+    private final ProductOperation po;
+    private final MongoClusterConfig config;
 
 
-	@Override
-	public UUID getTrackerId() {
-		return po.getId();
-	}
+    public InstallOperationHandler( final MongoImpl manager, final MongoClusterConfig config )
+    {
+        super( manager, config.getClusterName() );
+        this.config = config;
+        po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
+                String.format( "Setting up %s cluster...", config.getClusterName() ) );
+    }
 
 
-	@Override
-	public void run() {
+    @Override
+    public UUID getTrackerId()
+    {
+        return po.getId();
+    }
 
-		po.addLog("Building environment...");
 
-		try {
-			Environment env = manager.getEnvironmentManager()
-					.buildEnvironmentAndReturn(manager.getDefaultEnvironmentBlueprint(config));
+    @Override
+    public void run()
+    {
 
-			ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy(env, config, po);
-			clusterSetupStrategy.setup();
+        po.addLog( "Building environment..." );
 
-			po.addLogDone(String.format("Cluster %s set up successfully", clusterName));
-		} catch (EnvironmentBuildException | ClusterSetupException e) {
-			po.addLogFailed(String.format("Failed to setup cluster %s : %s", clusterName, e.getMessage()));
-		}
-	}
+        try
+        {
+            Environment env = manager.getEnvironmentManager()
+                                     .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
+
+            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
+            clusterSetupStrategy.setup();
+
+            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+        }
+        catch ( EnvironmentBuildException | ClusterSetupException e )
+        {
+            po.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
+        }
+    }
 }

@@ -32,49 +32,58 @@ import com.google.gson.JsonObject;
 /**
  * This is an implementation of LxcManager
  */
-public class ConfigManagerImpl implements ConfigManager {
+public class ConfigManagerImpl implements ConfigManager
+{
 
-    private final Logger LOG = Logger.getLogger( ConfigManagerImpl.class.getName() );
-
+    private static final Logger LOG = Logger.getLogger( ConfigManagerImpl.class.getName() );
     private TextInjector textInjector;
 
 
-    public TextInjector getTextInjector() {
+    public TextInjector getTextInjector()
+    {
         return textInjector;
     }
 
 
-    public void setTextInjector( final TextInjector textInjector ) {
+    public void setTextInjector( final TextInjector textInjector )
+    {
         this.textInjector = textInjector;
     }
 
 
     @Override
     public boolean injectConfiguration( String hostname, String configFilePath, String jsonObjectConfig,
-                                        ConfigTypeEnum configTypeEnum ) {
+                                        ConfigTypeEnum configTypeEnum )
+    {
 
         //TODO echo to given agent
         ConfigurationLoader configurationLoader = null;
 
-        switch ( configTypeEnum ) {
-            case YAML: {
+        switch ( configTypeEnum )
+        {
+            case YAML:
+            {
                 configurationLoader = new YamConfigurationlLoader( textInjector );
                 break;
             }
-            case PROPERTIES: {
+            case PROPERTIES:
+            {
                 configurationLoader = new PropertiesConfigurationLoader( textInjector );
                 break;
             }
-            case XML: {
+            case XML:
+            {
                 configurationLoader = new XMLConfigurationLoader( textInjector );
                 break;
             }
-            case PLAIN: {
+            case PLAIN:
+            {
                 //TODO
                 configurationLoader = new PlainConfigurationLoader( textInjector );
                 break;
             }
-            case SH: {
+            case SH:
+            {
                 //TODO
                 configurationLoader = new ShellConfigurationLoader( textInjector );
                 break;
@@ -82,7 +91,8 @@ public class ConfigManagerImpl implements ConfigManager {
             default:
                 break;
         }
-        if ( configurationLoader != null ) {
+        if ( configurationLoader != null )
+        {
             return configurationLoader.setConfiguration( hostname, configFilePath, jsonObjectConfig );
         }
 
@@ -91,28 +101,34 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public JsonObject getConfiguration( String agentHostname, String configPathFilename,
-                                        ConfigTypeEnum configTypeEnum ) {
+    public JsonObject getConfiguration( String agentHostname, String configPathFilename, ConfigTypeEnum configTypeEnum )
+    {
         ConfigurationLoader loader = null;
-        switch ( configTypeEnum ) {
-            case YAML: {
+        switch ( configTypeEnum )
+        {
+            case YAML:
+            {
                 loader = new YamConfigurationlLoader( textInjector );
                 break;
             }
-            case PROPERTIES: {
+            case PROPERTIES:
+            {
                 loader = new PropertiesConfigurationLoader( textInjector );
                 break;
             }
-            case XML: {
+            case XML:
+            {
                 loader = new XMLConfigurationLoader( textInjector );
                 break;
             }
-            case PLAIN: {
+            case PLAIN:
+            {
                 //TODO
                 loader = new PlainConfigurationLoader( textInjector );
                 break;
             }
-            case SH: {
+            case SH:
+            {
                 //TODO
                 loader = new ShellConfigurationLoader( textInjector );
                 break;
@@ -121,7 +137,8 @@ public class ConfigManagerImpl implements ConfigManager {
                 break;
         }
 
-        if ( loader != null ) {
+        if ( loader != null )
+        {
             return loader.getConfiguration( agentHostname, configPathFilename );
         }
 
@@ -130,7 +147,8 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public String getProperty( JsonObject config, String path, ConfigTypeEnum configTypeEnum ) {
+    public String getProperty( JsonObject config, String path, ConfigTypeEnum configTypeEnum )
+    {
         /*ConfigParser configParser = null;
         String content = FileUtil.getContent( configPathFilename, this );
         try {
@@ -158,7 +176,8 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public void setProperty( JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum ) {
+    public void setProperty( JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum )
+    {
         /*ConfigParser configParser = null;
 //        String content = FileUtil.getContent(configPathFilename , this ); try {
             switch ( configTypeEnum ) {
@@ -184,39 +203,49 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum ) {
+    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum )
+    {
         String content = FileUtil.getContent( configPathFilename, this );
-        try {
+        try
+        {
             ConfigParser parser = null;
-            switch ( configTypeEnum ) {
-                case YAML: {
+            switch ( configTypeEnum )
+            {
+                case YAML:
+                {
                     parser = new XmlParser( content );
                     break;
                 }
-                case PROPERTIES: {
+                case PROPERTIES:
+                {
                     parser = new IniParser( content );
                     break;
                 }
-                case XML: {
+                case XML:
+                {
                     parser = new XmlParser( content );
                     break;
                 }
-                case PLAIN: {
+                case PLAIN:
+                {
                     parser = new PlainParser( content );
                     break;
                 }
-                case SH: {
+                case SH:
+                {
                     parser = new ShellParser( content );
                     break;
                 }
                 default:
                     break;
             }
-            if ( parser != null ) {
+            if ( parser != null )
+            {
                 return parser.parserConfig( configPathFilename, configTypeEnum );
             }
         }
-        catch ( ConfigurationException e ) {
+        catch ( ConfigurationException e )
+        {
             LOG.info( e.getMessage() );
         }
         return null;

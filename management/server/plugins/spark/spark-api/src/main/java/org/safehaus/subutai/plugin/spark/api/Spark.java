@@ -78,7 +78,6 @@ public interface Spark extends ApiBase<SparkClusterConfig>
      */
     public UUID checkMasterNode( String clusterName, String lxcHostName );
 
-
     /**
      * Checks status of the specified node
      *

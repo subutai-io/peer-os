@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
@@ -118,18 +117,9 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
 
         po.addLog( "Saving cluster information to database..." );
 
-        try
-        {
-            elasticsearchManager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase(),
-                    config.getClusterName(), config );
-            po.addLog( "Cluster information saved to database" );
-        }
-        catch ( DBException e )
-        {
-            throw new ClusterSetupException(
-                    String.format( "Failed to save cluster information to database, %s", e.getMessage() ) );
-        }
-
+        elasticsearchManager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase(),
+                config.getClusterName(), config );
+        po.addLog( "Cluster information saved to database" );
 
         return config;
     }

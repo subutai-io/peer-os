@@ -49,7 +49,6 @@ public class Manager
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private final String COORDINATOR_PREFIX = "Coordinator: ";
-    private PrestoClusterConfig config;
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final String message = "No cluster is installed !";
     private final ExecutorService executorService;
@@ -58,6 +57,7 @@ public class Manager
     private final Tracker tracker;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
+    private PrestoClusterConfig config;
 
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
@@ -329,7 +329,6 @@ public class Manager
         for ( final Agent agent : workers )
         {
             final Label resultHolder = new Label();
-
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );

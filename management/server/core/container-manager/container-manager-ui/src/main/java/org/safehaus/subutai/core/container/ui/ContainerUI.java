@@ -15,58 +15,74 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class ContainerUI implements PortalModule {
-
-    protected static final Logger LOG = Logger.getLogger( ContainerUI.class.getName() );
+public class ContainerUI implements PortalModule
+{
 
     public static final String MODULE_IMAGE = "lxc.png";
     public static final String MODULE_NAME = "Container";
-    private ExecutorService executor;
+    protected static final Logger LOG = Logger.getLogger( ContainerUI.class.getName() );
     private final ServiceLocator serviceLocator;
+    private ExecutorService executor;
 
 
-    public ContainerUI()  {
+    public ContainerUI()
+    {
         this.serviceLocator = new ServiceLocator();
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newFixedThreadPool( 5 );
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( ContainerUI.MODULE_IMAGE, this );
     }
 
 
     @Override
-    public Component createComponent() {
-        try {
+    public Component createComponent()
+    {
+        try
+        {
             return new ContainerForm( executor, serviceLocator );
         }
-        catch ( NamingException e ) {
+        catch ( NamingException e )
+        {
             LOG.severe( e.getMessage() );
         }
 
         return null;
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return true;
     }
 }

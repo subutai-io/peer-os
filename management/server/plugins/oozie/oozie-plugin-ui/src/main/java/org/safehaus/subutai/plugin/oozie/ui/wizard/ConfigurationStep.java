@@ -26,14 +26,16 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends Panel
+{
 
     private final ComboBox hadoopClusters;
     private TextField oozieClusterName;
     //    private final TwinColSelect select;
 
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -53,8 +55,10 @@ public class ConfigurationStep extends Panel {
         hadoopClusters.setNullSelectionAllowed( false );
 
         List<HadoopClusterConfig> clusters = wizard.getOozieUI().getHadoopManager().getClusters();
-        if ( clusters.size() > 0 ) {
-            for ( HadoopClusterConfig config : clusters ) {
+        if ( clusters.size() > 0 )
+        {
+            for ( HadoopClusterConfig config : clusters )
+            {
                 hadoopClusters.addItem( config );
                 hadoopClusters.setItemCaption( config, config.getClusterName() );
             }
@@ -63,14 +67,17 @@ public class ConfigurationStep extends Panel {
         HadoopClusterConfig info =
                 wizard.getOozieUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
-        if ( info != null ) {
+        if ( info != null )
+        {
             hadoopClusters.setValue( info );
         }
-        else if ( clusters.size() > 0 ) {
+        else if ( clusters.size() > 0 )
+        {
             hadoopClusters.setValue( clusters.iterator().next() );
         }
 
-        if ( hadoopClusters.getValue() != null ) {
+        if ( hadoopClusters.getValue() != null )
+        {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClusters.getValue();
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
             //            hadoopInfo.getAllNodes();
@@ -82,10 +89,13 @@ public class ConfigurationStep extends Panel {
             //            select.setContainerDataSource( new BeanItemContainer<>( String.class, hadoopNodes ) );
         }
 
-        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener() {
+        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     //                    select.setValue( null );
                     //                    Set<String> hadoopNodes = new HashSet<String>();
@@ -129,18 +139,23 @@ public class ConfigurationStep extends Panel {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 //                wizard.getConfig().setHadoopNodes( ( Set<String> ) select.getValue() );
 
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                {
                     show( "Please, select Hadoop cluster" );
                 }
-                else if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) ) {
+                else if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) )
+                {
                     show( "Please, provide oozie cluster name" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -148,9 +163,11 @@ public class ConfigurationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -172,7 +189,8 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

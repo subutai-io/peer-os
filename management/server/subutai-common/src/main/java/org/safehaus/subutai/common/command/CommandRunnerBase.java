@@ -9,7 +9,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by dilshat on 9/15/14.
  */
-public interface CommandRunnerBase {
+public interface CommandRunnerBase
+{
 
     /**
      * Runs command on agents. Runs asynchronously for calling party. The supplied callback is triggered every time a

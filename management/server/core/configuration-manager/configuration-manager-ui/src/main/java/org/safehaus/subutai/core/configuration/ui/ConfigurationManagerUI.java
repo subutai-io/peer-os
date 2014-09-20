@@ -12,7 +12,8 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class ConfigurationManagerUI implements PortalModule {
+public class ConfigurationManagerUI implements PortalModule
+{
 
     public final String MODULE_IMAGE = "config.png";
     public final String MODULE_NAME = "Configuration";
@@ -21,7 +22,8 @@ public class ConfigurationManagerUI implements PortalModule {
     //    private AgentManager agentManager;
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
@@ -31,47 +33,62 @@ public class ConfigurationManagerUI implements PortalModule {
     //    }
 
 
-    public ConfigManager getConfigManager() {
+    public ConfigManager getConfigManager()
+    {
         return configManager;
     }
 
 
-    public void setConfigManager( final ConfigManager configManager ) {
+    public void setConfigManager( final ConfigManager configManager )
+    {
         this.configManager = configManager;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         this.configManager = null;
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( MODULE_IMAGE, this );
     }
 
 
     @Override
-    public Component createComponent() {
+    public Component createComponent()
+    {
         return new ConfigurationManagerForm( configManager );
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return true;
     }
 }

@@ -1,8 +1,9 @@
 package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
-import com.datastax.driver.core.Cluster;
-import com.google.common.collect.Sets;
+import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
@@ -10,7 +11,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -19,19 +19,21 @@ import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperStandaloneSetupStrategy;
 
-import java.util.Set;
-import java.util.UUID;
+import com.google.common.collect.Sets;
 
 
 /**
  * Adds a node to ZK cluster. Install over a newly created lxc or over an existing hadoop cluster node
  */
-public class AddNodeOperationHandler  extends AbstractOperationHandler<ZookeeperImpl> {
+public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl>
+{
 
     private String lxcHostname;
     private ClusterConfiguration clusterConfiguration;
 
-    public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName ) {
+
+    public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName )
+    {
         super( manager, clusterName );
         clusterConfiguration = new ClusterConfiguration( manager, productOperation );
         productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
@@ -39,7 +41,8 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
     }
 
 
-    public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName, String lxcHostname ) {
+    public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName, String lxcHostname )
+    {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         clusterConfiguration = new ClusterConfiguration( manager, productOperation );
@@ -49,36 +52,44 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
 
 
     @Override
-    public UUID getTrackerId() {
+    public UUID getTrackerId()
+    {
         return productOperation.getId();
     }
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         final ZookeeperClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        if ( config == null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        if ( config.getSetupType() == SetupType.STANDALONE ) {
+        if ( config.getSetupType() == SetupType.STANDALONE )
+        {
             addStandalone( config );
         }
-        else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
             addOverHadoop( config );
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             addWithHadoop( config );
         }
     }
 
 
-    private void addWithHadoop( final ZookeeperClusterConfig config ) {
+    private void addWithHadoop( final ZookeeperClusterConfig config )
+    {
 
         //check if node agent is connected
         Agent lxcAgent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( lxcAgent == null ) {
+        if ( lxcAgent == null )
+        {
             productOperation.addLogFailed( String.format( "Node %s is not connected", lxcHostname ) );
             return;
         }
@@ -89,7 +100,8 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
-        if ( !checkInstalledCommand.hasCompleted() ) {
+        if ( !checkInstalledCommand.hasCompleted() )
+        {
             productOperation.addLogFailed( "Failed to check presence of installed subutai packages" );
             return;
         }
@@ -99,29 +111,36 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
         boolean hasZkInstalled =
                 result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME );
 
-        if ( hasZkInstalled ) {
+        if ( hasZkInstalled )
+        {
             productOperation.addLog( "Checking prerequisites..." );
 
-            if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
+            if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+            {
                 productOperation.addLogFailed( String.format( "Node %s has no Hadoop installed", lxcHostname ) );
                 return;
             }
 
-            if ( config.getNodes().contains( lxcAgent ) ) {
-                productOperation.addLogFailed( String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname,
-                        clusterName ) );
+            if ( config.getNodes().contains( lxcAgent ) )
+            {
+                productOperation.addLogFailed(
+                        String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname,
+                                clusterName ) );
                 return;
             }
 
             HadoopClusterConfig hadoopClusterConfig =
                     manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
 
-            if ( hadoopClusterConfig == null ) {
-                productOperation.addLogFailed( String.format( "Hadoop cluster %s not found", config.getHadoopClusterName() ) );
+            if ( hadoopClusterConfig == null )
+            {
+                productOperation
+                        .addLogFailed( String.format( "Hadoop cluster %s not found", config.getHadoopClusterName() ) );
                 return;
             }
 
-            if ( !hadoopClusterConfig.getAllNodes().contains( lxcAgent ) ) {
+            if ( !hadoopClusterConfig.getAllNodes().contains( lxcAgent ) )
+            {
                 productOperation.addLogFailed( String.format( "Specified node does not belong to Hadoop cluster %s",
                         config.getHadoopClusterName() ) );
                 return;
@@ -130,10 +149,12 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             config.getNodes().add( lxcAgent );
             config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
 
-            try {
+            try
+            {
                 new ClusterConfiguration( manager, productOperation ).configureCluster( config );
             }
-            catch ( ClusterConfigurationException e ) {
+            catch ( ClusterConfigurationException e )
+            {
                 productOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
                 return;
             }
@@ -141,31 +162,29 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             //update db
             productOperation.addLog( "Updating cluster information in database..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                productOperation.addLogDone( "Cluster information updated in database" );
-            }
-            catch ( DBException e ) {
-                productOperation.addLogFailed(
-                        String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLogDone( "Cluster information updated in database" );
         }
-        else {
+        else
+        {
             addOverHadoop( config );
         }
     }
 
 
-    private void addOverHadoop( final ZookeeperClusterConfig config ) {
+    private void addOverHadoop( final ZookeeperClusterConfig config )
+    {
 
         //check if node agent is connected
         Agent lxcAgent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( lxcAgent == null ) {
+        if ( lxcAgent == null )
+        {
             productOperation.addLogFailed( String.format( "Node %s is not connected", lxcHostname ) );
             return;
         }
 
-        if ( config.getNodes().contains( lxcAgent ) ) {
+        if ( config.getNodes().contains( lxcAgent ) )
+        {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
             return;
@@ -174,12 +193,15 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
         HadoopClusterConfig hadoopClusterConfig =
                 manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
 
-        if ( hadoopClusterConfig == null ) {
-            productOperation.addLogFailed( String.format( "Hadoop cluster %s not found", config.getHadoopClusterName() ) );
+        if ( hadoopClusterConfig == null )
+        {
+            productOperation
+                    .addLogFailed( String.format( "Hadoop cluster %s not found", config.getHadoopClusterName() ) );
             return;
         }
 
-        if ( !hadoopClusterConfig.getAllNodes().contains( lxcAgent ) ) {
+        if ( !hadoopClusterConfig.getAllNodes().contains( lxcAgent ) )
+        {
             productOperation.addLogFailed( String.format( "Specified node does not belong to Hadoop cluster %s",
                     config.getHadoopClusterName() ) );
             return;
@@ -191,18 +213,21 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
-        if ( !checkInstalledCommand.hasCompleted() ) {
+        if ( !checkInstalledCommand.hasCompleted() )
+        {
             productOperation.addLogFailed( "Failed to check presence of installed subutai packages" );
             return;
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
 
-        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) ) {
+        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
+        {
             productOperation.addLogFailed( String.format( "Node %s already has Zookeeper installed", lxcHostname ) );
             return;
         }
-        else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
+        else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+        {
             productOperation.addLogFailed( String.format( "Node %s has no Hadoop installed", lxcHostname ) );
             return;
         }
@@ -217,13 +242,16 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
         Command installCommand = Commands.getInstallCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( installCommand );
 
-        if ( installCommand.hasCompleted() ) {
+        if ( installCommand.hasCompleted() )
+        {
             productOperation.addLog( "Installation succeeded\nReconfiguring cluster..." );
 
-            try {
+            try
+            {
                 new ClusterConfiguration( manager, productOperation ).configureCluster( config );
             }
-            catch ( ClusterConfigurationException e ) {
+            catch ( ClusterConfigurationException e )
+            {
                 productOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
                 return;
             }
@@ -231,24 +259,21 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             //update db
             productOperation.addLog( "Updating cluster information in database..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                productOperation.addLogDone( "Cluster information updated in database" );
-            }
-            catch ( DBException e ) {
-                productOperation.addLogFailed(
-                        String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLogDone( "Cluster information updated in database" );
         }
-        else {
+        else
+        {
             productOperation.addLogFailed( String.format( "Installation failed, %s\nUse Terminal Module to cleanup",
                     installCommand.getAllErrors() ) );
         }
     }
 
 
-    private void addStandalone( final ZookeeperClusterConfig config ) {
-        try {
+    private void addStandalone( final ZookeeperClusterConfig config )
+    {
+        try
+        {
 
             //create lxc
             productOperation.addLog( "Creating lxc container..." );
@@ -264,11 +289,13 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
 
             //reconfigure cluster
-            try {
+            try
+            {
                 getClusterConfiguration().configureCluster( config );
-//                new ClusterConfiguration( manager, productOperation ).configureCluster( config );
+                //                new ClusterConfiguration( manager, productOperation ).configureCluster( config );
             }
-            catch ( ClusterConfigurationException e ) {
+            catch ( ClusterConfigurationException e )
+            {
                 productOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
                 return;
             }
@@ -276,25 +303,24 @@ public class AddNodeOperationHandler  extends AbstractOperationHandler<Zookeeper
             //update db
             productOperation.addLog( "Updating cluster information in database..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                productOperation.addLogDone( "Cluster information updated in database" );
-            }
-            catch ( DBException e ) {
-                productOperation.addLogFailed(
-                        String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
-            }
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLogDone( "Cluster information updated in database" );
         }
-        catch ( LxcCreateException ex ) {
+        catch ( LxcCreateException ex )
+        {
             productOperation.addLogFailed( ex.getMessage() );
         }
     }
 
-    public ClusterConfiguration getClusterConfiguration() {
+
+    public ClusterConfiguration getClusterConfiguration()
+    {
         return clusterConfiguration;
     }
 
-    public void setClusterConfiguration( ClusterConfiguration clusterConfiguration ) {
+
+    public void setClusterConfiguration( ClusterConfiguration clusterConfiguration )
+    {
         this.clusterConfiguration = clusterConfiguration;
     }
 }

@@ -5,7 +5,6 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -77,15 +76,8 @@ public class SetupStrategyWithHadoop extends SetupBase implements ClusterSetupSt
         checkConnected();
 
         po.addLog( "Saving cluster info..." );
-        try
-        {
-            manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster info saved to DB" );
-        }
-        catch ( DBException e )
-        {
-            throw new ClusterSetupException( "Failed to save cluster info: " + e.getMessage() );
-        }
+        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster info saved to DB" );
 
         SetupHelper helper = new SetupHelper( manager, config, po );
         helper.configureMasterIP( config.getSlaveNodes() );

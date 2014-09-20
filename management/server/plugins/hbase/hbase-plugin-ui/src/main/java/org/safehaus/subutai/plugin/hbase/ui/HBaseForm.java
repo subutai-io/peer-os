@@ -17,13 +17,15 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class HBaseForm extends CustomComponent {
+public class HBaseForm extends CustomComponent
+{
 
     private final Wizard wizard;
     private final Manager manager;
 
 
-    public HBaseForm(HBaseUI hBaseUI) {
+    public HBaseForm( HBaseUI hBaseUI )
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -32,8 +34,8 @@ public class HBaseForm extends CustomComponent {
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        manager = new Manager(hBaseUI);
-        wizard = new Wizard(hBaseUI);
+        manager = new Manager( hBaseUI );
+        wizard = new Wizard( hBaseUI );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
 

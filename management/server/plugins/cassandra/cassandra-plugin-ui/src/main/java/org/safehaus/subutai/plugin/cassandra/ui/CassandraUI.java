@@ -88,4 +88,11 @@ public class CassandraUI implements PortalModule
         }
         return null;
     }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return null;
+    }
 }

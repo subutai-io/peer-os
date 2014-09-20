@@ -60,7 +60,6 @@ public class StartTask implements Runnable
             {
                 break;
             }
-
             if ( System.currentTimeMillis() - start > 60 * 1000 )
             {
                 break;

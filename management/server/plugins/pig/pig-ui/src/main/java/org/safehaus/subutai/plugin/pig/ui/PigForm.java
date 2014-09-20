@@ -14,9 +14,11 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class PigForm extends CustomComponent {
+public class PigForm extends CustomComponent
+{
 
-    public PigForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public PigForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

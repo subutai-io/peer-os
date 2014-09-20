@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
@@ -137,15 +136,8 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
                 po.addLog( "Updating db..." );
                 //update db
-                try
-                {
-                    manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, clusterName, config );
-                    po.addLogDone( "Cluster info updated in DB\nDone" );
-                }
-                catch ( DBException e )
-                {
-                    po.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
-                }
+                manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, clusterName, config );
+                po.addLogDone( "Cluster info updated in DB\nDone" );
             }
             else
             {

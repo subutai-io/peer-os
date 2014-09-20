@@ -44,9 +44,6 @@ public class Manager
 {
 
     private final Table nodesTable;
-    private GridLayout contentRoot;
-    private ComboBox clusterCombo;
-    private ElasticsearchClusterConfiguration config;
     private static final String message = "No cluster is installed !";
     private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
@@ -56,6 +53,9 @@ public class Manager
     private final AgentManager agentManager;
     private final Elasticsearch elasticsearch;
     private final CommandRunner commandRunner;
+    private GridLayout contentRoot;
+    private ComboBox clusterCombo;
+    private ElasticsearchClusterConfiguration config;
 
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";

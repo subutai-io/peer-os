@@ -22,12 +22,12 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.api.helper.LxcBuildMessage;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
@@ -37,13 +37,13 @@ import com.google.gson.JsonSyntaxException;
 /**
  * This is an implementation of EnvironmentManager
  */
-public class EnvironmentManagerImpl implements EnvironmentManager {
+public class EnvironmentManagerImpl implements EnvironmentManager
+{
 
-    private final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
-
-    private String ENVIRONMENT = "ENVIRONMENT";
-    private String BLUEPRINT = "BLUEPRINT";
-
+    private static final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
+    private static final String ENVIRONMENT = "ENVIRONMENT";
+    private static final String PROCESS = "PROCESS";
+    private static final String BLUEPRINT = "BLUEPRINT";
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;
@@ -55,28 +55,33 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private PeerManager peerManager;
 
 
-    public EnvironmentManagerImpl() {
+    public EnvironmentManagerImpl()
+    {
     }
 
 
-    public PeerManager getPeerManager() {
+    public PeerManager getPeerManager()
+    {
         return peerManager;
     }
 
 
-    public void setPeerManager( final PeerManager peerManager ) {
+    public void setPeerManager( final PeerManager peerManager )
+    {
         this.peerManager = peerManager;
     }
 
 
-    public void init() {
+    public void init()
+    {
         this.blueprintParser = new BlueprintParser();
         this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         this.environmentDAO = null;
         this.environmentBuilder = null;
         this.blueprintParser = null;
@@ -89,87 +94,104 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public EnvironmentDAO getEnvironmentDAO() {
+    public EnvironmentDAO getEnvironmentDAO()
+    {
         return environmentDAO;
     }
 
 
-    public void setEnvironmentDAO( final EnvironmentDAO environmentDAO ) {
+    public void setEnvironmentDAO( final EnvironmentDAO environmentDAO )
+    {
         this.environmentDAO = environmentDAO;
     }
 
 
-    public EnvironmentBuilder getEnvironmentBuilder() {
+    public EnvironmentBuilder getEnvironmentBuilder()
+    {
         return environmentBuilder;
     }
 
 
-    public void setEnvironmentBuilder( final EnvironmentBuilder environmentBuilder ) {
+    public void setEnvironmentBuilder( final EnvironmentBuilder environmentBuilder )
+    {
         this.environmentBuilder = environmentBuilder;
     }
 
 
-    public BlueprintParser getBlueprintParser() {
+    public BlueprintParser getBlueprintParser()
+    {
         return blueprintParser;
     }
 
 
-    public void setBlueprintParser( final BlueprintParser blueprintParser ) {
+    public void setBlueprintParser( final BlueprintParser blueprintParser )
+    {
         this.blueprintParser = blueprintParser;
     }
 
 
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void setContainerManager( final ContainerManager containerManager ) {
+    public void setContainerManager( final ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
 
-    public TemplateRegistryManager getTemplateRegistryManager() {
+    public TemplateRegistryManager getTemplateRegistryManager()
+    {
         return templateRegistryManager;
     }
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager ) {
+    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager )
+    {
         this.templateRegistryManager = templateRegistryManager;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public NetworkManager getNetworkManager() {
+    public NetworkManager getNetworkManager()
+    {
         return networkManager;
     }
 
 
-    public void setNetworkManager( final NetworkManager networkManager ) {
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
         this.networkManager = networkManager;
     }
 
 
-    public DbManager getDbManager() {
+    public DbManager getDbManager()
+    {
         return dbManager;
     }
 
 
-    public void setDbManager( final DbManager dbManager ) {
+    public void setDbManager( final DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
-    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask ) {
+    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
+    {
         LOG.info( "saved to " );
         //        return build( environmentBuildTask );
         //TODO build environment in background
@@ -181,26 +203,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public Environment buildEnvironmentAndReturn( final EnvironmentBuildTask environmentBuildTask )
-            throws EnvironmentBuildException {
+            throws EnvironmentBuildException
+    {
 
         return environmentBuilder.build( environmentBuildTask, containerManager );
     }
 
 
     @Override
-    public List<Environment> getEnvironments() {
+    public List<Environment> getEnvironments()
+    {
         return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
     @Override
-    public Environment getEnvironmentInfo( final String uuid ) {
+    public Environment getEnvironmentInfo( final String uuid )
+    {
         return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
 
 
     @Override
-    public boolean destroyEnvironment( final String uuid ) {
+    public boolean destroyEnvironment( final String uuid )
+    {
         Environment environment = getEnvironmentInfo( uuid );
         try
         {
@@ -216,7 +242,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public boolean saveBlueprint( String blueprintStr ) {
+    public boolean saveBlueprint( String blueprintStr )
+    {
         try
         {
             EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
@@ -236,69 +263,75 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public List<EnvironmentBuildTask> getBlueprints() {
+    public List<EnvironmentBuildTask> getBlueprints()
+    {
         return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
     }
 
 
     @Override
-    public boolean deleteBlueprint( String uuid ) {
+    public boolean deleteBlueprint( String uuid )
+    {
         return environmentDAO.deleteInfo( BLUEPRINT, uuid );
     }
 
 
     @Override
-    public String parseBlueprint( final EnvironmentBlueprint blueprint ) {
+    public String parseBlueprint( final EnvironmentBlueprint blueprint )
+    {
         return blueprintParser.parseEnvironmentBlueprint( blueprint );
     }
 
 
     @Override
-    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress ) {
-        return environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
+    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress )
+    {
+        return environmentDAO.saveInfo( PROCESS, buildProgress.getUuid().toString(), buildProgress );
     }
 
 
     @Override
-    public List<EnvironmentBuildProcess> getBuildProcesses() {
-        return environmentDAO.getInfo( "PROCESS", EnvironmentBuildProcess.class );
+    public List<EnvironmentBuildProcess> getBuildProcesses()
+    {
+        return environmentDAO.getInfo( PROCESS, EnvironmentBuildProcess.class );
     }
 
 
     @Override
-    public void createContainers( final LxcBuildMessage lxcBuildMessage ) {
-        //        UUID uuid = lxcBuildMessage.getEnvironmentId();
-        //        String templateName = lxcBuildMessage.getTemplateName();
-        //        int numberOfContainers = lxcBuildMessage.getNumberOfContainers();
-        //        String strategyName = lxcBuildMessage.getStrategyName();
-        //        this.containerManager.clone( uuid, templateName, numberOfContainers, strategyName );
-    }
-
-
-    @Override
-    public void saveEnvironment( final Environment environment ) {
+    public void saveEnvironment( final Environment environment )
+    {
         environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
     }
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess ) {
+    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    {
         for ( ContainerBuildMessage cbm : environmentBuildProcess.getContainerBuildMessages() )
         {
-            LOG.info( "Sending build message to" + cbm.getTargetPeerId() );
 
-            Set<Agent> agents = peerManager
-                    .createContainers( cbm.getEnvironmentUuid(), cbm.getTemplateName(), cbm.getNumberOfContainers(),
-                            cbm.getStrategy(), cbm.getCriteria() );
-            for ( Agent agent : agents )
-            {
-                LOG.info( agent.getUuid().toString() );
-            }
+            CreateContainersMessage ccm = new CreateContainersMessage();
+            ccm.setTemplate( cbm.getTemplateName() );
+            ccm.setTargetPeerId( cbm.getTargetPeerId() );
+            ccm.setNumberOfNodes( cbm.getNumberOfContainers() );
+            ccm.setEnvId( cbm.getEnvironmentUuid() );
+            ccm.setStrategy( cbm.getStrategy() );
+            ccm.setCriteria( cbm.getCriteria() );
+
+            Set<Agent> agents = peerManager.createContainers( ccm );
         }
     }
 
 
-    private boolean build( EnvironmentBuildTask environmentBuildTask ) {
+    @Override
+    public void deleteBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+        environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getUuid().toString() );
+    }
+
+
+    private boolean build( EnvironmentBuildTask environmentBuildTask )
+    {
 
         if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
                 .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) )

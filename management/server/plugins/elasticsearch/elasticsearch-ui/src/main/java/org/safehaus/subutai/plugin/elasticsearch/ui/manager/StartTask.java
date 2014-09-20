@@ -49,7 +49,6 @@ public class StartTask implements Runnable
                     break;
                 }
             }
-
             try
             {
                 Thread.sleep( 1000 );

@@ -24,57 +24,71 @@ import com.vaadin.ui.Component;
 /**
  * @author dilshat
  */
-public class SolrUI implements PortalModule {
-    protected static final Logger LOG = Logger.getLogger( SolrUI.class.getName() );
-
+public class SolrUI implements PortalModule
+{
     public static final String MODULE_IMAGE = "solr.png";
-
-
-    private ExecutorService executor;
+    protected static final Logger LOG = Logger.getLogger( SolrUI.class.getName() );
     private final ServiceLocator serviceLocator;
+    private ExecutorService executor;
 
 
-    public SolrUI() {
+    public SolrUI()
+    {
         serviceLocator = new ServiceLocator();
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
 
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return SolrClusterConfig.PRODUCT_KEY;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return SolrClusterConfig.PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( SolrUI.MODULE_IMAGE, this );
     }
 
 
-    public Component createComponent() {
-        try {
+    public Component createComponent()
+    {
+        try
+        {
             return new SolrForm( executor, serviceLocator );
         }
-        catch ( NamingException e ) {
+        catch ( NamingException e )
+        {
             LOG.severe( e.getMessage() );
         }
 
         return null;
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return false;
     }
 }

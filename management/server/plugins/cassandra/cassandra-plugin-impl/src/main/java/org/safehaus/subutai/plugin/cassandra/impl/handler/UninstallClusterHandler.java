@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 
@@ -47,15 +46,7 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
 
         productOperation.addLog( "Deleting cluster information from database.." );
 
-        try
-        {
-            manager.getPluginDAO().deleteInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
-            productOperation.addLogDone( "Cluster info deleted from database" );
-        }
-        catch ( DBException e )
-        {
-            productOperation.addLogFailed(
-                    String.format( "Error while deleting cluster info from database, %s", e.getMessage() ) );
-        }
+        manager.getPluginDAO().deleteInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
+        productOperation.addLogDone( "Cluster info deleted from database" );
     }
 }

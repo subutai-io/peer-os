@@ -6,28 +6,56 @@ import java.util.Set;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
  * Created by timur on 9/13/14.
  */
-public interface Container {
+public interface Container
+{
 
     /**
      * Execute command
      */
     public void execute( Command command );
 
+    /**
+     * Execute command
+     */
     public void execute( RequestBuilder requestBuilder ) throws CommandException;
 
+    /**
+     * Starts LXC container
+     *
+     * @return true if LXC container started successfully.
+     */
     public boolean start();
 
+    /**
+     * Stops LXC container
+     *
+     * @return true if LXC container stopped successfully.
+     */
     public boolean stop();
 
+    /**
+     * Checks state of container
+     *
+     * @return true, if the container is alive
+     */
     public boolean isConnected();
 
+    /**
+     * Returns state of container
+     */
     public ContainerState getContainerState();
 
+    /**
+     * Returns type of container.
+     *
+     * @return ContainerType.PHYSICAL or ContainerType.LOGICAL
+     */
     public ContainerType getContainerType();
 
     /**
@@ -35,7 +63,13 @@ public interface Container {
      */
     public void destroy() throws ContainerDestroyException;
 
+    /**
+     * Returns set of logical containers
+     */
     public Set<Container> getLogicalContainers();
 
-    org.safehaus.subutai.common.protocol.Agent getAgent();
+    /**
+     * Returns Agent
+     */
+    Agent getAgent();
 }

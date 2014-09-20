@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
@@ -36,15 +35,8 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
     public void run()
     {
         CassandraClusterConfig config = null;
-        try
-        {
-            config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName,
-                    CassandraClusterConfig.class );
-        }
-        catch ( DBException e )
-        {
-            LOG.info( e.getMessage() );
-        }
+        config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName,
+                CassandraClusterConfig.class );
 
         if ( config == null )
         {

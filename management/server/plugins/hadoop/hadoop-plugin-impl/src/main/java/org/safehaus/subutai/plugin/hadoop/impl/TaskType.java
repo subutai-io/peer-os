@@ -5,10 +5,12 @@
  */
 package org.safehaus.subutai.plugin.hadoop.impl;
 
+
 /**
  * @author dilshat
  */
-public enum TaskType {
+public enum TaskType
+{
 
-	INSTALL, CONFIGURE, UNINSTALL, START, STOP, STATUS
+    INSTALL, CONFIGURE, UNINSTALL, START, STOP, STATUS
 }

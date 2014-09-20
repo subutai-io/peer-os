@@ -1,11 +1,12 @@
 package org.safehaus.subutai.common.util;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 /**
@@ -38,5 +39,12 @@ public class JsonUtil
     {
 
         return GSON.fromJson( value, clazz );
+    }
+
+
+    public static <T> T fromJson( String value, Type type )
+    {
+
+        return GSON.fromJson( value, type );
     }
 }

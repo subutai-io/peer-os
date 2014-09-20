@@ -20,10 +20,9 @@ public class ElasticsearchUI implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "logo.jpeg";
-    protected Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
-
-    private ExecutorService executor;
     private final ServiceLocator serviceLocator;
+    protected Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
+    private ExecutorService executor;
 
 
     public ElasticsearchUI()
@@ -76,5 +75,12 @@ public class ElasticsearchUI implements PortalModule
             ;
         }
         return null;
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return false;
     }
 }

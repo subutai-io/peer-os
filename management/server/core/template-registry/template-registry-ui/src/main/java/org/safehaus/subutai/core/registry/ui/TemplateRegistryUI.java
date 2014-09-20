@@ -11,7 +11,8 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class TemplateRegistryUI implements PortalModule {
+public class TemplateRegistryUI implements PortalModule
+{
 
     public static final String MODULE_IMAGE = "tree.png";
     public static final String MODULE_NAME = "Registry";
@@ -19,46 +20,61 @@ public class TemplateRegistryUI implements PortalModule {
     private TemplateRegistryManager registryManager;
 
 
-    public void setAgentManager( AgentManager agentManager ) {
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public void setRegistryManager( final TemplateRegistryManager registryManager ) {
+    public void setRegistryManager( final TemplateRegistryManager registryManager )
+    {
         this.registryManager = registryManager;
     }
 
 
-    public void init() {
+    public void init()
+    {
 
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
 
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return MODULE_NAME;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( MODULE_IMAGE, this );
     }
 
 
     @Override
-    public Component createComponent() {
+    public Component createComponent()
+    {
         return new TemplateRegistryForm( agentManager, registryManager );
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return true;
     }
 }

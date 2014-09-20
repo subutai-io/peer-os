@@ -36,7 +36,6 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
     @Override
     public void run()
     {
-
         CassandraClusterConfig cassandraClusterConfig = manager.getCluster( clusterName );
         if ( cassandraClusterConfig == null )
         {

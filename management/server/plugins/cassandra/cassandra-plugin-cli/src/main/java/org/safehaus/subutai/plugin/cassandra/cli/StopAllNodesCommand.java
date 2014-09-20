@@ -22,11 +22,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 public class StopAllNodesCommand extends OsgiCommandSupport
 {
 
-    private Cassandra cassandraManager;
-    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
 
 
     public Cassandra getCassandraManager()

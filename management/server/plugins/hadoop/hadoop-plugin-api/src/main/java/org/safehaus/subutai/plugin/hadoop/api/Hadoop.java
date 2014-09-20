@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.hadoop.api;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
@@ -9,49 +11,48 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
-import java.util.UUID;
+
+public interface Hadoop extends ApiBase<HadoopClusterConfig>
+{
 
 
-public interface Hadoop extends ApiBase<HadoopClusterConfig> {
+    public UUID startNameNode( HadoopClusterConfig hadoopClusterConfig );
 
+    public UUID stopNameNode( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID startNameNode(HadoopClusterConfig hadoopClusterConfig);
+    public UUID restartNameNode( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID stopNameNode(HadoopClusterConfig hadoopClusterConfig);
+    public UUID statusNameNode( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID restartNameNode(HadoopClusterConfig hadoopClusterConfig);
+    public UUID statusSecondaryNameNode( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID statusNameNode(HadoopClusterConfig hadoopClusterConfig);
+    public UUID statusDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
-    public UUID statusSecondaryNameNode(HadoopClusterConfig hadoopClusterConfig);
+    public UUID startJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID statusDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent);
+    public UUID stopJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID startJobTracker(HadoopClusterConfig hadoopClusterConfig);
+    public UUID restartJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID stopJobTracker(HadoopClusterConfig hadoopClusterConfig);
+    public UUID statusJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID restartJobTracker(HadoopClusterConfig hadoopClusterConfig);
+    public UUID statusTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
-    public UUID statusJobTracker(HadoopClusterConfig hadoopClusterConfig);
+    public UUID addNode( String clusterName );
 
-    public UUID statusTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent);
+    public UUID blockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
-    public UUID addNode(String clusterName);
+    public UUID blockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
-    public UUID blockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent);
+    public UUID unblockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
-    public UUID blockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent);
+    public UUID unblockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
-    public UUID unblockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent);
+    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, HadoopClusterConfig hadoopClusterConfig );
 
-    public UUID unblockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent);
+    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, HadoopClusterConfig hadoopClusterConfig,
+                                                         Environment environment );
 
-    public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, HadoopClusterConfig hadoopClusterConfig);
-
-    public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, HadoopClusterConfig hadoopClusterConfig,
-                                                        Environment environment);
-
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(final HadoopClusterConfig config)
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
             throws ClusterSetupException;
 }

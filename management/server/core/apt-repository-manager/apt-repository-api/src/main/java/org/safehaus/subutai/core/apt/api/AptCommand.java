@@ -4,7 +4,8 @@ package org.safehaus.subutai.core.apt.api;
 /**
  * Enumeration for apt commands
  */
-public enum AptCommand {
+public enum AptCommand
+{
     LIST_PACKAGES( "list packages" ),
     ADD_PACKAGE( "add package" ),
     REMOVE_PACKAGE( "remove package" ),
@@ -14,7 +15,8 @@ public enum AptCommand {
     private String command;
 
 
-    private AptCommand( final String command ) {
+    private AptCommand( final String command )
+    {
         this.command = command;
     }
 
@@ -22,7 +24,8 @@ public enum AptCommand {
     /**
      * Returns corresponding to this enum apt command
      */
-    public String getCommand() {
+    public String getCommand()
+    {
         return command;
     }
 }

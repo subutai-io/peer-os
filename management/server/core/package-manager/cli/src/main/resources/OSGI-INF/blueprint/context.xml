@@ -1,38 +1,38 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="packageManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.packge.api.PackageManager"/>
+  <reference id="packageManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.packge.api.PackageManager" />
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="deb-package/delete">
-            <action class="org.safehaus.subutai.core.packge.cli.DeletePackagesInfo">
-                <property name="packageManager" ref="packageManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="deb-package/delete">
+      <action class="org.safehaus.subutai.core.packge.cli.DeletePackagesInfo">
+        <property name="packageManager" ref="packageManager" />
+      </action>
+    </command>
+  </command-bundle>
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="deb-package/find">
-            <action class="org.safehaus.subutai.core.packge.cli.FindPackagesInfo">
-                <property name="packageManager" ref="packageManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="deb-package/find">
+      <action class="org.safehaus.subutai.core.packge.cli.FindPackagesInfo">
+        <property name="packageManager" ref="packageManager" />
+      </action>
+    </command>
+  </command-bundle>
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="deb-package/list">
-            <action class="org.safehaus.subutai.core.packge.cli.ListPackages">
-                <property name="packageManager" ref="packageManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="deb-package/list">
+      <action class="org.safehaus.subutai.core.packge.cli.ListPackages">
+        <property name="packageManager" ref="packageManager" />
+      </action>
+    </command>
+  </command-bundle>
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="deb-package/save">
-            <action class="org.safehaus.subutai.core.packge.cli.SavePackagesInfo">
-                <property name="packageManager" ref="packageManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="deb-package/save">
+      <action class="org.safehaus.subutai.core.packge.cli.SavePackagesInfo">
+        <property name="packageManager" ref="packageManager" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>

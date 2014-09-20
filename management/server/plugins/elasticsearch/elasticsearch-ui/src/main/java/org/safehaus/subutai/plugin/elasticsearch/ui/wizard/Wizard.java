@@ -20,13 +20,12 @@ public class Wizard
 {
 
     private final VerticalLayout verticalLayout;
-    GridLayout grid;
-    private int step = 1;
-    private ElasticsearchClusterConfiguration config = new ElasticsearchClusterConfiguration();
-
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Elasticsearch elasticsearch;
+    GridLayout grid;
+    private int step = 1;
+    private ElasticsearchClusterConfiguration config = new ElasticsearchClusterConfiguration();
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException

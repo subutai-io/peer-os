@@ -48,7 +48,6 @@ public class Manager
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private SparkClusterConfig config;
     private final ExecutorService executor;
     private final Spark spark;
     private final Tracker tracker;
@@ -57,6 +56,7 @@ public class Manager
     private final CommandRunner commandRunner;
     private final String message = "No cluster is installed !";
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private SparkClusterConfig config;
 
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
@@ -152,7 +152,6 @@ public class Manager
         } );
         controlsContent.addComponent( refreshClustersBtn );
 
-
         /** Check All button */
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -187,24 +186,23 @@ public class Manager
                     disableOREnableAllTopButtons( false );
                     disableOREnableAllButtonsOnTable( nodesTable, false );
                     executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
-                                    config.getMasterNode().getHostname(), new CompleteEvent()
+                            config.getMasterNode().getHostname(), new CompleteEvent()
+                    {
+                        @Override
+                        public void onComplete( String result )
+                        {
+                            synchronized ( progressIcon )
                             {
-                                @Override
-                                public void onComplete( String result )
-                                {
-                                    synchronized ( progressIcon )
-                                    {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
-                                        checkAllNodesStatus();
-                                        disableOREnableAllTopButtons( true );
-                                    }
-                                }
-                            } ) );
+                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                checkAllNodesStatus();
+                                disableOREnableAllTopButtons( true );
+                            }
+                        }
+                    } ) );
                 }
             }
         } );
         controlsContent.addComponent( startAllNodesBtn );
-
 
         /** Stop all button */
         stopAllNodesBtn.addClickListener( new Button.ClickListener()
@@ -222,19 +220,19 @@ public class Manager
                     disableOREnableAllTopButtons( false );
                     disableOREnableAllButtonsOnTable( nodesTable, false );
                     executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
-                                    config.getMasterNode().getHostname(), new CompleteEvent()
+                            config.getMasterNode().getHostname(), new CompleteEvent()
+                    {
+                        @Override
+                        public void onComplete( String result )
+                        {
+                            synchronized ( progressIcon )
                             {
-                                @Override
-                                public void onComplete( String result )
-                                {
-                                    synchronized ( progressIcon )
-                                    {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
-                                        checkAllNodesStatus();
-                                        disableOREnableAllTopButtons( true );
-                                    }
-                                }
-                            } ) );
+                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                checkAllNodesStatus();
+                                disableOREnableAllTopButtons( true );
+                            }
+                        }
+                    } ) );
                 }
             }
         } );
@@ -578,30 +576,30 @@ public class Manager
                     destroyBtn.setEnabled( false );
 
                     executor.execute( new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
+                            new CompleteEvent()
+                            {
+                                @Override
+                                public void onComplete( String result )
+                                {
+                                    synchronized ( progressIcon )
                                     {
-                                        @Override
-                                        public void onComplete( String result )
+                                        resultHolder.setValue( result );
+                                        if ( result.contains( "NOT" ) )
                                         {
-                                            synchronized ( progressIcon )
-                                            {
-                                                resultHolder.setValue( result );
-                                                if ( result.contains( "NOT" ) )
-                                                {
-                                                    startBtn.setEnabled( true );
-                                                    stopBtn.setEnabled( false );
-                                                }
-                                                else
-                                                {
-                                                    startBtn.setEnabled( false );
-                                                    stopBtn.setEnabled( true );
-                                                }
-                                                progressIcon.setVisible( false );
-                                                destroyBtn.setEnabled( true );
-                                                checkBtn.setEnabled( true );
-                                            }
+                                            startBtn.setEnabled( true );
+                                            stopBtn.setEnabled( false );
                                         }
-                                    } ) );
+                                        else
+                                        {
+                                            startBtn.setEnabled( false );
+                                            stopBtn.setEnabled( true );
+                                        }
+                                        progressIcon.setVisible( false );
+                                        destroyBtn.setEnabled( true );
+                                        checkBtn.setEnabled( true );
+                                    }
+                                }
+                            } ) );
                 }
             } );
 
@@ -642,7 +640,6 @@ public class Manager
                     stopBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
                     checkBtn.setEnabled( false );
-
                     executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
                             new CompleteEvent()
                             {
@@ -657,7 +654,6 @@ public class Manager
                             } ) );
                 }
             } );
-
             destroyBtn.addClickListener( new Button.ClickListener()
             {
                 @Override

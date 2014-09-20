@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
+
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
@@ -8,8 +9,6 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.StopNodeOperationHandler;
 
 import static junit.framework.Assert.assertTrue;
@@ -18,18 +17,22 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class StopNodeOperationHandlerTest {
+
+public class StopNodeOperationHandlerTest
+{
     @Test
-    public void testWithoutCluster() {
+    public void testWithoutCluster()
+    {
         ZookeeperImpl zookeeperMock = mock( ZookeeperImpl.class );
         when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
         when( zookeeperMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
-        when( zookeeperMock.getCommandRunner() ).thenReturn( mock ( CommandRunner.class ) );
+        when( zookeeperMock.getCommandRunner() ).thenReturn( mock( CommandRunner.class ) );
         when( zookeeperMock.getTracker() ).thenReturn( new TrackerMock() );
         when( zookeeperMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
         when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
         when( zookeeperMock.getCluster( anyString() ) ).thenReturn( null );
-        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( zookeeperMock, "test-cluster", "test-node" );
+        AbstractOperationHandler operationHandler =
+                new StopNodeOperationHandler( zookeeperMock, "test-cluster", "test-node" );
         operationHandler.run();
 
         assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );

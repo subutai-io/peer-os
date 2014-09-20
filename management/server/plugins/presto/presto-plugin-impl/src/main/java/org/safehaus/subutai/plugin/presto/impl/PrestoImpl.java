@@ -1,14 +1,12 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.Presto;
@@ -73,29 +71,14 @@ public class PrestoImpl extends PrestoBase implements Presto
     @Override
     public List<PrestoClusterConfig> getClusters()
     {
-        try
-        {
-            return pluginDAO.getInfo( PrestoClusterConfig.PRODUCT_KEY, PrestoClusterConfig.class );
-        }
-        catch ( DBException e )
-        {
-            return Collections.emptyList();
-        }
+        return pluginDAO.getInfo( PrestoClusterConfig.PRODUCT_KEY, PrestoClusterConfig.class );
     }
 
 
     @Override
     public PrestoClusterConfig getCluster( String clusterName )
     {
-
-        try
-        {
-            return pluginDAO.getInfo( PrestoClusterConfig.PRODUCT_KEY, clusterName, PrestoClusterConfig.class );
-        }
-        catch ( DBException e )
-        {
-            return null;
-        }
+        return pluginDAO.getInfo( PrestoClusterConfig.PRODUCT_KEY, clusterName, PrestoClusterConfig.class );
     }
 
 

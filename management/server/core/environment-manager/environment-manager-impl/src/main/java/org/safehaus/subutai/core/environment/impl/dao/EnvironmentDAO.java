@@ -20,10 +20,11 @@ import com.google.gson.JsonSyntaxException;
 /**
  * PluginDAO is used to manage cluster configuration information in database
  */
-public class EnvironmentDAO {
+public class EnvironmentDAO
+{
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger( EnvironmentDAO.class.getName() );
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DbManager dbManager;
 
 

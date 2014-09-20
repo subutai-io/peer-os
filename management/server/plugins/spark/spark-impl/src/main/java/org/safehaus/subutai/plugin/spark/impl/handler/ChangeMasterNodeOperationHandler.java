@@ -11,7 +11,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -150,15 +149,8 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
 
                     po.addLog( "Updating db..." );
                     //update db
-                    try
-                    {
-                        manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config );
-                        po.addLogDone( "Cluster info updated in DB\nDone" );
-                    }
-                    catch ( DBException e )
-                    {
-                        po.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
-                    }
+                    manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, config );
+                    po.addLogDone( "Cluster info updated in DB\nDone" );
                 }
                 else
                 {

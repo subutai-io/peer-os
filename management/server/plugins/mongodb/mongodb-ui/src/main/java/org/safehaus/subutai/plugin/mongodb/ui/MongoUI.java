@@ -24,55 +24,70 @@ import com.vaadin.ui.Component;
 /**
  * @author dilshat
  */
-public class MongoUI implements PortalModule {
-    protected static final Logger LOG = Logger.getLogger( MongoUI.class.getName() );
-
+public class MongoUI implements PortalModule
+{
     public static final String MODULE_IMAGE = "mongodb.png";
-
-    private ExecutorService executor;
+    protected static final Logger LOG = Logger.getLogger( MongoUI.class.getName() );
     private final ServiceLocator serviceLocator;
+    private ExecutorService executor;
 
 
-    public MongoUI() {
+    public MongoUI()
+    {
         serviceLocator = new ServiceLocator();
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return MongoClusterConfig.PRODUCT_KEY;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return MongoClusterConfig.PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( MongoUI.MODULE_IMAGE, this );
     }
 
 
-    public Component createComponent() {
-        try {
+    public Component createComponent()
+    {
+        try
+        {
             return new MongoForm( executor, serviceLocator );
         }
-        catch ( NamingException e ) {
+        catch ( NamingException e )
+        {
             LOG.severe( e.getMessage() );
         }
 
         return null;
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return false;
     }
 }

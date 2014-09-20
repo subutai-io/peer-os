@@ -6,18 +6,21 @@
 package org.safehaus.subutai.plugin.solr.rest;
 
 
-public class TrimmedSolrConfig {
+public class TrimmedSolrConfig
+{
 
     private String clusterName = "";
     private int numberOfNodes = 1;
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public int getNumberOfNodes() {
+    public int getNumberOfNodes()
+    {
         return numberOfNodes;
     }
 }

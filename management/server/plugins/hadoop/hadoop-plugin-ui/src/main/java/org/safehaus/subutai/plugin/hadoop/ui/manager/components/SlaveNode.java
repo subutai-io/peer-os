@@ -15,16 +15,19 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class SlaveNode extends ClusterNode {
+public class SlaveNode extends ClusterNode
+{
 
-    private Agent agent;
-    private boolean isDataNode;
     private final ExecutorService executorService;
     private final Hadoop hadoop;
-    private  final  Tracker tracker;
+    private final Tracker tracker;
+    private Agent agent;
+    private boolean isDataNode;
 
 
-    public SlaveNode(Hadoop hadoop, Tracker tracker, ExecutorService executorService, HadoopClusterConfig cluster, Agent agent, boolean isDataNode ) {
+    public SlaveNode( Hadoop hadoop, Tracker tracker, ExecutorService executorService, HadoopClusterConfig cluster,
+                      Agent agent, boolean isDataNode )
+    {
 
         super( cluster );
         this.hadoop = hadoop;
@@ -44,18 +47,24 @@ public class SlaveNode extends ClusterNode {
 
 
     @Override
-    protected void getStatus( UUID trackID ) {
+    protected void getStatus( UUID trackID )
+    {
         setLoading( true );
 
-        executorService.execute( new CheckTask(hadoop, tracker, cluster, new CompleteEvent() {
+        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent()
+        {
 
-            public void onComplete( NodeState state ) {
-                synchronized ( progressButton ) {
+            public void onComplete( NodeState state )
+            {
+                synchronized ( progressButton )
+                {
                     boolean isRunning = false;
-                    if ( state == NodeState.RUNNING ) {
+                    if ( state == NodeState.RUNNING )
+                    {
                         isRunning = true;
                     }
-                    else if ( state == NodeState.STOPPED ) {
+                    else if ( state == NodeState.STOPPED )
+                    {
                         isRunning = false;
                     }
 
@@ -69,14 +78,16 @@ public class SlaveNode extends ClusterNode {
 
 
     @Override
-    protected void setLoading( boolean isLoading ) {
+    protected void setLoading( boolean isLoading )
+    {
         startButton.setVisible( !isLoading );
         stopButton.setVisible( !isLoading );
         progressButton.setVisible( isLoading );
     }
 
 
-    public Agent getAgent() {
+    public Agent getAgent()
+    {
         return agent;
     }
 }

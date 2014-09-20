@@ -5,15 +5,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
@@ -28,7 +27,8 @@ import com.google.common.collect.Lists;
 /**
  * This is a hadoop cluster init strategy.
  */
-public class HadoopSetupStrategy implements ClusterSetupStrategy {
+public class HadoopSetupStrategy implements ClusterSetupStrategy
+{
 
     private Environment environment;
     private HadoopImpl hadoopManager;
@@ -36,8 +36,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-    public HadoopSetupStrategy( ProductOperation po, HadoopImpl hadoopManager,
-                                HadoopClusterConfig hadoopClusterConfig ) {
+    public HadoopSetupStrategy( ProductOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
         Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
@@ -49,7 +49,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
 
 
     public HadoopSetupStrategy( ProductOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig,
-                                Environment environment ) {
+                                Environment environment )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -62,8 +63,10 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public static PlacementStrategy getNodePlacementStrategyByNodeType( NodeType nodeType ) {
-        switch ( nodeType ) {
+    public static PlacementStrategy getNodePlacementStrategyByNodeType( NodeType nodeType )
+    {
+        switch ( nodeType )
+        {
             case MASTER_NODE:
                 return PlacementStrategy.MORE_RAM;
             case SLAVE_NODE:
@@ -75,13 +78,16 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public HadoopClusterConfig setup() throws ClusterSetupException {
+    public HadoopClusterConfig setup() throws ClusterSetupException
+    {
 
-        try {
+        try
+        {
             po.addLog( String.format( "Creating %d servers...", hadoopClusterConfig.getCountOfSlaveNodes()
                     + HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY ) );
 
-            if ( this.environment == null ) {
+            if ( this.environment == null )
+            {
                 environment = hadoopManager.getEnvironmentManager().buildEnvironmentAndReturn(
                         hadoopManager.getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
             }
@@ -96,7 +102,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
             po.addLogDone(
                     String.format( "Cluster '%s' \nInstallation finished", hadoopClusterConfig.getClusterName() ) );
         }
-        catch ( EnvironmentBuildException e ) {
+        catch ( EnvironmentBuildException e )
+        {
             destroyLXC( po, "Destroying lxc containers after cluster installation failure.\n" + e.getMessage() );
         }
 
@@ -104,65 +111,70 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private void installHadoopCluster() throws ClusterSetupException {
+    private void installHadoopCluster() throws ClusterSetupException
+    {
 
         po.addLog( "Hadoop installation started" );
-        try {
-            hadoopManager.getPluginDAO()
-                         .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                                 hadoopClusterConfig );
-            po.addLog( "Cluster info saved to DB" );
+        hadoopManager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                hadoopClusterConfig );
+        po.addLog( "Cluster info saved to DB" );
 
-            InstallHadoopOperation installOperation = new InstallHadoopOperation( hadoopClusterConfig );
-            for ( Command command : installOperation.getCommandList() ) {
-                po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
-                hadoopManager.getCommandRunner().runCommand( command );
+        InstallHadoopOperation installOperation = new InstallHadoopOperation( hadoopClusterConfig );
+        for ( Command command : installOperation.getCommandList() )
+        {
+            po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
+            hadoopManager.getCommandRunner().runCommand( command );
 
-                if ( command.hasSucceeded() ) {
-                    po.addLog( String.format( "%s succeeded", command.getDescription() ) );
-                }
-                else {
-                    po.addLogFailed(
-                            String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
-                }
+            if ( command.hasSucceeded() )
+            {
+                po.addLog( String.format( "%s succeeded", command.getDescription() ) );
             }
-        }
-        catch ( DBException e ) {
-            throw new ClusterSetupException(
-                    "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+            else
+            {
+                po.addLogFailed( String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
+            }
         }
     }
 
 
-    private void destroyLXC( ProductOperation po, String log ) {
+    private void destroyLXC( ProductOperation po, String log )
+    {
         //destroy all lxcs also
         po.addLog( "Destroying lxc containers" );
-        try {
-            for ( Agent agent : hadoopClusterConfig.getAllNodes() ) {
+        try
+        {
+            for ( Agent agent : hadoopClusterConfig.getAllNodes() )
+            {
                 hadoopManager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
             }
             po.addLog( "Lxc containers successfully destroyed" );
         }
-        catch ( LxcDestroyException ex ) {
+        catch ( LxcDestroyException ex )
+        {
             po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
         po.addLogFailed( log );
     }
 
 
-    private void setMasterNodes() throws ClusterSetupException {
+    private void setMasterNodes() throws ClusterSetupException
+    {
         Set<Agent> masterNodes = new HashSet<>();
 
-        for ( Node node : this.environment.getNodes() ) {
-            if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
+        for ( Node node : this.environment.getNodes() )
+        {
+            if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) )
+            {
                 if ( node.getTemplate().getProducts()
-                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) ) {
+                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                {
                     masterNodes.add( node.getAgent() );
                 }
             }
         }
 
-        if ( masterNodes.size() != HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY ) {
+        if ( masterNodes.size() != HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY )
+        {
             throw new ClusterSetupException( String.format( "Hadoop master nodes must be %d in count",
                     HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY ) );
         }
@@ -174,19 +186,24 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private void setSlaveNodes() throws ClusterSetupException {
+    private void setSlaveNodes() throws ClusterSetupException
+    {
         Set<Agent> slaveNodes = new HashSet<>();
 
-        for ( Node node : environment.getNodes() ) {
-            if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
+        for ( Node node : environment.getNodes() )
+        {
+            if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) )
+            {
                 if ( node.getTemplate().getProducts()
-                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) ) {
+                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                {
                     slaveNodes.add( node.getAgent() );
                 }
             }
         }
 
-        if ( slaveNodes.isEmpty() ) {
+        if ( slaveNodes.isEmpty() )
+        {
             throw new ClusterSetupException( "Hadoop slave nodes are empty" );
         }
 

@@ -15,10 +15,12 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StartServerHandler extends AbstractOperationHandler<OozieImpl> {
+public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
+{
 
 
-    public StartServerHandler( final OozieImpl manager, final String clusterName ) {
+    public StartServerHandler( final OozieImpl manager, final String clusterName )
+    {
         super( manager, clusterName );
         productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Starting server on %s cluster...", clusterName ) );
@@ -26,21 +28,26 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl> {
 
 
     @Override
-    public void run() {
+    public void run()
+    {
 
-        manager.getExecutor().execute( new Runnable() {
+        manager.getExecutor().execute( new Runnable()
+        {
 
-            public void run() {
+            public void run()
+            {
                 OozieClusterConfig config = manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
                         OozieClusterConfig.class );
-                if ( config == null ) {
+                if ( config == null )
+                {
                     productOperation.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
                 Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
 
-                if ( serverAgent == null ) {
+                if ( serverAgent == null )
+                {
                     productOperation
                             .addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
@@ -50,23 +57,27 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl> {
                 Command startServiceCommand = Commands.getStartServerCommand( servers );
                 manager.getCommandRunner().runCommand( startServiceCommand );
 
-                if ( startServiceCommand.hasCompleted() ) {
+                if ( startServiceCommand.hasCompleted() )
+                {
                     productOperation.addLog( "Checking status..." );
 
                     Command checkCommand = Commands.getStatusServerCommand( servers );
                     manager.getCommandRunner().runCommand( checkCommand );
 
-                    if ( checkCommand.hasCompleted() ) {
+                    if ( checkCommand.hasCompleted() )
+                    {
 
                         productOperation
                                 .addLogDone( checkCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                     }
-                    else {
+                    else
+                    {
                         productOperation.addLogFailed(
                                 String.format( "Failed to check status, %s", checkCommand.getAllErrors() ) );
                     }
                 }
-                else {
+                else
+                {
                     productOperation
                             .addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
                 }

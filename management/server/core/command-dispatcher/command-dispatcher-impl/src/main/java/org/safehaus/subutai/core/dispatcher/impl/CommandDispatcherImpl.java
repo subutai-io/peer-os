@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.dispatcher.impl;
 
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,6 +20,7 @@ import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -29,6 +31,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
@@ -40,7 +43,8 @@ import com.google.gson.JsonSyntaxException;
 /**
  * Implementation of CommandDispatcher interface
  */
-public class CommandDispatcherImpl extends AbstractCommandRunner implements CommandDispatcher, PeerMessageListener {
+public class CommandDispatcherImpl extends AbstractCommandRunner implements CommandDispatcher, PeerMessageListener
+{
 
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
@@ -50,7 +54,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
-                                  final DbManager dbManager, final PeerManager peerManager ) {
+                                  final DbManager dbManager, final PeerManager peerManager )
+    {
         super();
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
@@ -60,66 +65,144 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    public void init() {
+    public void init()
+    {
 
         peerManager.addPeerMessageListener( this );
         responseSender.init();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         peerManager.removePeerMessageListener( this );
         responseSender.dispose();
         super.dispose();
     }
 
 
-    private void executeCommand( CommandImpl command ) {
+    private void executeCommand( CommandImpl command )
+    {
+
+        for ( Map.Entry<UUID, Set<BatchRequest>> entry : command.getRemoteRequests().entrySet() )
+        {
+            //check if peer is registered
+            Peer peer = peerManager.getPeerByUUID( entry.getKey() );
+            if ( peer == null )
+            {
+                throw new RunCommandException( String.format( "Peer %s not found", entry.getKey() ) );
+            }
+            //check if batch requests are not empty
+            if ( CollectionUtil.isCollectionEmpty( entry.getValue() ) )
+            {
+                throw new RunCommandException( "Batch requests are empty" );
+            }
+            try
+            {
+                //check if remote peers are reachable
+                if ( !peerManager.isPeerReachable( peer ) )
+                {
+                    throw new RunCommandException( String.format( "Peer is not reachable %s", peer ) );
+                }
+                else
+                {
+                    //check if all agents required for command execution are connected on remote peer
+                    UUID environmentId = entry.getValue().iterator().next().getEnvironmentId();
+
+                    Set<Agent> agents = peerManager.getConnectedAgents( peer, environmentId.toString() );
+
+                    Set<UUID> connectedAgentsIds = new HashSet<>();
+                    for ( Agent agent : agents )
+                    {
+                        connectedAgentsIds.add( agent.getUuid() );
+                    }
+                    Set<UUID> requestAgentsIds = new HashSet<>();
+                    for ( BatchRequest batchRequest : entry.getValue() )
+                    {
+                        requestAgentsIds.addAll( batchRequest.getAgentIds() );
+                    }
+
+                    if ( !connectedAgentsIds.containsAll( requestAgentsIds ) )
+                    {
+                        CollectionUtil.removeValues( requestAgentsIds, connectedAgentsIds );
+                        throw new RunCommandException(
+                                String.format( "Agents %s are not connected", requestAgentsIds ) );
+                    }
+                }
+            }
+            catch ( PeerException e )
+            {
+                String err = String.format( "Error in executeCommand: %s", e.getMessage() );
+                LOG.severe( err );
+                throw new RunCommandException( err );
+            }
+        }
+
+        //check if local agents are connected
+        Set<UUID> localIds = new HashSet<>();
+        for ( Request request : command.getRequests() )
+        {
+            if ( agentManager.getAgentByUUID( request.getUuid() ) == null )
+            {
+                localIds.add( request.getUuid() );
+            }
+        }
+        if ( !localIds.isEmpty() )
+        {
+            throw new RunCommandException( String.format( "Agents %s are not connected", localIds ) );
+        }
 
         //send remote requests
-        if ( !command.getRemoteRequests().isEmpty() ) {
-            //TODO check if peers are accessible otherwise throw RunCommandException
-            //not implemented yet...
-
-            //TODO check if agents are connected otherwise throw RunCommandException
-            //not implemented yet...
-
+        if ( !command.getRemoteRequests().isEmpty() )
+        {
             LOG.warning( "executing remote requests" );
+
             sendRequests( command.getRemoteRequests() );
         }
 
         //send local requests
-        if ( !command.getRequests().isEmpty() ) {
+        if ( !command.getRequests().isEmpty() )
+        {
+
             LOG.warning( "executing local requests" );
+
             Command localCommand = new CommandImpl( command.getRequests(), commandRunner );
             final CommandDispatcherImpl self = this;
-            try {
-                localCommand.executeAsync( new CommandCallback() {
+            try
+            {
+                localCommand.executeAsync( new CommandCallback()
+                {
                     @Override
                     public void onResponse( final Response response, final AgentResult agentResult,
-                                            final Command command ) {
+                                            final Command command )
+                    {
                         self.onResponse( response );
                     }
                 } );
             }
-            catch ( CommandException e ) {
+            catch ( CommandException e )
+            {
                 LOG.severe( String.format( "Error executing local requests: %s", e.getMessage() ) );
             }
         }
     }
 
 
-    private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
+    private void sendRequests( final Map<UUID, Set<BatchRequest>> requests )
+    {
 
-        for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() ) {
+        for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() )
+        {
             Peer peer = peerManager.getPeerByUUID( request.getKey() );
 
-            try {
+            try
+            {
                 String message =
                         JsonUtil.toJson( new DispatcherMessage( DispatcherMessageType.REQUEST, request.getValue() ) );
                 peerManager.sendPeerMessage( peer, Common.DISPATCHER_NAME, message );
             }
-            catch ( JsonSyntaxException | PeerMessageException e ) {
+            catch ( JsonSyntaxException | PeerMessageException e )
+            {
                 String errString = String.format( "Error in sendRequests for peer %s: %s", peer, e.getMessage() );
 
                 LOG.log( Level.SEVERE, errString );
@@ -129,54 +212,66 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void processResponses( final Set<Response> responses ) {
+    private void processResponses( final Set<Response> responses )
+    {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( responses ), "Responses are null or empty" );
 
-        Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
+        Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>()
+        {
 
             @Override
-            public int compare( final Response o1, final Response o2 ) {
+            public int compare( final Response o1, final Response o2 )
+            {
                 int compareAgents = o1.getUuid().compareTo( o2.getUuid() );
                 return compareAgents == 0 ? o1.getResponseSequenceNumber().compareTo( o2.getResponseSequenceNumber() ) :
                        compareAgents;
             }
         } );
         sortedSet.addAll( responses );
-        for ( Response response : sortedSet ) {
+        for ( Response response : sortedSet )
+        {
             onResponse( response );
         }
     }
 
 
-    private void executeRequests( final Peer peer, final Set<BatchRequest> requests ) throws PeerMessageException {
+    private void executeRequests( final Peer peer, final Set<BatchRequest> requests ) throws PeerMessageException
+    {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 
-        try {
+        try
+        {
             int requestsCount = 0;
-            for ( BatchRequest batchRequest : requests ) {
+            for ( BatchRequest batchRequest : requests )
+            {
                 requestsCount += batchRequest.getRequestsCount();
             }
             final UUID commandId = requests.iterator().next().getCommandId();
             //get request from db
             RemoteRequest remoteRequest = dispatcherDAO.getRemoteRequest( commandId );
             //if no request exists, create a new one
-            if ( remoteRequest == null ) {
+            if ( remoteRequest == null )
+            {
                 remoteRequest = new RemoteRequest( peer.getId(), commandId, requestsCount );
                 //save request to db
                 dispatcherDAO.saveRemoteRequest( remoteRequest );
 
                 //execute requests using Command Runner
                 Command command = new CommandImpl( requests, commandRunner );
-                command.executeAsync( new CommandCallback() {
+                command.executeAsync( new CommandCallback()
+                {
                     @Override
                     public void onResponse( final Response response, final AgentResult agentResult,
-                                            final Command command ) {
-                        try {
+                                            final Command command )
+                    {
+                        try
+                        {
 
                             //save response to db
                             dispatcherDAO.saveRemoteResponse( new RemoteResponse( response ) );
                         }
-                        catch ( DBException e ) {
+                        catch ( DBException e )
+                        {
                             LOG.log( Level.SEVERE,
                                     String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(),
                                             response ) );
@@ -185,12 +280,14 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                     }
                 } );
             }
-            else {
+            else
+            {
                 throw new PeerMessageException(
                         String.format( "Command %s is already queued for processing", commandId ) );
             }
         }
-        catch ( CommandException | DBException e ) {
+        catch ( CommandException | DBException e )
+        {
             LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ) );
             throw new PeerMessageException( e.getMessage() );
         }
@@ -198,7 +295,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public void runCommandAsync( final Command command, final CommandCallback commandCallback ) {
+    public void runCommandAsync( final Command command, final CommandCallback commandCallback )
+    {
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkArgument( command instanceof CommandImpl, "Command is of wrong type" );
         Preconditions.checkNotNull( commandCallback, "Callback is null" );
@@ -218,59 +316,70 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                 org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 2000,
                 new CommandExecutorExpiryCallback() );
 
-        if ( queued ) {
+        if ( queued )
+        {
             //set command status to RUNNING
             commandImpl.setCommandStatus( CommandStatus.RUNNING );
 
             //execute command
             executeCommand( commandImpl );
         }
-        else {
+        else
+        {
             throw new RunCommandException( "Could not queue command for processing" );
         }
     }
 
 
     @Override
-    public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents ) {
+    public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents )
+    {
         return new CommandImpl( null, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final String description, final RequestBuilder requestBuilder,
-                                  final Set<Agent> agents ) {
+                                  final Set<Agent> agents )
+    {
         return new CommandImpl( description, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
-    public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders ) {
+    public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders )
+    {
         return new CommandImpl( null, agentRequestBuilders, peerManager, this );
     }
 
 
     @Override
-    public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders ) {
+    public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders )
+    {
         return new CommandImpl( description, agentRequestBuilders, peerManager, this );
     }
 
 
     @Override
-    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException {
-        try {
+    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException
+    {
+        try
+        {
 
             DispatcherMessage dispatcherMessage = JsonUtil.fromJson( peerMessage, DispatcherMessage.class );
 
 
-            if ( dispatcherMessage.getDispatcherMessageType() == DispatcherMessageType.REQUEST ) {
+            if ( dispatcherMessage.getDispatcherMessageType() == DispatcherMessageType.REQUEST )
+            {
                 executeRequests( peer, dispatcherMessage.getBatchRequests() );
             }
-            else {
+            else
+            {
                 processResponses( dispatcherMessage.getResponses() );
             }
         }
-        catch ( RuntimeException e ) {
+        catch ( RuntimeException e )
+        {
             throw new PeerMessageException( e.getMessage() );
         }
         return null;
@@ -278,7 +387,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return Common.DISPATCHER_NAME;
     }
 }

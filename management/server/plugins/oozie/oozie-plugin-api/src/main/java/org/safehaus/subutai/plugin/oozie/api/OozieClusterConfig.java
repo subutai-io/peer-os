@@ -12,7 +12,8 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * @author dilshat
  */
-public class OozieClusterConfig implements ConfigBase {
+public class OozieClusterConfig implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "Oozie";
     public static final String PRODUCT_NAME_CLIENT = "hadoopOozieClient";
@@ -28,100 +29,119 @@ public class OozieClusterConfig implements ConfigBase {
     private SetupType setupType;
 
 
-    public OozieClusterConfig() {
+    public OozieClusterConfig()
+    {
         this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
     }
 
 
-    public String getTemplateNameServer() {
+    public String getTemplateNameServer()
+    {
         return templateNameServer;
     }
 
 
-    public void setTemplateNameServer( final String templateNameServer ) {
+    public void setTemplateNameServer( final String templateNameServer )
+    {
         this.templateNameServer = templateNameServer;
     }
 
 
-    public SetupType getSetupType() {
+    public SetupType getSetupType()
+    {
         return setupType;
     }
 
 
-    public void setSetupType( final SetupType setupType ) {
+    public void setSetupType( final SetupType setupType )
+    {
         this.setupType = setupType;
     }
 
 
-    public String getHadoopClusterName() {
+    public String getHadoopClusterName()
+    {
         return hadoopClusterName;
     }
 
 
-    public void setHadoopClusterName( final String hadoopClusterName ) {
+    public void setHadoopClusterName( final String hadoopClusterName )
+    {
         this.hadoopClusterName = hadoopClusterName;
     }
 
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
 
-    public void setUuid( UUID uuid ) {
+    public void setUuid( UUID uuid )
+    {
         this.uuid = uuid;
     }
 
 
-    public void reset() {
+    public void reset()
+    {
         this.server = null;
         this.clients = null;
         this.domainName = "";
     }
 
 
-    public String getDomainName() {
+    public String getDomainName()
+    {
         return domainName;
     }
 
 
-    public void setDomainName( String domainName ) {
+    public void setDomainName( String domainName )
+    {
         this.domainName = domainName;
     }
 
 
-    public String getServer() {
+    public String getServer()
+    {
         return server;
     }
 
 
-    public void setServer( String server ) {
+    public void setServer( String server )
+    {
         this.server = server;
     }
 
 
-    public Set<String> getClients() {
+    public Set<String> getClients()
+    {
         return clients;
     }
 
 
-    public void setClients( Set<String> clients ) {
+    public void setClients( Set<String> clients )
+    {
         this.clients = clients;
     }
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public void setClusterName( String clusterName ) {
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
 
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_KEY;
     }
 
@@ -137,7 +157,8 @@ public class OozieClusterConfig implements ConfigBase {
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "OozieConfig{" +
                 "domainName='" + domainName + '\'' +
                 ", uuid=" + uuid +
@@ -149,17 +170,20 @@ public class OozieClusterConfig implements ConfigBase {
     }
 
 
-    public String getTemplateNameClient() {
+    public String getTemplateNameClient()
+    {
         return templateNameClient;
     }
 
 
-    public void setTemplateNameClient( final String templateNameClient ) {
+    public void setTemplateNameClient( final String templateNameClient )
+    {
         this.templateNameClient = templateNameClient;
     }
 
 
-    public Set<String> getAllOozieAgents() {
+    public Set<String> getAllOozieAgents()
+    {
         clients.add( server );
         return clients;
     }

@@ -17,7 +17,6 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ConfigurationStep extends VerticalLayout
 {
-
     public ConfigurationStep( final Wizard wizard )
     {
 

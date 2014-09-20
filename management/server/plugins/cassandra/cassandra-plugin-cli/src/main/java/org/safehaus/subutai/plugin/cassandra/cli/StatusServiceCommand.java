@@ -20,13 +20,13 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 public class StatusServiceCommand extends OsgiCommandSupport
 {
 
-    private Cassandra cassandraManager;
-    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "Name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
     @Argument(index = 1, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
     String agentUUID = null;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
 
 
     public Cassandra getCassandraManager()

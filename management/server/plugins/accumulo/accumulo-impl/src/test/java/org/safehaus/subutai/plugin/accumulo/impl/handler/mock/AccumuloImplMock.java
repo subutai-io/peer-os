@@ -15,39 +15,48 @@ import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import static org.mockito.Mockito.mock;
 
 
-public class AccumuloImplMock extends AccumuloImpl {
+public class AccumuloImplMock extends AccumuloImpl
+{
 
     private AccumuloClusterConfig clusterAccumuloClusterConfig = null;
 
 
-    public AccumuloImplMock() {
-        super ( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), new TrackerMock(),
+    public AccumuloImplMock()
+    {
+        super( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), new TrackerMock(),
                 mock( Hadoop.class ), mock( Zookeeper.class ), mock( EnvironmentManager.class ) );
     }
 
 
-    public AccumuloImplMock setClusterAccumuloClusterConfig( AccumuloClusterConfig clusterAccumuloClusterConfig ) {
+    public AccumuloImplMock setClusterAccumuloClusterConfig( AccumuloClusterConfig clusterAccumuloClusterConfig )
+    {
         this.clusterAccumuloClusterConfig = clusterAccumuloClusterConfig;
         return this;
     }
 
-    public AccumuloImplMock setCommands( Commands commands ) {
+
+    public AccumuloImplMock setCommands( Commands commands )
+    {
         this.commands = commands;
         return this;
     }
 
-    public void setAccumuloClusterConfig( AccumuloClusterConfig config ){
+
+    public void setAccumuloClusterConfig( AccumuloClusterConfig config )
+    {
         this.clusterAccumuloClusterConfig = config;
     }
 
 
     @Override
-    public AccumuloClusterConfig getCluster( String clusterName ) {
+    public AccumuloClusterConfig getCluster( String clusterName )
+    {
         return clusterAccumuloClusterConfig;
     }
 
 
-    public AccumuloImplMock setAgentManager( AgentManager agentManager ) {
+    public AccumuloImplMock setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
         return this;
     }

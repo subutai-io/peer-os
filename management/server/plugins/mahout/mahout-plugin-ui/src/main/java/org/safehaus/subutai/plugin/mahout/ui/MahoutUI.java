@@ -25,7 +25,8 @@ import com.vaadin.ui.Component;
 /**
  * @author dilshat
  */
-public class MahoutUI implements PortalModule {
+public class MahoutUI implements PortalModule
+{
 
     public static final String MODULE_IMAGE = "mahout.png";
 
@@ -37,76 +38,91 @@ public class MahoutUI implements PortalModule {
     private ExecutorService executor;
 
 
-    public MahoutUI() {
+    public MahoutUI()
+    {
     }
 
 
-    public Mahout getMahoutManager() {
+    public Mahout getMahoutManager()
+    {
         return mahoutManager;
     }
 
 
-    public void setMahoutManager( final Mahout mahoutManager ) {
+    public void setMahoutManager( final Mahout mahoutManager )
+    {
         this.mahoutManager = mahoutManager;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( final Tracker tracker ) {
+    public void setTracker( final Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public void setHadoopManager( final Hadoop hadoopManager ) {
+    public void setHadoopManager( final Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void setCommandRunner( final CommandRunner commandRunner ) {
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
 
-    public void setExecutor( final ExecutorService executor ) {
+    public void setExecutor( final ExecutorService executor )
+    {
         this.executor = executor;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         mahoutManager = null;
         agentManager = null;
         hadoopManager = null;
@@ -116,23 +132,34 @@ public class MahoutUI implements PortalModule {
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return MahoutClusterConfig.PRODUCT_KEY;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return MahoutClusterConfig.PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( MahoutUI.MODULE_IMAGE, this );
     }
 
 
-    public Component createComponent() {
-        return new MahoutForm(this);
+    public Component createComponent()
+    {
+        return new MahoutForm( this );
+    }
+
+
+    @Override
+    public Boolean isCorePlugin()
+    {
+        return false;
     }
 }

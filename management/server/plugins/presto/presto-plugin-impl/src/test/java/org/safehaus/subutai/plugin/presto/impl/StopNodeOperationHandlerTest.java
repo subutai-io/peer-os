@@ -46,7 +46,6 @@ public class StopNodeOperationHandlerTest
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        System.out.println( po.getLog() );
         Assert.assertTrue( po.getLog().contains( "not connected" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }

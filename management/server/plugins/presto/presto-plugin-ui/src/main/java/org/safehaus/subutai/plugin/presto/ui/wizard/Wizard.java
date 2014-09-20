@@ -20,13 +20,13 @@ public class Wizard
 {
 
     private final GridLayout grid;
-    private int step = 1;
-    private PrestoClusterConfig config = new PrestoClusterConfig();
-    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
     private final Hadoop hadoop;
     private final Presto presto;
     private final ExecutorService executorService;
     private final Tracker tracker;
+    private int step = 1;
+    private PrestoClusterConfig config = new PrestoClusterConfig();
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException

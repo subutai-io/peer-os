@@ -47,11 +47,11 @@ public class StopTask implements Runnable
             {
                 if ( po.getState() != ProductOperationState.RUNNING )
                 {
+
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
-
             try
             {
                 Thread.sleep( 1000 );
@@ -60,7 +60,6 @@ public class StopTask implements Runnable
             {
                 break;
             }
-
             if ( System.currentTimeMillis() - start > 30 * 1000 )
             {
                 break;

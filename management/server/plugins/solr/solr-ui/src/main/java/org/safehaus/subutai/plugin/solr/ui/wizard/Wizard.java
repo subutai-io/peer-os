@@ -22,16 +22,18 @@ import com.vaadin.ui.GridLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
     private final GridLayout grid;
-    private int step = 1;
-    private SolrClusterConfig solrClusterConfig = new SolrClusterConfig();
     private final Solr solr;
     private final Tracker tracker;
     private final ExecutorService executorService;
+    private int step = 1;
+    private SolrClusterConfig solrClusterConfig = new SolrClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         this.executorService = executorService;
         this.solr = serviceLocator.getService( Solr.class );
         this.tracker = serviceLocator.getService( Tracker.class );
@@ -44,58 +46,70 @@ public class Wizard {
     }
 
 
-    public Component getContent() {
+    private void putForm()
+    {
+        grid.removeComponent( 0, 1 );
+        Component component = null;
+        switch ( step )
+        {
+            case 1:
+            {
+                component = new WelcomeStep( this );
+                break;
+            }
+            case 2:
+            {
+                component = new ConfigurationStep( this );
+                break;
+            }
+            case 3:
+            {
+                component = new VerificationStep( solr, executorService, tracker, this );
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+
+        if ( component != null )
+        {
+            grid.addComponent( component, 0, 1, 0, 19 );
+        }
+    }
+
+
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         solrClusterConfig = new SolrClusterConfig();
         putForm();
     }
 
 
-    public SolrClusterConfig getSolrClusterConfig() {
+    public SolrClusterConfig getSolrClusterConfig()
+    {
         return solrClusterConfig;
-    }
-
-
-    private void putForm() {
-        grid.removeComponent( 0, 1 );
-        Component component = null;
-        switch ( step ) {
-            case 1: {
-                component = new WelcomeStep( this );
-                break;
-            }
-            case 2: {
-                component = new ConfigurationStep( this );
-                break;
-            }
-            case 3: {
-                component = new VerificationStep( solr, executorService, tracker, this );
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-
-        if ( component != null ) {
-            grid.addComponent( component, 0, 1, 0, 19 );
-        }
     }
 }

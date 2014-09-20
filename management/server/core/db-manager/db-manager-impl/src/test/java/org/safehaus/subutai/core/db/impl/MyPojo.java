@@ -9,43 +9,51 @@ package org.safehaus.subutai.core.db.impl;
 /**
  * Test pojo
  */
-public class MyPojo {
+public class MyPojo
+{
 
-	private final String content;
-
-
-	public MyPojo(String test) {
-		this.content = test;
-	}
+    private final String content;
 
 
-	@Override
-	public int hashCode() {
-		return 5;
-	}
+    public MyPojo( String test )
+    {
+        this.content = test;
+    }
 
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final MyPojo other = (MyPojo) obj;
-		return !((this.content == null) ? (other.getContent() != null) :
-				!this.content.equals(other.getContent()));
-	}
+    @Override
+    public int hashCode()
+    {
+        return 5;
+    }
 
 
-	public String getContent() {
-		return content;
-	}
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( obj == null )
+        {
+            return false;
+        }
+        if ( getClass() != obj.getClass() )
+        {
+            return false;
+        }
+        final MyPojo other = ( MyPojo ) obj;
+        return !( ( this.content == null ) ? ( other.getContent() != null ) :
+                  !this.content.equals( other.getContent() ) );
+    }
 
 
-	@Override
-	public String toString() {
-		return "MyPojo{" + "content=" + content + '}';
-	}
+    public String getContent()
+    {
+        return content;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "MyPojo{" + "content=" + content + '}';
+    }
 }

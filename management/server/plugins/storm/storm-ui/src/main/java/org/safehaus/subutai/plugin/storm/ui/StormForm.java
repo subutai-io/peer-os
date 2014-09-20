@@ -14,13 +14,15 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class StormForm extends CustomComponent {
+public class StormForm extends CustomComponent
+{
 
     private final Wizard wizard;
     private final Manager manager;
 
 
-    public StormForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public StormForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
 

@@ -24,9 +24,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends VerticalLayout {
+public class ConfigurationStep extends VerticalLayout
+{
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -39,19 +41,23 @@ public class ConfigurationStep extends VerticalLayout {
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setMaxLength( 20 );
-        if ( !Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
+        if ( !Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) )
+        {
             clusterNameTxtFld.setValue( wizard.getHadoopClusterConfig().getClusterName() );
         }
-        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getHadoopClusterConfig().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
 
         //configuration servers number
         List<Integer> s = new ArrayList<Integer>();
-        for ( int i = 0; i < 50; i++ ) {
+        for ( int i = 0; i < 50; i++ )
+        {
             s.add( i );
         }
 
@@ -62,9 +68,11 @@ public class ConfigurationStep extends VerticalLayout {
         slaveNodesComboBox.setNullSelectionAllowed( false );
         slaveNodesComboBox.setValue( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() );
 
-        slaveNodesComboBox.addValueChangeListener( new Property.ValueChangeListener() {
+        slaveNodesComboBox.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getHadoopClusterConfig().setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -77,9 +85,11 @@ public class ConfigurationStep extends VerticalLayout {
         replicationFactorComboBox.setNullSelectionAllowed( false );
         replicationFactorComboBox.setValue( wizard.getHadoopClusterConfig().getReplicationFactor() );
 
-        replicationFactorComboBox.addValueChangeListener( new Property.ValueChangeListener() {
+        replicationFactorComboBox.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getHadoopClusterConfig().setReplicationFactor( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -88,11 +98,14 @@ public class ConfigurationStep extends VerticalLayout {
         domain.setInputPrompt( wizard.getHadoopClusterConfig().getDomainName() );
         domain.setValue( wizard.getHadoopClusterConfig().getDomainName() );
         domain.setMaxLength( 20 );
-        domain.addValueChangeListener( new Property.ValueChangeListener() {
+        domain.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String value = event.getProperty().getValue().toString().trim();
-                if ( !Strings.isNullOrEmpty( value ) ) {
+                if ( !Strings.isNullOrEmpty( value ) )
+                {
                     wizard.getHadoopClusterConfig().setDomainName( value );
                 }
             }
@@ -100,13 +113,17 @@ public class ConfigurationStep extends VerticalLayout {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) )
+                {
                     show( "Please provide cluster name" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -114,9 +131,11 @@ public class ConfigurationStep extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -140,7 +159,8 @@ public class ConfigurationStep extends VerticalLayout {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

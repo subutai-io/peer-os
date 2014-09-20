@@ -1,11 +1,12 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 
+import java.util.logging.Logger;
+
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
@@ -15,6 +16,8 @@ import com.google.common.collect.Sets;
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
+
+    private static final Logger LOG = Logger.getLogger( DestroyNodeOperationHandler.class.getName() );
     private final String lxcHostname;
 
 
@@ -88,17 +91,9 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
             elasticsearchClusterConfiguration.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
-            try
-            {
-                manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                        elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
-                productOperation.addLogDone( "Cluster info update in DB\nDone" );
-            }
-            catch ( DBException e )
-            {
-                productOperation.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
-                e.printStackTrace();
-            }
+            manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+                    elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
+            productOperation.addLogDone( "Cluster info update in DB\nDone" );
         }
         else
         {

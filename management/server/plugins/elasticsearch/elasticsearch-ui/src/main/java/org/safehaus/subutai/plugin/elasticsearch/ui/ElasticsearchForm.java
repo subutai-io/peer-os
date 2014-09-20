@@ -16,7 +16,6 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ElasticsearchForm extends CustomComponent
 {
-
     private final Wizard wizard;
     private final Manager manager;
 
@@ -30,7 +29,6 @@ public class ElasticsearchForm extends CustomComponent
         verticalLayout.setSizeFull();
 
         setCompositionRoot( verticalLayout );
-
         TabSheet sheet = new TabSheet();
         sheet.setSizeFull();
         manager = new Manager( executorService, serviceLocator );

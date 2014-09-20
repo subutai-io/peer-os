@@ -6,7 +6,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
@@ -82,15 +81,8 @@ public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<
             config.getWorkers().remove( agent );
             po.addLog( "Updating db..." );
 
-            try
-            {
-                manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                po.addLogDone( "Cluster info updated in DB\nDone" );
-            }
-            catch ( DBException e )
-            {
-                po.addLogFailed( "Failed to update cluster info in DB" );
-            }
+            manager.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Cluster info updated in DB\nDone" );
         }
         else
         {

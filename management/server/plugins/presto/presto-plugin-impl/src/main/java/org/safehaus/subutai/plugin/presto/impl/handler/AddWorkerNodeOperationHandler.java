@@ -13,7 +13,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.SetupType;
@@ -81,20 +80,10 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 
             po.addLogDone( null );
         }
-        catch ( ClusterSetupException ex )
+        catch ( ClusterSetupException | LxcCreateException ex )
         {
             po.addLog( ex.getMessage() );
             po.addLogFailed( "Add worker node failed" );
-        }
-        catch ( LxcCreateException ex )
-        {
-            po.addLog( ex.getMessage() );
-            po.addLogFailed( "Add worker node failed" );
-        }
-        catch ( DBException ex )
-        {
-            po.addLog( ex.getMessage() );
-            po.addLogFailed( "Failed to save cluster info" );
         }
     }
 

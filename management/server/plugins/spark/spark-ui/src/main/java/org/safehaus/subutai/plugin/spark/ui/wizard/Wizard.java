@@ -20,14 +20,14 @@ public class Wizard
 {
 
     private final GridLayout grid;
-    private int step = 1;
-    private SparkClusterConfig config = new SparkClusterConfig();
-    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
     private final ServiceLocator serviceLocator;
     private final ExecutorService executor;
     private final Tracker tracker;
     private final Hadoop hadoop;
     private final Spark spark;
+    private int step = 1;
+    private SparkClusterConfig config = new SparkClusterConfig();
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
     public Wizard( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
