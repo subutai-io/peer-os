@@ -306,6 +306,11 @@ public class PeerManagerImpl implements PeerManager
         }
         if ( getPeerByUUID( peer.getId() ) != null )
         {
+
+            if ( peer.getId().compareTo( getSiteId() ) == 0 )
+            {
+                return true;
+            }
             try
             {
                 RestUtil.get( String.format( Common.PING_URL, peer.getIp() ), null );
@@ -333,6 +338,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( IllegalArgumentException e )
         {
+            LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
             throw new PeerException( e.getMessage() );
         }
     }
@@ -366,7 +372,8 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( CreateContainersMessage ccm ) {
+    public Set<Agent> createContainers( CreateContainersMessage ccm )
+    {
 
         try
         {

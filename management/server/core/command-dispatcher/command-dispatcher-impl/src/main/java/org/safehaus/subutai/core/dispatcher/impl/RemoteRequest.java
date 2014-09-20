@@ -9,7 +9,8 @@ import com.google.common.base.Preconditions;
 /**
  * Created by dilshat on 9/8/14.
  */
-public class RemoteRequest {
+public class RemoteRequest
+{
 
     private final UUID peerId;
     private final UUID commandId;
@@ -19,7 +20,8 @@ public class RemoteRequest {
     private int requestsCompleted;
 
 
-    public RemoteRequest( final UUID peerId, final UUID commandId, final int requestsCount ) {
+    public RemoteRequest( final UUID peerId, final UUID commandId, final int requestsCount )
+    {
         Preconditions.checkNotNull( peerId, "Peer Id is null" );
         Preconditions.checkNotNull( commandId, "CommandId is null" );
         Preconditions.checkArgument( requestsCount > 0, "Requests count is less than 0" );
@@ -27,52 +29,61 @@ public class RemoteRequest {
         this.commandId = commandId;
         this.timestamp = System.currentTimeMillis();
         this.requestCount = requestsCount;
-        attempts = 0;
+        attempts = 1;
     }
 
 
-    public UUID getPeerId() {
+    public UUID getPeerId()
+    {
         return peerId;
     }
 
 
-    public void incrementCompletedRequestsCount() {
+    public void incrementCompletedRequestsCount()
+    {
         requestsCompleted++;
     }
 
 
-    public boolean isCompleted() {
+    public boolean isCompleted()
+    {
         return requestCount == requestsCompleted;
     }
 
 
-    public long getTimestamp() {
+    public long getTimestamp()
+    {
         return timestamp;
     }
 
 
-    public void incrementAttempts() {
+    public void incrementAttempts()
+    {
         attempts++;
     }
 
 
-    public UUID getCommandId() {
+    public UUID getCommandId()
+    {
         return commandId;
     }
 
 
-    public void updateTimestamp() {
+    public void updateTimestamp()
+    {
         this.timestamp = System.currentTimeMillis();
     }
 
 
-    public int getAttempts() {
+    public int getAttempts()
+    {
         return attempts;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "RemoteRequest{" +
                 "peerId=" + peerId +
                 ", commandId=" + commandId +
