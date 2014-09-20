@@ -127,6 +127,9 @@ public class ConfigurationStep extends VerticalLayout {
                 else if ( Strings.isNullOrEmpty( wizard.getConfig().getDomainName() ) ) {
                     show( "Please provide domain name !" );
                 }
+                else if ( nodesCountCombo.getValue() == null | seedsCountCombo.getValue() == null ){
+                    show ("Please provide number of nodes and seeds !");
+                }
                 else if ( ( int ) nodesCountCombo.getValue()  <= ( int ) seedsCountCombo.getValue() ){
                     show( "Number of seeds should be smaller than total number nodes in the cluster !");
                 }
