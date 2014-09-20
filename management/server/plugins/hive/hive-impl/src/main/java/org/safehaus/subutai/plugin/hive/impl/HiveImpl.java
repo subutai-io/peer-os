@@ -8,8 +8,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.xml.transform.ErrorListener;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -38,7 +36,8 @@ import org.safehaus.subutai.plugin.hive.impl.handler.StopHandler;
 import org.safehaus.subutai.plugin.hive.impl.handler.UninstallHandler;
 
 
-public class HiveImpl implements Hive {
+public class HiveImpl implements Hive
+{
 
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
@@ -52,94 +51,112 @@ public class HiveImpl implements Hive {
     protected ExecutorService executor;
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
         pluginDao = new PluginDAO( dbManager );
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void setCommandRunner( CommandRunner commandRunner ) {
+    public void setCommandRunner( CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( AgentManager agentManager ) {
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public DbManager getDbManager() {
+    public DbManager getDbManager()
+    {
         return dbManager;
     }
 
 
-    public void setDbManager( DbManager dbManager ) {
+    public void setDbManager( DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void setContainerManager( ContainerManager containerManager ) {
+    public void setContainerManager( ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
 
-    public void setEnvironmentManager( EnvironmentManager environmentManager ) {
+    public void setEnvironmentManager( EnvironmentManager environmentManager )
+    {
         this.environmentManager = environmentManager;
     }
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public void setHadoopManager( Hadoop hadoopManager ) {
+    public void setHadoopManager( Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
 
-    public PluginDAO getPluginDao() {
+    public PluginDAO getPluginDao()
+    {
         return pluginDao;
     }
 
 
     @Override
-    public UUID installCluster( HiveConfig config ) {
+    public UUID installCluster( HiveConfig config )
+    {
         AbstractOperationHandler h = new InstallHandler( this, config );
         executor.execute( h );
         return h.getTrackerId();
@@ -147,7 +164,8 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public UUID uninstallCluster( String clusterName ) {
+    public UUID uninstallCluster( String clusterName )
+    {
         AbstractOperationHandler h = new UninstallHandler( this, clusterName );
         executor.execute( h );
         return h.getTrackerId();
@@ -155,19 +173,22 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public List<HiveConfig> getClusters() {
+    public List<HiveConfig> getClusters()
+    {
         return pluginDao.getInfo( HiveConfig.PRODUCT_KEY, HiveConfig.class );
     }
 
 
     @Override
-    public HiveConfig getCluster( String clusterName ) {
+    public HiveConfig getCluster( String clusterName )
+    {
         return pluginDao.getInfo( HiveConfig.PRODUCT_KEY, clusterName, HiveConfig.class );
     }
 
 
     @Override
-    public UUID installCluster( HiveConfig config, HadoopClusterConfig hc ) {
+    public UUID installCluster( HiveConfig config, HadoopClusterConfig hc )
+    {
         InstallHandler h = new InstallHandler( this, config );
         h.setHadoopConfig( hc );
         executor.execute( h );
@@ -176,7 +197,8 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public UUID statusCheck( String clusterName, String hostname ) {
+    public UUID statusCheck( String clusterName, String hostname )
+    {
         AbstractOperationHandler h = new StatusHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -184,7 +206,8 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public UUID startNode( String clusterName, String hostname ) {
+    public UUID startNode( String clusterName, String hostname )
+    {
         AbstractOperationHandler h = new StartHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -192,7 +215,8 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public UUID stopNode( String clusterName, String hostname ) {
+    public UUID stopNode( String clusterName, String hostname )
+    {
         AbstractOperationHandler h = new StopHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -200,7 +224,8 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public UUID restartNode( String clusterName, String hostname ) {
+    public UUID restartNode( String clusterName, String hostname )
+    {
         AbstractOperationHandler h = new RestartHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -208,7 +233,8 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public UUID addNode( String clusterName, String hostname ) {
+    public UUID addNode( String clusterName, String hostname )
+    {
         AbstractOperationHandler h = new AddNodeHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -216,7 +242,8 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public UUID destroyNode( String clusterName, String hostname ) {
+    public UUID destroyNode( String clusterName, String hostname )
+    {
         AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -224,14 +251,16 @@ public class HiveImpl implements Hive {
 
 
     @Override
-    public Map<Agent, Boolean> isInstalled( Set<Agent> nodes ) {
+    public Map<Agent, Boolean> isInstalled( Set<Agent> nodes )
+    {
         CheckInstallHandler h = new CheckInstallHandler( this );
         return h.check( Product.HIVE, nodes );
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, HiveConfig config, ProductOperation po ) {
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, HiveConfig config, ProductOperation po )
+    {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             return new SetupStrategyOverHadoop( this, config, po );
@@ -244,7 +273,4 @@ public class HiveImpl implements Hive {
         }
         return null;
     }
-
-
-
 }

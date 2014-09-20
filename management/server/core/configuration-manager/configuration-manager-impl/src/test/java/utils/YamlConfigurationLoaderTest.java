@@ -12,7 +12,8 @@ import org.yaml.snakeyaml.Yaml;
 /**
  * Created by bahadyr on 7/15/14.
  */
-public class YamlConfigurationLoaderTest {
+public class YamlConfigurationLoaderTest
+{
 
     //    String filePath =
     //            "/home/bahadyr/SUBUTAI/main/management/server/core/configuration-manager/configuration/src/main
@@ -21,7 +22,8 @@ public class YamlConfigurationLoaderTest {
 
 
     @Test
-    public void test() {
+    public void test()
+    {
 
 
         String filePath = "cassandra_conf/cassandra.yaml";
@@ -30,7 +32,8 @@ public class YamlConfigurationLoaderTest {
         Yaml yaml = new Yaml();
         Map<String, Object> config = ( Map<String, Object> ) yaml.load( content );
         Iterator iterator = config.entrySet().iterator();
-        for ( String key : config.keySet() ) {
+        for ( String key : config.keySet() )
+        {
 
             Object value = config.get( key );
         }

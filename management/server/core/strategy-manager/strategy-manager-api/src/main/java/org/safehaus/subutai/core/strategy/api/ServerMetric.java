@@ -6,104 +6,121 @@
 package org.safehaus.subutai.core.strategy.api;
 
 
-import org.safehaus.subutai.core.monitor.api.Metric;
-
 import java.util.Collections;
 import java.util.Map;
+
+import org.safehaus.subutai.core.monitor.api.Metric;
 
 
 /**
  * Class which contains metrics for physical server
  */
-public class ServerMetric {
+public class ServerMetric
+{
 
-    public void setAverageMetrics(Map<Metric, Double> averageMetrics) {
+    //average metrics obtained from elastic search
+    private Map<Metric, Double> averageMetrics;
+    private int freeHddMb;
+    private int freeRamMb;
+    private int cpuLoadPercent;
+    private int numOfProcessors;
+    private int numOfLxcs;
+
+
+    public ServerMetric( int freeHddMb, int freeRamMb, int cpuLoadPercent, int numOfProcessors,
+                         Map<Metric, Double> averageMetrics )
+    {
+        this.freeHddMb = freeHddMb;
+        this.freeRamMb = freeRamMb;
+        this.cpuLoadPercent = cpuLoadPercent;
+        this.numOfProcessors = numOfProcessors;
         this.averageMetrics = averageMetrics;
     }
 
-    //average metrics obtained from elastic search
-	private Map<Metric, Double> averageMetrics;
-	private int freeHddMb;
-	private int freeRamMb;
-	private int cpuLoadPercent;
-	private int numOfProcessors;
-	private int numOfLxcs;
+
+    public Map<Metric, Double> getAverageMetrics()
+    {
+        return Collections.unmodifiableMap( averageMetrics );
+    }
 
 
-	public ServerMetric(int freeHddMb, int freeRamMb, int cpuLoadPercent, int numOfProcessors,
-                        Map<Metric, Double> averageMetrics) {
-		this.freeHddMb = freeHddMb;
-		this.freeRamMb = freeRamMb;
-		this.cpuLoadPercent = cpuLoadPercent;
-		this.numOfProcessors = numOfProcessors;
-		this.averageMetrics = averageMetrics;
-	}
+    public void setAverageMetrics( Map<Metric, Double> averageMetrics )
+    {
+        this.averageMetrics = averageMetrics;
+    }
 
 
-	public Map<Metric, Double> getAverageMetrics() {
-		return Collections.unmodifiableMap(averageMetrics);
-	}
+    public Double getAverageMetric( Metric metricKey )
+    {
+        return averageMetrics.get( metricKey );
+    }
 
 
-	public Double getAverageMetric(Metric metricKey) {
-		return averageMetrics.get(metricKey);
-	}
+    public int getNumOfProcessors()
+    {
+        return numOfProcessors;
+    }
 
 
-	public int getNumOfProcessors() {
-		return numOfProcessors;
-	}
+    public void setNumOfProcessors( int numOfProcessors )
+    {
+        this.numOfProcessors = numOfProcessors;
+    }
 
 
-	public void setNumOfProcessors(int numOfProcessors) {
-		this.numOfProcessors = numOfProcessors;
-	}
+    public int getFreeHddMb()
+    {
+        return freeHddMb;
+    }
 
 
-	public int getFreeHddMb() {
-		return freeHddMb;
-	}
+    public void setFreeHddMb( int freeHddMb )
+    {
+        this.freeHddMb = freeHddMb;
+    }
 
 
-	public void setFreeHddMb(int freeHddMb) {
-		this.freeHddMb = freeHddMb;
-	}
+    public int getFreeRamMb()
+    {
+        return freeRamMb;
+    }
 
 
-	public int getFreeRamMb() {
-		return freeRamMb;
-	}
+    public void setFreeRamMb( int freeRamMb )
+    {
+        this.freeRamMb = freeRamMb;
+    }
 
 
-	public void setFreeRamMb(int freeRamMb) {
-		this.freeRamMb = freeRamMb;
-	}
+    public int getCpuLoadPercent()
+    {
+        return cpuLoadPercent;
+    }
 
 
-	public int getCpuLoadPercent() {
-		return cpuLoadPercent;
-	}
+    public void setCpuLoadPercent( int cpuLoadPercent )
+    {
+        this.cpuLoadPercent = cpuLoadPercent;
+    }
 
 
-	public void setCpuLoadPercent(int cpuLoadPercent) {
-		this.cpuLoadPercent = cpuLoadPercent;
-	}
+    public int getNumOfLxcs()
+    {
+        return numOfLxcs;
+    }
 
 
-	public int getNumOfLxcs() {
-		return numOfLxcs;
-	}
+    public void setNumOfLxcs( int numOfLxcs )
+    {
+        this.numOfLxcs = numOfLxcs;
+    }
 
 
-	public void setNumOfLxcs(int numOfLxcs) {
-		this.numOfLxcs = numOfLxcs;
-	}
-
-
-	@Override
-	public String toString() {
-		return "ServerMetric{" + "freeHddMb=" + freeHddMb + ", freeRamMb=" + freeRamMb + ", cpuLoadPercent="
-				+ cpuLoadPercent + ", numOfProcessors=" + numOfProcessors + ", numOfLxcs=" + numOfLxcs
-				+ ", averageMetrics=" + averageMetrics + '}';
-	}
+    @Override
+    public String toString()
+    {
+        return "ServerMetric{" + "freeHddMb=" + freeHddMb + ", freeRamMb=" + freeRamMb + ", cpuLoadPercent="
+                + cpuLoadPercent + ", numOfProcessors=" + numOfProcessors + ", numOfLxcs=" + numOfLxcs
+                + ", averageMetrics=" + averageMetrics + '}';
+    }
 }

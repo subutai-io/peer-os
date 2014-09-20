@@ -35,8 +35,8 @@ abstract class PigSetupStrategy implements ClusterSetupStrategy
 
         if ( manager.getCluster( config.getClusterName() ) != null )
         {
-            throw new ClusterSetupException( m + String.format(
-                "Cluster '%s' already exists", config.getClusterName() ) );
+            throw new ClusterSetupException(
+                    m + String.format( "Cluster '%s' already exists", config.getClusterName() ) );
         }
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )

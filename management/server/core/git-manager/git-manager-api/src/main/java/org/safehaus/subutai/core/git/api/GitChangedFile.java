@@ -4,33 +4,38 @@ package org.safehaus.subutai.core.git.api;
 /**
  * Represents a path to a changed file with the status of file
  */
-public class GitChangedFile {
+public class GitChangedFile
+{
 
-	private GitFileStatus gitFileStatus;
-	private String gitFilePath;
-
-
-	public GitChangedFile(final GitFileStatus gitFileStatus, final String gitFilePath) {
-		this.gitFileStatus = gitFileStatus;
-		this.gitFilePath = gitFilePath;
-	}
+    private GitFileStatus gitFileStatus;
+    private String gitFilePath;
 
 
-	public GitFileStatus getGitFileStatus() {
-		return gitFileStatus;
-	}
+    public GitChangedFile( final GitFileStatus gitFileStatus, final String gitFilePath )
+    {
+        this.gitFileStatus = gitFileStatus;
+        this.gitFilePath = gitFilePath;
+    }
 
 
-	public String getGitFilePath() {
-		return gitFilePath;
-	}
+    public GitFileStatus getGitFileStatus()
+    {
+        return gitFileStatus;
+    }
 
 
-	@Override
-	public String toString() {
-		return "GitFileDiff{" +
-				"gitFileStatus=" + gitFileStatus +
-				", gitFilePath='" + gitFilePath + '\'' +
-				'}';
-	}
+    public String getGitFilePath()
+    {
+        return gitFilePath;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "GitFileDiff{" +
+                "gitFileStatus=" + gitFileStatus +
+                ", gitFilePath='" + gitFilePath + '\'' +
+                '}';
+    }
 }

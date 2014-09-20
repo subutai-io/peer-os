@@ -17,7 +17,8 @@ public class UninstallOperationHandlerTest {
 
 	@Test
 	public void testWithoutCluster() {
-		AbstractOperationHandler operationHandler = new UninstallOperationHandler(new LuceneImplMock(), "test-cluster");
+		AbstractOperationHandler operationHandler = new UninstallOperationHandler(new LuceneImplMock(),
+		"test-cluster");
 
 		operationHandler.run();
 

@@ -14,36 +14,43 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command(scope = "cassandra", name = "describe-cluster", description = "Shows the details of the Cassandra cluster.")
-public class DescribeClusterCommand extends OsgiCommandSupport {
+public class DescribeClusterCommand extends OsgiCommandSupport
+{
 
-    private Cassandra cassandraManager;
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
+    private Cassandra cassandraManager;
 
 
-    public Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager()
+    {
         return cassandraManager;
     }
 
 
-    public void setCassandraManager( Cassandra cassandraManager ) {
+    public void setCassandraManager( Cassandra cassandraManager )
+    {
         this.cassandraManager = cassandraManager;
     }
 
 
-    protected Object doExecute() {
+    protected Object doExecute()
+    {
         CassandraClusterConfig config = cassandraManager.getCluster( clusterName );
-        if ( config != null ) {
+        if ( config != null )
+        {
             StringBuilder sb = new StringBuilder();
             sb.append( "Cluster name: " ).append( config.getClusterName() ).append( "\n" );
             sb.append( "Nodes:" ).append( "\n" );
-            for ( Agent agent : config.getNodes() ) {
+            for ( Agent agent : config.getNodes() )
+            {
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( ", Agent UUID: " )
                   .append( agent.getUuid() ).append( "\n" );
             }
             sb.append( "Seeds:" ).append( "\n" );
-            for ( Agent agent : config.getSeedNodes() ) {
+            for ( Agent agent : config.getSeedNodes() )
+            {
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( ", Agent UUID: " )
                   .append( agent.getUuid() ).append( "\n" );
             }
@@ -53,7 +60,8 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
             sb.append( "Domain name: " ).append( config.getDomainName() ).append( "\n" );
             System.out.println( sb.toString() );
         }
-        else {
+        else
+        {
             System.out.println( "No clusters found..." );
         }
 

@@ -9,9 +9,11 @@ package org.safehaus.subutai.core.container.api;
 /**
  * Exception which can be thrown while destroying containers
  */
-public class ContainerException extends Exception {
+public class ContainerException extends Exception
+{
 
-	public ContainerException( String message ) {
-		super(message);
-	}
+    public ContainerException( String message )
+    {
+        super( message );
+    }
 }

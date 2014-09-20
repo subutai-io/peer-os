@@ -5,45 +5,59 @@
  */
 package org.safehaus.subutai.plugin.shark.api;
 
+
+import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
-import java.util.Set;
 
 /**
  * @author dilshat
  */
-public class SharkClusterConfig implements ConfigBase {
+public class SharkClusterConfig implements ConfigBase
+{
 
-	public static final String PRODUCT_KEY = "Shark";
-	private String clusterName = "";
+    public static final String PRODUCT_KEY = "Shark";
+    private String clusterName = "";
 
-	private Set<Agent> nodes;
+    private Set<Agent> nodes;
 
-	public String getClusterName() {
-		return clusterName;
-	}
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public String getClusterName()
+    {
+        return clusterName;
+    }
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_KEY;
-	}
 
-	public Set<Agent> getNodes() {
-		return nodes;
-	}
+    public void setClusterName( String clusterName )
+    {
+        this.clusterName = clusterName;
+    }
 
-	public void setNodes(Set<Agent> nodes) {
-		this.nodes = nodes;
-	}
 
-	@Override
-	public String toString() {
-		return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
-	}
+    @Override
+    public String getProductName()
+    {
+        return PRODUCT_KEY;
+    }
 
+
+    public Set<Agent> getNodes()
+    {
+        return nodes;
+    }
+
+
+    public void setNodes( Set<Agent> nodes )
+    {
+        this.nodes = nodes;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
+    }
 }

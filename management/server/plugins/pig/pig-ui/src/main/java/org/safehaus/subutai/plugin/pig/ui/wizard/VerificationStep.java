@@ -21,10 +21,12 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-public class VerificationStep extends Panel {
+public class VerificationStep extends Panel
+{
 
     public VerificationStep( final Pig pig, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard ) {
+                             final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -43,12 +45,15 @@ public class VerificationStep extends Panel {
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Hadoop cluster name", config.getHadoopClusterName() );
 
-        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
-            for ( Agent agent : wizard.getConfig().getNodes() ) {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
+            for ( Agent agent : wizard.getConfig().getNodes() )
+            {
                 cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
             }
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
             cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
             cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
@@ -60,23 +65,29 @@ public class VerificationStep extends Panel {
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
 
                 UUID trackId = null;
 
-                if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
                     trackId = pig.installCluster( config );
                 }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
                     trackId = pig.installCluster( config, wizard.getHadoopConfig() );
                 }
 
                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, Config.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -86,9 +97,11 @@ public class VerificationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );

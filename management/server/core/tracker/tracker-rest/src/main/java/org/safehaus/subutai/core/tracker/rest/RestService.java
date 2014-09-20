@@ -9,7 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
-public interface RestService {
+public interface RestService
+{
 
     @GET
     @Path("operations/{source}/{uuid}")
@@ -21,7 +22,7 @@ public interface RestService {
     @Path("operations/{source}/{dateFrom}/{dateTo}/{limit}")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getProductOperations( @PathParam("source") String source, @PathParam("dateFrom") String fromDate,
-                                        @PathParam("dateTo") String toDate, @PathParam("limit") int limit );
+                                          @PathParam("dateTo") String toDate, @PathParam("limit") int limit );
 
     @GET
     @Path("operations/sources")

@@ -5,22 +5,26 @@ import java.util.UUID;
 
 
 /**
- * Created by timur on 9/16/14.
+ * Container event type.
  */
-public class ContainerEvent {
+public class ContainerEvent
+{
     private ContainerEventType eventType;
     private UUID envId;
     private String parentHostname;
     private String hostname;
     private long timestamp;
 
-    public ContainerEvent(ContainerEventType eventType, UUID envId, String parentHostname, String hostname) {
+
+    public ContainerEvent( ContainerEventType eventType, UUID envId, String parentHostname, String hostname )
+    {
         this.eventType = eventType;
         this.envId = envId;
         this.hostname = hostname;
         this.parentHostname = parentHostname;
         this.timestamp = System.currentTimeMillis();
     }
+
 
     public ContainerEventType getEventType()
     {

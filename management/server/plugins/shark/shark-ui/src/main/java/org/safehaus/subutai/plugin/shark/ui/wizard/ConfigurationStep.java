@@ -26,9 +26,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends Panel
+{
 
-    public ConfigurationStep( Spark spark, final Wizard wizard ) {
+    public ConfigurationStep( Spark spark, final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -45,17 +47,22 @@ public class ConfigurationStep extends Panel {
         sparkClusters.setNullSelectionAllowed( false );
 
         List<SparkClusterConfig> clusters = spark.getClusters();
-        if ( clusters.size() > 0 ) {
-            for ( SparkClusterConfig info : clusters ) {
+        if ( clusters.size() > 0 )
+        {
+            for ( SparkClusterConfig info : clusters )
+            {
                 sparkClusters.addItem( info );
                 sparkClusters.setItemCaption( info, info.getClusterName() );
             }
         }
 
-        sparkClusters.addValueChangeListener( new Property.ValueChangeListener() {
+        sparkClusters.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     SparkClusterConfig config = ( SparkClusterConfig ) event.getProperty().getValue();
                     wizard.getConfig().setClusterName( config.getClusterName() );
                     wizard.getConfig().setNodes( config.getAllNodes() );
@@ -64,18 +71,23 @@ public class ConfigurationStep extends Panel {
         } );
 
 
-        if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
-            if ( clusters.size() > 0 ) {
+        if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+        {
+            if ( clusters.size() > 0 )
+            {
                 sparkClusters.setValue( clusters.iterator().next() );
             }
         }
-        else {
+        else
+        {
             SparkClusterConfig info = spark.getCluster( wizard.getConfig().getClusterName() );
-            if ( info != null ) {
+            if ( info != null )
+            {
                 //restore cluster
                 sparkClusters.setValue( info );
             }
-            else if ( clusters.size() > 0 ) {
+            else if ( clusters.size() > 0 )
+            {
                 sparkClusters.setValue( clusters.iterator().next() );
             }
         }
@@ -83,13 +95,17 @@ public class ConfigurationStep extends Panel {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                {
                     show( "Please, select Spark cluster" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -97,9 +113,11 @@ public class ConfigurationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -120,7 +138,8 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

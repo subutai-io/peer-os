@@ -16,16 +16,17 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "container", name = "clone" )
-public class Clone extends OsgiCommandSupport implements ContainerEventListener {
+@Command(scope = "container", name = "clone")
+public class Clone extends OsgiCommandSupport implements ContainerEventListener
+{
 
     ContainerManager containerManager;
 
-    @Argument( index = 0, required = true )
+    @Argument(index = 0, required = true)
     private String hostname;
-    @Argument( index = 1, required = true )
+    @Argument(index = 1, required = true)
     private String templateName;
-    @Argument( index = 2, required = true )
+    @Argument(index = 2, required = true)
     private String cloneName;
 
 

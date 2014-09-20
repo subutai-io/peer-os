@@ -11,29 +11,35 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 /**
  * Created by bahadyr on 9/4/14.
  */
-public class WithHadoopSetupStrategy extends HBaseSetupStrategy {
+public class WithHadoopSetupStrategy extends HBaseSetupStrategy
+{
 
     private Environment environment;
 
 
-    public WithHadoopSetupStrategy( Environment environment, HBaseImpl manager, ProductOperation po, HBaseClusterConfig config ) {
+    public WithHadoopSetupStrategy( Environment environment, HBaseImpl manager, ProductOperation po,
+                                    HBaseClusterConfig config )
+    {
         super( manager, po, config );
         this.environment = environment;
     }
 
 
-    public Environment getEnvironment() {
+    public Environment getEnvironment()
+    {
         return environment;
     }
 
 
-    public void setEnvironment( final Environment environment ) {
+    public void setEnvironment( final Environment environment )
+    {
         this.environment = environment;
     }
 
 
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
 
 
         return config;

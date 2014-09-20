@@ -10,24 +10,25 @@ import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.ui.util.FileUtil;
 
 
-class Chart {
-
-    private final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+class Chart
+{
 
     private static final String CHART_TEMPLATE = FileUtil.getContent( "js/chart.js" );
-
+    private final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
     private final int maxSize;
     //    private final JavaScript javaScript;
 
 
-    Chart( int maxSize ) {
+    Chart( int maxSize )
+    {
         this.maxSize = maxSize;
         //        javaScript = new JavaScript( window );
         loadScripts();
     }
 
 
-    private void loadScripts() {
+    private void loadScripts()
+    {
         //        javaScript.loadFile( "js/jquery.min.js" );
         //        javaScript.loadFile( "js/jquery.flot.min.js" );
         //        javaScript.loadFile( "js/jquery.flot.time.min.js" );
@@ -37,7 +38,8 @@ class Chart {
     }
 
 
-    void load( String host, Metric metric, Map<Date, Double> values ) {
+    void load( String host, Metric metric, Map<Date, Double> values )
+    {
 
         String data = toPoints( values );
         String label = String.format( "%s for %s", metric.toString(), host );
@@ -50,13 +52,16 @@ class Chart {
     }
 
 
-    private String toPoints( Map<Date, Double> values ) {
+    private String toPoints( Map<Date, Double> values )
+    {
 
         StringBuilder str = new StringBuilder();
         int i = 0;
 
-        for ( Map.Entry<Date, Double> entry : values.entrySet() ) {
-            if ( str.length() > 0 ) {
+        for ( Map.Entry<Date, Double> entry : values.entrySet() )
+        {
+            if ( str.length() > 0 )
+            {
                 str.append( ", " );
             }
 
@@ -64,7 +69,8 @@ class Chart {
                     entry.getValue() ) );
             i++;
 
-            if ( i > maxSize ) {
+            if ( i > maxSize )
+            {
                 break;
             }
         }

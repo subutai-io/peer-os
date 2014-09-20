@@ -12,60 +12,70 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * @author dilshat
  */
-public class TrimmedMongodbConfig {
+public class TrimmedMongodbConfig
+{
 
-	private String clusterName = "";
-	private String replicaSetName = "repl";
-	private String domainName = Common.DEFAULT_DOMAIN_NAME;
-	private int numberOfConfigServers = 3;
-	private int numberOfRouters = 2;
-	private int numberOfDataNodes = 3;
-	private int cfgSrvPort = 27019;
-	private int routerPort = 27018;
-	private int dataNodePort = 27017;
-
-
-	public String getClusterName() {
-		return clusterName;
-	}
+    private String clusterName = "";
+    private String replicaSetName = "repl";
+    private String domainName = Common.DEFAULT_DOMAIN_NAME;
+    private int numberOfConfigServers = 3;
+    private int numberOfRouters = 2;
+    private int numberOfDataNodes = 3;
+    private int cfgSrvPort = 27019;
+    private int routerPort = 27018;
+    private int dataNodePort = 27017;
 
 
-	public String getReplicaSetName() {
-		return replicaSetName;
-	}
+    public String getClusterName()
+    {
+        return clusterName;
+    }
 
 
-	public String getDomainName() {
-		return domainName;
-	}
+    public String getReplicaSetName()
+    {
+        return replicaSetName;
+    }
 
 
-	public int getNumberOfConfigServers() {
-		return numberOfConfigServers;
-	}
+    public String getDomainName()
+    {
+        return domainName;
+    }
 
 
-	public int getNumberOfRouters() {
-		return numberOfRouters;
-	}
+    public int getNumberOfConfigServers()
+    {
+        return numberOfConfigServers;
+    }
 
 
-	public int getNumberOfDataNodes() {
-		return numberOfDataNodes;
-	}
+    public int getNumberOfRouters()
+    {
+        return numberOfRouters;
+    }
 
 
-	public int getCfgSrvPort() {
-		return cfgSrvPort;
-	}
+    public int getNumberOfDataNodes()
+    {
+        return numberOfDataNodes;
+    }
 
 
-	public int getRouterPort() {
-		return routerPort;
-	}
+    public int getCfgSrvPort()
+    {
+        return cfgSrvPort;
+    }
 
 
-	public int getDataNodePort() {
-		return dataNodePort;
-	}
+    public int getRouterPort()
+    {
+        return routerPort;
+    }
+
+
+    public int getDataNodePort()
+    {
+        return dataNodePort;
+    }
 }

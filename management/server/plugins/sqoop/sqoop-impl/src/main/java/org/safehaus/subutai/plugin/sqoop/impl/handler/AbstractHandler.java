@@ -10,28 +10,33 @@ import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 
 
-abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl> {
+abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl>
+{
 
     protected String hostname;
 
 
-    public AbstractHandler( SqoopImpl manager, String clusterName, ProductOperation po ) {
+    public AbstractHandler( SqoopImpl manager, String clusterName, ProductOperation po )
+    {
         super( manager, clusterName );
         this.productOperation = po;
     }
 
 
-    public String getHostname() {
+    public String getHostname()
+    {
         return hostname;
     }
 
 
-    public void setHostname( String hostname ) {
+    public void setHostname( String hostname )
+    {
         this.hostname = hostname;
     }
 
 
-    public SqoopConfig getClusterConfig() {
+    public SqoopConfig getClusterConfig()
+    {
         return manager.getPluginDao().getInfo( SqoopConfig.PRODUCT_KEY, clusterName, SqoopConfig.class );
     }
 
@@ -41,7 +46,8 @@ abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl> {
      *
      * @return number of connected nodes
      */
-    int checkNodes( SqoopConfig config, boolean removeDisconnected ) {
+    int checkNodes( SqoopConfig config, boolean removeDisconnected )
+    {
         int connected = 0;
         Iterator<Agent> it = config.getNodes().iterator();
         while ( it.hasNext() )
@@ -64,12 +70,14 @@ abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl> {
     }
 
 
-    boolean isNodeConnected( String hostname ) {
+    boolean isNodeConnected( String hostname )
+    {
         return manager.getAgentManager().getAgentByHostname( hostname ) != null;
     }
 
 
-    boolean isZero( Integer i ) {
+    boolean isZero( Integer i )
+    {
         return i != null && i == 0;
     }
 }

@@ -1,5 +1,9 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -15,83 +19,108 @@ import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
-import java.util.HashSet;
-import java.util.Set;
 
-public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl> {
+public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
+{
 
     private final SparkClusterConfig config;
     private HadoopClusterConfig hadoopConfig;
 
-    public InstallOperationHandler(SparkImpl manager, SparkClusterConfig config) {
-        super(manager, config.getClusterName());
+
+    public InstallOperationHandler( SparkImpl manager, SparkClusterConfig config )
+    {
+        super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation(SparkClusterConfig.PRODUCT_KEY,
-                String.format("Installing %s", SparkClusterConfig.PRODUCT_KEY));
+        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+                String.format( "Installing %s", SparkClusterConfig.PRODUCT_KEY ) );
     }
 
-    public void setHadoopConfig(HadoopClusterConfig hadoopConfig) {
+
+    public void setHadoopConfig( HadoopClusterConfig hadoopConfig )
+    {
         this.hadoopConfig = hadoopConfig;
     }
 
+
     @Override
-    public void run() {
+    public void run()
+    {
         ProductOperation po = productOperation;
         Environment env = null;
-        if (config.getSetupType() == SetupType.WITH_HADOOP) {
+        if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
 
-            if (hadoopConfig == null) {
-                po.addLogFailed("No Hadoop configuration specified");
+            if ( hadoopConfig == null )
+            {
+                po.addLogFailed( "No Hadoop configuration specified" );
                 return;
             }
 
-            po.addLog("Preparing environment...");
-            hadoopConfig.setTemplateName(SparkClusterConfig.TEMPLATE_NAME);
-            try {
-                EnvironmentBuildTask eb = manager.getHadoopManager()
-                        .getDefaultEnvironmentBlueprint(hadoopConfig);
-                env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
-            } catch (ClusterSetupException ex) {
-                po.addLogFailed("Failed to prepare environment: " + ex.getMessage());
-                destroyNodes(env);
-                return;
-            } catch (EnvironmentBuildException ex) {
-                po.addLogFailed("Failed to build environment: " + ex.getMessage());
-                destroyNodes(env);
+            po.addLog( "Preparing environment..." );
+            hadoopConfig.setTemplateName( SparkClusterConfig.TEMPLATE_NAME );
+            try
+            {
+                EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
+                env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );
+            }
+            catch ( ClusterSetupException ex )
+            {
+                po.addLogFailed( "Failed to prepare environment: " + ex.getMessage() );
+                destroyNodes( env );
                 return;
             }
-            po.addLog("Environment preparation completed");
+            catch ( EnvironmentBuildException ex )
+            {
+                po.addLogFailed( "Failed to build environment: " + ex.getMessage() );
+                destroyNodes( env );
+                return;
+            }
+            po.addLog( "Environment preparation completed" );
         }
 
-        ClusterSetupStrategy s = manager.getClusterSetupStrategy(po, config, env);
-        try {
-            if (s == null) throw new ClusterSetupException("No setup strategy");
+        ClusterSetupStrategy s = manager.getClusterSetupStrategy( po, config, env );
+        try
+        {
+            if ( s == null )
+            {
+                throw new ClusterSetupException( "No setup strategy" );
+            }
 
-            po.addLog("Installing cluster...");
+            po.addLog( "Installing cluster..." );
             s.setup();
-            po.addLogDone("Installing cluster completed");
-
-        } catch (ClusterSetupException ex) {
-            po.addLogFailed("Failed to setup cluster: " + ex.getMessage());
-            destroyNodes(env);
+            po.addLogDone( "Installing cluster completed" );
         }
-
-    }
-
-    void destroyNodes(Environment env) {
-
-        if (env == null || env.getNodes().isEmpty()) return;
-
-        Set<Agent> set = new HashSet<>(env.getNodes().size());
-        for (Node n : env.getNodes()) set.add(n.getAgent());
-
-        productOperation.addLog("Destroying node(s)...");
-        try {
-            manager.getContainerManager().clonesDestroy(set);
-            productOperation.addLog("Destroying node(s) completed");
-        } catch (LxcDestroyException ex) {
-            productOperation.addLog("Failed to destroy node(s): " + ex.getMessage());
+        catch ( ClusterSetupException ex )
+        {
+            po.addLogFailed( "Failed to setup cluster: " + ex.getMessage() );
+            destroyNodes( env );
         }
     }
 
+
+    void destroyNodes( Environment env )
+    {
+
+        if ( env == null || env.getNodes().isEmpty() )
+        {
+            return;
+        }
+
+        Set<Agent> set = new HashSet<>( env.getNodes().size() );
+        for ( Node n : env.getNodes() )
+        {
+            set.add( n.getAgent() );
+        }
+
+        productOperation.addLog( "Destroying node(s)..." );
+        try
+        {
+            manager.getContainerManager().clonesDestroy( set );
+            productOperation.addLog( "Destroying node(s) completed" );
+        }
+        catch ( LxcDestroyException ex )
+        {
+            productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+        }
+    }
 }

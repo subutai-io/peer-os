@@ -8,7 +8,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-public class MahoutClusterConfig implements ConfigBase {
+public class MahoutClusterConfig implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "Mahout";
     public static final String PRODUCT_NAME = "Mahout";
@@ -19,54 +20,64 @@ public class MahoutClusterConfig implements ConfigBase {
     private Set<Agent> nodes = new HashSet();
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public void setClusterName( String clusterName ) {
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
 
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_KEY;
     }
 
 
-    public Set<Agent> getNodes() {
+    public Set<Agent> getNodes()
+    {
         return nodes;
     }
 
 
-    public void setNodes( Set<Agent> nodes ) {
+    public void setNodes( Set<Agent> nodes )
+    {
         this.nodes = nodes;
     }
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName( final String templateName )
+    {
         this.templateName = templateName;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
     }
 
 
-    public SetupType getSetupType() {
+    public SetupType getSetupType()
+    {
         return setupType;
     }
 
 
-    public void setSetupType( final SetupType setupType ) {
+    public void setSetupType( final SetupType setupType )
+    {
         this.setupType = setupType;
     }
 }

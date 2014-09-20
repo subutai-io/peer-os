@@ -22,7 +22,8 @@ import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
 /**
  * @author dilshat
  */
-public class StartTask implements Runnable {
+public class StartTask implements Runnable
+{
 
     private final NodeType nodeType;
     private final String clusterName, lxcHostname;
@@ -32,7 +33,8 @@ public class StartTask implements Runnable {
 
 
     public StartTask( Mongo mongo, Tracker tracker, NodeType nodeType, String clusterName, String lxcHostname,
-                      CompleteEvent completeEvent ) {
+                      CompleteEvent completeEvent )
+    {
         this.mongo = mongo;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -42,37 +44,47 @@ public class StartTask implements Runnable {
     }
 
 
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = mongo.startNode( clusterName, lxcHostname );
 
         long start = System.currentTimeMillis();
         NodeState state = NodeState.UNKNOWN;
         int waitTimeout = Timeouts.START_DATE_NODE_TIMEOUT_SEC;
-        if ( nodeType == NodeType.CONFIG_NODE ) {
+        if ( nodeType == NodeType.CONFIG_NODE )
+        {
             waitTimeout = Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC;
         }
-        else if ( nodeType == NodeType.ROUTER_NODE ) {
+        else if ( nodeType == NodeType.ROUTER_NODE )
+        {
             waitTimeout = Timeouts.START_ROUTER_TIMEOUT_SEC;
         }
 
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( MongoClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( po.getState() == ProductOperationState.SUCCEEDED ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
+                    if ( po.getState() == ProductOperationState.SUCCEEDED )
+                    {
                         state = NodeState.RUNNING;
                     }
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > ( waitTimeout + 3 ) * 1000 ) {
+            if ( System.currentTimeMillis() - start > ( waitTimeout + 3 ) * 1000 )
+            {
                 break;
             }
         }

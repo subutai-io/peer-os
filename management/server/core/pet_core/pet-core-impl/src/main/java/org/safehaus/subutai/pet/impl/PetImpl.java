@@ -7,16 +7,19 @@ import org.safehaus.subutai.pet.api.PetManager;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public class PetImpl implements PetManager {
+public class PetImpl implements PetManager
+{
 
     @Override
-    public String getPetName() {
+    public String getPetName()
+    {
         return "hello kitty beta!";
     }
 
 
     @Override
-    public String helloPet( final String name ) {
+    public String helloPet( final String name )
+    {
         return "Hello dear " + name + "!";
     }
 }

@@ -11,79 +11,106 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 
 
-public class RestUtil {
+public class RestUtil
+{
     public static final int RESPONSE_OK = 200;
 
 
-    public static String get( String url, Map<String, String> params ) throws HTTPException {
+    public static String get( String url, Map<String, String> params ) throws HTTPException
+    {
         WebClient client = null;
         Response response = null;
-        try {
+        try
+        {
             client = WebClient.create( url );
-            if ( params != null ) {
-                for ( Map.Entry<String, String> entry : params.entrySet() ) {
+            if ( params != null )
+            {
+                for ( Map.Entry<String, String> entry : params.entrySet() )
+                {
                     client.query( entry.getKey(), entry.getValue() );
                 }
             }
             response = client.get();
-            if ( response.getStatus() != RESPONSE_OK ) {
+            if ( response.getStatus() != RESPONSE_OK )
+            {
                 throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
             }
-            else {
+            else
+            {
                 return response.readEntity( String.class );
             }
         }
-        finally {
-            if ( response != null ) {
-                try {
+        finally
+        {
+            if ( response != null )
+            {
+                try
+                {
                     response.close();
                 }
-                catch ( Exception ignore ) {
+                catch ( Exception ignore )
+                {
                 }
             }
-            if ( client != null ) {
-                try {
+            if ( client != null )
+            {
+                try
+                {
                     client.close();
                 }
-                catch ( Exception ignore ) {
+                catch ( Exception ignore )
+                {
                 }
             }
         }
     }
 
 
-    public static String post( String url, Map<String, String> params ) throws HTTPException {
+    public static String post( String url, Map<String, String> params ) throws HTTPException
+    {
         WebClient client = null;
         Response response = null;
-        try {
+        try
+        {
             client = WebClient.create( url );
             Form form = new Form();
-            if ( params != null ) {
-                for ( Map.Entry<String, String> entry : params.entrySet() ) {
+            if ( params != null )
+            {
+                for ( Map.Entry<String, String> entry : params.entrySet() )
+                {
                     form.set( entry.getKey(), entry.getValue() );
                 }
             }
             response = client.form( form );
-            if ( response.getStatus() != RESPONSE_OK ) {
+            if ( response.getStatus() != RESPONSE_OK )
+            {
                 throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
             }
-            else {
+            else
+            {
                 return response.readEntity( String.class );
             }
         }
-        finally {
-            if ( response != null ) {
-                try {
+        finally
+        {
+            if ( response != null )
+            {
+                try
+                {
                     response.close();
                 }
-                catch ( Exception ignore ) {
+                catch ( Exception ignore )
+                {
                 }
             }
-            if ( client != null ) {
-                try {
+            if ( client != null )
+            {
+                try
+                {
                     client.close();
                 }
-                catch ( Exception ignore ) {
+                catch ( Exception ignore )
+                {
                 }
             }
         }

@@ -16,7 +16,8 @@ import com.vaadin.ui.GridLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private MahoutUI mahoutUI;
     private GridLayout grid;
@@ -24,7 +25,8 @@ public class Wizard {
     private MahoutClusterConfig config = new MahoutClusterConfig();
 
 
-    public Wizard( final MahoutUI mahoutUi ) {
+    public Wizard( final MahoutUI mahoutUi )
+    {
         this.mahoutUI = mahoutUi;
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -34,68 +36,82 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         grid.removeComponent( 0, 1 );
         Component component = null;
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 component = new WelcomeStep( this );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 component = new ConfigurationStep( this );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 component = new VerificationStep( this );
                 break;
             }
-            default: {
+            default:
+            {
                 break;
             }
         }
 
-        if ( component != null ) {
+        if ( component != null )
+        {
             grid.addComponent( component, 0, 1, 0, 19 );
         }
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         config = new MahoutClusterConfig();
         putForm();
     }
 
 
-    public MahoutClusterConfig getConfig() {
+    public MahoutClusterConfig getConfig()
+    {
         return config;
     }
 
 
-    public MahoutUI getMahoutUI() {
+    public MahoutUI getMahoutUI()
+    {
         return mahoutUI;
     }
 
 
-    public void setMahoutUI( final MahoutUI mahoutUI ) {
+    public void setMahoutUI( final MahoutUI mahoutUI )
+    {
         this.mahoutUI = mahoutUI;
     }
 }

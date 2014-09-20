@@ -4,7 +4,8 @@ package org.safehaus.subutai.plugin.hbase.api;
 /**
  * Created by bahadyr on 4/10/14.
  */
-public enum HBaseType {
+public enum HBaseType
+{
 
     HMaster( "HMaster is running", "HMaster is NOT running" ),
     HQuorumPeer( "HQuorumPeer is running", "HQuorumPeer is NOT running" ),
@@ -14,18 +15,21 @@ public enum HBaseType {
     String notRunningMsg;
 
 
-    HBaseType( String runningMsg, String notRunningMsg ) {
+    HBaseType( String runningMsg, String notRunningMsg )
+    {
         this.runningMsg = runningMsg;
         this.notRunningMsg = notRunningMsg;
     }
 
 
-    public String getRunningMsg() {
+    public String getRunningMsg()
+    {
         return runningMsg;
     }
 
 
-    public String getNotRunningMsg() {
+    public String getNotRunningMsg()
+    {
         return notRunningMsg;
     }
 }

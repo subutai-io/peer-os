@@ -24,7 +24,8 @@ import com.google.common.collect.Sets;
 /**
  * Created by timur on 9/13/14.
  */
-public class ContainerImpl implements Container {
+public class ContainerImpl implements Container
+{
     private Agent agent;
 
     private ContainerManager containerManager;

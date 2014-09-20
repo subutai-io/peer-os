@@ -6,13 +6,14 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
-import com.google.common.base.Preconditions;
+import java.util.Date;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 
-import java.util.Date;
-import java.util.UUID;
+import com.google.common.base.Preconditions;
 
 
 /**
@@ -112,11 +113,11 @@ public class ProductOperationViewImpl implements ProductOperationView
     public String toString()
     {
         return "ProductOperationViewImpl{" +
-            "id=" + id +
-            ", description='" + description + '\'' +
-            ", log='" + log + '\'' +
-            ", state=" + state +
-            ", createDate=" + createDate +
-            '}';
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", log='" + log + '\'' +
+                ", state=" + state +
+                ", createDate=" + createDate +
+                '}';
     }
 }

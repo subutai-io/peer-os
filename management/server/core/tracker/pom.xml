@@ -2,22 +2,22 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mgmt-server-core-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.subutai</groupId>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>tracker-parent</artifactId>
-    <name>Subutai Tracker Parent</name>
-    <description>Subutai Tracker Parent</description>
-    <packaging>pom</packaging>
+  <artifactId>tracker-parent</artifactId>
+  <name>Subutai Tracker Parent</name>
+  <description>Subutai Tracker Parent</description>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>tracker-api</module>
-        <module>tracker-impl</module>
-        <module>tracker-ui</module>
-        <module>tracker-rest</module>
-    </modules>
+  <modules>
+    <module>tracker-api</module>
+    <module>tracker-impl</module>
+    <module>tracker-ui</module>
+    <module>tracker-rest</module>
+  </modules>
 </project>

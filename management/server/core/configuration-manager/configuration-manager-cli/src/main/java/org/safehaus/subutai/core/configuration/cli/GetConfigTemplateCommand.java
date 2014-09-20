@@ -13,24 +13,28 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  */
 @Command(scope = "config", name = "get-config-template",
         description = "Gets the content of given configuration tempalte")
-public class GetConfigTemplateCommand extends OsgiCommandSupport {
+public class GetConfigTemplateCommand extends OsgiCommandSupport
+{
 
-    private TextInjector textInjector;
     @Argument(index = 0, name = "pathToFile", required = true, multiValued = false, description = "Path to file")
     String pathToFile;
+    private TextInjector textInjector;
 
 
-    public TextInjector getTextInjector() {
+    public TextInjector getTextInjector()
+    {
         return textInjector;
     }
 
 
-    public void setTextInjector( final TextInjector textInjector ) {
+    public void setTextInjector( final TextInjector textInjector )
+    {
         this.textInjector = textInjector;
     }
 
 
-    protected Object doExecute() {
+    protected Object doExecute()
+    {
 
         String fileContent = textInjector.getConfigTemplate( pathToFile );
         System.out.println( fileContent );

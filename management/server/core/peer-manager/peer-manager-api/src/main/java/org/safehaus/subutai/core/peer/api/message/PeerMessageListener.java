@@ -7,7 +7,8 @@ import org.safehaus.subutai.core.peer.api.Peer;
 /**
  * Interested modules should implement this interface to receive messages
  */
-public interface PeerMessageListener {
+public interface PeerMessageListener
+{
 
     /**
      * This handler is triggered when a remote message arrives

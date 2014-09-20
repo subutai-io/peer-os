@@ -3,16 +3,16 @@ package org.safehaus.subutai.plugin.accumulo.impl;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -21,7 +21,8 @@ import com.google.common.base.Strings;
 /**
  * This is an accumulo cluster setup strategy over existing Hadoop & ZK clusters
  */
-public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy {
+public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
+{
 
 
     private final AccumuloImpl accumuloManager;
@@ -30,7 +31,8 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
 
 
     public AccumuloOverZkNHadoopSetupStrategy( final AccumuloClusterConfig accumuloClusterConfig,
-                                               final ProductOperation po, final AccumuloImpl accumuloManager ) {
+                                               final ProductOperation po, final AccumuloImpl accumuloManager )
+    {
 
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -43,18 +45,21 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
 
 
     @Override
-    public AccumuloClusterConfig setup() throws ClusterSetupException {
+    public AccumuloClusterConfig setup() throws ClusterSetupException
+    {
         if ( accumuloClusterConfig.getMasterNode() == null || accumuloClusterConfig.getGcNode() == null
                 || accumuloClusterConfig.getMonitor() == null || Strings
                 .isNullOrEmpty( accumuloClusterConfig.getClusterName() ) || CollectionUtil
                 .isCollectionEmpty( accumuloClusterConfig.getTracers() ) || CollectionUtil
                 .isCollectionEmpty( accumuloClusterConfig.getSlaves() ) || Strings
                 .isNullOrEmpty( accumuloClusterConfig.getInstanceName() ) ||
-                Strings.isNullOrEmpty( accumuloClusterConfig.getPassword() ) ) {
+                Strings.isNullOrEmpty( accumuloClusterConfig.getPassword() ) )
+        {
             throw new ClusterSetupException( "Malformed configuration" );
         }
 
-        if ( accumuloManager.getCluster( accumuloClusterConfig.getClusterName() ) != null ) {
+        if ( accumuloManager.getCluster( accumuloClusterConfig.getClusterName() ) != null )
+        {
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists", accumuloClusterConfig.getClusterName() ) );
         }
@@ -62,20 +67,23 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
         HadoopClusterConfig hadoopClusterConfig =
                 accumuloManager.getHadoopManager().getCluster( accumuloClusterConfig.getHadoopClusterName() );
 
-        if ( hadoopClusterConfig == null ) {
+        if ( hadoopClusterConfig == null )
+        {
             throw new ClusterSetupException( String.format( "Hadoop cluster with name '%s' not found",
                     accumuloClusterConfig.getHadoopClusterName() ) );
         }
 
         ZookeeperClusterConfig zookeeperClusterConfig =
                 accumuloManager.getZkManager().getCluster( accumuloClusterConfig.getZookeeperClusterName() );
-        if ( zookeeperClusterConfig == null ) {
+        if ( zookeeperClusterConfig == null )
+        {
             throw new ClusterSetupException( String.format( "ZK cluster with name '%s' not found",
                     accumuloClusterConfig.getZookeeperClusterName() ) );
         }
 
 
-        if ( !hadoopClusterConfig.getAllNodes().containsAll( accumuloClusterConfig.getAllNodes() ) ) {
+        if ( !hadoopClusterConfig.getAllNodes().containsAll( accumuloClusterConfig.getAllNodes() ) )
+        {
             throw new ClusterSetupException( String.format( "Not all supplied nodes belong to Hadoop cluster %s",
                     hadoopClusterConfig.getClusterName() ) );
         }
@@ -86,18 +94,22 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( accumuloClusterConfig.getAllNodes() );
         accumuloManager.getCommandRunner().runCommand( checkInstalledCommand );
 
-        if ( !checkInstalledCommand.hasCompleted() ) {
+        if ( !checkInstalledCommand.hasCompleted() )
+        {
             throw new ClusterSetupException( "Failed to check presence of installed subutai packages" );
         }
 
-        for ( Agent node : accumuloClusterConfig.getAllNodes() ) {
+        for ( Agent node : accumuloClusterConfig.getAllNodes() )
+        {
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME ) ) {
+            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME ) )
+            {
                 throw new ClusterSetupException(
                         String.format( "Node %s already has Accumulo installed", node.getHostname() ) );
             }
-            else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
+            else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+            {
                 throw new ClusterSetupException(
                         String.format( "Node %s has no Hadoop installation", node.getHostname() ) );
             }
@@ -110,18 +122,22 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
         Command installCommand = Commands.getInstallCommand( accumuloClusterConfig.getAllNodes() );
         accumuloManager.getCommandRunner().runCommand( installCommand );
 
-        if ( installCommand.hasSucceeded() ) {
+        if ( installCommand.hasSucceeded() )
+        {
             po.addLog( "Installation succeeded" );
 
-            try {
+            try
+            {
                 new ClusterConfiguration( po, accumuloManager )
                         .configureCluster( accumuloClusterConfig, zookeeperClusterConfig );
             }
-            catch ( ClusterConfigurationException e ) {
+            catch ( ClusterConfigurationException e )
+            {
                 throw new ClusterSetupException( e.getMessage() );
             }
         }
-        else {
+        else
+        {
             throw new ClusterSetupException(
                     String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }

@@ -14,14 +14,16 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings("serial")
-public class BlueprintsForm {
+public class BlueprintsForm
+{
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
 
 
-    public BlueprintsForm( EnvironmentManagerUI managerUI ) {
+    public BlueprintsForm( EnvironmentManagerUI managerUI )
+    {
         this.managerUI = managerUI;
 
 
@@ -33,9 +35,11 @@ public class BlueprintsForm {
 
         Button getEnvironmentsButton = new Button( "View" );
 
-        getEnvironmentsButton.addClickListener( new Button.ClickListener() {
+        getEnvironmentsButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 updateTableData();
             }
         } );
@@ -45,7 +49,8 @@ public class BlueprintsForm {
     }
 
 
-    private Table createTable( String caption, int size ) {
+    private Table createTable( String caption, int size )
+    {
         Table table = new Table( caption );
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "View", Button.class, null );
@@ -60,7 +65,8 @@ public class BlueprintsForm {
     }
 
 
-    private void updateTableData() {
+    private void updateTableData()
+    {
         environmentsTable.removeAllItems();
         List<EnvironmentBuildTask> environmentBuildTasks = managerUI.getEnvironmentManager().getBlueprints();
         if ( environmentBuildTasks.size() > 0 )
@@ -69,9 +75,11 @@ public class BlueprintsForm {
             {
 
                 final Button viewButton = new Button( "View" );
-                viewButton.addClickListener( new Button.ClickListener() {
+                viewButton.addClickListener( new Button.ClickListener()
+                {
                     @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
                         BlueprintDetails details =
                                 new BlueprintDetails( "Blueprint details", managerUI.getEnvironmentManager() );
                         details.setContent( environmentBuildTask.getEnvironmentBlueprint() );
@@ -81,19 +89,24 @@ public class BlueprintsForm {
                 } );
 
                 final Button buildEnvironmentButton = new Button( "Build Environment" );
-                buildEnvironmentButton.addClickListener( new Button.ClickListener() {
+                buildEnvironmentButton.addClickListener( new Button.ClickListener()
+                {
                     @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent ) {
-                        EnvironmentBuildWizard environmentBuildWizard = new EnvironmentBuildWizard( "Wizard", managerUI, environmentBuildTask );
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        EnvironmentBuildWizard environmentBuildWizard =
+                                new EnvironmentBuildWizard( "Wizard", managerUI, environmentBuildTask );
                         contentRoot.getUI().addWindow( environmentBuildWizard );
                         environmentBuildWizard.setVisible( true );
                     }
                 } );
 
                 final Button deleteBlueprintButton = new Button( "Delete" );
-                deleteBlueprintButton.addClickListener( new Button.ClickListener() {
+                deleteBlueprintButton.addClickListener( new Button.ClickListener()
+                {
                     @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
                         managerUI.getEnvironmentManager().deleteBlueprint( environmentBuildTask.getUuid().toString() );
                     }
                 } );
@@ -112,7 +125,8 @@ public class BlueprintsForm {
     }
 
 
-    public VerticalLayout getContentRoot() {
+    public VerticalLayout getContentRoot()
+    {
         return this.contentRoot;
     }
 }

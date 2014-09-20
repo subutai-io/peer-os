@@ -6,108 +6,124 @@
 package org.safehaus.subutai.plugin.zookeeper.api;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.ConfigBase;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
 /**
  * @author dilshat
  */
-public class ZookeeperClusterConfig implements ConfigBase {
+public class ZookeeperClusterConfig implements ConfigBase
+{
 
-	public static final String PRODUCT_KEY = "Zookeeper2";
-	public static final String PRODUCT_NAME = "zookeeper";
-	private String templateName = PRODUCT_NAME;
-	private String clusterName = "";
-	private int numberOfNodes = 3;
-	private Set<Agent> nodes;
-	private SetupType setupType;
-	private String hadoopClusterName;
-
-
-	public ZookeeperClusterConfig() {
-		nodes = new HashSet<>();
-	}
+    public static final String PRODUCT_KEY = "Zookeeper2";
+    public static final String PRODUCT_NAME = "zookeeper";
+    private String templateName = PRODUCT_NAME;
+    private String clusterName = "";
+    private int numberOfNodes = 3;
+    private Set<Agent> nodes;
+    private SetupType setupType;
+    private String hadoopClusterName;
 
 
-	public String getHadoopClusterName() {
-		return hadoopClusterName;
-	}
+    public ZookeeperClusterConfig()
+    {
+        nodes = new HashSet<>();
+    }
 
 
-	public void setHadoopClusterName(final String hadoopClusterName) {
-		this.hadoopClusterName = hadoopClusterName;
-	}
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
+    }
 
 
-	public String getTemplateName() {
-		return templateName;
-	}
+    public void setHadoopClusterName( final String hadoopClusterName )
+    {
+        this.hadoopClusterName = hadoopClusterName;
+    }
 
 
-	public void setTemplateName(final String templateName) {
-		this.templateName = templateName;
-	}
+    public String getTemplateName()
+    {
+        return templateName;
+    }
 
 
-	public SetupType getSetupType() {
-		return setupType;
-	}
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
 
 
-	public void setSetupType(final SetupType setupType) {
-		this.setupType = setupType;
-	}
+    public SetupType getSetupType()
+    {
+        return setupType;
+    }
 
 
-	public String getClusterName() {
-		return clusterName;
-	}
+    public void setSetupType( final SetupType setupType )
+    {
+        this.setupType = setupType;
+    }
 
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public String getClusterName()
+    {
+        return clusterName;
+    }
 
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_NAME;
-	}
+    public void setClusterName( String clusterName )
+    {
+        this.clusterName = clusterName;
+    }
 
 
-	public int getNumberOfNodes() {
-		return numberOfNodes;
-	}
+    @Override
+    public String getProductName()
+    {
+        return PRODUCT_NAME;
+    }
 
 
-	public void setNumberOfNodes(int numberOfNodes) {
-		this.numberOfNodes = numberOfNodes;
-	}
+    public int getNumberOfNodes()
+    {
+        return numberOfNodes;
+    }
 
 
-	public Set<Agent> getNodes() {
-		return nodes;
-	}
+    public void setNumberOfNodes( int numberOfNodes )
+    {
+        this.numberOfNodes = numberOfNodes;
+    }
 
 
-	public void setNodes(Set<Agent> nodes) {
-		this.nodes = nodes;
-	}
+    public Set<Agent> getNodes()
+    {
+        return nodes;
+    }
 
 
-	@Override
-	public String toString() {
-		return "ZookeeperClusterConfig{" +
-				"templateName='" + templateName + '\'' +
-				", clusterName='" + clusterName + '\'' +
-				", numberOfNodes=" + numberOfNodes +
-				", nodes=" + nodes +
-				", setupType=" + setupType +
-				", hadoopClusterName='" + hadoopClusterName + '\'' +
-				'}';
-	}
+    public void setNodes( Set<Agent> nodes )
+    {
+        this.nodes = nodes;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "ZookeeperClusterConfig{" +
+                "templateName='" + templateName + '\'' +
+                ", clusterName='" + clusterName + '\'' +
+                ", numberOfNodes=" + numberOfNodes +
+                ", nodes=" + nodes +
+                ", setupType=" + setupType +
+                ", hadoopClusterName='" + hadoopClusterName + '\'' +
+                '}';
+    }
 }

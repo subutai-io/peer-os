@@ -9,7 +9,8 @@ package org.safehaus.subutai.core.container.impl.lxcmanager;
 /**
  *
  */
-public enum LxcAction {
+public enum LxcAction
+{
 
-	CLONE, DESTROY, START
+    CLONE, DESTROY, START
 }

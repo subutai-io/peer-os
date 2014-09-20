@@ -13,25 +13,31 @@ import org.safehaus.subutai.common.protocol.ResponseListener;
 /**
  * Created by dilshat on 9/15/14.
  */
-public abstract class AbstractCommandRunner implements CommandRunnerBase, ResponseListener {
+public abstract class AbstractCommandRunner implements CommandRunnerBase, ResponseListener
+{
 
     protected static final Logger LOG = Logger.getLogger( AbstractCommandRunner.class.getName() );
     protected ExpiringCache<UUID, CommandExecutor> commandExecutors;
 
 
-    protected AbstractCommandRunner() {
+    protected AbstractCommandRunner()
+    {
         this.commandExecutors = new ExpiringCache<>();
     }
 
 
-    public void dispose() {
+    public void dispose()
+    {
         Map<UUID, CacheEntry<CommandExecutor>> entries = commandExecutors.getEntries();
         //shutdown all executors which are still there
-        for ( Map.Entry<UUID, CacheEntry<CommandExecutor>> entry : entries.entrySet() ) {
-            try {
+        for ( Map.Entry<UUID, CacheEntry<CommandExecutor>> entry : entries.entrySet() )
+        {
+            try
+            {
                 entry.getValue().getValue().getExecutor().shutdown();
             }
-            catch ( Exception ignore ) {
+            catch ( Exception ignore )
+            {
             }
         }
         commandExecutors.dispose();
@@ -39,37 +45,47 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
 
 
     @Override
-    public void onResponse( final Response response ) {
-        if ( response != null && response.getUuid() != null && response.getTaskUuid() != null ) {
+    public void onResponse( final Response response )
+    {
+        if ( response != null && response.getUuid() != null && response.getTaskUuid() != null )
+        {
             final CommandExecutor commandExecutor = commandExecutors.get( response.getTaskUuid() );
 
-            if ( commandExecutor != null ) {
+            if ( commandExecutor != null )
+            {
 
                 //process command response
-                commandExecutor.getExecutor().execute( new Runnable() {
+                commandExecutor.getExecutor().execute( new Runnable()
+                {
 
-                    public void run() {
+                    public void run()
+                    {
                         //obtain command lock
                         commandExecutor.getCommand().getUpdateLock();
-                        try {
-                            if ( commandExecutors.get( response.getTaskUuid() ) != null ) {
+                        try
+                        {
+                            if ( commandExecutors.get( response.getTaskUuid() ) != null )
+                            {
 
                                 //append results to command
                                 commandExecutor.getCommand().appendResult( response );
 
                                 //call command callback
-                                try {
+                                try
+                                {
                                     commandExecutor.getCallback().onResponse( response,
                                             commandExecutor.getCommand().getResults().get( response.getUuid() ),
                                             commandExecutor.getCommand() );
                                 }
-                                catch ( Exception e ) {
+                                catch ( Exception e )
+                                {
                                     LOG.log( Level.SEVERE, "Error in callback {0}", e );
                                 }
 
                                 //do cleanup on command completion or interruption by user
                                 if ( commandExecutor.getCommand().hasCompleted() || commandExecutor.getCallback()
-                                                                                                   .isStopped() ) {
+                                                                                                   .isStopped() )
+                                {
                                     //remove command executor so that
                                     //if response comes from agent it is not processed by callback
                                     commandExecutors.remove( commandExecutor.getCommand().getCommandUUID() );
@@ -80,7 +96,8 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
                                 }
                             }
                         }
-                        finally {
+                        finally
+                        {
                             commandExecutor.getCommand().releaseUpdateLock();
                         }
                     }
@@ -108,7 +125,8 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
      * @param command - command to run
      * @param commandCallback - - callback to trigger on every response
      */
-    public void runCommand( Command command, CommandCallback commandCallback ) {
+    public void runCommand( Command command, CommandCallback commandCallback )
+    {
         runCommandAsync( command, commandCallback );
         ( ( AbstractCommand ) command ).waitCompletion();
     }
@@ -120,10 +138,13 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
      *
      * @param command - command to run
      */
-    public void runCommandAsync( Command command ) {
-        runCommandAsync( command, new CommandCallback() {
+    public void runCommandAsync( Command command )
+    {
+        runCommandAsync( command, new CommandCallback()
+        {
             @Override
-            public void onResponse( final Response response, final AgentResult agentResult, final Command command ) {
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
+            {
 
             }
         } );
@@ -135,10 +156,13 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
      *
      * @param command - command to run
      */
-    public void runCommand( Command command ) {
-        runCommandAsync( command, new CommandCallback() {
+    public void runCommand( Command command )
+    {
+        runCommandAsync( command, new CommandCallback()
+        {
             @Override
-            public void onResponse( final Response response, final AgentResult agentResult, final Command command ) {
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
+            {
 
             }
         } );

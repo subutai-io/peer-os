@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.api;
 
 
@@ -13,10 +8,8 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
 
-/**
- * @author dilshat
- */
-public class CassandraClusterConfig implements ConfigBase {
+public class CassandraClusterConfig implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "Cassandra";
     public static final String PRODUCT_NAME = "Cassandra";
@@ -32,119 +25,142 @@ public class CassandraClusterConfig implements ConfigBase {
     private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
 
 
-    public static String getProductKey() {
+    public static String getProductKey()
+    {
         return PRODUCT_KEY;
     }
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName( final String templateName )
+    {
         this.templateName = templateName;
     }
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public void setClusterName( String clusterName ) {
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
 
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_KEY;
     }
 
 
-    public String getDataDirectory() {
+    public String getDataDirectory()
+    {
         return dataDirectory;
     }
 
 
-    public void setDataDirectory( String dataDirectory ) {
+    public void setDataDirectory( String dataDirectory )
+    {
         this.dataDirectory = dataDirectory;
     }
 
 
-    public String getCommitLogDirectory() {
+    public String getCommitLogDirectory()
+    {
         return commitLogDirectory;
     }
 
 
-    public void setCommitLogDirectory( String commitLogDirectory ) {
+    public void setCommitLogDirectory( String commitLogDirectory )
+    {
         this.commitLogDirectory = commitLogDirectory;
     }
 
 
-    public String getSavedCachesDirectory() {
+    public String getSavedCachesDirectory()
+    {
         return savedCachesDirectory;
     }
 
 
-    public void setSavedCachesDirectory( String savedCachesDirectory ) {
+    public void setSavedCachesDirectory( String savedCachesDirectory )
+    {
         this.savedCachesDirectory = savedCachesDirectory;
     }
 
 
-    public int getNumberOfSeeds() {
+    public int getNumberOfSeeds()
+    {
         return numberOfSeeds;
     }
 
 
-    public void setNumberOfSeeds( int numberOfSeeds ) {
+    public void setNumberOfSeeds( int numberOfSeeds )
+    {
         this.numberOfSeeds = numberOfSeeds;
     }
 
 
-    public Set<Agent> getSeedNodes() {
+    public Set<Agent> getSeedNodes()
+    {
         return seedNodes;
     }
 
 
-    public void setSeedNodes( Set<Agent> seedNodes ) {
+    public void setSeedNodes( Set<Agent> seedNodes )
+    {
         this.seedNodes = seedNodes;
     }
 
 
-    public Set<Agent> getNodes() {
+    public Set<Agent> getNodes()
+    {
         return nodes;
     }
 
 
-    public void setNodes( Set<Agent> nodes ) {
+    public void setNodes( Set<Agent> nodes )
+    {
         this.nodes = nodes;
     }
 
 
-    public String getDomainName() {
+    public String getDomainName()
+    {
         return domainName;
     }
 
 
-    public void setDomainName( String domainName ) {
+    public void setDomainName( String domainName )
+    {
         this.domainName = domainName;
     }
 
 
-    public int getNumberOfNodes() {
+    public int getNumberOfNodes()
+    {
         return numberOfNodes;
     }
 
 
-    public void setNumberOfNodes( int numberOfNodes ) {
+    public void setNumberOfNodes( int numberOfNodes )
+    {
         this.numberOfNodes = numberOfNodes;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Config{" +
                 "clusterName='" + clusterName + '\'' +
                 ", domainName='" + domainName + '\'' +
@@ -154,10 +170,5 @@ public class CassandraClusterConfig implements ConfigBase {
                 ", commitLogDirectory='" + commitLogDirectory + '\'' +
                 ", savedCachesDirectory='" + savedCachesDirectory + '\'' +
                 '}';
-    }
-
-
-    public void reset() {
-
     }
 }

@@ -10,11 +10,15 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 
-public class AddPropertyOperationHandlerTest {
+public class AddPropertyOperationHandlerTest
+{
 
     @Test
-    public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new AddPropertyOperationHandler( new AccumuloImplMock(), "test-cluster", "test-property", "test-value" );
+    public void testWithoutCluster()
+    {
+        AbstractOperationHandler operationHandler =
+                new AddPropertyOperationHandler( new AccumuloImplMock(), "test-cluster", "test-property",
+                        "test-value" );
 
         operationHandler.run();
 

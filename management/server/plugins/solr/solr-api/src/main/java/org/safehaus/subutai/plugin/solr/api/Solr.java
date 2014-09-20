@@ -6,32 +6,33 @@
 package org.safehaus.subutai.plugin.solr.api;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
-import java.util.UUID;
-
 
 /**
  * @author dilshat
  */
-public interface Solr extends ApiBase<SolrClusterConfig> {
+public interface Solr extends ApiBase<SolrClusterConfig>
+{
 
-    public UUID startNode(String clusterName, String lxcHostname);
+    public UUID startNode( String clusterName, String lxcHostname );
 
-    public UUID stopNode(String clusterName, String lxcHostname);
+    public UUID stopNode( String clusterName, String lxcHostname );
 
-    public UUID checkNode(String clusterName, String lxcHostname);
+    public UUID checkNode( String clusterName, String lxcHostname );
 
-    public UUID addNode(String clusterName);
+    public UUID addNode( String clusterName );
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
+    public UUID destroyNode( String clusterName, String lxcHostname );
 
-    public ClusterSetupStrategy getClusterSetupStrategy(final Environment environment, final SolrClusterConfig config,
-                                                        final ProductOperation po);
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,
+                                                         final ProductOperation po );
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(SolrClusterConfig config);
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( SolrClusterConfig config );
 }

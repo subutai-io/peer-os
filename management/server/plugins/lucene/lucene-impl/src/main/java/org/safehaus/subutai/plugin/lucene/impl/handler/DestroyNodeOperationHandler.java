@@ -1,15 +1,16 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 
-import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.lucene.api.Config;
 import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
+
+import com.google.common.collect.Sets;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<LuceneImpl>
@@ -22,7 +23,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Lucene
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-            String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
+                String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
 
@@ -33,7 +34,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Lucene
         if ( config == null )
         {
             productOperation.addLogFailed(
-                String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -41,21 +42,21 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Lucene
         if ( agent == null )
         {
             productOperation.addLogFailed(
-                String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
         if ( !config.getNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
-                String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
         if ( config.getNodes().size() == 1 )
         {
             productOperation.addLogFailed(
-                "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
             return;
         }
 
@@ -71,7 +72,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Lucene
                 if ( result.getStdOut().contains( "Package ksks-lucene is not installed, so not removed" ) )
                 {
                     productOperation.addLog( String.format( "Lucene is not installed, so not removed on node %s",
-                        agent.getHostname() ) );
+                            agent.getHostname() ) );
                 }
                 else
                 {
@@ -81,7 +82,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Lucene
             else
             {
                 productOperation
-                    .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
+                        .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
             }
 
             config.getNodes().remove( agent );
@@ -95,7 +96,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Lucene
             catch ( DBException e )
             {
                 productOperation
-                    .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
+                        .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
             }
         }
         else

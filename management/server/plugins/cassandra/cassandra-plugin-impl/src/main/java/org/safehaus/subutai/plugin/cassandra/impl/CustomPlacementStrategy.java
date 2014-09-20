@@ -13,7 +13,8 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 
 
-class CustomPlacementStrategy extends LxcPlacementStrategy {
+class CustomPlacementStrategy extends LxcPlacementStrategy
+{
 
     public static final String DEFAULT_NODE_TYPE = "default";
     private final float HDD_PER_NODE_MB = 1024 * 20;
@@ -26,25 +27,30 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
     private final int nodesCount;
 
 
-    public CustomPlacementStrategy( int nodesCount ) {
+    public CustomPlacementStrategy( int nodesCount )
+    {
         this.nodesCount = nodesCount;
     }
 
 
-    public static Map<Agent, Set<Agent>> createNodes( LxcManager lxcManager, int nodesCount )
-            throws LxcCreateException {
+    public static Map<Agent, Set<Agent>> createNodes( LxcManager lxcManager, int nodesCount ) throws LxcCreateException
+    {
         Map<String, Map<Agent, Set<Agent>>> map =
                 lxcManager.createLxcsByStrategy( new CustomPlacementStrategy( nodesCount ) );
 
         // ignore node types and group nodes by physical servers
         Map<Agent, Set<Agent>> res = new HashMap<>();
-        for ( Map<Agent, Set<Agent>> m : map.values() ) {
-            for ( Map.Entry<Agent, Set<Agent>> e : m.entrySet() ) {
+        for ( Map<Agent, Set<Agent>> m : map.values() )
+        {
+            for ( Map.Entry<Agent, Set<Agent>> e : m.entrySet() )
+            {
                 Set<Agent> nodes = res.get( e.getKey() );
-                if ( nodes != null ) {
+                if ( nodes != null )
+                {
                     nodes.addAll( e.getValue() );
                 }
-                else {
+                else
+                {
                     res.put( e.getKey(), e.getValue() );
                 }
             }
@@ -54,33 +60,41 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 
 
     @Override
-    public Map<Agent, Integer> calculateSlots( Map<Agent, ServerMetric> metrics ) {
-        try {
+    public Map<Agent, Integer> calculateSlots( Map<Agent, ServerMetric> metrics )
+    {
+        try
+        {
             return calculateSlotsInternal( metrics );
         }
-        catch ( LxcCreateException ex ) {
+        catch ( LxcCreateException ex )
+        {
             return Collections.emptyMap();
         }
     }
 
 
-    Map<Agent, Integer> calculateSlotsInternal( Map<Agent, ServerMetric> metrics ) throws LxcCreateException {
+    Map<Agent, Integer> calculateSlotsInternal( Map<Agent, ServerMetric> metrics ) throws LxcCreateException
+    {
         Map<Agent, Integer> slots = new HashMap<>();
-        if ( metrics == null || metrics.isEmpty() ) {
+        if ( metrics == null || metrics.isEmpty() )
+        {
             return slots;
         }
 
-        for ( Map.Entry<Agent, ServerMetric> e : metrics.entrySet() ) {
+        for ( Map.Entry<Agent, ServerMetric> e : metrics.entrySet() )
+        {
             ServerMetric m = e.getValue();
             int min = Integer.MAX_VALUE;
 
             int n = Math.round( ( m.getFreeRamMb() - RAM_IN_RESERVE_MB ) / RAM_PER_NODE_MB );
-            if ( ( min = Math.min( n, min ) ) <= 0 ) {
+            if ( ( min = Math.min( n, min ) ) <= 0 )
+            {
                 throw new LxcCreateException( "Placement strategy returned empty due to RAM resources" );
             }
 
             n = Math.round( ( m.getFreeHddMb() - HDD_IN_RESERVE_MB ) / HDD_PER_NODE_MB );
-            if ( ( min = Math.min( n, min ) ) <= 0 ) {
+            if ( ( min = Math.min( n, min ) ) <= 0 )
+            {
                 throw new LxcCreateException( "Placement strategy returned empty due to HDD resources" );
             }
 
@@ -92,25 +106,31 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 
 
     @Override
-    public void calculatePlacement( Map<Agent, ServerMetric> serverMetrics ) throws LxcCreateException {
+    public void calculatePlacement( Map<Agent, ServerMetric> serverMetrics ) throws LxcCreateException
+    {
 
         Map<Agent, Integer> serversSlots = calculateSlotsInternal( serverMetrics );
-        if ( serversSlots.isEmpty() ) {
+        if ( serversSlots.isEmpty() )
+        {
             return;
         }
 
         int available = 0;
-        for ( Integer i : serversSlots.values() ) {
+        for ( Integer i : serversSlots.values() )
+        {
             available += i.intValue();
         }
-        if ( available < nodesCount ) {
+        if ( available < nodesCount )
+        {
             throw new LxcCreateException(
                     String.format( "Placement strategy returned only %d container(s)", available ) );
         }
 
-        for ( int i = 0; i < nodesCount; i++ ) {
+        for ( int i = 0; i < nodesCount; i++ )
+        {
             Agent physicalNode = findBestServer( serversSlots );
-            if ( physicalNode == null ) {
+            if ( physicalNode == null )
+            {
                 break;
             }
 
@@ -124,11 +144,14 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
     }
 
 
-    private Agent findBestServer( Map<Agent, Integer> map ) {
+    private Agent findBestServer( Map<Agent, Integer> map )
+    {
         int max = 0;
         Agent best = null;
-        for ( Map.Entry<Agent, Integer> e : map.entrySet() ) {
-            if ( e.getValue().intValue() > max ) {
+        for ( Map.Entry<Agent, Integer> e : map.entrySet() )
+        {
+            if ( e.getValue().intValue() > max )
+            {
                 best = e.getKey();
                 max = e.getValue().intValue();
             }

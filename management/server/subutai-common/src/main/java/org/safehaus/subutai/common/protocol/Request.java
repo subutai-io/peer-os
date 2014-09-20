@@ -36,13 +36,12 @@ public class Request implements Serializable
 
 
     public Request( String source, RequestType type, UUID uuid, UUID taskUuid, Integer requestSequenceNumber,
-        String workingDirectory, String program, OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath,
-        String stdErrPath, String runAs, List<String> args, Map<String, String> environment, Integer pid,
-        Integer timeout )
+                    String workingDirectory, String program, OutputRedirection stdOut, OutputRedirection stdErr,
+                    String stdOutPath, String stdErrPath, String runAs, List<String> args,
+                    Map<String, String> environment, Integer pid, Integer timeout )
     {
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ),
-            "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
 
         Preconditions.checkNotNull( type, "Request Type is null" );
 
@@ -182,9 +181,9 @@ public class Request implements Serializable
     public String toString()
     {
         return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", taskUuid=" + taskUuid
-            + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory
-            + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath
-            + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment
-            + ", pid=" + pid + ", timeout=" + timeout + '}';
+                + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory
+                + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath
+                + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment
+                + ", pid=" + pid + ", timeout=" + timeout + '}';
     }
 }

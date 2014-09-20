@@ -4,7 +4,8 @@ package org.safehaus.subutai.core.git.api;
 /**
  * Git file change statuses
  */
-public enum GitFileStatus {
+public enum GitFileStatus
+{
     MODIFIED,
     COPIED,
     RENAMED,
@@ -22,8 +23,10 @@ public enum GitFileStatus {
      *
      * @return {@code GitFileStatus}
      */
-    public static GitFileStatus parse( String status ) {
-        switch ( status ) {
+    public static GitFileStatus parse( String status )
+    {
+        switch ( status )
+        {
             case "M":
                 return GitFileStatus.MODIFIED;
             case "C":

@@ -24,9 +24,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class StepSetMaster extends VerticalLayout {
+public class StepSetMaster extends VerticalLayout
+{
 
-    public StepSetMaster( final Wizard wizard ) {
+    public StepSetMaster( final Wizard wizard )
+    {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         verticalLayout.setMargin( true );
@@ -66,24 +68,30 @@ public class StepSetMaster extends VerticalLayout {
         grid.setComponentAlignment( verticalLayoutForm, Alignment.TOP_CENTER );
 
         Button next = new Button( "Next" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.getConfig().setMaster( ( String ) selectMaster.getValue() );
 
-                if ( wizard.getConfig().getMaster() == null ) {
+                if ( wizard.getConfig().getMaster() == null )
+                {
                     show( "Please add master servers" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
         } );
 
         Button back = new Button( "Back" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -103,7 +111,8 @@ public class StepSetMaster extends VerticalLayout {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

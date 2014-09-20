@@ -3,8 +3,6 @@ package org.safehaus.subutai.plugin.presto.ui.manager;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -12,7 +10,8 @@ import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
 
-public class StartTask implements Runnable {
+public class StartTask implements Runnable
+{
 
     private final String clusterName, hostname;
     private final CompleteEvent completeEvent;
@@ -21,7 +20,8 @@ public class StartTask implements Runnable {
 
 
     public StartTask( final Presto presto, final Tracker tracker, String clusterName, String lxcHostname,
-                      CompleteEvent completeEvent ) {
+                      CompleteEvent completeEvent )
+    {
         this.presto = presto;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -31,34 +31,36 @@ public class StartTask implements Runnable {
 
 
     @Override
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = presto.startNode( clusterName, hostname );
 
         long start = System.currentTimeMillis();
-        NodeState state = NodeState.UNKNOWN;
 
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( PrestoClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( po.getState() == ProductOperationState.SUCCEEDED ) {
-                        state = NodeState.RUNNING;
-                    }
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
+                    completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > 60 * 1000 ) {
+            if ( System.currentTimeMillis() - start > 60 * 1000 )
+            {
                 break;
             }
         }
-
-        completeEvent.onComplete( state );
     }
 }

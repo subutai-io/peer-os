@@ -25,13 +25,15 @@ import com.vaadin.ui.themes.Runo;
 /**
  *
  */
-public class LxcForm extends CustomComponent implements Disposable {
+public class LxcForm extends CustomComponent implements Disposable
+{
 
     private final static String managerTabCaption = "Manage";
     private final AgentTree agentTree;
 
 
-    public LxcForm( AgentManager agentManager, LxcManager lxcManager, Executor executor ) {
+    public LxcForm( AgentManager agentManager, LxcManager lxcManager, Executor executor )
+    {
         setHeight( 100, Unit.PERCENTAGE );
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
@@ -49,12 +51,15 @@ public class LxcForm extends CustomComponent implements Disposable {
         final Manager manager = new Manager( agentManager, lxcManager, executor );
         commandsSheet.addTab( new Cloner( lxcManager, agentTree, executor ), "Clone" );
         commandsSheet.addTab( manager, managerTabCaption );
-        commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+        commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
             @Override
-            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
                 TabSheet tabsheet = event.getTabSheet();
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if ( caption.equals( managerTabCaption ) ) {
+                if ( caption.equals( managerTabCaption ) )
+                {
                     manager.getLxcInfo();
                 }
             }
@@ -66,7 +71,8 @@ public class LxcForm extends CustomComponent implements Disposable {
     }
 
 
-    public void dispose() {
+    public void dispose()
+    {
         agentTree.dispose();
     }
 }

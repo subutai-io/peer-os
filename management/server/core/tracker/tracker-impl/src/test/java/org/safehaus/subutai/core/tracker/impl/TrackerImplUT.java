@@ -6,14 +6,12 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
+import java.util.Date;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.tracker.impl.ProductOperationImpl;
-import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
-
-import java.util.Date;
-import java.util.UUID;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
@@ -24,76 +22,84 @@ import static org.mockito.Mockito.verify;
 /**
  * Test for TrackerImpl class
  */
-public class TrackerImplUT {
+public class TrackerImplUT
+{
 
-	private final UUID poID = UUID.randomUUID();
-	private final String SOURCE = "source";
-	private final String DESCRIPTION = "description";
+    private final UUID poID = UUID.randomUUID();
+    private final String SOURCE = "source";
+    private final String DESCRIPTION = "description";
 
-	private DbManager dbManager;
-	private TrackerImpl ti;
-
-
-	@Before
-	public void setupMethod() {
-		dbManager = mock(DbManager.class);
-		ti = new TrackerImpl();
-		ti.setDbManager(dbManager);
-	}
+    private DbManager dbManager;
+    private TrackerImpl ti;
 
 
-	@Test
-	public void shouldCallDbManagerExecuteUpdateWhenCreatePO() {
-
-		ti.createProductOperation(SOURCE, DESCRIPTION);
-
-		verify(dbManager).executeUpdate(any(String.class), anyVararg());
-	}
-
-
-	@Test
-	public void shouldCallDbManagerExecuteUpdateWhenSavePO() {
-
-		ProductOperationImpl poi = new ProductOperationImpl(SOURCE, DESCRIPTION, ti);
-
-		ti.saveProductOperation(SOURCE, poi);
-
-		verify(dbManager).executeUpdate(any(String.class), anyVararg());
-	}
+    @Before
+    public void setupMethod()
+    {
+        dbManager = mock( DbManager.class );
+        ti = new TrackerImpl();
+        ti.setDbManager( dbManager );
+    }
 
 
-	@Test
-	public void shouldCallDbManagerExecuteQueryWhenGetPO() {
+    @Test
+    public void shouldCallDbManagerExecuteUpdateWhenCreatePO()
+    {
 
-		ti.getProductOperation(SOURCE, poID);
+        ti.createProductOperation( SOURCE, DESCRIPTION );
 
-		verify(dbManager).executeQuery(any(String.class), anyVararg());
-	}
-
-
-	@Test
-	public void shouldCallDbManagerExecuteQueryWhenGetPOs() {
-
-		ti.getProductOperations(SOURCE, mock(Date.class), mock(Date.class), 1);
-
-		verify(dbManager).executeQuery(any(String.class), anyVararg());
-	}
+        verify( dbManager ).executeUpdate( any( String.class ), anyVararg() );
+    }
 
 
-	@Test
-	public void shouldCallDbManagerExecuteQueryWhenGetPOSources() {
+    @Test
+    public void shouldCallDbManagerExecuteUpdateWhenSavePO()
+    {
 
-		ti.getProductOperationSources();
+        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, ti );
 
-		verify(dbManager).executeQuery(any(String.class), anyVararg());
-	}
+        ti.saveProductOperation( SOURCE, poi );
+
+        verify( dbManager ).executeUpdate( any( String.class ), anyVararg() );
+    }
 
 
-	@Test
-	public void shouldCallDbManagerExecuteQueryWhenPrintOperationLog() {
+    @Test
+    public void shouldCallDbManagerExecuteQueryWhenGetPO()
+    {
 
-		ti.printOperationLog(SOURCE, poID, 100);
+        ti.getProductOperation( SOURCE, poID );
 
-		verify(dbManager).executeQuery(any(String.class), anyVararg());
-	}
+        verify( dbManager ).executeQuery( any( String.class ), anyVararg() );
+    }
+
+
+    @Test
+    public void shouldCallDbManagerExecuteQueryWhenGetPOs()
+    {
+
+        ti.getProductOperations( SOURCE, mock( Date.class ), mock( Date.class ), 1 );
+
+        verify( dbManager ).executeQuery( any( String.class ), anyVararg() );
+    }
+
+
+    @Test
+    public void shouldCallDbManagerExecuteQueryWhenGetPOSources()
+    {
+
+        ti.getProductOperationSources();
+
+        verify( dbManager ).executeQuery( any( String.class ), anyVararg() );
+    }
+
+
+    @Test
+    public void shouldCallDbManagerExecuteQueryWhenPrintOperationLog()
+    {
+
+        ti.printOperationLog( SOURCE, poID, 100 );
+
+        verify( dbManager ).executeQuery( any( String.class ), anyVararg() );
+    }
 }

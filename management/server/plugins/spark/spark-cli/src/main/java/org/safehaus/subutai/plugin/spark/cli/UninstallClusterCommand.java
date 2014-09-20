@@ -18,7 +18,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command(scope = "spark", name = "uninstall-cluster", description = "Command to uninstall Spark cluster")
-public class UninstallClusterCommand extends OsgiCommandSupport {
+public class UninstallClusterCommand extends OsgiCommandSupport
+{
 
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
@@ -27,49 +28,61 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
     private Tracker tracker;
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public Spark getSparkManager() {
+    public Spark getSparkManager()
+    {
         return sparkManager;
     }
 
 
-    public void setSparkManager( Spark sparkManager ) {
+    public void setSparkManager( Spark sparkManager )
+    {
         this.sparkManager = sparkManager;
     }
 
 
-    protected Object doExecute() {
+    protected Object doExecute()
+    {
         UUID uuid = sparkManager.uninstallCluster( clusterName );
         int logSize = 0;
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( SparkClusterConfig.PRODUCT_KEY, uuid );
-            if ( po != null ) {
-                if ( logSize != po.getLog().length() ) {
+            if ( po != null )
+            {
+                if ( logSize != po.getLog().length() )
+                {
                     System.out.print( po.getLog().substring( logSize, po.getLog().length() ) );
                     System.out.flush();
                     logSize = po.getLog().length();
                 }
-                if ( po.getState() != ProductOperationState.RUNNING ) {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
                     break;
                 }
             }
-            else {
+            else
+            {
                 System.out.println( "Product operation not found. Check logs" );
                 break;
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
         }

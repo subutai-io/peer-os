@@ -15,7 +15,8 @@ import org.safehaus.subutai.common.command.RequestBuilder;
  * Command Runner i used to send requests to agents and obtain responses from them using either Command.getResults() or
  * by parsing AgetnResult inside command callbacks.
  */
-public interface CommandRunner extends CommandRunnerBase {
+public interface CommandRunner extends CommandRunnerBase
+{
 
 
     /**

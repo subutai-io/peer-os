@@ -33,7 +33,8 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class AddNodeWindow extends Window {
+public class AddNodeWindow extends Window
+{
 
     private final TextArea outputTxtArea;
     private final Label indicator;
@@ -41,7 +42,8 @@ public class AddNodeWindow extends Window {
 
 
     public AddNodeWindow( final Zookeeper zookeeper, final ExecutorService executorService, final Tracker tracker,
-                          final ZookeeperClusterConfig config, Set<Agent> nodes ) {
+                          final ZookeeperClusterConfig config, Set<Agent> nodes )
+    {
         super( "Add New Node" );
         setModal( true );
 
@@ -64,7 +66,8 @@ public class AddNodeWindow extends Window {
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 200, Unit.PIXELS );
-        for ( Agent node : nodes ) {
+        for ( Agent node : nodes )
+        {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
         }
@@ -76,36 +79,46 @@ public class AddNodeWindow extends Window {
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
-        addNodeBtn.addClickListener( new Button.ClickListener() {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 addNodeBtn.setEnabled( false );
                 showProgress();
                 Agent agent = ( Agent ) hadoopNodes.getValue();
                 final UUID trackID = zookeeper.addNode( config.getClusterName(), agent.getHostname() );
-                executorService.execute( new Runnable() {
+                executorService.execute( new Runnable()
+                {
 
-                    public void run() {
-                        while ( track ) {
+                    public void run()
+                    {
+                        while ( track )
+                        {
                             ProductOperationView po =
                                     tracker.getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID );
-                            if ( po != null ) {
+                            if ( po != null )
+                            {
                                 setOutput(
                                         po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                                if ( po.getState() != ProductOperationState.RUNNING ) {
+                                if ( po.getState() != ProductOperationState.RUNNING )
+                                {
                                     hideProgress();
                                     break;
                                 }
                             }
-                            else {
+                            else
+                            {
                                 setOutput( "Product operation not found. Check logs" );
                                 break;
                             }
-                            try {
+                            try
+                            {
                                 Thread.sleep( 1000 );
                             }
-                            catch ( InterruptedException ex ) {
+                            catch ( InterruptedException ex )
+                            {
                                 break;
                             }
                         }
@@ -131,10 +144,12 @@ public class AddNodeWindow extends Window {
 
         Button ok = new Button( "Ok" );
         ok.addStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener() {
+        ok.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 //close window
                 track = false;
                 close();
@@ -153,26 +168,31 @@ public class AddNodeWindow extends Window {
     }
 
 
-    private void showProgress() {
+    private void showProgress()
+    {
         indicator.setVisible( true );
     }
 
 
-    private void setOutput( String output ) {
-        if ( !Strings.isNullOrEmpty( output ) ) {
+    private void setOutput( String output )
+    {
+        if ( !Strings.isNullOrEmpty( output ) )
+        {
             outputTxtArea.setValue( output );
             outputTxtArea.setCursorPosition( outputTxtArea.getValue().toString().length() - 1 );
         }
     }
 
 
-    private void hideProgress() {
+    private void hideProgress()
+    {
         indicator.setVisible( false );
     }
 
 
     @Override
-    public void close() {
+    public void close()
+    {
         super.close();
         track = false;
     }

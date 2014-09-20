@@ -11,7 +11,8 @@ import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 /**
  * Created by bahadyr on 8/26/14.
  */
-public class MahoutSetupStrategy implements ClusterSetupStrategy {
+public class MahoutSetupStrategy implements ClusterSetupStrategy
+{
 
 
     public MahoutClusterConfig config;
@@ -19,7 +20,8 @@ public class MahoutSetupStrategy implements ClusterSetupStrategy {
     MahoutImpl manager;
 
 
-    public MahoutSetupStrategy( MahoutImpl manager, final ProductOperation po, final MahoutClusterConfig config ) {
+    public MahoutSetupStrategy( MahoutImpl manager, final ProductOperation po, final MahoutClusterConfig config )
+    {
 
         this.config = config;
         this.po = po;
@@ -28,7 +30,8 @@ public class MahoutSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
         return config;
     }
 }

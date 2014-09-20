@@ -9,9 +9,11 @@ package org.safehaus.subutai.core.container.api.lxcmanager;
 /**
  * Exception which can be thrown while creating lxcs
  */
-public class LxcCreateException extends Exception {
+public class LxcCreateException extends Exception
+{
 
-	public LxcCreateException(String message) {
-		super(message);
-	}
+    public LxcCreateException( String message )
+    {
+        super( message );
+    }
 }

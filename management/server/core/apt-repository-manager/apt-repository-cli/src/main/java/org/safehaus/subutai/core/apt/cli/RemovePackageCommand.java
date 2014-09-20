@@ -1,13 +1,14 @@
 package org.safehaus.subutai.core.apt.cli;
 
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
-import org.safehaus.subutai.common.settings.Common;
+
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command(scope = "apt", name = "remove-package", description = "Remove package from apt repository by name")
@@ -39,8 +40,8 @@ public class RemovePackageCommand extends OsgiCommandSupport
         try
         {
             aptRepositoryManager
-                .removePackageByName( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ),
-                    packageName );
+                    .removePackageByName( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ),
+                            packageName );
         }
         catch ( AptRepoException e )
         {

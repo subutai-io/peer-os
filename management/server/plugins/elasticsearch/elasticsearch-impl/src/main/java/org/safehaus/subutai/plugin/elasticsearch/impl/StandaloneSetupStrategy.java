@@ -2,13 +2,13 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
@@ -18,9 +18,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class StandaloneSetupStrategy implements ClusterSetupStrategy {
+public class StandaloneSetupStrategy implements ClusterSetupStrategy
+{
 
-    private final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration;
+    private final ElasticsearchClusterConfiguration config;
     private final ElasticsearchImpl elasticsearchManager;
     private final ProductOperation po;
     private final Environment environment;
@@ -28,13 +29,14 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
 
     public StandaloneSetupStrategy( final Environment environment,
                                     final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,
-                                    ProductOperation po, ElasticsearchImpl elasticsearchManager ) {
+                                    ProductOperation po, ElasticsearchImpl elasticsearchManager )
+    {
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
         Preconditions.checkNotNull( elasticsearchManager, "elasticsearchManager manager is null" );
 
-        this.elasticsearchClusterConfiguration = elasticsearchClusterConfiguration;
+        this.config = elasticsearchClusterConfiguration;
         this.po = po;
         this.elasticsearchManager = elasticsearchManager;
         this.environment = environment;
@@ -42,40 +44,61 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public ElasticsearchClusterConfiguration setup() throws ClusterSetupException {
-        if ( Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getClusterName() ) ||
+    public ElasticsearchClusterConfiguration setup() throws ClusterSetupException
+    {
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 Strings.isNullOrEmpty( ElasticsearchClusterConfiguration.getTemplateName() ) ||
-                elasticsearchClusterConfiguration.getNumberOfNodes() <= 0 )
+                config.getNumberOfNodes() <= 0 )
         {
             throw new ClusterSetupException( "Malformed configuration" );
         }
 
-        if ( elasticsearchManager.getCluster( elasticsearchClusterConfiguration.getClusterName() ) != null )
+        if ( elasticsearchManager.getCluster( config.getClusterName() ) != null )
         {
-            throw new ClusterSetupException( String.format( "Cluster with name '%s' already exists",
-                    elasticsearchClusterConfiguration.getClusterName() ) );
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getNodes().size() < elasticsearchClusterConfiguration.getNumberOfNodes() )
+        if ( environment.getNodes().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
-                    elasticsearchClusterConfiguration.getNumberOfNodes(), environment.getNodes().size() ) );
+                    config.getNumberOfNodes(), environment.getNodes().size() ) );
         }
 
-        Set<Agent> agents = new HashSet<>();
+        Set<Agent> elasticsearhcNodes = new HashSet<Agent>();
         for ( Node node : environment.getNodes() )
         {
-            if ( node.getTemplate().getProducts()
-                     .contains( Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_NAME ) )
+            elasticsearhcNodes.add( node.getAgent() );
+        }
+        config.setNodes( elasticsearhcNodes );
+
+        Iterator nodesItr = elasticsearhcNodes.iterator();
+        Set<Agent> masterNodes = new HashSet<Agent>();
+        while ( nodesItr.hasNext() )
+        {
+            masterNodes.add( ( Agent ) nodesItr.next() );
+            if ( masterNodes.size() == config.getNumberOfMasterNodes() )
             {
-                agents.add( node.getAgent() );
+                break;
             }
         }
+        config.setMasterNodes( masterNodes );
 
-        elasticsearchClusterConfiguration.getNodes().addAll( agents );
+
+        Set<Agent> dataNodes = new HashSet<Agent>();
+        while ( nodesItr.hasNext() )
+        {
+            Agent temp = ( Agent ) nodesItr.next();
+            if ( !masterNodes.contains( temp ) )
+            {
+                dataNodes.add( temp );
+            }
+        }
+        config.setDataNodes( dataNodes );
+
 
         //check if node agent is connected
-        for ( Agent node : elasticsearchClusterConfiguration.getNodes() )
+        for ( Agent node : config.getNodes() )
         {
             if ( elasticsearchManager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
@@ -85,7 +108,7 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
 
         try
         {
-            new ClusterConfiguration( elasticsearchManager, po ).configureCluster( elasticsearchClusterConfiguration );
+            new ClusterConfiguration( elasticsearchManager, po ).configureCluster( config );
         }
         catch ( ClusterConfigurationException ex )
         {
@@ -95,11 +118,9 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy {
         po.addLog( "Saving cluster information to database..." );
 
         elasticsearchManager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase(),
-                elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
-
+                config.getClusterName(), config );
         po.addLog( "Cluster information saved to database" );
 
-
-        return elasticsearchClusterConfiguration;
+        return config;
     }
 }

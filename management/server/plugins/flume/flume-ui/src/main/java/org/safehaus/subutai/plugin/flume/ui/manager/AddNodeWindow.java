@@ -25,7 +25,8 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 
 
-class AddNodeWindow extends Window {
+class AddNodeWindow extends Window
+{
 
     private final TextArea outputTxtArea;
     private final Button ok;
@@ -34,7 +35,8 @@ class AddNodeWindow extends Window {
 
 
     public AddNodeWindow( final Flume flume, final ExecutorService executorService, final Tracker tracker,
-                          final FlumeConfig config, Set<Agent> nodes ) {
+                          final FlumeConfig config, Set<Agent> nodes )
+    {
         super( "Add New Node" );
         setModal( true );
         setClosable( false );
@@ -61,7 +63,8 @@ class AddNodeWindow extends Window {
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
         hadoopNodes.setWidth( 60, Unit.PERCENTAGE );
-        for ( Agent node : nodes ) {
+        for ( Agent node : nodes )
+        {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
         }
@@ -73,35 +76,45 @@ class AddNodeWindow extends Window {
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
-        addNodeBtn.addClickListener( new Button.ClickListener() {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 addNodeBtn.setEnabled( false );
                 showProgress();
                 Agent agent = ( Agent ) hadoopNodes.getValue();
                 final UUID trackID = flume.addNode( config.getClusterName(), agent.getHostname() );
-                executorService.execute( new Runnable() {
+                executorService.execute( new Runnable()
+                {
 
                     @Override
-                    public void run() {
-                        while ( track ) {
+                    public void run()
+                    {
+                        while ( track )
+                        {
                             ProductOperationView po = tracker.getProductOperation( FlumeConfig.PRODUCT_KEY, trackID );
-                            if ( po != null ) {
+                            if ( po != null )
+                            {
                                 setOutput(
                                         po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                                if ( po.getState() != ProductOperationState.RUNNING ) {
+                                if ( po.getState() != ProductOperationState.RUNNING )
+                                {
                                     hideProgress();
                                     break;
                                 }
                             }
-                            else {
+                            else
+                            {
                                 setOutput( "Product operation not found. Check logs" );
                                 break;
                             }
-                            try {
+                            try
+                            {
                                 Thread.sleep( 1000 );
                             }
-                            catch ( InterruptedException ex ) {
+                            catch ( InterruptedException ex )
+                            {
                                 break;
                             }
                         }
@@ -127,9 +140,11 @@ class AddNodeWindow extends Window {
 
         ok = new Button( "Ok" );
         ok.addStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener() {
+        ok.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 //close window
                 track = false;
                 close();
@@ -149,26 +164,31 @@ class AddNodeWindow extends Window {
 
 
     @Override
-    public void close() {
+    public void close()
+    {
         super.close();
         track = false;
     }
 
 
-    private void showProgress() {
+    private void showProgress()
+    {
         indicator.setVisible( true );
         ok.setEnabled( false );
     }
 
 
-    private void hideProgress() {
+    private void hideProgress()
+    {
         indicator.setVisible( false );
         ok.setEnabled( true );
     }
 
 
-    private void setOutput( String output ) {
-        if ( output != null ) {
+    private void setOutput( String output )
+    {
+        if ( output != null )
+        {
             outputTxtArea.setValue( output );
             outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
         }

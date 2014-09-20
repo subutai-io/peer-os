@@ -6,13 +6,14 @@
 package org.safehaus.subutai.plugin.solr.api;
 
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 
 public class SolrClusterConfig implements ConfigBase
@@ -39,6 +40,13 @@ public class SolrClusterConfig implements ConfigBase
     }
 
 
+    @Override
+    public String getProductName()
+    {
+        return PRODUCT_KEY;
+    }
+
+
     public String getTemplateName()
     {
         return templateName;
@@ -48,13 +56,6 @@ public class SolrClusterConfig implements ConfigBase
     public void setTemplateName( final String templateName )
     {
         this.templateName = templateName;
-    }
-
-
-    @Override
-    public String getProductName()
-    {
-        return PRODUCT_KEY;
     }
 
 
@@ -86,7 +87,7 @@ public class SolrClusterConfig implements ConfigBase
     public String toString()
     {
         return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE ).append( "clusterName", clusterName )
-            .append( "numberOfNodes", numberOfNodes )
-            .append( "nodes", nodes ).toString();
+                                                                            .append( "numberOfNodes", numberOfNodes )
+                                                                            .append( "nodes", nodes ).toString();
     }
 }

@@ -17,7 +17,8 @@ import com.google.common.base.Strings;
 /**
  * Implementation of AgentResult interface
  */
-public class AgentResultImpl implements AgentResult {
+public class AgentResultImpl implements AgentResult
+{
 
     //tagent UUID
     private final UUID agentUUID;
@@ -34,7 +35,8 @@ public class AgentResultImpl implements AgentResult {
      *
      * @param agentUUID - UUID of agent
      */
-    public AgentResultImpl( UUID agentUUID ) {
+    public AgentResultImpl( UUID agentUUID )
+    {
         Preconditions.checkNotNull( agentUUID, "Agent UUID is null" );
 
         this.agentUUID = agentUUID;
@@ -47,15 +49,20 @@ public class AgentResultImpl implements AgentResult {
      *
      * @param response - received response
      */
-    public void appendResults( Response response ) {
-        if ( response != null && exitCode == null && agentUUID.equals( response.getUuid() ) ) {
-            if ( !Strings.isNullOrEmpty( response.getStdOut() ) ) {
+    public void appendResults( Response response )
+    {
+        if ( response != null && exitCode == null && agentUUID.equals( response.getUuid() ) )
+        {
+            if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
+            {
                 stdOut.append( response.getStdOut() );
             }
-            if ( !Strings.isNullOrEmpty( response.getStdErr() ) ) {
+            if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
+            {
                 stdErr.append( response.getStdErr() );
             }
-            if ( response.isFinal() && response.getExitCode() != null ) {
+            if ( response.isFinal() && response.getExitCode() != null )
+            {
                 exitCode = response.getExitCode();
             }
         }
@@ -65,7 +72,8 @@ public class AgentResultImpl implements AgentResult {
     /**
      * Returns command exit code
      */
-    public Integer getExitCode() {
+    public Integer getExitCode()
+    {
         return exitCode;
     }
 
@@ -73,7 +81,8 @@ public class AgentResultImpl implements AgentResult {
     /**
      * Returns command cumulative std output
      */
-    public String getStdOut() {
+    public String getStdOut()
+    {
         return stdOut.toString();
     }
 
@@ -81,7 +90,8 @@ public class AgentResultImpl implements AgentResult {
     /**
      * Returns command cumulative err output
      */
-    public String getStdErr() {
+    public String getStdErr()
+    {
         return stdErr.toString();
     }
 
@@ -89,7 +99,8 @@ public class AgentResultImpl implements AgentResult {
     /**
      * Returns target agent uuid
      */
-    public UUID getAgentUUID() {
+    public UUID getAgentUUID()
+    {
         return agentUUID;
     }
 }
