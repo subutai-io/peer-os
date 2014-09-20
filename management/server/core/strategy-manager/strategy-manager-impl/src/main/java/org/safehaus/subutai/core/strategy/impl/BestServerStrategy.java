@@ -13,8 +13,7 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 
-public class BestServerStrategy extends RoundRobinStrategy
-{
+public class BestServerStrategy extends RoundRobinStrategy {
     private List<Criteria> criteria = new ArrayList<Criteria>();
 
 
@@ -60,8 +59,7 @@ public class BestServerStrategy extends RoundRobinStrategy
 
         // sort servers by their grades in decreasing order
         ArrayList<Map.Entry<Agent, Integer>> ls = new ArrayList<Map.Entry<Agent, Integer>>( grades.entrySet() );
-        Collections.sort( ls, new Comparator<Map.Entry>()
-        {
+        Collections.sort( ls, new Comparator<Map.Entry>() {
 
             @Override
             public int compare( Map.Entry o1, Map.Entry o2 )
@@ -86,8 +84,7 @@ public class BestServerStrategy extends RoundRobinStrategy
 
         List<Map.Entry<Agent, ServerMetric>> ls =
                 new ArrayList<Map.Entry<Agent, ServerMetric>>( serverMetrics.entrySet() );
-        Collections.sort( ls, new Comparator<Map.Entry>()
-        {
+        Collections.sort( ls, new Comparator<Map.Entry>() {
 
             @Override
             public int compare( Map.Entry o1, Map.Entry o2 )

@@ -18,8 +18,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
 /**
  * Created by timur on 9/18/14.
  */
-public class StrategyManagerImpl implements StrategyManager
-{
+public class StrategyManagerImpl implements StrategyManager {
 
     List<ContainerPlacementStrategy> placementStrategies =
             Collections.synchronizedList( new ArrayList<ContainerPlacementStrategy>() );
@@ -105,7 +104,7 @@ public class StrategyManagerImpl implements StrategyManager
 
 
     @Override
-    public ContainerPlacementStrategy findStrategyById( String strategyId )
+    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotAvailable
     {
         ContainerPlacementStrategy placementStrategy = null;
         for ( int i = 0; i < placementStrategies.size() && placementStrategy == null; i++ )
@@ -114,6 +113,10 @@ public class StrategyManagerImpl implements StrategyManager
             {
                 placementStrategy = placementStrategies.get( i );
             }
+        }
+        if ( placementStrategy == null )
+        {
+            throw new StrategyNotAvailable( "Strategy not available." );
         }
         return placementStrategy;
     }
