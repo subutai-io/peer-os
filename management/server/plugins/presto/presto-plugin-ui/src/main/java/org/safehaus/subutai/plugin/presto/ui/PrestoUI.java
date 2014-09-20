@@ -18,11 +18,6 @@ import com.vaadin.ui.Component;
 
 public class PrestoUI implements PortalModule
 {
-    <<<<<<<HEAD
-    protected static final Logger LOG = Logger.getLogger( PrestoUI.class.getName() );
-
-    =======
-            >>>>>>>master
     public static final String MODULE_IMAGE = "presto.png";
     protected static final Logger LOG = Logger.getLogger( PrestoUI.class.getName() );
     private final ServiceLocator serviceLocator;
