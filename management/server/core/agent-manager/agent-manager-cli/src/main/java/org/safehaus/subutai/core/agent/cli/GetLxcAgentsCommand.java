@@ -13,7 +13,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "agent", name = "get-lxc-agents", description = "get lxc agents")
+@Command( scope = "agent", name = "get-lxc-agents", description = "get lxc agents" )
 public class GetLxcAgentsCommand extends OsgiCommandSupport
 {
 

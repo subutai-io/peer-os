@@ -315,14 +315,6 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- REST -->
-                <artifactItem>
-                  <groupId>org.restlet.jse</groupId>
-                  <artifactId>org.restlet</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.restlet.jse</groupId>
-                  <artifactId>org.restlet.ext.jackson</artifactId>
-                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
@@ -428,6 +420,11 @@
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
         <configuration>
+          <descriptors>
+            <descriptor>
+              mvn:org.apache.cxf.karaf/apache-cxf/2.7.11/xml/features
+            </descriptor>
+          </descriptors>
           <ignoreDependencyFlag>true</ignoreDependencyFlag>
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
@@ -436,6 +433,7 @@
             <feature>ssh</feature>
             <feature>webconsole</feature>
             <feature>jms</feature>
+            <feature>cxf</feature>
           </bootFeatures>
         </configuration>
       </plugin>
