@@ -356,68 +356,68 @@
                 </artifactItem>
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-client</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-pool</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-jms-pool</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>javax.management.j2ee</groupId>
-                  <artifactId>management-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-pool</groupId>
-                  <artifactId>commons-pool</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.servicemix.bundles</groupId>
-                  <artifactId>org.apache.servicemix.bundles.junit</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>org.apache.activemq</groupId>-->
+                <!--<artifactId>activemq-client</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>org.apache.activemq</groupId>-->
+                <!--<artifactId>activemq-pool</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>org.apache.activemq</groupId>-->
+                <!--<artifactId>activemq-jms-pool</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>javax.management.j2ee</groupId>-->
+                <!--<artifactId>management-api</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>commons-pool</groupId>-->
+                <!--<artifactId>commons-pool</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>org.apache.servicemix.bundles</groupId>-->
+                <!--<artifactId>org.apache.servicemix.bundles.junit</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- db-manager -->
-                <artifactItem>
-                  <groupId>com.datastax.cassandra</groupId>
-                  <artifactId>cassandra-driver-core</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.codahale.metrics</groupId>
-                  <artifactId>metrics-core</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>io.netty</groupId>
-                  <artifactId>netty</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xerial.snappy</groupId>
-                  <artifactId>snappy-java</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.jpountz.lz4</groupId>
-                  <artifactId>lz4</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>com.datastax.cassandra</groupId>-->
+                <!--<artifactId>cassandra-driver-core</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>com.codahale.metrics</groupId>-->
+                <!--<artifactId>metrics-core</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>io.netty</groupId>-->
+                <!--<artifactId>netty</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>org.xerial.snappy</groupId>-->
+                <!--<artifactId>snappy-java</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>net.jpountz.lz4</groupId>-->
+                <!--<artifactId>lz4</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- monitoring -->
-                <artifactItem>
-                  <groupId>commons-io</groupId>
-                  <artifactId>commons-io</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.codehaus.jackson</groupId>
-                  <artifactId>jackson-mapper-asl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.codehaus.jackson</groupId>
-                  <artifactId>jackson-core-asl</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>commons-io</groupId>-->
+                <!--<artifactId>commons-io</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>org.codehaus.jackson</groupId>-->
+                <!--<artifactId>jackson-mapper-asl</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>org.codehaus.jackson</groupId>-->
+                <!--<artifactId>jackson-core-asl</artifactId>-->
+                <!--</artifactItem>-->
 
               </artifactItems>
             </configuration>
