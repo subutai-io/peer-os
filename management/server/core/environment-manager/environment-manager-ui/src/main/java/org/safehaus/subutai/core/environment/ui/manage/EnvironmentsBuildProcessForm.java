@@ -63,6 +63,14 @@ public class EnvironmentsBuildProcessForm {
 //                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
                 message.setTargetPeerId( UUID.fromString( "66ccf4d9-8ab4-3286-bb9a-8fe14bd19ea5" ) );
                 environmentBuildProcess.addBuildBlock( message );
+                ContainerBuildMessage message2 = new ContainerBuildMessage();
+                message2.setNumberOfContainers( 2 );
+                message2.setTemplateName( "master" );
+                message2.setStrategy( "ROUND_ROBIN" );
+                message2.setEnvironmentUuid( UUID.randomUUID() );
+//                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
+                message2.setTargetPeerId( UUID.fromString( "7e363225-2c4b-3ce3-8b33-d026d3367771" ) );
+                environmentBuildProcess.addBuildBlock( message2 );
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
         } );

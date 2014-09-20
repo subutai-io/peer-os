@@ -295,8 +295,7 @@ public class PeerManagerImpl implements PeerManager {
     public Set<Agent> createContainers( CreateContainersMessage ccm ) {
 
         try {
-
-            if ( getSiteId().equals( ccm.getTargetPeerId() ) ) {
+            if ( getSiteId().toString().equals( ccm.getTargetPeerId().toString() ) ) {
                 UUID envId = ccm.getEnvId();
                 String template = ccm.getTemplate();
                 int numberOfNodes = ccm.getNumberOfNodes();
@@ -305,11 +304,9 @@ public class PeerManagerImpl implements PeerManager {
             } else {
                 RemotePeerClient client = new RemotePeerClient();
                 Peer remotePeer = getPeerByUUID( ccm.getTargetPeerId() );
-
                 String baseUrl = "http://" + remotePeer.getIp() + ":8181/cxf";
                 client.setBaseUrl( baseUrl );
                 String response = client.createRemoteContainers( ccm );
-                LOG.info( "REMOTE CONTAINERS CREATE COMMAND SENT" + response );
             }
         } catch ( ContainerCreateException e ) {
             LOG.severe( e.getMessage() );

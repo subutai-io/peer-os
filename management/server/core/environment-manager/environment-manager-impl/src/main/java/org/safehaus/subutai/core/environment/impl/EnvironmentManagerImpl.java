@@ -268,8 +268,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess ) {
         for ( ContainerBuildMessage cbm : environmentBuildProcess.getContainerBuildMessages() ) {
 
-            LOG.info( "Sending build message to " + cbm.getTargetPeerId() );
-
             CreateContainersMessage ccm = new CreateContainersMessage();
             ccm.setTemplate( cbm.getTemplateName() );
             ccm.setTargetPeerId( cbm.getTargetPeerId() );
@@ -279,9 +277,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             ccm.setCriteria( cbm.getCriteria() );
 
             Set<Agent> agents = peerManager.createContainers( ccm );
-            for ( Agent agent : agents ) {
-                LOG.info( agent.getUuid().toString() );
-            }
+
         }
     }
 
