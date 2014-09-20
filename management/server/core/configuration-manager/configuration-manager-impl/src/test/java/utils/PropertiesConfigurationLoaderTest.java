@@ -16,11 +16,13 @@ import com.google.gson.JsonObject;
 /**
  * Created by bahadyr on 7/16/14.
  */
-public class PropertiesConfigurationLoaderTest {
+public class PropertiesConfigurationLoaderTest
+{
 
 
     @Test
-    public void test() {
+    public void test()
+    {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 

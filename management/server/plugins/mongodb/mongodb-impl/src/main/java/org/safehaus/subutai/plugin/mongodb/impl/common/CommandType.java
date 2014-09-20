@@ -5,10 +5,12 @@
  */
 package org.safehaus.subutai.plugin.mongodb.impl.common;
 
+
 /**
  * Contains mongo control command types
  */
-public enum CommandType {
+public enum CommandType
+{
 
-	START_CONFIG_SERVERS, START_ROUTERS, START_DATA_NODES, FIND_PRIMARY_NODE
+    START_CONFIG_SERVERS, START_ROUTERS, START_DATA_NODES, FIND_PRIMARY_NODE
 }

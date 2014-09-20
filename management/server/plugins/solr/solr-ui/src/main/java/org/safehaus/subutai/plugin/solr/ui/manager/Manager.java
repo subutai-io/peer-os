@@ -46,21 +46,22 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class Manager {
+public class Manager
+{
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private SolrClusterConfig solrClusterConfig;
-
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Solr solr;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
+    private SolrClusterConfig solrClusterConfig;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
@@ -89,9 +90,11 @@ public class Manager {
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 solrClusterConfig = ( SolrClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
@@ -100,9 +103,11 @@ public class Manager {
 
         Button refreshClustersBtn = new Button( "Refresh installations" );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 refreshClustersInfo();
             }
         } );
@@ -110,21 +115,27 @@ public class Manager {
 
         Button destroyClusterBtn = new Button( "Destroy Installation" );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 ConfirmationDialog alert = new ConfirmationDialog(
                         String.format( "Do you want to destroy the %s installation?",
                                 solrClusterConfig.getClusterName() ), "Yes", "No" );
-                alert.getOk().addClickListener( new Button.ClickListener() {
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
                     @Override
-                    public void buttonClick( Button.ClickEvent clickEvent ) {
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
                         UUID trackID = solr.uninstallCluster( solrClusterConfig.getClusterName() );
                         final ProgressWindow window =
                                 new ProgressWindow( executorService, tracker, trackID, SolrClusterConfig.PRODUCT_KEY );
-                        window.getWindow().addCloseListener( new Window.CloseListener() {
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
                             @Override
-                            public void windowClose( Window.CloseEvent closeEvent ) {
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
                                 refreshClustersInfo();
                             }
                         } );
@@ -143,21 +154,26 @@ public class Manager {
     }
 
 
-    public Component getContent() {
-        return contentRoot;
+    private void refreshUI()
+    {
+        if ( solrClusterConfig != null )
+        {
+            populateTable( nodesTable, solrClusterConfig.getNodes() );
+        }
+        else
+        {
+            nodesTable.removeAllItems();
+        }
     }
 
 
-    private void show( String notification ) {
-        Notification.show( notification );
-    }
-
-
-    private void populateTable( final Table table, Set<Agent> agents ) {
+    private void populateTable( final Table table, Set<Agent> agents )
+    {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
@@ -173,23 +189,30 @@ public class Manager {
                     agent.getHostname(), checkBtn, startBtn, stopBtn, progressIcon
             }, null );
 
-            checkBtn.addClickListener( new Button.ClickListener() {
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
 
                     executorService.execute(
                             new CheckTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else if ( state == NodeState.STOPPED ) {
+                                                else if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 progressIcon.setVisible( false );
@@ -199,23 +222,30 @@ public class Manager {
                 }
             } );
 
-            startBtn.addClickListener( new Button.ClickListener() {
+            startBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
 
                     executorService.execute(
                             new StartTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else {
+                                                else
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 progressIcon.setVisible( false );
@@ -225,23 +255,30 @@ public class Manager {
                 }
             } );
 
-            stopBtn.addClickListener( new Button.ClickListener() {
+            stopBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
 
                     executorService.execute(
                             new StopTask( solr, tracker, solrClusterConfig.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.STOPPED ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
-                                                else {
+                                                else
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
                                                 progressIcon.setVisible( false );
@@ -254,41 +291,39 @@ public class Manager {
     }
 
 
-    private void refreshUI() {
-        if ( solrClusterConfig != null ) {
-            populateTable( nodesTable, solrClusterConfig.getNodes() );
-        }
-        else {
-            nodesTable.removeAllItems();
-        }
-    }
-
-
-    public void refreshClustersInfo() {
+    public void refreshClustersInfo()
+    {
         List<SolrClusterConfig> mongoClusterInfos = solr.getClusters();
         SolrClusterConfig clusterInfo = ( SolrClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
-            for ( SolrClusterConfig mongoClusterInfo : mongoClusterInfos ) {
+        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 )
+        {
+            for ( SolrClusterConfig mongoClusterInfo : mongoClusterInfos )
+            {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
             }
-            if ( clusterInfo != null ) {
-                for ( SolrClusterConfig mongoClusterInfo : mongoClusterInfos ) {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+            if ( clusterInfo != null )
+            {
+                for ( SolrClusterConfig mongoClusterInfo : mongoClusterInfos )
+                {
+                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    {
                         clusterCombo.setValue( mongoClusterInfo );
                         return;
                     }
                 }
             }
-            else {
+            else
+            {
                 clusterCombo.setValue( mongoClusterInfos.iterator().next() );
             }
         }
     }
 
 
-    private Table createTableTemplate( String caption ) {
+    private Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
@@ -300,25 +335,42 @@ public class Manager {
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
             }
         } );
         return table;
+    }
+
+
+    private void show( String notification )
+    {
+        Notification.show( notification );
+    }
+
+
+    public Component getContent()
+    {
+        return contentRoot;
     }
 }

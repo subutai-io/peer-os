@@ -14,23 +14,37 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class SparkForm extends CustomComponent {
+public class SparkForm extends CustomComponent
+{
 
-    public SparkForm( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException {
+    public SparkForm( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
-        Manager manager = new Manager( executor, serviceLocator );
+        TabSheet sparkSheet = new TabSheet();
+        sparkSheet.setSizeFull();
+        final Manager manager = new Manager( executor, serviceLocator );
         Wizard wizard = new Wizard( executor, serviceLocator );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
-        verticalLayout.addComponent( mongoSheet );
-
+        sparkSheet.addTab( wizard.getContent(), "Install" );
+        sparkSheet.addTab( manager.getContent(), "Manage" );
+        sparkSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( sparkSheet );
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }

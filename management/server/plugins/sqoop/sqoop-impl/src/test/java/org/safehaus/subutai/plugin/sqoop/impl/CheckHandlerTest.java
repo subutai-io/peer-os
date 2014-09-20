@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.sqoop.impl;
 
+
 import org.junit.Test;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -9,9 +10,12 @@ import org.safehaus.subutai.plugin.sqoop.impl.mock.SqoopImplMock;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
-public class CheckHandlerTest {
+
+public class CheckHandlerTest
+{
     @Test
-    public void testWithoutConfiguration(){
+    public void testWithoutConfiguration()
+    {
         ProductOperation po = SqoopImplMock.getProductOperationMock();
         SqoopImplMock sqoopImplMock = new SqoopImplMock();
         CheckHandler checkHandler = new CheckHandler( sqoopImplMock.getSqoopImplMock(), "test", po );
@@ -19,8 +23,10 @@ public class CheckHandlerTest {
         verify( po ).addLogFailed( "Sqoop installation not found:" + anyString() );
     }
 
+
     @Test
-    public void testNodeNotConnected(){
+    public void testNodeNotConnected()
+    {
         ProductOperation po = SqoopImplMock.getProductOperationMock();
         SqoopImplMock sqoopImplMock = new SqoopImplMock();
         SqoopConfig config = new SqoopConfig();

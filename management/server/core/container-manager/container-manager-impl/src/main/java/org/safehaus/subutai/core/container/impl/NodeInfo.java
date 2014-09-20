@@ -1,57 +1,78 @@
 package org.safehaus.subutai.core.container.impl;
 
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
-class NodeInfo {
 
-	UUID envId;
-	String templateName;
-	Set<PlacementStrategy> strategy;
-	Set<String> products;
-	UUID instanceId;
+class NodeInfo
+{
 
-	public UUID getEnvId() {
-		return envId;
-	}
+    UUID envId;
+    String templateName;
+    Set<PlacementStrategy> strategy;
+    Set<String> products;
+    UUID instanceId;
 
-	public void setEnvId(UUID envId) {
-		this.envId = envId;
-	}
 
-	public String getTemplateName() {
-		return templateName;
-	}
+    public UUID getEnvId()
+    {
+        return envId;
+    }
 
-	public void setTemplateName(String templateName) {
-		this.templateName = templateName;
-	}
 
-	public Set<PlacementStrategy> getStrategy() {
-		return strategy;
-	}
+    public void setEnvId( UUID envId )
+    {
+        this.envId = envId;
+    }
 
-	public void setStrategy(Set<PlacementStrategy> strategy) {
-		this.strategy = strategy;
-	}
 
-	public Set<String> getProducts() {
-		return products;
-	}
+    public String getTemplateName()
+    {
+        return templateName;
+    }
 
-	public void setProducts(Set<String> products) {
-		this.products = products;
-	}
 
-	public UUID getInstanceId() {
-		return instanceId;
-	}
+    public void setTemplateName( String templateName )
+    {
+        this.templateName = templateName;
+    }
 
-	public void setInstanceId(UUID instanceId) {
-		this.instanceId = instanceId;
-	}
 
+    public Set<PlacementStrategy> getStrategy()
+    {
+        return strategy;
+    }
+
+
+    public void setStrategy( Set<PlacementStrategy> strategy )
+    {
+        this.strategy = strategy;
+    }
+
+
+    public Set<String> getProducts()
+    {
+        return products;
+    }
+
+
+    public void setProducts( Set<String> products )
+    {
+        this.products = products;
+    }
+
+
+    public UUID getInstanceId()
+    {
+        return instanceId;
+    }
+
+
+    public void setInstanceId( UUID instanceId )
+    {
+        this.instanceId = instanceId;
+    }
 }

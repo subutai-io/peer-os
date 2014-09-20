@@ -26,9 +26,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class MonitorView extends VerticalLayout implements View {
-
-    private final Logger LOG = Logger.getLogger( MonitorView.class.getName() );
+public class MonitorView extends VerticalLayout implements View
+{
 
     private static String jsonString = "{\n" +
             "    \"parameters\": [\n" +
@@ -122,10 +121,12 @@ public class MonitorView extends VerticalLayout implements View {
             "        }\n" +
             "    ]\n" +
             "}";
+    private final Logger LOG = Logger.getLogger( MonitorView.class.getName() );
 
 
     @Override
-    public void enter( ViewChangeEvent event ) {
+    public void enter( ViewChangeEvent event )
+    {
         setSizeFull();
         addStyleName( "reports" );
 
@@ -138,43 +139,53 @@ public class MonitorView extends VerticalLayout implements View {
         addComponent( panel );
 
         final Gson gson = new Gson();
-        try {
+        try
+        {
             final Parameters param = gson.fromJson( jsonString, Parameters.class );
-            for ( final Setting field : param.parameters ) {
-                if ( field.uiType.equals( "TextField" ) ) {
+            for ( final Setting field : param.parameters )
+            {
+                if ( field.uiType.equals( "TextField" ) )
+                {
                     final TextField textField = new TextField();
                     textField.setWidth( 100, Unit.PERCENTAGE );
                     textField.setCaption( field.label );
                     textField.setInputPrompt( field.tooltip );
                     textField.setDescription( field.tooltip );
                     textField.setImmediate( true );
-                    if ( field.value != null ) {
+                    if ( field.value != null )
+                    {
                         textField.setValue( field.value );
                     }
                     panel.addComponent( textField );
 
-                    textField.addValueChangeListener( new Property.ValueChangeListener() {
+                    textField.addValueChangeListener( new Property.ValueChangeListener()
+                    {
                         @Override
-                        public void valueChange( Property.ValueChangeEvent valueChangeEvent ) {
+                        public void valueChange( Property.ValueChangeEvent valueChangeEvent )
+                        {
                             field.value = textField.getValue();
                         }
                     } );
                 }
-                else {
+                else
+                {
                     final TextArea textArea = new TextArea();
                     textArea.setWidth( 100, Unit.PERCENTAGE );
                     textArea.setCaption( field.label );
                     textArea.setInputPrompt( field.tooltip );
                     textArea.setDescription( field.tooltip );
                     textArea.setImmediate( true );
-                    if ( field.value != null ) {
+                    if ( field.value != null )
+                    {
                         textArea.setValue( field.value );
                     }
                     panel.addComponent( textArea );
 
-                    textArea.addValueChangeListener( new Property.ValueChangeListener() {
+                    textArea.addValueChangeListener( new Property.ValueChangeListener()
+                    {
                         @Override
-                        public void valueChange( Property.ValueChangeEvent valueChangeEvent ) {
+                        public void valueChange( Property.ValueChangeEvent valueChangeEvent )
+                        {
                             field.value = textArea.getValue();
                         }
                     } );
@@ -185,14 +196,17 @@ public class MonitorView extends VerticalLayout implements View {
             button.addStyleName( "default" );
             panel.addComponent( button );
 
-            button.addClickListener( new Button.ClickListener() {
+            button.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     System.out.println( gson.toJson( param ) );
                 }
             } );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.info( ex.getMessage() );
         }
     }

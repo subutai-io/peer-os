@@ -11,95 +11,107 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.command.ExpiringCache;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 
 /**
  * Test for ExpiringCache class
  */
-public class ExpiringCacheUT {
+public class ExpiringCacheUT
+{
 
-	private final Object KEY = new Object();
-	private final Object VALUE = new Object();
-	private final Integer TIME_TO_LIVE_MS = 100;
-	private ExpiringCache cache;
-
-
-	@Before
-	public void beforeMethod() {
-		cache = new ExpiringCache();
-	}
+    private final Object KEY = new Object();
+    private final Object VALUE = new Object();
+    private final Integer TIME_TO_LIVE_MS = 100;
+    private ExpiringCache cache;
 
 
-	@After
-	public void afterMethod() {
-		cache.dispose();
-	}
+    @Before
+    public void beforeMethod()
+    {
+        cache = new ExpiringCache();
+    }
 
 
-	@Test
-	public void shouldReturnValue() {
-
-		cache.put(KEY, VALUE, TIME_TO_LIVE_MS);
-
-		assertNotNull(cache.get(KEY));
-	}
+    @After
+    public void afterMethod()
+    {
+        cache.dispose();
+    }
 
 
-	@Test
-	public void shouldReturnNull() {
+    @Test
+    public void shouldReturnValue()
+    {
 
-		assertNull(cache.get(KEY));
-	}
+        cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
 
-
-	@Test
-	public void shouldRemoveValue() {
-
-		cache.put(KEY, VALUE, TIME_TO_LIVE_MS);
-		cache.remove(KEY);
-
-		assertNull(cache.get(KEY));
-	}
+        assertNotNull( cache.get( KEY ) );
+    }
 
 
-	@Test
-	public void shouldClearValues() {
+    @Test
+    public void shouldReturnNull()
+    {
 
-		cache.put(KEY, VALUE, TIME_TO_LIVE_MS);
-		cache.clear();
-
-		assertNull(cache.get(KEY));
-	}
+        assertNull( cache.get( KEY ) );
+    }
 
 
-	@Test
-	public void shouldReturnEntries() {
+    @Test
+    public void shouldRemoveValue()
+    {
 
-		cache.put(KEY, VALUE, TIME_TO_LIVE_MS);
+        cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
+        cache.remove( KEY );
 
-		assertFalse(cache.getEntries().isEmpty());
-	}
-
-
-	@Test
-	public void shouldExpireEntry() throws InterruptedException {
-
-		cache.put(KEY, VALUE, TIME_TO_LIVE_MS);
-
-		Thread.sleep(TIME_TO_LIVE_MS + 1);
-
-		assertNull(cache.get(KEY));
-	}
+        assertNull( cache.get( KEY ) );
+    }
 
 
-	@Test
-	public void shouldNotExpireEntry() throws InterruptedException {
+    @Test
+    public void shouldClearValues()
+    {
 
-		cache.put(KEY, VALUE, TIME_TO_LIVE_MS);
+        cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
+        cache.clear();
 
-		Thread.sleep(50);
+        assertNull( cache.get( KEY ) );
+    }
 
-		assertNotNull(cache.get(KEY));
-	}
+
+    @Test
+    public void shouldReturnEntries()
+    {
+
+        cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
+
+        assertFalse( cache.getEntries().isEmpty() );
+    }
+
+
+    @Test
+    public void shouldExpireEntry() throws InterruptedException
+    {
+
+        cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
+
+        Thread.sleep( TIME_TO_LIVE_MS + 1 );
+
+        assertNull( cache.get( KEY ) );
+    }
+
+
+    @Test
+    public void shouldNotExpireEntry() throws InterruptedException
+    {
+
+        cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
+
+        Thread.sleep( 50 );
+
+        assertNotNull( cache.get( KEY ) );
+    }
 }

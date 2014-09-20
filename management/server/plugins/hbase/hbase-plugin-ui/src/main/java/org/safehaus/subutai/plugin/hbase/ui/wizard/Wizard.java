@@ -16,7 +16,8 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private final VerticalLayout vlayout;
     private int step = 1;
@@ -24,7 +25,8 @@ public class Wizard {
     private HBaseUI hBaseUI;
 
 
-    public Wizard(HBaseUI hBaseUI) {
+    public Wizard( HBaseUI hBaseUI )
+    {
         this.hBaseUI = hBaseUI;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
@@ -33,48 +35,48 @@ public class Wizard {
     }
 
 
-    public HBaseUI gethBaseUI() {
-        return hBaseUI;
-    }
-
-
-    public void sethBaseUI( final HBaseUI hBaseUI ) {
-        this.hBaseUI = hBaseUI;
-    }
-
-
-    private void putForm() {
+    private void putForm()
+    {
         vlayout.removeAllComponents();
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 vlayout.addComponent( new StepStart( this ) );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 vlayout.addComponent( new ConfigurationStep( this ) );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 vlayout.addComponent( new StepSetMaster( this ) );
                 break;
             }
-            case 4: {
+            case 4:
+            {
                 vlayout.addComponent( new StepSetRegion( this ) );
                 break;
             }
-            case 5: {
+            case 5:
+            {
                 vlayout.addComponent( new StepSetQuorum( this ) );
                 break;
             }
-            case 6: {
+            case 6:
+            {
                 vlayout.addComponent( new StepSetBackupMasters( this ) );
                 break;
             }
-            case 7: {
+            case 7:
+            {
                 vlayout.addComponent( new VerificationStep( this ) );
                 break;
             }
-            default: {
+            default:
+            {
                 step = 1;
                 vlayout.addComponent( new StepStart( this ) );
                 break;
@@ -83,37 +85,55 @@ public class Wizard {
     }
 
 
-    public Component getContent() {
+    public HBaseUI gethBaseUI()
+    {
+        return hBaseUI;
+    }
+
+
+    public void sethBaseUI( final HBaseUI hBaseUI )
+    {
+        this.hBaseUI = hBaseUI;
+    }
+
+
+    public Component getContent()
+    {
         return vlayout;
     }
 
 
-    public void next() {
+    public void next()
+    {
         step++;
         putForm();
     }
 
 
-    public void back() {
+    public void back()
+    {
         step--;
         putForm();
     }
 
 
-    public void cancel() {
+    public void cancel()
+    {
         step = 1;
         putForm();
     }
 
 
-    public void init() {
+    public void init()
+    {
         step = 1;
         config = new HBaseClusterConfig();
         putForm();
     }
 
 
-    public HBaseClusterConfig getConfig() {
+    public HBaseClusterConfig getConfig()
+    {
         return config;
     }
 }

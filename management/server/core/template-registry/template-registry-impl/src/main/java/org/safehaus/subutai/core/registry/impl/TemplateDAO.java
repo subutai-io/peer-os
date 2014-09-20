@@ -20,7 +20,8 @@ import com.google.gson.JsonSyntaxException;
 /**
  * Provides Data Access API for templates
  */
-public class TemplateDAO {
+public class TemplateDAO
+{
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private DbManager dbManager;

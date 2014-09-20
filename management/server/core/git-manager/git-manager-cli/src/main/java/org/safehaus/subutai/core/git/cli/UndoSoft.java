@@ -9,23 +9,24 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Undoes all uncommitted changes to specified files
  */
-@Command( scope = "git", name = "undo-soft", description = "Undo all uncommitted changes to specified files" )
-public class UndoSoft extends OsgiCommandSupport {
+@Command(scope = "git", name = "undo-soft", description = "Undo all uncommitted changes to specified files")
+public class UndoSoft extends OsgiCommandSupport
+{
 
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
-    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
+    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
     String repoPath;
-    @Argument( index = 2, name = "file(s)", required = true, multiValued = true,
-            description = "file(s) to undo changes to" )
+    @Argument(index = 2, name = "file(s)", required = true, multiValued = true,
+            description = "file(s) to undo changes to")
     Collection<String> files;
     private AgentManager agentManager;
     private GitManager gitManager;

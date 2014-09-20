@@ -9,7 +9,8 @@ import org.safehaus.subutai.common.protocol.Response;
 /**
  * Object to be used for exchange with remote counterparts
  */
-public class DispatcherMessage {
+public class DispatcherMessage
+{
 
     private final DispatcherMessageType dispatcherMessageType;
 
@@ -17,30 +18,34 @@ public class DispatcherMessage {
     private Set<Response> responses;
 
 
-    public DispatcherMessage( final DispatcherMessageType dispatcherMessageType,
-                              final Set<BatchRequest> batchRequests ) {
+    public DispatcherMessage( final DispatcherMessageType dispatcherMessageType, final Set<BatchRequest> batchRequests )
+    {
         this.dispatcherMessageType = dispatcherMessageType;
         this.batchRequests = batchRequests;
     }
 
 
-    public DispatcherMessage( final Set<Response> responses, final DispatcherMessageType dispatcherMessageType ) {
+    public DispatcherMessage( final Set<Response> responses, final DispatcherMessageType dispatcherMessageType )
+    {
         this.responses = responses;
         this.dispatcherMessageType = dispatcherMessageType;
     }
 
 
-    public Set<BatchRequest> getBatchRequests() {
+    public Set<BatchRequest> getBatchRequests()
+    {
         return batchRequests;
     }
 
 
-    public Set<Response> getResponses() {
+    public Set<Response> getResponses()
+    {
         return responses;
     }
 
 
-    public DispatcherMessageType getDispatcherMessageType() {
+    public DispatcherMessageType getDispatcherMessageType()
+    {
         return dispatcherMessageType;
     }
 }

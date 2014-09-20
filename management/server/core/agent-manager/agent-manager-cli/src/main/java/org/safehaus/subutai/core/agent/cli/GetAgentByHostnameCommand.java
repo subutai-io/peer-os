@@ -4,19 +4,19 @@ package org.safehaus.subutai.core.agent.cli;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Displays the last log entries
  */
-@Command( scope = "agent", name = "get-agent-by-hostname", description = "get agent by hostname" )
+@Command(scope = "agent", name = "get-agent-by-hostname", description = "get agent by hostname")
 public class GetAgentByHostnameCommand extends OsgiCommandSupport
 {
 
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
     private AgentManager agentManager;
 

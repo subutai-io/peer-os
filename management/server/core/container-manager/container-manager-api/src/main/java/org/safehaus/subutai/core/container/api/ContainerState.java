@@ -9,7 +9,8 @@ package org.safehaus.subutai.core.container.api;
 /**
  * Possible states of container
  */
-public enum ContainerState {
+public enum ContainerState
+{
 
     UNKNOWN, RUNNING, STOPPED, FROZEN;
 

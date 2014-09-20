@@ -1,7 +1,8 @@
 package org.safehaus.subutai.core.template.impl;
 
 
-enum ActionType {
+enum ActionType
+{
 
     SETUP( "setup" ),
     CLONE( "clone" ),
@@ -38,6 +39,12 @@ enum ActionType {
     }
 
 
+    static String wrapInBash( String command )
+    {
+        return String.format( "bash -c '%s'", command );
+    }
+
+
     String buildCommand( String... args )
     {
         StringBuilder sb = new StringBuilder();
@@ -54,12 +61,6 @@ enum ActionType {
             }
         }
         return sb.toString();
-    }
-
-
-    static String wrapInBash( String command )
-    {
-        return String.format( "bash -c '%s'", command );
     }
 
 }

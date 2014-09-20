@@ -17,49 +17,58 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-.v-theme-version:after {
+.v-theme-version:after
+{
     content: "6_8_2";
 }
 
-.v-theme-version-6_8_2 {
+.v-theme-version-6_8_2
+{
     display: none;
 }
 
 /* Automatically compiled css file from subdirectories. */
 
-.v-absolutelayout-wrapper {
+.v-absolutelayout-wrapper
+{
     position: absolute;
     overflow: hidden;
 }
 
-.v-accordion {
+.v-accordion
+{
     position: relative;
     outline: none;
     overflow: hidden;
     text-align: left /* Force default alignment */
 }
 
-.v-accordion-item {
+.v-accordion-item
+{
     position: relative;
     zoom: 1;
 }
 
-.v-accordion-item-caption {
+.v-accordion-item-caption
+{
     overflow: hidden;
     white-space: nowrap;
     background: #eee;
     border-bottom: 1px solid #ddd;
 }
 
-.v-accordion-item-caption .v-caption {
+.v-accordion-item-caption .v-caption
+{
     cursor: pointer;
 }
 
-.v-accordion-item-open .v-accordion-item-caption .v-caption {
+.v-accordion-item-open .v-accordion-item-caption .v-caption
+{
     cursor: default;
 }
 
-.v-accordion-item-content {
+.v-accordion-item-content
+{
     position: absolute;
     width: 100%;
 }
@@ -67,7 +76,8 @@
 /*
  * Default button (more customizable)
  * -------------------------------------- */
-.v-button {
+.v-button
+{
     display: inline-block;
     zoom: 1;
     text-align: center;
@@ -91,20 +101,24 @@
     box-sizing: border-box;
 }
 
-.v-button.v-disabled {
+.v-button.v-disabled
+{
     cursor: default;
 }
 
-.v-ie6 .v-button {
+.v-ie6 .v-button
+{
     display: inline;
 }
 
-.v-ie7 .v-button {
+.v-ie7 .v-button
+{
     display: inline;
 }
 
 .v-button-wrap,
-.v-button-caption {
+.v-button-caption
+{
     vertical-align: middle;
     white-space: nowrap;
     font: inherit;
@@ -113,14 +127,16 @@
 }
 
 .v-button .v-icon,
-.v-nativebutton .v-icon {
+.v-nativebutton .v-icon
+{
     vertical-align: middle;
     margin-right: 3px;
     border: none;
 }
 
 .v-button .v-errorindicator,
-.v-nativebutton .v-errorindicator {
+.v-nativebutton .v-errorindicator
+{
     display: inline-block;
     zoom: 1;
     vertical-align: middle;
@@ -129,7 +145,8 @@
 
 /* Link style (we really should deprecate this) */
 .v-button-link,
-.v-nativebutton-link {
+.v-nativebutton-link
+{
     border: none;
     text-align: left;
     background: transparent;
@@ -142,12 +159,14 @@
 }
 
 /* Inset Safari focus outline a bit */
-.v-sa .v-button-link:focus {
+.v-sa .v-button-link:focus
+{
     outline-offset: -3px;
 }
 
 .v-button-link .v-button-caption,
-.v-nativebutton-link .v-nativebutton-caption {
+.v-nativebutton-link .v-nativebutton-caption
+{
     text-decoration: underline;
     color: inherit;
     text-align: left;
@@ -156,7 +175,8 @@
 /*
  * NativeButton styles (html button element)
  * -------------------------------------- */
-.v-nativebutton {
+.v-nativebutton
+{
     text-align: center;
     cursor: pointer;
     white-space: nowrap;
@@ -166,36 +186,42 @@
     line-height: normal;
 }
 
-.v-nativebutton .v-nativebutton-caption {
+.v-nativebutton .v-nativebutton-caption
+{
     vertical-align: middle;
     white-space: nowrap;
     font: inherit;
     color: inherit;
 }
 
-.v-nativebutton .v-icon {
+.v-nativebutton .v-icon
+{
     vertical-align: middle;
     margin-right: 3px;
 }
 
-.v-nativebutton .v-errorindicator {
+.v-nativebutton .v-errorindicator
+{
     display: inline-block;
     zoom: 1;
     float: none;
 }
 
 /* Fixes streched buttons in IE6 and IE7*/
-.v-ie6 .v-nativebutton {
+.v-ie6 .v-nativebutton
+{
     width: 1px;
 }
 
-.v-ie .v-nativebutton {
+.v-ie .v-nativebutton
+{
     overflow: visible;
     padding-left: 1em;
     padding-right: 1em;
 }
 
-.v-ie .v-nativebutton-link {
+.v-ie .v-nativebutton-link
+{
     padding: 0;
 }
 
@@ -203,29 +229,34 @@
  * Checkbox styles
  * -------------------------------------- */
 
-.v-checkbox {
+.v-checkbox
+{
     display: block;
 }
 
 .v-checkbox,
 .v-checkbox label,
 .v-checkbox input,
-.v-checkbox .v-icon {
+.v-checkbox .v-icon
+{
     vertical-align: middle;
     white-space: nowrap;
 }
 
 /* Fix for IE6/IE7 issue where checkbox moves 1 pixel down after selection (#4636) */
 .v-ie6 .v-checkbox,
-.v-ie7 .v-checkbox {
+.v-ie7 .v-checkbox
+{
     vertical-align: baseline;
 }
 
-.v-checkbox .v-icon {
+.v-checkbox .v-icon
+{
     margin: 0 2px;
 }
 
-.v-checkbox .v-errorindicator {
+.v-checkbox .v-errorindicator
+{
     float: none;
     display: inline;
     display: inline-block;
@@ -243,36 +274,43 @@
 }
 */
 
-.v-captionwrapper {
+.v-captionwrapper
+{
     text-align: left; /* Force default alignment */
 }
 
-.v-caption {
+.v-caption
+{
     overflow: hidden;
     white-space: nowrap;
 }
 
-.v-errorindicator {
+.v-errorindicator
+{
     float: left;
 }
 
-.v-caption .v-icon {
+.v-caption .v-icon
+{
     float: left;
     padding-right: 2px;
     vertical-align: middle;
 }
 
-.v-caption .v-captiontext {
+.v-caption .v-captiontext
+{
     float: left;
     overflow: hidden;
     vertical-align: middle;
 }
 
-.v-caption .v-required-field-indicator {
+.v-caption .v-required-field-indicator
+{
     float: left;
 }
 
-.v-caption-clearelem {
+.v-caption-clearelem
+{
     clear: both;
     width: 0;
     height: 0;
@@ -283,19 +321,22 @@
 .v-ie6 .v-errorindicator,
 .v-ie6 .v-icon,
 .v-ie6 .v-captiontext,
-.v-ie6 .v-required-field-indicator {
+.v-ie6 .v-required-field-indicator
+{
     display: inline;
 }
 
 .v-ie9 .v-gridlayout-margin > div > div > .v-caption,
 .v-ie9 .v-verticallayout > div > div > .v-caption,
-.v-ie9 .v-horizontallayout > div > div > .v-caption {
+.v-ie9 .v-horizontallayout > div > div > .v-caption
+{
     /* Fix possible sub pixel rounding errors that cause error indicators to drop */
     margin-right: -0.5px;
 }
 
 /* References the BODY tag generated by Vaadin application servlet */
-.v-generated-body {
+.v-generated-body
+{
     width: 100%;
     height: 100%;
     border: 0;
@@ -303,7 +344,8 @@
     overflow: hidden;
 }
 
-.v-app {
+.v-app
+{
     height: 100%;
 }
 
@@ -312,11 +354,13 @@
 .v-window,
 .v-popupview-popup,
 .v-label,
-.v-caption {
+.v-caption
+{
     cursor: default;
 }
 
-div.v-app-loading {
+div.v-app-loading
+{
     /* You can use this to provide indication for the user that the application is loading. */
     /* It is applied to the same element as .v-app */
     background-image: url(img/spinner.gif);
@@ -326,7 +370,8 @@ div.v-app-loading {
     height: 100%;
 }
 
-.v-view {
+.v-view
+{
     height: 100%;
     width: 100%;
     /* avoid scrollbars with margins in root layout */
@@ -340,65 +385,79 @@ div.v-app-loading {
  * Try to handle printing somehow. Reasonable printing support 
  * needs application specific planning and CSS tuning.
  */
-@media print {
-    .v-generated-body {
+@media print
+{
+    .v-generated-body
+    {
         height: auto;
         min-height: 20cm;
         overflow: visible;
     }
 
-    .v-app {
+    .v-app
+    {
         height: auto;
         min-height: 20cm;
     }
 
-    .v-view {
+    .v-view
+    {
         overflow: visible;
     }
 
-    .v-gridlayout {
+    .v-gridlayout
+    {
         overflow: visible !important;
     }
 }
 
 .v-view:active,
-.v-view:focus {
+.v-view:focus
+{
     outline: none;
 }
 
 .v-app select,
-.v-window select {
+.v-window select
+{
     margin: 0;
 }
 
-.v-disabled {
+.v-disabled
+{
     opacity: .3;
     filter: alpha(opacity=30);
     cursor: default;
 }
 
-.v-disabled * {
+.v-disabled *
+{
     cursor: default;
 }
 
-* html .v-disabled {
+* html .v-disabled
+{
     zoom: 1;
 }
 
-* + html .v-disabled {
+* + html .v-disabled
+{
     zoom: 1;
 }
 
-.v-disabled .v-disabled {
+.v-disabled .v-disabled
+{
     opacity: 1;
 }
 
-.v-required-field-indicator {
+.v-required-field-indicator
+{
     padding-left: 2px;
     color: red;
 }
 
-.v-form fieldset {
+.v-form fieldset
+{
     border: none;
     padding: 0;
     margin: 0;
@@ -419,24 +478,29 @@ div.v-app-loading {
 	background: #ffffe0;
 }
 */
-.v-tooltip {
+.v-tooltip
+{
     cursor: default;
     background: #fff;
 }
 
-.v-tooltip-text {
+.v-tooltip-text
+{
     overflow: auto;
 }
 
-.v-tooltip .v-errormessage {
+.v-tooltip .v-errormessage
+{
     overflow: auto;
 }
 
-.v-contextmenu {
+.v-contextmenu
+{
     background: #fff;
 }
 
-.v-contextmenu .gwt-MenuItem {
+.v-contextmenu .gwt-MenuItem
+{
     cursor: pointer;
     vertical-align: middle;
     padding: 0;
@@ -444,35 +508,41 @@ div.v-app-loading {
     margin: 0;
 }
 
-.v-contextmenu .gwt-MenuItem div {
+.v-contextmenu .gwt-MenuItem div
+{
     cursor: pointer;
     vertical-align: middle;
     white-space: nowrap;
 }
 
-.v-contextmenu .gwt-MenuItem-selected div {
+.v-contextmenu .gwt-MenuItem-selected div
+{
     background: #aaa;
     color: #fff;
 }
 
-.v-contextmenu table {
+.v-contextmenu table
+{
     border-collapse: collapse;
     margin: 0;
     padding: 0;
 }
 
-.v-contextmenu .gwt-MenuItem img {
+.v-contextmenu .gwt-MenuItem img
+{
     margin-right: 1em;
     vertical-align: middle;
 }
 
 /* Margins are not supported within Label */
-.v-label pre {
+.v-label pre
+{
     margin: 0;
 }
 
 /* A label with undefined width is always considered to be on one line */
-.v-label-undef-w {
+.v-label-undef-w
+{
     white-space: nowrap;
 }
 
@@ -482,7 +552,8 @@ div.v-app-loading {
 .v-label h3,
 .v-label h4,
 .v-label h5,
-.v-label h6 {
+.v-label h6
+{
     line-height: normal;
 }
 
@@ -492,7 +563,8 @@ div.v-app-loading {
  */
 .v-loading-indicator,
 .v-loading-indicator-delay,
-.v-loading-indicator-wait {
+.v-loading-indicator-wait
+{
     position: absolute;
     top: 0;
     right: 0;
@@ -504,42 +576,49 @@ div.v-app-loading {
     margin-top: 5px;
 }
 
-.v-loading-indicator-delay {
+.v-loading-indicator-delay
+{
     background-image: url(../base/common/img/loading-indicator-delay.gif);
 }
 
-.v-loading-indicator-wait {
+.v-loading-indicator-wait
+{
     background-image: url(../base/common/img/loading-indicator-wait.gif);
 }
 
 /* Debug dialog */
-.v-debug-console {
+.v-debug-console
+{
     background: #fff;
     opacity: .9;
     border: 1px solid #000;
     font-family: sans-serif;
 }
 
-.v-debug-console-caption {
+.v-debug-console-caption
+{
     background: #000;
     border-bottom: 1px solid grey;
     color: white;
     font-weight: bold;
 }
 
-.v-debug-console-content {
+.v-debug-console-content
+{
     font-size: x-small;
     overflow: auto;
     white-space: pre;
 }
 
-.v-debug-console-content input {
+.v-debug-console-content input
+{
     font-size: xx-small;
 }
 
 /* Debug style */
 .v-app .invalidlayout,
-.v-app .invalidlayout * {
+.v-app .invalidlayout *
+{
     background: #f99 !important;
 }
 
@@ -553,11 +632,13 @@ div.v-app-loading {
 .v-window input[type="password"],
 .v-window input[type="reset"],
 .v-window select,
-.v-window textarea {
+.v-window textarea
+{
     padding: 2px;
 }
 
-.v-drag-element {
+.v-drag-element
+{
     z-index: 60000;
     /* override any other position: properties */
     position: absolute !important;
@@ -566,141 +647,172 @@ div.v-app-loading {
     cursor: default;
 }
 
-.v-scrollable {
+.v-scrollable
+{
     overflow: auto;
 }
 
-.v-csslayout {
+.v-csslayout
+{
     overflow: hidden;
 }
 
-.v-csslayout-margin-top {
+.v-csslayout-margin-top
+{
     padding-top: 12px;
 }
 
-.v-csslayout-margin-bottom {
+.v-csslayout-margin-bottom
+{
     padding-bottom: 12px;
 }
 
-.v-csslayout-margin-left {
+.v-csslayout-margin-left
+{
     padding-left: 12px;
 }
 
-.v-csslayout-margin-right {
+.v-csslayout-margin-right
+{
     padding-right: 12px;
 }
 
-.v-customcomponent {
+.v-customcomponent
+{
     overflow: hidden;
 }
 
-.v-customlayout {
+.v-customlayout
+{
     overflow: hidden;
 }
 
-.v-datefield {
+.v-datefield
+{
     white-space: nowrap;
     float: left; /* Force minimum width */
 }
 
-.v-datefield-textfield {
+.v-datefield-textfield
+{
     vertical-align: top;
 }
 
-.v-datefield-button {
+.v-datefield-button
+{
     cursor: pointer;
 }
 
-.v-datefield-prompt .v-datefield-textfield {
+.v-datefield-prompt .v-datefield-textfield
+{
     color: #999;
     font-style: italic;
 }
 
-.v-datefield .v-datefield-button-readonly {
+.v-datefield .v-datefield-button-readonly
+{
     display: none;
 }
 
-.v-datefield-calendarpanel table {
+.v-datefield-calendarpanel table
+{
     width: 100%;
 }
 
-.v-datefield-calendarpanel td {
+.v-datefield-calendarpanel td
+{
     padding: 0;
     margin: 0;
 }
 
-.v-datefield-calendarpanel:focus {
+.v-datefield-calendarpanel:focus
+{
     outline: none;
 }
 
-.v-datefield-calendarpanel-header td {
+.v-datefield-calendarpanel-header td
+{
     text-align: center;
 }
 
-.v-datefield-calendarpanel-month {
+.v-datefield-calendarpanel-month
+{
     text-align: center;
     white-space: nowrap;
 }
 
-.v-datefield-calendarpanel-weeknumber {
+.v-datefield-calendarpanel-weeknumber
+{
     color: #999;
     border-right: 1px solid #ddd;
     font-size: 0.9em;
 }
 
 .v-datefield-calendarpanel-day,
-.v-datefield-calendarpanel-day-today {
+.v-datefield-calendarpanel-day-today
+{
     cursor: pointer;
 }
 
-.v-datefield-calendarpanel-day-today {
+.v-datefield-calendarpanel-day-today
+{
     border: 1px solid #ddd;
 }
 
 .v-disabled .v-datefield-calendarpanel-day,
-.v-disabled .v-datefield-calendarpanel-day-today {
+.v-disabled .v-datefield-calendarpanel-day-today
+{
     cursor: default;
 }
 
-.v-datefield-calendarpanel-day-disabled {
+.v-datefield-calendarpanel-day-disabled
+{
     cursor: default;
     opacity: .5;
 }
 
-.v-datefield-calendarpanel-day-selected {
+.v-datefield-calendarpanel-day-selected
+{
     cursor: default;
     background: #333;
     color: #fff;
 }
 
-.v-datefield-calendarpanel-day-focused {
+.v-datefield-calendarpanel-day-focused
+{
     outline: 1px dotted black;
 }
 
-.v-datefield-calendarpanel-day-offmonth {
+.v-datefield-calendarpanel-day-offmonth
+{
     color: #666;
 }
 
 .v-ie6 .v-datefield-calendarpanel-day,
-.v-ie7 .v-datefield-calendarpanel-day {
+.v-ie7 .v-datefield-calendarpanel-day
+{
     margin: 1px;
 }
 
 .v-ie6 .v-datefield-calendarpanel-day-focused,
-.v-ie7 .v-datefield-calendarpanel-day-focused {
+.v-ie7 .v-datefield-calendarpanel-day-focused
+{
     border: 1px dotted black;
     margin: 0px;
 }
 
-.v-datefield-time {
+.v-datefield-time
+{
     white-space: nowrap;
 }
 
-.v-datefield-time .v-label {
+.v-datefield-time .v-label
+{
     display: inline;
 }
 
-.v-datefield-popup {
+.v-datefield-popup
+{
     background: #fff;
 }
 
@@ -722,11 +834,13 @@ div.v-app-loading {
 .v-ie6 .v-disabled .v-datefield-button,
 .v-ie6 .v-disabled .v-datefield-textfield,
 .v-ie7 .v-disabled .v-datefield-button,
-.v-ie7 .v-disabled .v-datefield-textfield {
+.v-ie7 .v-disabled .v-datefield-textfield
+{
     filter: alpha(opacity=30);
 }
 
-.v-ddwrapper {
+.v-ddwrapper
+{
     padding: 2px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -734,14 +848,16 @@ div.v-app-loading {
     position: relative;
 }
 
-[draggable=true] {
+[draggable=true]
+{
     -khtml-user-drag: element;
     -webkit-user-drag: element;
     -khtml-user-select: none;
     -webkit-user-select: none;
 }
 
-.v-ie .v-ddwrapper a.drag-start {
+.v-ie .v-ddwrapper a.drag-start
+{
     display: block;
     position: absolute;
     top: 0;
@@ -756,17 +872,20 @@ div.v-app-loading {
     filter: alpha(opacity=0);
 }
 
-.v-ddwrapper-over {
+.v-ddwrapper-over
+{
     border: 2px solid #1d9dff;
     background-color: #bcdcff;
     padding: 0;
 }
 
-.v-ddwrapper-over {
+.v-ddwrapper-over
+{
     background-color: rgba(169, 209, 255, .6);
 }
 
-.no-box-drag-hints .v-ddwrapper-over {
+.no-box-drag-hints .v-ddwrapper-over
+{
     border: none;
     background-color: transparent;
     padding: 2px;
@@ -774,7 +893,8 @@ div.v-app-loading {
 
 .v-app .v-ddwrapper-over-top,
 .v-window .v-ddwrapper-over-top,
-.v-popupview-popup .v-ddwrapper-over-top {
+.v-popupview-popup .v-ddwrapper-over-top
+{
     border: none;
     border-top: 2px solid #1d9dff;
     background-color: transparent;
@@ -787,7 +907,8 @@ div.v-app-loading {
 
 .v-app .v-ddwrapper-over-bottom,
 .v-window .v-ddwrapper-over-bottom,
-.v-popupview-popup .v-ddwrapper-over-bottom {
+.v-popupview-popup .v-ddwrapper-over-bottom
+{
     border: none;
     border-bottom: 2px solid #1d9dff;
     background-color: transparent;
@@ -800,7 +921,8 @@ div.v-app-loading {
 
 .v-app .v-ddwrapper-over-left,
 .v-window .v-ddwrapper-over-left,
-.v-popupview-popup .v-ddwrapper-over-left {
+.v-popupview-popup .v-ddwrapper-over-left
+{
     border: none;
     border-left: 2px solid #1d9dff;
     background-color: transparent;
@@ -813,7 +935,8 @@ div.v-app-loading {
 
 .v-app .v-ddwrapper-over-right,
 .v-window .v-ddwrapper-over-right,
-.v-popupview-popup .v-ddwrapper-over-right {
+.v-popupview-popup .v-ddwrapper-over-right
+{
     border: none;
     border-right: 2px solid #1d9dff;
     background-color: transparent;
@@ -837,14 +960,16 @@ div.v-app-loading {
 .v-popupview-popup .v-ddwrapper-over-left,
 .v-app .v-ddwrapper-over-right,
 .v-window .v-ddwrapper-over-right,
-.v-popupview-popup .v-ddwrapper-over-right {
+.v-popupview-popup .v-ddwrapper-over-right
+{
     border-color: rgba(0, 109, 232, .6);
 }
 
 .v-ddwrapper-over-top:before,
 .v-ddwrapper-over-bottom:after,
 .v-ddwrapper-over-left:before,
-.v-ddwrapper-over-right:before {
+.v-ddwrapper-over-right:before
+{
     display: block;
     content: "";
     position: absolute;
@@ -855,18 +980,21 @@ div.v-app-loading {
     background: transparent url(../base/common/img/drag-slot-dot.png) no-repeat;
 }
 
-.v-ddwrapper-over-bottom:after {
+.v-ddwrapper-over-bottom:after
+{
     margin-top: -2px;
 }
 
 .v-ddwrapper-over-left:before,
-.v-ddwrapper-over-right:before {
+.v-ddwrapper-over-right:before
+{
     background-position: 0 -6px;
     margin-top: -2px;
     margin-left: -4px;
 }
 
-.v-ddwrapper-over-right:before {
+.v-ddwrapper-over-right:before
+{
     position: relative;
     margin-bottom: -4px;
     margin-right: -4px;
@@ -875,22 +1003,26 @@ div.v-app-loading {
     background-position: 100% -6px;
 }
 
-.no-horizontal-drag-hints .v-ddwrapper-over-left {
+.no-horizontal-drag-hints .v-ddwrapper-over-left
+{
     padding-left: 2px;
     border-left: none;
 }
 
-.no-horizontal-drag-hints .v-ddwrapper-over-right {
+.no-horizontal-drag-hints .v-ddwrapper-over-right
+{
     padding-right: 2px;
     border-right: none;
 }
 
-.no-vertical-drag-hints .v-ddwrapper-over-top {
+.no-vertical-drag-hints .v-ddwrapper-over-top
+{
     padding-top: 2px;
     border-top: none;
 }
 
-.no-vertical-drag-hints .v-ddwrapper-over-bottom {
+.no-vertical-drag-hints .v-ddwrapper-over-bottom
+{
     padding-bottom: 2px;
     border-bottom: none;
 }
@@ -898,146 +1030,176 @@ div.v-app-loading {
 .no-horizontal-drag-hints .v-ddwrapper-over-left:before,
 .no-horizontal-drag-hints .v-ddwrapper-over-right:before,
 .no-vertical-drag-hints .v-ddwrapper-over-top:before,
-.no-vertical-drag-hints .v-ddwrapper-over-bottom:after {
+.no-vertical-drag-hints .v-ddwrapper-over-bottom:after
+{
     display: none;
 }
 
-.v-table .v-embedded-image {
+.v-table .v-embedded-image
+{
     /* make embeddeds be centered in centered table cells. */
     display: inline-block;
 }
 
-.v-formlayout-cell .v-errorindicator {
+.v-formlayout-cell .v-errorindicator
+{
     display: block;
 }
 
-.v-formlayout-error-indicator {
+.v-formlayout-error-indicator
+{
     /* fix width so layout is not jumpy when error disappears */
     width: 12px;
 }
 
-.v-formlayout-captioncell {
+.v-formlayout-captioncell
+{
     text-align: right;
     white-space: nowrap;
 }
 
-.v-formlayout-captioncell .v-caption {
+.v-formlayout-captioncell .v-caption
+{
     overflow: visible;
 }
 
 .v-formlayout-spacing .v-formlayout-row .v-formlayout-captioncell,
 .v-formlayout-spacing .v-formlayout-row .v-formlayout-contentcell,
-.v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
+.v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell
+{
     padding-top: 6px;
 }
 
 .v-formlayout-spacing .v-formlayout-firstrow .v-formlayout-captioncell,
 .v-formlayout-spacing .v-formlayout-firstrow .v-formlayout-contentcell,
-.v-formlayout-spacing .v-formlayout-firstrow .v-formlayout-errorcell {
+.v-formlayout-spacing .v-formlayout-firstrow .v-formlayout-errorcell
+{
     padding-top: 0;
 }
 
 .v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-captioncell,
 .v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-contentcell,
-.v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-errorcell {
+.v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-errorcell
+{
     padding-top: 12px;
 }
 
 .v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-captioncell,
 .v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-contentcell,
-.v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-errorcell {
+.v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-errorcell
+{
     padding-bottom: 12px;
 }
 
-.v-formlayout-margin-left .v-formlayout-captioncell {
+.v-formlayout-margin-left .v-formlayout-captioncell
+{
     padding-left: 12px;
 }
 
-.v-formlayout-margin-right .v-formlayout-contentcell {
+.v-formlayout-margin-right .v-formlayout-contentcell
+{
     padding-right: 12px;
 }
 
-.v-formlayout-captioncell .v-caption .v-required-field-indicator {
+.v-formlayout-captioncell .v-caption .v-required-field-indicator
+{
     float: none;
 }
 
-.v-gridlayout-margin-top {
+.v-gridlayout-margin-top
+{
     padding-top: 12px;
 }
 
-.v-gridlayout-margin-bottom {
+.v-gridlayout-margin-bottom
+{
     padding-bottom: 12px;
 }
 
-.v-gridlayout-margin-left {
+.v-gridlayout-margin-left
+{
     padding-left: 12px;
 }
 
-.v-gridlayout-margin-right {
+.v-gridlayout-margin-right
+{
     padding-right: 12px;
 }
 
-.v-gridlayout-spacing-on {
+.v-gridlayout-spacing-on
+{
     padding-left: 6px;
     padding-top: 6px;
     overflow: hidden;
 }
 
 .v-gridlayout-spacing,
-.v-gridlayout-spacing-off {
+.v-gridlayout-spacing-off
+{
     padding-left: 0;
     padding-top: 0;
 }
 
-.v-gridlayout-spacing-off {
+.v-gridlayout-spacing-off
+{
     overflow: hidden;
 }
 
 /* Ensure that resizing gridlayout works in IE */
 .v-ie6 .v-gridlayout,
-.v-ie7 .v-gridlayout {
+.v-ie7 .v-gridlayout
+{
     overflow: hidden;
 }
 
-.v-link {
+.v-link
+{
     white-space: nowrap;
 }
 
-.v-link a {
+.v-link a
+{
     vertical-align: middle;
     text-decoration: none;
 }
 
-.v-link span {
+.v-link span
+{
     text-decoration: underline;
     vertical-align: middle;
 }
 
-.v-disabled a {
+.v-disabled a
+{
     cursor: default;
 }
 
-.v-link img {
+.v-link img
+{
     vertical-align: middle;
     border: none;
 }
 
-.v-loginform {
+.v-loginform
+{
     height: 140px;
     width: 200px;
 }
 
 .v-app-loginpage .v-button,
-.v-app-loginpage .v-button {
+.v-app-loginpage .v-button
+{
     float: left; /* Force minimum width for button */
 }
 
-.v-menubar {
+.v-menubar
+{
     float: left; /* Force minimum width */
     white-space: nowrap;
 }
 
-.v-menubar .v-menubar-menuitem {
+.v-menubar .v-menubar-menuitem
+{
     cursor: default;
     vertical-align: middle;
     white-space: nowrap;
@@ -1046,43 +1208,51 @@ div.v-app-loading {
     zoom: 1;
 }
 
-.v-menubar .v-menubar-menuitem-caption .v-icon {
+.v-menubar .v-menubar-menuitem-caption .v-icon
+{
     vertical-align: middle;
     white-space: nowrap;
 }
 
-.v-menubar-submenu {
+.v-menubar-submenu
+{
     background: #fff;
 }
 
-.v-menubar-menuitem-selected {
+.v-menubar-menuitem-selected
+{
     background: #333;
     color: #fff;
 }
 
-.v-menubar-submenu .v-menubar-menuitem {
+.v-menubar-submenu .v-menubar-menuitem
+{
     cursor: default;
     display: block;
     position: relative;
     padding-right: 1.5em;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-caption {
+.v-menubar-submenu .v-menubar-menuitem-caption
+{
     display: block;
 }
 
 .v-menubar-submenu .v-menubar-menuitem *,
-.v-menubar-submenu .v-menubar-menuitem-caption * {
+.v-menubar-submenu .v-menubar-menuitem-caption *
+{
     white-space: nowrap;
 }
 
-.v-menubar-submenu-indicator {
+.v-menubar-submenu-indicator
+{
     display: none;
     /* Arial has the most coverage for geometric entity characters */
     font-family: arial, helvetica, sans-serif;
 }
 
-.v-menubar-submenu .v-menubar-submenu-indicator {
+.v-menubar-submenu .v-menubar-submenu-indicator
+{
     display: block;
     position: absolute;
     right: 0;
@@ -1094,20 +1264,24 @@ div.v-app-loading {
 .v-menubar-menuitem-disabled,
 .v-menubar span.v-menubar-menuitem-disabled:hover,
 .v-menubar span.v-menubar-menuitem-disabled:focus,
-.v-menubar span.v-menubar-menuitem-disabled:active {
+.v-menubar span.v-menubar-menuitem-disabled:active
+{
     color: #999;
 }
 
-.v-menubar-more-menuitem {
+.v-menubar-more-menuitem
+{
     /* Arial has the most coverage for geometric entity characters */
     font-family: arial, helvetica, sans-serif;
 }
 
-.v-menubar-separator {
+.v-menubar-separator
+{
     overflow: hidden;
 }
 
-.v-menubar-separator span {
+.v-menubar-separator span
+{
     display: block;
     text-indent: -9999px;
     font-size: 1px;
@@ -1118,32 +1292,38 @@ div.v-app-loading {
 }
 
 .v-menubar .v-icon,
-.v-menubar-submenu .v-icon {
+.v-menubar-submenu .v-icon
+{
     margin-right: 3px;
 }
 
 .v-menubar:focus,
 .v-menubar-popup:focus,
 .v-menubar-popup .popupContent:focus,
-.v-menubar-popup .popupContent .v-menubar-submenu:focus {
+.v-menubar-popup .popupContent .v-menubar-submenu:focus
+{
     outline: none;
 }
 
 /* Checkboxes for checkable/checked menu items */
 /* Checked/unchecked requires combined style selected-(un)checked for IE6 */
-.v-menubar-submenu-check-column .v-menubar-menuitem {
+.v-menubar-submenu-check-column .v-menubar-menuitem
+{
     padding-left: 6px;
 }
 
-.v-menubar-submenu-check-column .v-menubar-menuitem-caption {
+.v-menubar-submenu-check-column .v-menubar-menuitem-caption
+{
     padding-left: 18px;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-checked .v-menubar-menuitem-caption {
+.v-menubar-submenu .v-menubar-menuitem-checked .v-menubar-menuitem-caption
+{
     background: transparent url(../base/menubar/img/check.gif) no-repeat left;
 }
 
-.v-Notification {
+.v-Notification
+{
     background: #999;
     color: #fff;
     cursor: pointer;
@@ -1158,65 +1338,77 @@ div.v-app-loading {
 .v-Notification-error h1,
 .v-Notification-error p,
 .v-Notification-warning h1,
-.v-Notification-warning p {
+.v-Notification-warning p
+{
     display: inline;
     margin: 0 0.5em 0 0;
 }
 
-.v-Notification-warning {
+.v-Notification-warning
+{
     background: orange;
 }
 
-.v-Notification-error {
+.v-Notification-error
+{
     background: red;
 }
 
-.v-Notification-tray h1 {
+.v-Notification-tray h1
+{
     display: block;
 }
 
-.v-Notification-tray p {
+.v-Notification-tray p
+{
     display: block;
 }
 
-.v-Notification-system {
+.v-Notification-system
+{
     background-color: red;
     opacity: .7;
     filter: alpha(opacity=70);
 }
 
-.v-Notification-system h1 {
+.v-Notification-system h1
+{
     display: block;
     margin: 0;
 }
 
 .v-orderedlayout-margin-top,
 .v-horizontallayout-margin-top,
-.v-verticallayout-margin-top {
+.v-verticallayout-margin-top
+{
     padding-top: 12px;
 }
 
 .v-orderedlayout-margin-right,
 .v-horizontallayout-margin-right,
-.v-verticallayout-margin-right {
+.v-verticallayout-margin-right
+{
     padding-right: 12px;
 }
 
 .v-orderedlayout-margin-bottom,
 .v-horizontallayout-margin-bottom,
-.v-verticallayout-margin-bottom {
+.v-verticallayout-margin-bottom
+{
     padding-bottom: 12px;
 }
 
 .v-orderedlayout-margin-left,
 .v-horizontallayout-margin-left,
-.v-verticallayout-margin-left {
+.v-verticallayout-margin-left
+{
     padding-left: 12px;
 }
 
 .v-orderedlayout-spacing-on,
 .v-horizontallayout-spacing-on,
-.v-verticallayout-spacing-on {
+.v-verticallayout-spacing-on
+{
     padding-top: 6px;
     padding-left: 6px;
 }
@@ -1224,7 +1416,8 @@ div.v-app-loading {
 /* This can be used to define spacing if spacing is off server side */
 .v-orderedlayout-spacing-off,
 .v-horizontallayout-spacing-off,
-.v-verticallayout-spacing-off {
+.v-verticallayout-spacing-off
+{
     padding-top: 0;
     padding-left: 0;
 }
@@ -1235,7 +1428,8 @@ div.v-app-loading {
 .v-ie6 .v-verticallayout,
 .v-ie7 .v-orderedlayout,
 .v-ie7 .v-horizontallayout,
-.v-ie7 .v-verticallayout {
+.v-ie7 .v-verticallayout
+{
     overflow: hidden;
 }
 
@@ -1246,75 +1440,90 @@ div.v-app-loading {
 .v-panel-light,
 .v-panel-caption-light,
 .v-panel-content-light,
-.v-panel-deco-light {
+.v-panel-deco-light
+{
     outline: none; /* Prevent selection outline which might break layouts or cause scrollbars */
     text-align: left /* Force default alignment */
 }
 
-.v-panel-caption .v-errorindicator {
+.v-panel-caption .v-errorindicator
+{
     float: none;
     display: inline;
 }
 
-.v-panel-caption .v-icon {
+.v-panel-caption .v-icon
+{
     display: inline;
     vertical-align: middle;
 }
 
-.v-panel-caption span {
+.v-panel-caption span
+{
     vertical-align: middle;
 }
 
-.v-panel-caption {
+.v-panel-caption
+{
     white-space: nowrap;
     overflow: hidden;
     font-weight: bold;
 }
 
-.v-panel-nocaption {
+.v-panel-nocaption
+{
     overflow: hidden;
 }
 
-.v-panel-content {
+.v-panel-content
+{
 }
 
-.v-panel-deco {
+.v-panel-deco
+{
 }
 
-.v-popupview {
+.v-popupview
+{
     cursor: pointer;
     text-decoration: underline;
     white-space: nowrap;
 }
 
-.v-popupview-popup {
+.v-popupview-popup
+{
     overflow: auto;
 }
 
-.v-popupview-loading {
+.v-popupview-loading
+{
     width: 30px;
     height: 30px;
     background: transparent url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
 }
 
-.v-progressindicator {
+.v-progressindicator
+{
     overflow: hidden; /* for IE6 */
     width: 150px;
 }
 
-.v-progressindicator-wrapper {
+.v-progressindicator-wrapper
+{
     overflow: hidden; /* for IE6 */
     height: 7px;
     border: 1px solid #ddd;
 }
 
-.v-progressindicator-indicator {
+.v-progressindicator-indicator
+{
     height: 7px;
     overflow: hidden; /* for IE6 */
     background: #ddd;
 }
 
-div.v-progressindicator-indeterminate {
+div.v-progressindicator-indeterminate
+{
     height: 20px;
     width: 20px;
     overflow: hidden; /* for IE6 */
@@ -1328,109 +1537,131 @@ div.v-progressindicator-indeterminate {
 .v-progressindicator-indeterminate .v-progressindicator-wrapper,
 .v-progressindicator-indeterminate .v-progressindicator-indicator,
 .v-progressindicator-indeterminate-disabled .v-progressindicator-wrapper,
-.v-progressindicator-indeterminate-disabled .v-progressindicator-indicator {
+.v-progressindicator-indeterminate-disabled .v-progressindicator-indicator
+{
     display: none;
 }
 
-div.v-progressindicator-indeterminate-disabled {
+div.v-progressindicator-indeterminate-disabled
+{
     height: 20px;
     width: 20px;
     overflow: hidden; /* for IE6 */
     background: transparent;
 }
 
-.v-select {
+.v-select
+{
     text-align: left;
 }
 
-.v-select-optiongroup .v-select-option {
+.v-select-optiongroup .v-select-option
+{
     display: block;
     white-space: nowrap;
 }
 
-.v-select-optiongroup .v-icon {
+.v-select-optiongroup .v-icon
+{
     vertical-align: middle;
     white-space: nowrap;
     margin: 0 2px;
 }
 
-.v-ie .v-select-optiongroup .v-select-option {
+.v-ie .v-select-optiongroup .v-select-option
+{
     zoom: 1;
 }
 
-.v-select-select {
+.v-select-select
+{
     display: block;
 }
 
-.v-select-twincol {
+.v-select-twincol
+{
     white-space: nowrap;
 }
 
-.v-select-twincol-options {
+.v-select-twincol-options
+{
     float: left;
 }
 
-.v-select-twincol-caption-left {
+.v-select-twincol-caption-left
+{
     float: left;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.v-select-twincol-selections {
+.v-select-twincol-selections
+{
     font-weight: bold;
 }
 
-.v-select-twincol-caption-right {
+.v-select-twincol-caption-right
+{
     float: right;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.v-select-twincol-buttons {
+.v-select-twincol-buttons
+{
     float: left;
     text-align: center;
 }
 
-.v-select-twincol-buttons .v-select-twincol-deco {
+.v-select-twincol-buttons .v-select-twincol-deco
+{
     clear: both;
 }
 
-.v-select-twincol .v-textfield {
+.v-select-twincol .v-textfield
+{
     display: block;
     float: left;
     clear: left;
 }
 
-.v-select-twincol .v-button {
+.v-select-twincol .v-button
+{
     float: left;
 }
 
-.v-select-twincol-buttons .v-button {
+.v-select-twincol-buttons .v-button
+{
     float: none;
 }
 
-.v-filterselect {
+.v-filterselect
+{
     white-space: nowrap;
     text-align: left;
 }
 
-.v-filterselect .v-icon {
+.v-filterselect .v-icon
+{
     float: left;
 }
 
 .v-app .v-filterselect-input,
 .v-window .v-filterselect-input,
-.v-popupview-popup .v-filterselect-input {
+.v-popupview-popup .v-filterselect-input
+{
     float: left;
     -webkit-border-radius: 0px;
 }
 
-.v-filterselect-prompt .v-filterselect-input {
+.v-filterselect-prompt .v-filterselect-input
+{
     color: #999;
     font-style: italic;
 }
 
-.v-filterselect-button {
+.v-filterselect-button
+{
     float: right;
     cursor: pointer;
     width: 1em;
@@ -1438,39 +1669,47 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/common/img/sprites.png) no-repeat -5px -8px;
 }
 
-.v-filterselect.v-readonly .v-filterselect-button {
+.v-filterselect.v-readonly .v-filterselect-button
+{
     display: none;
 }
 
 .v-filterselect.v-readonly,
-.v-filterselect.v-readonly .v-filterselect-input {
+.v-filterselect.v-readonly .v-filterselect-input
+{
     background: transparent;
 }
 
-.v-filterselect-suggestpopup {
+.v-filterselect-suggestpopup
+{
     background: #fff;
     border: 1px solid #eee;
 }
 
-.v-filterselect-suggestmenu table {
+.v-filterselect-suggestmenu table
+{
     border-collapse: collapse;
     border: none;
 }
 
-.v-filterselect-suggestmenu .gwt-MenuItem {
+.v-filterselect-suggestmenu .gwt-MenuItem
+{
     white-space: nowrap;
 }
 
-.v-filterselect-suggestmenu .gwt-MenuItem .v-icon {
+.v-filterselect-suggestmenu .gwt-MenuItem .v-icon
+{
     margin-right: 3px;
     vertical-align: middle;
 }
 
-.v-filterselect-suggestmenu .gwt-MenuItem span {
+.v-filterselect-suggestmenu .gwt-MenuItem span
+{
     vertical-align: middle;
 }
 
-.v-filterselect-suggestmenu .gwt-MenuItem-selected {
+.v-filterselect-suggestmenu .gwt-MenuItem-selected
+{
     background: #333;
     color: #fff;
 }
@@ -1478,7 +1717,8 @@ div.v-progressindicator-indeterminate-disabled {
 .v-filterselect-nextpage,
 .v-filterselect-nextpage-off,
 .v-filterselect-prevpage-off,
-.v-filterselect-prevpage {
+.v-filterselect-prevpage
+{
     width: 100%;
     background: #aaa;
     text-align: center;
@@ -1487,7 +1727,8 @@ div.v-progressindicator-indeterminate-disabled {
 }
 
 .v-filterselect-nextpage-off,
-.v-filterselect-prevpage-off {
+.v-filterselect-prevpage-off
+{
     color: #666;
     opacity: .5;
     filter: alpha(opacity=50);
@@ -1495,16 +1736,19 @@ div.v-progressindicator-indeterminate-disabled {
 }
 
 .v-filterselect-nextpage-off span,
-.v-filterselect-prevpage-off span {
+.v-filterselect-prevpage-off span
+{
     cursor: default;
 }
 
-.v-filterselect-status {
+.v-filterselect-status
+{
     white-space: nowrap;
     text-align: center;
 }
 
-.v-filterselect-no-input .v-filterselect-input {
+.v-filterselect-no-input .v-filterselect-input
+{
     cursor: default;
 }
 
@@ -1530,11 +1774,13 @@ div.v-progressindicator-indeterminate-disabled {
 }
 */
 
-.v-shadow {
+.v-shadow
+{
     position: absolute;
 }
 
-.v-shadow .top-left {
+.v-shadow .top-left
+{
     position: absolute;
     overflow: hidden;
     top: -3px;
@@ -1544,7 +1790,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/top-left.png);
 }
 
-.v-shadow .top {
+.v-shadow .top
+{
     position: absolute;
     overflow: hidden;
     top: -3px;
@@ -1554,7 +1801,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/top.png);
 }
 
-.v-shadow .top-right {
+.v-shadow .top-right
+{
     position: absolute;
     overflow: hidden;
     top: -3px;
@@ -1564,7 +1812,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/top-right.png);
 }
 
-.v-shadow .left {
+.v-shadow .left
+{
     position: absolute;
     overflow: hidden;
     top: 7px;
@@ -1574,7 +1823,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/left.png);
 }
 
-.v-shadow .center {
+.v-shadow .center
+{
     position: absolute;
     overflow: hidden;
     top: 7px;
@@ -1584,7 +1834,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/center.png);
 }
 
-.v-shadow .right {
+.v-shadow .right
+{
     position: absolute;
     overflow: hidden;
     top: 7px;
@@ -1594,7 +1845,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/right.png);
 }
 
-.v-shadow .bottom-left {
+.v-shadow .bottom-left
+{
     position: absolute;
     overflow: hidden;
     bottom: -7px;
@@ -1604,7 +1856,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/bottom-left.png);
 }
 
-.v-shadow .bottom {
+.v-shadow .bottom
+{
     position: absolute;
     overflow: hidden;
     bottom: -7px;
@@ -1614,7 +1867,8 @@ div.v-progressindicator-indeterminate-disabled {
     background: transparent url(../base/shadow/img/bottom.png);
 }
 
-.v-shadow .bottom-right {
+.v-shadow .bottom-right
+{
     position: absolute;
     overflow: hidden;
     bottom: -7px;
@@ -1626,22 +1880,26 @@ div.v-progressindicator-indeterminate-disabled {
 
 /* For IE6 (no transparent png's, we use a blur filter) */
 
-.v-ie6 .v-shadow * {
+.v-ie6 .v-shadow *
+{
     display: none;
 }
 
-.v-ie6 .v-shadow {
+.v-ie6 .v-shadow
+{
     background: #000;
     filter: progid:DXImageTransform.Microsoft.Blur(pixelRadius=2) alpha(opacity=20);
     margin-top: -2px;
     margin-left: -2px;
 }
 
-.v-slider {
+.v-slider
+{
     margin: 5px 0;
 }
 
-.v-slider-base {
+.v-slider-base
+{
     /* changing the borders will require adjustments to ISlider.java */
     height: 2px;
     border-top: 1px solid #ddd;
@@ -1651,7 +1909,8 @@ div.v-progressindicator-indeterminate-disabled {
 
 }
 
-.v-slider-handle {
+.v-slider-handle
+{
     background: #aaa;
     width: 12px;
     height: 12px;
@@ -1659,7 +1918,8 @@ div.v-progressindicator-indeterminate-disabled {
     font-size: 0;
 }
 
-.v-slider-vertical {
+.v-slider-vertical
+{
     width: 2px;
     height: auto;
     margin: 0 5px;
@@ -1668,20 +1928,23 @@ div.v-progressindicator-indeterminate-disabled {
     border-right: 1px solid #cccfd0;
 }
 
-.v-slider-vertical .v-slider-base {
+.v-slider-vertical .v-slider-base
+{
     width: 2px;
     border-bottom: 1px solid #eee;
     border-right: none;
 }
 
-.v-slider-vertical .v-slider-handle {
+.v-slider-vertical .v-slider-handle
+{
     width: 12px;
     height: 12px;
     font-size: 0;
     margin-left: -5px;
 }
 
-.v-slider-feedback {
+.v-slider-feedback
+{
     padding: 2px 5px;
     background: #444;
     color: #fff;
@@ -1709,29 +1972,35 @@ div.v-progressindicator-indeterminate-disabled {
 
 /* IE specific styles */
 .v-ie6 .v-slider,
-.v-ie6 .v-slider-vertical {
+.v-ie6 .v-slider-vertical
+{
     margin: 0;
 }
 
-.v-ie6 .v-slider .v-slider-handle {
+.v-ie6 .v-slider .v-slider-handle
+{
     margin: -1px 0;
 }
 
-.v-ie6 .v-slider-vertical .v-slider-handle {
+.v-ie6 .v-slider-vertical .v-slider-handle
+{
     margin: 0 -1px;
 }
 
 .v-splitpanel-horizontal,
-.v-splitpanel-vertical {
+.v-splitpanel-vertical
+{
     overflow: hidden;
 }
 
-.v-splitpanel-hsplitter {
+.v-splitpanel-hsplitter
+{
     width: 6px;
     font-size: 1px; /* for IE6 */
 }
 
-.v-splitpanel-hsplitter div {
+.v-splitpanel-hsplitter div
+{
     width: 6px;
     font-size: 1px; /* for IE6 */
     position: absolute;
@@ -1742,16 +2011,19 @@ div.v-progressindicator-indeterminate-disabled {
     cursor: col-resize;
 }
 
-.v-disabled .v-splitpanel-hsplitter div {
+.v-disabled .v-splitpanel-hsplitter div
+{
     cursor: default;
 }
 
-.v-splitpanel-vsplitter {
+.v-splitpanel-vsplitter
+{
     height: 6px;
     font-size: 1px; /* for IE6 */
 }
 
-.v-splitpanel-vsplitter div {
+.v-splitpanel-vsplitter div
+{
     height: 6px;
     font-size: 1px; /* for IE6 */
     background: #ddd;
@@ -1759,19 +2031,22 @@ div.v-progressindicator-indeterminate-disabled {
     cursor: row-resize;
 }
 
-.v-disabled .v-splitpanel-vsplitter div {
+.v-disabled .v-splitpanel-vsplitter div
+{
     cursor: default;
 }
 
 /* IE specific styles */
-.v-ie6 .v-splitpanel-hsplitter div {
+.v-ie6 .v-splitpanel-hsplitter div
+{
     height: 99%;
 }
 
 .v-ie6 .v-splitpanel-first-container,
 .v-ie6 .v-splitpanel-second-container,
 .v-ie7 .v-splitpanel-first-container,
-.v-ie7 .v-splitpanel-second-container {
+.v-ie7 .v-splitpanel-second-container
+{
     position: relative;
 }
 
@@ -1799,16 +2074,19 @@ div.v-progressindicator-indeterminate-disabled {
  *  - Possible cell border in header must be themed into column resizer.
  *
  */
-.v-table {
+.v-table
+{
     overflow: hidden;
     text-align: left; /* Force default alignment */
 }
 
-.v-ie7 .v-table {
+.v-ie7 .v-table
+{
     overflow: visible;
 }
 
-.v-table-header-wrap {
+.v-table-header-wrap
+{
     overflow: hidden;
     border: 1px solid #aaa;
     border-bottom: none;
@@ -1816,7 +2094,8 @@ div.v-progressindicator-indeterminate-disabled {
 }
 
 .v-table-header table,
-.v-table-table {
+.v-table-table
+{
     border-spacing: 0;
     border-collapse: separate;
     margin: 0;
@@ -1824,30 +2103,35 @@ div.v-progressindicator-indeterminate-disabled {
     border: 0;
 }
 
-.v-table-header td {
+.v-table-header td
+{
     padding: 0;
 }
 
 .v-table-header-cell,
 .v-table-header-cell-asc,
-.v-table-header-cell-desc {
+.v-table-header-cell-desc
+{
     cursor: pointer;
 }
 
 .v-table.v-disabled .v-table-header-cell,
 .v-table.v-disabled .v-table-header-cell-asc,
-.v-table.v-disabled .v-table-header-cell-desc {
+.v-table.v-disabled .v-table-header-cell-desc
+{
     cursor: default;
 }
 
-.v-table-footer-wrap {
+.v-table-footer-wrap
+{
     overflow: hidden;
     border: 1px solid #aaa;
     border-top: none;
     background: #efefef;
 }
 
-.v-table-footer table {
+.v-table-footer table
+{
     border-spacing: 0;
     border-collapse: collapse;
     margin: 0;
@@ -1855,23 +2139,27 @@ div.v-progressindicator-indeterminate-disabled {
     border: 0;
 }
 
-.v-table-footer td {
+.v-table-footer td
+{
     padding: 0;
     border-right: 1px solid #aaa;
 }
 
-.v-table-footer-cell {
+.v-table-footer-cell
+{
     cursor: pointer;
 }
 
-.v-table-footer-container {
+.v-table-footer-container
+{
     float: right;
     padding-right: 6px;
     overflow: hidden;
     white-space: nowrap;
 }
 
-.v-table-resizer {
+.v-table-resizer
+{
     display: block;
     height: 1.2em;
     float: right;
@@ -1882,70 +2170,84 @@ div.v-progressindicator-indeterminate-disabled {
     overflow: hidden;
 }
 
-.v-table.v-disabled .v-table-resizer {
+.v-table.v-disabled .v-table-resizer
+{
     cursor: default;
 }
 
-.v-table-caption-container {
+.v-table-caption-container
+{
     overflow: hidden;
     white-space: nowrap;
     margin-left: 6px;
 }
 
-.v-ie7 .v-table-caption-container-align-right {
+.v-ie7 .v-table-caption-container-align-right
+{
     margin-left: 0px;
     padding-left: 6px;
 }
 
-.v-table-caption-container-align-right {
+.v-table-caption-container-align-right
+{
     float: right;
 }
 
-.v-table-sort-indicator {
+.v-table-sort-indicator
+{
     width: 0px;
     height: 1.2em;
     float: right;
 }
 
 .v-table-header-cell-asc .v-table-sort-indicator,
-.v-table-header-cell-desc .v-table-sort-indicator {
+.v-table-header-cell-desc .v-table-sort-indicator
+{
     width: 16px;
     height: 1.2em;
     float: right;
 }
 
-.v-table-header-cell-asc .v-table-sort-indicator {
+.v-table-header-cell-asc .v-table-sort-indicator
+{
     background: transparent url(../base/common/img/sprites.png) no-repeat right 6px;
 }
 
-.v-table-header-cell-desc .v-table-sort-indicator {
+.v-table-header-cell-desc .v-table-sort-indicator
+{
     background: transparent url(../base/common/img/sprites.png) no-repeat right -10px;
 }
 
-.v-table-caption-container-align-center {
+.v-table-caption-container-align-center
+{
     text-align: center;
 }
 
-.v-table-caption-container-align-right {
+.v-table-caption-container-align-right
+{
     text-align: right;
 }
 
 .v-table-caption-container .v-icon,
-.v-table-header-drag .v-icon {
+.v-table-header-drag .v-icon
+{
     vertical-align: middle;
 }
 
-.v-table-body {
+.v-table-body
+{
     border: 1px solid #aaa;
 }
 
-.v-table-row-spacer {
+.v-table-row-spacer
+{
     height: 10px;
     overflow: hidden; /* IE hack to allow < one line height divs */
 }
 
 .v-table-row,
-.v-table-row-odd {
+.v-table-row-odd
+{
     background: #fff;
     border: 0;
     margin: 0;
@@ -1953,42 +2255,50 @@ div.v-progressindicator-indeterminate-disabled {
     cursor: pointer;
 }
 
-.v-table-generated-row {
+.v-table-generated-row
+{
     background: #efefef;
 }
 
 .v-table-body-noselection .v-table-row,
-.v-table-body-noselection .v-table-row-odd {
+.v-table-body-noselection .v-table-row-odd
+{
     cursor: default;
 }
 
-.v-table .v-selected {
+.v-table .v-selected
+{
     background: #999;
     color: #fff;
 }
 
-.v-table-cell-content {
+.v-table-cell-content
+{
     white-space: nowrap;
     overflow: hidden;
     padding: 0 6px;
     border-right: 1px solid #aaa;
 }
 
-.v-table-cell-wrapper {
+.v-table-cell-wrapper
+{
     /* Do not specify any margins, paddings or borders here */
     white-space: nowrap;
     overflow: hidden;
 }
 
-.v-table-cell-wrapper-align-center {
+.v-table-cell-wrapper-align-center
+{
     text-align: center;
 }
 
-.v-table-cell-wrapper-align-right {
+.v-table-cell-wrapper-align-right
+{
     text-align: right;
 }
 
-.v-table-column-selector {
+.v-table-column-selector
+{
     float: right;
     background: transparent url(../base/common/img/sprites.png) no-repeat 4px -37px;
     margin: -1.2em 0 0 0;
@@ -1998,16 +2308,19 @@ div.v-progressindicator-indeterminate-disabled {
     cursor: pointer;
 }
 
-.v-table.v-disabled .v-table-column-selector {
+.v-table.v-disabled .v-table-column-selector
+{
     cursor: default;
 }
 
 .v-ie6 .v-table-column-selector,
-.v-ie7 .v-table-column-selector {
+.v-ie7 .v-table-column-selector
+{
     position: static;
 }
 
-.v-table-focus-slot-left {
+.v-table-focus-slot-left
+{
     border-left: 2px solid #999;
     float: none;
     margin-bottom: -1.2em;
@@ -2016,12 +2329,14 @@ div.v-progressindicator-indeterminate-disabled {
     border-right: 1px solid #aaa;
 }
 
-.v-table-focus-slot-right {
+.v-table-focus-slot-right
+{
     border-right: 2px solid #999;
     margin-left: -2px;
 }
 
-.v-table-header-drag {
+.v-table-header-drag
+{
     position: absolute;
     background: #efefef;
     border: 1px solid #eee;
@@ -2031,82 +2346,99 @@ div.v-progressindicator-indeterminate-disabled {
     z-index: 30000;
 }
 
-.v-table-header-drag .v-icon {
+.v-table-header-drag .v-icon
+{
     vertical-align: middle;
 }
 
-.v-table-scrollposition {
+.v-table-scrollposition
+{
     width: 160px;
     background: #eee;
     border: 1px solid #aaa;
 }
 
-.v-table-scrollposition span {
+.v-table-scrollposition span
+{
     display: block;
     text-align: center;
 }
 
 .v-table-body:focus,
-.v-table-body-wrapper:focus {
+.v-table-body-wrapper:focus
+{
     outline: none;
 }
 
-.v-table-body.focused {
+.v-table-body.focused
+{
     border-color: #388ddd;
 }
 
-.v-table-focus .v-table-cell-content {
+.v-table-focus .v-table-cell-content
+{
     border-top: 1px dotted #0066bd;
     border-bottom: 1px dotted #0066bd;
 }
 
-.v-table-focus .v-table-cell-wrapper {
+.v-table-focus .v-table-cell-wrapper
+{
     margin-top: -1px;
     margin-bottom: -1px;
 }
 
 /* row in column selector */
-.v-on {
+.v-on
+{
 
 }
 
-.v-off {
+.v-off
+{
     color: #ddd;
 }
 
-.v-table .v-checkbox {
+.v-table .v-checkbox
+{
     display: inline-block;
 }
 
 /*************************************
  * Drag'n'drop styles
  *************************************/
-.v-table-drag .v-table-body {
+.v-table-drag .v-table-body
+{
     border-color: #1d9dff;
 }
 
-.v-table-row-drag-middle .v-table-cell-content {
+.v-table-row-drag-middle .v-table-cell-content
+{
     background-color: #bcdcff;
 }
 
-.v-table-row-drag-top .v-table-cell-content {
+.v-table-row-drag-top .v-table-cell-content
+{
     border-top: 2px solid #1d9dff;
 }
 
-.v-table-row-drag-top .v-table-cell-wrapper {
+.v-table-row-drag-top .v-table-cell-wrapper
+{
     margin-top: -2px; /* compensate the space consumed by border hint */
 }
 
-.v-table-row-drag-bottom .v-table-cell-content {
+.v-table-row-drag-bottom .v-table-cell-content
+{
     border-bottom: 2px solid #1d9dff;
 }
 
-.v-table-row-drag-bottom .v-table-cell-wrapper {
+.v-table-row-drag-bottom .v-table-cell-wrapper
+{
     margin-bottom: -2px; /* compensate the space consumed by border hint */
 }
 
 .v-table-row-drag-top .v-table-cell-content:first-child:before,
-.v-table-row-drag-bottom .v-table-cell-content:first-child:after {
+.v-table-row-drag-bottom .v-table-cell-content:first-child:after
+{
     display: block;
     content: "";
     position: absolute;
@@ -2118,18 +2450,21 @@ div.v-progressindicator-indeterminate-disabled {
 }
 
 .v-ff .v-table-row-drag-bottom .v-table-cell-content:first-child:after,
-.v-ie .v-table-row-drag-bottom .v-table-cell-content:first-child:after {
+.v-ie .v-table-row-drag-bottom .v-table-cell-content:first-child:after
+{
     margin-top: -2px;
 }
 
 .v-tabsheet,
 .v-tabsheet-content,
-.v-tabsheet-deco {
+.v-tabsheet-deco
+{
     outline: none; /* Prevent selection outline which might break layouts or cause scrollbars */
     text-align: left /* Force default alignment */
 }
 
-.v-tabsheet-tabs {
+.v-tabsheet-tabs
+{
     empty-cells: hide;
     border-collapse: collapse;
     margin: 0;
@@ -2139,50 +2474,59 @@ div.v-progressindicator-indeterminate-disabled {
     overflow: hidden;
 }
 
-.v-tabsheet-tabitemcell:focus {
+.v-tabsheet-tabitemcell:focus
+{
     outline: none;
 }
 
 .v-tabsheet-tabitemcell,
-.v-tabsheet-spacertd {
+.v-tabsheet-spacertd
+{
     margin: 0;
     padding: 0;
     vertical-align: bottom;
 }
 
-.v-tabsheet-spacertd {
+.v-tabsheet-spacertd
+{
     width: 100%;
 }
 
-.v-tabsheet-spacertd div {
+.v-tabsheet-spacertd div
+{
     border-left: 1px solid #aaa;
     border-bottom: 1px solid #aaa;
     height: 1em;
     padding: 0.2em 0;
 }
 
-.v-tabsheet-hidetabs .v-tabsheet-tabcontainer {
+.v-tabsheet-hidetabs .v-tabsheet-tabcontainer
+{
     display: none;
 }
 
-.v-tabsheet-scroller {
+.v-tabsheet-scroller
+{
     white-space: nowrap;
     text-align: right;
     margin-top: -1em;
 }
 
-.v-ff2 .v-tabsheet-scroller {
+.v-ff2 .v-tabsheet-scroller
+{
     position: relative;
 }
 
-.v-disabled .v-tabsheet-scroller {
+.v-disabled .v-tabsheet-scroller
+{
     display: none;
 }
 
 .v-tabsheet-scrollerPrev,
 .v-tabsheet-scrollerNext,
 .v-tabsheet-scrollerPrev-disabled,
-.v-tabsheet-scrollerNext-disabled {
+.v-tabsheet-scrollerNext-disabled
+{
     border: 1px solid #aaa;
     background: #fff;
     width: 12px;
@@ -2191,17 +2535,20 @@ div.v-progressindicator-indeterminate-disabled {
 }
 
 .v-tabsheet-scrollerPrev-disabled,
-.v-tabsheet-scrollerNext-disabled {
+.v-tabsheet-scrollerNext-disabled
+{
     opacity: 0.5;
     cursor: default;
 }
 
 .v-tabsheet-tabs .v-caption,
-.v-tabsheet-tabs .v-caption span {
+.v-tabsheet-tabs .v-caption span
+{
     white-space: nowrap;
 }
 
-.v-tabsheet-caption-close {
+.v-tabsheet-caption-close
+{
     display: inline;
     display: inline-block;
     zoom: 1;
@@ -2218,46 +2565,55 @@ div.v-progressindicator-indeterminate-disabled {
     -webkit-user-select: none;
 }
 
-.v-tabsheet .v-disabled .v-tabsheet-caption-close {
+.v-tabsheet .v-disabled .v-tabsheet-caption-close
+{
     cursor: default;
     visibility: hidden;
 }
 
 .v-tabsheet-tabitem:hover .v-tabsheet-caption-close,
-.v-ie6 .v-tabsheet-caption-close {
+.v-ie6 .v-tabsheet-caption-close
+{
     visibility: visible;
 }
 
-.v-ie6 .v-tabsheet-caption-close {
+.v-ie6 .v-tabsheet-caption-close
+{
     float: right;
 }
 
-.v-tabsheet-tabitem {
+.v-tabsheet-tabitem
+{
     border: 1px solid #aaa;
     border-right: none;
     cursor: pointer;
     padding: 0.2em 0.5em;
 }
 
-.v-tabsheet-tabitem .v-caption {
+.v-tabsheet-tabitem .v-caption
+{
     cursor: inherit;
 }
 
 .v-tabsheet.v-disabled .v-tabsheet-tabitem,
-.v-tabsheet-tabitemcell-disabled .v-tabsheet-tabitem {
+.v-tabsheet-tabitemcell-disabled .v-tabsheet-tabitem
+{
     cursor: default;
 }
 
-.v-tabsheet-tabitem-selected {
+.v-tabsheet-tabitem-selected
+{
     cursor: default;
     border-bottom-color: #fff;
 }
 
-.v-tabsheet-tabitem-selected .v-caption {
+.v-tabsheet-tabitem-selected .v-caption
+{
     cursor: default;
 }
 
-.v-tabsheet-content {
+.v-tabsheet-content
+{
     border: 1px solid #aaa;
     /* Vertical borders are not supported, use v-tabsheet-tabcontainer and v-tabsheet-deco to present these borders */
     border-top: none;
@@ -2266,56 +2622,67 @@ div.v-progressindicator-indeterminate-disabled {
 }
 
 .v-ie6 .v-tabsheet-content,
-.v-ie7 .v-tabsheet-content {
+.v-ie7 .v-tabsheet-content
+{
     zoom: 1;
 }
 
-.v-tabsheet-deco {
+.v-tabsheet-deco
+{
     height: 1px;
     background: #aaa;
     overflow: hidden;
 }
 
-.v-tabsheet-hidetabs .v-tabsheet-content {
+.v-tabsheet-hidetabs .v-tabsheet-content
+{
     border: none;
 }
 
-.v-tabsheet-hidetabs .v-tabsheet-deco {
+.v-tabsheet-hidetabs .v-tabsheet-deco
+{
     height: 0;
 }
 
-.v-textfield {
+.v-textfield
+{
     text-align: left /* Force default alignment */
 }
 
-.v-textarea {
+.v-textarea
+{
     resize: none;
 }
 
 .v-textfield-focus,
-.v-textarea-focus {
+.v-textarea-focus
+{
 }
 
 input.v-textfield-prompt,
-textarea.v-textarea-prompt {
+textarea.v-textarea-prompt
+{
     color: #999;
     font-style: italic;
 }
 
 input.v-textfield-readonly,
-textarea.v-textarea-readonly {
+textarea.v-textarea-readonly
+{
     background: transparent;
     border: none;
     resize: none;
 }
 
 input.v-disabled,
-textarea.v-disabled {
+textarea.v-disabled
+{
     resize: none;
 }
 
 input.v-textfield-readonly:focus,
-textarea.v-textarea-readonly:focus {
+textarea.v-textarea-readonly:focus
+{
     outline: none;
 }
 
@@ -2335,25 +2702,30 @@ textarea.v-textarea-readonly:focus {
 */
 /* Safari focus glow fix */
 .v-sa input:focus,
-.v-sa textarea:focus {
+.v-sa textarea:focus
+{
     outline-width: medium;
 }
 
-.v-richtextarea {
+.v-richtextarea
+{
     border: 1px solid #aaa;
     overflow: hidden;
 }
 
-.v-richtextarea .gwt-RichTextArea {
+.v-richtextarea .gwt-RichTextArea
+{
     background: #fff;
     border: none;
 }
 
-.v-richtextarea .gwt-HTML {
+.v-richtextarea .gwt-HTML
+{
     height: 100%;
 }
 
-.v-richtextarea .gwt-RichTextToolbar {
+.v-richtextarea .gwt-RichTextToolbar
+{
     white-space: nowrap;
     background: #959595 url(../base/textfield/img/richtext-toolbar-bg.png) repeat-x 0 -42px;
     border-bottom: 1px solid #7d7d7d;
@@ -2361,20 +2733,23 @@ textarea.v-textarea-readonly:focus {
     overflow: hidden;
 }
 
-.v-richtextarea .gwt-RichTextToolbar-top {
+.v-richtextarea .gwt-RichTextToolbar-top
+{
     padding-bottom: 1px;
     overflow: hidden;
     white-space: normal;
 }
 
-.v-richtextarea .gwt-RichTextToolbar-bottom {
+.v-richtextarea .gwt-RichTextToolbar-bottom
+{
     clear: left;
     overflow: hidden;
     white-space: nowrap;
 }
 
 .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton,
-.v-richtextarea .gwt-RichTextToolbar .gwt-PushButton {
+.v-richtextarea .gwt-RichTextToolbar .gwt-PushButton
+{
     float: left;
     display: inline;
     width: 22px;
@@ -2389,83 +2764,100 @@ textarea.v-textarea-readonly:focus {
 .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down,
 .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down,
 .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down-hovering,
-.v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down-hovering {
+.v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down-hovering
+{
     background-position: 0 -21px;
 }
 
 .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton img,
-.v-richtextarea .gwt-RichTextToolbar .gwt-PushButton img {
+.v-richtextarea .gwt-RichTextToolbar .gwt-PushButton img
+{
 
 }
 
-.v-richtextarea .gwt-RichTextToolbar .gwt-ListBox {
+.v-richtextarea .gwt-RichTextToolbar .gwt-ListBox
+{
     width: 24.5%;
     margin-right: 2px;
 }
 
-.v-richtextarea-readonly {
+.v-richtextarea-readonly
+{
     border: none;
 }
 
-.v-tree {
+.v-tree
+{
     text-align: left; /* Force default alignment */
     overflow: hidden;
     padding: 1px 0;
     outline: none;
 }
 
-.v-tree-node {
+.v-tree-node
+{
     background: transparent url(../base/common/img/sprites.png) no-repeat 5px -37px;
     padding: 1px 0;
 }
 
-.v-tree-node-caption:focus {
+.v-tree-node-caption:focus
+{
     outline: none;
 }
 
-div.v-tree-node-leaf {
+div.v-tree-node-leaf
+{
     background: transparent;
 }
 
-.v-tree-node-expanded {
+.v-tree-node-expanded
+{
     background: transparent url(../base/common/img/sprites.png) no-repeat -5px -10px;
 }
 
-.v-tree-node-caption {
+.v-tree-node-caption
+{
     margin-left: 1em;
 }
 
-.v-tree-node span {
+.v-tree-node span
+{
     cursor: pointer;
 }
 
-.v-tree-node-caption div {
+.v-tree-node-caption div
+{
     white-space: nowrap;
 }
 
 .v-tree-node-caption span,
-.v-tree-node-caption .v-icon {
+.v-tree-node-caption .v-icon
+{
     vertical-align: middle;
 }
 
-.v-tree-node-selected span {
+.v-tree-node-selected span
+{
     background: #999;
     color: #fff;
 }
 
-.v-tree-node-children {
+.v-tree-node-children
+{
     padding-left: 1em;
 }
 
 /* ie6compatnode is hidden from non ie6 browsers, for ie6 
  * uses weird hack to sink all events properly 
  */
-.v-tree-node-ie6compatnode {
+.v-tree-node-ie6compatnode
+{
     display: none;
 }
 
 /* IMPORTANT keep the offsetWidth of this element the same as the margin-left of v-tree-node-caption */
-.v-ie6 .v-tree-node-ie6compatnode {
+.v-ie6 .v-tree-node-ie6compatnode
+{
     display: inline;
     float: left;
     background: orange;
@@ -2477,20 +2869,23 @@ div.v-tree-node-leaf {
 }
 
 .v-ie6 .v-tree-node,
-.v-ie6 .v-tree-node-children {
+.v-ie6 .v-tree-node-children
+{
     clear: left;
 }
 
 /***************************************
  * Drag'n'drop styles
  ***************************************/
-.v-tree .v-tree-node-drag-top {
+.v-tree .v-tree-node-drag-top
+{
     border-top: 2px solid #1d9dff;
     margin-top: -1px;
     padding-top: 0;
 }
 
-.v-tree .v-tree-node-drag-bottom {
+.v-tree .v-tree-node-drag-bottom
+{
     border-bottom: 2px solid #1d9dff;
     margin-bottom: -1px;
     padding-bottom: 0;
@@ -2498,7 +2893,8 @@ div.v-tree-node-leaf {
 
 .v-tree .v-tree-node-drag-top:before,
 .v-tree .v-tree-node-drag-bottom:after,
-.v-tree .v-tree-node-caption-drag-center:after {
+.v-tree .v-tree-node-caption-drag-center:after
+{
     display: block;
     content: "";
     position: absolute;
@@ -2508,28 +2904,34 @@ div.v-tree-node-leaf {
     background: transparent url(../base/common/img/drag-slot-dot.png);
 }
 
-.v-tree .v-tree-node-drag-bottom:after {
+.v-tree .v-tree-node-drag-bottom:after
+{
     margin-top: -2px;
 }
 
-.v-tree .v-tree-node-caption-drag-center:after {
+.v-tree .v-tree-node-caption-drag-center:after
+{
     margin-left: 14px;
 }
 
 .v-ff .v-tree .v-tree-node-caption-drag-center:after,
-.v-ie .v-tree .v-tree-node-caption-drag-center:after {
+.v-ie .v-tree .v-tree-node-caption-drag-center:after
+{
     margin-top: -2px;
 }
 
-.v-tree .v-tree-node-drag-top {
+.v-tree .v-tree-node-drag-top
+{
     background-position: 5px -38px;
 }
 
-.v-tree .v-tree-node-drag-top.v-tree-node-expanded {
+.v-tree .v-tree-node-drag-top.v-tree-node-expanded
+{
     background-position: -5px -11px;
 }
 
-.v-tree .v-tree-node-caption-drag-center div {
+.v-tree .v-tree-node-caption-drag-center div
+{
     border: 2px solid #1d9dff;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -2538,84 +2940,103 @@ div.v-tree-node-leaf {
     background-color: #bcdcff;
 }
 
-.v-ie6 .v-tree .v-tree-node-caption-drag-center div {
+.v-ie6 .v-tree .v-tree-node-caption-drag-center div
+{
     margin: -2px;
 }
 
-.v-tree .v-tree-node-caption-drag-center div {
+.v-tree .v-tree-node-caption-drag-center div
+{
     background-color: rgba(169, 209, 255, .6);
 }
 
 .v-tree .v-tree-node-caption-drag-center div,
 .v-tree .v-tree-node-drag-top,
-.v-tree .v-tree-node-drag-bottom {
+.v-tree .v-tree-node-drag-bottom
+{
     border-color: rgba(0, 109, 232, .6);
 }
 
 /* Make item caption height an even number (so that the connector dots overlap nicely) */
-.v-tree-connectors .v-tree-node-caption {
+.v-tree-connectors .v-tree-node-caption
+{
     padding-top: 1px;
 }
 
-.v-tree-connectors .v-tree-node {
+.v-tree-connectors .v-tree-node
+{
     background: transparent url(../base/tree/img/connector-expand.png) no-repeat 2px -52px;
 }
 
-.v-tree-connectors .v-tree-node-expanded {
+.v-tree-connectors .v-tree-node-expanded
+{
     background: transparent url(../base/tree/img/connector-collapse.png) no-repeat 2px -52px;
 }
 
-.v-tree-connectors .v-tree-node-last {
+.v-tree-connectors .v-tree-node-last
+{
     background: transparent url(../base/tree/img/connector-expand-last.png) no-repeat 2px -52px;
 }
 
-.v-tree-connectors .v-tree-node-expanded.v-tree-node-last {
+.v-tree-connectors .v-tree-node-expanded.v-tree-node-last
+{
     background: transparent url(../base/tree/img/connector-collapse-last.png) no-repeat 2px -52px;
 }
 
-.v-tree-connectors .v-tree-node-leaf {
+.v-tree-connectors .v-tree-node-leaf
+{
     background: transparent url(../base/tree/img/connector-leaf.png) repeat-y 2px 50%;
 }
 
-.v-tree-connectors .v-tree-node-leaf-last {
+.v-tree-connectors .v-tree-node-leaf-last
+{
     background: transparent url(../base/tree/img/connector-leaf-last.png) repeat-y 2px 50%;
 }
 
-.v-tree-connectors .v-tree-node-children {
+.v-tree-connectors .v-tree-node-children
+{
     background: transparent url(../base/tree/img/connector.png) repeat-y 2px 0;
 }
 
-.v-tree-connectors .v-tree-node-children-last {
+.v-tree-connectors .v-tree-node-children-last
+{
     background: transparent;
 }
 
 .v-tree-connectors .v-tree-node-drag-top,
-.v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top {
+.v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top
+{
     background-position: 2px -53px;
 }
 
-.v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf {
+.v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf
+{
     background-position: 2px 50%;
 }
 
 /* IE6 */
-.v-ie6 .v-tree-connectors .v-tree-node {
+.v-ie6 .v-tree-connectors .v-tree-node
+{
     background: transparent url(../base/tree/img/connector-expand-ie6.png) no-repeat 2px -52px;
 }
 
-.v-ie6 .v-tree-connectors .v-tree-node-expanded {
+.v-ie6 .v-tree-connectors .v-tree-node-expanded
+{
     background: transparent url(../base/tree/img/connector-collapse-ie6.png) no-repeat 2px -52px;
 }
 
-.v-ie6 .v-tree-connectors .v-tree-node-last {
+.v-ie6 .v-tree-connectors .v-tree-node-last
+{
     background: transparent url(../base/tree/img/connector-expand-last-ie6.png) no-repeat 2px -52px;
 }
 
-.v-ie6 .v-tree-connectors .v-tree-node-last.v-tree-node-expanded {
+.v-ie6 .v-tree-connectors .v-tree-node-last.v-tree-node-expanded
+{
     background: transparent url(../base/tree/img/connector-collapse-last-ie6.png) no-repeat 2px -52px;
 }
 
-.v-treetable-treespacer {
+.v-treetable-treespacer
+{
     display: inline-block;
     background: transparent;
     height: 10px;
@@ -2626,90 +3047,108 @@ div.v-tree-node-leaf {
     top: 5px;
 }
 
-.v-treetable-node-closed {
+.v-treetable-node-closed
+{
     background: url(../base/treetable/img/arrow-right.png) right top no-repeat;
 }
 
-.v-ie6 .v-treetable-node-closed {
+.v-ie6 .v-treetable-node-closed
+{
     background-image: url(../base/treetable/img/arrow-right.gif);
 }
 
-.v-treetable-node-open {
+.v-treetable-node-open
+{
     background: url(../base/treetable/img/arrow-down.png) right top no-repeat;
 }
 
-.v-ie6 .v-treetable-node-open {
+.v-ie6 .v-treetable-node-open
+{
     background-image: url(../base/treetable/img/arrow-down.gif);
 }
 
-.v-treetable .v-checkbox {
+.v-treetable .v-checkbox
+{
     display: inline-block;
     padding-bottom: 4px;
 }
 
 .v-treetable .v-table-row .v-table-cell-content,
-.v-treetable .v-table-row-odd .v-table-cell-content {
+.v-treetable .v-table-row-odd .v-table-cell-content
+{
     position: relative;
     z-index: 10;
 }
 
-.v-treetable .v-table-cell-wrapper {
+.v-treetable .v-table-cell-wrapper
+{
     position: relative;
 }
 
-.v-treetable .v-table-body .v-table-table .v-table-row-animating {
+.v-treetable .v-table-body .v-table-table .v-table-row-animating
+{
     zoom: 1;
     z-index: 1;
 }
 
 .v-treetable .v-table-body .v-table-table .v-table-row-animating,
-.v-treetable .v-table-body .v-table-table .v-table-row-animating .v-table-cell-content {
+.v-treetable .v-table-body .v-table-table .v-table-row-animating .v-table-cell-content
+{
     background: transparent;
 }
 
-.v-treetable-animation-clone {
+.v-treetable-animation-clone
+{
     border-spacing: 0;
     zoom: 1;
 }
 
-div.v-treetable-animation-clone-wrapper {
+div.v-treetable-animation-clone-wrapper
+{
     position: absolute;
     z-index: 2;
     background-color: #fff;
 }
 
-div.v-treetable-animation-clone-wrapper table.v-treetable-animation-clone {
+div.v-treetable-animation-clone-wrapper table.v-treetable-animation-clone
+{
     background-color: #fff;
 }
 
 div table.v-treetable-animation-clone tr.v-table-row,
 div table.v-treetable-animation-clone tr.v-table-row-odd,
 div table.v-treetable-animation-clone tr.v-table-row td.v-table-cell-content,
-div table.v-treetable-animation-clone tr.v-table-row-odd td.v-table-cell-content {
+div table.v-treetable-animation-clone tr.v-table-row-odd td.v-table-cell-content
+{
     visibility: visible;
 }
 
-.v-upload {
+.v-upload
+{
     white-space: nowrap;
 }
 
 .v-ie6 .v-upload,
-.v-ie7 .v-upload {
+.v-ie7 .v-upload
+{
     margin: 0;
 }
 
-.v-upload-immediate {
+.v-upload-immediate
+{
     position: relative;
     margin: 0;
     overflow: hidden;
 }
 
 .v-ff .v-upload-immediate,
-.v-op .v-upload-immediate {
+.v-op .v-upload-immediate
+{
     display: inline-block;
 }
 
-.v-upload-immediate input {
+.v-upload-immediate input
+{
     opacity: 0;
     filter: alpha(opacity=0);
     z-index: 2;
@@ -2721,7 +3160,8 @@ div table.v-treetable-animation-clone tr.v-table-row-odd td.v-table-cell-content
     background: transparent;
 }
 
-.v-upload-immediate button {
+.v-upload-immediate button
+{
     position: relative;
     left: 0;
     top: 0;
@@ -2729,26 +3169,31 @@ div table.v-treetable-animation-clone tr.v-table-row-odd td.v-table-cell-content
     text-align: left;
 }
 
-.v-window {
+.v-window
+{
     background: #fff;
 }
 
-.v-window-outerheader {
+.v-window-outerheader
+{
     padding: 0.3em 1em;
     height: 1em;
 }
 
 .v-window-outerheader,
-.v-window-draggingCurtain {
+.v-window-draggingCurtain
+{
     cursor: move;
 }
 
-.v-window-header {
+.v-window-header
+{
     font-weight: bold;
 }
 
 /* A more specific selector to make sure padding isn't so easily overridden */
-div.v-window-header {
+div.v-window-header
+{
     white-space: nowrap;
     text-overflow: ellipsis;
     -ms-text-overflow: ellipsis;
@@ -2756,30 +3201,36 @@ div.v-window-header {
     padding: 0;
 }
 
-.v-ie6 .v-window-header {
+.v-ie6 .v-window-header
+{
     width: 100%;
 }
 
-.v-window-header .v-icon {
+.v-window-header .v-icon
+{
     vertical-align: middle; /* This has to be 'middle', not 'bottom', to allow larger icons than 16px */
 }
 
 /* Partial fix for bug #1106 */
 /* Target Firefox 2 (somehow this will force almost all window borders on top of a Flash object) */
-.v-window-contents, x:-moz-any-link {
+.v-window-contents, x:-moz-any-link
+{
     overflow: hidden;
 }
 
 /* Target Firefox 3 (it doesn't need any trickery, so revert the previous) */
-.v-window-contents, x:-moz-any-link, x:default {
+.v-window-contents, x:-moz-any-link, x:default
+{
     overflow: visible;
 }
 
-.v-window-contents > div {
+.v-window-contents > div
+{
     outline: none;
 }
 
-.v-window-footer {
+.v-window-footer
+{
     overflow: hidden;
     zoom: 1;
     height: 10px;
@@ -2787,7 +3238,8 @@ div.v-window-header {
     cursor: move;
 }
 
-.v-window-resizebox {
+.v-window-resizebox
+{
     width: 10px;
     height: 10px;
     background: #ddd;
@@ -2797,20 +3249,24 @@ div.v-window-header {
 }
 
 .v-window-resizebox,
-.v-window-resizingCurtain {
+.v-window-resizingCurtain
+{
     cursor: se-resize;
 }
 
-.v-window div.v-window-footer-noresize {
+.v-window div.v-window-footer-noresize
+{
     height: 0;
 }
 
-.v-window-resizebox-disabled {
+.v-window-resizebox-disabled
+{
     cursor: default;
     display: none;
 }
 
-.v-window-closebox {
+.v-window-closebox
+{
     position: absolute;
     top: 0;
     right: 0;
@@ -2821,7 +3277,8 @@ div.v-window-header {
     overflow: hidden;
 }
 
-.v-window-modalitycurtain {
+.v-window-modalitycurtain
+{
     top: 0;
     left: 0;
     background: #999;
@@ -2833,22 +3290,26 @@ div.v-window-header {
 }
 
 /* IE6 workaround for position:fixed; */
-.v-ie6 .v-window-modalitycurtain {
+.v-ie6 .v-window-modalitycurtain
+{
     position: absolute;
     top: expression(document.documentElement.scrollTop + "px");
 }
 
 /* min-width for IE6 */
-.v-ie6 .v-window {
+.v-ie6 .v-window
+{
     width: 0; /*  */
 }
 
 /* Shadow for window */
-.v-shadow-window {
+.v-shadow-window
+{
     position: absolute;
 }
 
-.v-shadow-window .top-left {
+.v-shadow-window .top-left
+{
     position: absolute;
     overflow: hidden;
     top: -10px;
@@ -2858,7 +3319,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/top-left.png);
 }
 
-.v-shadow-window .top {
+.v-shadow-window .top
+{
     position: absolute;
     overflow: hidden;
     top: -10px;
@@ -2868,7 +3330,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/top.png);
 }
 
-.v-shadow-window .top-right {
+.v-shadow-window .top-right
+{
     position: absolute;
     overflow: hidden;
     top: -10px;
@@ -2878,7 +3341,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/top-right.png);
 }
 
-.v-shadow-window .left {
+.v-shadow-window .left
+{
     position: absolute;
     overflow: hidden;
     top: 18px;
@@ -2888,7 +3352,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/left.png);
 }
 
-.v-shadow-window .center {
+.v-shadow-window .center
+{
     position: absolute;
     overflow: hidden;
     top: 18px;
@@ -2898,7 +3363,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/center.png);
 }
 
-.v-shadow-window .right {
+.v-shadow-window .right
+{
     position: absolute;
     overflow: hidden;
     top: 18px;
@@ -2908,7 +3374,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/right.png);
 }
 
-.v-shadow-window .bottom-left {
+.v-shadow-window .bottom-left
+{
     position: absolute;
     overflow: hidden;
     bottom: -18px;
@@ -2918,7 +3385,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/bottom-left.png);
 }
 
-.v-shadow-window .bottom {
+.v-shadow-window .bottom
+{
     position: absolute;
     overflow: hidden;
     bottom: -18px;
@@ -2928,7 +3396,8 @@ div.v-window-header {
     background: transparent url(../base/window/img/shadow/bottom.png);
 }
 
-.v-shadow-window .bottom-right {
+.v-shadow-window .bottom-right
+{
     position: absolute;
     overflow: hidden;
     bottom: -18px;
@@ -2939,11 +3408,13 @@ div.v-window-header {
 }
 
 /* For IE6 (no transparent png's, we use a blur filter) */
-.v-ie6 .v-shadow-window * {
+.v-ie6 .v-shadow-window *
+{
     display: none;
 }
 
-.v-ie6 .v-shadow-window {
+.v-ie6 .v-shadow-window
+{
     background: #000;
     filter: progid:DXImageTransform.Microsoft.Blur(pixelRadius=5) alpha(opacity=20);
     margin-top: 2px;
@@ -2960,7 +3431,8 @@ div.v-window-header {
  * Buttons 
  * -----------*/
 
-.v-accordion {
+.v-accordion
+{
     border: 1px solid #bebebe;
     border-radius: 2px;
     -webkit-border-radius: 2px;
@@ -2968,11 +3440,13 @@ div.v-window-header {
     overflow: hidden;
 }
 
-.v-accordion-item {
+.v-accordion-item
+{
     background-color: #fff;
 }
 
-.v-accordion-item-caption {
+.v-accordion-item-caption
+{
     height: 19px;
     background: #e4e4e4 repeat-x;
     background-image: url(common/img/vertical-sprites.png);
@@ -2984,35 +3458,42 @@ div.v-window-header {
     text-shadow: #fff 0 1px 0;
 }
 
-.v-accordion-item-first .v-accordion-item-caption {
+.v-accordion-item-first .v-accordion-item-caption
+{
     border-top: none;
 }
 
-.v-accordion-item-caption .v-caption {
+.v-accordion-item-caption .v-caption
+{
     padding: 3px 0 5px 10px;
 }
 
-.v-ie .v-accordion-item-caption .v-caption {
+.v-ie .v-accordion-item-caption .v-caption
+{
     padding: 2px 0 6px 10px;
 }
 
-.v-accordion-item-open .v-accordion-item-caption {
+.v-accordion-item-open .v-accordion-item-caption
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -19px;
     border-bottom: 1px solid #bbb;
 }
 
-.v-accordion-item-caption .v-icon {
+.v-accordion-item-caption .v-icon
+{
     margin-top: -1px;
 }
 
-.v-ie .v-accordion-item-caption .v-icon {
+.v-ie .v-accordion-item-caption .v-icon
+{
     vertical-align: top;
 }
 
 /* Borderless style */
-.v-accordion-borderless {
+.v-accordion-borderless
+{
     border: none;
     border-radius: 0;
     -webkit-border-radius: 0;
@@ -3023,14 +3504,16 @@ div.v-window-header {
  * These files contain styles that apply to all browsers
  */
 
-.v-button:focus {
+.v-button:focus
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -0px;
     outline: none;
 }
 
-.v-button:focus .v-button-wrap {
+.v-button:focus .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -26px;
@@ -3038,7 +3521,8 @@ div.v-window-header {
 }
 
 .v-button:active,
-.v-button.v-pressed {
+.v-button.v-pressed
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -52px;
@@ -3046,7 +3530,8 @@ div.v-window-header {
 }
 
 .v-button:active .v-button-wrap,
-.v-button.v-pressed .v-button-wrap {
+.v-button.v-pressed .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -78px;
@@ -3054,7 +3539,8 @@ div.v-window-header {
 }
 
 .v-button,
-.v-disabled.v-button {
+.v-disabled.v-button
+{
     height: 26px;
     padding: 0 0 0 6px;
     background-color: transparent;
@@ -3067,7 +3553,8 @@ div.v-window-header {
 }
 
 .v-button-wrap,
-.v-disabled.v-button .v-button-wrap {
+.v-disabled.v-button .v-button-wrap
+{
     display: block;
     height: 22px;
     padding: 4px 15px 0 9px;
@@ -3079,7 +3566,8 @@ div.v-window-header {
     background-position: right -130px;
 }
 
-.v-button-caption {
+.v-button-caption
+{
     color: #222;
     text-shadow: #fff 0 1px 0;
     font-weight: bold;
@@ -3090,86 +3578,99 @@ div.v-window-header {
 /**************************
  * Black style
  **************************/
-.black .v-button:focus {
+.black .v-button:focus
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -0px;
 }
 
-.black .v-button:focus .v-button-wrap {
+.black .v-button:focus .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -26px;
 }
 
 .black .v-button:active,
-.black .v-button.v-pressed {
+.black .v-button.v-pressed
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -52px;
 }
 
 .black .v-button:active .v-button-wrap,
-.black .v-button.v-pressed .v-button-wrap {
+.black .v-button.v-pressed .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -78px;
 }
 
 .black .v-button,
-.black .v-disabled.v-button {
+.black .v-disabled.v-button
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -104px;
 }
 
 .black .v-button-wrap,
-.black .v-disabled.v-button .v-button-wrap {
+.black .v-disabled.v-button .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -130px;
 }
 
-.black .v-button-caption {
+.black .v-button-caption
+{
     color: #c9ccce;
     text-shadow: #121314 0 -1px 0;
 }
 
-.v-button-primary:focus {
+.v-button-primary:focus
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -156px;
 }
 
-.v-button-primary:focus .v-button-wrap {
+.v-button-primary:focus .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -182px;
 }
 
 .v-button-primary:active,
-.v-button-primary.v-pressed {
+.v-button-primary.v-pressed
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -208px;
 }
 
 .v-button-primary:active .v-button-wrap,
-.v-button-primary.v-pressed .v-button-wrap {
+.v-button-primary.v-pressed .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -234px;
 }
 
 .v-button-primary,
-.v-disabled.v-button-primary {
+.v-disabled.v-button-primary
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -260px;
 }
 
 .v-button-primary .v-button-wrap,
-.v-disabled.v-button-primary .v-button-wrap {
+.v-disabled.v-button-primary .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -286px;
@@ -3177,13 +3678,15 @@ div.v-window-header {
 
 /* Black style */
 
-.black .v-button-primary:focus {
+.black .v-button-primary:focus
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -156px;
 }
 
-.black .v-button-primary:focus .v-button-wrap {
+.black .v-button-primary:focus .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -182px;
@@ -3191,61 +3694,70 @@ div.v-window-header {
 }
 
 .black .v-button-primary:active,
-.black .v-button-primary.v-pressed {
+.black .v-button-primary.v-pressed
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -208px;
 }
 
 .black .v-button-primary:active .v-button-wrap,
-.black .v-button-primary.v-pressed .v-button-wrap {
+.black .v-button-primary.v-pressed .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -234px;
 }
 
 .black .v-button-primary,
-.black .v-disabled.v-button-primary {
+.black .v-disabled.v-button-primary
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -260px;
 }
 
 .black .v-button-primary .v-button-wrap,
-.black .v-disabled.v-button-primary .v-button-wrap {
+.black .v-disabled.v-button-primary .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -286px;
 }
 
-.v-button-small:focus {
+.v-button-small:focus
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -312px;
 }
 
-.v-button-small:focus .v-button-wrap {
+.v-button-small:focus .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -332px;
 }
 
 .v-button-small:active,
-.v-button-small.v-pressed {
+.v-button-small.v-pressed
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -352px;
 }
 
 .v-button-small:active .v-button-wrap,
-.v-button-small.v-pressed .v-button-wrap {
+.v-button-small.v-pressed .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -372px;
 }
 
 .v-button-small,
-.v-disabled.v-button-small {
+.v-disabled.v-button-small
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: left -392px;
@@ -3253,7 +3765,8 @@ div.v-window-header {
 }
 
 .v-button-small .v-button-wrap,
-.v-disabled.v-button-small .v-button-wrap {
+.v-disabled.v-button-small .v-button-wrap
+{
     background-image: url(button/img/button-sprites.png);
     -background-image: url(button/img/button-sprites-ie6.png);
     background-position: right -412px;
@@ -3261,47 +3774,54 @@ div.v-window-header {
     padding: 1px 14px 0 8px;
 }
 
-.v-button-small .v-button-caption {
+.v-button-small .v-button-caption
+{
     font-weight: normal;
 }
 
 /* Black style */
 
-.black .v-button-small:focus {
+.black .v-button-small:focus
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -312px;
 }
 
-.black .v-button-small:focus .v-button-wrap {
+.black .v-button-small:focus .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -332px;
 }
 
 .black .v-button-small:active,
-.black .v-button-small.v-pressed {
+.black .v-button-small.v-pressed
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -352px;
 }
 
 .black .v-button-small:active .v-button-wrap,
-.black .v-button-small.v-pressed .v-button-wrap {
+.black .v-button-small.v-pressed .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -372px;
 }
 
 .black .v-button-small,
-.black .v-disabled.v-button-small {
+.black .v-disabled.v-button-small
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: left -392px;
 }
 
 .black .v-button-small .v-button-wrap,
-.black .v-disabled.v-button-small .v-button-wrap {
+.black .v-disabled.v-button-small .v-button-wrap
+{
     background-image: url(button/img/black-button-sprites.png);
     -background-image: url(button/img/black-button-sprites-ie6.png);
     background-position: right -412px;
@@ -3316,7 +3836,8 @@ div.v-window-header {
 .v-button.v-button-link:focus .v-button-wrap,
 .v-button.v-button-link:active .v-button-wrap,
 .v-button-link.v-pressed .v-button-wrap,
-.v-disabled.v-button.v-button-link .v-button-wrap {
+.v-disabled.v-button.v-button-link .v-button-wrap
+{
     background: transparent;
     height: auto;
     padding: 0;
@@ -3325,12 +3846,14 @@ div.v-window-header {
 }
 
 .v-button.v-button-link.v-disabled,
-.v-button.v-button-link.v-disabled .v-button-wrap {
+.v-button.v-button-link.v-disabled .v-button-wrap
+{
     cursor: default;
 }
 
 .v-button-link .v-button-caption,
-.v-nativebutton-link .v-nativebutton-caption {
+.v-nativebutton-link .v-nativebutton-caption
+{
     line-height: inherit;
     font-weight: normal;
     color: #1b699f;
@@ -3339,13 +3862,15 @@ div.v-window-header {
 }
 
 .v-button-link:focus .v-button-caption,
-.v-nativebutton-link:focus .v-nativebutton-caption {
+.v-nativebutton-link:focus .v-nativebutton-caption
+{
     outline: 1px dotted #1b699f;
 }
 
 /* Browser-specific corrections to the standard implementation */
 
-.v-ff2 .v-button .v-button-caption {
+.v-ff2 .v-button .v-button-caption
+{
     display: -moz-inline-box;
     padding-top: 6px;
     height: 20px;
@@ -3353,7 +3878,8 @@ div.v-window-header {
 
 .v-ie6 .v-nativebutton-link,
 .v-ie7 .v-nativebutton-link,
-.v-ie8 .v-nativebutton-link {
+.v-ie8 .v-nativebutton-link
+{
     padding: 0;
     text-align: left;
 }
@@ -3361,7 +3887,8 @@ div.v-window-header {
 /**
  * IE6 buttons --------------------------
  */
-.v-ie6 .v-button {
+.v-ie6 .v-button
+{
     border: 1px solid #b3b3b3;
     border-bottom-color: #9a9a9a;
     background: #d8d8d8 url(button/img/right.png) no-repeat 0 -1px;
@@ -3369,7 +3896,8 @@ div.v-window-header {
     height: 23px;
 }
 
-.v-ie6 .v-button .v-button-wrap {
+.v-ie6 .v-button .v-button-wrap
+{
     background: transparent;
     height: 20px;
     padding: 3px 0 0;
@@ -3377,53 +3905,63 @@ div.v-window-header {
     zoom: 1;
 }
 
-.v-ie6 .v-button-primary {
+.v-ie6 .v-button-primary
+{
     background-image: url(button/img/primary-right.png);
 }
 
-.v-ie6 .v-button-small {
+.v-ie6 .v-button-small
+{
     background-image: url(button/img/small-right.png);
     height: 17px;
 }
 
-.v-ie6 .v-button-small .v-button-wrap {
+.v-ie6 .v-button-small .v-button-wrap
+{
     height: 17px;
     padding: 0;
 }
 
-.v-ie6 .v-button.v-pressed {
+.v-ie6 .v-button.v-pressed
+{
     background: transparent url(button/img/right-pressed.png) no-repeat 0 -1px;
 }
 
 /* Buttons on blue background */
-.v-ie6 .blue .v-button {
+.v-ie6 .blue .v-button
+{
     border-color: #84949c;
     border-top-color: #83939b;
     border-bottom-color: #888d91;
 }
 
 /* Buttons on black background */
-.v-ie6 .black .v-button {
+.v-ie6 .black .v-button
+{
     border: 1px solid #0d0e0f;
     background: #202224 url(button/img/black/right.png) no-repeat 0 -1px;
     color: #c9ccce;
 }
 
-.v-ie6 .black .v-button-primary {
+.v-ie6 .black .v-button-primary
+{
     background-image: url(button/img/black/primary-right.png);
 }
 
-.v-ie6 .black .v-button-small {
+.v-ie6 .black .v-button-small
+{
     background-image: url(button/img/black/small-right.png);
 }
 
-.v-ie6 .black .v-button.v-pressed {
+.v-ie6 .black .v-button.v-pressed
+{
     background-image: url(button/img/black/right-pressed.png);
 }
 
 /* Link style button */
 .v-ie6 .v-button-link,
-.v-ie6 .black .v-button-link {
+.v-ie6 .black .v-button-link
+{
     background: transparent;
     border: none;
     height: auto;
@@ -3432,13 +3970,15 @@ div.v-window-header {
 }
 
 .v-ie6 .v-button-link .v-button-wrap,
-.v-ie6 .black .v-button-link .v-button-wrap {
+.v-ie6 .black .v-button-link .v-button-wrap
+{
     padding: 0;
     height: auto;
 }
 
 .v-generated-body,
-.v-app {
+.v-app
+{
     background: #f5f5f5;
 }
 
@@ -3465,7 +4005,8 @@ div.v-window-header {
 .v-Notification,
 .v-menubar-submenu,
 .v-drag-element,
-.v-table-header-drag {
+.v-table-header-drag
+{
     font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
     font-size: 12px;
     line-height: normal;
@@ -3476,33 +4017,39 @@ div.v-window-header {
 .v-app .black,
 .v-window-black,
 .v-window .black,
-.v-popupview-popup .black {
+.v-popupview-popup .black
+{
     color: #c9ccce;
     text-shadow: #000 0 0 1px;
 }
 
-.v-errorindicator {
+.v-errorindicator
+{
     width: 13px;
     height: 16px;
     background: transparent url(common/icons/error.png) no-repeat 50%;
 }
 
-.v-ie6 .v-errorindicator {
+.v-ie6 .v-errorindicator
+{
     background-image: url(common/icons/error-ie6.png);
 }
 
-.v-tooltip {
+.v-tooltip
+{
     background-color: #fffcdd;
     border: 1px solid #b8b295;
     font-size: 11px;
     color: #222;
 }
 
-.v-tooltip-text {
+.v-tooltip-text
+{
     padding: 2px 4px;
 }
 
-.v-tooltip .v-errormessage {
+.v-tooltip .v-errormessage
+{
     padding: 3px 4px;
     background: #ffecc6;
     color: #b74100;
@@ -3510,20 +4057,23 @@ div.v-window-header {
     border-top: 1px solid #fff3dc;
 }
 
-.v-tooltip .v-errormessage h2 {
+.v-tooltip .v-errormessage h2
+{
     font-size: 16px;
     font-weight: normal;
     color: #ab3101;
     margin: 2px 0 8px 0;
 }
 
-.v-tooltip .v-errormessage h3 {
+.v-tooltip .v-errormessage h3
+{
     font-size: 13px;
     font-weight: bold;
     margin: 1px 0 4px 0;
 }
 
-.v-contextmenu {
+.v-contextmenu
+{
     background: #f8f8f9;
     border: none;
     border-radius: 3px;
@@ -3534,7 +4084,8 @@ div.v-window-header {
     padding: 4px 0;
 }
 
-.v-contextmenu .gwt-MenuItem {
+.v-contextmenu .gwt-MenuItem
+{
     padding: 1px 12px 1px 8px;
     height: 16px;
     user-select: none;
@@ -3543,11 +4094,13 @@ div.v-window-header {
     cursor: default;
 }
 
-.v-contextmenu .gwt-MenuItem .v-icon {
+.v-contextmenu .gwt-MenuItem .v-icon
+{
     margin-right: 3px;
 }
 
-.v-contextmenu .gwt-MenuItem-selected {
+.v-contextmenu .gwt-MenuItem-selected
+{
     background: transparent repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -3556,18 +4109,21 @@ div.v-window-header {
     text-shadow: #3b5a7a 0 1px 0;
 }
 
-.v-ie .v-contextmenu .gwt-MenuItem-selected {
+.v-ie .v-contextmenu .gwt-MenuItem-selected
+{
     background-image: url(common/img/sel-bg.png);
     background-position: left top;
 }
 
-.v-contextmenu .gwt-MenuItem-selected div {
+.v-contextmenu .gwt-MenuItem-selected div
+{
     background: transparent;
     cursor: default;
 }
 
 /* Fixes for Liferay 6.0 */
-.portlet .v-app {
+.portlet .v-app
+{
     background: transparent;
 }
 
@@ -3576,16 +4132,19 @@ div.v-window-header {
 .portlet .v-popupview-popup .v-radiobutton input,
 .portlet .v-app .v-checkbox input,
 .portlet .v-window .v-checkbox input,
-.portlet .v-popupview-popup .v-checkbox input {
+.portlet .v-popupview-popup .v-checkbox input
+{
     margin-right: 3px;
     background: transparent;
 }
 
-input.v-textfield-readonly:focus {
+input.v-textfield-readonly:focus
+{
     background-color: transparent;
 }
 
-.v-datefield-calendarpanel {
+.v-datefield-calendarpanel
+{
     border-collapse: collapse;
     margin: 0;
     padding: 0;
@@ -3593,15 +4152,18 @@ input.v-textfield-readonly:focus {
 }
 
 .v-datefield-year .v-datefield-calendarpanel-prevmonth,
-.v-datefield-year .v-datefield-calendarpanel-nextmonth {
+.v-datefield-year .v-datefield-calendarpanel-nextmonth
+{
     display: none;
 }
 
-.v-datefield-calendarpanel td {
+.v-datefield-calendarpanel td
+{
     vertical-align: top;
 }
 
-td.v-datefield-calendarpanel-month {
+td.v-datefield-calendarpanel-month
+{
     height: 23px;
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
@@ -3609,7 +4171,8 @@ td.v-datefield-calendarpanel-month {
     background-position: left -58px;
 }
 
-span.v-datefield-calendarpanel-month {
+span.v-datefield-calendarpanel-month
+{
     display: block;
     text-align: center;
     height: 16px;
@@ -3621,49 +4184,58 @@ span.v-datefield-calendarpanel-month {
     margin-top: 1px;
 }
 
-.v-datefield-year .v-datefield-calendarpanel-month {
+.v-datefield-year .v-datefield-calendarpanel-month
+{
     width: 35px;
 }
 
 .v-datefield-month .v-datefield-calendarpanel-month,
 .v-datefield-day .v-datefield-calendarpanel-month,
-.v-datefield-full .v-datefield-calendarpanel-month {
+.v-datefield-full .v-datefield-calendarpanel-month
+{
     width: 124px;
 }
 
 .v-datefield-month,
 .v-datefield-day,
-.v-datefield-full {
+.v-datefield-full
+{
     min-width: 240px;
 }
 
 .v-ff2 .v-datefield-month,
 .v-ff2 .v-datefield-day,
-.v-ff2 .v-datefield-full {
+.v-ff2 .v-datefield-full
+{
     min-width: 254px;
 }
 
 .v-datefield-popupcalendar,
-.v-ff2 .v-datefield-popupcalendar {
+.v-ff2 .v-datefield-popupcalendar
+{
     min-width: 0;
 }
 
-.v-datefield-year .v-datefield-calendarpanel {
+.v-datefield-year .v-datefield-calendarpanel
+{
     width: 100px;
 }
 
-td.v-datefield-calendarpanel-prevyear {
+td.v-datefield-calendarpanel-prevyear
+{
     text-align: right;
 }
 
-td.v-datefield-calendarpanel-nextyear {
+td.v-datefield-calendarpanel-nextyear
+{
     text-align: left;
 }
 
 .v-datefield-calendarpanel-prevyear button,
 .v-datefield-calendarpanel-nextyear button,
 .v-datefield-calendarpanel-prevmonth button,
-.v-datefield-calendarpanel-nextmonth button {
+.v-datefield-calendarpanel-nextmonth button
+{
     width: 24px;
     height: 23px;
     border: none;
@@ -3684,12 +4256,14 @@ td.v-datefield-calendarpanel-nextyear {
 .v-ie .v-datefield-calendarpanel-prevyear button,
 .v-ie .v-datefield-calendarpanel-nextyear button,
 .v-ie .v-datefield-calendarpanel-prevmonth button,
-.v-ie .v-datefield-calendarpanel-nextmonth button {
+.v-ie .v-datefield-calendarpanel-nextmonth button
+{
     text-indent: 0;
     font-size: 1px;
 }
 
-.v-datefield-calendarpanel-nextyear button {
+.v-datefield-calendarpanel-nextyear button
+{
     background-position: left top;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -3697,21 +4271,24 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-datefield-calendarpanel-prevyear button:active,
-.v-ie .v-datefield-calendarpanel-prevyear button.v-pressed {
+.v-ie .v-datefield-calendarpanel-prevyear button.v-pressed
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -127px;
 }
 
 .v-datefield-calendarpanel-nextyear button:active,
-.v-ie .v-datefield-calendarpanel-nextyear button.v-pressed {
+.v-ie .v-datefield-calendarpanel-nextyear button.v-pressed
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -150px;
 }
 
 .v-datefield-calendarpanel-prevmonth,
-.v-datefield-calendarpanel-nextmonth {
+.v-datefield-calendarpanel-nextmonth
+{
     width: 24px;
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
@@ -3720,7 +4297,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-datefield-calendarpanel-prevmonth button,
-.v-datefield-calendarpanel-nextmonth button {
+.v-datefield-calendarpanel-nextmonth button
+{
     width: 100%;
     height: 21px;
     border-left: 1px solid #efefef;
@@ -3735,23 +4313,27 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-ie .v-datefield-calendarpanel-prevmonth button,
-.v-ie .v-datefield-calendarpanel-nextmonth button {
+.v-ie .v-datefield-calendarpanel-nextmonth button
+{
     border: none;
 }
 
 .v-ie6 .v-datefield-calendarpanel-prevmonth button,
-.v-ie6 .v-datefield-calendarpanel-nextmonth button {
+.v-ie6 .v-datefield-calendarpanel-nextmonth button
+{
     width: 24px;
 }
 
-.v-datefield-calendarpanel-nextmonth button {
+.v-datefield-calendarpanel-nextmonth button
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: center -217px;
 }
 
 .v-datefield-calendarpanel-prevmonth button:active,
-.v-ie .v-datefield-calendarpanel-prevmonth button.v-pressed {
+.v-ie .v-datefield-calendarpanel-prevmonth button.v-pressed
+{
     background-position: center top;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -3759,7 +4341,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-datefield-calendarpanel-nextmonth button:active,
-.v-ie .v-datefield-calendarpanel-nextmonth button.v-pressed {
+.v-ie .v-datefield-calendarpanel-nextmonth button.v-pressed
+{
     background-position: center top;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -3767,12 +4350,14 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-datefield-calendarpanel-body,
-.v-datefield-calendarpanel-time {
+.v-datefield-calendarpanel-time
+{
     text-align: center;
     vertical-align: top;
 }
 
-.v-datefield-calendarpanel-body table {
+.v-datefield-calendarpanel-body table
+{
     border-collapse: collapse;
     margin: 0;
     padding: 0;
@@ -3780,7 +4365,8 @@ td.v-datefield-calendarpanel-nextyear {
     margin: 0 auto;
 }
 
-.v-datefield-calendarpanel-weekdays td {
+.v-datefield-calendarpanel-weekdays td
+{
     width: 14.2%;
     overflow: hidden;
     background-repeat: repeat-x;
@@ -3795,11 +4381,13 @@ td.v-datefield-calendarpanel-nextyear {
     vertical-align: top;
 }
 
-.v-datefield-calendarpanel-weeknumbers td {
+.v-datefield-calendarpanel-weeknumbers td
+{
     width: 12.4%;
 }
 
-.v-datefield-calendarpanel-weekdays strong {
+.v-datefield-calendarpanel-weekdays strong
+{
     display: block;
     text-align: right;
     padding: 1px 5px 0 0;
@@ -3807,14 +4395,16 @@ td.v-datefield-calendarpanel-nextyear {
     border-top: 1px solid #596775;
 }
 
-.v-datefield-calendarpanel-weekdays .v-first {
+.v-datefield-calendarpanel-weekdays .v-first
+{
     background-repeat: no-repeat;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -299px;
 }
 
-.v-datefield-calendarpanel-weekdays .v-last {
+.v-datefield-calendarpanel-weekdays .v-last
+{
     background-repeat: no-repeat;
     background-position: right top;
     background-image: url(common/img/vertical-sprites.png);
@@ -3823,44 +4413,52 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 /* IE fails to position backgrounds inside table element */
-.v-ie .v-datefield-calendarpanel-weekdays td {
+.v-ie .v-datefield-calendarpanel-weekdays td
+{
     background: url(datefield/img/weekday-bg.png) repeat-x;
     background-position: left top;
 }
 
-.v-ie .v-datefield-calendarpanel .v-first {
+.v-ie .v-datefield-calendarpanel .v-first
+{
     background: url(datefield/img/weekday-first.png) no-repeat;
 }
 
-.v-ie .v-datefield-calendarpanel .v-last {
+.v-ie .v-datefield-calendarpanel .v-last
+{
     background: url(datefield/img/weekday-last.png) no-repeat right top;
 }
 
-.v-datefield-calendarpanel-body td {
+.v-datefield-calendarpanel-body td
+{
     text-align: right;
     height: 19px;
 }
 
 .v-datefield-calendarpanel-day,
 .v-datefield-calendarpanel-weeknumber,
-.v-datefield-calendarpanel-day-today {
+.v-datefield-calendarpanel-day-today
+{
     padding: 2px 5px 2px 0;
     display: block;
     margin: 1px 0 0 5px;
 }
 
-.v-datefield-calendarpanel-weeknumber {
+.v-datefield-calendarpanel-weeknumber
+{
     margin: 0;
     padding-top: 4px;
     padding-bottom: 3px;
 }
 
-.v-datefield-calendarpanel-day-today {
+.v-datefield-calendarpanel-day-today
+{
     color: #4095d1;
     border: none;
 }
 
-.v-datefield-calendarpanel-day-selected {
+.v-datefield-calendarpanel-day-selected
+{
     background: #507ba3;
     color: #fff;
     text-shadow: #3b5b79 0 1px 0;
@@ -3869,12 +4467,14 @@ td.v-datefield-calendarpanel-nextyear {
     -moz-border-radius: 2px;
 }
 
-.v-datefield-calendarpanel-time select {
+.v-datefield-calendarpanel-time select
+{
     padding: 0;
     font-size: 11px;
 }
 
-.v-datefield-popup {
+.v-datefield-popup
+{
     background: #f8f8f9;
     padding: 8px 4px;
     border-radius: 3px;
@@ -3884,27 +4484,33 @@ td.v-datefield-calendarpanel-nextyear {
 
 .v-sa .v-datefield-popup,
 .v-ff3 .v-datefield-popup,
-.v-op .v-datefield-popup {
+.v-op .v-datefield-popup
+{
     background: rgba(255, 255, 255, .95);
 }
 
-.v-datefield-year .v-datefield-textfield {
+.v-datefield-year .v-datefield-textfield
+{
     width: 4em;
 }
 
-.v-datefield-month .v-datefield-textfield {
+.v-datefield-month .v-datefield-textfield
+{
     width: 5em;
 }
 
-.v-datefield-day .v-datefield-textfield {
+.v-datefield-day .v-datefield-textfield
+{
     width: 5.5em;
 }
 
-.v-datefield-full .v-datefield-textfield {
+.v-datefield-full .v-datefield-textfield
+{
     width: 12em;
 }
 
-.v-datefield-popupcalendar input.v-datefield-textfield {
+.v-datefield-popupcalendar input.v-datefield-textfield
+{
     border-right-width: 0;
     -moz-border-radius-topright: 0;
     -moz-border-radius-bottomright: 0;
@@ -3913,19 +4519,22 @@ td.v-datefield-calendarpanel-nextyear {
     height: 14px;
 }
 
-.v-datefield.v-readonly input.v-datefield-textfield {
+.v-datefield.v-readonly input.v-datefield-textfield
+{
     border-right-width: 1px;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
 }
 
-.v-datefield-prompt .v-datefield-textfield {
+.v-datefield-prompt .v-datefield-textfield
+{
     color: #999;
     font-style: normal;
 }
 
-.v-datefield-popupcalendar .v-datefield-button {
+.v-datefield-popupcalendar .v-datefield-button
+{
     width: 24px;
     height: 23px;
     background: transparent;
@@ -3940,27 +4549,31 @@ td.v-datefield-calendarpanel-nextyear {
     border-radius: 0;
 }
 
-.v-datefield-popupcalendar .v-datefield-button:active {
+.v-datefield-popupcalendar .v-datefield-button:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -360px;
 }
 
 /* over black background */
-.black .v-datefield-popupcalendar .v-datefield-button {
+.black .v-datefield-popupcalendar .v-datefield-button
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -0px;
 }
 
-.black .v-datefield-popupcalendar .v-datefield-button:active {
+.black .v-datefield-popupcalendar .v-datefield-button:active
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -23px;
 }
 
 /* Small adjustment for IE6 */
-.v-ie6 .v-datefield-popupcalendar .v-datefield-button {
+.v-ie6 .v-datefield-popupcalendar .v-datefield-button
+{
     margin-top: 1px;
 }
 
@@ -3968,14 +4581,16 @@ td.v-datefield-calendarpanel-nextyear {
 * on black background
 */
 
-.black td.v-datefield-calendarpanel-month {
+.black td.v-datefield-calendarpanel-month
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -46px;
     height: 21px;
 }
 
-.black span.v-datefield-calendarpanel-month {
+.black span.v-datefield-calendarpanel-month
+{
     border-left: 1px solid #333638;
     border-right: 1px solid #232527;
     color: #c9ccce;
@@ -3987,42 +4602,48 @@ td.v-datefield-calendarpanel-nextyear {
 .black .v-datefield-calendarpanel-prevyear button,
 .black .v-datefield-calendarpanel-nextyear button,
 .black .v-datefield-calendarpanel-prevmonth button,
-.black .v-datefield-calendarpanel-nextmonth button {
+.black .v-datefield-calendarpanel-nextmonth button
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -67px;
     height: 21px;
 }
 
-.black .v-datefield-calendarpanel-nextyear button {
+.black .v-datefield-calendarpanel-nextyear button
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -88px;
 }
 
 .black .v-datefield-calendarpanel-prevyear button:active,
-.v-ie .black .v-datefield-calendarpanel-prevyear button.v-pressed {
+.v-ie .black .v-datefield-calendarpanel-prevyear button.v-pressed
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -109px;
 }
 
 .black .v-datefield-calendarpanel-nextyear button:active,
-.v-ie .black .v-datefield-calendarpanel-nextyear button.v-pressed {
+.v-ie .black .v-datefield-calendarpanel-nextyear button.v-pressed
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -130px;
 }
 
 .black .v-datefield-calendarpanel-prevmonth,
-.black .v-datefield-calendarpanel-nextmonth {
+.black .v-datefield-calendarpanel-nextmonth
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -151px;
 }
 
 .black .v-datefield-calendarpanel-prevmonth button,
-.black .v-datefield-calendarpanel-nextmonth button {
+.black .v-datefield-calendarpanel-nextmonth button
+{
     border-left: 1px solid #333638;
     border-right: 1px solid #232527;
     background-image: url(common/img/black-vertical-sprites.png);
@@ -4031,32 +4652,37 @@ td.v-datefield-calendarpanel-nextyear {
     margin-top: 0;
 }
 
-.black .v-datefield-calendarpanel-nextmonth button {
+.black .v-datefield-calendarpanel-nextmonth button
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: center -193px;
 }
 
 .black .v-datefield-calendarpanel-prevmonth button:active,
-.v-ie .black .v-datefield-calendarpanel-prevmonth button.v-pressed {
+.v-ie .black .v-datefield-calendarpanel-prevmonth button.v-pressed
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: center -214px;
 }
 
 .black .v-datefield-calendarpanel-nextmonth button:active,
-.v-ie .black .v-datefield-calendarpanel-nextmonth button.v-pressed {
+.v-ie .black .v-datefield-calendarpanel-nextmonth button.v-pressed
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: center -235px;
 }
 
 .v-ie .black .v-datefield-calendarpanel-prevmonth button,
-.v-ie .black .v-datefield-calendarpanel-nextmonth button {
+.v-ie .black .v-datefield-calendarpanel-nextmonth button
+{
     border: none;
 }
 
-.black .v-datefield-calendarpanel-weekdays td {
+.black .v-datefield-calendarpanel-weekdays td
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -256px;
@@ -4064,73 +4690,87 @@ td.v-datefield-calendarpanel-nextyear {
     text-shadow: #5a5c5e 0 1px 0;
 }
 
-.black .v-datefield-calendarpanel-weekdays strong {
+.black .v-datefield-calendarpanel-weekdays strong
+{
     border-top-color: #1b1c1d;
 }
 
-.black .v-datefield-calendarpanel .v-first {
+.black .v-datefield-calendarpanel .v-first
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -275px;
 }
 
-.black .v-datefield-calendarpanel .v-last {
+.black .v-datefield-calendarpanel .v-last
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: right -294px;
 }
 
-.black .v-datefield-prompt .v-datefield-textfield {
+.black .v-datefield-prompt .v-datefield-textfield
+{
     color: #5f6366;
 }
 
-.v-formlayout-errorcell {
+.v-formlayout-errorcell
+{
     width: 13px;
 }
 
-.v-formlayout-cell .v-errorindicator {
+.v-formlayout-cell .v-errorindicator
+{
     width: 13px;
     height: 16px;
     background: transparent url(common/icons/error.png) no-repeat 50%;
 }
 
-.v-ie6 .v-formlayout-cell .v-errorindicator {
+.v-ie6 .v-formlayout-cell .v-errorindicator
+{
     background-image: url(common/icons/error-ie6.png);
 }
 
-.v-formlayout-captioncell {
+.v-formlayout-captioncell
+{
     text-align: right;
     white-space: nowrap;
 }
 
 .v-formlayout-spacing .v-formlayout-row .v-formlayout-captioncell,
 .v-formlayout-spacing .v-formlayout-row .v-formlayout-contentcell,
-.v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell {
+.v-formlayout-spacing .v-formlayout-row .v-formlayout-errorcell
+{
     padding-top: 8px;
 }
 
 .v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-captioncell,
 .v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-contentcell,
-.v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-errorcell {
+.v-formlayout-margin-top .v-formlayout-firstrow .v-formlayout-errorcell
+{
     padding-top: 15px;
 }
 
 .v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-captioncell,
 .v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-contentcell,
-.v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-errorcell {
+.v-formlayout-margin-bottom .v-formlayout-lastrow .v-formlayout-errorcell
+{
     padding-bottom: 15px;
 }
 
-.v-formlayout-margin-left .v-formlayout-captioncell {
+.v-formlayout-margin-left .v-formlayout-captioncell
+{
     padding-left: 18px;
 }
 
-.v-formlayout-margin-right .v-formlayout-contentcell {
+.v-formlayout-margin-right .v-formlayout-contentcell
+{
     padding-right: 18px;
 }
 
 /* form */
-.v-form-errormessage {
+.v-form-errormessage
+{
     background: transparent url(common/icons/error.png) no-repeat 3px 2px;
     padding-left: 20px;
     margin-bottom: 5px;
@@ -4138,36 +4778,43 @@ td.v-datefield-calendarpanel-nextyear {
     min-height: 20px;
 }
 
-.v-ie6 .v-form-errormessage {
+.v-ie6 .v-form-errormessage
+{
     height: 20px;
     background-image: url(common/icons/error-ie6.png);
 }
 
-.v-form fieldset {
+.v-form fieldset
+{
     border: none;
     border-top: 1px solid #babfc0;
 }
 
-.v-form-nocaption fieldset {
+.v-form-nocaption fieldset
+{
     border: none;
 }
 
-.v-form-nocaption legend {
+.v-form-nocaption legend
+{
     display: none;
 }
 
-.v-form legend {
+.v-form legend
+{
     margin: 0 0 0 20px;
     padding: 0 5px;
     font-weight: bold;
     color: #222;
 }
 
-.black .v-form legend {
+.black .v-form legend
+{
     color: #e3e6e8;
 }
 
-.v-label {
+.v-label
+{
     line-height: 18px;
 }
 
@@ -4175,7 +4822,8 @@ td.v-datefield-calendarpanel-nextyear {
  * Black styles
  **********************/
 .white .black,
-.blue .black {
+.blue .black
+{
     color: #C9CCCE;
     text-shadow: 0 0 1px #000;
 }
@@ -4191,18 +4839,21 @@ td.v-datefield-calendarpanel-nextyear {
 .blue .black .v-label-h1,
 .blue .black .v-label-h2,
 .blue .black .v-caption-h1,
-.blue .black .v-caption-h2 {
+.blue .black .v-caption-h2
+{
     color: #fff;
     text-shadow: rgba(0, 0, 0, .8) 0 2px 2px;
 }
 
 .black .v-label-light,
-.white .black .v-label-light {
+.white .black .v-label-light
+{
     color: #72787c;
 }
 
 .black .v-label hr,
-.white .black .v-label hr {
+.white .black .v-label hr
+{
     background: #0c0d0e;
     color: #0c0d0e;
     border-bottom-color: #292b2e;
@@ -4214,7 +4865,8 @@ td.v-datefield-calendarpanel-nextyear {
 .v-app .white,
 .v-window .white,
 .v-app .blue,
-.v-window .blue {
+.v-window .blue
+{
     color: #222;
     text-shadow: none;
 }
@@ -4226,18 +4878,21 @@ td.v-datefield-calendarpanel-nextyear {
 .white .blue .v-label-h1,
 .white .blue .v-label-h2,
 .white .blue .v-caption-h1,
-.white .blue .v-caption-h2 {
+.white .blue .v-caption-h2
+{
     color: #fff;
     text-shadow: rgba(0, 0, 0, .3) 0 1px 1px;
 }
 
 .blue .v-label-light,
-.white .blue .v-label-light {
+.white .blue .v-label-light
+{
     color: #6e7c83;
 }
 
 .blue .v-label hr,
-.white .blue .v-label hr {
+.white .blue .v-label hr
+{
     background: #a3bcc9;
     color: #a3bcc9;
     border-bottom-color: #cfe2eb;
@@ -4253,7 +4908,8 @@ td.v-datefield-calendarpanel-nextyear {
 .white .v-label-h1,
 .white .v-label-h2,
 .white .v-caption-h1,
-.white .v-caption-h2 {
+.white .v-caption-h2
+{
     font-family: Helvetica, Arial, "Lucida Grande", Geneva, Tahoma, Verdana, sans-serif;
     font-size: 24px;
     line-height: 30px;
@@ -4266,20 +4922,23 @@ td.v-datefield-calendarpanel-nextyear {
 .v-label-h2,
 .v-caption-h2,
 .white .v-label-h2,
-.white .v-caption-h2 {
+.white .v-caption-h2
+{
     font-size: 16px;
     line-height: 22px;
 }
 
 .v-label-light,
-.white .v-label-light {
+.white .v-label-light
+{
     font-size: 11px;
     line-height: 13px;
     color: #707070;
 }
 
 .v-label hr,
-.white .v-label hr {
+.white .v-label hr
+{
     height: 2px;
     overflow: hidden;
     background: #dcdcdc;
@@ -4289,65 +4948,77 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-sa .v-label hr,
-.v-ie8 .v-label hr {
+.v-ie8 .v-label hr
+{
     height: 1px;
 }
 
 /* Labels inside Table don't need a line-height */
-.v-table .v-label {
+.v-table .v-label
+{
     line-height: normal;
 }
 
 .v-orderedlayout-margin-top,
 .v-horizontallayout-margin-top,
-.v-verticallayout-margin-top {
+.v-verticallayout-margin-top
+{
     padding-top: 18px;
 }
 
 .v-orderedlayout-margin-right,
 .v-horizontallayout-margin-right,
-.v-verticallayout-margin-right {
+.v-verticallayout-margin-right
+{
     padding-right: 18px;
 }
 
 .v-orderedlayout-margin-bottom,
 .v-horizontallayout-margin-bottom,
-.v-verticallayout-margin-bottom {
+.v-verticallayout-margin-bottom
+{
     padding-bottom: 18px;
 }
 
 .v-orderedlayout-margin-left,
 .v-horizontallayout-margin-left,
-.v-verticallayout-margin-left {
+.v-verticallayout-margin-left
+{
     padding-left: 18px;
 }
 
 .v-orderedlayout-spacing-on,
 .v-horizontallayout-spacing-on,
-.v-verticallayout-spacing-on {
+.v-verticallayout-spacing-on
+{
     padding-top: 7px;
     padding-left: 6px;
 }
 
 /* Different for historical reasons: previously was inherited directly from Base theme */
 /* TODO unify these values in version 7 */
-.v-gridlayout-margin-top {
+.v-gridlayout-margin-top
+{
     padding-top: 24px;
 }
 
-.v-gridlayout-margin-bottom {
+.v-gridlayout-margin-bottom
+{
     padding-bottom: 24px;
 }
 
-.v-gridlayout-margin-left {
+.v-gridlayout-margin-left
+{
     padding-left: 24px;
 }
 
-.v-gridlayout-margin-right {
+.v-gridlayout-margin-right
+{
     padding-right: 24px;
 }
 
-.v-gridlayout-spacing-on {
+.v-gridlayout-spacing-on
+{
     padding-left: 12px;
     padding-top: 12px;
 }
@@ -4360,11 +5031,13 @@ td.v-datefield-calendarpanel-nextyear {
 .v-csslayout-blue,
 .v-formlayout-blue,
 .v-splitpanel-vertical-blue,
-.v-splitpanel-horizontal-blue {
+.v-splitpanel-horizontal-blue
+{
     background-color: #bcd3de;
 }
 
-.v-panel-content > div.blue {
+.v-panel-content > div.blue
+{
     background-color: #bcd3de;
 }
 
@@ -4376,12 +5049,14 @@ td.v-datefield-calendarpanel-nextyear {
 .v-csslayout-white,
 .v-formlayout-white,
 .v-splitpanel-vertical-white,
-.v-splitpanel-horizontal-white {
+.v-splitpanel-horizontal-white
+{
     background-color: #fff;
     color: #222;
 }
 
-.v-panel-content > div.white {
+.v-panel-content > div.white
+{
     background-color: #fff;
     color: #222;
 }
@@ -4394,27 +5069,33 @@ td.v-datefield-calendarpanel-nextyear {
 .v-csslayout-black,
 .v-formlayout-black,
 .v-splitpanel-vertical-black,
-.v-splitpanel-horizontal-black {
+.v-splitpanel-horizontal-black
+{
     background: #1e2022 url(layouts/img/black-bg.png) repeat-x;
 }
 
-.v-panel-content > div.black {
+.v-panel-content > div.black
+{
     background: #1e2022 url(layouts/img/black-bg.png) repeat-x;
 }
 
-.v-link a:link span {
+.v-link a:link span
+{
     color: #1b699f;
 }
 
-.v-link a:visited span {
+.v-link a:visited span
+{
     color: #5c7485;
 }
 
-.v-link a:hover span {
+.v-link a:hover span
+{
     color: #2483c4;
 }
 
-.v-menubar {
+.v-menubar
+{
     height: 23px;
     background: #323336 repeat-x;
     background-image: url(common/img/vertical-sprites.png);
@@ -4425,17 +5106,20 @@ td.v-datefield-calendarpanel-nextyear {
     padding: 0 8px;
 }
 
-.v-menubar .v-menubar-menuitem {
+.v-menubar .v-menubar-menuitem
+{
     padding: 3px 8px;
     height: 17px;
     line-height: 16px;
 }
 
-.v-menubar .v-menubar-menuitem:hover {
+.v-menubar .v-menubar-menuitem:hover
+{
     color: #fff;
 }
 
-.v-menubar-submenu {
+.v-menubar-submenu
+{
     background: #f8f8f9;
     border: none;
     border-radius: 3px;
@@ -4446,17 +5130,20 @@ td.v-datefield-calendarpanel-nextyear {
     padding: 4px 0;
 }
 
-.v-menubar-submenu .v-menubar-menuitem {
+.v-menubar-submenu .v-menubar-menuitem
+{
     padding: 1px 26px 1px 10px;
     line-height: 16px;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-caption .v-icon {
+.v-menubar-submenu .v-menubar-menuitem-caption .v-icon
+{
     vertical-align: middle;
 }
 
 .v-menubar .v-menubar-menuitem-selected,
-.v-menubar-submenu .v-menubar-menuitem-selected {
+.v-menubar-submenu .v-menubar-menuitem-selected
+{
     background: #4d749f repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -4465,49 +5152,59 @@ td.v-datefield-calendarpanel-nextyear {
     text-shadow: 0 1px 0 #3b5a7a;
 }
 
-.v-menubar .v-menubar-menuitem-selected {
+.v-menubar .v-menubar-menuitem-selected
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -426px;
 }
 
-.v-menubar-submenu .v-menubar-submenu-indicator {
+.v-menubar-submenu .v-menubar-submenu-indicator
+{
     background: transparent url(menubar/img/submenu-icon.png) no-repeat right 70%;
     width: 26px;
     height: 16px;
     text-indent: -9999px;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-selected .v-menubar-submenu-indicator {
+.v-menubar-submenu .v-menubar-menuitem-selected .v-menubar-submenu-indicator
+{
     background-image: url(menubar/img/submenu-icon-hover.png);
 }
 
 /* Checkboxes for checkable/checked menu items */
-.v-menubar-submenu-check-column .v-menubar-menuitem {
+.v-menubar-submenu-check-column .v-menubar-menuitem
+{
     padding-left: 6px;
 }
 
-.v-menubar-submenu-check-column .v-menubar-menuitem-caption {
+.v-menubar-submenu-check-column .v-menubar-menuitem-caption
+{
     padding-left: 18px;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-checked .v-menubar-menuitem-caption {
+.v-menubar-submenu .v-menubar-menuitem-checked .v-menubar-menuitem-caption
+{
     background: transparent url(menubar/img/checked.png) no-repeat left;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-unchecked .v-menubar-menuitem-caption {
+.v-menubar-submenu .v-menubar-menuitem-unchecked .v-menubar-menuitem-caption
+{
     background: transparent url(menubar/img/unchecked.png) no-repeat left;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-selected-checked .v-menubar-menuitem-caption {
+.v-menubar-submenu .v-menubar-menuitem-selected-checked .v-menubar-menuitem-caption
+{
     background: transparent url(menubar/img/checked-selected.png) no-repeat left;
 }
 
-.v-menubar-submenu .v-menubar-menuitem-selected-unchecked .v-menubar-menuitem-caption {
+.v-menubar-submenu .v-menubar-menuitem-selected-unchecked .v-menubar-menuitem-caption
+{
     background: transparent url(menubar/img/unchecked-selected.png) no-repeat left;
 }
 
-.v-Notification {
+.v-Notification
+{
     color: #fff;
     border-radius: 4px;
     -moz-border-radius: 4px;
@@ -4517,57 +5214,67 @@ td.v-datefield-calendarpanel-nextyear {
     font-weight: bold;
 }
 
-.v-ie9 .v-Notification H1 {
+.v-ie9 .v-Notification H1
+{
     /* Fix for #6793 */
     font-weight: bold;
 }
 
-.v-Notification p {
+.v-Notification p
+{
     line-height: 1.3;
 }
 
-.v-Notification-warning {
+.v-Notification-warning
+{
     background: #fdf3b5;
     color: #ca9a61;
     border: 3px solid #fee3af;
 }
 
-.v-Notification-error {
+.v-Notification-error
+{
     background: #b40000 url(notification/img/error-close.png) no-repeat right top;
     border: 3px solid #ca3030;
 }
 
-.v-Notification-tray {
+.v-Notification-tray
+{
     margin: 0 5px 5px 0;
     background: #3b3c3e;
     border: 2px solid #585b5c;
     padding: 0.8em 0.9em;
 }
 
-.v-Notification-tray h1 {
+.v-Notification-tray h1
+{
     font-size: 14px;
     line-height: 18px;
 }
 
-.v-Notification-tray p {
+.v-Notification-tray p
+{
     font-size: 12px;
     font-weight: normal;
 }
 
-.v-Notification-system {
+.v-Notification-system
+{
     background-color: #b40000;
 }
 
 .blue .v-panel-caption,
 .blue .v-panel-nocaption,
-.blue .v-panel-content {
+.blue .v-panel-content
+{
     border-color: #a8bcc5;
 }
 
 .v-panel-caption,
 .v-panel-nocaption,
 .white .v-panel-caption,
-.white .v-panel-nocaption {
+.white .v-panel-nocaption
+{
     border-bottom: 1px solid #e5e5e5;
     line-height: 16px; /* accommodate minimum icon size */
 }
@@ -4577,16 +5284,19 @@ td.v-datefield-calendarpanel-nextyear {
 .v-gecko .v-panel-caption,
 .v-gecko .v-panel-nocaption,
 .v-ie9 .v-panel-caption,
-.v-ie9 .v-panel-nocaption {
+.v-ie9 .v-panel-nocaption
+{
     border-bottom-color: rgba(0, 0, 0, .08);
 }
 
-.v-panel-caption {
+.v-panel-caption
+{
     padding-bottom: 2px;
 }
 
 .v-panel-content,
-.white .v-panel-content {
+.white .v-panel-content
+{
     border: 1px solid #dcdcdc;
     border-bottom: none;
     border-top: none;
@@ -4594,26 +5304,31 @@ td.v-datefield-calendarpanel-nextyear {
 
 .v-webkit .v-panel-content,
 .v-gecko .v-panel-content,
-.v-ie9 .v-panel-content {
+.v-ie9 .v-panel-content
+{
     border-top-color: rgba(0, 0, 0, .07);
 }
 
-.v-panel-content > div {
+.v-panel-content > div
+{
     background: #fff;
     min-height: 100%;
 }
 
-.v-ie6 .v-panel-content {
+.v-ie6 .v-panel-content
+{
     background: #fff;
 }
 
-.blue .v-panel-deco {
+.blue .v-panel-deco
+{
     border-color: #92a3ac;
     background: #adc2cd;
 }
 
 .v-panel-deco,
-.white .v-panel-deco {
+.white .v-panel-deco
+{
     height: 1px;
     border-top: 1px solid #bebebe;
     background: #e2e2e2;
@@ -4622,12 +5337,14 @@ td.v-datefield-calendarpanel-nextyear {
 
 .v-webkit .v-panel-deco,
 .v-gecko .v-panel-deco,
-.v-ie9 .v-panel-deco {
+.v-ie9 .v-panel-deco
+{
     border-top-color: rgba(0, 0, 0, .1);
     background: rgba(0, 0, 0, .08);
 }
 
-.v-panel-caption .v-errorindicator {
+.v-panel-caption .v-errorindicator
+{
     height: 16px;
     width: 13px;
     background: url(common/icons/error.png) no-repeat 50%;
@@ -4636,60 +5353,73 @@ td.v-datefield-calendarpanel-nextyear {
     vertical-align: middle;
 }
 
-.v-ie6 .v-panel-caption .v-errorindicator {
+.v-ie6 .v-panel-caption .v-errorindicator
+{
     background-image: url(common/icons/error-ie6.png);
 }
 
 /* Light style */
 .v-panel-light .v-panel-caption-light,
-.v-panel-light .v-panel-nocaption-light {
+.v-panel-light .v-panel-nocaption-light
+{
     border: none;
 }
 
-.v-panel-light .v-panel-content-light {
+.v-panel-light .v-panel-content-light
+{
     border: none;
 }
 
-.v-panel-content-light > div {
+.v-panel-content-light > div
+{
     background: transparent;
 }
 
-.v-ie6 .v-panel-content-light {
+.v-ie6 .v-panel-content-light
+{
     background: transparent;
 }
 
-.v-panel-light .v-panel-deco-light {
+.v-panel-light .v-panel-deco-light
+{
     height: 0;
     border: none;
 }
 
-.v-popupview {
+.v-popupview
+{
     color: #1b699f;
 }
 
-.v-popupview:hover {
+.v-popupview:hover
+{
     color: #2483c4;
 }
 
-.v-popupview-popup {
+.v-popupview-popup
+{
     background: #fff;
     padding: 3px;
 }
 
-.v-progressindicator-wrapper {
+.v-progressindicator-wrapper
+{
     background: #dfe2e4 url(progressindicator/img/base.gif) repeat-x;
     border: 1px solid #bfbfbf;
 }
 
-.v-disabled .v-progressindicator-wrapper {
+.v-disabled .v-progressindicator-wrapper
+{
     background-image: url(progressindicator/img/disabled.gif);
 }
 
-.v-progressindicator-indicator {
+.v-progressindicator-indicator
+{
     background: #f7f9f9 url(progressindicator/img/progress.png);
 }
 
-.v-filterselect {
+.v-filterselect
+{
     height: 24px;
     background-repeat: no-repeat;
     background-image: url(common/img/vertical-sprites.png);
@@ -4698,7 +5428,8 @@ td.v-datefield-calendarpanel-nextyear {
     padding-left: 2px;
 }
 
-.v-ie6 .v-filterselect {
+.v-ie6 .v-filterselect
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -475px;
@@ -4706,7 +5437,8 @@ td.v-datefield-calendarpanel-nextyear {
 
 .v-app .v-filterselect-input,
 .v-window .v-filterselect-input,
-.v-popupview-popup .v-filterselect-input {
+.v-popupview-popup .v-filterselect-input
+{
     background: transparent repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -4718,37 +5450,44 @@ td.v-datefield-calendarpanel-nextyear {
 /* More specific selector to override padding */
 .v-app input.v-filterselect-input,
 .v-window input.v-filterselect-input,
-.v-popupview-popup input.v-filterselect-input {
+.v-popupview-popup input.v-filterselect-input
+{
     padding: 4px 0 4px 2px;
 }
 
-.v-filterselect-prompt .v-filterselect-input {
+.v-filterselect-prompt .v-filterselect-input
+{
     font-style: normal;
 }
 
-.v-filterselect-input:focus {
+.v-filterselect-input:focus
+{
     outline: none;
 }
 
-.v-filterselect-focus {
+.v-filterselect-focus
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -524px;
 }
 
-.v-ie6 .v-filterselect-focus {
+.v-ie6 .v-filterselect-focus
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -549px;
 }
 
-.v-filterselect-focus .v-filterselect-input {
+.v-filterselect-focus .v-filterselect-input
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -573px;
 }
 
-.v-filterselect-button {
+.v-filterselect-button
+{
     overflow: hidden;
     width: 25px;
     height: 24px;
@@ -4758,44 +5497,51 @@ td.v-datefield-calendarpanel-nextyear {
     cursor: default;
 }
 
-.v-filterselect-button:hover {
+.v-filterselect-button:hover
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -622px;
 }
 
-.v-filterselect-button:active {
+.v-filterselect-button:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -646px;
 }
 
-.v-filterselect-focus .v-filterselect-button {
+.v-filterselect-focus .v-filterselect-button
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -670px;
 }
 
-.v-filterselect-focus .v-filterselect-button:hover {
+.v-filterselect-focus .v-filterselect-button:hover
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -694px;
 }
 
-.v-filterselect-focus .v-filterselect-button:active {
+.v-filterselect-focus .v-filterselect-button:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -718px;
 }
 
 .v-disabled .v-filterselect-button:hover,
-.v-readonly .v-filterselect-button:hover {
+.v-readonly .v-filterselect-button:hover
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -742px;
 }
 
-.v-filterselect-suggestpopup {
+.v-filterselect-suggestpopup
+{
     background: #f8f8f9;
     border: none;
     border-radius: 3px;
@@ -4805,11 +5551,13 @@ td.v-datefield-calendarpanel-nextyear {
     overflow: hidden;
 }
 
-.v-filterselect-suggestmenu {
+.v-filterselect-suggestmenu
+{
     margin: 4px 0;
 }
 
-.v-filterselect-suggestmenu .gwt-MenuItem {
+.v-filterselect-suggestmenu .gwt-MenuItem
+{
     padding: 1px 8px;
     height: 16px;
     user-select: none;
@@ -4818,15 +5566,18 @@ td.v-datefield-calendarpanel-nextyear {
     cursor: default;
 }
 
-.v-ff .v-filterselect-suggestmenu .gwt-MenuItem {
+.v-ff .v-filterselect-suggestmenu .gwt-MenuItem
+{
     height: 18px;
 }
 
-.v-filterselect-suggestmenu .gwt-MenuItem .v-icon {
+.v-filterselect-suggestmenu .gwt-MenuItem .v-icon
+{
     margin-right: 3px;
 }
 
-.v-filterselect-suggestmenu .gwt-MenuItem-selected {
+.v-filterselect-suggestmenu .gwt-MenuItem-selected
+{
     background: transparent repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -4838,7 +5589,8 @@ td.v-datefield-calendarpanel-nextyear {
 .v-filterselect-nextpage,
 .v-filterselect-nextpage-off,
 .v-filterselect-prevpage-off,
-.v-filterselect-prevpage {
+.v-filterselect-prevpage
+{
     height: 11px;
     width: 100%;
     background: transparent;
@@ -4846,32 +5598,37 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-filterselect-nextpage,
-.v-filterselect-nextpage-off {
+.v-filterselect-nextpage-off
+{
     margin: -4px 0 0;
 }
 
-.v-filterselect-nextpage:hover {
+.v-filterselect-nextpage:hover
+{
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -786px;
 }
 
-.v-filterselect-prevpage:hover {
+.v-filterselect-prevpage:hover
+{
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -797px;
 }
 
-.v-filterselect-nextpage:active {
+.v-filterselect-nextpage:active
+{
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -808px;
 }
 
-.v-filterselect-prevpage:active {
+.v-filterselect-prevpage:active
+{
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -4879,12 +5636,14 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-filterselect-nextpage-off span,
-.v-filterselect-prevpage-off span {
+.v-filterselect-prevpage-off span
+{
     display: none;
 }
 
 .v-filterselect-nextpage span,
-.v-filterselect-prevpage span {
+.v-filterselect-prevpage span
+{
     display: block;
     height: 11px;
     width: 100%;
@@ -4899,25 +5658,29 @@ td.v-datefield-calendarpanel-nextyear {
     -webkit-user-select: none;
 }
 
-.v-filterselect-prevpage span {
+.v-filterselect-prevpage span
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: center -841px;
 }
 
-.v-filterselect-nextpage:hover span {
+.v-filterselect-nextpage:hover span
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: center -852px;
 }
 
-.v-filterselect-prevpage:hover span {
+.v-filterselect-prevpage:hover span
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: center -863px;
 }
 
-.v-filterselect-status {
+.v-filterselect-status
+{
     text-shadow: #e9eaeb 0 1px 0;
     font-size: 11px;
     line-height: normal;
@@ -4939,57 +5702,69 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 /* IE fails to position background images properly inside table elements */
-.v-ie .v-filterselect-suggestmenu .gwt-MenuItem-selected {
+.v-ie .v-filterselect-suggestmenu .gwt-MenuItem-selected
+{
     background: transparent url(common/img/sel-bg.png) repeat-x;
 }
 
-.v-ie .v-filterselect-nextpage:hover {
+.v-ie .v-filterselect-nextpage:hover
+{
     background: transparent url(select/img/page-down-hover.png) repeat-x;
 }
 
-.v-ie .v-filterselect-prevpage:hover {
+.v-ie .v-filterselect-prevpage:hover
+{
     background: transparent url(select/img/page-up-hover.png) repeat-x;
 }
 
-.v-ie .v-filterselect-prevpage span {
+.v-ie .v-filterselect-prevpage span
+{
     background: transparent url(select/img/arrow-up.png) no-repeat center 3px;
 }
 
-.v-ie .v-filterselect-nextpage span {
+.v-ie .v-filterselect-nextpage span
+{
     background: transparent url(select/img/arrow-down.png) no-repeat center 3px;
 }
 
-.v-ie .v-filterselect-prevpage:hover span {
+.v-ie .v-filterselect-prevpage:hover span
+{
     background: transparent url(select/img/arrow-up-hover.png) no-repeat center 3px;
 }
 
-.v-ie .v-filterselect-nextpage:hover span {
+.v-ie .v-filterselect-nextpage:hover span
+{
     background: transparent url(select/img/arrow-down-hover.png) no-repeat center 3px;
 }
 
-.v-ie .v-filterselect-status {
+.v-ie .v-filterselect-status
+{
     background: transparent url(select/img/status-bg.png) repeat-x;
 }
 
 /* Filterselect with icon needs a similar fix than in buttons */
-.v-filterselect .v-icon {
+.v-filterselect .v-icon
+{
     width: 16px;
     position: relative;
 }
 
-.v-filterselect .v-icon + .v-filterselect-input {
+.v-filterselect .v-icon + .v-filterselect-input
+{
     margin-left: -16px;
     padding-left: 18px;
 }
 
 /* Combobox on black background */
-.black .v-filterselect {
+.black .v-filterselect
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -310px;
 }
 
-.v-ie6 .black .v-filterselect {
+.v-ie6 .black .v-filterselect
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -334px;
@@ -4998,81 +5773,94 @@ td.v-datefield-calendarpanel-nextyear {
 .v-app .black .v-filterselect-input,
 .v-window .black .v-filterselect-input,
 .v-window-black .v-filterselect-input,
-.v-popupview-popup .black .v-filterselect-input {
+.v-popupview-popup .black .v-filterselect-input
+{
     color: #c9ccce;
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -358px;
 }
 
-.black .v-filterselect-focus {
+.black .v-filterselect-focus
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -382px;
 }
 
-.v-ie6 .black .v-filterselect-focus {
+.v-ie6 .black .v-filterselect-focus
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -406px;
 }
 
-.black .v-filterselect-focus .v-filterselect-input {
+.black .v-filterselect-focus .v-filterselect-input
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -430px;
 }
 
-.black .v-filterselect-button {
+.black .v-filterselect-button
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -454px;
 }
 
-.black .v-filterselect-button:hover {
+.black .v-filterselect-button:hover
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -478px;
 }
 
-.black .v-filterselect-button:active {
+.black .v-filterselect-button:active
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -502px;
 }
 
-.black .v-filterselect-focus .v-filterselect-button {
+.black .v-filterselect-focus .v-filterselect-button
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -526px;
 }
 
-.black .v-filterselect-focus .v-filterselect-button:hover {
+.black .v-filterselect-focus .v-filterselect-button:hover
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -550px;
 }
 
-.black .v-filterselect-focus .v-filterselect-button:active {
+.black .v-filterselect-focus .v-filterselect-button:active
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -574px;
 }
 
 .black .v-disabled .v-filterselect-button:hover,
-.black .v-readonly .v-filterselect-button:hover {
+.black .v-readonly .v-filterselect-button:hover
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -598px;
 }
 
-.black .v-filterselect-prompt .v-filterselect-input {
+.black .v-filterselect-prompt .v-filterselect-input
+{
     color: #5f6366;
 }
 
 /* Native selects on black background */
 .black .v-select select,
-.black .v-select-twincol select {
+.black .v-select-twincol select
+{
     border-color: #38393a;
     border-top-color: #2c2d2e;
     border-bottom-color: #3e3f3f;
@@ -5081,24 +5869,28 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 /* Twincolselect needs a little tweak in IE6 */
-.v-ie6 .v-select-twincol-buttons .v-button {
+.v-ie6 .v-select-twincol-buttons .v-button
+{
     padding-left: 12px;
     padding-right: 12px;
 }
 
 /* IE6 needs some help identifying when the input is readonly */
 .v-ie6 .v-filterselect.v-readonly,
-.v-ie6 .v-filterselect .v-filterselect-input-readonly {
+.v-ie6 .v-filterselect .v-filterselect-input-readonly
+{
     background: transparent;
 }
 
-.v-slider {
+.v-slider
+{
     border-top: 1px solid #9a9c9e;
     border-bottom: 1px solid #bdbfc1;
     margin: 4px 0;
 }
 
-.v-slider-base {
+.v-slider-base
+{
     height: 1px;
     background: #e0e2e2;
     border-top: 1px solid #adb0b1;
@@ -5106,7 +5898,8 @@ td.v-datefield-calendarpanel-nextyear {
     border-right: 1px solid #a0a3a6;
 }
 
-.v-slider-handle {
+.v-slider-handle
+{
     background: transparent;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -5116,13 +5909,15 @@ td.v-datefield-calendarpanel-nextyear {
     margin-top: -5px;
 }
 
-.v-slider-handle-active {
+.v-slider-handle-active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -901px;
 }
 
-.v-slider-vertical {
+.v-slider-vertical
+{
     width: 2px;
     margin: 0 5px;
     border: none;
@@ -5130,7 +5925,8 @@ td.v-datefield-calendarpanel-nextyear {
     border-right: 1px solid #bdbfc1;
 }
 
-.v-slider-vertical .v-slider-base {
+.v-slider-vertical .v-slider-base
+{
     width: 2px;
     border-left: 1px solid #adb0b1;
     border-right: none;
@@ -5138,21 +5934,24 @@ td.v-datefield-calendarpanel-nextyear {
     border-bottom: 1px solid #adb0b1;
 }
 
-.v-slider-vertical .v-slider-handle {
+.v-slider-vertical .v-slider-handle
+{
     width: 10px;
     height: 10px;
     margin-left: -5px;
 }
 
 .v-splitpanel-hsplitter,
-.v-splitpanel-hsplitter-locked {
+.v-splitpanel-hsplitter-locked
+{
     width: 7px;
     background-repeat: repeat-y;
     background-image: url(common/img/horizontal-sprites.png);
     background-position: -0px top;
 }
 
-.v-splitpanel-hsplitter div {
+.v-splitpanel-hsplitter div
+{
     width: 7px;
     height: 100%; /* for Opera */
     background: transparent;
@@ -5163,7 +5962,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-splitpanel-vsplitter,
-.v-splitpanel-vsplitter-locked {
+.v-splitpanel-vsplitter-locked
+{
     height: 7px;
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
@@ -5171,7 +5971,8 @@ td.v-datefield-calendarpanel-nextyear {
     background-position: left -911px;
 }
 
-.v-splitpanel-vsplitter div {
+.v-splitpanel-vsplitter div
+{
     height: 7px;
     background: transparent;
     background-repeat: no-repeat;
@@ -5183,13 +5984,15 @@ td.v-datefield-calendarpanel-nextyear {
 
 /* Splitpanels on blue background */
 .blue .v-splitpanel-hsplitter-small,
-.blue .v-splitpanel-hsplitter-small-locked {
+.blue .v-splitpanel-hsplitter-small-locked
+{
     background: #7c8a91;
 }
 
 /* Splitpanels on black background */
 .black .v-splitpanel-hsplitter-small,
-.black .v-splitpanel-hsplitter-small-locked {
+.black .v-splitpanel-hsplitter-small-locked
+{
     background: #4e5253;
 }
 
@@ -5197,7 +6000,8 @@ td.v-datefield-calendarpanel-nextyear {
 .v-splitpanel-hsplitter-small,
 .v-splitpanel-hsplitter-small-locked,
 .white .v-splitpanel-hsplitter-small,
-.white .v-splitpanel-hsplitter-small-locked {
+.white .v-splitpanel-hsplitter-small-locked
+{
     width: 1px;
     background: #949698;
 }
@@ -5205,29 +6009,34 @@ td.v-datefield-calendarpanel-nextyear {
 .v-splitpanel-vsplitter-small,
 .v-splitpanel-vsplitter-small-locked,
 .white .v-splitpanel-vsplitter-small,
-.white .v-splitpanel-vsplitter-small-locked {
+.white .v-splitpanel-vsplitter-small-locked
+{
     height: 1px;
     background: #949698;
 }
 
-.v-splitpanel-hsplitter-small div {
+.v-splitpanel-hsplitter-small div
+{
     width: 5px;
     margin-left: -2px;
     background: transparent;
 }
 
-.v-splitpanel-vsplitter-small div {
+.v-splitpanel-vsplitter-small div
+{
     height: 5px;
     margin-top: -2px;
     background: transparent;
 }
 
 /* Table on blue background */
-.blue .v-table-header-wrap {
+.blue .v-table-header-wrap
+{
     border-color: #92a2aa;
 }
 
-.blue .v-table-body {
+.blue .v-table-body
+{
     border-color: #92a2aa;
     border-top-color: #c2c3c4;
 }
@@ -5237,7 +6046,8 @@ td.v-datefield-calendarpanel-nextyear {
 .white .v-table-header-wrap,
 .v-table-footer-wrap,
 .white .v-table-footer-wrap,
-.v-table-header-drag {
+.v-table-header-drag
+{
     border-color: #c2c3c4;
     background: transparent repeat-x;
     background-image: url(common/img/vertical-sprites.png);
@@ -5255,7 +6065,8 @@ td.v-datefield-calendarpanel-nextyear {
 .v-ie6 .v-table,
 .v-ie6 .v-table-header-wrap,
 .v-ie6 .v-table-footer-wrap,
-.v-ie6 .v-table-column-selector {
+.v-ie6 .v-table-column-selector
+{
     /* The header will overflow the Table due to a bug in IE6 after changes in #3003. To fix this (#7314) 
 	 * we need to apply position:relative to the wrappers and selector to make them appear on top of the 
 	 * header. We also need to apply it to the table root div to get rid of a really weird IE6 rendering bug
@@ -5265,65 +6076,76 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-ie6 .v-table.v-disabled,
-.v-ie7 .v-table.v-disabled {
+.v-ie7 .v-table.v-disabled
+{
     /* Fixes ie issue #7324 where disabled shim does not cover table body */
     position: relative;
 }
 
 .v-table-footer-wrap,
-.white .v-table-footer-wrap {
+.white .v-table-footer-wrap
+{
     text-transform: none;
     font-size: 12px;
     font-weight: normal;
 }
 
 .v-table-footer td,
-.white .v-table-footer td {
+.white .v-table-footer td
+{
     border-color: #c2c3c4;
 }
 
-.v-table-footer-container {
+.v-table-footer-container
+{
     padding-right: 7px;
 }
 
 .v-table-header,
 .v-table-footer,
-.v-table-footer table {
+.v-table-footer table
+{
     height: 20px;
 }
 
 .v-table-caption-container,
-.v-table-header-drag {
+.v-table-header-drag
+{
     padding-top: 4px;
     padding-right: 4px;
 }
 
 .v-table-caption-container .v-icon,
-.v-table-header-drag .v-icon {
+.v-table-header-drag .v-icon
+{
     height: 16px;
     margin: -4px 3px 0 0;
     vertical-align: middle;
 }
 
 .v-ie .v-table-caption-container .v-icon,
-.v-ie .v-table-header-drag .v-icon {
+.v-ie .v-table-header-drag .v-icon
+{
     margin-top: -3px;
 }
 
-.v-table-resizer {
+.v-table-resizer
+{
     height: 20px;
     width: 2px;
     background: transparent;
     border-right: 1px solid #c2c3c4;
 }
 
-.v-table-sort-indicator {
+.v-table-sort-indicator
+{
     background: transparent;
     width: 0px;
     height: 20px;
 }
 
-.v-table-header-cell-asc .v-table-sort-indicator {
+.v-table-header-cell-asc .v-table-sort-indicator
+{
     background: transparent no-repeat right 7px;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -5331,7 +6153,8 @@ td.v-datefield-calendarpanel-nextyear {
     width: 16px;
 }
 
-.v-table-header-cell-desc .v-table-sort-indicator {
+.v-table-header-cell-desc .v-table-sort-indicator
+{
     background: transparent no-repeat right 7px;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -5340,27 +6163,32 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-table-body,
-.white .v-table-body {
+.white .v-table-body
+{
     border-color: #c2c3c4;
     background: #fff;
 }
 
-.v-table-cell-content {
+.v-table-cell-content
+{
     padding-top: 0;
     border-right-color: #d3d4d5;
     vertical-align: top;
 }
 
-.v-table-cell-wrapper {
+.v-table-cell-wrapper
+{
     padding-top: 3px;
     padding-bottom: 3px;
 }
 
-.v-table-row-odd {
+.v-table-row-odd
+{
     background: #eff0f1;
 }
 
-.v-table-generated-row {
+.v-table-generated-row
+{
     background: #dcdee0;
     text-transform: uppercase;
     font-size: 10px;
@@ -5370,27 +6198,32 @@ td.v-datefield-calendarpanel-nextyear {
     line-height: normal;
 }
 
-.v-table-generated-row .v-table-cell-wrapper {
+.v-table-generated-row .v-table-cell-wrapper
+{
     padding-top: 4px;
     padding-bottom: 5px;
 }
 
-.v-table-cell-content:last-child {
+.v-table-cell-content:last-child
+{
     border-right-color: transparent;
 }
 
 .v-table .v-selected,
-.black .v-table .v-selected {
+.black .v-table .v-selected
+{
     background: #4d749f url(common/img/sel-bg.png) repeat-x; /* We can't include this in the sprite, since we don't know the row height */
     color: #fff;
     text-shadow: #3b5a7a 0 1px 0;
 }
 
-.v-table .v-selected .v-table-cell-content {
+.v-table .v-selected .v-table-cell-content
+{
     border-right-color: #466c90;
 }
 
-.v-table-column-selector {
+.v-table-column-selector
+{
     width: 16px;
     height: 20px;
     margin-top: -20px;
@@ -5400,40 +6233,47 @@ td.v-datefield-calendarpanel-nextyear {
     background-position: left -985px;
 }
 
-.v-table-column-selector:active {
+.v-table-column-selector:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1005px;
 }
 
-.v-table-focus-slot-left {
+.v-table-focus-slot-left
+{
     border-left: 1px solid #222;
     margin-bottom: -20px;
     width: auto;
 }
 
-.v-table-focus-slot-right {
+.v-table-focus-slot-right
+{
     border-right-color: #222;
     margin-right: 0;
 }
 
-.v-table-header-drag {
+.v-table-header-drag
+{
     padding-left: 6px;
     height: 16px;
 }
 
-.v-table-header-drag img {
+.v-table-header-drag img
+{
     height: 16px;
     margin: -3px 3px 0 0;
 }
 
-.v-table-scrollposition {
+.v-table-scrollposition
+{
     width: auto;
     background: transparent;
     border: none;
 }
 
-.v-table-scrollposition span {
+.v-table-scrollposition span
+{
     background: transparent repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -5457,13 +6297,15 @@ td.v-datefield-calendarpanel-nextyear {
     -moz-box-shadow: rgba(0, 0, 0, .5) 0 1px 2px;
 }
 
-.v-table-borderless .v-table-scrollposition span {
+.v-table-borderless .v-table-scrollposition span
+{
     top: 0;
 }
 
 /* row in column selector */
 .v-contextmenu .v-on,
-.v-contextmenu .v-off {
+.v-contextmenu .v-off
+{
     display: inline-block;
     zoom: 1;
     background: transparent no-repeat 0 4px;
@@ -5474,12 +6316,14 @@ td.v-datefield-calendarpanel-nextyear {
     padding-right: 4px;
 }
 
-.v-contextmenu .v-off {
+.v-contextmenu .v-off
+{
     background-image: none;
     color: #666;
 }
 
-.v-contextmenu .gwt-MenuItem-selected .v-on {
+.v-contextmenu .gwt-MenuItem-selected .v-on
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1061px;
@@ -5487,7 +6331,8 @@ td.v-datefield-calendarpanel-nextyear {
 
 /* Strong style */
 .v-table-strong .v-table-header-wrap,
-.v-table-strong .v-table-header-drag {
+.v-table-strong .v-table-header-drag
+{
     border-color: #2b3033;
     border-top-color: #2b3033;
     background-image: url(common/img/vertical-sprites.png);
@@ -5497,46 +6342,54 @@ td.v-datefield-calendarpanel-nextyear {
     text-shadow: #000 0 -1px 0;
 }
 
-.v-table-strong .v-table-body {
+.v-table-strong .v-table-body
+{
     border-top-color: #2b3033;
 }
 
-.v-table-strong .v-table-resizer {
+.v-table-strong .v-table-resizer
+{
     border-right-color: #1c1f21;
 }
 
-.v-table-strong .v-table-header-cell-asc .v-table-sort-indicator {
+.v-table-strong .v-table-header-cell-asc .v-table-sort-indicator
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: right -1096px;
 }
 
-.v-table-strong .v-table-header-cell-desc .v-table-sort-indicator {
+.v-table-strong .v-table-header-cell-desc .v-table-sort-indicator
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: right -1115px;
 }
 
-.v-table-strong .v-table-column-selector {
+.v-table-strong .v-table-column-selector
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1134px;
 }
 
-.v-table-strong .v-table-column-selector:active {
+.v-table-strong .v-table-column-selector:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1154px;
 }
 
 .v-table-strong .v-table-focus-slot-left,
-.v-table-strong .v-table-focus-slot-right {
+.v-table-strong .v-table-focus-slot-right
+{
     border-color: #9ca1a5;
 }
 
 /* Table on black background (normal style) */
 .black .v-table-header-wrap,
-.black .v-table-header-drag {
+.black .v-table-header-drag
+{
     border-color: #252729;
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
@@ -5545,65 +6398,77 @@ td.v-datefield-calendarpanel-nextyear {
     text-shadow: #000 0 -1px 0;
 }
 
-.black .v-table-resizer {
+.black .v-table-resizer
+{
     border-right-color: #252729;
 }
 
-.black .v-table-header-cell-asc .v-table-sort-indicator {
+.black .v-table-header-cell-asc .v-table-sort-indicator
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: right -642px;
 }
 
-.black .v-table-header-cell-desc .v-table-sort-indicator {
+.black .v-table-header-cell-desc .v-table-sort-indicator
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: right -661px;
 }
 
-.black .v-table-column-selector {
+.black .v-table-column-selector
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -680px;
 }
 
-.black .v-table-column-selector:active {
+.black .v-table-column-selector:active
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -700px;
 }
 
 .black .v-table-focus-slot-left,
-.black .v-table-focus-slot-right {
+.black .v-table-focus-slot-right
+{
     border-color: #9ca1a5;
 }
 
-.black .v-table-body {
+.black .v-table-body
+{
     border-color: #252729;
     background: transparent;
 }
 
-.black .v-table-cell-content {
+.black .v-table-cell-content
+{
     border-right-color: #252729;
     border-bottom: 1px solid #252729;
 }
 
-.black .v-table-cell-wrapper {
+.black .v-table-cell-wrapper
+{
     padding-bottom: 2px;
 }
 
-.black .v-table-row-odd {
+.black .v-table-row-odd
+{
     background: transparent;
 }
 
 /* Selection background-color combined with the default (white) style selector, so we don't have to duplicate the sprite image in the final sprite collection */
-.black .v-table .v-selected .v-table-cell-content {
+.black .v-table .v-selected .v-table-cell-content
+{
     border-bottom: 1px solid #4d749f;
 }
 
 /* Borderless style */
 .v-table-borderless .v-table-header-wrap,
-.v-table-borderless .v-table-body {
+.v-table-borderless .v-table-body
+{
     border: none;
 }
 
@@ -5612,11 +6477,13 @@ td.v-datefield-calendarpanel-nextyear {
 /* Default Tabsheet styles */
 
 .v-tabsheet-tabitemcell,
-.v-tabsheet-spacertd {
+.v-tabsheet-spacertd
+{
     height: 32px;
 }
 
-.v-tabsheet-tabitemcell {
+.v-tabsheet-tabitemcell
+{
     background: no-repeat;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -5624,7 +6491,8 @@ td.v-datefield-calendarpanel-nextyear {
     padding-left: 3px;
 }
 
-.v-tabsheet-tabitemcell-first {
+.v-tabsheet-tabitemcell-first
+{
     padding-left: 10px;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -5632,7 +6500,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-tabsheet-tabitem,
-.v-tabsheet-spacertd div {
+.v-tabsheet-spacertd div
+{
     border: none;
     height: 32px;
     background: transparent repeat-x;
@@ -5644,7 +6513,8 @@ td.v-datefield-calendarpanel-nextyear {
     text-shadow: #fff 0 1px 0;
 }
 
-.v-tabsheet-tabitem .v-caption {
+.v-tabsheet-tabitem .v-caption
+{
     border: none;
     height: 23px;
     background: no-repeat right top;
@@ -5654,17 +6524,20 @@ td.v-datefield-calendarpanel-nextyear {
     padding: 9px 8px 0 6px;
 }
 
-.v-tabsheet-tabitem .v-caption-closable {
+.v-tabsheet-tabitem .v-caption-closable
+{
     padding-right: 0;
     padding-left: 17px;
 }
 
-.v-tabsheet-tabitem .v-captiontext {
+.v-tabsheet-tabitem .v-captiontext
+{
     height: 16px;
     line-height: 16px;
 }
 
-.v-tabsheet-caption-close {
+.v-tabsheet-caption-close
+{
     float: right;
     width: 19px;
     height: 18px;
@@ -5682,86 +6555,101 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-ff .v-tabsheet-caption-close,
-.v-ie7 .v-tabsheet-caption-close {
+.v-ie7 .v-tabsheet-caption-close
+{
     margin-top: -17px;
 }
 
-.v-ie6 .v-tabsheet-caption-close {
+.v-ie6 .v-tabsheet-caption-close
+{
     float: none;
 }
 
-.v-tabsheet-caption-close:hover {
+.v-tabsheet-caption-close:hover
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1320px;
 }
 
-.v-tabsheet-caption-close:active {
+.v-tabsheet-caption-close:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1338px;
 }
 
-.v-tabsheet-tabitem-selected .v-tabsheet-caption-close {
+.v-tabsheet-tabitem-selected .v-tabsheet-caption-close
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1356px;
 }
 
-.v-tabsheet-tabitem-selected .v-tabsheet-caption-close:hover {
+.v-tabsheet-tabitem-selected .v-tabsheet-caption-close:hover
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1374px;
 }
 
-.v-tabsheet-tabitem-selected .v-tabsheet-caption-close:active {
+.v-tabsheet-tabitem-selected .v-tabsheet-caption-close:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1392px;
 }
 
-.v-tabsheet-tabitemcell-selected {
+.v-tabsheet-tabitemcell-selected
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1410px;
 }
 
-.v-tabsheet-tabitemcell-selected-first {
+.v-tabsheet-tabitemcell-selected-first
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1442px;
 }
 
-.v-tabsheet-tabitem-selected {
+.v-tabsheet-tabitem-selected
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1474px;
     color: #232930;
 }
 
-.v-tabsheet-tabitem-selected .v-caption {
+.v-tabsheet-tabitem-selected .v-caption
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: right -1506px;
 }
 
-.v-tabsheet-spacertd div {
+.v-tabsheet-spacertd div
+{
     margin-right: 4px;
 }
 
-.v-tabsheet-spacertd {
+.v-tabsheet-spacertd
+{
     background: transparent no-repeat right top;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: right -1538px;
 }
 
-.blue .v-tabsheet-content {
+.blue .v-tabsheet-content
+{
     border-color: #a8bcc5;
 }
 
 .v-tabsheet-content,
-.white .v-tabsheet-content {
+.white .v-tabsheet-content
+{
     border: 1px solid #dcdcdc;
     border-bottom: none;
     border-top: none;
@@ -5769,22 +6657,26 @@ td.v-datefield-calendarpanel-nextyear {
     text-shadow: none;
 }
 
-.v-tabsheet-tabsheetpanel {
+.v-tabsheet-tabsheetpanel
+{
     background: #fff;
 }
 
 .v-sa .v-tabsheet-content,
-.v-ff3 .v-tabsheet-content {
+.v-ff3 .v-tabsheet-content
+{
     border-color: rgba(0, 0, 0, .1);
 }
 
-.blue .v-tabsheet-deco {
+.blue .v-tabsheet-deco
+{
     border-color: #92a3ac;
     background: #adc2cd;
 }
 
 .v-tabsheet-deco,
-.white .v-tabsheet-deco {
+.white .v-tabsheet-deco
+{
     height: 1px;
     border-top: 1px solid #bebebe;
     background: #e2e2e2;
@@ -5792,7 +6684,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-sa .v-tabsheet-deco,
-.v-ff3 .v-tabsheet-deco {
+.v-ff3 .v-tabsheet-deco
+{
     border-top-color: rgba(0, 0, 0, .1);
     background: rgba(0, 0, 0, .08);
 }
@@ -5801,21 +6694,25 @@ td.v-datefield-calendarpanel-nextyear {
 
 .v-tabsheet-tabs .v-icon,
 .v-tabsheet-tabs .v-captiontext,
-.v-tabsheet-tabs .v-errorindicator {
+.v-tabsheet-tabs .v-errorindicator
+{
     display: inline;
     float: none;
 }
 
-.v-sa .v-tabsheet-tabs .v-captiontext {
+.v-sa .v-tabsheet-tabs .v-captiontext
+{
     display: inline-block;
 }
 
-.v-tabsheet-tabs .v-icon {
+.v-tabsheet-tabs .v-icon
+{
     width: 16px !important;
     height: 16px !important;
 }
 
-.v-tabsheet-tabs .v-errorindicator {
+.v-tabsheet-tabs .v-errorindicator
+{
     display: inline-block;
     width: 13px;
     height: 16px;
@@ -5823,27 +6720,32 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-ff2 .v-tabsheet-tabs .v-icon,
-.v-ff2 .v-tabsheet-tabs .v-errorindicator {
+.v-ff2 .v-tabsheet-tabs .v-errorindicator
+{
     display: -moz-inline-stack;
 }
 
-.v-ie6 .v-tabsheet-tabs .v-errorindicator {
+.v-ie6 .v-tabsheet-tabs .v-errorindicator
+{
     background-image: url(common/icons/error-ie6.png);
 }
 
-.v-ie .v-tabsheet-tabs .v-errorindicator {
+.v-ie .v-tabsheet-tabs .v-errorindicator
+{
     zoom: 1;
     display: inline;
 }
 
 .v-ie8 .v-tabsheet-tabs .v-errorindicator,
-.v-ie9 .v-tabsheet-tabs .v-errorindicator {
+.v-ie9 .v-tabsheet-tabs .v-errorindicator
+{
     display: inline-block;
 }
 
 /* Tabsheet scroller styles */
 
-.v-tabsheet-scroller {
+.v-tabsheet-scroller
+{
     height: 31px;
     margin-top: -31px;
     padding: 0 3px 0 4px;
@@ -5855,14 +6757,16 @@ td.v-datefield-calendarpanel-nextyear {
     width: 36px;
 }
 
-.v-tabsheet-scroller button {
+.v-tabsheet-scroller button
+{
     margin-top: 7px;
 }
 
 .v-tabsheet-scrollerPrev,
 .v-tabsheet-scrollerNext,
 .v-tabsheet-scrollerPrev-disabled,
-.v-tabsheet-scrollerNext-disabled {
+.v-tabsheet-scrollerNext-disabled
+{
     border: none;
     background: transparent;
     background-image: url(common/img/vertical-sprites.png);
@@ -5873,30 +6777,35 @@ td.v-datefield-calendarpanel-nextyear {
     overflow: hidden;
 }
 
-.v-tabsheet-scroller button::-moz-focus-inner {
+.v-tabsheet-scroller button::-moz-focus-inner
+{
     border: none;
 }
 
-.v-tabsheet-scrollerNext {
+.v-tabsheet-scrollerNext
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1587px;
 }
 
-.v-tabsheet-scrollerPrev:active {
+.v-tabsheet-scrollerPrev:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1604px;
 }
 
-.v-tabsheet-scrollerNext:active {
+.v-tabsheet-scrollerNext:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1621px;
 }
 
 .v-tabsheet-scrollerPrev-disabled,
-.v-tabsheet-scrollerPrev-disabled:active {
+.v-tabsheet-scrollerPrev-disabled:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1638px;
@@ -5905,7 +6814,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-tabsheet-scrollerNext-disabled,
-.v-tabsheet-scrollerNext-disabled:active {
+.v-tabsheet-scrollerNext-disabled:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1655px;
@@ -5913,28 +6823,34 @@ td.v-datefield-calendarpanel-nextyear {
     filter: none;
 }
 
-.v-tabsheet-borderless .v-tabsheet-tabitemcell-first {
+.v-tabsheet-borderless .v-tabsheet-tabitemcell-first
+{
     padding-left: 7px;
     background: url(tabsheet/img/framed/tab-first-left.png) no-repeat -3px 0;
 }
 
-.v-tabsheet-borderless .v-tabsheet-tabitemcell-selected-first {
+.v-tabsheet-borderless .v-tabsheet-tabitemcell-selected-first
+{
     background: url(tabsheet/img/framed/tab-first-left-sel.png) no-repeat -3px 0;
 }
 
-.v-tabsheet-borderless .v-tabsheet-spacertd div {
+.v-tabsheet-borderless .v-tabsheet-spacertd div
+{
     margin-right: 0;
 }
 
-.v-tabsheet-borderless .v-tabsheet-spacertd {
+.v-tabsheet-borderless .v-tabsheet-spacertd
+{
     background: transparent;
 }
 
-.v-tabsheet-borderless .v-tabsheet-content {
+.v-tabsheet-borderless .v-tabsheet-content
+{
     border: none;
 }
 
-.v-tabsheet-borderless .v-tabsheet-deco {
+.v-tabsheet-borderless .v-tabsheet-deco
+{
     height: 0;
     border-top: none;
 }
@@ -5946,40 +6862,47 @@ td.v-datefield-calendarpanel-nextyear {
 /* Minimal tabsheet on blue background */
 .blue .v-tabsheet-tabs-minimal .v-tabsheet-spacertd div,
 .blue .v-tabsheet-tabs-minimal .v-tabsheet-tabitem,
-.blue .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected {
+.blue .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected
+{
     border-color: #7c8a91;
 }
 
-.blue .v-tabsheet-tabs-minimal .v-tabsheet-caption-close {
+.blue .v-tabsheet-tabs-minimal .v-tabsheet-caption-close
+{
     color: #7c8a91;
 }
 
-.blue .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover {
+.blue .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover
+{
     color: #BCD3DE;
     background: #778d98;
 }
 
-.blue .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active {
+.blue .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active
+{
     background: #4f6874;
 }
 
 /* Default & white styles */
 .v-tabsheet-tabs-minimal .v-tabsheet-spacertd div,
-.white .v-tabsheet-tabs-minimal .v-tabsheet-spacertd div {
+.white .v-tabsheet-tabs-minimal .v-tabsheet-spacertd div
+{
     border-bottom: 1px solid #bfbfbf;
     height: auto;
     background: transparent;
 }
 
 .v-tabsheet-tabs-minimal .v-tabsheet-tabitemcell,
-.v-tabsheet-tabs-minimal .v-tabsheet-spacertd {
+.v-tabsheet-tabs-minimal .v-tabsheet-spacertd
+{
     height: auto;
     background: transparent;
     padding-left: 0;
 }
 
 .v-tabsheet-tabs-minimal .v-tabsheet-tabitem,
-.white .v-tabsheet-tabs-minimal .v-tabsheet-tabitem {
+.white .v-tabsheet-tabs-minimal .v-tabsheet-tabitem
+{
     border: none;
     border-bottom: 1px solid #bfbfbf;
     color: #4d748f;
@@ -5989,50 +6912,59 @@ td.v-datefield-calendarpanel-nextyear {
     text-shadow: none;
 }
 
-.v-tabsheet-tabs-minimal .v-tabsheet-tabitem .v-caption {
+.v-tabsheet-tabs-minimal .v-tabsheet-tabitem .v-caption
+{
     padding: 5px 16px;
     height: auto;
     background: transparent;
 }
 
-.v-tabsheet-tabs-minimal .v-tabsheet-tabitemcell-selected {
+.v-tabsheet-tabs-minimal .v-tabsheet-tabitemcell-selected
+{
     background: transparent;
 }
 
 .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected,
-.white .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected {
+.white .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected
+{
     background: transparent;
     border: 1px solid #bfbfbf;
     border-bottom: none;
     color: #222;
 }
 
-.v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected .v-caption {
+.v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected .v-caption
+{
     background: transparent;
     padding: 4px 15px 6px 15px;
 }
 
 .v-tabsheet-tabs-minimal .v-tabsheet-tabitem .v-caption-closable,
-.v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected .v-caption-closable {
+.v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected .v-caption-closable
+{
     padding-right: 6px;
 }
 
 .v-tabsheet-content-minimal,
-.white .v-tabsheet-content-minimal {
+.white .v-tabsheet-content-minimal
+{
     border: none;
 }
 
-.v-tabsheet-content-minimal .v-tabsheet-tabsheetpanel {
+.v-tabsheet-content-minimal .v-tabsheet-tabsheetpanel
+{
     background: transparent;
 }
 
 .v-tabsheet-deco-minimal,
-.white .v-tabsheet-deco-minimal {
+.white .v-tabsheet-deco-minimal
+{
     height: 0;
     border: none;
 }
 
-.v-tabsheet-tabcontainer-minimal .v-tabsheet-scroller {
+.v-tabsheet-tabcontainer-minimal .v-tabsheet-scroller
+{
     margin-top: -20px;
     height: 17px;
     padding: 0;
@@ -6040,13 +6972,15 @@ td.v-datefield-calendarpanel-nextyear {
     background: transparent;
 }
 
-.v-tabsheet-tabcontainer-minimal .v-tabsheet-scroller button {
+.v-tabsheet-tabcontainer-minimal .v-tabsheet-scroller button
+{
     margin-top: 0;
 }
 
 .v-tabsheet-tabs-minimal .v-tabsheet-caption-close,
 .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover,
-.v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active {
+.v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active
+{
     text-indent: 0;
     background: transparent;
     margin-left: 3px;
@@ -6060,54 +6994,64 @@ td.v-datefield-calendarpanel-nextyear {
     -moz-border-radius: 7px;
 }
 
-.v-tabsheet-tabs-minimal .v-tabsheet-caption-close {
+.v-tabsheet-tabs-minimal .v-tabsheet-caption-close
+{
     margin-top: 1px;
 }
 
 .v-ff .v-tabsheet-tabs-minimal .v-tabsheet-caption-close,
-.v-ie7 .v-tabsheet-tabs-minimal .v-tabsheet-caption-close {
+.v-ie7 .v-tabsheet-tabs-minimal .v-tabsheet-caption-close
+{
     margin-top: -15px;
 }
 
 .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover,
-.white .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover {
+.white .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover
+{
     color: #fff;
     background: #aaa;
 }
 
 .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active,
-.white .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active {
+.white .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active
+{
     background: #777;
 }
 
 /* Minimal tabsheet on black background */
 .black .v-tabsheet-tabs-minimal .v-tabsheet-spacertd div,
 .black .v-tabsheet-tabs-minimal .v-tabsheet-tabitem,
-.black .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected {
+.black .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected
+{
     border-color: #3e4044;
     color: #6a7f89;
 }
 
-.black .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected {
+.black .v-tabsheet-tabs-minimal .v-tabsheet-tabitem-selected
+{
     color: #c9ccce;
 }
 
 .black .v-tabsheet-content-minimal,
-.black .v-tabsheet-content-bar {
+.black .v-tabsheet-content-bar
+{
     color: #c9ccce;
     text-shadow: #000 0 0 1px;
 }
 
-.black .v-tabsheet-tabs-minimal .v-tabsheet-caption-close {
+.black .v-tabsheet-tabs-minimal .v-tabsheet-caption-close
+{
     color: #72787c;
 }
 
-.black .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover {
+.black .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:hover
+{
     color: #1d2021;
     background: #4d5154;
 }
 
-.black .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active {
+.black .v-tabsheet-tabs-minimal .v-tabsheet-caption-close:active
+{
     background: #626669;
 }
 
@@ -6115,21 +7059,25 @@ td.v-datefield-calendarpanel-nextyear {
  * Tabsheet bar style ---------------
  */
 .v-tabsheet-tabs-bar .v-tabsheet-tabitemcell,
-.v-tabsheet-tabs-bar .v-tabsheet-spacertd {
+.v-tabsheet-tabs-bar .v-tabsheet-spacertd
+{
     height: 20px;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-spacertd {
+.v-tabsheet-tabs-bar .v-tabsheet-spacertd
+{
     background: transparent;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1673px;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell-first {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell-first
+{
     padding-left: 6px;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -6137,7 +7085,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-tabsheet-tabs-bar .v-tabsheet-tabitem,
-.v-tabsheet-tabs-bar .v-tabsheet-spacertd div {
+.v-tabsheet-tabs-bar .v-tabsheet-spacertd div
+{
     height: 20px;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -6146,7 +7095,8 @@ td.v-datefield-calendarpanel-nextyear {
     margin: 0;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitem .v-caption {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitem .v-caption
+{
     height: 18px;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -6155,14 +7105,16 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-tabsheet-tabs-bar .v-tabsheet-tabitem .v-caption-closable,
-.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-caption-closable {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-caption-closable
+{
     padding-right: 8px;
     padding-left: 14px;
 }
 
 .v-tabsheet-tabs-bar .v-tabsheet-caption-close,
 .v-tabsheet-tabs-bar .v-tabsheet-caption-close:hover,
-.v-tabsheet-tabs-bar .v-tabsheet-caption-close:active {
+.v-tabsheet-tabs-bar .v-tabsheet-caption-close:active
+{
     text-indent: 0;
     background: transparent;
     margin-left: 3px;
@@ -6176,64 +7128,76 @@ td.v-datefield-calendarpanel-nextyear {
     -moz-border-radius: 7px;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-caption-close {
+.v-tabsheet-tabs-bar .v-tabsheet-caption-close
+{
     margin-top: 1px;
 }
 
 .v-ff .v-tabsheet-tabs-bar .v-tabsheet-caption-close,
-.v-ie7 .v-tabsheet-tabs-bar .v-tabsheet-caption-close {
+.v-ie7 .v-tabsheet-tabs-bar .v-tabsheet-caption-close
+{
     margin-top: -14px;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-caption-close:hover {
+.v-tabsheet-tabs-bar .v-tabsheet-caption-close:hover
+{
     background: #bfbfbf;
     -webkit-box-shadow: 0 1px 0 #fff;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-caption-close:active {
+.v-tabsheet-tabs-bar .v-tabsheet-caption-close:active
+{
     background: #a9a9a9;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-tabsheet-caption-close {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-tabsheet-caption-close
+{
     color: #404142;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-tabsheet-caption-close:hover {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-tabsheet-caption-close:hover
+{
     background: #5e666e;
     color: #fff;
     text-shadow: 0 -1px 0 #222;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-tabsheet-caption-close:active {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-tabsheet-caption-close:active
+{
     background: #404142;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell-selected {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell-selected
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1753px;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell-selected-first {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitemcell-selected-first
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1773px;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1793px;
     color: #232930;
 }
 
-.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-caption {
+.v-tabsheet-tabs-bar .v-tabsheet-tabitem-selected .v-caption
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: right -1813px;
 }
 
-.v-tabsheet-tabcontainer-bar .v-tabsheet-scroller {
+.v-tabsheet-tabcontainer-bar .v-tabsheet-scroller
+{
     margin-top: -20px;
     height: 19px;
     border-right: none;
@@ -6242,21 +7206,25 @@ td.v-datefield-calendarpanel-nextyear {
     background-position: left -1833px;
 }
 
-.v-tabsheet-tabcontainer-bar .v-tabsheet-scroller button {
+.v-tabsheet-tabcontainer-bar .v-tabsheet-scroller button
+{
     margin-top: 1px;
 }
 
 .v-tabsheet-content-bar,
-.white .v-tabsheet-content-bar {
+.white .v-tabsheet-content-bar
+{
     border: none;
 }
 
-.v-tabsheet-content-bar .v-tabsheet-tabsheetpanel {
+.v-tabsheet-content-bar .v-tabsheet-tabsheetpanel
+{
     background: transparent;
 }
 
 .v-tabsheet-deco-bar,
-.white .v-tabsheet-deco-bar {
+.white .v-tabsheet-deco-bar
+{
     height: 0;
     border: none;
 }
@@ -6264,26 +7232,31 @@ td.v-datefield-calendarpanel-nextyear {
 /* Content area font color specified with minimal style (reduces additional selectors) */
 
 .v-tabsheet-tabs-selected-closable .v-tabsheet-tabitem .v-tabsheet-caption-close,
-.v-tabsheet-tabs-selected-closable .v-tabsheet-tabitem:hover .v-tabsheet-caption-close {
+.v-tabsheet-tabs-selected-closable .v-tabsheet-tabitem:hover .v-tabsheet-caption-close
+{
     visibility: hidden;
 }
 
 .v-tabsheet-tabs-selected-closable .v-tabsheet-tabitem-selected .v-tabsheet-caption-close,
-.v-tabsheet-tabs-selected-closable .v-tabsheet-tabitem-selected:hover .v-tabsheet-caption-close {
+.v-tabsheet-tabs-selected-closable .v-tabsheet-tabitem-selected:hover .v-tabsheet-caption-close
+{
     visibility: visible;
 }
 
-.v-tabsheet-tabs-hover-closable .v-tabsheet-caption-close {
+.v-tabsheet-tabs-hover-closable .v-tabsheet-caption-close
+{
     visibility: hidden;
 }
 
-.v-tabsheet-tabs-hover-closable .v-tabsheet-tabitem:hover .v-tabsheet-caption-close {
+.v-tabsheet-tabs-hover-closable .v-tabsheet-tabitem:hover .v-tabsheet-caption-close
+{
     visibility: visible;
 }
 
 /* Textfield on blue background */
 .blue .v-textfield,
-.blue .v-textarea {
+.blue .v-textarea
+{
     border-color: #92a2aa;
     border-top-color: #7c8a90;
     border-bottom-color: #a1b3bc;
@@ -6293,7 +7266,8 @@ td.v-datefield-calendarpanel-nextyear {
 .v-textfield,
 .v-textarea,
 .white .v-textfield,
-.white .v-textarea {
+.white .v-textarea
+{
     border: 1px solid #bcbdbe;
     border-top-color: #a2a3a4;
     border-bottom-color: #d2d3d4;
@@ -6311,7 +7285,8 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 .v-textarea,
-.white .v-textarea {
+.white .v-textarea
+{
     background-image: none;
     height: auto;
 }
@@ -6320,7 +7295,8 @@ td.v-datefield-calendarpanel-nextyear {
 .v-app input.v-textfield,
 .v-window input.v-textfield,
 .v-app textarea.v-textarea,
-.v-window textarea.v-textarea {
+.v-window textarea.v-textarea
+{
     padding: 3px 3px 4px;
 }
 
@@ -6329,7 +7305,8 @@ td.v-datefield-calendarpanel-nextyear {
 .v-popupview-popup .v-textfield-focus,
 .v-app .v-textarea-focus,
 .v-window .v-textarea-focus,
-.v-popupview-popup .v-textarea-focus {
+.v-popupview-popup .v-textarea-focus
+{
     border-color: #5b97d0;
     border-top-color: #4f83b4;
     border-bottom-color: #5ca0df;
@@ -6338,47 +7315,55 @@ td.v-datefield-calendarpanel-nextyear {
 }
 
 input.v-textfield-prompt,
-textarea.v-textarea-prompt {
+textarea.v-textarea-prompt
+{
     font-style: normal;
     color: #999;
 }
 
 /* Small style textfield */
-.v-app input.v-textfield-small {
+.v-app input.v-textfield-small
+{
     font-size: 11px;
     line-height: normal;
     height: auto;
     padding: 2px;
 }
 
-.v-app textarea.v-textarea-small {
+.v-app textarea.v-textarea-small
+{
     font-size: 11px;
 }
 
-.v-table input.v-textfield {
+.v-table input.v-textfield
+{
     padding: 1px 2px;
     height: auto;
     line-height: normal;
 }
 
-.v-table-cell-wrapper > input.v-textfield {
+.v-table-cell-wrapper > input.v-textfield
+{
     margin-top: -2px;
     margin-bottom: -2px;
 }
 
-.v-ie6 .v-table-cell-wrapper input.v-textfield {
+.v-ie6 .v-table-cell-wrapper input.v-textfield
+{
     margin-top: -2px;
     margin-bottom: -2px;
 }
 
-.v-ie6 .v-table-cell-wrapper div input.v-textfield {
+.v-ie6 .v-table-cell-wrapper div input.v-textfield
+{
     margin-top: 0;
     margin-bottom: 0;
 }
 
 /* Textfield on black background */
 .black .v-textfield,
-.black .v-textarea {
+.black .v-textarea
+{
     border-color: #38393a;
     border-top-color: #2c2d2e;
     border-bottom-color: #3e3f3f;
@@ -6390,7 +7375,8 @@ textarea.v-textarea-prompt {
     text-shadow: #000 0 0 1px;
 }
 
-.black .v-textarea {
+.black .v-textarea
+{
     background-image: none;
 }
 
@@ -6401,14 +7387,16 @@ textarea.v-textarea-prompt {
 .v-app .black .v-textarea-focus,
 .v-window-black .v-textarea-focus,
 .v-window .black .v-textarea-focus,
-.v-popupview-popup .black .v-textarea-focus {
+.v-popupview-popup .black .v-textarea-focus
+{
     border-color: #4b7192;
     border-top-color: #3b5a75;
     border-bottom-color: #507596;
     background-color: #151717;
 }
 
-.black input.v-textfield-prompt {
+.black input.v-textfield-prompt
+{
     color: #5f6366;
 }
 
@@ -6416,39 +7404,47 @@ textarea.v-textarea-prompt {
 input.v-textfield-readonly,
 .black input.v-textfield-readonly,
 textarea.v-textarea-readonly,
-.black textarea.v-textarea-readonly {
+.black textarea.v-textarea-readonly
+{
     border: none;
     background: transparent;
 }
 
-.v-tree-node {
+.v-tree-node
+{
     background: transparent url(tree/img/arrows.png) no-repeat 6px -10px;
 }
 
-.v-ie6 .v-tree-node {
+.v-ie6 .v-tree-node
+{
     background-image: url(tree/img/arrows-ie6.png);
     background-repeat: no-repeat;
 }
 
-.v-ie6 div.v-tree-node-leaf {
+.v-ie6 div.v-tree-node-leaf
+{
     background: transparent;
 }
 
-.v-tree-node-expanded {
+.v-tree-node-expanded
+{
     background-position: -7px 5px;
 }
 
-.v-tree-node-caption {
+.v-tree-node-caption
+{
     margin-left: 16px;
     padding-bottom: 1px;
 }
 
-.v-tree-node span {
+.v-tree-node span
+{
     padding: 1px 2px;
     display: inline-block;
 }
 
-.v-tree-node-selected span {
+.v-tree-node-selected span
+{
     background: #4d749f repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
@@ -6461,90 +7457,107 @@ textarea.v-textarea-readonly,
     display: inline-block;
 }
 
-.v-tree-node-children {
+.v-tree-node-children
+{
     padding-left: 16px;
 }
 
 /* IMPORTANT keep the offsetWidth (width + padding) of this element the same as the margin-left of v-tree-node-caption */
-.v-ie6 .v-tree-node-ie6compatnode {
+.v-ie6 .v-tree-node-ie6compatnode
+{
     width: 14px;
     height: 10px;
     padding: 1px;
 }
 
-.v-tree-node-caption.v-tree-node-focused span {
+.v-tree-node-caption.v-tree-node-focused span
+{
     padding-left: 1px;
     padding-top: 0px;
     padding-bottom: 0px;
 }
 
-.v-tree-node-focused span {
+.v-tree-node-focused span
+{
     border: 1px dotted black;
 }
 
-.v-ie6 .v-tree-node-ie6compatnode.v-tree-node-focused {
+.v-ie6 .v-tree-node-ie6compatnode.v-tree-node-focused
+{
     padding-left: 0px;
 }
 
 /***************************************
  * Drag'n'drop styles
  ***************************************/
-.v-tree .v-tree-node-drag-top {
+.v-tree .v-tree-node-drag-top
+{
     background-position: 6px -11px;
 }
 
-.v-tree .v-tree-node-drag-top.v-tree-node-expanded {
+.v-tree .v-tree-node-drag-top.v-tree-node-expanded
+{
     background-position: -7px 4px;
 }
 
 .v-tree-connectors .v-tree-node-drag-top,
-.v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top {
+.v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top
+{
     background-position: 2px -53px;
 }
 
-.v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf {
+.v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf
+{
     background-position: 2px 50%;
 }
 
-.v-window {
+.v-window
+{
     background: transparent;
 }
 
-.v-window-wrap {
+.v-window-wrap
+{
     border: 1px solid #808386;
 }
 
 .v-sa .v-window-wrap,
 .v-ff3 .v-window-wrap,
-.v-op .v-window-wrap {
+.v-op .v-window-wrap
+{
     border-color: rgba(0, 0, 0, .2);
 }
 
 .v-ff2 .v-window-wrap,
-.v-ie6 .v-window-wrap {
+.v-ie6 .v-window-wrap
+{
     border: none;
 }
 
 .v-ff2 .v-window-outerheader,
-.v-ie6 .v-window-outerheader {
+.v-ie6 .v-window-outerheader
+{
     border: 1px solid #808386;
     border-bottom: none;
 }
 
 .v-ff2 .v-window-contents,
-.v-ie6 .v-window-contents {
+.v-ie6 .v-window-contents
+{
     border: 1px solid #808386;
     border-top: none;
     border-bottom: none;
 }
 
 .v-ff2 .v-window-footer,
-.v-ie6 .v-window-footer {
+.v-ie6 .v-window-footer
+{
     border: 1px solid #808386;
     border-top: none;
 }
 
-.v-window-outerheader {
+.v-window-outerheader
+{
     padding: 12px 32px 0 14px;
     height: 25px;
     background: black repeat-x;
@@ -6553,7 +7566,8 @@ textarea.v-textarea-readonly,
     background-position: left -1896px;
 }
 
-.v-window-header {
+.v-window-header
+{
     font-weight: bold;
     font-size: 12px;
     line-height: normal;
@@ -6565,16 +7579,19 @@ textarea.v-textarea-readonly,
     -ms-text-overflow: ellipsis;
 }
 
-.v-window-error .v-window-header {
+.v-window-error .v-window-header
+{
     padding-left: 13px;
     background: transparent url(common/icons/error.png) no-repeat 0 50%;
 }
 
-.v-ie6 .v-window-error .v-window-header {
+.v-ie6 .v-window-error .v-window-header
+{
     background-image: url(common/icons/error-ie6.png);
 }
 
-.v-window-resizebox {
+.v-window-resizebox
+{
     width: 15px;
     height: 15px;
     cursor: se-resize;
@@ -6584,7 +7601,8 @@ textarea.v-textarea-readonly,
     background-position: left -1933px;
 }
 
-.v-window-footer {
+.v-window-footer
+{
     background-color: white;
     background-repeat: repeat-x;
     background-image: url(common/img/vertical-sprites.png);
@@ -6593,7 +7611,8 @@ textarea.v-textarea-readonly,
     height: 15px;
 }
 
-.v-window-closebox {
+.v-window-closebox
+{
     top: 12px;
     right: 10px;
     width: 15px;
@@ -6604,23 +7623,27 @@ textarea.v-textarea-readonly,
     background-position: left -1963px;
 }
 
-.v-window-closebox:hover {
+.v-window-closebox:hover
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1979px;
 }
 
-.v-window-closebox:active {
+.v-window-closebox:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -1995px;
 }
 
-.v-window-contents {
+.v-window-contents
+{
     background: #fff;
 }
 
-.v-window-modalitycurtain {
+.v-window-modalitycurtain
+{
     background: #56595b;
 }
 
@@ -6628,19 +7651,22 @@ textarea.v-textarea-readonly,
  Light style window -----------------------------
 **/
 
-.v-window-light .v-window-outerheader {
+.v-window-light .v-window-outerheader
+{
     background: transparent;
     padding: 15px 32px 0 18px;
     height: 23px;
 }
 
-.v-window-light .v-window-header {
+.v-window-light .v-window-header
+{
     font-size: 16px;
     color: #292e34;
     text-shadow: none;
 }
 
-.v-window-light .v-window-resizebox {
+.v-window-light .v-window-resizebox
+{
     width: 12px;
     height: 12px;
     background-image: url(common/img/vertical-sprites.png);
@@ -6648,12 +7674,14 @@ textarea.v-textarea-readonly,
     background-position: left -2011px;
 }
 
-.v-window-light .v-window-footer {
+.v-window-light .v-window-footer
+{
     background: transparent;
     height: 12px;
 }
 
-.v-window-light .v-window-closebox {
+.v-window-light .v-window-closebox
+{
     right: 1px;
     top: 17px;
     width: 19px;
@@ -6663,31 +7691,36 @@ textarea.v-textarea-readonly,
     background-position: left -2023px;
 }
 
-.v-window-light .v-window-closebox:hover {
+.v-window-light .v-window-closebox:hover
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -2038px;
 }
 
-.v-window-light .v-window-closebox:active {
+.v-window-light .v-window-closebox:active
+{
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -2053px;
 }
 
-.v-window-light .v-window-contents {
+.v-window-light .v-window-contents
+{
     background: transparent;
 }
 
 /* This must be the last sprite added to the verticals-sprite image */
-.v-window-light .v-window-wrap2 {
+.v-window-light .v-window-wrap2
+{
     background: #f7f7f8 repeat-x;
     background-image: url(common/img/vertical-sprites.png);
     -background-image: url(common/img/vertical-sprites-ie6.png);
     background-position: left -2068px;
 }
 
-.v-ie6 .v-window-light .v-window-wrap2 {
+.v-ie6 .v-window-light .v-window-wrap2
+{
     background-image: none;
 }
 
@@ -6695,7 +7728,8 @@ textarea.v-textarea-readonly,
  Black style window -----------------------------
 **/
 
-.v-window-black .v-window-wrap {
+.v-window-black .v-window-wrap
+{
     border-color: #2e3030;
     border-radius: 8px;
     -webkit-border-radius: 8px;
@@ -6705,11 +7739,13 @@ textarea.v-textarea-readonly,
 
 .v-sa .v-window-black .v-window-wrap,
 .v-ff3 .v-window-black .v-window-wrap,
-.v-op .v-window-black .v-window-wrap {
+.v-op .v-window-black .v-window-wrap
+{
     border-color: rgba(0, 0, 0, .8);
 }
 
-.v-window-black .v-window-wrap2 {
+.v-window-black .v-window-wrap2
+{
     background-color: #1d2021;
     -moz-border-radius: 7px;
     -webkit-border-radius: 7px;
@@ -6717,11 +7753,13 @@ textarea.v-textarea-readonly,
 
 .v-sa .v-window-black .v-window-wrap2,
 .v-ff3 .v-window-black .v-window-wrap2,
-.v-op .v-window-black .v-window-wrap2 {
+.v-op .v-window-black .v-window-wrap2
+{
     background-color: rgba(29, 32, 33, .9);
 }
 
-.v-window-black .v-window-outerheader {
+.v-window-black .v-window-outerheader
+{
     height: auto;
     padding: 7px 14px;
     height: 15px;
@@ -6738,23 +7776,27 @@ textarea.v-textarea-readonly,
     border: none;
 }
 
-.v-window-black .v-window-header {
+.v-window-black .v-window-header
+{
     font-size: 12px;
     font-weight: normal;
     color: #dddfe1;
 }
 
-.v-window-black .v-window-closebox {
+.v-window-black .v-window-closebox
+{
     top: 8px;
 }
 
-.v-window-black .v-window-footer {
+.v-window-black .v-window-footer
+{
     background: transparent;
     border: none;
     height: 14px;
 }
 
-.v-window-black .v-window-resizebox {
+.v-window-black .v-window-resizebox
+{
     background: transparent no-repeat;
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
@@ -6763,18 +7805,21 @@ textarea.v-textarea-readonly,
     height: 14px;
 }
 
-.v-ie6 .v-window-black .v-window-resizebox {
+.v-ie6 .v-window-black .v-window-resizebox
+{
     background-image: url(common/img/black-vertical-sprites.png);
     -background-image: url(common/img/black-vertical-sprites-ie6.png);
     background-position: left -786px;
 }
 
-.v-ie6 .v-window-black .v-window-contents {
+.v-ie6 .v-window-black .v-window-contents
+{
     background: transparent url(window/img/black/content-bg-ie6.png) repeat-x;
 }
 
 /* Must be last to make this image last in the sprites */
-.v-window-black .v-window-contents {
+.v-window-black .v-window-contents
+{
     border: none;
     background: transparent repeat-x;
     background-image: url(common/img/black-vertical-sprites.png);

@@ -14,7 +14,8 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.core.peer.api.Peer;
 
 
-public interface RestService {
+public interface RestService
+{
 
 
     @POST
@@ -24,15 +25,15 @@ public interface RestService {
     public Peer registerPeer( String peer );
 
     @POST
-    @Path( "containers" )
-    @Produces( MediaType.APPLICATION_JSON )
-    @Consumes( MediaType.TEXT_PLAIN )
+    @Path("containers")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
     public String createContainers( String createContainersMsg );
 
 
     @GET
-    @Path( "containers/format" )
-    @Produces( MediaType.APPLICATION_JSON )
+    @Path("containers/format")
+    @Produces(MediaType.APPLICATION_JSON)
     public String getCreateContainersMsgJsonFormat();
 
 

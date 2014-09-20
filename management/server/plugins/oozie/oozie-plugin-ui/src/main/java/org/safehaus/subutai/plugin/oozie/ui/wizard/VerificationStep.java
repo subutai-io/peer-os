@@ -23,9 +23,11 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class VerificationStep extends Panel {
+public class VerificationStep extends Panel
+{
 
-    public VerificationStep( final Wizard wizard ) {
+    public VerificationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -41,22 +43,27 @@ public class VerificationStep extends Panel {
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
         cfgView.addStringCfg( "Server", wizard.getConfig().getServer() + "\n" );
-        for ( String agent : wizard.getConfig().getClients() ) {
+        for ( String agent : wizard.getConfig().getClients() )
+        {
             cfgView.addStringCfg( "Clients", agent + "\n" );
         }
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 UUID trackID = wizard.getOozieUI().getOozieManager().installCluster( wizard.getConfig() );
                 ProgressWindow window =
                         new ProgressWindow( wizard.getOozieUI().getExecutor(), wizard.getOozieUI().getTracker(),
                                 trackID, OozieClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -66,9 +73,11 @@ public class VerificationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );

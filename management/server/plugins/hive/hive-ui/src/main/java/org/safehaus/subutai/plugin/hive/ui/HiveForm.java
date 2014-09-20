@@ -14,13 +14,15 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class HiveForm extends CustomComponent {
+public class HiveForm extends CustomComponent
+{
 
     private final Wizard wizard;
     private final Manager manager;
 
 
-    public HiveForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public HiveForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

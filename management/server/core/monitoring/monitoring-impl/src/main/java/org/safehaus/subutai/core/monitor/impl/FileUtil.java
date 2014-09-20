@@ -10,7 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-class FileUtil {
+class FileUtil
+{
 
     private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
 

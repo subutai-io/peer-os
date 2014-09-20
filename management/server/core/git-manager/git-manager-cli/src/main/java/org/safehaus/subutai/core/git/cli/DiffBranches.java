@@ -9,26 +9,27 @@ import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Diffs branches
  */
-@Command( scope = "git", name = "diff-branches", description = "Diff branches to see changed files" )
-public class DiffBranches extends OsgiCommandSupport {
+@Command(scope = "git", name = "diff-branches", description = "Diff branches to see changed files")
+public class DiffBranches extends OsgiCommandSupport
+{
 
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
-    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
+    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
     String repoPath;
-    @Argument( index = 2, name = "branch name 1", required = true, multiValued = false,
-            description = "branch name 1" )
+    @Argument(index = 2, name = "branch name 1", required = true, multiValued = false,
+            description = "branch name 1")
     String branchName1;
-    @Argument( index = 3, name = "branch name 2", required = false, multiValued = false,
-            description = "branch name 2 (master = default)" )
+    @Argument(index = 3, name = "branch name 2", required = false, multiValued = false,
+            description = "branch name 2 (master = default)")
     String branchName2;
     private AgentManager agentManager;
     private GitManager gitManager;

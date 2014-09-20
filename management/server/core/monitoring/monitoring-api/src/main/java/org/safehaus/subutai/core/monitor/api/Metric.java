@@ -1,7 +1,8 @@
 package org.safehaus.subutai.core.monitor.api;
 
 
-public enum Metric {
+public enum Metric
+{
 
     CPU_USER( "CPU User", "%" ),
     CPU_SYSTEM( "CPU System", "%" ),

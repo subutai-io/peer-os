@@ -5,17 +5,18 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * Created by bahadyr on 7/4/14.
- */
-public class ConfigurationView extends VerticalLayout {
+public class ConfigurationView extends VerticalLayout
+{
 
-    public ConfigurationView() {
+    public ConfigurationView()
+    {
         final ClustersTable clustersTable = new ClustersTable();
         Button viewClustersButton = new Button( "View clusters" );
-        viewClustersButton.addClickListener( new Button.ClickListener() {
+        viewClustersButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 Object[] o = getClusters();
                 clustersTable.refreshData( o );
             }
@@ -25,7 +26,8 @@ public class ConfigurationView extends VerticalLayout {
     }
 
 
-    private Object[] getClusters() {
+    private Object[] getClusters()
+    {
         Object[] o = {
                 "Environment1", new Button( "Configure" ), "Environment2", new Button( "Configure" )
         };

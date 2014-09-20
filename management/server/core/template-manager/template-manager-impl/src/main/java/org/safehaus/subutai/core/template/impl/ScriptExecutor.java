@@ -11,7 +11,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 
 
-class ScriptExecutor {
+class ScriptExecutor
+{
 
     private final CommandRunner commandRunner;
     int defaultTimeout = 360;

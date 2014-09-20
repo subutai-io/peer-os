@@ -194,10 +194,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
         Preconditions.checkArgument( pathsToFilesInsidePackage != null && !pathsToFilesInsidePackage.isEmpty(),
                 "PathsToFilesInsidePackage is null or empty" );
         StringBuilder filesSB = new StringBuilder();
-
         long nano = System.nanoTime();
 
-        assert pathsToFilesInsidePackage != null;
         for ( int i = 0; i < pathsToFilesInsidePackage.size(); i++ )
         {
             final String path = pathsToFilesInsidePackage.get( i );

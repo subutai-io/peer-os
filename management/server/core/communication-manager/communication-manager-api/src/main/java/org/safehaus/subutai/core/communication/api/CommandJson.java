@@ -8,6 +8,7 @@ package org.safehaus.subutai.core.communication.api;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 
@@ -231,37 +232,44 @@ public class CommandJson
      *
      * @return agent in json format
      */
-    /*public static String getAgentJson( Object agent ) {
-        try {
+    public static String getAgentJson( Object agent )
+    {
+        try
+        {
             return gson.toJson( agent );
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getAgentJson", ex );
         }
         return null;
-    }*/
+    }
 
 
     /**
      * Returns deserialized agent from Agent json
      *
-     * \@param json - agent in json format
+     * @param json - agent in json format
      *
-     * \@return agent in pojo format
+     * @return agent in pojo format
      */
-    /*static Agent getAgent( String json ) {
-        try {
+    public static Agent getAgent( String json )
+    {
+        try
+        {
             Agent agent = gson.fromJson( escape( json ), Agent.class );
-            if ( agent != null ) {
+            if ( agent != null )
+            {
                 return agent;
             }
         }
-        catch ( Exception ex ) {
+        catch ( Exception ex )
+        {
             LOG.log( Level.SEVERE, "Error in getAgent", ex );
         }
 
         return null;
-    }*/
+    }
 
 
     private static class CommandImpl implements Command

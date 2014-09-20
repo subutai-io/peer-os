@@ -17,7 +17,8 @@ public class DestroyNodeOperationHandlerTest {
 
 	@Test
 	public void testWithoutCluster() {
-		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(new LuceneImplMock(), "test-cluster",
+		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(new LuceneImplMock(),
+		"test-cluster",
 				"lxc-host");
 
 		operationHandler.run();

@@ -1,7 +1,9 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -11,7 +13,9 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 
-public abstract class PrestoBase {
+
+public abstract class PrestoBase
+{
 
     CommandRunner commandRunner;
     AgentManager agentManager;
@@ -23,78 +27,113 @@ public abstract class PrestoBase {
     ExecutorService executor;
     PluginDAO pluginDAO;
 
-    public void init() {
-        Commands.init(commandRunner);
-        pluginDAO = new PluginDAO(dbManager);
+
+    public void init()
+    {
+        Commands.init( commandRunner );
+        pluginDAO = new PluginDAO( dbManager );
         executor = Executors.newCachedThreadPool();
     }
 
-    public void destroy() {
+
+    public void destroy()
+    {
         executor.shutdown();
     }
 
-    public CommandRunner getCommandRunner() {
+
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
-    public void setCommandRunner(CommandRunner commandRunner) {
+
+    public void setCommandRunner( CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
-    public AgentManager getAgentManager() {
+
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
-    public void setAgentManager(AgentManager agentManager) {
+
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
-    public DbManager getDbManager() {
+
+    public DbManager getDbManager()
+    {
         return dbManager;
     }
 
-    public void setDbManager(DbManager dbManager) {
+
+    public void setDbManager( DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
-    public Tracker getTracker() {
+
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
+
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
-    public Hadoop getHadoopManager() {
+
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
-    public void setHadoopManager(Hadoop hadoopManager) {
+
+    public void setHadoopManager( Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
-    public EnvironmentManager getEnvironmentManager() {
+
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
-    public void setEnvironmentManager(EnvironmentManager environmentManager) {
+
+    public void setEnvironmentManager( EnvironmentManager environmentManager )
+    {
         this.environmentManager = environmentManager;
     }
 
-    public ContainerManager getContainerManager() {
+
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
-    public void setContainerManager(ContainerManager containerManager) {
+
+    public void setContainerManager( ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
-    public PluginDAO getPluginDAO() {
+
+    public PluginDAO getPluginDAO()
+    {
         return pluginDAO;
     }
 
-    public void setPluginDAO(PluginDAO pluginDAO) {
+
+    public void setPluginDAO( PluginDAO pluginDAO )
+    {
         this.pluginDAO = pluginDAO;
     }
-
 }

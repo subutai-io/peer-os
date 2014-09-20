@@ -16,7 +16,8 @@ import com.google.common.base.Strings;
 /**
  * Created by daralbaev on 04.04.14.
  */
-public class SshManager {
+public class SshManager
+{
 
     protected static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
 
@@ -94,7 +95,14 @@ public class SshManager {
         }
         keys = value.toString();
 
-        return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
+        if ( !Strings.isNullOrEmpty( keys ) && command.hasSucceeded() )
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 
@@ -165,6 +173,7 @@ public class SshManager {
         {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
+        ;
 
         return command.hasSucceeded();
     }

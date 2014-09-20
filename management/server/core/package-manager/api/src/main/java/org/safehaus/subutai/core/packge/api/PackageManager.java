@@ -4,7 +4,8 @@ package org.safehaus.subutai.core.packge.api;
 import java.util.Collection;
 
 
-public interface PackageManager {
+public interface PackageManager
+{
 
     /**
      * Gets a list of packages on a given host.

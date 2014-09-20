@@ -8,15 +8,16 @@ import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "monitor", name = "all-metrics" )
-public class AllMetricsCommand extends OsgiCommandSupport {
+@Command(scope = "monitor", name = "all-metrics")
+public class AllMetricsCommand extends OsgiCommandSupport
+{
 
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false )
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false)
     protected String hostname = null;
 
     private Monitor monitor;

@@ -11,7 +11,8 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
 
     AgentManager agentManager;
 

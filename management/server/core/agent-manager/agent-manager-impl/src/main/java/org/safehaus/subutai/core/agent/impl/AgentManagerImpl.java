@@ -272,7 +272,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     {
         long threshold = System.currentTimeMillis() + timeout;
         Agent result = getAgentByHostname( hostname );
-        LOG.info( Thread.currentThread().toString() );
         while ( result == null && System.currentTimeMillis() < threshold )
         {
             try

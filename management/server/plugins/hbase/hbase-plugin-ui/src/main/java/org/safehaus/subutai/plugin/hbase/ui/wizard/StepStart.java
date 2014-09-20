@@ -22,9 +22,11 @@ import com.vaadin.ui.Panel;
 /**
  * @author dilshat
  */
-public class StepStart extends Panel {
+public class StepStart extends Panel
+{
 
-    public StepStart( final Wizard wizard ) {
+    public StepStart( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -54,17 +56,21 @@ public class StepStart extends Panel {
         grid.addComponent( startWithHadoop, 8, 4, 8, 4 );
         grid.setComponentAlignment( startWithHadoop, Alignment.BOTTOM_RIGHT );
 
-        startOverHadoop.addClickListener( new Button.ClickListener() {
+        startOverHadoop.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.OVER_HADOOP );
                 wizard.next();
             }
         } );
-        startWithHadoop.addClickListener( new Button.ClickListener() {
+        startWithHadoop.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.WITH_HADOOP );
                 wizard.next();

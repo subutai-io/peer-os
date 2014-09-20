@@ -36,7 +36,8 @@ import com.google.common.collect.Sets;
 /**
  * This is an implementation of TemplateRegistryManager
  */
-public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
+public class TemplateRegistryManagerImpl implements TemplateRegistryManager
+{
 
     private final TemplateDAO templateDAO;
 

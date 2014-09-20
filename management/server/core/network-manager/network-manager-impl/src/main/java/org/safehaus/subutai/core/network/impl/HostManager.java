@@ -14,7 +14,8 @@ import com.google.common.collect.Sets;
 /**
  * Created by daralbaev on 04.04.14.
  */
-public class HostManager {
+public class HostManager
+{
     protected static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
 
     private List<Agent> agentList;
@@ -32,7 +33,12 @@ public class HostManager {
 
     public boolean execute()
     {
-        return agentList != null && !agentList.isEmpty() && write();
+        if ( agentList != null && !agentList.isEmpty() )
+        {
+            return write();
+        }
+
+        return false;
     }
 
 

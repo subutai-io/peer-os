@@ -9,20 +9,21 @@ import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 
-public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl> {
+public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
+{
 
     private final Logger LOG = Logger.getLogger( CheckClusterHandler.class.getName() );
 
     private String clusterName;
 
 
-    public CheckClusterHandler( final CassandraImpl manager, final String clusterName ) {
+    public CheckClusterHandler( final CassandraImpl manager, final String clusterName )
+    {
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
@@ -31,12 +32,14 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         CassandraClusterConfig config = null;
         config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName,
                 CassandraClusterConfig.class );
 
-        if ( config == null ) {
+        if ( config == null )
+        {
             productOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
@@ -45,26 +48,32 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
         Command checkStatusCommand = Commands.getStatusCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkStatusCommand );
 
-        if ( checkStatusCommand.hasSucceeded() ) {
+        if ( checkStatusCommand.hasSucceeded() )
+        {
             productOperation.addLogDone( "All nodes are running." );
         }
-        else {
+        else
+        {
             logStatusResults( productOperation, checkStatusCommand );
         }
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    {
 
         StringBuilder log = new StringBuilder();
 
-        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
+        {
 
             String status = "UNKNOWN";
-            if ( e.getValue().getExitCode() == 0 ) {
+            if ( e.getValue().getExitCode() == 0 )
+            {
                 status = "Cassandra is running";
             }
-            else if ( e.getValue().getExitCode() == 768 ) {
+            else if ( e.getValue().getExitCode() == 768 )
+            {
                 status = "Cassandra is not running";
             }
 

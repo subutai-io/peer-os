@@ -31,7 +31,8 @@ import com.vaadin.ui.themes.Runo;
 /**
  * Created by bahadyr on 9/10/14.
  */
-public class EnvironmentBuildWizard extends DetailsWindow {
+public class EnvironmentBuildWizard extends DetailsWindow
+{
 
     private static final Logger LOG = Logger.getLogger( EnvironmentBuildWizard.class.getName() );
 
@@ -44,7 +45,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
 
 
     public EnvironmentBuildWizard( final String caption, EnvironmentManagerUI managerUI,
-                                   EnvironmentBuildTask environmentBuildTask ) {
+                                   EnvironmentBuildTask environmentBuildTask )
+    {
         super( caption );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
@@ -52,13 +54,15 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    public void next() {
+    public void next()
+    {
         step++;
         putForm();
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         switch ( step )
         {
             case 1:
@@ -81,32 +85,38 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    public EnvironmentManagerUI getManagerUI() {
+    public EnvironmentManagerUI getManagerUI()
+    {
         return managerUI;
     }
 
 
-    public void setManagerUI( final EnvironmentManagerUI managerUI ) {
+    public void setManagerUI( final EnvironmentManagerUI managerUI )
+    {
         this.managerUI = managerUI;
     }
 
 
-    public EnvironmentBuildTask getEnvironmentBuildTask() {
+    public EnvironmentBuildTask getEnvironmentBuildTask()
+    {
         return environmentBuildTask;
     }
 
 
-    public void setEnvironmentBuildTask( final EnvironmentBuildTask environmentBuildTask ) {
+    public void setEnvironmentBuildTask( final EnvironmentBuildTask environmentBuildTask )
+    {
         this.environmentBuildTask = environmentBuildTask;
     }
 
 
-    public void back() {
+    public void back()
+    {
         step--;
     }
 
 
-    private VerticalLayout genPeersTable() {
+    private VerticalLayout genPeersTable()
+    {
         VerticalLayout vl = new VerticalLayout();
 
         peersTable = new Table();
@@ -131,9 +141,11 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             peersTable.setItemCaptionPropertyId( "name" );
         }
         Button nextButton = new Button( "Next" );
-        nextButton.addClickListener( new Button.ClickListener() {
+        nextButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 if ( selectedPeers().size() > 0 )
                 {
                     next();
@@ -152,7 +164,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    private TabSheet genContainerToPeersTable() {
+    private TabSheet genContainerToPeersTable()
+    {
 
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
@@ -183,9 +196,11 @@ public class EnvironmentBuildWizard extends DetailsWindow {
             }
         }
         Button nextButton = new Button( "Build" );
-        nextButton.addClickListener( new Button.ClickListener() {
+        nextButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( final Button.ClickEvent clickEvent ) {
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
                 createBackgroundEnvironmentBuildProcess();
                 close();
             }
@@ -202,7 +217,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    private List<UUID> selectedPeers() {
+    private List<UUID> selectedPeers()
+    {
         List<UUID> uuids = new ArrayList<>();
         for ( Object itemId : peersTable.getItemIds() )
         {
@@ -217,7 +233,8 @@ public class EnvironmentBuildWizard extends DetailsWindow {
     }
 
 
-    private void createBackgroundEnvironmentBuildProcess() {
+    private void createBackgroundEnvironmentBuildProcess()
+    {
         EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
 
         Map<UUID, Map<String, ContainerBuildMessage>> buildMessageMap =
@@ -241,7 +258,7 @@ public class EnvironmentBuildWizard extends DetailsWindow {
                 cbm.setPeerId( peerUuid );
                 cbm.setCompleteState( false );
                 cbm.setEnvironmentUuid( environmentBuildTask.getUuid() );
-//                buildMessageMap.put(  ).put( templateName, cbm );
+                //                buildMessageMap.put(  ).put( templateName, cbm );
             }
             else
             {

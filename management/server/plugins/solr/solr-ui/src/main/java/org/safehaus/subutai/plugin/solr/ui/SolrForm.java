@@ -5,40 +5,43 @@
  */
 package org.safehaus.subutai.plugin.solr.ui;
 
+
 import java.util.concurrent.ExecutorService;
 
 import javax.naming.NamingException;
-
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.solr.ui.manager.Manager;
 import org.safehaus.subutai.plugin.solr.ui.wizard.Wizard;
 
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
+
+
 /**
  * @author dilshat
  */
-public class SolrForm extends CustomComponent {
+public class SolrForm extends CustomComponent
+{
 
-	public SolrForm(ExecutorService executorService, ServiceLocator serviceLocator) throws NamingException{
-		setSizeFull();
+    public SolrForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
+        setSizeFull();
 
-		VerticalLayout verticalLayout = new VerticalLayout();
-		verticalLayout.setSpacing(true);
-		verticalLayout.setSizeFull();
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSpacing( true );
+        verticalLayout.setSizeFull();
 
-		TabSheet mongoSheet = new TabSheet();
-		mongoSheet.setSizeFull();
-		Manager manager = new Manager(executorService, serviceLocator);
-		Wizard wizard = new Wizard(executorService, serviceLocator);
-		mongoSheet.addTab(wizard.getContent(), "Install");
-		mongoSheet.addTab(manager.getContent(), "Manage");
-		verticalLayout.addComponent(mongoSheet);
+        TabSheet mongoSheet = new TabSheet();
+        mongoSheet.setSizeFull();
+        Manager manager = new Manager( executorService, serviceLocator );
+        Wizard wizard = new Wizard( executorService, serviceLocator );
+        mongoSheet.addTab( wizard.getContent(), "Install" );
+        mongoSheet.addTab( manager.getContent(), "Manage" );
+        verticalLayout.addComponent( mongoSheet );
 
-		setCompositionRoot(verticalLayout);
+        setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
-	}
-
+    }
 }

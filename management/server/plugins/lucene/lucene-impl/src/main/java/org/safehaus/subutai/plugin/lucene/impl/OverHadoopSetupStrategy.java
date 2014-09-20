@@ -1,22 +1,26 @@
 package org.safehaus.subutai.plugin.lucene.impl;
 
+
 import java.util.Iterator;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.lucene.api.Config;
 
 
-class OverHadoopSetupStrategy extends LuceneSetupStrategy {
+class OverHadoopSetupStrategy extends LuceneSetupStrategy
+{
 
-    public OverHadoopSetupStrategy(LuceneImpl manager, Config config, ProductOperation po) {
-        super(manager, config, po);
+    public OverHadoopSetupStrategy( LuceneImpl manager, Config config, ProductOperation po )
+    {
+        super( manager, config, po );
     }
+
 
     @Override
     public ConfigBase setup() throws ClusterSetupException
@@ -27,7 +31,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy {
         if ( manager.getHadoopManager().getCluster( config.getHadoopClusterName() ) == null )
         {
             throw new ClusterSetupException( String.format( "Hadoop cluster '%s' not found\nInstallation aborted",
-                config.getHadoopClusterName() ) );
+                    config.getHadoopClusterName() ) );
         }
 
         // Check if node agent is connected
@@ -36,8 +40,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy {
             Agent node = it.next();
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
-                po.addLog(
-                    String.format( "Node %s is not connected. Omitting this node from installation",
+                po.addLog( String.format( "Node %s is not connected. Omitting this node from installation",
                         node.getHostname() ) );
                 it.remove();
             }
@@ -56,7 +59,8 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy {
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            throw new ClusterSetupException( "Failed to check presence of installed subutai packages\nInstallation aborted" );
+            throw new ClusterSetupException(
+                    "Failed to check presence of installed subutai packages\nInstallation aborted" );
         }
 
         for ( Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); )
@@ -66,15 +70,13 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy {
 
             if ( result.getStdOut().contains( "ksks-lucene" ) )
             {
-                po.addLog(
-                    String.format( "Node %s already has Lucene installed. Omitting this node from installation",
+                po.addLog( String.format( "Node %s already has Lucene installed. Omitting this node from installation",
                         node.getHostname() ) );
                 it.remove();
             }
             else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
             {
-                po.addLog(
-                    String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
+                po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                         node.getHostname() ) );
                 it.remove();
             }
@@ -103,15 +105,16 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy {
             }
             catch ( DBException e )
             {
-                throw new ClusterSetupException( String.format( "Failed to update information in db, %s", e.getMessage() ) );
+                throw new ClusterSetupException(
+                        String.format( "Failed to update information in db, %s", e.getMessage() ) );
             }
         }
         else
         {
-            throw new ClusterSetupException( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+            throw new ClusterSetupException(
+                    String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
 
         return config;
     }
-
 }

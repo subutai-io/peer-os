@@ -16,7 +16,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
-public class UninstallClusterCommand extends OsgiCommandSupport {
+public class UninstallClusterCommand extends OsgiCommandSupport
+{
 
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
             multiValued = false)
@@ -25,27 +26,32 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
     private Tracker tracker;
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager()
+    {
         return cassandraManager;
     }
 
 
-    public void setCassandraManager( Cassandra cassandraManager ) {
+    public void setCassandraManager( Cassandra cassandraManager )
+    {
         this.cassandraManager = cassandraManager;
     }
 
 
-    protected Object doExecute() {
+    protected Object doExecute()
+    {
         UUID uuid = cassandraManager.uninstallCluster( clusterName );
         tracker.printOperationLog( CassandraClusterConfig.PRODUCT_KEY, uuid, 30000 );
         return null;

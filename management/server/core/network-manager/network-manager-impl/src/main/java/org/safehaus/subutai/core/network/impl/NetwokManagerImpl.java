@@ -13,7 +13,8 @@ import com.google.common.base.Preconditions;
 /**
  * Created by daralbaev on 04.04.14.
  */
-public class NetwokManagerImpl implements NetworkManager {
+public class NetwokManagerImpl implements NetworkManager
+{
     private final Commands commands;
 
 

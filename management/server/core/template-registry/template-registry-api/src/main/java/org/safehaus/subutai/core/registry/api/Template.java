@@ -15,7 +15,8 @@ import com.google.gson.annotations.Expose;
 /**
  * Template represents template entry in registry
  */
-public class Template {
+public class Template
+{
 
     //name of template
     @Expose
@@ -211,19 +212,11 @@ public class Template {
 
 
     @Override
-    public String toString()
+    public int hashCode()
     {
-        return "Template{" +
-                "templateName='" + templateName + '\'' +
-                ", parentTemplateName='" + parentTemplateName + '\'' +
-                ", lxcArch='" + lxcArch + '\'' +
-                ", lxcUtsname='" + lxcUtsname + '\'' +
-                ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
-                ", subutaiParent='" + subutaiParent + '\'' +
-                ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
-                ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
-                ", products=" + products +
-                '}';
+        int result = templateName.hashCode();
+        result = 31 * result + lxcArch.hashCode();
+        return result;
     }
 
 
@@ -255,10 +248,18 @@ public class Template {
 
 
     @Override
-    public int hashCode()
+    public String toString()
     {
-        int result = templateName.hashCode();
-        result = 31 * result + lxcArch.hashCode();
-        return result;
+        return "Template{" +
+                "templateName='" + templateName + '\'' +
+                ", parentTemplateName='" + parentTemplateName + '\'' +
+                ", lxcArch='" + lxcArch + '\'' +
+                ", lxcUtsname='" + lxcUtsname + '\'' +
+                ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
+                ", subutaiParent='" + subutaiParent + '\'' +
+                ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
+                ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
+                ", products=" + products +
+                '}';
     }
 }

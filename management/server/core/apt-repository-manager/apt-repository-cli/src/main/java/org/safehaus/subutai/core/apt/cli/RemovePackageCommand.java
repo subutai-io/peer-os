@@ -6,15 +6,15 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "apt", name = "remove-package", description = "Remove package from apt repository by name" )
+@Command(scope = "apt", name = "remove-package", description = "Remove package from apt repository by name")
 public class RemovePackageCommand extends OsgiCommandSupport
 {
-    @Argument( index = 0, name = "package name", required = true, multiValued = false, description = "name of package" )
+    @Argument(index = 0, name = "package name", required = true, multiValued = false, description = "name of package")
     String packageName;
 
     private AptRepositoryManager aptRepositoryManager;

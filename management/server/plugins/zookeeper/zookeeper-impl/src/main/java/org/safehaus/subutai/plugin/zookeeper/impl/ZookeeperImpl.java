@@ -41,7 +41,8 @@ import com.google.common.collect.Sets;
 
 
 //TODO: Add parameter validation
-public class ZookeeperImpl implements Zookeeper {
+public class ZookeeperImpl implements Zookeeper
+{
 
     private final CommandRunner commandRunner;
     private final AgentManager agentManager;
@@ -55,7 +56,8 @@ public class ZookeeperImpl implements Zookeeper {
 
     public ZookeeperImpl( final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
                           final Tracker tracker, final ContainerManager containerManager,
-                          final EnvironmentManager environmentManager, final Hadoop hadoopManager ) {
+                          final EnvironmentManager environmentManager, final Hadoop hadoopManager )
+    {
 
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
         Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
@@ -77,52 +79,62 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public PluginDAO getPluginDAO() {
+    public PluginDAO getPluginDAO()
+    {
         return pluginDAO;
     }
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
-    public UUID installCluster( ZookeeperClusterConfig config ) {
+    public UUID installCluster( ZookeeperClusterConfig config )
+    {
         Preconditions.checkNotNull( config, "Configuration is null" );
 
         AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
@@ -133,7 +145,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID uninstallCluster( String clusterName ) {
+    public UUID uninstallCluster( String clusterName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
 
@@ -145,20 +158,23 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public List<ZookeeperClusterConfig> getClusters() {
+    public List<ZookeeperClusterConfig> getClusters()
+    {
 
         return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, ZookeeperClusterConfig.class );
     }
 
 
     @Override
-    public ZookeeperClusterConfig getCluster( String clusterName ) {
+    public ZookeeperClusterConfig getCluster( String clusterName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class );
     }
 
 
-    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig ) {
+    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig )
+    {
         Preconditions.checkNotNull( config, "Accumulo configuration is null" );
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop configuration is null" );
 
@@ -168,7 +184,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID startNode( String clusterName, String lxcHostName ) {
+    public UUID startNode( String clusterName, String lxcHostName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
@@ -179,7 +196,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID stopNode( String clusterName, String lxcHostName ) {
+    public UUID stopNode( String clusterName, String lxcHostName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
@@ -190,7 +208,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID checkNode( String clusterName, String lxcHostName ) {
+    public UUID checkNode( String clusterName, String lxcHostName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
@@ -201,7 +220,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID addNode( String clusterName ) {
+    public UUID addNode( String clusterName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
 
@@ -211,7 +231,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID addNode( String clusterName, String lxcHostname ) {
+    public UUID addNode( String clusterName, String lxcHostname )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
 
@@ -222,7 +243,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID destroyNode( String clusterName, String lxcHostName ) {
+    public UUID destroyNode( String clusterName, String lxcHostName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
 
@@ -234,7 +256,8 @@ public class ZookeeperImpl implements Zookeeper {
 
 
     @Override
-    public UUID addProperty( String clusterName, String fileName, String propertyName, String propertyValue ) {
+    public UUID addProperty( String clusterName, String fileName, String propertyName, String propertyValue )
+    {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fileName ), "File name is null or empty" );
@@ -249,7 +272,8 @@ public class ZookeeperImpl implements Zookeeper {
 
 
     @Override
-    public UUID removeProperty( String clusterName, String fileName, String propertyName ) {
+    public UUID removeProperty( String clusterName, String fileName, String propertyName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fileName ), "File name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( propertyName ), "Property name is null or empty" );
@@ -264,7 +288,8 @@ public class ZookeeperImpl implements Zookeeper {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
                                                          final ZookeeperClusterConfig config,
-                                                         final ProductOperation po ) {
+                                                         final ProductOperation po )
+    {
         Preconditions.checkNotNull( config, "Zookeeper cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );
         if ( config.getSetupType() != SetupType.OVER_HADOOP )
@@ -290,7 +315,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config ) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config )
+    {
         Preconditions.checkNotNull( config, "Zookeeper cluster config is null" );
 
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();

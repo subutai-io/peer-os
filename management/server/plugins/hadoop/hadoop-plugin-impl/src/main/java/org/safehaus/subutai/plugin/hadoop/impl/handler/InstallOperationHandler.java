@@ -1,12 +1,10 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 
-import java.util.Iterator;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -15,12 +13,14 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import com.google.common.base.Strings;
 
 
-public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl> {
+public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl>
+{
     private final ProductOperation productOperation;
     private final HadoopClusterConfig config;
 
 
-    public InstallOperationHandler( HadoopImpl manager, HadoopClusterConfig config ) {
+    public InstallOperationHandler( HadoopImpl manager, HadoopClusterConfig config )
+    {
         super( manager, config.getClusterName() );
         this.config = config;
         productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
@@ -29,21 +29,25 @@ public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl
 
 
     @Override
-    public UUID getTrackerId() {
+    public UUID getTrackerId()
+    {
         return productOperation.getId();
     }
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 config.getCountOfSlaveNodes() == null ||
-                config.getCountOfSlaveNodes() <= 0 ) {
+                config.getCountOfSlaveNodes() <= 0 )
+        {
             productOperation.addLogFailed( "Malformed configuration\nInstallation aborted" );
             return;
         }
 
-        if ( manager.getCluster( config.getClusterName() ) != null ) {
+        if ( manager.getCluster( config.getClusterName() ) != null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                     config.getClusterName() ) );
             return;
@@ -53,15 +57,18 @@ public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl
     }
 
 
-    private void setup() {
+    private void setup()
+    {
 
-        try {
+        try
+        {
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( productOperation, config );
             setupStrategy.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( ClusterSetupException e ) {
+        catch ( ClusterSetupException e )
+        {
             productOperation.addLogFailed(
                     String.format( "Failed to setup Hadoop cluster %s : %s", clusterName, e.getMessage() ) );
         }

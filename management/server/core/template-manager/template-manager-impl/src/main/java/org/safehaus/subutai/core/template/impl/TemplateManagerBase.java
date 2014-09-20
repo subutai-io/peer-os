@@ -8,7 +8,8 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
 
-public abstract class TemplateManagerBase implements TemplateManager {
+public abstract class TemplateManagerBase implements TemplateManager
+{
 
     CommandRunner commandRunner;
     AgentManager agentManager;

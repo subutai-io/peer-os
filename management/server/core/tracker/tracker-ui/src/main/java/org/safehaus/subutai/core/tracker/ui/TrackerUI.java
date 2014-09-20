@@ -1,17 +1,19 @@
 package org.safehaus.subutai.core.tracker.ui;
 
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
-public class TrackerUI implements PortalModule {
+import com.vaadin.ui.Component;
+
+
+public class TrackerUI implements PortalModule
+{
 
     public static final String MODULE_IMAGE = "tracker.png";
     public static final String MODULE_NAME = "Tracker";
@@ -20,50 +22,59 @@ public class TrackerUI implements PortalModule {
     private ExecutorService executor;
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         tracker = null;
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return TrackerUI.MODULE_NAME;
     }
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return TrackerUI.MODULE_NAME;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( TrackerUI.MODULE_IMAGE, this );
     }
 
 
     @Override
-    public Component createComponent() {
+    public Component createComponent()
+    {
         trackerForm = new TrackerForm( tracker, executor );
         trackerForm.refreshSources();
         trackerForm.startTracking();
         return trackerForm;
     }
 
+
     @Override
-    public Boolean isCorePlugin() {
+    public Boolean isCorePlugin()
+    {
         return true;
     }
 }

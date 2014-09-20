@@ -1,7 +1,8 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 
-import com.google.common.base.Strings;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -10,14 +11,18 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
-import java.util.UUID;
+import com.google.common.base.Strings;
 
 
-public class InstallOperationHandler extends AbstractOperationHandler<ElasticsearchImpl > {
+public class InstallOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+{
 
     private final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration;
 
-    public InstallOperationHandler( ElasticsearchImpl manager, ElasticsearchClusterConfiguration elasticsearchClusterConfiguration ) {
+
+    public InstallOperationHandler( ElasticsearchImpl manager,
+                                    ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    {
 
         super( manager, elasticsearchClusterConfiguration.getClusterName() );
         this.elasticsearchClusterConfiguration = elasticsearchClusterConfiguration;
@@ -27,19 +32,23 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
 
 
     @Override
-    public UUID getTrackerId() {
+    public UUID getTrackerId()
+    {
         return productOperation.getId();
     }
 
 
     @Override
-    public void run() {
-        if ( Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getClusterName() ) ) {
+    public void run()
+    {
+        if ( Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getClusterName() ) )
+        {
             productOperation.addLogFailed( "Malformed configuration" );
             return;
         }
 
-        if ( manager.getCluster( clusterName ) != null ) {
+        if ( manager.getCluster( clusterName ) != null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
             return;
         }
@@ -48,21 +57,24 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
     }
 
 
-    private void setupStandalone() {
+    private void setupStandalone()
+    {
 
-        try {
-            Environment env = manager.getEnvironmentManager()
-                                     .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( elasticsearchClusterConfiguration ) );
+        try
+        {
+            Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(
+                    manager.getDefaultEnvironmentBlueprint( elasticsearchClusterConfiguration ) );
 
-            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, elasticsearchClusterConfiguration, productOperation );
+            ClusterSetupStrategy clusterSetupStrategy =
+                    manager.getClusterSetupStrategy( env, elasticsearchClusterConfiguration, productOperation );
             clusterSetupStrategy.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( EnvironmentBuildException | ClusterSetupException e ) {
+        catch ( EnvironmentBuildException | ClusterSetupException e )
+        {
             productOperation.addLogFailed(
                     String.format( "Failed to setup Elasticsearch cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
-
 }

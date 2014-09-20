@@ -13,13 +13,15 @@ import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class InstallHandler extends AbstractOperationHandler<HBaseImpl> {
+public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
+{
 
     private ProductOperation po;
     private HBaseClusterConfig config;
 
 
-    public InstallHandler( final HBaseImpl manager, final HBaseClusterConfig config ) {
+    public InstallHandler( final HBaseImpl manager, final HBaseClusterConfig config )
+    {
         super( manager, config.getClusterName() );
         this.config = config;
         po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
@@ -28,32 +30,39 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl> {
 
 
     @Override
-    public void run() {
-        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+    public void run()
+    {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
             setupOverHadoop();
         }
-        else {
+        else
+        {
             setupWithHadoop();
         }
     }
 
 
-    private void setupOverHadoop() {
-        try {
+    private void setupOverHadoop()
+    {
+        try
+        {
             //setup up Accumulo cluster
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, productOperation );
             setupStrategy.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( ClusterSetupException e ) {
+        catch ( ClusterSetupException e )
+        {
             productOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 
 
-    private void setupWithHadoop() {
+    private void setupWithHadoop()
+    {
 
     }
 }

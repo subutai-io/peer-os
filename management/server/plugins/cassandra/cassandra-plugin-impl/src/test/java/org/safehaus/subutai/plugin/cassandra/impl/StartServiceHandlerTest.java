@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -8,7 +9,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StartServiceHandler;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 
@@ -18,11 +18,15 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class StartServiceHandlerTest {
+
+public class StartServiceHandlerTest
+{
     CassandraImpl cassandraMock;
 
+
     @Before
-    public void setup(){
+    public void setup()
+    {
         cassandraMock = mock( CassandraImpl.class );
         when( cassandraMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
         when( cassandraMock.getCommandRunner() ).thenReturn( mock( CommandRunner.class ) );
@@ -31,9 +35,12 @@ public class StartServiceHandlerTest {
         when( cassandraMock.getCluster( anyString() ) ).thenReturn( null );
     }
 
+
     @Test
-    public void testWithoutCluster() throws DBException {
-        AbstractOperationHandler operationHandler = new StartServiceHandler( cassandraMock, "test-cluster", "test-node" );
+    public void testWithoutCluster() throws DBException
+    {
+        AbstractOperationHandler operationHandler =
+                new StartServiceHandler( cassandraMock, "test-cluster", "test-node" );
         operationHandler.run();
         assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );

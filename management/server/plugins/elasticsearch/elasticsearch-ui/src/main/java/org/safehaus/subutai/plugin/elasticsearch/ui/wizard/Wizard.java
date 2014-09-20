@@ -7,8 +7,8 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -16,19 +16,20 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class Wizard {
+public class Wizard
+{
 
     private final VerticalLayout verticalLayout;
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final Elasticsearch elasticsearch;
     GridLayout grid;
     private int step = 1;
     private ElasticsearchClusterConfiguration config = new ElasticsearchClusterConfiguration();
 
-    private final ExecutorService executorService;
-    private final Tracker tracker;
-    private final Elasticsearch elasticsearch;
 
-
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.elasticsearch = serviceLocator.getService( Elasticsearch.class );
         this.executorService = executorService;
@@ -46,22 +47,28 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         verticalLayout.removeAllComponents();
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 verticalLayout.addComponent( new StepStart( this ) );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 verticalLayout.addComponent( new ConfigurationStep( this ) );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 verticalLayout.addComponent( new VerificationStep( elasticsearch, executorService, tracker, this ) );
                 break;
             }
-            default: {
+            default:
+            {
                 step = 1;
                 verticalLayout.addComponent( new StepStart( this ) );
                 break;
@@ -70,35 +77,41 @@ public class Wizard {
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void cancel() {
+    protected void cancel()
+    {
         step = 1;
         putForm();
     }
 
 
-    public ElasticsearchClusterConfiguration getConfig() {
+    public ElasticsearchClusterConfiguration getConfig()
+    {
         return config;
     }
 
 
-    public void init() {
+    public void init()
+    {
         step = 1;
         config = new ElasticsearchClusterConfiguration();
         putForm();

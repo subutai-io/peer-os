@@ -7,23 +7,26 @@ import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
 
-public class CommandsTest {
+public class CommandsTest
+{
 
     private static Commands commands;
 
+
     @BeforeClass
-    public static void setUp() {
+    public static void setUp()
+    {
         commands = new Commands( new CommandRunnerMock() );
     }
 
 
     @Test
-    public void getStartCommand() {
+    public void getStartCommand()
+    {
         Command command = commands.getStartCommand( null );
 
         assertNotNull( command );
@@ -32,7 +35,8 @@ public class CommandsTest {
 
 
     @Test
-    public void getStopCommand() {
+    public void getStopCommand()
+    {
         Command command = commands.getStopCommand( null );
 
         assertNotNull( command );
@@ -41,7 +45,8 @@ public class CommandsTest {
 
 
     @Test
-    public void getStatusCommand() {
+    public void getStatusCommand()
+    {
         Command command = commands.getStatusCommand( null );
 
         assertNotNull( command );

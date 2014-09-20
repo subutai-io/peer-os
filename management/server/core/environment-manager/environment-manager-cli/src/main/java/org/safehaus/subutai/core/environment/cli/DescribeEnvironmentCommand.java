@@ -1,11 +1,12 @@
 package org.safehaus.subutai.core.environment.cli;
 
 
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
 /**
@@ -13,7 +14,8 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
  */
 @Command(scope = "environment", name = "describe", description = "Command to describe environment",
         detailedDescription = "Command to describe environment by name")
-public class DescribeEnvironmentCommand extends OsgiCommandSupport {
+public class DescribeEnvironmentCommand extends OsgiCommandSupport
+{
 
     EnvironmentManager environmentManager;
 
@@ -22,20 +24,23 @@ public class DescribeEnvironmentCommand extends OsgiCommandSupport {
     String environmentName;
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
 
-    public void setEnvironmentManager(final EnvironmentManager environmentManager) {
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
         this.environmentManager = environmentManager;
     }
 
 
     @Override
-    protected Object doExecute() throws Exception {
-        Environment environment = environmentManager.getEnvironmentInfo(environmentName);
-        System.out.println(environment.toString());
+    protected Object doExecute() throws Exception
+    {
+        Environment environment = environmentManager.getEnvironmentInfo( environmentName );
+        System.out.println( environment.toString() );
         return null;
     }
 }

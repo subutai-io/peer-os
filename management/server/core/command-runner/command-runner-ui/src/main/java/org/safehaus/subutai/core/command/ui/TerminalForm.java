@@ -40,7 +40,8 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Command Runner UI - Terminal
  */
-public class TerminalForm extends CustomComponent implements Disposable {
+public class TerminalForm extends CustomComponent implements Disposable
+{
 
     final CommandRunner commandRunner;
     final AgentManager agentManager;
@@ -55,7 +56,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     private VerticalLayout controls;
 
 
-    public TerminalForm( final CommandRunner commandRunner, final AgentManager agentManager ) {
+    public TerminalForm( final CommandRunner commandRunner, final AgentManager agentManager )
+    {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
 
@@ -95,7 +97,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private void initProgram() {
+    private void initProgram()
+    {
         Label programLbl = new Label( "Program" );
         programTxtFld = new TextField();
         programTxtFld.setId( "pwd" );
@@ -106,7 +109,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private void initCommand() {
+    private void initCommand()
+    {
         Label workDirLbl = new Label( "Cwd" );
         workDirTxtFld = new TextField();
         workDirTxtFld.setValue( "/" );
@@ -115,7 +119,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private void initTimeout() {
+    private void initTimeout()
+    {
         Label timeoutLbl = new Label( "Timeout" );
         timeoutTxtFld = new TextField();
         timeoutTxtFld.setId( "timeout_txt" );
@@ -126,7 +131,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private void initRequestType() {
+    private void initRequestType()
+    {
         Label requestTypeLabel = new Label( "Req Type" );
         controls.addComponent( requestTypeLabel );
         requestTypeCombo = new ComboBox( null,
@@ -140,7 +146,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private void initIndicator() {
+    private void initIndicator()
+    {
         indicator = new Label();
         indicator.setId( "terminal_indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
@@ -152,16 +159,20 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    public void sendCommand( String command ) {
+    public void sendCommand( String command )
+    {
         Set<Agent> agents = checkAgents();
-        if ( agents != null && validateInputs( command ) ) {
+        if ( agents != null && validateInputs( command ) )
+        {
             RequestBuilder requestBuilder = new RequestBuilder( command );
 
-            if ( requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST ) {
+            if ( requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
+            {
                 requestBuilder.withPid( Integer.parseInt( programTxtFld.getValue() ) );
                 requestBuilder.withType( RequestType.TERMINATE_REQUEST );
             }
-            else if ( requestTypeCombo.getValue() == RequestType.PS_REQUEST ) {
+            else if ( requestTypeCombo.getValue() == RequestType.PS_REQUEST )
+            {
                 requestBuilder.withType( RequestType.PS_REQUEST );
             }
 
@@ -174,9 +185,11 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private Set<Agent> checkAgents() {
+    private Set<Agent> checkAgents()
+    {
         Set<Agent> agents = agentTree.getSelectedAgents();
-        if ( agents.isEmpty() ) {
+        if ( agents.isEmpty() )
+        {
             agents = null;
             show( "Please, select nodes\\n" );
         }
@@ -185,25 +198,37 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private boolean validateInputs( String command ) {
+    private void show( String notification )
+    {
+        commandOutputTxtArea.setOutputPrompt( notification );
+    }
 
-        if ( Strings.isNullOrEmpty( command ) ) {
+
+    private boolean validateInputs( String command )
+    {
+
+        if ( Strings.isNullOrEmpty( command ) )
+        {
             show( "Please, enter command\\n" );
             return false;
         }
 
-        if ( Strings.isNullOrEmpty( timeoutTxtFld.getValue() ) || !StringUtil.isNumeric( timeoutTxtFld.getValue() ) ) {
+        if ( Strings.isNullOrEmpty( timeoutTxtFld.getValue() ) || !StringUtil.isNumeric( timeoutTxtFld.getValue() ) )
+        {
             show( "Please, enter integer timeout value\\n" );
             return false;
         }
-        else {
+        else
+        {
             int timeout = Integer.parseInt( timeoutTxtFld.getValue() );
-            if ( timeout <= 0 || timeout > Common.MAX_COMMAND_TIMEOUT_SEC ) {
+            if ( timeout <= 0 || timeout > Common.MAX_COMMAND_TIMEOUT_SEC )
+            {
                 show( "Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC + "\\n" );
             }
         }
 
-        if ( Strings.isNullOrEmpty( workDirTxtFld.getValue() ) ) {
+        if ( Strings.isNullOrEmpty( workDirTxtFld.getValue() ) )
+        {
             show( "Please, enter working directory\\n" );
             return false;
         }
@@ -212,24 +237,31 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private void createCommand( RequestBuilder requestBuilder, Set<Agent> agents ) {
+    private void createCommand( RequestBuilder requestBuilder, Set<Agent> agents )
+    {
         final Command command = commandRunner.createCommand( requestBuilder, agents );
         final String[] output = { "" };
         indicator.setVisible( true );
         taskCount.incrementAndGet();
-        executor.execute( new Runnable() {
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
-                commandRunner.runCommand( command, new CommandCallback() {
+            public void run()
+            {
+                commandRunner.runCommand( command, new CommandCallback()
+                {
 
                     @Override
-                    public void onResponse( Response response, AgentResult agentResult, Command command ) {
+                    public void onResponse( Response response, AgentResult agentResult, Command command )
+                    {
                         StringBuilder out = new StringBuilder( "" );
 
-                        if ( !Strings.isNullOrEmpty( response.getStdOut() ) ) {
+                        if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
+                        {
                             out.append( response.getStdOut() );
                         }
-                        if ( !Strings.isNullOrEmpty( response.getStdErr() ) ) {
+                        if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
+                        {
                             out.append( response.getStdErr() );
                         }
 
@@ -238,7 +270,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
                 } );
 
                 taskCount.decrementAndGet();
-                if ( taskCount.get() == 0 ) {
+                if ( taskCount.get() == 0 )
+                {
                     show( output[0] );
                     indicator.setVisible( false );
                 }
@@ -247,12 +280,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     }
 
 
-    private void show( String notification ) {
-        commandOutputTxtArea.setOutputPrompt( notification );
-    }
-
-
-    public void dispose() {
+    public void dispose()
+    {
         agentTree.dispose();
         executor.shutdown();
     }

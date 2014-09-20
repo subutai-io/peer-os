@@ -7,7 +7,8 @@ import java.util.Set;
 /**
  * A wrapper interface that wraps LXC and ZFS command scripts on physical hosts.
  */
-public interface TemplateManager {
+public interface TemplateManager
+{
 
     public String getMasterTemplateName();
 

@@ -6,21 +6,21 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Displays the last log entries
  */
-@Command( scope = "agent", name = "get-lxc-agents-by-parent-hostname",
-        description = "get LXC agents by parent hostname" )
+@Command(scope = "agent", name = "get-lxc-agents-by-parent-hostname",
+        description = "get LXC agents by parent hostname")
 public class GetLxcAgentsByParentHostnameCommand extends OsgiCommandSupport
 {
 
-    @Argument( index = 0, name = "parentHostname", required = true, multiValued = false,
-            description = "Parent hostname" )
+    @Argument(index = 0, name = "parentHostname", required = true, multiValued = false,
+            description = "Parent hostname")
     String parentHostname;
     private AgentManager agentManager;
 

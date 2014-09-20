@@ -21,13 +21,15 @@ import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 
-public class RestService {
+public class RestService
+{
 
     private static final String OPERATION_ID = "OPERATION_ID";
     private Elasticsearch elasticsearch;
 
 
-    public void setElasticsearch( final Elasticsearch elasticsearch ) {
+    public void setElasticsearch( final Elasticsearch elasticsearch )
+    {
         this.elasticsearch = elasticsearch;
     }
 
@@ -35,7 +37,8 @@ public class RestService {
     @GET
     @Path("clusters")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response listClusters() {
+    public Response listClusters()
+    {
 
         List<ElasticsearchClusterConfiguration> elasticsearchClusterConfigurationList = elasticsearch.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
@@ -59,7 +62,8 @@ public class RestService {
                                     @QueryParam("numberOfMasterNodes") int numberOfMasterNodes,
                                     @QueryParam("numberOfDataNodes") int numberOfDataNodes,
                                     @QueryParam("numberOfShards") int numberOfShards,
-                                    @QueryParam("numberOfReplicas") int numberOfReplicas ) {
+                                    @QueryParam("numberOfReplicas") int numberOfReplicas )
+    {
 
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = new ElasticsearchClusterConfiguration();
         elasticsearchClusterConfiguration.setClusterName( clusterName );
@@ -79,7 +83,8 @@ public class RestService {
     @DELETE
     @Path("clusters/{clusterName}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName ) {
+    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    {
 
         UUID uuid = elasticsearch.uninstallCluster( clusterName );
 
@@ -91,7 +96,8 @@ public class RestService {
     @GET
     @Path("clusters/{clusterName}/nodes")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response checkAllNodes( @PathParam("clusterName") String clusterName ) {
+    public Response checkAllNodes( @PathParam("clusterName") String clusterName )
+    {
 
         UUID uuid = elasticsearch.checkAllNodes( clusterName );
 
@@ -103,7 +109,8 @@ public class RestService {
     @PUT
     @Path("clusters/{clusterName}/nodes/start")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response startAllNodes( @PathParam("clusterName") String clusterName ) {
+    public Response startAllNodes( @PathParam("clusterName") String clusterName )
+    {
 
         UUID uuid = elasticsearch.startAllNodes( clusterName );
 
@@ -115,7 +122,8 @@ public class RestService {
     @PUT
     @Path("clusters/{clusterName}/nodes/stop")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response stopAllNodes( @PathParam("clusterName") String clusterName ) {
+    public Response stopAllNodes( @PathParam("clusterName") String clusterName )
+    {
 
         UUID uuid = elasticsearch.stopAllNodes( clusterName );
 
@@ -127,7 +135,8 @@ public class RestService {
     @POST
     @Path("clusters/{clusterName}/nodes/{node}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node ) {
+    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    {
         UUID uuid = elasticsearch.addNode( clusterName, node );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
@@ -138,7 +147,8 @@ public class RestService {
     @DELETE
     @Path("clusters/{clusterName}/nodes/{node}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node ) {
+    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    {
         UUID uuid = elasticsearch.destroyNode( clusterName, node );
 
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );

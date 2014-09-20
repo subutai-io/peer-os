@@ -1,13 +1,14 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
-import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
+
+import com.google.common.collect.Sets;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImpl>
@@ -20,7 +21,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-            String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
+                String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
 
@@ -31,7 +32,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
         if ( config == null )
         {
             productOperation.addLogFailed(
-                String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -39,14 +40,14 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
         if ( agent == null )
         {
             productOperation.addLogFailed(
-                String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
         if ( !config.getNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
-                String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
@@ -60,10 +61,10 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             if ( result.getExitCode() != null && result.getExitCode() == 0 )
             {
                 if ( result.getStdOut().contains(
-                    String.format( "Package %s is not installed, so not removed", Config.PRODUCT_PACKAGE ) ) )
+                        String.format( "Package %s is not installed, so not removed", Config.PRODUCT_PACKAGE ) ) )
                 {
                     productOperation.addLog(
-                        String.format( "Pig is not installed, so not removed on node %s", agent.getHostname() ) );
+                            String.format( "Pig is not installed, so not removed on node %s", agent.getHostname() ) );
                 }
                 else
                 {
@@ -73,15 +74,15 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             else
             {
                 productOperation
-                    .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
+                        .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
             }
 
             config.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
             if ( config.getNodes().isEmpty() ?
-                manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) :
-                manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
+                 manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) :
+                 manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
             {
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
             }

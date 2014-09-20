@@ -1,10 +1,12 @@
 package org.safehaus.subutai.plugin.common.mock;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import java.util.Date;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+
 
 public class ProductOperationMock implements ProductOperation
 {
@@ -12,45 +14,61 @@ public class ProductOperationMock implements ProductOperation
 
     private ProductOperationState state = ProductOperationState.RUNNING;
 
+
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         return null;
     }
 
+
     @Override
-    public UUID getId() {
+    public UUID getId()
+    {
         return null;
     }
 
+
     @Override
-    public String getLog() {
+    public String getLog()
+    {
         return log.toString();
     }
 
+
     @Override
-    public Date createDate() {
+    public Date createDate()
+    {
         return null;
     }
 
+
     @Override
-    public ProductOperationState getState() {
+    public ProductOperationState getState()
+    {
         return state;
     }
 
-    @Override
-    public void addLog(String logString) {
-        log.append(logString);
-    }
 
     @Override
-    public void addLogDone(String logString) {
-        addLog(logString);
+    public void addLog( String logString )
+    {
+        log.append( logString );
+    }
+
+
+    @Override
+    public void addLogDone( String logString )
+    {
+        addLog( logString );
         state = ProductOperationState.SUCCEEDED;
     }
 
+
     @Override
-    public void addLogFailed(String logString) {
-        addLog(logString);
+    public void addLogFailed( String logString )
+    {
+        addLog( logString );
         state = ProductOperationState.FAILED;
     }
 }

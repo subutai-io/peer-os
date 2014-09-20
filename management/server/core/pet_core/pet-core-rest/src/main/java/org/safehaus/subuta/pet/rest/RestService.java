@@ -9,17 +9,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 
-public interface RestService {
+public interface RestService
+{
 
     @GET
-    @Path( "welcome/{name}" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public String welcome( @PathParam( "name" ) String name );
+    @Path("welcome/{name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String welcome( @PathParam("name") String name );
 
     @POST
-    @Path( "somePost" )
+    @Path("somePost")
     @Produces(MediaType.APPLICATION_JSON)
     public void somePost();
-
-
 }

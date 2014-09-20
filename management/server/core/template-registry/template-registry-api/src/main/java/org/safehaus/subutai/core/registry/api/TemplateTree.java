@@ -13,7 +13,8 @@ import com.google.common.base.Strings;
  * TemplateTree is used for storing templates in genealogical tree. This class is used by UI modules to visualize
  * template hierarchy.
  */
-public class TemplateTree {
+public class TemplateTree
+{
 
     Map<String, List<Template>> parentChild = new HashMap<>();
     Map<String, String> childParent = new HashMap<>();
@@ -36,8 +37,9 @@ public class TemplateTree {
             parentChild.put( parentTemplateName, children );
         }
         children.add( template );
-        childParent.put( String.format( "%s-%s", template.getTemplateName().toLowerCase(),
-                        template.getLxcArch().toLowerCase() ), parentTemplateName );
+        childParent.put( String
+                .format( "%s-%s", template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() ),
+                parentTemplateName );
     }
 
 

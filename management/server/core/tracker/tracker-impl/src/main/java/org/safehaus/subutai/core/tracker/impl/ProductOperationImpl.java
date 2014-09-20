@@ -20,7 +20,8 @@ import com.google.common.base.Strings;
 /**
  * This is an implementaion of ProductOperation
  */
-public class ProductOperationImpl implements ProductOperation {
+public class ProductOperationImpl implements ProductOperation
+{
 
     /**
      * product operation id

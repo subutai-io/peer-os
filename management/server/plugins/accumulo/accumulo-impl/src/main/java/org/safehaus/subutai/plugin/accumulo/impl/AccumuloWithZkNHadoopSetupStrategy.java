@@ -5,17 +5,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -24,7 +24,8 @@ import com.google.common.base.Strings;
 /**
  * Accumulo cluster setup strategy using environment
  */
-public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy {
+public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
+{
 
     private final Environment environment;
     private final AccumuloImpl accumuloManager;
@@ -34,7 +35,8 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy 
 
     public AccumuloWithZkNHadoopSetupStrategy( final Environment environment,
                                                final AccumuloClusterConfig accumuloClusterConfig,
-                                               final ProductOperation po, final AccumuloImpl accumuloManager ) {
+                                               final ProductOperation po, final AccumuloImpl accumuloManager )
+    {
 
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
@@ -49,38 +51,45 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy 
 
 
     @Override
-    public AccumuloClusterConfig setup() throws ClusterSetupException {
+    public AccumuloClusterConfig setup() throws ClusterSetupException
+    {
         if ( Strings.isNullOrEmpty( accumuloClusterConfig.getClusterName() ) ||
                 Strings.isNullOrEmpty( accumuloClusterConfig.getInstanceName() ) ||
-                Strings.isNullOrEmpty( accumuloClusterConfig.getPassword() ) ) {
+                Strings.isNullOrEmpty( accumuloClusterConfig.getPassword() ) )
+        {
             po.addLogFailed( "Malformed configuration" );
         }
 
-        if ( accumuloManager.getCluster( accumuloClusterConfig.getClusterName() ) != null ) {
+        if ( accumuloManager.getCluster( accumuloClusterConfig.getClusterName() ) != null )
+        {
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists", accumuloClusterConfig.getClusterName() ) );
         }
 
         HadoopClusterConfig hadoopClusterConfig =
                 accumuloManager.getHadoopManager().getCluster( accumuloClusterConfig.getHadoopClusterName() );
-        if ( hadoopClusterConfig == null ) {
+        if ( hadoopClusterConfig == null )
+        {
             throw new ClusterSetupException( String.format( "Hadoop cluster with name '%s' not found",
                     accumuloClusterConfig.getHadoopClusterName() ) );
         }
 
         ZookeeperClusterConfig zookeeperClusterConfig =
                 accumuloManager.getZkManager().getCluster( accumuloClusterConfig.getZookeeperClusterName() );
-        if ( zookeeperClusterConfig == null ) {
+        if ( zookeeperClusterConfig == null )
+        {
             throw new ClusterSetupException( String.format( "Zookeeper cluster with name '%s' not found",
                     accumuloClusterConfig.getZookeeperClusterName() ) );
         }
 
         //get ZK nodes with Hadoop installed from environment
         Set<Agent> accumuloAgents = new HashSet<>();
-        for ( Node node : environment.getNodes() ) {
+        for ( Node node : environment.getNodes() )
+        {
             if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
                     && node.getTemplate().getProducts()
-                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
+                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+            {
                 accumuloAgents.add( node.getAgent() );
             }
         }
@@ -89,7 +98,8 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy 
                 AccumuloClusterConfig.DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY + accumuloClusterConfig
                         .getNumberOfTracers() + accumuloClusterConfig.getNumberOfSlaves();
 
-        if ( numberOfNeededAccumuloNodes > accumuloAgents.size() ) {
+        if ( numberOfNeededAccumuloNodes > accumuloAgents.size() )
+        {
             throw new ClusterSetupException( String.format(
                     "Number of needed Accumulo nodes (%d) exceeds number of available nodes with Hadoop installed (%d)",
                     numberOfNeededAccumuloNodes, accumuloAgents.size() ) );
@@ -103,21 +113,25 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy 
         accumuloClusterConfig.setMasterNode( agentIterator.next() );
         accumuloClusterConfig.setGcNode( agentIterator.next() );
         accumuloClusterConfig.setMonitor( agentIterator.next() );
-        for ( int i = 0; i < accumuloClusterConfig.getNumberOfTracers(); i++ ) {
+        for ( int i = 0; i < accumuloClusterConfig.getNumberOfTracers(); i++ )
+        {
             accumuloTracerNodes.add( agentIterator.next() );
         }
-        for ( int i = 0; i < accumuloClusterConfig.getNumberOfSlaves(); i++ ) {
+        for ( int i = 0; i < accumuloClusterConfig.getNumberOfSlaves(); i++ )
+        {
             accumuloSlaveNodes.add( agentIterator.next() );
         }
 
         accumuloClusterConfig.setTracers( accumuloTracerNodes );
         accumuloClusterConfig.setSlaves( accumuloSlaveNodes );
 
-        try {
+        try
+        {
             new ClusterConfiguration( po, accumuloManager )
                     .configureCluster( accumuloClusterConfig, zookeeperClusterConfig );
         }
-        catch ( ClusterConfigurationException e ) {
+        catch ( ClusterConfigurationException e )
+        {
             throw new ClusterSetupException( e.getMessage() );
         }
 

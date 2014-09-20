@@ -19,7 +19,8 @@ import com.google.common.base.Preconditions;
 /**
  * Created by daralbaev on 03.04.14.
  */
-public class Commands {
+public class Commands
+{
 
     private final CommandRunner commandRunner;
 

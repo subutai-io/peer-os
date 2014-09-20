@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
+
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
@@ -16,13 +17,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class UninstallOperationHandlerTest {
+
+public class UninstallOperationHandlerTest
+{
     @Test
-    public void testWithoutCluster() {
+    public void testWithoutCluster()
+    {
         ZookeeperImpl zookeeperMock = mock( ZookeeperImpl.class );
         when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );
         when( zookeeperMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
-        when( zookeeperMock.getCommandRunner() ).thenReturn( mock ( CommandRunner.class ) );
+        when( zookeeperMock.getCommandRunner() ).thenReturn( mock( CommandRunner.class ) );
         when( zookeeperMock.getTracker() ).thenReturn( new TrackerMock() );
         when( zookeeperMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
         when( zookeeperMock.getHadoopManager() ).thenReturn( mock( Hadoop.class ) );

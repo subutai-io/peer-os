@@ -6,14 +6,14 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Displays the last log entries
  */
-@Command( scope = "agent", name = "get-physical-agents", description = "get the list of physical-agents" )
+@Command(scope = "agent", name = "get-physical-agents", description = "get the list of physical-agents")
 public class GetPhysicalAgentsCommand extends OsgiCommandSupport
 {
 

@@ -18,7 +18,8 @@ import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 /**
  * @author dilshat
  */
-public class CheckTask implements Runnable {
+public class CheckTask implements Runnable
+{
 
     private final String clusterName, lxcHostname;
     private final CompleteEvent completeEvent;
@@ -28,7 +29,8 @@ public class CheckTask implements Runnable {
 
 
     public CheckTask( Accumulo accumulo, Tracker tracker, String clusterName, String lxcHostname,
-                      CompleteEvent completeEvent ) {
+                      CompleteEvent completeEvent )
+    {
         this.accumulo = accumulo;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -37,26 +39,33 @@ public class CheckTask implements Runnable {
     }
 
 
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = accumulo.checkNode( clusterName, lxcHostname );
 
         long start = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( AccumuloClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 ) {
+            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
+            {
                 break;
             }
         }

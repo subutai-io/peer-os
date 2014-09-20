@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Needed mostly for testing FileTracker
  */
-@Command( scope = "file-tracker", name = "test" )
+@Command(scope = "file-tracker", name = "test")
 public class CliTest extends OsgiCommandSupport implements ResponseListener
 {
 

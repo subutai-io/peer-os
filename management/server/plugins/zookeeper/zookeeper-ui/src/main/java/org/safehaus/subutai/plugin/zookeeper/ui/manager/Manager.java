@@ -50,21 +50,23 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 
-public class Manager {
+public class Manager
+{
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private ZookeeperClusterConfig config;
     private final Hadoop hadoop;
     private final Zookeeper zookeeper;
     private final CommandRunner commandRunner;
     private final Tracker tracker;
     private final AgentManager agentManager;
     private final ExecutorService executorService;
+    private ZookeeperClusterConfig config;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.executorService = executorService;
@@ -94,10 +96,12 @@ public class Manager {
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 config = ( ZookeeperClusterConfig ) event.getProperty().getValue();
                 refreshUI();
                 checkAll();
@@ -107,10 +111,12 @@ public class Manager {
 
         Button refreshClustersBtn = new Button( "Refresh Clusters" );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 refreshClustersInfo();
             }
         } );
@@ -118,10 +124,12 @@ public class Manager {
 
         Button checkAllBtn = new Button( "Check All" );
         checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener() {
+        checkAllBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 checkNodesStatus( nodesTable );
             }
         } );
@@ -129,10 +137,12 @@ public class Manager {
 
         Button startAllBtn = new Button( "Start All" );
         startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
+        startAllBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 startAllNodes( nodesTable );
             }
         } );
@@ -140,10 +150,12 @@ public class Manager {
 
         Button stopAllBtn = new Button( "Stop All" );
         stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
+        stopAllBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 stopAllNodes( nodesTable );
             }
         } );
@@ -151,23 +163,30 @@ public class Manager {
 
         Button destroyClusterBtn = new Button( "Destroy Cluster" );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
-                if ( config != null ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
+                if ( config != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
                             "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = zookeeper.uninstallCluster( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     ZookeeperClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -177,7 +196,8 @@ public class Manager {
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -186,24 +206,32 @@ public class Manager {
 
         Button addNodeBtn = new Button( "Add Node" );
         addNodeBtn.addStyleName( "default" );
-        addNodeBtn.addClickListener( new Button.ClickListener() {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
-                if ( config != null ) {
-                    if ( config.getSetupType() == SetupType.STANDALONE ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
+                if ( config != null )
+                {
+                    if ( config.getSetupType() == SetupType.STANDALONE )
+                    {
                         ConfirmationDialog alert = new ConfirmationDialog(
                                 String.format( "Do you want to add node to the %s cluster?", config.getClusterName() ),
                                 "Yes", "No" );
-                        alert.getOk().addClickListener( new Button.ClickListener() {
+                        alert.getOk().addClickListener( new Button.ClickListener()
+                        {
                             @Override
-                            public void buttonClick( Button.ClickEvent clickEvent ) {
+                            public void buttonClick( Button.ClickEvent clickEvent )
+                            {
                                 UUID trackID = zookeeper.addNode( config.getClusterName() );
                                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                         ZookeeperClusterConfig.PRODUCT_KEY );
-                                window.getWindow().addCloseListener( new Window.CloseListener() {
+                                window.getWindow().addCloseListener( new Window.CloseListener()
+                                {
                                     @Override
-                                    public void windowClose( Window.CloseEvent closeEvent ) {
+                                    public void windowClose( Window.CloseEvent closeEvent )
+                                    {
                                         refreshClustersInfo();
                                     }
                                 } );
@@ -212,33 +240,41 @@ public class Manager {
                         } );
                     }
                     else if ( config.getSetupType() == SetupType.OVER_HADOOP
-                            || config.getSetupType() == SetupType.WITH_HADOOP ) {
+                            || config.getSetupType() == SetupType.WITH_HADOOP )
+                    {
                         HadoopClusterConfig info = hadoop.getCluster( config.getClusterName() );
 
-                        if ( info != null ) {
+                        if ( info != null )
+                        {
                             Set<Agent> nodes = new HashSet<>( info.getAllNodes() );
                             nodes.removeAll( config.getNodes() );
-                            if ( !nodes.isEmpty() ) {
+                            if ( !nodes.isEmpty() )
+                            {
                                 AddNodeWindow addNodeWindow =
                                         new AddNodeWindow( zookeeper, executorService, tracker, config, nodes );
                                 contentRoot.getUI().addWindow( addNodeWindow );
-                                addNodeWindow.addCloseListener( new Window.CloseListener() {
+                                addNodeWindow.addCloseListener( new Window.CloseListener()
+                                {
                                     @Override
-                                    public void windowClose( Window.CloseEvent closeEvent ) {
+                                    public void windowClose( Window.CloseEvent closeEvent )
+                                    {
                                         refreshClustersInfo();
                                     }
                                 } );
                             }
-                            else {
+                            else
+                            {
                                 show( "All nodes in corresponding Hadoop cluster have Zookeeper installed" );
                             }
                         }
-                        else {
+                        else
+                        {
                             show( "Hadoop cluster info not found" );
                         }
                     }
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -259,32 +295,41 @@ public class Manager {
 
         Button removePropertyBtn = new Button( "Remove" );
         removePropertyBtn.addStyleName( "default" );
-        removePropertyBtn.addClickListener( new Button.ClickListener() {
+        removePropertyBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
                     String fileName = fileTextField.getValue();
                     String propertyName = propertyNameTextField.getValue();
-                    if ( Strings.isNullOrEmpty( fileName ) ) {
+                    if ( Strings.isNullOrEmpty( fileName ) )
+                    {
                         show( "Please, specify file name where property resides" );
                     }
-                    else if ( Strings.isNullOrEmpty( propertyName ) ) {
+                    else if ( Strings.isNullOrEmpty( propertyName ) )
+                    {
                         show( "Please, specify property name to remove" );
                     }
-                    else {
+                    else
+                    {
                         UUID trackID = zookeeper.removeProperty( config.getClusterName(), fileName, propertyName );
                         ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                 ZookeeperClusterConfig.PRODUCT_KEY );
-                        window.getWindow().addCloseListener( new Window.CloseListener() {
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
                             @Override
-                            public void windowClose( Window.CloseEvent closeEvent ) {
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
                                 refreshClustersInfo();
                             }
                         } );
                         contentRoot.getUI().addWindow( window.getWindow() );
                     }
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -297,37 +342,47 @@ public class Manager {
         customPropertyContent.addComponent( propertyValueTextField );
         Button addPropertyBtn = new Button( "Add" );
         addPropertyBtn.addStyleName( "default" );
-        addPropertyBtn.addClickListener( new Button.ClickListener() {
+        addPropertyBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
                     String fileName = fileTextField.getValue();
                     String propertyName = propertyNameTextField.getValue();
                     String propertyValue = propertyValueTextField.getValue();
-                    if ( Strings.isNullOrEmpty( fileName ) ) {
+                    if ( Strings.isNullOrEmpty( fileName ) )
+                    {
                         show( "Please, specify file name where property will be added" );
                     }
-                    else if ( Strings.isNullOrEmpty( propertyName ) ) {
+                    else if ( Strings.isNullOrEmpty( propertyName ) )
+                    {
                         show( "Please, specify property name to add" );
                     }
-                    else if ( Strings.isNullOrEmpty( propertyValue ) ) {
+                    else if ( Strings.isNullOrEmpty( propertyValue ) )
+                    {
                         show( "Please, specify property value to set" );
                     }
-                    else {
+                    else
+                    {
                         UUID trackID =
                                 zookeeper.addProperty( config.getClusterName(), fileName, propertyName, propertyValue );
                         ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                 ZookeeperClusterConfig.PRODUCT_KEY );
-                        window.getWindow().addCloseListener( new Window.CloseListener() {
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
                             @Override
-                            public void windowClose( Window.CloseEvent closeEvent ) {
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
                                 refreshClustersInfo();
                             }
                         } );
                         contentRoot.getUI().addWindow( window.getWindow() );
                     }
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -340,7 +395,8 @@ public class Manager {
     }
 
 
-    private Table createTableTemplate( String caption ) {
+    private Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "IP", Label.class, null );
@@ -354,20 +410,25 @@ public class Manager {
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
@@ -377,83 +438,32 @@ public class Manager {
     }
 
 
-    private void refreshUI() {
-        if ( config != null ) {
+    private void show( String notification )
+    {
+        Notification.show( notification );
+    }
+
+
+    private void refreshUI()
+    {
+        if ( config != null )
+        {
             populateTable( nodesTable, config.getNodes() );
         }
-        else {
+        else
+        {
             nodesTable.removeAllItems();
         }
     }
 
 
-    public void refreshClustersInfo() {
-        List<ZookeeperClusterConfig> mongoClusterInfos = zookeeper.getClusters();
-        ZookeeperClusterConfig clusterInfo = ( ZookeeperClusterConfig ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
-            for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos ) {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
-            }
-            if ( clusterInfo != null ) {
-                for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos ) {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                        clusterCombo.setValue( mongoClusterInfo );
-                        return;
-                    }
-                }
-            }
-            else {
-                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
-            }
-        }
-    }
-
-
-    public static void checkNodesStatus( Table table ) {
-        for ( Object o : table.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
-            checkBtn.addStyleName( "default" );
-            checkBtn.click();
-        }
-    }
-
-
-    public static void startAllNodes( Table table ) {
-        for ( Object o : table.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
-            checkBtn.addStyleName( "default" );
-            checkBtn.click();
-        }
-    }
-
-
-    public static void stopAllNodes( Table table ) {
-        for ( Object o : table.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
-            checkBtn.addStyleName( "default" );
-            checkBtn.click();
-        }
-    }
-
-
-    private void show( String notification ) {
-        Notification.show( notification );
-    }
-
-
-    private void populateTable( final Table table, Set<Agent> agents ) {
+    private void populateTable( final Table table, Set<Agent> agents )
+    {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             final Label ip = new Label( agent.getListIP().toString() );
             ip.addStyleName( "default" );
             final Button checkBtn = new Button( "Check" );
@@ -473,10 +483,12 @@ public class Manager {
                     agent.getHostname(), ip, checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
             }, null );
 
-            checkBtn.addClickListener( new Button.ClickListener() {
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -484,14 +496,19 @@ public class Manager {
 
                     executorService.execute(
                             new CheckTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else if ( state == NodeState.STOPPED ) {
+                                                else if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 destroyBtn.setEnabled( true );
@@ -502,10 +519,12 @@ public class Manager {
                 }
             } );
 
-            startBtn.addClickListener( new Button.ClickListener() {
+            startBtn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -513,14 +532,19 @@ public class Manager {
 
                     executorService.execute(
                             new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else {
+                                                else
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 destroyBtn.setEnabled( true );
@@ -531,10 +555,12 @@ public class Manager {
                 }
             } );
 
-            stopBtn.addClickListener( new Button.ClickListener() {
+            stopBtn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -542,14 +568,19 @@ public class Manager {
 
                     executorService.execute(
                             new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.STOPPED ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
-                                                else {
+                                                else
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
                                                 destroyBtn.setEnabled( true );
@@ -560,21 +591,27 @@ public class Manager {
                 }
             } );
 
-            destroyBtn.addClickListener( new Button.ClickListener() {
+            destroyBtn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = zookeeper.destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     ZookeeperClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -589,15 +626,87 @@ public class Manager {
     }
 
 
-    public Component getContent() {
-        return contentRoot;
+    public void refreshClustersInfo()
+    {
+        List<ZookeeperClusterConfig> mongoClusterInfos = zookeeper.getClusters();
+        ZookeeperClusterConfig clusterInfo = ( ZookeeperClusterConfig ) clusterCombo.getValue();
+        clusterCombo.removeAllItems();
+        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 )
+        {
+            for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos )
+            {
+                clusterCombo.addItem( mongoClusterInfo );
+                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+            }
+            if ( clusterInfo != null )
+            {
+                for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos )
+                {
+                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    {
+                        clusterCombo.setValue( mongoClusterInfo );
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
+            }
+        }
+    }
+
+
+    public static void startAllNodes( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
+            checkBtn.addStyleName( "default" );
+            checkBtn.click();
+        }
+    }
+
+
+    public static void stopAllNodes( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
+            checkBtn.addStyleName( "default" );
+            checkBtn.click();
+        }
     }
 
 
     /**
      * Checks all nodes status on all tables.
      */
-    public void checkAll() {
+    public void checkAll()
+    {
         checkNodesStatus( nodesTable );
+    }
+
+
+    public static void checkNodesStatus( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
+            checkBtn.addStyleName( "default" );
+            checkBtn.click();
+        }
+    }
+
+
+    public Component getContent()
+    {
+        return contentRoot;
     }
 }

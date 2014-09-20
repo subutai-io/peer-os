@@ -20,7 +20,8 @@ import static org.mockito.Mockito.when;
 /**
  * Test of AgentResult class
  */
-public class AgentResultUT {
+public class AgentResultUT
+{
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";
     private final Integer OK_EXIT_CODE = 0;
@@ -28,7 +29,7 @@ public class AgentResultUT {
     private final AgentResultImpl agentResult = new AgentResultImpl( agentUUID );
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullAgentUUID()
     {
         new AgentResultImpl( null );

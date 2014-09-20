@@ -12,24 +12,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class MonitorImpl implements Monitor {
+public class MonitorImpl implements Monitor
+{
 
-    private static final Logger LOG = Logger.getLogger( MonitorImpl.class.getName() );
+    private final static Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    private final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-
     private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json" );
+    private final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 
     /**
@@ -56,9 +55,7 @@ public class MonitorImpl implements Monitor {
     @Override
     public Map<Date, Double> getData( String host, Metric metric, Date startDate, Date endDate )
     {
-        LOG.log( Level.INFO,
-                String.format( "host: {%s}, metric: {%s}, startDate: {%s}, endDate: {%s}", host, metric, startDate,
-                        endDate ) );
+        LOG.info( "host: {}, metric: {}, startDate: {}, endDate: {}", host, metric, startDate, endDate );
 
         Map<Date, Double> data = Collections.emptyMap();
 
@@ -68,7 +65,7 @@ public class MonitorImpl implements Monitor {
         }
         catch ( Exception e )
         {
-            LOG.log( Level.SEVERE, "Error while executing query: ", e );
+            LOG.error( "Error while executing query: ", e );
         }
 
         return data;
@@ -82,12 +79,12 @@ public class MonitorImpl implements Monitor {
                             .replace( "$startDate", dateToStr( startDate ) )
                             .replace( "$endDate", dateToStr( endDate ) );
 
-        LOG.log( Level.CONFIG, "query: {%s}", query );
+        LOG.debug( "query: {}", query );
 
         String response = HttpPost.execute( query );
         List<JsonNode> nodes = toNodes( response );
 
-        LOG.log( Level.INFO, String.format( "nodes count: {%d}", nodes.size() ) );
+        LOG.info( "nodes count: {}", nodes.size() );
 
         // Reversing the list b/c the query returns the data in desc order (to get the latest values first).
         Collections.reverse( nodes );
@@ -109,7 +106,7 @@ public class MonitorImpl implements Monitor {
             JsonNode node = hits.get( i ).get( "_source" );
             nodes.add( node );
 
-            LOG.log( Level.CONFIG, String.format( "node: {%s}", node ) );
+            LOG.debug( "node: {}", node );
         }
 
         return nodes;
@@ -144,7 +141,7 @@ public class MonitorImpl implements Monitor {
         }
         catch ( ParseException e )
         {
-            LOG.log( Level.SEVERE, "Error while parsing time: ", e );
+            LOG.error( "Error while parsing time: ", e );
         }
 
         return date;

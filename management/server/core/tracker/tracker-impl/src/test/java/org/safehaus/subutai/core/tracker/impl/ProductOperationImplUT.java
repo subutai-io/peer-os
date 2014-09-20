@@ -21,7 +21,8 @@ import static org.mockito.Mockito.when;
 /**
  * Test for ProductOperation class
  */
-public class ProductOperationImplUT {
+public class ProductOperationImplUT
+{
 
     private final UUID ID = UUID.randomUUID();
     private final String SOURCE = "source";
@@ -29,21 +30,21 @@ public class ProductOperationImplUT {
     private final String DESCRIPTION = "description";
 
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailNullSource()
     {
         new ProductOperationImpl( null, DESCRIPTION, mock( TrackerImpl.class ) );
     }
 
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailNullDescription()
     {
         new ProductOperationImpl( SOURCE, null, mock( TrackerImpl.class ) );
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullTracker()
     {
         new ProductOperationImpl( SOURCE, DESCRIPTION, null );
@@ -111,7 +112,7 @@ public class ProductOperationImplUT {
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void poViewConstructorShouldFailNullPO()
     {
         new ProductOperationViewImpl( null );

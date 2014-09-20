@@ -1,6 +1,9 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,30 +16,35 @@ import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.CheckNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 
-import java.util.Arrays;
-import java.util.HashSet;
 
-public class CheckNodeOperationHandlerTest {
+public class CheckNodeOperationHandlerTest
+{
     private PrestoImplMock mock;
     private AbstractOperationHandler handler;
 
+
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         mock = new PrestoImplMock();
-        handler = new CheckNodeOperationHandler(mock, "test-cluster", "test-host");
+        handler = new CheckNodeOperationHandler( mock, "test-cluster", "test-host" );
     }
 
+
     @Test
-    public void testWithoutCluster() {
+    public void testWithoutCluster()
+    {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
 
+
     @Test
-    public void testWithUnconnectedAgents() {
+    public void testWithUnconnectedAgents()
+    {
         PrestoClusterConfig config = new PrestoClusterConfig();
         config.setClusterName( "test-cluster" );
         config.setWorkers( new HashSet<Agent>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
@@ -46,7 +54,7 @@ public class CheckNodeOperationHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue( po.getLog().toLowerCase().contains( "not connected" ) );
+        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
 }

@@ -306,6 +306,11 @@ public class PeerManagerImpl implements PeerManager
         }
         if ( getPeerByUUID( peer.getId() ) != null )
         {
+
+            if ( peer.getId().compareTo( getSiteId() ) == 0 )
+            {
+                return true;
+            }
             try
             {
                 RestUtil.get( String.format( Common.PING_URL, peer.getIp() ), null );
@@ -333,6 +338,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( IllegalArgumentException e )
         {
+            LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
             throw new PeerException( e.getMessage() );
         }
     }
@@ -348,7 +354,8 @@ public class PeerManagerImpl implements PeerManager
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {}.getType() );
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
+                {}.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -366,15 +373,13 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( CreateContainersMessage ccm ) {
+    public Set<Agent> createContainers( CreateContainersMessage ccm )
+    {
 
         try
         {
-            // TODO remote subutai or local
-
-            if ( getSiteId().equals( ccm.getTargetPeerId() ) )
+            if ( getSiteId().toString().equals( ccm.getTargetPeerId().toString() ) )
             {
-
                 UUID envId = ccm.getEnvId();
                 String template = ccm.getTemplate();
                 int numberOfNodes = ccm.getNumberOfNodes();
@@ -385,10 +390,9 @@ public class PeerManagerImpl implements PeerManager
             {
                 RemotePeerClient client = new RemotePeerClient();
                 Peer remotePeer = getPeerByUUID( ccm.getTargetPeerId() );
-                String baseUrl = "http://" + remotePeer + ":8181/cxf";
+                String baseUrl = "http://" + remotePeer.getIp() + ":8181/cxf";
                 client.setBaseUrl( baseUrl );
                 String response = client.createRemoteContainers( ccm );
-                LOG.info( "REMOTE CONTAINERS CREATE COMMAND SENT" + response );
             }
         }
         catch ( ContainerCreateException e )

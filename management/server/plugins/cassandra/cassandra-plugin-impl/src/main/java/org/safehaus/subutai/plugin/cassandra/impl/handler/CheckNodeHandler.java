@@ -13,14 +13,18 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
+import com.google.common.collect.Sets;
 
-public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
+
+public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
+{
 
     private String clusterName;
     private String lxcHostname;
 
 
-    public CheckNodeHandler( final CassandraImpl manager, String clusterName, String lxcHostname ) {
+    public CheckNodeHandler( final CassandraImpl manager, String clusterName, String lxcHostname )
+    {
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
@@ -29,55 +33,63 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
-
-        StringBuilder log = new StringBuilder();
-
-        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
-
-            String status = "UNKNOWN";
-            if ( e.getValue().getExitCode() == 0 ) {
-                status = "Cassandra is running";
-            }
-            else if ( e.getValue().getExitCode() == 768 ) {
-                status = "Cassandra is not running";
-            }
-
-            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );
-        }
-
-        po.addLogDone( log.toString() );
-    }
-
-
     @Override
-    public void run() {
-        CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
-        if ( cassandraConfig == null ) {
+    public void run()
+    {
+        CassandraClusterConfig cassandraClusterConfig = manager.getCluster( clusterName );
+        if ( cassandraClusterConfig == null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( node == null ) {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+        if ( node == null )
+        {
+            productOperation.addLogFailed( "Agent is not connected !" );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) ) {
+        if ( !cassandraClusterConfig.getNodes().contains( node ) )
+        {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
-        Command checkNodeCommand = Commands.getStatusCommand( node );
-        manager.getCommandRunner().runCommand( checkNodeCommand );
+        Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
+        manager.getCommandRunner().runCommand( statusServiceCommand );
 
-        if ( checkNodeCommand.hasSucceeded() ) {
-            productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
-                    checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
+        if ( statusServiceCommand.hasSucceeded() )
+        {
+            productOperation.addLogDone( "Cassandra is running" );
         }
-        else {
-            logStatusResults( productOperation, checkNodeCommand );
+        else
+        {
+            logStatusResults( productOperation, statusServiceCommand );
         }
+    }
+
+
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    {
+
+        StringBuilder log = new StringBuilder();
+
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
+        {
+
+            String status = "UNKNOWN";
+            if ( e.getValue().getExitCode() == 0 )
+            {
+                status = "Cassandra is running";
+            }
+            else if ( e.getValue().getExitCode() == 768 )
+            {
+                status = "Cassandra is not running";
+            }
+
+            log.append( String.format( "%s\n", status ) );
+        }
+        po.addLogDone( log.toString() );
     }
 }

@@ -7,7 +7,8 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 9/12/14.
  */
-public class LxcBuildMessage {
+public class LxcBuildMessage
+{
 
     private int numberOfContainers;
     private String templateName;

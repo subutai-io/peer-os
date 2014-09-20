@@ -21,7 +21,8 @@ import com.vaadin.ui.themes.Runo;
 /**
  *
  */
-public class EnvironmentManagerForm extends CustomComponent implements Disposable {
+public class EnvironmentManagerForm extends CustomComponent implements Disposable
+{
 
 
     private BlueprintLoadForm blueprintManager;
@@ -30,7 +31,8 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
     private EnvironmentsBuildProcessForm environmentBuildForm;
 
 
-    public EnvironmentManagerForm( EnvironmentManagerUI managerUI ) {
+    public EnvironmentManagerForm( EnvironmentManagerUI managerUI )
+    {
         setHeight( 100, UNITS_PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -55,7 +57,8 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
     }
 
 
-    public void dispose() {
+    public void dispose()
+    {
         this.blueprintManager = null;
         this.blueprintsForm = null;
         this.environmentForm = null;

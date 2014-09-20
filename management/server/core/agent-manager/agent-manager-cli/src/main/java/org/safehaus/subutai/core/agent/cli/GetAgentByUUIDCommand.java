@@ -6,19 +6,19 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Displays the last log entries
  */
-@Command( scope = "agent", name = "get-agent-by-uuid", description = "get agent by uuid" )
+@Command(scope = "agent", name = "get-agent-by-uuid", description = "get agent by uuid")
 public class GetAgentByUUIDCommand extends OsgiCommandSupport
 {
 
-    @Argument( index = 0, name = "uuid", required = true, multiValued = false, description = "agent UUID" )
+    @Argument(index = 0, name = "uuid", required = true, multiValued = false, description = "agent UUID")
     String uuid;
     private AgentManager agentManager;
 

@@ -43,7 +43,8 @@ import com.google.gson.JsonSyntaxException;
 /**
  * Implementation of CommandDispatcher interface
  */
-public class CommandDispatcherImpl extends AbstractCommandRunner implements CommandDispatcher, PeerMessageListener {
+public class CommandDispatcherImpl extends AbstractCommandRunner implements CommandDispatcher, PeerMessageListener
+{
 
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
@@ -53,7 +54,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
-                                  final DbManager dbManager, final PeerManager peerManager ) {
+                                  final DbManager dbManager, final PeerManager peerManager )
+    {
         super();
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
@@ -63,21 +65,24 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    public void init() {
+    public void init()
+    {
 
         peerManager.addPeerMessageListener( this );
         responseSender.init();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         peerManager.removePeerMessageListener( this );
         responseSender.dispose();
         super.dispose();
     }
 
 
-    private void executeCommand( CommandImpl command ) {
+    private void executeCommand( CommandImpl command )
+    {
 
         for ( Map.Entry<UUID, Set<BatchRequest>> entry : command.getRemoteRequests().entrySet() )
         {
@@ -134,12 +139,17 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         }
 
         //check if local agents are connected
+        Set<UUID> localIds = new HashSet<>();
         for ( Request request : command.getRequests() )
         {
             if ( agentManager.getAgentByUUID( request.getUuid() ) == null )
             {
-                throw new RunCommandException( String.format( "Agent %s is not connected", request.getUuid() ) );
+                localIds.add( request.getUuid() );
             }
+        }
+        if ( !localIds.isEmpty() )
+        {
+            throw new RunCommandException( String.format( "Agents %s are not connected", localIds ) );
         }
 
         //send remote requests
@@ -160,10 +170,12 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             final CommandDispatcherImpl self = this;
             try
             {
-                localCommand.executeAsync( new CommandCallback() {
+                localCommand.executeAsync( new CommandCallback()
+                {
                     @Override
                     public void onResponse( final Response response, final AgentResult agentResult,
-                                            final Command command ) {
+                                            final Command command )
+                    {
                         self.onResponse( response );
                     }
                 } );
@@ -176,7 +188,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
+    private void sendRequests( final Map<UUID, Set<BatchRequest>> requests )
+    {
 
         for ( Map.Entry<UUID, Set<BatchRequest>> request : requests.entrySet() )
         {
@@ -199,13 +212,16 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void processResponses( final Set<Response> responses ) {
+    private void processResponses( final Set<Response> responses )
+    {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( responses ), "Responses are null or empty" );
 
-        Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
+        Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>()
+        {
 
             @Override
-            public int compare( final Response o1, final Response o2 ) {
+            public int compare( final Response o1, final Response o2 )
+            {
                 int compareAgents = o1.getUuid().compareTo( o2.getUuid() );
                 return compareAgents == 0 ? o1.getResponseSequenceNumber().compareTo( o2.getResponseSequenceNumber() ) :
                        compareAgents;
@@ -219,7 +235,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void executeRequests( final Peer peer, final Set<BatchRequest> requests ) throws PeerMessageException {
+    private void executeRequests( final Peer peer, final Set<BatchRequest> requests ) throws PeerMessageException
+    {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 
         try
@@ -241,10 +258,12 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
                 //execute requests using Command Runner
                 Command command = new CommandImpl( requests, commandRunner );
-                command.executeAsync( new CommandCallback() {
+                command.executeAsync( new CommandCallback()
+                {
                     @Override
                     public void onResponse( final Response response, final AgentResult agentResult,
-                                            final Command command ) {
+                                            final Command command )
+                    {
                         try
                         {
 
@@ -276,7 +295,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public void runCommandAsync( final Command command, final CommandCallback commandCallback ) {
+    public void runCommandAsync( final Command command, final CommandCallback commandCallback )
+    {
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkArgument( command instanceof CommandImpl, "Command is of wrong type" );
         Preconditions.checkNotNull( commandCallback, "Callback is null" );
@@ -312,32 +332,37 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents ) {
+    public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents )
+    {
         return new CommandImpl( null, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
     public Command createCommand( final String description, final RequestBuilder requestBuilder,
-                                  final Set<Agent> agents ) {
+                                  final Set<Agent> agents )
+    {
         return new CommandImpl( description, requestBuilder, agents, peerManager, this );
     }
 
 
     @Override
-    public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders ) {
+    public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders )
+    {
         return new CommandImpl( null, agentRequestBuilders, peerManager, this );
     }
 
 
     @Override
-    public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders ) {
+    public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders )
+    {
         return new CommandImpl( description, agentRequestBuilders, peerManager, this );
     }
 
 
     @Override
-    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException {
+    public String onMessage( final Peer peer, final String peerMessage ) throws PeerMessageException
+    {
         try
         {
 
@@ -362,7 +387,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return Common.DISPATCHER_NAME;
     }
 }

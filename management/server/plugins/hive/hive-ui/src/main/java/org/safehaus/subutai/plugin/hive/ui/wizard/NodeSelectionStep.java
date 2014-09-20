@@ -28,14 +28,16 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class NodeSelectionStep extends Panel {
+public class NodeSelectionStep extends Panel
+{
 
-    private int controlWidth = 350;
     private final Hive hive;
     private final Hadoop hadoop;
+    private int controlWidth = 350;
 
 
-    public NodeSelectionStep( final Hive hive, final Hadoop hadoop, final Wizard wizard ) {
+    public NodeSelectionStep( final Hive hive, final Hadoop hadoop, final Wizard wizard )
+    {
 
         this.hive = hive;
         this.hadoop = hadoop;
@@ -50,10 +52,12 @@ public class NodeSelectionStep extends Panel {
         TextField nameTxt = new TextField( "Cluster name" );
         nameTxt.setRequired( true );
         nameTxt.setWidth( controlWidth, Unit.POINTS );
-        nameTxt.addValueChangeListener( new Property.ValueChangeListener() {
+        nameTxt.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent e ) {
+            public void valueChange( Property.ValueChangeEvent e )
+            {
                 wizard.getConfig().setClusterName( e.getProperty().getValue().toString().trim() );
             }
         } );
@@ -61,18 +65,22 @@ public class NodeSelectionStep extends Panel {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 nextButtonClickHandler( wizard );
             }
         } );
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -87,10 +95,12 @@ public class NodeSelectionStep extends Panel {
         buttons.addComponent( next );
 
         content.addComponent( nameTxt );
-        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP ) {
+        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
+        {
             addOverHadoopComponents( content, wizard.getConfig() );
         }
-        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
+        {
             addWithHadoopComponents( content, wizard.getConfig(), wizard.getHadoopConfig() );
         }
         content.addComponent( buttons );
@@ -99,7 +109,8 @@ public class NodeSelectionStep extends Panel {
     }
 
 
-    private void addOverHadoopComponents( ComponentContainer parent, final HiveConfig config ) {
+    private void addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
+    {
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
         final ComboBox cmbServerNode = makeServerNodeComboBox( config );
 
@@ -108,10 +119,13 @@ public class NodeSelectionStep extends Panel {
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
-        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener() {
+        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     HadoopClusterConfig hc = ( HadoopClusterConfig ) event.getProperty().getValue();
                     config.setHadoopClusterName( hc.getClusterName() );
                     config.setHadoopNodes( new HashSet<>( hc.getAllNodes() ) );
@@ -124,17 +138,21 @@ public class NodeSelectionStep extends Panel {
         } );
 
         List<HadoopClusterConfig> clusters = hadoop.getClusters();
-        if ( clusters.size() > 0 ) {
-            for ( HadoopClusterConfig hci : clusters ) {
+        if ( clusters.size() > 0 )
+        {
+            for ( HadoopClusterConfig hci : clusters )
+            {
                 hadoopClusters.addItem( hci );
                 hadoopClusters.setItemCaption( hci, hci.getClusterName() );
             }
         }
 
         String hn = config.getHadoopClusterName();
-        if ( hn != null && !hn.isEmpty() ) {
+        if ( hn != null && !hn.isEmpty() )
+        {
             HadoopClusterConfig info = hadoop.getCluster( hn );
-            if ( info != null ) {
+            if ( info != null )
+            {
                 hadoopClusters.setValue( info );
             }
         }
@@ -144,20 +162,104 @@ public class NodeSelectionStep extends Panel {
     }
 
 
+    private ComboBox makeServerNodeComboBox( final HiveConfig config )
+    {
+        ComboBox cb = new ComboBox( "Server node" );
+        cb.setImmediate( true );
+        cb.setTextInputAllowed( false );
+        cb.setRequired( true );
+        cb.setNullSelectionAllowed( false );
+        cb.setWidth( controlWidth, Unit.POINTS );
+        cb.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                Agent hiveMaster = ( Agent ) event.getProperty().getValue();
+                config.setServer( hiveMaster );
+                config.getClients().clear();
+                config.getClients().addAll( config.getHadoopNodes() );
+                config.getClients().remove( hiveMaster );
+            }
+        } );
+        return cb;
+    }
+
+
+    private void fillServerNodeComboBox( ComboBox serverNode, HadoopClusterConfig hadoopInfo, Agent selected )
+    {
+        serverNode.removeAllItems();
+        List<Agent> slaves = hadoopInfo.getAllSlaveNodes();
+        for ( Agent a : hadoopInfo.getAllNodes() )
+        {
+            serverNode.addItem( a );
+            String caption = a.getHostname();
+            if ( hadoopInfo.getJobTracker().equals( a ) )
+            {
+                caption += " [Job tracker]";
+            }
+            else if ( hadoopInfo.getNameNode().equals( a ) )
+            {
+                caption += " [Name node]";
+            }
+            else if ( hadoopInfo.getSecondaryNameNode().equals( a ) )
+            {
+                caption += " [Name node 2]";
+            }
+            else if ( slaves.contains( a ) )
+            {
+                caption += " [Slave node]";
+            }
+            serverNode.setItemCaption( a, caption );
+        }
+        if ( selected != null )
+        {
+            serverNode.setValue( selected );
+        }
+    }
+
+
+    private void filterNodes( final ComboBox serverNode )
+    {
+        Collection<Agent> items = ( Collection<Agent> ) serverNode.getItemIds();
+        final Set<Agent> set = new HashSet<>( items );
+        new Thread( new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                Map<Agent, Boolean> map = hive.isInstalled( set );
+                for ( Map.Entry<Agent, Boolean> e : map.entrySet() )
+                {
+                    if ( e.getValue() )
+                    {
+                        serverNode.removeItem( e.getKey() );
+                    }
+                }
+            }
+        } ).start();
+    }
+
+
     private void addWithHadoopComponents( ComponentContainer content, final HiveConfig config,
-                                          final HadoopClusterConfig hadoopConfig ) {
+                                          final HadoopClusterConfig hadoopConfig )
+    {
 
         Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
 
         final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
         txtHadoopClusterName.setRequired( true );
         txtHadoopClusterName.setMaxLength( 20 );
-        if ( hadoopConfig.getClusterName() != null ) {
+        if ( hadoopConfig.getClusterName() != null )
+        {
             txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
         }
-        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener() {
+        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String name = event.getProperty().getValue().toString().trim();
                 config.setHadoopClusterName( name );
                 hadoopConfig.setClusterName( name );
@@ -169,9 +271,11 @@ public class NodeSelectionStep extends Panel {
         cmbSlaveNodes.setTextInputAllowed( false );
         cmbSlaveNodes.setNullSelectionAllowed( false );
         cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
-        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener() {
+        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -181,9 +285,11 @@ public class NodeSelectionStep extends Panel {
         cmbReplFactor.setTextInputAllowed( false );
         cmbReplFactor.setNullSelectionAllowed( false );
         cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
-        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener() {
+        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -192,11 +298,14 @@ public class NodeSelectionStep extends Panel {
         txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
         txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
         txtHadoopDomain.setMaxLength( 20 );
-        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener() {
+        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String val = event.getProperty().getValue().toString().trim();
-                if ( !val.isEmpty() ) {
+                if ( !val.isEmpty() )
+                {
                     hadoopConfig.setDomainName( val );
                 }
             }
@@ -210,117 +319,67 @@ public class NodeSelectionStep extends Panel {
     }
 
 
-    private ComboBox makeServerNodeComboBox( final HiveConfig config ) {
-        ComboBox cb = new ComboBox( "Server node" );
-        cb.setImmediate( true );
-        cb.setTextInputAllowed( false );
-        cb.setRequired( true );
-        cb.setNullSelectionAllowed( false );
-        cb.setWidth( controlWidth, Unit.POINTS );
-        cb.addValueChangeListener( new Property.ValueChangeListener() {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                Agent hiveMaster = ( Agent ) event.getProperty().getValue();
-                config.setServer( hiveMaster );
-                config.getClients().clear();
-                config.getClients().addAll( config.getHadoopNodes() );
-                config.getClients().remove( hiveMaster );
-            }
-        } );
-        return cb;
-    }
-
-
-    private void fillServerNodeComboBox( ComboBox serverNode, HadoopClusterConfig hadoopInfo, Agent selected ) {
-        serverNode.removeAllItems();
-        List<Agent> slaves = hadoopInfo.getAllSlaveNodes();
-        for ( Agent a : hadoopInfo.getAllNodes() ) {
-            serverNode.addItem( a );
-            String caption = a.getHostname();
-            if ( hadoopInfo.getJobTracker().equals( a ) ) {
-                caption += " [Job tracker]";
-            }
-            else if ( hadoopInfo.getNameNode().equals( a ) ) {
-                caption += " [Name node]";
-            }
-            else if ( hadoopInfo.getSecondaryNameNode().equals( a ) ) {
-                caption += " [Name node 2]";
-            }
-            else if ( slaves.contains( a ) ) {
-                caption += " [Slave node]";
-            }
-            serverNode.setItemCaption( a, caption );
-        }
-        if ( selected != null ) {
-            serverNode.setValue( selected );
-        }
-    }
-
-
-    private void filterNodes( final ComboBox serverNode ) {
-        Collection<Agent> items = ( Collection<Agent> ) serverNode.getItemIds();
-        final Set<Agent> set = new HashSet<>( items );
-        new Thread( new Runnable() {
-
-            @Override
-            public void run() {
-                Map<Agent, Boolean> map = hive.isInstalled( set );
-                for ( Map.Entry<Agent, Boolean> e : map.entrySet() ) {
-                    if ( e.getValue() ) {
-                        serverNode.removeItem( e.getKey() );
-                    }
-                }
-            }
-        } ).start();
-    }
-
-
-    private void nextButtonClickHandler( Wizard wizard ) {
+    private void nextButtonClickHandler( Wizard wizard )
+    {
         HiveConfig config = wizard.getConfig();
-        if ( config.getClusterName() == null || config.getClusterName().isEmpty() ) {
+        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+        {
             show( "Enter name for Hive installation" );
             return;
         }
-        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
             String name = config.getHadoopClusterName();
-            if ( name == null || name.isEmpty() ) {
+            if ( name == null || name.isEmpty() )
+            {
                 show( "Select Hadoop cluster" );
             }
-            else if ( config.getServer() == null ) {
+            else if ( config.getServer() == null )
+            {
                 show( "Select server node" );
             }
-            else if ( config.getClients() == null || config.getClients().isEmpty() ) {
+            else if ( config.getClients() == null || config.getClients().isEmpty() )
+            {
                 show( "Select client nodes" );
             }
-            else {
+            else
+            {
                 wizard.next();
             }
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() ) {
+            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() )
+            {
                 show( "Enter Hadoop cluster name" );
             }
-            else if ( hc.getCountOfSlaveNodes() <= 0 ) {
+            else if ( hc.getCountOfSlaveNodes() <= 0 )
+            {
                 show( "Invalid number of Hadoop slave nodes" );
             }
-            else if ( hc.getReplicationFactor() <= 0 ) {
+            else if ( hc.getReplicationFactor() <= 0 )
+            {
                 show( "Invalid replication factor" );
             }
-            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() ) {
+            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() )
+            {
                 show( "Enter Hadoop domain name" );
             }
-            else {
+            else
+            {
                 wizard.next();
             }
         }
-        else {
+        else
+        {
             show( "Installation type not supported" );
         }
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

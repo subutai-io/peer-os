@@ -6,7 +6,8 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.Agent;
 
 
-public interface NetworkManager {
+public interface NetworkManager
+{
     public boolean configSshOnAgents( List<Agent> agentList );
 
     public boolean configSshOnAgents( List<Agent> agentList, Agent agent );

@@ -22,7 +22,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
-public class TemplateManagerImpl extends TemplateManagerBase {
+public class TemplateManagerImpl extends TemplateManagerBase
+{
 
     private static final Logger logger = Logger.getLogger( TemplateManagerImpl.class.getName() );
 
@@ -87,16 +88,13 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         Agent a = agentManager.getAgentByHostname( hostName );
 
         StringBuilder cmdBuilder = new StringBuilder();
-        if ( cloneNames != null )
+        for ( String cloneName : cloneNames )
         {
-            for ( final String cloneName : cloneNames )
+            if ( cmdBuilder.length() > 0 )
             {
-                if ( cmdBuilder.length() > 0 )
-                {
-                    cmdBuilder.append( " & " );
-                }
-                cmdBuilder.append( ActionType.DESTROY.buildCommand( cloneName ) );
+                cmdBuilder.append( " & " );
             }
+            cmdBuilder.append( ActionType.DESTROY.buildCommand( cloneName ) );
         }
 
         Command cmd = getCommandRunner().createCommand( new RequestBuilder( cmdBuilder.toString() ).withTimeout( 180 ),
@@ -233,6 +231,33 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     }
 
 
+    private String getExportedPackageFilePath( Agent a, String templateName )
+    {
+        Set<Agent> set = new HashSet<>( Arrays.asList( a ) );
+        Command cmd = commandRunner.createCommand( new RequestBuilder( "echo $SUBUTAI_TMPDIR" ), set );
+        commandRunner.runCommand( cmd );
+        AgentResult res = cmd.getResults().get( a.getUuid() );
+        if ( res.getExitCode() != null && res.getExitCode() == 0 )
+        {
+            String dir = res.getStdOut();
+            String s = ActionType.GET_DEB_PACKAGE_NAME.buildCommand( templateName );
+            cmd = commandRunner.createCommand( new RequestBuilder( s ), set );
+            commandRunner.runCommand( cmd );
+            if ( cmd.hasSucceeded() )
+            {
+                res = cmd.getResults().get( a.getUuid() );
+                return Paths.get( dir, res.getStdOut() ).toString();
+            }
+            else
+            { // TODO: to be removed
+                templateName = templateName + "-subutai-template.deb";
+                return Paths.get( dir, templateName ).toString();
+            }
+        }
+        return null;
+    }
+
+
     private boolean prepareTemplates( Agent a, String templateName )
     {
         // check parents first
@@ -262,32 +287,5 @@ public class TemplateManagerImpl extends TemplateManagerBase {
             }
         }
         return true;
-    }
-
-
-    private String getExportedPackageFilePath( Agent a, String templateName )
-    {
-        Set<Agent> set = new HashSet<>( Arrays.asList( a ) );
-        Command cmd = commandRunner.createCommand( new RequestBuilder( "echo $SUBUTAI_TMPDIR" ), set );
-        commandRunner.runCommand( cmd );
-        AgentResult res = cmd.getResults().get( a.getUuid() );
-        if ( res.getExitCode() != null && res.getExitCode() == 0 )
-        {
-            String dir = res.getStdOut();
-            String s = ActionType.GET_DEB_PACKAGE_NAME.buildCommand( templateName );
-            cmd = commandRunner.createCommand( new RequestBuilder( s ), set );
-            commandRunner.runCommand( cmd );
-            if ( cmd.hasSucceeded() )
-            {
-                res = cmd.getResults().get( a.getUuid() );
-                return Paths.get( dir, res.getStdOut() ).toString();
-            }
-            else
-            { // TODO: to be removed
-                templateName = templateName + "-subutai-template.deb";
-                return Paths.get( dir, templateName ).toString();
-            }
-        }
-        return null;
     }
 }

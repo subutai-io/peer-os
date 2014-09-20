@@ -22,7 +22,8 @@ import static org.mockito.Mockito.verify;
 /**
  * Test for TrackerImpl class
  */
-public class TrackerImplUT {
+public class TrackerImplUT
+{
 
     private final UUID poID = UUID.randomUUID();
     private final String SOURCE = "source";

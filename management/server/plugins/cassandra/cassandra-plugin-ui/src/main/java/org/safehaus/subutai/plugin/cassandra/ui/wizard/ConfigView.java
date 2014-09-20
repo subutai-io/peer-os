@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
@@ -13,21 +8,25 @@ import com.vaadin.ui.TreeTable;
 /**
  * @author dilshat
  */
-public class ConfigView {
+public class ConfigView
+{
 
     private final TreeTable configTbl;
 
 
-    public ConfigView( String cfgCaption ) {
+    public ConfigView( String cfgCaption )
+    {
         configTbl = new TreeTable();
         configTbl.setSizeFull();
         configTbl.addContainerProperty( cfgCaption, String.class, "" );
     }
 
 
-    public void addStringCfg( String cfgCategory, String cfgValue ) {
+    public void addStringCfg( String cfgCategory, String cfgValue )
+    {
         Item ctg = configTbl.getItem( cfgCategory );
-        if ( ctg == null ) {
+        if ( ctg == null )
+        {
             configTbl.addItem( new Object[] { cfgCategory }, cfgCategory );
         }
         configTbl.addItem( new Object[] { cfgValue }, cfgCategory + "_" + cfgValue );
@@ -37,7 +36,8 @@ public class ConfigView {
     }
 
 
-    public TreeTable getCfgTable() {
+    public TreeTable getCfgTable()
+    {
         return configTbl;
     }
 }

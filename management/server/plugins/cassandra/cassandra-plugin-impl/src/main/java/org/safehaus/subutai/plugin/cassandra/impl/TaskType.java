@@ -6,10 +6,8 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-/**
- * @author dilshat
- */
-public enum TaskType {
+public enum TaskType
+{
 
     CHECK, INSTALL, UNINSTALL, START, STOP, CONFIGURE, START_ALL, CHECK_ALL, STOP_ALL, STATUS
 }

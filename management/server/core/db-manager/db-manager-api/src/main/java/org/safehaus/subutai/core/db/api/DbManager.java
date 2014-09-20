@@ -14,7 +14,8 @@ import com.datastax.driver.core.ResultSet;
 /**
  * Db Manager provides methods for working with database to persist and retrieve stored objects
  */
-public interface DbManager {
+public interface DbManager
+{
 
     /**
      * Executes a select query against db

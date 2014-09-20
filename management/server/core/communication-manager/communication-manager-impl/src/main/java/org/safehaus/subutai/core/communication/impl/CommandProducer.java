@@ -16,6 +16,10 @@ import org.safehaus.subutai.core.communication.api.CommandJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//import java.util.logging.Logger;
+
+//import java.util.logging.Logger;
+
 
 /**
  * This class is used internally by CommunicationManagerImpl for sending requests to agents.
@@ -23,6 +27,7 @@ import org.slf4j.LoggerFactory;
 class CommandProducer implements Runnable
 {
 
+    //    private static final Logger LOG = Logger.getLogger( CommandProducer.class.getName() );
     private static final Logger LOG = LoggerFactory.getLogger( CommandProducer.class.getName() );
     private final Request command;
     private final CommunicationManagerImpl communicationManagerImpl;
@@ -76,6 +81,7 @@ class CommandProducer implements Runnable
         }
         catch ( JMSException e )
         {
+            //            LOG.log( Level.SEVERE, "Error in CommandProducer.run", ex );
             LOG.error( "Error to send a message: ", e );
         }
         finally

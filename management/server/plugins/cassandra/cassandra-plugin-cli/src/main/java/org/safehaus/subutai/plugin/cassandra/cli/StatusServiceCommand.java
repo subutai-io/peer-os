@@ -17,38 +17,44 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command(scope = "cassandra", name = "service-cassandra-status", description = "Command to check Cassandra service")
-public class StatusServiceCommand extends OsgiCommandSupport {
+public class StatusServiceCommand extends OsgiCommandSupport
+{
 
-    private Cassandra cassandraManager;
-    private Tracker tracker;
     @Argument(index = 0, name = "clusterName", description = "Name of the cluster.", required = true,
             multiValued = false)
     String clusterName = null;
     @Argument(index = 1, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
     String agentUUID = null;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
 
 
-    public Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager()
+    {
         return cassandraManager;
     }
 
 
-    public void setCassandraManager( Cassandra cassandraManager ) {
+    public void setCassandraManager( Cassandra cassandraManager )
+    {
         this.cassandraManager = cassandraManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    protected Object doExecute() throws IOException {
+    protected Object doExecute() throws IOException
+    {
 
         UUID uuid = cassandraManager.statusService( clusterName, agentUUID );
         tracker.printOperationLog( CassandraClusterConfig.PRODUCT_KEY, uuid, 30000 );

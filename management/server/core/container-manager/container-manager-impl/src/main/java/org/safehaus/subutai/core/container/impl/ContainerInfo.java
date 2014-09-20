@@ -9,7 +9,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Contains information for Completion service
  */
-public class ContainerInfo {
+public class ContainerInfo
+{
 
     private final Agent physicalAgent;
     private final String cloneName;

@@ -9,7 +9,8 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 9/14/14.
  */
-public class EnvironmentBuildProcess {
+public class EnvironmentBuildProcess
+{
 
     String environmentName;
     private UUID uuid;

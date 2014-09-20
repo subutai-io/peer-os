@@ -9,7 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
-public interface RestService {
+public interface RestService
+{
 
     // should return Set<Agent> in Json format
 

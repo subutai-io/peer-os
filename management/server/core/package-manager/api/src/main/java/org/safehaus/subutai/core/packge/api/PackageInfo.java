@@ -5,7 +5,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 
-public class PackageInfo implements Comparable<PackageInfo>, Serializable {
+public class PackageInfo implements Comparable<PackageInfo>, Serializable
+{
 
     public static final String SOURCE_NAME = "PackageManager";
     private static final long serialVersionUID = 22L;

@@ -19,56 +19,67 @@ import com.google.gson.JsonObject;
 /**
  * @author dilshat
  */
-public class YamlParser implements ConfigParser {
+public class YamlParser implements ConfigParser
+{
 
     private final Map yaml;
 
 
-    public YamlParser( String content ) throws YamlException {
+    public YamlParser( String content ) throws YamlException
+    {
 
         YamlReader reader = new YamlReader( content );
         yaml = ( Map ) reader.read();
     }
 
 
-    public String getStringProperty( String propertyName ) {
+    public String getStringProperty( String propertyName )
+    {
         Object property = yaml.get( propertyName );
-        if ( property instanceof String ) {
+        if ( property instanceof String )
+        {
             return ( String ) yaml.get( propertyName );
         }
         return null;
     }
 
 
-    public Map getMapProperty( String propertyName ) {
+    public Map getMapProperty( String propertyName )
+    {
         Object property = yaml.get( propertyName );
-        if ( property instanceof Map ) {
+        if ( property instanceof Map )
+        {
             return ( Map ) yaml.get( propertyName );
         }
         return null;
     }
 
 
-    public List getListProperty( String propertyName ) {
+    public List getListProperty( String propertyName )
+    {
         Object property = yaml.get( propertyName );
-        if ( property instanceof List ) {
+        if ( property instanceof List )
+        {
             return ( List ) yaml.get( propertyName );
         }
         return null;
     }
 
 
-    public Object getProperty( String propertyName ) {
+    public Object getProperty( String propertyName )
+    {
         return yaml.get( propertyName );
     }
 
 
-    public void setProperty( String propertyName, Object propertyValue ) {
+    public void setProperty( String propertyName, Object propertyValue )
+    {
         yaml.put( propertyName, propertyValue );
     }
 
 
-    public String getYaml() throws YamlException {
+    public String getYaml() throws YamlException
+    {
         StringWriter str = new StringWriter();
         YamlWriter writer = new YamlWriter( str );
         writer.write( yaml );
@@ -78,7 +89,8 @@ public class YamlParser implements ConfigParser {
 
 
     @Override
-    public JsonObject parserConfig( final String pathToConfig, final ConfigTypeEnum configTypeEnum ) {
+    public JsonObject parserConfig( final String pathToConfig, final ConfigTypeEnum configTypeEnum )
+    {
         ConfigBuilder configBuilder = new ConfigBuilder();
         JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configTypeEnum );
 
@@ -87,7 +99,8 @@ public class YamlParser implements ConfigParser {
         Yaml yaml = new Yaml();
         Map<String, Object> config = ( Map<String, Object> ) yaml.load( content );
         List<JsonObject> fields = new ArrayList<>();
-        for ( Map.Entry<String, Object> entry : config.entrySet() ) {
+        for ( Map.Entry<String, Object> entry : config.entrySet() )
+        {
             String key = entry.getKey();
             Object value = entry.getValue();
             JsonObject field = configBuilder.buildFieldJsonObject( key, "", true, "textfield", true, value.toString() );

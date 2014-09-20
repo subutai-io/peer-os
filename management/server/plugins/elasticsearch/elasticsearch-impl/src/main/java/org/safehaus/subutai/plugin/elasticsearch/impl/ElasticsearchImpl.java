@@ -42,8 +42,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
-public class ElasticsearchImpl implements Elasticsearch {
-
+public class ElasticsearchImpl implements Elasticsearch
+{
     private static final Logger LOG = Logger.getLogger( ElasticsearchImpl.class.getName() );
     private DbManager dbManager;
     private Tracker tracker;
@@ -57,94 +57,112 @@ public class ElasticsearchImpl implements Elasticsearch {
     private EnvironmentManager environmentManager;
 
 
-    public PluginDAO getPluginDAO() {
+    public PluginDAO getPluginDAO()
+    {
         return pluginDAO;
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void setCommandRunner( CommandRunner commandRunner ) {
+    public void setCommandRunner( CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
 
-    public void setEnvironmentManager( final EnvironmentManager environmentManager ) {
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
         this.environmentManager = environmentManager;
     }
 
 
-    public DbManager getDbManager() {
+    public DbManager getDbManager()
+    {
         return dbManager;
     }
 
 
-    public void setDbManager( DbManager dbManager ) {
+    public void setDbManager( DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( AgentManager agentManager ) {
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void setContainerManager( final ContainerManager containerManager ) {
+    public void setContainerManager( final ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public void init() {
+    public void init()
+    {
         Commands.init( commandRunner );
         this.pluginDAO = new PluginDAO( dbManager );
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
-    public void setLxcManager( LxcManager lxcManager ) {
+    public void setLxcManager( LxcManager lxcManager )
+    {
         this.lxcManager = lxcManager;
     }
 
 
-    public void setNetworkManager( NetworkManager networkManager ) {
+    public void setNetworkManager( NetworkManager networkManager )
+    {
         this.networkManager = networkManager;
     }
 
 
-    public UUID installCluster( final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration ) {
+    public UUID installCluster( final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    {
         AbstractOperationHandler operationHandler =
                 new InstallOperationHandler( this, elasticsearchClusterConfiguration );
         executor.execute( operationHandler );
@@ -153,13 +171,16 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName ) {
+    public UUID uninstallCluster( final String clusterName )
+    {
         final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
 
-        executor.execute( new Runnable() {
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
+            public void run()
+            {
                 ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null )
                 {
@@ -192,14 +213,16 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public List<ElasticsearchClusterConfiguration> getClusters() {
+    public List<ElasticsearchClusterConfiguration> getClusters()
+    {
         return pluginDAO
                 .getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, ElasticsearchClusterConfiguration.class );
     }
 
 
     @Override
-    public ElasticsearchClusterConfiguration getCluster( String clusterName ) {
+    public ElasticsearchClusterConfiguration getCluster( String clusterName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         return pluginDAO.getInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, clusterName,
                 ElasticsearchClusterConfiguration.class );
@@ -207,12 +230,15 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID startAllNodes( final String clusterName ) {
+    public UUID startAllNodes( final String clusterName )
+    {
         final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Starting cluster %s", clusterName ) );
 
-        executor.execute( new Runnable() {
-            public void run() {
+        executor.execute( new Runnable()
+        {
+            public void run()
+            {
                 ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null )
                 {
@@ -239,13 +265,16 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID checkAllNodes( final String clusterName ) {
+    public UUID checkAllNodes( final String clusterName )
+    {
         final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Checking cluster %s", clusterName ) );
 
-        executor.execute( new Runnable() {
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
+            public void run()
+            {
                 ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null )
                 {
@@ -273,13 +302,16 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID stopAllNodes( final String clusterName ) {
+    public UUID stopAllNodes( final String clusterName )
+    {
         final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Stopping cluster %s", clusterName ) );
 
-        executor.execute( new Runnable() {
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
+            public void run()
+            {
                 ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
                 if ( elasticsearchClusterConfiguration == null )
                 {
@@ -307,7 +339,8 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID addNode( final String clusterName, final String lxcHostname ) {
+    public UUID addNode( final String clusterName, final String lxcHostname )
+    {
         AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -315,7 +348,8 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID checkNode( final String clusterName, final String lxcHostname ) {
+    public UUID checkNode( final String clusterName, final String lxcHostname )
+    {
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -323,7 +357,8 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID startNode( final String clusterName, final String lxcHostname ) {
+    public UUID startNode( final String clusterName, final String lxcHostname )
+    {
         AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -331,7 +366,8 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID stopNode( final String clusterName, final String lxcHostname ) {
+    public UUID stopNode( final String clusterName, final String lxcHostname )
+    {
         AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -339,7 +375,8 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID destroyNode( final String clusterName, final String lxcHostname ) {
+    public UUID destroyNode( final String clusterName, final String lxcHostname )
+    {
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -350,7 +387,8 @@ public class ElasticsearchImpl implements Elasticsearch {
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
                                                          final ElasticsearchClusterConfiguration
                                                                  elasticsearchClusterConfiguration,
-                                                         final ProductOperation po ) {
+                                                         final ProductOperation po )
+    {
 
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Zookeeper cluster config is null" );
@@ -360,7 +398,8 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    {
 
         StringBuilder log = new StringBuilder();
 
@@ -385,7 +424,8 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint(
-            ElasticsearchClusterConfiguration elasticsearchClusterConfiguration ) {
+            ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    {
 
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Elasticsearch cluster config is null" );
 

@@ -8,7 +8,8 @@ import org.safehaus.subutai.core.registry.api.Template;
 /**
  * Created by bahadyr on 7/24/14.
  */
-public class Node {
+public class Node
+{
 
     private Agent agent;
     private Template template;

@@ -9,22 +9,23 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Deletes file(s) from working directory and index
  */
-@Command( scope = "git", name = "delete-files", description = "Delete files from repo" )
-public class DeleteFiles extends OsgiCommandSupport {
+@Command(scope = "git", name = "delete-files", description = "Delete files from repo")
+public class DeleteFiles extends OsgiCommandSupport
+{
 
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
-    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
+    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
     String repoPath;
-    @Argument( index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to delete" )
+    @Argument(index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to delete")
     Collection<String> files;
     private AgentManager agentManager;
     private GitManager gitManager;

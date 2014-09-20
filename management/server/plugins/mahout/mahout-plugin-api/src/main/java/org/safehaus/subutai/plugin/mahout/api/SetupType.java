@@ -1,7 +1,8 @@
 package org.safehaus.subutai.plugin.mahout.api;
 
 
-public enum SetupType {
+public enum SetupType
+{
 
     OVER_HADOOP,
     WITH_HADOOP

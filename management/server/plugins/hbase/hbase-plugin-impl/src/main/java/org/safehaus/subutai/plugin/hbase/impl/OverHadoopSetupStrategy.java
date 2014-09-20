@@ -4,56 +4,66 @@ package org.safehaus.subutai.plugin.hbase.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 
 /**
  * Created by bahadyr on 9/4/14.
  */
-public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
+public class OverHadoopSetupStrategy extends HBaseSetupStrategy
+{
 
 
-    public OverHadoopSetupStrategy( HBaseImpl manager, ProductOperation po, HBaseClusterConfig config ) {
+    public OverHadoopSetupStrategy( HBaseImpl manager, ProductOperation po, HBaseClusterConfig config )
+    {
         super( manager, po, config );
     }
 
 
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
         final ProductOperation po =
                 manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY, "Installing HBase" );
 
-        manager.getExecutor().execute( new Runnable() {
+        manager.getExecutor().execute( new Runnable()
+        {
 
-            public void run() {
+            public void run()
+            {
                 if ( manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(),
-                        HBaseClusterConfig.class ) != null ) {
+                        HBaseClusterConfig.class ) != null )
+                {
                     po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
                     return;
                 }
 
                 Set<Agent> allNodes;
-                try {
+                try
+                {
                     allNodes = getAllNodes( config );
                 }
-                catch ( Exception e ) {
+                catch ( Exception e )
+                {
                     po.addLogFailed( e.getMessage() );
                     return;
                 }
 
-                if ( manager.getAgentManager().getAgentByHostname( config.getHadoopNameNode() ) == null ) {
+                if ( manager.getAgentManager().getAgentByHostname( config.getHadoopNameNode() ) == null )
+                {
                     po.addLogFailed( String.format( "Hadoop NameNode %s not connected", config.getHadoopNameNode() ) );
                     return;
                 }
 
                 if ( manager.getDbManager()
-                            .saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+                            .saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+                {
 
                     po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
 
@@ -75,16 +85,19 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
 
                     // Installing HBase
                     po.addLog( "Installing HBase on ..." );
-                    for ( Agent agent : allNodes ) {
+                    for ( Agent agent : allNodes )
+                    {
                         po.addLog( agent.getHostname() );
                     }
                     Command installCommand = Commands.getInstallCommand( allNodes );
                     manager.getCommandRunner().runCommand( installCommand );
 
-                    if ( installCommand.hasSucceeded() ) {
+                    if ( installCommand.hasSucceeded() )
+                    {
                         po.addLog( "Installation HBase successful.." );
                     }
-                    else {
+                    else
+                    {
                         po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
                         return;
                     }
@@ -97,10 +110,12 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
                             manager.getAgentManager().getAgentByHostname( config.getMaster() ).getHostname() );
                     manager.getCommandRunner().runCommand( configureMasterCommand );
 
-                    if ( configureMasterCommand.hasSucceeded() ) {
+                    if ( configureMasterCommand.hasSucceeded() )
+                    {
                         po.addLog( "Configure master successful..." );
                     }
-                    else {
+                    else
+                    {
                         po.addLogFailed( String.format( "Configuration failed, %s", configureMasterCommand ) );
                         return;
                     }
@@ -108,7 +123,8 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
 
                     // Configuring region
                     StringBuilder sbRegion = new StringBuilder();
-                    for ( String hostname : config.getRegion() ) {
+                    for ( String hostname : config.getRegion() )
+                    {
                         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
                         sbRegion.append( agent.getHostname() );
                         sbRegion.append( " " );
@@ -117,10 +133,12 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
                             Commands.getConfigRegionCommand( allNodes, sbRegion.toString().trim() );
                     manager.getCommandRunner().runCommand( configureRegionCommand );
 
-                    if ( configureRegionCommand.hasSucceeded() ) {
+                    if ( configureRegionCommand.hasSucceeded() )
+                    {
                         po.addLog( "Configuring region success..." );
                     }
-                    else {
+                    else
+                    {
                         po.addLogFailed(
                                 String.format( "Configuring failed, %s", configureRegionCommand.getAllErrors() ) );
                         return;
@@ -129,7 +147,8 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
 
                     // Configuring quorum
                     StringBuilder sbQuorum = new StringBuilder();
-                    for ( String hostname : config.getQuorum() ) {
+                    for ( String hostname : config.getQuorum() )
+                    {
                         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
                         sbQuorum.append( agent.getHostname() );
                         sbQuorum.append( " " );
@@ -138,10 +157,12 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
                             Commands.getConfigQuorumCommand( allNodes, sbQuorum.toString().trim() );
                     manager.getCommandRunner().runCommand( configureQuorumCommand );
 
-                    if ( configureQuorumCommand.hasSucceeded() ) {
+                    if ( configureQuorumCommand.hasSucceeded() )
+                    {
                         po.addLog( "Configuring quorum success..." );
                     }
-                    else {
+                    else
+                    {
                         po.addLogFailed(
                                 String.format( "Installation failed, %s", configureQuorumCommand.getAllErrors() ) );
                         return;
@@ -153,17 +174,20 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
                             manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ).getHostname() );
                     manager.getCommandRunner().runCommand( configureBackupMasterCommand );
 
-                    if ( configureBackupMasterCommand.hasSucceeded() ) {
+                    if ( configureBackupMasterCommand.hasSucceeded() )
+                    {
                         po.addLogDone( "Configuring backup master success..." );
                     }
-                    else {
+                    else
+                    {
                         po.addLogFailed( String.format( "Installation failed, %s",
                                 configureBackupMasterCommand.getAllErrors() ) );
                         return;
                     }
                     po.addLogDone( "Cluster installation succeeded\n" );
                 }
-                else {
+                else
+                {
                     po.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
                 }
             }
@@ -173,27 +197,34 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy {
     }
 
 
-    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception {
+    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception
+    {
         final Set<Agent> allNodes = new HashSet<>();
 
-        if ( manager.getAgentManager().getAgentByHostname( config.getMaster() ) == null ) {
+        if ( manager.getAgentManager().getAgentByHostname( config.getMaster() ) == null )
+        {
             throw new Exception( String.format( "Master node %s not connected", config.getMaster() ) );
         }
         allNodes.add( manager.getAgentManager().getAgentByHostname( config.getMaster() ) );
-        if ( manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ) == null ) {
+        if ( manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ) == null )
+        {
             throw new Exception( String.format( "Backup master node %s not connected", config.getBackupMasters() ) );
         }
         allNodes.add( manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ) );
 
-        for ( String hostname : config.getRegion() ) {
-            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null ) {
+        for ( String hostname : config.getRegion() )
+        {
+            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null )
+            {
                 throw new Exception( String.format( "Region server node %s not connected", hostname ) );
             }
             allNodes.add( manager.getAgentManager().getAgentByHostname( hostname ) );
         }
 
-        for ( String hostname : config.getQuorum() ) {
-            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null ) {
+        for ( String hostname : config.getQuorum() )
+        {
+            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null )
+            {
                 throw new Exception( String.format( "Quorum node %s not connected", hostname ) );
             }
             allNodes.add( manager.getAgentManager().getAgentByHostname( hostname ) );

@@ -2,9 +2,10 @@ package org.safehaus.subutai.core.strategy.api;
 
 
 /**
- * Created by timur on 9/18/14.
+ * Root exception for container placement strategy
  */
-public class StrategyException extends Exception {
+public class StrategyException extends Exception
+{
     public StrategyException( String msg )
     {
         super( msg );

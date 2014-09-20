@@ -5,7 +5,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 
 
-public interface FileTracker {
+public interface FileTracker
+{
 
     public void addListener( ResponseListener listener );
 

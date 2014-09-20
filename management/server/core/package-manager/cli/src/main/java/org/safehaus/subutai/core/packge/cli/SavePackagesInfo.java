@@ -6,16 +6,17 @@ import java.util.Collection;
 import org.safehaus.subutai.core.packge.api.PackageInfo;
 import org.safehaus.subutai.core.packge.api.PackageManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "deb-package", name = "save", description = "save packages info" )
-public class SavePackagesInfo extends OsgiCommandSupport {
+@Command(scope = "deb-package", name = "save", description = "save packages info")
+public class SavePackagesInfo extends OsgiCommandSupport
+{
 
     private PackageManager packageManager;
-    @Argument( index = 0, required = true )
+    @Argument(index = 0, required = true)
     private String hostname;
 
 

@@ -18,13 +18,15 @@ import org.safehaus.subutai.plugin.mahout.impl.MahoutImpl;
 /**
  * Created by dilshat on 5/6/14.
  */
-public class InstallHandler extends AbstractOperationHandler<MahoutImpl> {
+public class InstallHandler extends AbstractOperationHandler<MahoutImpl>
+{
     private final ProductOperation po;
     private final MahoutClusterConfig config;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-    public InstallHandler( MahoutImpl manager, MahoutClusterConfig config ) {
+    public InstallHandler( MahoutImpl manager, MahoutClusterConfig config )
+    {
         super( manager, config.getClusterName() );
         this.config = config;
         po = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
@@ -33,40 +35,49 @@ public class InstallHandler extends AbstractOperationHandler<MahoutImpl> {
 
 
     @Override
-    public UUID getTrackerId() {
+    public UUID getTrackerId()
+    {
         return po.getId();
     }
 
 
     @Override
-    public void run() {
+    public void run()
+    {
 
-        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
             setupOverHadoop();
         }
-        else {
+        else
+        {
             setupWithHadoop();
         }
     }
 
 
-    private void setupOverHadoop() {
-        try {
+    private void setupOverHadoop()
+    {
+        try
+        {
             //setup up Accumulo cluster
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, productOperation );
             setupStrategy.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( ClusterSetupException e ) {
+        catch ( ClusterSetupException e )
+        {
             productOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 
 
-    private void setupWithHadoop() {
-        try {
+    private void setupWithHadoop()
+    {
+        try
+        {
             final String COMBO_TEMPLATE_NAME = "hadoopnzknaccumulo";
             hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
             //create environment
@@ -80,13 +91,13 @@ public class InstallHandler extends AbstractOperationHandler<MahoutImpl> {
 
 
             //setup up Mahout cluster
-            ClusterSetupStrategy ss =
-                    manager.getClusterSetupStrategy( env, config, productOperation );
+            ClusterSetupStrategy ss = manager.getClusterSetupStrategy( env, config, productOperation );
             ss.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( EnvironmentBuildException | ClusterSetupException e ) {
+        catch ( EnvironmentBuildException | ClusterSetupException e )
+        {
             productOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }

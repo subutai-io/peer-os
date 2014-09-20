@@ -3,13 +3,14 @@ package org.safehaus.subutai.core.packge.cli;
 
 import org.safehaus.subutai.core.packge.api.PackageManager;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 @Command(scope = "deb-package", name = "delete", description = "delete previously saved packages info")
-public class DeletePackagesInfo extends OsgiCommandSupport {
+public class DeletePackagesInfo extends OsgiCommandSupport
+{
 
     private PackageManager packageManager;
     @Argument(index = 0, required = true)
