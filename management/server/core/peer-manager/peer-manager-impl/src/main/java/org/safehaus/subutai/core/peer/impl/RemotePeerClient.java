@@ -20,9 +20,7 @@ import com.google.gson.GsonBuilder;
 public class RemotePeerClient
 {
 
-    private final static Logger LOG = Logger.getLogger( RemotePeerClient.class.getName() );
-
-
+    private static final Logger LOG = Logger.getLogger( RemotePeerClient.class.getName() );
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl;
 
