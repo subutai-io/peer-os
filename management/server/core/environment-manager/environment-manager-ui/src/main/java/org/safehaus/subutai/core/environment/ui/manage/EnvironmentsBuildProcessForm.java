@@ -23,7 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentsBuildProcessForm
 {
 
-    private final static Logger LOG = Logger.getLogger( EnvironmentsBuildProcessForm.class.getName() );
+    private static final Logger LOG = Logger.getLogger( EnvironmentsBuildProcessForm.class.getName() );
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
@@ -211,10 +211,13 @@ public class EnvironmentsBuildProcessForm
                     } );
                     break;
                 }
+                default:{
+                    break;
+                }
             }
 
 
-            final Object rowId = environmentsTable.addItem( new Object[] {
+            environmentsTable.addItem( new Object[] {
                     environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
                     destroyButton
             }, null );
