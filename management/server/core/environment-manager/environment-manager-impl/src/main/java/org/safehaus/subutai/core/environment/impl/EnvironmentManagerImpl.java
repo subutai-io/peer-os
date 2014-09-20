@@ -8,6 +8,7 @@ package org.safehaus.subutai.core.environment.impl;
 
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
@@ -235,7 +236,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( EnvironmentDestroyException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return false;
     }
@@ -256,7 +257,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return false;
     }
@@ -343,7 +344,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             catch ( EnvironmentBuildException e )
             {
-                LOG.severe( e.getMessage() );
+                LOG.log( Level.SEVERE, e.getMessage() );
             }
         }
         return false;
