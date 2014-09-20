@@ -6,6 +6,24 @@
 package org.safehaus.subutai.plugin.cassandra.ui.manager;
 
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -23,22 +41,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-
-import javax.naming.NamingException;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 
 
 public class Manager
@@ -76,7 +78,8 @@ public class Manager
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.cassandra = serviceLocator.getService( Cassandra.class );
         this.executorService = executorService;
@@ -111,9 +114,11 @@ public class Manager
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 config = ( CassandraClusterConfig ) event.getProperty().getValue();
                 refreshUI();
                 checkAllNodes();
@@ -125,9 +130,11 @@ public class Manager
         /** Refresh button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 refreshClustersInfo();
             }
         } );
@@ -137,12 +144,17 @@ public class Manager
         /** Check all button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
         checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener() {
+        checkAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
-                } else {
+                }
+                else
+                {
                     checkAllNodes();
                 }
             }
@@ -153,13 +165,17 @@ public class Manager
         /** Start all button */
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
         startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
+        startAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
                 }
-                else {
+                else
+                {
                     startAllNodes();
                 }
             }
@@ -170,13 +186,17 @@ public class Manager
         /** Stop all button */
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
         stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
+        stopAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
                 }
-                else {
+                else
+                {
                     stopAllNodes();
                 }
             }
@@ -188,26 +208,32 @@ public class Manager
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
                             "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             /** before destroying cluster, stop it first to not leave background zombie processes **/
                             stopAllBtn.click();
                             UUID trackID = cassandra.uninstallCluster( config.getClusterName() );
 
-                            ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID,
-                                            CassandraClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    CassandraClusterConfig.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -217,7 +243,8 @@ public class Manager
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -231,14 +258,20 @@ public class Manager
     }
 
 
-    public void disableOREnableAllButtonsOnTable( Table table, boolean value ){
-        if ( table != null ) {
-            for ( Object o : table.getItemIds() ) {
+    public void disableOREnableAllButtonsOnTable( Table table, boolean value )
+    {
+        if ( table != null )
+        {
+            for ( Object o : table.getItemIds() )
+            {
                 int rowId = ( Integer ) o;
                 Item row = table.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-                if ( availableOperationsLayout != null ) {
-                    for ( Component component : availableOperationsLayout ) {
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    for ( Component component : availableOperationsLayout )
+                    {
                         component.setEnabled( value );
                     }
                 }
@@ -254,7 +287,8 @@ public class Manager
      *
      * @return nodes table
      */
-    private Table createTableTemplate( String caption ) {
+    private Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
@@ -267,20 +301,26 @@ public class Manager
         table.setSelectable( false );
         table.setImmediate( true );
         table.setColumnCollapsingAllowed( true );
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION ).getValue();
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
+                                            .getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService,
-                                        commandRunner, agentManager );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
@@ -296,9 +336,11 @@ public class Manager
      * @param table table to be filled
      * @param agents nodes
      */
-    private void populateTable( final Table table, Set<Agent> agents ) {
+    private void populateTable( final Table table, Set<Agent> agents )
+    {
         table.removeAllItems();
-        for ( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
             checkButton.addStyleName( "default" );
@@ -315,7 +357,7 @@ public class Manager
             stopButton.setEnabled( false );
             progressIcon.setVisible( false );
 
-            final HorizontalLayout availableOperations = new HorizontalLayout( );
+            final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.addStyleName( "default" );
             availableOperations.setSpacing( true );
 
@@ -329,70 +371,91 @@ public class Manager
                     agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
             }, null );
 
-            checkButton.addClickListener( new Button.ClickListener() {
+            checkButton.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
                     executorService.execute(
-                            new CheckTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-                                public void onComplete( String result ) {
-                                    synchronized( progressIcon ) {
-                                        resultHolder.setValue( result );
-                                        if( result.contains( "not" ) ) {
-                                            startButton.setEnabled( true );
-                                            stopButton.setEnabled( false );
-                                        } else {
-                                            startButton.setEnabled( false );
-                                            stopButton.setEnabled( true );
+                            new CheckTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                resultHolder.setValue( result );
+                                                if ( result.contains( "not" ) )
+                                                {
+                                                    startButton.setEnabled( true );
+                                                    stopButton.setEnabled( false );
+                                                }
+                                                else
+                                                {
+                                                    startButton.setEnabled( false );
+                                                    stopButton.setEnabled( true );
+                                                }
+                                                progressIcon.setVisible( false );
+                                                checkButton.setEnabled( true );
+                                            }
                                         }
-                                        progressIcon.setVisible( false );
-                                        checkButton.setEnabled( true );
-                                    }
-                                }
-                            } ) );
+                                    } ) );
                 }
             } );
 
-            startButton.addClickListener( new Button.ClickListener() {
+            startButton.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
                     executorService.execute(
-                            new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-                                @Override
-                                public void onComplete( String result ) {
-                                    synchronized( progressIcon ) {
-                                        checkButton.setEnabled( true );
-                                        checkButton.click();
-                                    }
-                                }
-                            } ) );
+                            new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
+                                        @Override
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                checkButton.setEnabled( true );
+                                                checkButton.click();
+                                            }
+                                        }
+                                    } ) );
                 }
             } );
 
-            stopButton.addClickListener( new Button.ClickListener() {
+            stopButton.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
                     executorService.execute(
-                            new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-                                @Override
-                                public void onComplete( String result ) {
-                                    synchronized( progressIcon ) {
-                                        checkButton.setEnabled( true );
-                                        checkButton.click();
-                                    }
-                                }
-                            } ) );
+                            new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
+                                        @Override
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                checkButton.setEnabled( true );
+                                                checkButton.click();
+                                            }
+                                        }
+                                    } ) );
                 }
             } );
         }
@@ -404,39 +467,26 @@ public class Manager
      *
      * @param notification notification which will shown.
      */
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 
 
-    public void stopAllNodes() {
-        for( Agent agent : config.getNodes() ) {
+    public void stopAllNodes()
+    {
+        for ( Agent agent : config.getNodes() )
+        {
             progressIcon.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    {
                         @Override
-                        public void onComplete( String result ) {
-                            synchronized ( progressIcon ) {
-                                disableOREnableAllButtonsOnTable( nodesTable, true );
-                                checkAllNodes();
-                            }
-                        }
-                    } ) );
-
-        }
-    }
-
-
-    public void startAllNodes() {
-        for( Agent agent : config.getNodes() ) {
-            progressIcon.setVisible( true );
-            disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService.execute(
-                    new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-                        @Override
-                        public void onComplete( String result ) {
-                            synchronized ( progressIcon ) {
+                        public void onComplete( String result )
+                        {
+                            synchronized ( progressIcon )
+                            {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();
                             }
@@ -446,15 +496,44 @@ public class Manager
     }
 
 
-    public void checkAllNodes() {
-        if ( nodesTable != null ) {
-            for ( Object o : nodesTable.getItemIds() ) {
+    public void startAllNodes()
+    {
+        for ( Agent agent : config.getNodes() )
+        {
+            progressIcon.setVisible( true );
+            disableOREnableAllButtonsOnTable( nodesTable, false );
+            executorService.execute(
+                    new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    {
+                        @Override
+                        public void onComplete( String result )
+                        {
+                            synchronized ( progressIcon )
+                            {
+                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                checkAllNodes();
+                            }
+                        }
+                    } ) );
+        }
+    }
+
+
+    public void checkAllNodes()
+    {
+        if ( nodesTable != null )
+        {
+            for ( Object o : nodesTable.getItemIds() )
+            {
                 int rowId = ( Integer ) o;
                 Item row = nodesTable.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-                if ( availableOperationsLayout != null ) {
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
                     Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
-                    if ( checkBtn != null ) {
+                    if ( checkBtn != null )
+                    {
                         checkBtn.click();
                     }
                 }
@@ -463,13 +542,18 @@ public class Manager
     }
 
 
-    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption ) {
-        if ( availableOperationsLayout == null ) {
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( caption ) ) {
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -482,11 +566,14 @@ public class Manager
      * Removes all items in the table, and populate it again with {@link #populateTable(com.vaadin.ui.Table,
      * java.util.Set)}.
      */
-    private void refreshUI() {
-        if ( config != null ) {
+    private void refreshUI()
+    {
+        if ( config != null )
+        {
             populateTable( nodesTable, config.getNodes() );
         }
-        else {
+        else
+        {
             nodesTable.removeAllItems();
         }
     }
@@ -497,8 +584,10 @@ public class Manager
      *
      * @return Yes if give agent is among seeds, otherwise returns No
      */
-    public String checkIfSeed( Agent agent ) {
-        if ( config.getSeedNodes().contains( agent ) ) {
+    public String checkIfSeed( Agent agent )
+    {
+        if ( config.getSeedNodes().contains( agent ) )
+        {
             return "Seed";
         }
         return "Not Seed";
@@ -508,31 +597,40 @@ public class Manager
     /**
      * Refreshes combo box which lists available clusters in DB
      */
-    public void refreshClustersInfo() {
+    public void refreshClustersInfo()
+    {
         List<CassandraClusterConfig> info = cassandra.getClusters();
         CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( info != null && info.size() > 0 ) {
-            for ( CassandraClusterConfig cassandraInfo : info ) {
+        if ( info != null && info.size() > 0 )
+        {
+            for ( CassandraClusterConfig cassandraInfo : info )
+            {
                 clusterCombo.addItem( cassandraInfo );
                 clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
             }
-            if ( clusterInfo != null ) {
-                for ( CassandraClusterConfig cassandraInfo : info ) {
-                    if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+            if ( clusterInfo != null )
+            {
+                for ( CassandraClusterConfig cassandraInfo : info )
+                {
+                    if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    {
                         clusterCombo.setValue( cassandraInfo );
                         return;
                     }
                 }
             }
-            else {
+            else
+            {
                 clusterCombo.setValue( info.iterator().next() );
             }
         }
         progressIcon.setVisible( false );
     }
 
-    public Component getContent() {
+
+    public Component getContent()
+    {
         return contentRoot;
     }
 }

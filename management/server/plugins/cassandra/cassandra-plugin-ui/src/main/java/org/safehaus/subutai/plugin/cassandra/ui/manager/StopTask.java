@@ -10,14 +10,18 @@ import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
-public class StopTask implements Runnable {
+public class StopTask implements Runnable
+{
 
     private final String clusterName, lxcHostname;
     private final CompleteEvent completeEvent;
     private Cassandra cassandra;
     private Tracker tracker;
 
-    public StopTask( Cassandra cassandra, Tracker tracker, String clusterName, String lxcHostname, CompleteEvent completeEvent ) {
+
+    public StopTask( Cassandra cassandra, Tracker tracker, String clusterName, String lxcHostname,
+                     CompleteEvent completeEvent )
+    {
         this.cassandra = cassandra;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -25,27 +29,35 @@ public class StopTask implements Runnable {
         this.completeEvent = completeEvent;
     }
 
+
     @Override
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = cassandra.stopService( clusterName, lxcHostname );
 
         long start = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( CassandraClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 ) {
+            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
+            {
                 break;
             }
         }

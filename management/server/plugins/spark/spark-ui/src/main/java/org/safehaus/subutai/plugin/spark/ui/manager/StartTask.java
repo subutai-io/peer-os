@@ -1,14 +1,17 @@
 package org.safehaus.subutai.plugin.spark.ui.manager;
 
+
+import java.util.UUID;
+
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
-import java.util.UUID;
 
-public class StartTask implements Runnable {
+public class StartTask implements Runnable
+{
 
     private final boolean master;
     private final String clusterName, lxcHostname;
@@ -16,7 +19,10 @@ public class StartTask implements Runnable {
     private final Spark spark;
     private final Tracker tracker;
 
-    public StartTask( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname, boolean master, CompleteEvent completeEvent) {
+
+    public StartTask( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname, boolean master,
+                      CompleteEvent completeEvent )
+    {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
@@ -25,31 +31,40 @@ public class StartTask implements Runnable {
         this.tracker = tracker;
     }
 
+
     @Override
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = spark.startNode( clusterName, lxcHostname, master );
 
         long start = System.currentTimeMillis();
 
-        while (!Thread.interrupted()) {
-            ProductOperationView po = tracker.getProductOperation(SparkClusterConfig.PRODUCT_KEY, trackID);
-            if (po != null) {
-                if( po.getState() != ProductOperationState.RUNNING ) {
+        while ( !Thread.interrupted() )
+        {
+            ProductOperationView po = tracker.getProductOperation( SparkClusterConfig.PRODUCT_KEY, trackID );
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
+            try
+            {
+                Thread.sleep( 1000 );
+            }
+            catch ( InterruptedException ex )
+            {
                 break;
             }
 
-            if (System.currentTimeMillis() - start > 60 * 1000)
+            if ( System.currentTimeMillis() - start > 60 * 1000 )
+            {
                 break;
+            }
         }
     }
-
 }

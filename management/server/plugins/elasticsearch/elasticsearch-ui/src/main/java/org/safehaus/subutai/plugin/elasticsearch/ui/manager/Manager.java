@@ -1,6 +1,25 @@
 package org.safehaus.subutai.plugin.elasticsearch.ui.manager;
 
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
@@ -19,34 +38,17 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
-import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-
-import javax.naming.NamingException;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
-public class Manager {
+public class Manager
+{
 
     private final Table nodesTable;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private ElasticsearchClusterConfiguration config;
-    private final String message = "No cluster is installed !";
-    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private static final String message = "No cluster is installed !";
+    private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
 
     private final ExecutorService executorService;
@@ -74,7 +76,8 @@ public class Manager {
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.elasticsearch = serviceLocator.getService( Elasticsearch.class );
         this.executorService = executorService;
@@ -107,13 +110,14 @@ public class Manager {
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 config = ( ElasticsearchClusterConfiguration ) event.getProperty().getValue();
                 refreshUI();
                 checkAllNodes();
-
             }
         } );
 
@@ -123,9 +127,11 @@ public class Manager {
         /**  Refresh clusters button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 refreshClustersInfo();
             }
         } );
@@ -137,12 +143,17 @@ public class Manager {
         /** Check all button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
         checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener() {
+        checkAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
-                } else {
+                }
+                else
+                {
                     checkAllNodes();
                 }
             }
@@ -155,12 +166,17 @@ public class Manager {
         /**  Start all button */
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
         startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
+        startAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
-                } else {
+                }
+                else
+                {
                     startAllNodes();
                 }
             }
@@ -173,12 +189,17 @@ public class Manager {
         /**  Stop all button  */
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
         stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
+        stopAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
-                } else {
+                }
+                else
+                {
                     stopAllNodes();
                 }
             }
@@ -191,26 +212,32 @@ public class Manager {
         /**  Destroy cluster button  */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if( config != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ),
-                            "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
 
                             UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
 
-                            ProgressWindow window = new ProgressWindow(
-                                    executorService, tracker, trackID,
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     ElasticsearchClusterConfiguration.PRODUCT_KEY );
 
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -219,7 +246,9 @@ public class Manager {
                     } );
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
-                } else {
+                }
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -231,19 +260,47 @@ public class Manager {
         controlsContent.addComponent( progressIcon );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
-
     }
 
 
-    public void startAllNodes() {
-        for( Agent agent : config.getNodes() ) {
+    public void startAllNodes()
+    {
+        for ( Agent agent : config.getNodes() )
+        {
             progressIcon.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                            new CompleteEvent()
+                            {
+                                @Override
+                                public void onComplete( String result )
+                                {
+                                    synchronized ( progressIcon )
+                                    {
+                                        disableOREnableAllButtonsOnTable( nodesTable, true );
+                                        checkAllNodes();
+                                    }
+                                }
+                            } ) );
+        }
+    }
+
+
+    public void stopAllNodes()
+    {
+        for ( Agent agent : config.getNodes() )
+        {
+            progressIcon.setVisible( true );
+            disableOREnableAllButtonsOnTable( nodesTable, false );
+            executorService.execute( new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                    new CompleteEvent()
+                    {
                         @Override
-                        public void onComplete( String result ) {
-                            synchronized ( progressIcon ) {
+                        public void onComplete( String result )
+                        {
+                            synchronized ( progressIcon )
+                            {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();
                             }
@@ -253,33 +310,21 @@ public class Manager {
     }
 
 
-    public void stopAllNodes() {
-        for( Agent agent : config.getNodes() ) {
-            progressIcon.setVisible( true );
-            disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService.execute(
-                    new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
-                        @Override
-                        public void onComplete( String result ) {
-                            synchronized ( progressIcon ) {
-                                disableOREnableAllButtonsOnTable( nodesTable, true );
-                                checkAllNodes();
-                            }
-                        }
-                    } ) );
-        }
-    }
-
-
-    public void checkAllNodes() {
-        if ( nodesTable != null ) {
-            for ( Object o : nodesTable.getItemIds() ) {
+    public void checkAllNodes()
+    {
+        if ( nodesTable != null )
+        {
+            for ( Object o : nodesTable.getItemIds() )
+            {
                 int rowId = ( Integer ) o;
                 Item row = nodesTable.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-                if ( availableOperationsLayout != null ) {
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
                     Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
-                    if ( checkBtn != null ) {
+                    if ( checkBtn != null )
+                    {
                         checkBtn.click();
                     }
                 }
@@ -288,13 +333,18 @@ public class Manager {
     }
 
 
-    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption ) {
-        if ( availableOperationsLayout == null ) {
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( caption ) ) {
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -303,14 +353,20 @@ public class Manager {
     }
 
 
-    public void disableOREnableAllButtonsOnTable( Table table, boolean value ){
-        if ( table != null ) {
-            for ( Object o : table.getItemIds() ) {
+    public void disableOREnableAllButtonsOnTable( Table table, boolean value )
+    {
+        if ( table != null )
+        {
+            for ( Object o : table.getItemIds() )
+            {
                 int rowId = ( Integer ) o;
                 Item row = table.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-                if ( availableOperationsLayout != null ) {
-                    for ( Component component : availableOperationsLayout ) {
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    for ( Component component : availableOperationsLayout )
+                    {
                         component.setEnabled( value );
                     }
                 }
@@ -318,7 +374,9 @@ public class Manager {
         }
     }
 
-    private Table createTableTemplate( String caption ) {
+
+    private Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
@@ -333,17 +391,26 @@ public class Manager {
         table.setImmediate( true );
         table.setColumnCollapsingAllowed( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if( event.isDoubleClick() ) {
-                    String lxcHostname = ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
-                            .getValue();
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
+                    String lxcHostname =
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
+                                            .getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if( lxcAgent != null ) {
-                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner, agentManager );
+                    if ( lxcAgent != null )
+                    {
+                        TerminalWindow terminal =
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
-                    } else {
+                    }
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
@@ -352,57 +419,74 @@ public class Manager {
         return table;
     }
 
-    private void show( String notification ) {
+
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 
 
-    private void refreshUI() {
-        if( config != null ) {
+    private void refreshUI()
+    {
+        if ( config != null )
+        {
             populateTable( nodesTable, config.getNodes() );
-        } else {
+        }
+        else
+        {
             nodesTable.removeAllItems();
         }
     }
 
 
-    public void refreshClustersInfo() {
-        List< ElasticsearchClusterConfiguration > config = elasticsearch.getClusters();
+    public void refreshClustersInfo()
+    {
+        List<ElasticsearchClusterConfiguration> config = elasticsearch.getClusters();
         ElasticsearchClusterConfiguration clusterInfo = ( ElasticsearchClusterConfiguration ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
 
-        if( config == null || config.isEmpty() ) {
+        if ( config == null || config.isEmpty() )
+        {
             progressIcon.setVisible( false );
             return;
         }
 
-        for( ElasticsearchClusterConfiguration esConfig : config ) {
+        for ( ElasticsearchClusterConfiguration esConfig : config )
+        {
             clusterCombo.addItem( esConfig );
             clusterCombo.setItemCaption( esConfig, esConfig.getClusterName() );
         }
 
-        if( clusterInfo != null ) {
-            for( ElasticsearchClusterConfiguration esConfig : config ) {
-                if( esConfig.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+        if ( clusterInfo != null )
+        {
+            for ( ElasticsearchClusterConfiguration esConfig : config )
+            {
+                if ( esConfig.getClusterName().equals( clusterInfo.getClusterName() ) )
+                {
                     clusterCombo.setValue( esConfig );
                     return;
                 }
             }
-        } else {
+        }
+        else
+        {
             clusterCombo.setValue( config.iterator().next() );
         }
         progressIcon.setVisible( false );
     }
 
+
     /**
      * Fill out the table in which all nodes in the cluster are listed.
      *
-     * @param table  table to be filled
+     * @param table table to be filled
      * @param agents nodes
      */
-    private void populateTable( final Table table, Set< Agent > agents ) {
+    private void populateTable( final Table table, Set<Agent> agents )
+    {
         table.removeAllItems();
-        for( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
             checkButton.addStyleName( "default" );
@@ -428,28 +512,37 @@ public class Manager {
             availableOperations.addComponent( startButton );
             availableOperations.addComponent( stopButton );
 
-            final Object rowId = table.addItem( new Object[]{
-                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder, availableOperations
+            final Object rowId = table.addItem( new Object[] {
+                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder,
+                    availableOperations
             }, null );
 
-            checkButton.addClickListener( new Button.ClickListener() {
+            checkButton.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
                     executorService.execute(
                             new CheckTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
+                                    new CompleteEvent()
+                                    {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
                                                 String status = parseServiceResult( result );
                                                 resultHolder.setValue( status );
-                                                if( status.contains( "not" ) ) {
+                                                if ( status.contains( "not" ) )
+                                                {
                                                     startButton.setEnabled( true );
                                                     stopButton.setEnabled( false );
-                                                } else {
+                                                }
+                                                else
+                                                {
                                                     startButton.setEnabled( false );
                                                     stopButton.setEnabled( true );
                                                 }
@@ -461,18 +554,24 @@ public class Manager {
                 }
             } );
 
-            startButton.addClickListener( new Button.ClickListener() {
+            startButton.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
-                    executorService.execute( new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                    executorService.execute(
+                            new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
                                         @Override
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
                                                 startButton.setEnabled( true );
                                                 stopButton.setEnabled( true );
                                                 checkButton.setEnabled( true );
@@ -483,23 +582,28 @@ public class Manager {
                 }
             } );
 
-            stopButton.addClickListener( new Button.ClickListener() {
+            stopButton.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
-                    executorService.execute( new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                    executorService.execute(
+                            new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
                                         @Override
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
                                                 startButton.setEnabled( true );
                                                 stopButton.setEnabled( true );
                                                 checkButton.setEnabled( true );
                                                 checkButton.click();
-
                                             }
                                         }
                                     } ) );
@@ -508,16 +612,16 @@ public class Manager {
         }
     }
 
+
     /**
      * Parses output of 'service cassandra status' command
-     *
-     * @param result
-     * @return
      */
-    public static String parseServiceResult( String result ) {
+    public static String parseServiceResult( String result )
+    {
         StringBuilder parsedResult = new StringBuilder();
         Matcher tracersMatcher = elasticsearchPattern.matcher( result );
-        if( tracersMatcher.find() ) {
+        if ( tracersMatcher.find() )
+        {
             parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
         }
 
@@ -527,17 +631,21 @@ public class Manager {
 
     /**
      * @param agent agent
+     *
      * @return Yes if give agent is among seeds, otherwise returns No
      */
-    public String checkIfMaster( Agent agent ) {
-        if( config.getMasterNodes().contains( agent ) ) {
+    public String checkIfMaster( Agent agent )
+    {
+        if ( config.getMasterNodes().contains( agent ) )
+        {
             return "Master";
         }
         return "Data";
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return contentRoot;
     }
 }

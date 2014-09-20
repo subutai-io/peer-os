@@ -11,6 +11,7 @@ import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 
+
 public class StopNodeOperationHandlerTest
 {
     private PrestoImplMock mock;

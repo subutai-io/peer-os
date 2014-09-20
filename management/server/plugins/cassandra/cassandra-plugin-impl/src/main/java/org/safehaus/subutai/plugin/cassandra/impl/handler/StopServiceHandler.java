@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -10,15 +9,18 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
-import java.util.UUID;
+import com.google.common.collect.Sets;
 
-public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> {
+
+public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
+{
 
     private String lxcHostname;
     private String clusterName;
 
 
-    public StopServiceHandler( final CassandraImpl manager, final String clusterName, final String lxcHostname ) {
+    public StopServiceHandler( final CassandraImpl manager, final String clusterName, final String lxcHostname )
+    {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         this.clusterName = clusterName;
@@ -26,20 +28,25 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> 
                 String.format( "Stopping %s cluster...", clusterName ) );
     }
 
+
     @Override
-    public void run() {
+    public void run()
+    {
         CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
-        if ( cassandraConfig == null ) {
+        if ( cassandraConfig == null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( node == null ) {
+        if ( node == null )
+        {
             productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) ) {
+        if ( !cassandraConfig.getNodes().contains( node ) )
+        {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
@@ -48,11 +55,14 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> 
         Command stopServiceCommand = Commands.getStopCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( stopServiceCommand );
 
-        if ( stopServiceCommand.hasSucceeded() ) {
+        if ( stopServiceCommand.hasSucceeded() )
+        {
             AgentResult ar = stopServiceCommand.getResults().get( node.getUuid() );
             productOperation.addLog( ar.getStdOut() );
             productOperation.addLogDone( "Stop succeeded" );
-        } else {
+        }
+        else
+        {
             productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
         }
     }

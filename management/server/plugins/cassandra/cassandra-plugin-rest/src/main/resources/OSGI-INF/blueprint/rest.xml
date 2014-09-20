@@ -5,22 +5,22 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
-    <cxf:bus id="cxfBusCassandra">
-      <cxf:features>
-        <cxf:logging />
-      </cxf:features>
-    </cxf:bus>
+  <cxf:bus id="cxfBusCassandra">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
 
-    <jaxrs:server address="/cassandra" id="cassandraRestService">
-        <jaxrs:serviceBeans>
-            <ref component-id="cassandraRestServiceImpl"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
+  <jaxrs:server address="/cassandra" id="cassandraRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="cassandraRestServiceImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
 
-    <bean id="cassandraRestServiceImpl" class="org.safehaus.subutai.plugin.cassandra.rest.RestServiceImpl">
-        <property name="cassandraManager" ref="cassandraManager"/>
-    </bean>
+  <bean id="cassandraRestServiceImpl" class="org.safehaus.subutai.plugin.cassandra.rest.RestServiceImpl">
+    <property name="cassandraManager" ref="cassandraManager" />
+  </bean>
 
-    <reference id="cassandraManager" availability="mandatory"
-               interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra"/>
+  <reference id="cassandraManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra" />
 </blueprint>

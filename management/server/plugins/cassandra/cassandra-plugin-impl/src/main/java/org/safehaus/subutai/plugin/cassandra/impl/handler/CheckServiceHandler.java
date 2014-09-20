@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -10,16 +9,18 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
-import java.util.UUID;
+import com.google.common.collect.Sets;
 
 
-public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl> {
+public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
+{
 
     private String lxcHostname;
     private String clusterName;
 
 
-    public CheckServiceHandler( final CassandraImpl manager, final String clusterName, final String agentUUID ) {
+    public CheckServiceHandler( final CassandraImpl manager, final String clusterName, final String agentUUID )
+    {
         super( manager, clusterName );
         this.lxcHostname = agentUUID;
         this.clusterName = clusterName;
@@ -29,19 +30,23 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
-        if ( cassandraConfig == null ) {
+        if ( cassandraConfig == null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( node == null ) {
+        if ( node == null )
+        {
             productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) ) {
+        if ( !cassandraConfig.getNodes().contains( node ) )
+        {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
@@ -50,14 +55,20 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( statusServiceCommand );
-        if ( statusServiceCommand.hasSucceeded() ) {
+        if ( statusServiceCommand.hasSucceeded() )
+        {
             AgentResult ar = statusServiceCommand.getResults().get( agent.getUuid() );
-            if ( ar.getStdOut().contains( "is running" ) ) {
+            if ( ar.getStdOut().contains( "is running" ) )
+            {
                 productOperation.addLogDone( "Cassandra is running" );
-            } else {
+            }
+            else
+            {
                 productOperation.addLogFailed( "Cassandra is not running" );
             }
-        } else {
+        }
+        else
+        {
             productOperation.addLogFailed( "Cassandra is not running" );
         }
     }

@@ -14,9 +14,11 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class SparkForm extends CustomComponent {
+public class SparkForm extends CustomComponent
+{
 
-    public SparkForm( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException {
+    public SparkForm( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -29,12 +31,15 @@ public class SparkForm extends CustomComponent {
         Wizard wizard = new Wizard( executor, serviceLocator );
         sparkSheet.addTab( wizard.getContent(), "Install" );
         sparkSheet.addTab( manager.getContent(), "Manage" );
-        sparkSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+        sparkSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
             @Override
-            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
                 TabSheet tabsheet = event.getTabSheet();
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if( caption.equals( "Manage" ) ) {
+                if ( caption.equals( "Manage" ) )
+                {
                     manager.refreshClustersInfo();
                 }
             }

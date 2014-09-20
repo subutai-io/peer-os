@@ -1,16 +1,17 @@
 package org.safehaus.subutai.plugin.spark.ui.manager;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
-import java.util.UUID;
 
-
-public class StopTask implements Runnable {
+public class StopTask implements Runnable
+{
 
     private final String clusterName, lxcHostname;
     private final boolean master;
@@ -20,7 +21,8 @@ public class StopTask implements Runnable {
 
 
     public StopTask( final Spark spark, final Tracker tracker, String clusterName, String lxcHostname, boolean master,
-                     CompleteEvent completeEvent ) {
+                     CompleteEvent completeEvent )
+    {
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
@@ -31,28 +33,36 @@ public class StopTask implements Runnable {
 
 
     @Override
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = spark.stopNode( clusterName, lxcHostname, master );
 
         long start = System.currentTimeMillis();
 
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( SparkClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
 
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
-            } catch ( InterruptedException ex ) {
+            }
+            catch ( InterruptedException ex )
+            {
                 break;
             }
 
-            if ( System.currentTimeMillis() - start > 30 * 1000 ) {
+            if ( System.currentTimeMillis() - start > 30 * 1000 )
+            {
                 break;
             }
         }

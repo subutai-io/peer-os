@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -9,63 +10,88 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
-public class SetupStrategyWithHadoop extends SetupBase implements ClusterSetupStrategy {
+
+public class SetupStrategyWithHadoop extends SetupBase implements ClusterSetupStrategy
+{
 
     private Environment environment;
 
-    public SetupStrategyWithHadoop(ProductOperation po, SparkImpl manager, SparkClusterConfig config) {
-        super(po, manager, config);
+
+    public SetupStrategyWithHadoop( ProductOperation po, SparkImpl manager, SparkClusterConfig config )
+    {
+        super( po, manager, config );
     }
 
-    public void setEnvironment(Environment environment) {
+
+    public void setEnvironment( Environment environment )
+    {
         this.environment = environment;
     }
 
+
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
 
-        if (manager.getCluster(config.getClusterName()) != null)
-            throw new ClusterSetupException("Cluster already exists: " + config.getClusterName());
+        if ( manager.getCluster( config.getClusterName() ) != null )
+        {
+            throw new ClusterSetupException( "Cluster already exists: " + config.getClusterName() );
+        }
 
-        if (environment == null)
-            throw new ClusterSetupException("Environment not specified");
+        if ( environment == null )
+        {
+            throw new ClusterSetupException( "Environment not specified" );
+        }
 
-        if (environment.getNodes() == null || environment.getNodes().isEmpty())
-            throw new ClusterSetupException("Environment has no nodes");
+        if ( environment.getNodes() == null || environment.getNodes().isEmpty() )
+        {
+            throw new ClusterSetupException( "Environment has no nodes" );
+        }
 
         config.getSlaveNodes().clear();
         config.getHadoopNodes().clear();
-        for (Node n : environment.getNodes()) {
-            config.getHadoopNodes().add(n.getAgent());
-            if (n.getTemplate().getProducts().contains(Commands.PACKAGE_NAME))
-                if (config.getMasterNode() == null)
-                    config.setMasterNode(n.getAgent());
+        for ( Node n : environment.getNodes() )
+        {
+            config.getHadoopNodes().add( n.getAgent() );
+            if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
+            {
+                if ( config.getMasterNode() == null )
+                {
+                    config.setMasterNode( n.getAgent() );
+                }
                 else
-                    config.getSlaveNodes().add(n.getAgent());
+                {
+                    config.getSlaveNodes().add( n.getAgent() );
+                }
+            }
         }
-        if (config.getMasterNode() == null)
-            throw new ClusterSetupException("Environment has no master node");
-        if (config.getSlaveNodes().isEmpty())
-            throw new ClusterSetupException("Environment has no Spark nodes");
+        if ( config.getMasterNode() == null )
+        {
+            throw new ClusterSetupException( "Environment has no master node" );
+        }
+        if ( config.getSlaveNodes().isEmpty() )
+        {
+            throw new ClusterSetupException( "Environment has no Spark nodes" );
+        }
 
         checkConnected();
 
-        po.addLog("Saving cluster info...");
-        try {
-            manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info saved to DB");
-        } catch (DBException e) {
-            throw new ClusterSetupException("Failed to save cluster info: "
-                    + e.getMessage());
+        po.addLog( "Saving cluster info..." );
+        try
+        {
+            manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLog( "Cluster info saved to DB" );
+        }
+        catch ( DBException e )
+        {
+            throw new ClusterSetupException( "Failed to save cluster info: " + e.getMessage() );
         }
 
-        SetupHelper helper = new SetupHelper(manager, config, po);
-        helper.configureMasterIP(config.getSlaveNodes());
+        SetupHelper helper = new SetupHelper( manager, config, po );
+        helper.configureMasterIP( config.getSlaveNodes() );
         helper.registerSlaves();
         helper.startCluster();
 
         return config;
     }
-
 }

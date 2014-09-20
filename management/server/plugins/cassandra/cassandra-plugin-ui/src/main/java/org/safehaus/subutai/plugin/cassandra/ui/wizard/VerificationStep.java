@@ -21,10 +21,12 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class VerificationStep extends VerticalLayout {
+public class VerificationStep extends VerticalLayout
+{
 
-    public VerificationStep( final Cassandra cassandra, final ExecutorService executorService,
-                             final Tracker tracker, final Wizard wizard ) {
+    public VerificationStep( final Cassandra cassandra, final ExecutorService executorService, final Tracker tracker,
+                             final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -47,16 +49,19 @@ public class VerificationStep extends VerticalLayout {
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 UUID trackID = cassandra.installCluster( wizard.getConfig() );
                 ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID,
-                                CassandraClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                        new ProgressWindow( executorService, tracker, trackID, CassandraClusterConfig.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -66,9 +71,11 @@ public class VerificationStep extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );

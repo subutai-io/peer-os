@@ -1,9 +1,11 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -11,7 +13,6 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -25,18 +26,24 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.impl.handler.*;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckServiceHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.InstallClusterHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.StartClusterHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.StartServiceHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.StopClusterHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallClusterHandler;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 
-
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 
-public class CassandraImpl extends CassandraBase {
+public class CassandraImpl extends CassandraBase
+{
 
     private Commands commands;
     private DbManager dbManager;
@@ -51,257 +58,303 @@ public class CassandraImpl extends CassandraBase {
     private PluginDAO pluginDAO;
 
 
-    public CassandraImpl() {
+    public CassandraImpl()
+    {
 
     }
 
 
-    public DbManager getDbManager() {
+    public DbManager getDbManager()
+    {
         return dbManager;
     }
 
 
-    public void setDbManager(final DbManager dbManager) {
+    public void setDbManager( final DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker(final Tracker tracker) {
+    public void setTracker( final Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public LxcManager getLxcManager() {
+    public LxcManager getLxcManager()
+    {
         return lxcManager;
     }
 
 
-    public void setLxcManager(final LxcManager lxcManager) {
+    public void setLxcManager( final LxcManager lxcManager )
+    {
         this.lxcManager = lxcManager;
     }
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
 
-    public void setExecutor(final ExecutorService executor) {
+    public void setExecutor( final ExecutorService executor )
+    {
         this.executor = executor;
     }
 
 
-    public NetworkManager getNetworkManager() {
+    public NetworkManager getNetworkManager()
+    {
         return networkManager;
     }
 
 
-    public void setNetworkManager(final NetworkManager networkManager) {
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
         this.networkManager = networkManager;
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void setCommandRunner(final CommandRunner commandRunner) {
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager(final AgentManager agentManager) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
 
-    public void setEnvironmentManager(final EnvironmentManager environmentManager) {
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
         this.environmentManager = environmentManager;
     }
 
 
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void setContainerManager(final ContainerManager containerManager) {
+    public void setContainerManager( final ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
 
-    public PluginDAO getPluginDAO() {
+    public PluginDAO getPluginDAO()
+    {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO(final PluginDAO pluginDAO) {
+    public void setPluginDAO( final PluginDAO pluginDAO )
+    {
         this.pluginDAO = pluginDAO;
     }
 
 
-    public void init() {
-        this.pluginDAO = new PluginDAO(dbManager);
-        this.commands = new Commands(commandRunner);
+    public void init()
+    {
+        this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
 
-        Commands.init(commandRunner);
+        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
-    public UUID installCluster(final CassandraClusterConfig config) {
-        Preconditions.checkNotNull(config, "Configuration is null");
-        AbstractOperationHandler operationHandler = new InstallClusterHandler(this, config);
-        executor.execute(operationHandler);
+    public UUID installCluster( final CassandraClusterConfig config )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        AbstractOperationHandler operationHandler = new InstallClusterHandler( this, config );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
-    public UUID uninstallCluster(final String clusterName) {
-        AbstractOperationHandler operationHandler = new UninstallClusterHandler(this, clusterName);
-        executor.execute(operationHandler);
+    public UUID uninstallCluster( final String clusterName )
+    {
+        AbstractOperationHandler operationHandler = new UninstallClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
+
 
     @Override
-    public List<CassandraClusterConfig> getClusters() {
-        try {
+    public List<CassandraClusterConfig> getClusters()
+    {
+        try
+        {
             return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-        } catch ( DBException e ) {
+        }
+        catch ( DBException e )
+        {
             return Collections.emptyList();
         }
     }
 
 
     @Override
-    public CassandraClusterConfig getCluster( String clusterName ) {
+    public CassandraClusterConfig getCluster( String clusterName )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        try {
-            return pluginDAO.getInfo(CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class);
-        } catch (DBException e) {
+        try
+        {
+            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
+        }
+        catch ( DBException e )
+        {
             return null;
         }
     }
 
+
     @Override
-    public UUID startCluster(final String clusterName) {
-        AbstractOperationHandler operationHandler = new StartClusterHandler(this, clusterName);
-        executor.execute(operationHandler);
+    public UUID startCluster( final String clusterName )
+    {
+        AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID checkCluster(final String clusterName) {
-        AbstractOperationHandler operationHandler = new CheckClusterHandler(this, clusterName);
-        executor.execute(operationHandler);
-        return operationHandler.getTrackerId();
-
-    }
-
-
-    @Override
-    public UUID stopCluster(final String clusterName) {
-        AbstractOperationHandler operationHandler = new StopClusterHandler(this, clusterName);
-        executor.execute(operationHandler);
+    public UUID checkCluster( final String clusterName )
+    {
+        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID startService(final String clusterName, final String lxchostname) {
-        AbstractOperationHandler operationHandler = new StartServiceHandler(this, clusterName, lxchostname);
-        executor.execute(operationHandler);
+    public UUID stopCluster( final String clusterName )
+    {
+        AbstractOperationHandler operationHandler = new StopClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopService(final String clusterName, final String lxchostname) {
-        AbstractOperationHandler operationHandler = new StopServiceHandler(this, clusterName, lxchostname);
-        executor.execute(operationHandler);
+    public UUID startService( final String clusterName, final String lxchostname )
+    {
+        AbstractOperationHandler operationHandler = new StartServiceHandler( this, clusterName, lxchostname );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID statusService(final String clusterName, final String lxchostname ) {
-        AbstractOperationHandler operationHandler = new CheckServiceHandler(this, clusterName, lxchostname );
-        executor.execute(operationHandler);
+    public UUID stopService( final String clusterName, final String lxchostname )
+    {
+        AbstractOperationHandler operationHandler = new StopServiceHandler( this, clusterName, lxchostname );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID addNode(final String clusterName, final String lxchostname, final String nodetype) {
+    public UUID statusService( final String clusterName, final String lxchostname )
+    {
+        AbstractOperationHandler operationHandler = new CheckServiceHandler( this, clusterName, lxchostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID addNode( final String clusterName, final String lxchostname, final String nodetype )
+    {
         // TODO
         return null;
     }
 
 
     @Override
-    public UUID destroyNode(final String clusterName, final String lxchostname, final String nodetype) {
+    public UUID destroyNode( final String clusterName, final String lxchostname, final String nodetype )
+    {
         // TODO
         return null;
     }
 
 
     @Override
-    public UUID checkNode(final String clustername, final String lxchostname) {
-        AbstractOperationHandler operationHandler = new CheckNodeHandler(this, clustername, lxchostname);
-        executor.execute(operationHandler);
+    public UUID checkNode( final String clustername, final String lxchostname )
+    {
+        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy(final Environment environment,
-                                                        final CassandraClusterConfig config,
-                                                        final ProductOperation po) {
-        return new CassandraSetupStrategy(environment, config, po, this);
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
+                                                         final CassandraClusterConfig config,
+                                                         final ProductOperation po )
+    {
+        return new CassandraSetupStrategy( environment, config, po, this );
     }
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(final CassandraClusterConfig config) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final CassandraClusterConfig config )
+    {
 
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName(String.format("%s-%s", CassandraClusterConfig.getProductKey(), UUID.randomUUID()));
-        environmentBlueprint.setLinkHosts(true);
-        environmentBlueprint.setDomainName(Common.DEFAULT_DOMAIN_NAME);
-        environmentBlueprint.setExchangeSshKeys(true);
+        environmentBlueprint
+                .setName( String.format( "%s-%s", CassandraClusterConfig.getProductKey(), UUID.randomUUID() ) );
+        environmentBlueprint.setLinkHosts( true );
+        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+        environmentBlueprint.setExchangeSshKeys( true );
 
         NodeGroup nodeGroup = new NodeGroup();
-        nodeGroup.setTemplateName(config.getTemplateName());
-        nodeGroup.setPlacementStrategy(PlacementStrategy.ROUND_ROBIN);
-        nodeGroup.setNumberOfNodes(config.getNumberOfNodes());
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
-        environmentBlueprint.setNodeGroups(Sets.newHashSet(nodeGroup));
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
-        environmentBuildTask.setEnvironmentBlueprint(environmentBlueprint);
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
         return environmentBuildTask;
     }

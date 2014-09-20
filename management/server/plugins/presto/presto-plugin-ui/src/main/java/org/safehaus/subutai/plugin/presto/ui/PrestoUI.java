@@ -16,7 +16,8 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class PrestoUI implements PortalModule {
+public class PrestoUI implements PortalModule
+{
     protected static final Logger LOG = Logger.getLogger( PrestoUI.class.getName() );
 
     public static final String MODULE_IMAGE = "presto.png";
@@ -25,46 +26,55 @@ public class PrestoUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public PrestoUI()  {
+    public PrestoUI()
+    {
         this.serviceLocator = new ServiceLocator();
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return PrestoClusterConfig.PRODUCT_KEY;
     }
 
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return PrestoClusterConfig.PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( PrestoUI.MODULE_IMAGE, this );
     }
 
 
     @Override
-    public Component createComponent() {
+    public Component createComponent()
+    {
 
-        try {
+        try
+        {
             return new PrestoForm( executor, serviceLocator );
         }
-        catch ( NamingException e ) {
+        catch ( NamingException e )
+        {
             LOG.severe( e.getMessage() );
         }
 

@@ -3,17 +3,17 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-
-import com.google.common.collect.Sets;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
+import com.google.common.collect.Sets;
 
-public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl >
+
+public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
     private final String lxcHostname;
 
@@ -70,29 +70,32 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
             {
                 if ( result.getStdOut().contains( "Package ksks-elasticsearch is not installed, so not removed" ) )
                 {
-                    productOperation.addLog(
-                            String.format( "Elasticsearch is not installed, so not removed on node %s",
-                                    agent.getHostname() ) );
+                    productOperation.addLog( String.format( "Elasticsearch is not installed, so not removed on node %s",
+                            agent.getHostname() ) );
                 }
                 else
                 {
-                    productOperation.addLog(
-                            String.format( "Elasticsearch is removed from node %s", agent.getHostname() ) );
+                    productOperation
+                            .addLog( String.format( "Elasticsearch is removed from node %s", agent.getHostname() ) );
                 }
             }
             else
             {
-                productOperation.addLog(
-                        String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
+                productOperation
+                        .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
             }
 
             elasticsearchClusterConfiguration.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
-            try {
-                manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
+            try
+            {
+                manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+                        elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
-            } catch( DBException e ) {
+            }
+            catch ( DBException e )
+            {
                 productOperation.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
                 e.printStackTrace();
             }

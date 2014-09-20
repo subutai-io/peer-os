@@ -1,14 +1,17 @@
 package org.safehaus.subutai.plugin.cassandra.api;
 
+
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
-import java.util.UUID;
 
-public interface Cassandra extends ApiBase<CassandraClusterConfig> {
+public interface Cassandra extends ApiBase<CassandraClusterConfig>
+{
 
     UUID startCluster( String clusterName );
 
@@ -29,7 +32,7 @@ public interface Cassandra extends ApiBase<CassandraClusterConfig> {
     UUID checkNode( String clustername, String lxchostname );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraClusterConfig config,
-                                                        ProductOperation po );
+                                                         ProductOperation po );
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint( CassandraClusterConfig config );
 }

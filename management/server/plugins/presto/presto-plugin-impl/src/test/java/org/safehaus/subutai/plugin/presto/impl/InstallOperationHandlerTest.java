@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,51 +16,61 @@ import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 
-public class InstallOperationHandlerTest {
+
+public class InstallOperationHandlerTest
+{
 
     private PrestoImplMock mock;
     private AbstractOperationHandler handler;
 
+
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         mock = new PrestoImplMock();
     }
 
+
     @Test(expected = NullPointerException.class)
-    public void testWithNullConfig() {
-        handler = new InstallOperationHandler(mock, null);
+    public void testWithNullConfig()
+    {
+        handler = new InstallOperationHandler( mock, null );
         handler.run();
     }
 
+
     @Test
-    public void testWithInvalidConfig() {
+    public void testWithInvalidConfig()
+    {
         PrestoClusterConfig config = new PrestoClusterConfig();
-        config.setSetupType(SetupType.OVER_HADOOP);
+        config.setSetupType( SetupType.OVER_HADOOP );
         config.setClusterName( "test" );
         handler = new InstallOperationHandler( mock, config );
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "malformed" ) );
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
 
+
     @Test
-    public void testWithExistingCluster() {
+    public void testWithExistingCluster()
+    {
         PrestoClusterConfig config = new PrestoClusterConfig();
-        config.setSetupType(SetupType.OVER_HADOOP);
+        config.setSetupType( SetupType.OVER_HADOOP );
         config.setClusterName( "test-cluster" );
         config.setWorkers( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
         config.setCoordinatorNode( CommonMockBuilder.createAgent() );
 
         mock.setClusterConfig( config );
-        handler = new InstallOperationHandler(mock, config);
+        handler = new InstallOperationHandler( mock, config );
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("exists"));
-        Assert.assertTrue(po.getLog().toLowerCase().contains(config.getClusterName()));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue( po.getLog().toLowerCase().contains( "exists" ) );
+        Assert.assertTrue( po.getLog().toLowerCase().contains( config.getClusterName() ) );
+        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
 }
 

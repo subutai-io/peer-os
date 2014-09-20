@@ -1,6 +1,28 @@
 package org.safehaus.subutai.plugin.spark.ui.manager;
 
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
+import org.safehaus.subutai.plugin.spark.api.Spark;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
@@ -18,29 +40,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
-import org.safehaus.subutai.plugin.spark.api.Spark;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-
-import javax.naming.NamingException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 
 
-public class Manager {
+public class Manager
+{
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
@@ -73,7 +76,8 @@ public class Manager {
     final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
 
 
-    public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
+    {
         Preconditions.checkNotNull( executor, "Executor is null" );
         Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
 
@@ -105,9 +109,11 @@ public class Manager {
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 config = ( SparkClusterConfig ) event.getProperty().getValue();
                 refreshUI();
                 checkAllNodesStatus();
@@ -135,11 +141,12 @@ public class Manager {
         addNodeBtn.addStyleName( "default" );
 
 
-
         /** Refresh Cluster button */
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 refreshClustersInfo();
             }
         } );
@@ -147,12 +154,17 @@ public class Manager {
 
 
         /** Check All button */
-        checkAllBtn.addClickListener( new Button.ClickListener() {
+        checkAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ){
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
-                } else {
+                }
+                else
+                {
                     checkAllNodesStatus();
                 }
             }
@@ -160,27 +172,34 @@ public class Manager {
         controlsContent.addComponent( checkAllBtn );
 
         /** Start all button */
-        startAllNodesBtn.addClickListener( new Button.ClickListener() {
+        startAllNodesBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ){
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
-                } else {
+                }
+                else
+                {
                     progressIcon.setVisible( true );
                     disableOREnableAllTopButtons( false );
-                    disableOREnableAllButtonsOnTable( nodesTable, false);
-                    executor.execute(
-                            new StartAllTask( spark, tracker, config.getClusterName(), config.getMasterNode().getHostname(),
-                                    new CompleteEvent() {
-                                        @Override
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
-                                                disableOREnableAllButtonsOnTable( nodesTable, true );
-                                                checkAllNodesStatus();
-                                                disableOREnableAllTopButtons( true );
-                                            }
-                                        }
-                                    } ) );
+                    disableOREnableAllButtonsOnTable( nodesTable, false );
+                    executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
+                                    config.getMasterNode().getHostname(), new CompleteEvent()
+                            {
+                                @Override
+                                public void onComplete( String result )
+                                {
+                                    synchronized ( progressIcon )
+                                    {
+                                        disableOREnableAllButtonsOnTable( nodesTable, true );
+                                        checkAllNodesStatus();
+                                        disableOREnableAllTopButtons( true );
+                                    }
+                                }
+                            } ) );
                 }
             }
         } );
@@ -188,27 +207,34 @@ public class Manager {
 
 
         /** Stop all button */
-        stopAllNodesBtn.addClickListener( new Button.ClickListener() {
+        stopAllNodesBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ){
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
-                } else {
+                }
+                else
+                {
                     progressIcon.setVisible( true );
                     disableOREnableAllTopButtons( false );
                     disableOREnableAllButtonsOnTable( nodesTable, false );
-                    executor.execute(
-                            new StopAllTask( spark, tracker, config.getClusterName(), config.getMasterNode().getHostname(),
-                                    new CompleteEvent() {
-                                        @Override
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
-                                                disableOREnableAllButtonsOnTable( nodesTable, true );
-                                                checkAllNodesStatus();
-                                                disableOREnableAllTopButtons( true );
-                                            }
-                                        }
-                                    } ) );
+                    executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
+                                    config.getMasterNode().getHostname(), new CompleteEvent()
+                            {
+                                @Override
+                                public void onComplete( String result )
+                                {
+                                    synchronized ( progressIcon )
+                                    {
+                                        disableOREnableAllButtonsOnTable( nodesTable, true );
+                                        checkAllNodesStatus();
+                                        disableOREnableAllTopButtons( true );
+                                    }
+                                }
+                            } ) );
                 }
             }
         } );
@@ -216,22 +242,30 @@ public class Manager {
 
 
         /** Destroy Cluster button */
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             stopAllNodesBtn.click();
                             UUID trackID = spark.uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
                                     new ProgressWindow( executor, tracker, trackID, SparkClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -240,7 +274,8 @@ public class Manager {
                     } );
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -249,43 +284,54 @@ public class Manager {
 
 
         /** Add Node button */
-        addNodeBtn.addClickListener( new Button.ClickListener() {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( "Select cluster" );
                     return;
                 }
 
                 Set<Agent> set = null;
-                if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
                     String hn = config.getHadoopClusterName();
-                    if ( hn != null && !hn.isEmpty() ) {
+                    if ( hn != null && !hn.isEmpty() )
+                    {
                         HadoopClusterConfig hci = hadoop.getCluster( hn );
-                        if ( hci != null ) {
+                        if ( hci != null )
+                        {
                             set = new HashSet<>( hci.getAllNodes() );
                         }
                     }
                 }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
                     set = new HashSet<>( config.getHadoopNodes() );
                 }
 
-                if ( set == null ) {
+                if ( set == null )
+                {
                     show( "Hadoop cluster not found" );
                     return;
                 }
                 set.removeAll( config.getAllNodes() );
-                if ( set.isEmpty() ) {
+                if ( set.isEmpty() )
+                {
                     show( "All nodes in Hadoop cluster have Spark installed" );
                     return;
                 }
 
                 AddNodeWindow w = new AddNodeWindow( executor, spark, tracker, config, set );
                 contentRoot.getUI().addWindow( w );
-                w.addCloseListener( new Window.CloseListener() {
+                w.addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         refreshClustersInfo();
                     }
                 } );
@@ -299,7 +345,9 @@ public class Manager {
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
 
-    public void disableOREnableAllTopButtons( boolean value ){
+
+    public void disableOREnableAllTopButtons( boolean value )
+    {
         refreshClustersBtn.setEnabled( value );
         startAllNodesBtn.setEnabled( value );
         stopAllNodesBtn.setEnabled( value );
@@ -309,14 +357,20 @@ public class Manager {
     }
 
 
-    public void disableOREnableAllButtonsOnTable( Table table, boolean value ){
-        if ( table != null ) {
-            for ( Object o : table.getItemIds() ) {
+    public void disableOREnableAllButtonsOnTable( Table table, boolean value )
+    {
+        if ( table != null )
+        {
+            for ( Object o : table.getItemIds() )
+            {
                 int rowId = ( Integer ) o;
                 Item row = table.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-                if ( availableOperationsLayout != null ) {
-                    for ( Component component : availableOperationsLayout ) {
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    for ( Component component : availableOperationsLayout )
+                    {
                         component.setEnabled( value );
                     }
                 }
@@ -325,13 +379,14 @@ public class Manager {
     }
 
 
-    private Table createTableTemplate( String caption ) {
+    private Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
-        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null  );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
 
         table.setSizeFull();
         table.setPageLength( 10 );
@@ -339,20 +394,25 @@ public class Manager {
         table.setImmediate( true );
         table.setColumnCollapsingAllowed( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executor, commandRunner,
                                         agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
@@ -362,35 +422,45 @@ public class Manager {
     }
 
 
-    private void refreshUI() {
-        if ( config != null ) {
+    private void refreshUI()
+    {
+        if ( config != null )
+        {
             populateTable( nodesTable, config.getSlaveNodes(), config.getMasterNode() );
             checkAllNodesStatus();
         }
-        else {
+        else
+        {
             nodesTable.removeAllItems();
         }
     }
 
 
-    public void refreshClustersInfo() {
+    public void refreshClustersInfo()
+    {
         List<SparkClusterConfig> clustersInfo = spark.getClusters();
         SparkClusterConfig clusterInfo = ( SparkClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 ) {
-            for ( SparkClusterConfig ci : clustersInfo ) {
+        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        {
+            for ( SparkClusterConfig ci : clustersInfo )
+            {
                 clusterCombo.addItem( ci );
                 clusterCombo.setItemCaption( ci, ci.getClusterName() );
             }
-            if ( clusterInfo != null ) {
-                for ( SparkClusterConfig mongoClusterInfo : clustersInfo ) {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+            if ( clusterInfo != null )
+            {
+                for ( SparkClusterConfig mongoClusterInfo : clustersInfo )
+                {
+                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    {
                         clusterCombo.setValue( mongoClusterInfo );
                         return;
                     }
                 }
             }
-            else {
+            else
+            {
                 clusterCombo.setValue( clustersInfo.iterator().next() );
             }
         }
@@ -402,21 +472,28 @@ public class Manager {
      *
      * @return Yes if give agent is among seeds, otherwise returns No
      */
-    public String checkIfMaster( Agent agent ) {
-        if ( config.getMasterNode().equals( agent ) ) {
+    public String checkIfMaster( Agent agent )
+    {
+        if ( config.getMasterNode().equals( agent ) )
+        {
             return "Master";
         }
         return "Slave";
     }
 
 
-    protected Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
+    protected Button getCheckButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) ) {
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -425,15 +502,21 @@ public class Manager {
     }
 
 
-    public void checkAllNodesStatus() {
-        if ( nodesTable != null ) {
-            for ( Object o : nodesTable.getItemIds() ) {
+    public void checkAllNodesStatus()
+    {
+        if ( nodesTable != null )
+        {
+            for ( Object o : nodesTable.getItemIds() )
+            {
                 int rowId = ( Integer ) o;
                 Item row = nodesTable.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-                if ( availableOperationsLayout != null ) {
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
                     Button checkBtn = getCheckButton( availableOperationsLayout );
-                    if ( checkBtn != null ) {
+                    if ( checkBtn != null )
+                    {
                         checkBtn.click();
                     }
                 }
@@ -442,16 +525,19 @@ public class Manager {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents, final Agent master ) {
+    private void populateTable( final Table table, Set<Agent> agents, final Agent master )
+    {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
             checkBtn.addStyleName( "default" );
@@ -466,7 +552,7 @@ public class Manager {
             startBtn.setEnabled( false );
             progressIcon.setVisible( false );
 
-            final HorizontalLayout availableOperations = new HorizontalLayout( );
+            final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.addStyleName( "default" );
             availableOperations.setSpacing( true );
 
@@ -476,29 +562,37 @@ public class Manager {
             availableOperations.addComponent( destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder, availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder,
+                    availableOperations
             }, null );
 
-            checkBtn.addClickListener( new Button.ClickListener() {
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     checkBtn.setEnabled( false );
                     destroyBtn.setEnabled( false );
 
-                    executor.execute(
-                            new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                    executor.execute( new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
                                         @Override
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
                                                 resultHolder.setValue( result );
-                                                if( result.contains( "NOT" ) ) {
+                                                if ( result.contains( "NOT" ) )
+                                                {
                                                     startBtn.setEnabled( true );
                                                     stopBtn.setEnabled( false );
-                                                } else {
+                                                }
+                                                else
+                                                {
                                                     startBtn.setEnabled( false );
                                                     stopBtn.setEnabled( true );
                                                 }
@@ -511,9 +605,11 @@ public class Manager {
                 }
             } );
 
-            startBtn.addClickListener( new Button.ClickListener() {
+            startBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -522,10 +618,13 @@ public class Manager {
 
                     executor.execute(
                             new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
                                         @Override
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
                                                 checkBtn.click();
                                             }
                                         }
@@ -533,9 +632,11 @@ public class Manager {
                 }
             } );
 
-            stopBtn.addClickListener( new Button.ClickListener() {
+            stopBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -543,31 +644,40 @@ public class Manager {
                     checkBtn.setEnabled( false );
 
                     executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
-                                    new CompleteEvent() {
-                                        @Override
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
-                                                checkBtn.click();
-                                            }
-                                        }
-                                    } ) );
+                            new CompleteEvent()
+                            {
+                                @Override
+                                public void onComplete( String result )
+                                {
+                                    synchronized ( progressIcon )
+                                    {
+                                        checkBtn.click();
+                                    }
+                                }
+                            } ) );
                 }
             } );
 
-            destroyBtn.addClickListener( new Button.ClickListener() {
+            destroyBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = spark.destroySlaveNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
                                     new ProgressWindow( executor, tracker, trackID, SparkClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -596,7 +706,7 @@ public class Manager {
         startBtn.setEnabled( false );
         progressIcon.setVisible( false );
 
-        final HorizontalLayout availableOperations = new HorizontalLayout( );
+        final HorizontalLayout availableOperations = new HorizontalLayout();
         availableOperations.addStyleName( "default" );
         availableOperations.setSpacing( true );
 
@@ -606,80 +716,101 @@ public class Manager {
 
 
         table.addItem( new Object[] {
-                master.getHostname(), master.getListIP().get( 0 ), checkIfMaster( master ), resultHolder, availableOperations
+                master.getHostname(), master.getListIP().get( 0 ), checkIfMaster( master ), resultHolder,
+                availableOperations
         }, null );
 
-        checkBtn.addClickListener( new Button.ClickListener() {
+        checkBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
                 checkBtn.setEnabled( false );
 
                 executor.execute( new CheckTaskMaster( spark, tracker, config.getClusterName(), master.getHostname(),
-                                new CompleteEvent() {
-                                    @Override
-                                    public void onComplete( String result ) {
-                                        synchronized( progressIcon ) {
-                                            resultHolder.setValue( result );
-                                            if( result.contains( "NOT" ) ) {
-                                                startBtn.setEnabled( true );
-                                                stopBtn.setEnabled( false );
-                                            } else {
-                                                startBtn.setEnabled( false );
-                                                stopBtn.setEnabled( true );
-                                            }
-                                            progressIcon.setVisible( false );
-                                            checkBtn.setEnabled( true );
-                                        }
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( progressIcon )
+                                {
+                                    resultHolder.setValue( result );
+                                    if ( result.contains( "NOT" ) )
+                                    {
+                                        startBtn.setEnabled( true );
+                                        stopBtn.setEnabled( false );
                                     }
-                                } ) );
+                                    else
+                                    {
+                                        startBtn.setEnabled( false );
+                                        stopBtn.setEnabled( true );
+                                    }
+                                    progressIcon.setVisible( false );
+                                    checkBtn.setEnabled( true );
+                                }
+                            }
+                        } ) );
             }
         } );
 
-        startBtn.addClickListener( new Button.ClickListener() {
+        startBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
                 checkBtn.setEnabled( false );
 
                 executor.execute( new StartTask( spark, tracker, config.getClusterName(), master.getHostname(), true,
-                                new CompleteEvent() {
-                                    @Override
-                                    public void onComplete( String result ) {
-                                        synchronized( progressIcon ) {
-                                            checkBtn.click();
-                                        }
-                                    }
-                                } ) );
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( progressIcon )
+                                {
+                                    checkBtn.click();
+                                }
+                            }
+                        } ) );
             }
         } );
 
-        stopBtn.addClickListener( new Button.ClickListener() {
+        stopBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
                 checkBtn.setEnabled( false );
 
                 executor.execute( new StopTask( spark, tracker, config.getClusterName(), master.getHostname(), true,
-                                new CompleteEvent() {
-                                    @Override
-                                    public void onComplete( String result ) {
-                                        synchronized( progressIcon ) {
-                                            checkBtn.click();
-                                        }
-                                    }
-                                } ) );
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( progressIcon )
+                                {
+                                    checkBtn.click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
 
-    public Component getContent() {
+
+    public Component getContent()
+    {
         return contentRoot;
     }
 }

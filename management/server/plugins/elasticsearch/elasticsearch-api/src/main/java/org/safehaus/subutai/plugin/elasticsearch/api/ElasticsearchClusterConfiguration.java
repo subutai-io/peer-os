@@ -1,12 +1,15 @@
 package org.safehaus.subutai.plugin.elasticsearch.api;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ElasticsearchClusterConfiguration implements ConfigBase {
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
+
+
+public class ElasticsearchClusterConfiguration implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "Elasticsearch";
     public static final String PRODUCT_NAME = "elasticsearch";
@@ -24,108 +27,131 @@ public class ElasticsearchClusterConfiguration implements ConfigBase {
     private Set<Agent> masterNodes = new HashSet<>();
     private Set<Agent> dataNodes = new HashSet<>();
 
-    public static String getProductKey() {
-		return PRODUCT_KEY;
-	}
+
+    public static String getProductKey()
+    {
+        return PRODUCT_KEY;
+    }
 
 
     @Override
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public void setClusterName(String clusterName) {
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
 
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_KEY;
     }
 
 
-    public int getNumberOfNodes() {
+    public int getNumberOfNodes()
+    {
         return numberOfNodes;
     }
 
 
-    public void setNumberOfNodes(int numberOfNodes) {
+    public void setNumberOfNodes( int numberOfNodes )
+    {
         this.numberOfNodes = numberOfNodes;
     }
 
 
-    public int getNumberOfShards() {
+    public int getNumberOfShards()
+    {
         return numberOfShards;
     }
 
 
-    public void setNumberOfShards(final int numberOfShards) {
+    public void setNumberOfShards( final int numberOfShards )
+    {
         this.numberOfShards = numberOfShards;
     }
 
 
-    public int getNumberOfReplicas() {
+    public int getNumberOfReplicas()
+    {
         return numberOfReplicas;
     }
 
 
-    public void setNumberOfReplicas(final int numberOfReplicas) {
+    public void setNumberOfReplicas( final int numberOfReplicas )
+    {
         this.numberOfReplicas = numberOfReplicas;
     }
 
 
-    public int getNumberOfMasterNodes() {
+    public int getNumberOfMasterNodes()
+    {
         return numberOfMasterNodes;
     }
 
 
-    public void setNumberOfMasterNodes(int numberOfSeeds) {
+    public void setNumberOfMasterNodes( int numberOfSeeds )
+    {
         this.numberOfMasterNodes = numberOfSeeds;
     }
 
-    public int getNumberOfDataNodes() {
-		    return numberOfDataNodes;
-	  }
+
+    public int getNumberOfDataNodes()
+    {
+        return numberOfDataNodes;
+    }
 
 
-    public void setNumberOfDataNodes(int numberOfDataNodes) {
-		    this.numberOfDataNodes = numberOfDataNodes;
-	  }
+    public void setNumberOfDataNodes( int numberOfDataNodes )
+    {
+        this.numberOfDataNodes = numberOfDataNodes;
+    }
 
 
-    public Set<Agent> getNodes() {
-		    return nodes;
-	  }
+    public Set<Agent> getNodes()
+    {
+        return nodes;
+    }
 
 
-    public void setNodes( Set<Agent> nodes ) {
+    public void setNodes( Set<Agent> nodes )
+    {
         this.nodes = nodes;
     }
 
 
-    public Set<Agent> getMasterNodes() {
+    public Set<Agent> getMasterNodes()
+    {
         return masterNodes;
     }
 
 
-    public void setMasterNodes(Set<Agent> nodes ) {
-		    this.masterNodes = nodes;
-	  }
+    public void setMasterNodes( Set<Agent> nodes )
+    {
+        this.masterNodes = nodes;
+    }
 
 
-    public Set<Agent> getDataNodes() {
-		    return dataNodes;
-	  }
+    public Set<Agent> getDataNodes()
+    {
+        return dataNodes;
+    }
 
-    public void setDataNodes(Set<Agent> nodes) {
+
+    public void setDataNodes( Set<Agent> nodes )
+    {
         this.dataNodes = nodes;
     }
 
 
-    public static String getTemplateName() {
+    public static String getTemplateName()
+    {
         return templateName;
     }
-
 }

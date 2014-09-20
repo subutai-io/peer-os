@@ -3,16 +3,16 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-
-import com.google.common.collect.Sets;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
+import com.google.common.collect.Sets;
 
-public class AddNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl >
+
+public class AddNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
     private final String lxcHostname;
 
@@ -22,7 +22,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-            String.format( "Adding node to %s", clusterName ) );
+                String.format( "Adding node to %s", clusterName ) );
     }
 
 
@@ -41,8 +41,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            productOperation.addLogFailed(
-                    String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
+            productOperation
+                    .addLogFailed( String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
@@ -61,8 +61,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            productOperation.addLogFailed(
-                    "Failed to check presence of installed ksks packages\nInstallation aborted" );
+            productOperation
+                    .addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
             return;
         }
 
@@ -78,7 +78,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         elasticsearchClusterConfiguration.getNodes().add( agent );
         productOperation.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
+        if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+                elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
         {
             productOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
             //install mahout
@@ -93,14 +94,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
             else
             {
 
-                productOperation.addLogFailed(
-                        String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                productOperation
+                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation.addLogFailed(
-                    "Could not update cluster info in DB! Please see logs\nInstallation aborted" );
+            productOperation
+                    .addLogFailed( "Could not update cluster info in DB! Please see logs\nInstallation aborted" );
         }
     }
 }

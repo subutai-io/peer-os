@@ -16,7 +16,8 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class ElasticsearchUI implements PortalModule {
+public class ElasticsearchUI implements PortalModule
+{
 
     public static final String MODULE_IMAGE = "logo.jpeg";
     protected Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
@@ -25,43 +26,54 @@ public class ElasticsearchUI implements PortalModule {
     private final ServiceLocator serviceLocator;
 
 
-    public ElasticsearchUI()  {
+    public ElasticsearchUI()
+    {
         this.serviceLocator = new ServiceLocator();
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return ElasticsearchClusterConfiguration.PRODUCT_KEY;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return ElasticsearchClusterConfiguration.PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( ElasticsearchUI.MODULE_IMAGE, this );
     }
 
 
-    public Component createComponent() {
-        try {
+    public Component createComponent()
+    {
+        try
+        {
             return new ElasticsearchForm( executor, serviceLocator );
-        } catch ( NamingException e ) {
-            LOG.severe ( e.getMessage() ); ;
+        }
+        catch ( NamingException e )
+        {
+            LOG.severe( e.getMessage() );
+            ;
         }
         return null;
     }
