@@ -27,8 +27,11 @@ public class Commands extends CommandsSingleton
 
     public static Command getInstallCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "sleep 20; apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
-                .withTimeout( 600 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+        return createCommand(
+                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 600 )
+                                                                                                .withStdOutRedirection(
+                                                                                                        OutputRedirection.NO ),
+                agents );
     }
 
 
@@ -48,7 +51,7 @@ public class Commands extends CommandsSingleton
 
     public static Command getStartAllCommand( Agent masterNode )
     {
-        return createCommand( new RequestBuilder( "service spark-all start &" ).withTimeout( 360 ),
+        return createCommand( new RequestBuilder( "service spark-all start" ).withTimeout( 360 ),
                 Sets.newHashSet( masterNode ) );
     }
 
@@ -82,6 +85,14 @@ public class Commands extends CommandsSingleton
     }
 
 
+    public static Command getRestartClusterCommand( Agent masterNode )
+    {
+        return createCommand(
+                new RequestBuilder( "service spark-all stop && service spark-all start" ).withTimeout( 60 ),
+                Sets.newHashSet( masterNode ) );
+    }
+
+
     public static Command getStopMasterCommand( Agent masterNode )
     {
         return createCommand( new RequestBuilder( "service spark-master stop" ).withTimeout( 60 ),
@@ -89,9 +100,23 @@ public class Commands extends CommandsSingleton
     }
 
 
+    public static Command getStatusMasterCommand( Agent masterNode )
+    {
+        return createCommand( new RequestBuilder( "service spark-master status" ).withTimeout( 60 ),
+                Sets.newHashSet( masterNode ) );
+    }
+
+
     public static Command getStartSlaveCommand( Agent slaveNode )
     {
         return createCommand( new RequestBuilder( "service spark-slave start" ).withTimeout( 90 ),
+                Sets.newHashSet( slaveNode ) );
+    }
+
+
+    public static Command getStatusSlaveCommand( Agent slaveNode )
+    {
+        return createCommand( new RequestBuilder( "service spark-slave status" ).withTimeout( 90 ),
                 Sets.newHashSet( slaveNode ) );
     }
 

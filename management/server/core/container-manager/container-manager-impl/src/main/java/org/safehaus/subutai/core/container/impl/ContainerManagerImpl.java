@@ -59,8 +59,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class ContainerManagerImpl extends ContainerManagerBase
-{
+public class ContainerManagerImpl extends ContainerManagerBase {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
@@ -134,15 +133,10 @@ public class ContainerManagerImpl extends ContainerManagerBase
             ExecutorService executor = Executors.newFixedThreadPool( 1 );
             execute( agent, envId, templateName, cloneNames, executor, ContainerAction.CREATE );
             executor.shutdown();
-            for ( Agent a : successfullyClonedContainers )
-            {
-                //                LOG.info( String.format( "Successfully cloned container %s on %s failed.",
-                // a.getHostname(),
-                //                        a.getParentHostName() ) );
-            }
         }
         catch ( ContainerException e )
         {
+            // roll back on container exception: destroying successfully cloned containers
             for ( Agent a : successfullyClonedContainers )
             {
                 try
@@ -151,9 +145,8 @@ public class ContainerManagerImpl extends ContainerManagerBase
                 }
                 catch ( ContainerDestroyException cde )
                 {
-                    //                    LOG.error( String.format( "Destroying container %s on %s failed.",
-                    // a.getHostname(),
-                    //                            a.getParentHostName() ) );
+                    LOG.error( String.format( "Destroying container %s on %s failed.", a.getHostname(),
+                            a.getParentHostName() ) );
                 }
             }
             successfullyClonedContainers.clear();
@@ -202,8 +195,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         final ContainerManager self = this;
         for ( final Map.Entry<Agent, Set<String>> e : cloneNames.entrySet() )
         {
-            completionService.submit( new Callable<Set<Agent>>()
-            {
+            completionService.submit( new Callable<Set<Agent>>() {
                 @Override
                 public Set<Agent> call() throws Exception
                 {
@@ -252,8 +244,6 @@ public class ContainerManagerImpl extends ContainerManagerBase
         }
         else
         {
-            LOG.info( Thread.currentThread().toString() );
-
             Agent agent = agentManager.waitForRegistration( cloneName, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 );
             if ( agent == null )
             {
@@ -308,8 +298,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
             catch ( Exception e )
             {
                 it.remove();
-                //                LOG.error( "Error notifying container event listeners, removing faulting listener",
-                // e );
+                LOG.error( "Error notifying container event listeners, removing faulting listener", e );
             }
         }
     }
@@ -835,8 +824,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     }
 
 
-    private class ContainerEventListenerImpl implements ContainerEventListener
-    {
+    private class ContainerEventListenerImpl implements ContainerEventListener {
         private Set<Agent> successfullyClonedContainers;
 
 

@@ -5,7 +5,7 @@ import java.util.UUID;
 
 
 /**
- * Created by timur on 9/16/14.
+ * Container event type.
  */
 public class ContainerEvent
 {

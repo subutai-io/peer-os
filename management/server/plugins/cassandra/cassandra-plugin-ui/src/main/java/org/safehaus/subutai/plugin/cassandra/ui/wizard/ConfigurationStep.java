@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
@@ -20,9 +15,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class ConfigurationStep extends VerticalLayout
 {
 
@@ -154,6 +146,10 @@ public class ConfigurationStep extends VerticalLayout
                 else if ( Strings.isNullOrEmpty( wizard.getConfig().getDomainName() ) )
                 {
                     show( "Please provide domain name !" );
+                }
+                else if ( nodesCountCombo.getValue() == null | seedsCountCombo.getValue() == null )
+                {
+                    show( "Please provide number of nodes and seeds !" );
                 }
                 else if ( ( int ) nodesCountCombo.getValue() <= ( int ) seedsCountCombo.getValue() )
                 {

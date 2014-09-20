@@ -44,7 +44,6 @@ import com.google.common.collect.Sets;
 
 public class ElasticsearchImpl implements Elasticsearch
 {
-
     private static final Logger LOG = Logger.getLogger( ElasticsearchImpl.class.getName() );
     private DbManager dbManager;
     private Tracker tracker;

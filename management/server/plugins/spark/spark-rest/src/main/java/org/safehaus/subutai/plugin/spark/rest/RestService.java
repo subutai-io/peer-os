@@ -167,13 +167,14 @@ public class RestService
     }
 
 
+    //TODO checkMasterNode needs to be changed.
     @GET
     @Path("clusters/{clusterName}/nodes/{lxcHostName}")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response checkNode( @PathParam("clusterName") String clusterName,
                                @PathParam("lxcHostName") String lxcHostName )
     {
-        String operationId = JsonUtil.toJson( OPERATION_ID, sparkManager.checkNode( clusterName, lxcHostName ) );
+        String operationId = JsonUtil.toJson( OPERATION_ID, sparkManager.checkMasterNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }
 }

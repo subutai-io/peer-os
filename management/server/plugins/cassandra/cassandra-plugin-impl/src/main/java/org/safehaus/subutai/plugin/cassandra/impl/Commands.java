@@ -22,9 +22,6 @@ import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import com.google.common.collect.Sets;
 
 
-/**
- * @author dilshat
- */
 public class Commands extends CommandsSingleton
 {
 

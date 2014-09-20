@@ -5,9 +5,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 
 
-/**
- * Created by bahadyr on 7/4/14.
- */
 public class ClustersTable extends Table
 {
 

@@ -13,9 +13,6 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.api.TrimmedCassandraClusterConfig;
 
 
-/**
- * Created by bahadyr on 9/4/14.
- */
 public class RestServiceImpl implements RestService
 {
 

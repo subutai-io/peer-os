@@ -17,7 +17,6 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ConfigurationStep extends VerticalLayout
 {
-
     public ConfigurationStep( final Wizard wizard )
     {
 
@@ -41,7 +40,8 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        ComboBox nodesCountCombo = new ComboBox( "Number of nodes:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+        final ComboBox nodesCountCombo =
+                new ComboBox( "Number of nodes:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setTextInputAllowed( false );
         nodesCountCombo.setNullSelectionAllowed( false );
@@ -56,7 +56,7 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        ComboBox mastersCountCombo =
+        final ComboBox mastersCountCombo =
                 new ComboBox( "Number of master nodes:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         mastersCountCombo.setImmediate( true );
         mastersCountCombo.setTextInputAllowed( false );
@@ -72,7 +72,7 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        ComboBox dataNodesCountCombo =
+        final ComboBox dataNodesCountCombo =
                 new ComboBox( "Number of data nodes:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         dataNodesCountCombo.setImmediate( true );
         dataNodesCountCombo.setTextInputAllowed( false );
@@ -130,6 +130,23 @@ public class ConfigurationStep extends VerticalLayout
                 if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
                 {
                     show( "Please provide cluster name" );
+                }
+                else if ( nodesCountCombo.getValue() == null )
+                {
+                    show( "Please provide number of nodes !" );
+                }
+                else if ( mastersCountCombo.getValue() == null )
+                {
+                    show( "Please provide number of master nodes !" );
+                }
+                else if ( dataNodesCountCombo.getValue() == null )
+                {
+                    show( "Please provide number of data nodes !" );
+                }
+                else if ( ( int ) nodesCountCombo.getValue() != ( ( int ) mastersCountCombo.getValue()
+                        + ( int ) dataNodesCountCombo.getValue() ) )
+                {
+                    show( "Sum of master and data nodes should be equal to total number of nodes !" );
                 }
                 else
                 {

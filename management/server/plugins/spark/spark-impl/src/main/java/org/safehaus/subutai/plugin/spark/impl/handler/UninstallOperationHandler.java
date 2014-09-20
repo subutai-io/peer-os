@@ -96,12 +96,12 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
         try
         {
             manager.getContainerManager().clonesDestroy( config.getAllNodes() );
-            productOperation.addLog( "Destroying node(s) completed" );
+            productOperation.addLogDone( "Destroying node(s) completed" );
             return true;
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+            productOperation.addLogFailed( "Failed to destroy node(s): " + ex.getMessage() );
             return false;
         }
     }

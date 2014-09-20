@@ -80,12 +80,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 
             po.addLogDone( null );
         }
-        catch ( ClusterSetupException ex )
-        {
-            po.addLog( ex.getMessage() );
-            po.addLogFailed( "Add worker node failed" );
-        }
-        catch ( LxcCreateException ex )
+        catch ( ClusterSetupException | LxcCreateException ex )
         {
             po.addLog( ex.getMessage() );
             po.addLogFailed( "Add worker node failed" );

@@ -20,10 +20,14 @@ import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.AddSlaveNodeOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.handler.ChangeMasterNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.handler.CheckNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.CheckAllOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.CheckMasterNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.CheckSlaveNodeOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.handler.DestroySlaveNodeOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.handler.StartNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.handler.UninstallOperationHandler;
 
@@ -44,6 +48,16 @@ public class SparkImpl extends SparkBase implements Spark
         executor.execute( operationHandler );
 
         return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        InstallOperationHandler h = new InstallOperationHandler( this, config );
+        h.setHadoopConfig( hadoopConfig );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
 
@@ -70,16 +84,6 @@ public class SparkImpl extends SparkBase implements Spark
     public SparkClusterConfig getCluster( String clusterName )
     {
         return pluginDAO.getInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, SparkClusterConfig.class );
-    }
-
-
-    @Override
-    public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        InstallOperationHandler h = new InstallOperationHandler( this, config );
-        h.setHadoopConfig( hadoopConfig );
-        executor.execute( h );
-        return h.getTrackerId();
     }
 
 
@@ -135,6 +139,15 @@ public class SparkImpl extends SparkBase implements Spark
 
 
     @Override
+    public UUID startCluster( final String clusterName, final String lxcHostname )
+    {
+        AbstractOperationHandler operationHandler = new StartClusterOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
     public UUID stopNode( final String clusterName, final String lxcHostname, final boolean master )
     {
 
@@ -148,13 +161,42 @@ public class SparkImpl extends SparkBase implements Spark
 
 
     @Override
-    public UUID checkNode( final String clusterName, final String lxcHostname )
+    public UUID stopCluster( final String clusterName, final String lxcHostname )
+    {
+        AbstractOperationHandler operationHandler = new StopClusterOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID checkSlaveNode( final String clusterName, final String lxcHostname )
     {
 
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler =
+                new CheckSlaveNodeOperationHandler( this, clusterName, lxcHostname );
 
         executor.execute( operationHandler );
 
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID checkMasterNode( final String clusterName, final String lxcHostname )
+    {
+        AbstractOperationHandler operationHandler =
+                new CheckMasterNodeOperationHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID checkAllNodes( final String clusterName )
+    {
+        AbstractOperationHandler operationHandler = new CheckAllOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 

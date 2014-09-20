@@ -102,6 +102,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         config.getSlaveNodes().add( agent );
 
         po.addLog( "Updating db..." );
+
         //save to db
         manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLog( "Cluster info updated in DB" );

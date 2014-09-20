@@ -50,13 +50,6 @@ public class SparkClusterConfig implements ConfigBase
     }
 
 
-    @Override
-    public String getProductName()
-    {
-        return PRODUCT_KEY;
-    }
-
-
     public String getHadoopClusterName()
     {
         return hadoopClusterName;
@@ -78,6 +71,13 @@ public class SparkClusterConfig implements ConfigBase
     public void setSetupType( SetupType setupType )
     {
         this.setupType = setupType;
+    }
+
+
+    @Override
+    public String getProductName()
+    {
+        return PRODUCT_KEY;
     }
 
 

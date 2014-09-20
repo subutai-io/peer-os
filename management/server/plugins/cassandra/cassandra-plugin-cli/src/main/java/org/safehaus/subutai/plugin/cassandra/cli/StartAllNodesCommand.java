@@ -88,7 +88,6 @@ public class StartAllNodesCommand extends OsgiCommandSupport
                 break;
             }
         }
-
         return null;
     }
 }

@@ -12,9 +12,6 @@ import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
-/**
- * Created by bahadyr on 9/1/14.
- */
 public class ClusterConfiguration
 {
 
@@ -154,7 +151,7 @@ public class ClusterConfiguration
             return;
         }
 
-        po.addLog( "Cassandra cluster data saved into database" );
         cassandraManager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cassandra cluster data saved into database" );
     }
 }

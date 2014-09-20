@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -17,9 +13,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class StepStart extends VerticalLayout
 {
 
@@ -30,13 +23,13 @@ public class StepStart extends VerticalLayout
         GridLayout gridLayout = new GridLayout( 10, 6 );
         gridLayout.setSizeFull();
 
-        Label welcomeMsg = new Label( "<center><h2>Welcome to Cassandra Installation Wizard.</h2></center>" );
+        Label welcomeMsg = new Label( "<center><h2>Welcome to Cassandra Installation Wizard!</h2></center>" );
         welcomeMsg.addStyleName( "h2" );
         welcomeMsg.setContentMode( ContentMode.HTML );
         gridLayout.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( wizard.getCassandraUI().MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( CassandraUI.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 150, Unit.PIXELS );
         logoImg.setWidth( 220, Unit.PIXELS );
@@ -53,7 +46,6 @@ public class StepStart extends VerticalLayout
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                wizard.getConfig().reset();
                 wizard.next();
             }
         } );

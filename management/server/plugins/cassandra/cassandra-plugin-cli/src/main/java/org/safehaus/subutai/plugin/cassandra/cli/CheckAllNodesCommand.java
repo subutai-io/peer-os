@@ -88,7 +88,6 @@ public class CheckAllNodesCommand extends OsgiCommandSupport
                 break;
             }
         }
-
         return null;
     }
 }

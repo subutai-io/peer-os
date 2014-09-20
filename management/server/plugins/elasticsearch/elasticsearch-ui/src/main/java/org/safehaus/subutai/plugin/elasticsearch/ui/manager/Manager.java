@@ -43,10 +43,11 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
-    private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
     private final Table nodesTable;
-    private final String message = "No cluster is installed !";
-    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private static final String message = "No cluster is installed !";
+    private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
+
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final AgentManager agentManager;
@@ -55,6 +56,24 @@ public class Manager
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private ElasticsearchClusterConfiguration config;
+
+    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
+    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected final static String CHECK_BUTTON_CAPTION = "Check";
+    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
+    protected final static String START_BUTTON_CAPTION = "Start";
+    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected final static String STOP_BUTTON_CAPTION = "Stop";
+    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected final static String HOST_COLUMN_CAPTION = "Host";
+    protected final static String IP_COLUMN_CAPTION = "IP List";
+    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected final static String STATUS_COLUMN_CAPTION = "Status";
+    protected final static String ADD_NODE_CAPTION = "Add Node";
+
+    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -106,7 +125,7 @@ public class Manager
         controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
 
         /**  Refresh clusters button */
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -122,7 +141,7 @@ public class Manager
 
 
         /** Check all button */
-        Button checkAllBtn = new Button( "Check all" );
+        checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -145,7 +164,7 @@ public class Manager
 
 
         /**  Start all button */
-        Button startAllBtn = new Button( "Start all" );
+        startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
         startAllBtn.addStyleName( "default" );
         startAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -168,7 +187,7 @@ public class Manager
 
 
         /**  Stop all button  */
-        Button stopAllBtn = new Button( "Stop all" );
+        stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
         stopAllBtn.addStyleName( "default" );
         stopAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -191,7 +210,7 @@ public class Manager
 
 
         /**  Destroy cluster button  */
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -237,50 +256,95 @@ public class Manager
 
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
-
+        progressIcon.setVisible( false );
         controlsContent.addComponent( progressIcon );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
 
 
-    /**
-     * Clicks all "Check" buttons on table in which on nodes are listed. "Check" button is made hidden deliberately on
-     * this table.
-     */
-    public void checkAllNodes()
+    public void startAllNodes()
     {
-        for ( Object o : nodesTable.getItemIds() )
+        for ( Agent agent : config.getNodes() )
         {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
-            checkBtn.addStyleName( "default" );
-            checkBtn.click();
+            progressIcon.setVisible( true );
+            executorService.execute(
+                    new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                            new CompleteEvent()
+                            {
+                                @Override
+                                public void onComplete( String result )
+                                {
+                                    synchronized ( progressIcon )
+                                    {
+                                        checkAllNodes();
+                                    }
+                                }
+                            } ) );
         }
     }
 
 
     public void stopAllNodes()
     {
-        for ( Object o : nodesTable.getItemIds() )
+        for ( Agent agent : config.getNodes() )
         {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
-            checkBtn.click();
+            progressIcon.setVisible( true );
+            executorService.execute( new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                    new CompleteEvent()
+                    {
+                        @Override
+                        public void onComplete( String result )
+                        {
+                            synchronized ( progressIcon )
+                            {
+                                checkAllNodes();
+                            }
+                        }
+                    } ) );
         }
     }
 
 
-    public void startAllNodes()
+    public void checkAllNodes()
     {
-        for ( Object o : nodesTable.getItemIds() )
+        if ( nodesTable != null )
         {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
-            checkBtn.click();
+            for ( Object o : nodesTable.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = nodesTable.getItem( rowId );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
+                    if ( checkBtn != null )
+                    {
+                        checkBtn.click();
+                    }
+                }
+            }
+        }
+    }
+
+
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
         }
     }
 
@@ -288,20 +352,18 @@ public class Manager
     private Table createTableTemplate( String caption )
     {
         final Table table = new Table( caption );
-        table.addContainerProperty( "Host", String.class, null );
-        table.addContainerProperty( "IP", String.class, null );
-        table.addContainerProperty( "Master/Data", String.class, null );
-        table.addContainerProperty( "Check", Button.class, null );
-        table.addContainerProperty( "Start", Button.class, null );
-        table.addContainerProperty( "Stop", Button.class, null );
-        table.addContainerProperty( "Service Status", Label.class, null );
+        table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
+
 
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
         table.setColumnCollapsingAllowed( true );
-        table.setColumnCollapsed( "Check", true );
 
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
@@ -311,7 +373,8 @@ public class Manager
                 if ( event.isDoubleClick() )
                 {
                     String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+                            ( String ) table.getItem( event.getItemId() ).getItemProperty( HOST_COLUMN_CAPTION )
+                                            .getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
@@ -350,6 +413,42 @@ public class Manager
     }
 
 
+    public void refreshClustersInfo()
+    {
+        List<ElasticsearchClusterConfiguration> config = elasticsearch.getClusters();
+        ElasticsearchClusterConfiguration clusterInfo = ( ElasticsearchClusterConfiguration ) clusterCombo.getValue();
+        clusterCombo.removeAllItems();
+
+        if ( config == null || config.isEmpty() )
+        {
+            progressIcon.setVisible( false );
+            return;
+        }
+
+        for ( ElasticsearchClusterConfiguration esConfig : config )
+        {
+            clusterCombo.addItem( esConfig );
+            clusterCombo.setItemCaption( esConfig, esConfig.getClusterName() );
+        }
+
+        if ( clusterInfo != null )
+        {
+            for ( ElasticsearchClusterConfiguration esConfig : config )
+            {
+                if ( esConfig.getClusterName().equals( clusterInfo.getClusterName() ) )
+                {
+                    clusterCombo.setValue( esConfig );
+                    return;
+                }
+            }
+        }
+        else
+        {
+            clusterCombo.setValue( config.iterator().next() );
+        }
+    }
+
+
     /**
      * Fill out the table in which all nodes in the cluster are listed.
      *
@@ -362,15 +461,15 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Label resultHolder = new Label();
-            final Button checkButton = new Button( "Check" );
+            final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
             checkButton.addStyleName( "default" );
             checkButton.setVisible( true );
 
-            final Button startButton = new Button( "Start" );
+            final Button startButton = new Button( START_BUTTON_CAPTION );
             startButton.addStyleName( "default" );
             startButton.setVisible( true );
 
-            final Button stopButton = new Button( "Stop" );
+            final Button stopButton = new Button( STOP_BUTTON_CAPTION );
             stopButton.addStyleName( "default" );
             stopButton.setVisible( true );
 
@@ -378,11 +477,17 @@ public class Manager
             stopButton.setEnabled( false );
             progressIcon.setVisible( false );
 
-            String isMaster = checkIfMaster( agent );
+            HorizontalLayout availableOperations = new HorizontalLayout();
+            availableOperations.setSpacing( true );
+            availableOperations.addStyleName( "default" );
+
+            availableOperations.addComponent( checkButton );
+            availableOperations.addComponent( startButton );
+            availableOperations.addComponent( stopButton );
 
             final Object rowId = table.addItem( new Object[] {
-                    agent.getHostname(), parseIPList( agent.getListIP().toString() ), isMaster, checkButton,
-                    startButton, stopButton, resultHolder
+                    agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder,
+                    availableOperations
             }, null );
 
             checkButton.addClickListener( new Button.ClickListener()
@@ -391,6 +496,9 @@ public class Manager
                 public void buttonClick( Button.ClickEvent event )
                 {
                     progressIcon.setVisible( true );
+                    startButton.setEnabled( false );
+                    stopButton.setEnabled( false );
+                    checkButton.setEnabled( false );
                     executorService.execute(
                             new CheckTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent()
@@ -412,6 +520,7 @@ public class Manager
                                                     stopButton.setEnabled( true );
                                                 }
                                                 progressIcon.setVisible( false );
+                                                checkButton.setEnabled( true );
                                             }
                                         }
                                     } ) );
@@ -426,6 +535,7 @@ public class Manager
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
+                    checkButton.setEnabled( false );
                     executorService.execute(
                             new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent()
@@ -435,6 +545,9 @@ public class Manager
                                         {
                                             synchronized ( progressIcon )
                                             {
+                                                startButton.setEnabled( true );
+                                                stopButton.setEnabled( true );
+                                                checkButton.setEnabled( true );
                                                 checkButton.click();
                                             }
                                         }
@@ -450,6 +563,7 @@ public class Manager
                     progressIcon.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
+                    checkButton.setEnabled( false );
                     executorService.execute(
                             new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent()
@@ -459,6 +573,9 @@ public class Manager
                                         {
                                             synchronized ( progressIcon )
                                             {
+                                                startButton.setEnabled( true );
+                                                stopButton.setEnabled( true );
+                                                checkButton.setEnabled( true );
                                                 checkButton.click();
                                             }
                                         }
@@ -486,19 +603,6 @@ public class Manager
 
 
     /**
-     * Parses supplied string argument to extract external IP.
-     *
-     * @param ipList ex: [10.10.10.10, 127.0.0.1]
-     *
-     * @return 10.10.10.10
-     */
-    public String parseIPList( String ipList )
-    {
-        return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," ) );
-    }
-
-
-    /**
      * @param agent agent
      *
      * @return Yes if give agent is among seeds, otherwise returns No
@@ -507,46 +611,9 @@ public class Manager
     {
         if ( config.getMasterNodes().contains( agent ) )
         {
-            return "Master Node";
+            return "Master";
         }
-        return "Data Node";
-    }
-
-
-    public void refreshClustersInfo()
-    {
-        List<ElasticsearchClusterConfiguration> elasticsearchClusterConfigurationList = elasticsearch.getClusters();
-        ElasticsearchClusterConfiguration clusterInfo = ( ElasticsearchClusterConfiguration ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-
-        if ( elasticsearchClusterConfigurationList == null || elasticsearchClusterConfigurationList.isEmpty() )
-        {
-            return;
-        }
-
-        for ( ElasticsearchClusterConfiguration elasticsearchClusterConfiguration :
-                elasticsearchClusterConfigurationList )
-        {
-            clusterCombo.addItem( elasticsearchClusterConfiguration );
-            clusterCombo.setItemCaption( elasticsearchClusterConfiguration,
-                    elasticsearchClusterConfiguration.getClusterName() );
-        }
-
-        if ( clusterInfo != null )
-        {
-            for ( ElasticsearchClusterConfiguration cassandraInfo : elasticsearchClusterConfigurationList )
-            {
-                if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
-                {
-                    clusterCombo.setValue( cassandraInfo );
-                    return;
-                }
-            }
-        }
-        else
-        {
-            clusterCombo.setValue( elasticsearchClusterConfigurationList.iterator().next() );
-        }
+        return "Data";
     }
 
 

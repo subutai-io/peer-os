@@ -3,8 +3,6 @@ package org.safehaus.subutai.plugin.presto.ui.manager;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -39,7 +37,6 @@ public class StartTask implements Runnable
         UUID trackID = presto.startNode( clusterName, hostname );
 
         long start = System.currentTimeMillis();
-        NodeState state = NodeState.UNKNOWN;
 
         while ( !Thread.interrupted() )
         {
@@ -48,10 +45,7 @@ public class StartTask implements Runnable
             {
                 if ( po.getState() != ProductOperationState.RUNNING )
                 {
-                    if ( po.getState() == ProductOperationState.SUCCEEDED )
-                    {
-                        state = NodeState.RUNNING;
-                    }
+                    completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
@@ -68,7 +62,5 @@ public class StartTask implements Runnable
                 break;
             }
         }
-
-        completeEvent.onComplete( state );
     }
 }

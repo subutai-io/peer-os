@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.container.api;
 
 
 /**
- * Created by timur on 9/16/14.
+ * Container event type.
  */
 public enum ContainerEventType
 {

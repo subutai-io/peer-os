@@ -325,7 +325,9 @@ public class CassandraImpl extends CassandraBase
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", config.getProductKey(), UUID.randomUUID() ) );
+        environmentBlueprint
+                .setName( String.format( "%s-%s", CassandraClusterConfig.getProductKey(), UUID.randomUUID() ) );
+
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         environmentBlueprint.setExchangeSshKeys( true );

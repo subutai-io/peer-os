@@ -18,9 +18,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-/**
- * Created by bahadyr on 8/22/14.
- */
 public class CassandraSetupStrategy implements ClusterSetupStrategy
 {
 
@@ -94,8 +91,6 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
         {
             throw new ClusterSetupException( e.getMessage() );
         }
-
-
         return config;
     }
 }

@@ -1,13 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -15,24 +16,26 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class Wizard
 {
 
-    private static final int MAX_STEPS = 3;
     private final VerticalLayout verticalLayout;
     GridLayout grid;
     private int step = 1;
     private CassandraClusterConfig config = new CassandraClusterConfig();
-    private CassandraUI cassandraUI;
+
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final Cassandra cassandra;
 
 
-    public Wizard( CassandraUI cassandraUI )
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
 
-        this.cassandraUI = cassandraUI;
+        this.cassandra = serviceLocator.getService( Cassandra.class );
+        this.executorService = executorService;
+        this.tracker = serviceLocator.getService( Tracker.class );
+
         verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         grid = new GridLayout( 1, 1 );
@@ -62,7 +65,7 @@ public class Wizard
             }
             case 3:
             {
-                verticalLayout.addComponent( new VerificationStep( this ) );
+                verticalLayout.addComponent( new VerificationStep( cassandra, executorService, tracker, this ) );
                 break;
             }
             default:
@@ -72,18 +75,6 @@ public class Wizard
                 break;
             }
         }
-    }
-
-
-    public CassandraUI getCassandraUI()
-    {
-        return cassandraUI;
-    }
-
-
-    public void setCassandraUI( final CassandraUI cassandraUI )
-    {
-        this.cassandraUI = cassandraUI;
     }
 
 
