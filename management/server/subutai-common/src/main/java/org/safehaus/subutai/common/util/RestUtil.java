@@ -3,12 +3,9 @@ package org.safehaus.subutai.common.util;
 
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
-
+import org.restlet.Response;
+import org.restlet.data.Status;
 import org.safehaus.subutai.common.exception.HTTPException;
-
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 
 
 public class RestUtil
@@ -31,9 +28,9 @@ public class RestUtil
                 }
             }
             response = client.get();
-            if ( response.getStatus() != RESPONSE_OK )
+            if ( response.getStatus() != Status.SUCCESS_OK )
             {
-                throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
+                throw new HTTPException( String.format( "Http status code: %d", response.getStatus().getCode() ) );
             }
             else
             {
