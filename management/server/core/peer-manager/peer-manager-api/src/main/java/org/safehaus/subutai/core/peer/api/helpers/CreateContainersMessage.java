@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 9/19/14.
  */
-public class CreateContainersMessage
+public class CreateContainersMessage extends PeerCommandMessage
 {
     private UUID envId;
     private String template;
