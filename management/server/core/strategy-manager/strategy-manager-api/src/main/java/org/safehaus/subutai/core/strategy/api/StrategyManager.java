@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
- * Created by timur on 9/18/14.
+ * Strategy manager provides methods for working with container placement strategy
  */
 public interface StrategyManager
 {
@@ -19,5 +19,5 @@ public interface StrategyManager
             throws StrategyException;
 
 
-    public ContainerPlacementStrategy findStrategyById( String strategyId );
+    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotAvailable;
 }

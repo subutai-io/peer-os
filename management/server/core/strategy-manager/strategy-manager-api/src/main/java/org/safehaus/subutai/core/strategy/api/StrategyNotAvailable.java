@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.strategy.api;
 
 
 /**
- * Created by timur on 9/18/14.
+ * Thrown when container placement strategy not available
  */
 public class StrategyNotAvailable extends StrategyException
 {

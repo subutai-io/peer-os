@@ -41,8 +41,7 @@ import com.google.common.cache.CacheBuilder;
 /**
  * Implementation of Agent Manager Interface
  */
-public class AgentManagerImpl implements ResponseListener, AgentManager
-{
+public class AgentManagerImpl implements ResponseListener, AgentManager {
 
     private static final Logger LOG = Logger.getLogger( AgentManagerImpl.class.getName() );
     /**
@@ -271,7 +270,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     {
         long threshold = System.currentTimeMillis() + timeout;
         Agent result = getAgentByHostname( hostname );
-        LOG.info( Thread.currentThread().toString() );
         while ( result == null && System.currentTimeMillis() < threshold )
         {
             try
@@ -304,8 +302,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
             communicationService.addListener( this );
 
             exec = Executors.newSingleThreadExecutor();
-            exec.execute( new Runnable()
-            {
+            exec.execute( new Runnable() {
 
                 public void run()
                 {

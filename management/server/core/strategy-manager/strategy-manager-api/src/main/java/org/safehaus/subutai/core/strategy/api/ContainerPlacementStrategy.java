@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
- * Created by timur on 9/11/14.
+ * Container placement strategy contains methods to distribute containers on physical hosts
  */
 public interface ContainerPlacementStrategy
 {
