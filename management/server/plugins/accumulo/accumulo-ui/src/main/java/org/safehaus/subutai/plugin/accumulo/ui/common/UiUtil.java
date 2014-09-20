@@ -25,14 +25,16 @@ import com.vaadin.ui.TwinColSelect;
 /**
  * Created by dilshat on 4/28/14.
  */
-public class UiUtil {
+public class UiUtil
+{
 
     public static final String MASTER_PREFIX = "Master: ";
     public static final String GC_PREFIX = "GC: ";
     public static final String MONITOR_PREFIX = "Monitor: ";
 
 
-    public static ComboBox getCombo( String title ) {
+    public static ComboBox getCombo( String title )
+    {
         ComboBox combo = new ComboBox( title );
         combo.setImmediate( true );
         combo.setTextInputAllowed( false );
@@ -43,7 +45,8 @@ public class UiUtil {
 
 
     public static TwinColSelect getTwinSelect( String title, String captionProperty, String leftTitle,
-                                               String rightTitle, int rows ) {
+                                               String rightTitle, int rows )
+    {
         TwinColSelect twinColSelect = new TwinColSelect( title );
         twinColSelect.setItemCaptionPropertyId( captionProperty );
         twinColSelect.setRows( rows );
@@ -59,11 +62,13 @@ public class UiUtil {
 
     public static Table createTableTemplate( String caption, boolean destroyButtonNeeded,
                                              final AgentManager agentManager, final CommandRunner commandRunner,
-                                             final ExecutorService executorService ) {
+                                             final ExecutorService executorService )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
-        if ( destroyButtonNeeded ) {
+        if ( destroyButtonNeeded )
+        {
             table.addContainerProperty( "Destroy", Button.class, null );
         }
         table.addContainerProperty( "Nodes state", Label.class, null );
@@ -73,22 +78,27 @@ public class UiUtil {
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     lxcHostname = lxcHostname.replace( MASTER_PREFIX, "" ).replace( MONITOR_PREFIX, "" )
                                              .replace( GC_PREFIX, "" );
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
                         table.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         Notification.show( "Agent is not connected" );
                     }
                 }
@@ -98,7 +108,8 @@ public class UiUtil {
     }
 
 
-    public static TextField getTextField( String caption, String prompt, int maxLength ) {
+    public static TextField getTextField( String caption, String prompt, int maxLength )
+    {
         TextField textField = new TextField( caption );
         textField.setInputPrompt( prompt );
         textField.setMaxLength( maxLength );
@@ -107,8 +118,10 @@ public class UiUtil {
     }
 
 
-    public static void clickAllButtonsInTable( Table table, String buttonCaption ) {
-        for ( Object o : table.getItemIds() ) {
+    public static void clickAllButtonsInTable( Table table, String buttonCaption )
+    {
+        for ( Object o : table.getItemIds() )
+        {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
             Button checkBtn = ( Button ) ( row.getItemProperty( buttonCaption ).getValue() );

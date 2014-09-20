@@ -1,57 +1,68 @@
 package org.safehaus.subutai.core.container.impl.strategy;
 
 
-import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 
 
-abstract class MetricComparator {
+abstract class MetricComparator
+{
 
-	static MetricComparator create(PlacementStrategy st) {
-		MetricComparator mc = null;
-		// TODO: add missing case clauses
-		switch (st) {
-			case MORE_HDD:
-				mc = new MetricComparator() {
-					@Override
-					public int getValue(ServerMetric m) {
-						return m.getFreeHddMb();
-					}
-				};
-				break;
-			case MORE_RAM:
-				mc = new MetricComparator() {
-					@Override
-					int getValue(ServerMetric m) {
-						return m.getFreeRamMb();
-					}
-				};
-				break;
-			case MORE_CPU:
-				mc = new MetricComparator() {
-					@Override
-					int getValue(ServerMetric m) {
-						return m.getCpuLoadPercent();
-					}
-
-
-					@Override
-					boolean isLessBetter() {
-						return true;
-					}
-				};
-				break;
-			default:
-				throw new AssertionError(st.name());
-		}
-		return mc;
-	}
+    static MetricComparator create( PlacementStrategy st )
+    {
+        MetricComparator mc = null;
+        // TODO: add missing case clauses
+        switch ( st )
+        {
+            case MORE_HDD:
+                mc = new MetricComparator()
+                {
+                    @Override
+                    public int getValue( ServerMetric m )
+                    {
+                        return m.getFreeHddMb();
+                    }
+                };
+                break;
+            case MORE_RAM:
+                mc = new MetricComparator()
+                {
+                    @Override
+                    int getValue( ServerMetric m )
+                    {
+                        return m.getFreeRamMb();
+                    }
+                };
+                break;
+            case MORE_CPU:
+                mc = new MetricComparator()
+                {
+                    @Override
+                    int getValue( ServerMetric m )
+                    {
+                        return m.getCpuLoadPercent();
+                    }
 
 
-	abstract int getValue(ServerMetric m);
+                    @Override
+                    boolean isLessBetter()
+                    {
+                        return true;
+                    }
+                };
+                break;
+            default:
+                throw new AssertionError( st.name() );
+        }
+        return mc;
+    }
 
 
-	boolean isLessBetter() {
-		return false;
-	}
+    abstract int getValue( ServerMetric m );
+
+
+    boolean isLessBetter()
+    {
+        return false;
+    }
 }

@@ -21,7 +21,8 @@ import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
 /**
  * @author dilshat
  */
-public class CheckTask implements Runnable {
+public class CheckTask implements Runnable
+{
 
     private final String clusterName, lxcHostname;
     private final CompleteEvent completeEvent;
@@ -30,7 +31,8 @@ public class CheckTask implements Runnable {
 
 
     public CheckTask( Mongo mongo, Tracker tracker, String clusterName, String lxcHostname,
-                      CompleteEvent completeEvent ) {
+                      CompleteEvent completeEvent )
+    {
         this.mongo = mongo;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -39,32 +41,41 @@ public class CheckTask implements Runnable {
     }
 
 
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = mongo.checkNode( clusterName, lxcHostname );
 
         NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( MongoClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( po.getLog().contains( NodeState.STOPPED.toString() ) ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
+                    if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
+                    {
                         state = NodeState.STOPPED;
                     }
-                    else if ( po.getLog().contains( NodeState.RUNNING.toString() ) ) {
+                    else if ( po.getLog().contains( NodeState.RUNNING.toString() ) )
+                    {
                         state = NodeState.RUNNING;
                     }
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > ( Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3 ) * 1000 ) {
+            if ( System.currentTimeMillis() - start > ( Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3 ) * 1000 )
+            {
                 break;
             }
         }

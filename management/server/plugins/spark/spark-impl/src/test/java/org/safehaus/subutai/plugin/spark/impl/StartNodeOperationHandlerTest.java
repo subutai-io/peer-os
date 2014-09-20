@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -13,29 +14,36 @@ import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 
 
 @Ignore
-public class StartNodeOperationHandlerTest {
+public class StartNodeOperationHandlerTest
+{
 
     private SparkImplMock mock;
     private AbstractOperationHandler handler;
 
+
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         mock = new SparkImplMock();
         handler = new StartNodeOperationHandler( mock, "test-cluster", "test-host", true );
     }
 
+
     @Test
-    public void testWithoutCluster() {
+    public void testWithoutCluster()
+    {
 
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
         Assert.assertTrue( po.getLog().contains( "not exist" ) );
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
 
+
     @Test
-    public void testFail() {
+    public void testFail()
+    {
         mock.setClusterConfig( new SparkClusterConfig() );
         handler.run();
 

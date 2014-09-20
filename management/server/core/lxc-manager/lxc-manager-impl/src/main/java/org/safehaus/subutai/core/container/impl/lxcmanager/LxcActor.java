@@ -6,36 +6,44 @@
 package org.safehaus.subutai.core.container.impl.lxcmanager;
 
 
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
-
 import java.util.concurrent.Callable;
+
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 
 
 /**
  * Clones or destroys lxc
  */
-public class LxcActor implements Callable<LxcInfo> {
+public class LxcActor implements Callable<LxcInfo>
+{
 
-	private final LxcInfo info;
-	private final LxcManager lxcManager;
-	private final LxcAction lxcAction;
-
-
-	public LxcActor(LxcInfo info, LxcManager lxcManager, LxcAction lxcAction) {
-		this.info = info;
-		this.lxcManager = lxcManager;
-		this.lxcAction = lxcAction;
-	}
+    private final LxcInfo info;
+    private final LxcManager lxcManager;
+    private final LxcAction lxcAction;
 
 
-	public LxcInfo call() throws Exception {
-		if (lxcAction == LxcAction.CLONE) {
-			info.setResult(lxcManager.cloneLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
-		} else if (lxcAction == LxcAction.START) {
-			info.setResult(lxcManager.startLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
-		} else if (lxcAction == LxcAction.DESTROY) {
-			info.setResult(lxcManager.destroyLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
-		}
-		return info;
-	}
+    public LxcActor( LxcInfo info, LxcManager lxcManager, LxcAction lxcAction )
+    {
+        this.info = info;
+        this.lxcManager = lxcManager;
+        this.lxcAction = lxcAction;
+    }
+
+
+    public LxcInfo call() throws Exception
+    {
+        if ( lxcAction == LxcAction.CLONE )
+        {
+            info.setResult( lxcManager.cloneLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
+        }
+        else if ( lxcAction == LxcAction.START )
+        {
+            info.setResult( lxcManager.startLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
+        }
+        else if ( lxcAction == LxcAction.DESTROY )
+        {
+            info.setResult( lxcManager.destroyLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
+        }
+        return info;
+    }
 }

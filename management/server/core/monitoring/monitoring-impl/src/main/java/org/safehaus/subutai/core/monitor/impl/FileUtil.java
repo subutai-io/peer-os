@@ -1,5 +1,6 @@
 package org.safehaus.subutai.core.monitor.impl;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -8,48 +9,62 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class FileUtil {
 
-	private static final Logger log = Logger.getLogger(FileUtil.class.getName());
+class FileUtil
+{
 
-	private static URLClassLoader classLoader;
+    private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
 
-	static String getContent(String filePath) {
-		String content = "";
+    private static URLClassLoader classLoader;
 
-		try {
-			content = readFile(filePath);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Error while reading file: " + e);
-		}
 
-		return content;
-	}
+    static String getContent( String filePath )
+    {
+        String content = "";
 
-	private static String readFile(String filePath) throws IOException {
+        try
+        {
+            content = readFile( filePath );
+        }
+        catch ( Exception e )
+        {
+            log.log( Level.SEVERE, "Error while reading file: " + e );
+        }
 
-		InputStream is = getClassLoader().getResourceAsStream(filePath);
-		String s = streamToString(is);
-		is.close();
+        return content;
+    }
 
-		return s;
-	}
 
-	private static URLClassLoader getClassLoader() {
+    private static String readFile( String filePath ) throws IOException
+    {
 
-		if (classLoader != null) {
-			return classLoader;
-		}
+        InputStream is = getClassLoader().getResourceAsStream( filePath );
+        String s = streamToString( is );
+        is.close();
 
-		// Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
-		URL url = new FileUtil().getClass().getProtectionDomain().getCodeSource().getLocation();
-		classLoader = new URLClassLoader(new URL[] {url}, Thread.currentThread().getContextClassLoader());
+        return s;
+    }
 
-		return classLoader;
-	}
 
-	private static String streamToString(InputStream is) {
-		Scanner scanner = new Scanner(is).useDelimiter("\\A");
-		return scanner.hasNext() ? scanner.next() : "";
-	}
+    private static URLClassLoader getClassLoader()
+    {
+
+        if ( classLoader != null )
+        {
+            return classLoader;
+        }
+
+        // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
+        URL url = new FileUtil().getClass().getProtectionDomain().getCodeSource().getLocation();
+        classLoader = new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
+
+        return classLoader;
+    }
+
+
+    private static String streamToString( InputStream is )
+    {
+        Scanner scanner = new Scanner( is ).useDelimiter( "\\A" );
+        return scanner.hasNext() ? scanner.next() : "";
+    }
 }

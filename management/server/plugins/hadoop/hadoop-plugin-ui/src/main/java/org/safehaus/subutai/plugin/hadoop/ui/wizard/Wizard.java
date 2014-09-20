@@ -17,17 +17,18 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Created by daralbaev on 09.04.14.
  */
-public class Wizard {
+public class Wizard
+{
     private final VerticalLayout grid;
-    private int step = 1;
-    private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
-
     private final Hadoop hadoop;
     private final ExecutorService executorService;
     private final Tracker tracker;
+    private int step = 1;
+    private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.tracker = serviceLocator.getService( Tracker.class );
         this.executorService = executorService;
@@ -41,58 +42,70 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         grid.removeAllComponents();
         Component component = null;
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 component = new WelcomeStep( this );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 component = new ConfigurationStep( this );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 component = new VerificationStep( hadoop, executorService, tracker, this );
                 break;
             }
-            default: {
+            default:
+            {
                 break;
             }
         }
 
-        if ( component != null ) {
+        if ( component != null )
+        {
             grid.addComponent( component );
         }
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         hadoopClusterConfig = new HadoopClusterConfig();
         putForm();
     }
 
 
-    public HadoopClusterConfig getHadoopClusterConfig() {
+    public HadoopClusterConfig getHadoopClusterConfig()
+    {
         return hadoopClusterConfig;
     }
 }

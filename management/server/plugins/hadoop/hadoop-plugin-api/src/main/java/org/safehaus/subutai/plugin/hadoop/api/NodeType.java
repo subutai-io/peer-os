@@ -5,10 +5,12 @@
  */
 package org.safehaus.subutai.plugin.hadoop.api;
 
+
 /**
  * @author dilshat
  */
-public enum NodeType {
+public enum NodeType
+{
 
-	MASTER_NODE, SLAVE_NODE, DEFAULT_NODE
+    MASTER_NODE, SLAVE_NODE, DEFAULT_NODE
 }

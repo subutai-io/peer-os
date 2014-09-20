@@ -87,7 +87,7 @@ public class DbManagerImpl implements DbManager
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( cassandraKeyspace ), "Keyspace is null or empty" );
         Preconditions.checkArgument( cassandraPort >= 1024 && cassandraPort <= 65536,
-            "Port must be n range 1024 and 65536" );
+                "Port must be n range 1024 and 65536" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( cassandraHost ), "Cassandra host is null or empty" );
         Preconditions.checkArgument( cassandraHost.matches( Common.HOSTNAME_REGEX ), "Invalid cassandra host" );
 
@@ -137,8 +137,9 @@ public class DbManagerImpl implements DbManager
     /**
      * Executes a select query against db
      *
-     * @param cql    - sql query with placeholders for bind parameters in form of ?
+     * @param cql - sql query with placeholders for bind parameters in form of ?
      * @param values - bind parameters
+     *
      * @return - resultset
      */
     public ResultSet executeQuery( String cql, Object... values )
@@ -230,8 +231,9 @@ public class DbManagerImpl implements DbManager
     /**
      * Executes CUD (insert update delete) query against DB
      *
-     * @param cql    - sql query with placeholders for bind parameters in form of ?
+     * @param cql - sql query with placeholders for bind parameters in form of ?
      * @param values - bind parameters
+     *
      * @return true if all went well and false if exception was raised
      */
     public boolean executeUpdate( String cql, Object... values )
@@ -264,21 +266,22 @@ public class DbManagerImpl implements DbManager
      * Saves POJO to DB
      *
      * @param source - source key
-     * @param key    - POJO key
-     * @param info   - custom object
+     * @param key - POJO key
+     * @param info - custom object
+     *
      * @return true if all went well and false if exception was raised
      */
     public boolean saveInfo( String source, String key, Object info )
     {
         return executeUpdate( "insert into product_info(source,key,info) values (?,?,?)", source, key,
-            gson.toJson( info ) );
+                gson.toJson( info ) );
     }
 
 
     public boolean saveEnvironmentInfo( String source, String key, Object info )
     {
         return executeUpdate( "insert into environment_info(source,key,info) values (?,?,?)", source, key,
-            gson.toJson( info ) );
+                gson.toJson( info ) );
     }
 
 
@@ -286,8 +289,9 @@ public class DbManagerImpl implements DbManager
      * Returns POJO from DB
      *
      * @param source - source key
-     * @param key    - pojo key
-     * @param clazz  - class of POJO
+     * @param key - pojo key
+     * @param clazz - class of POJO
+     *
      * @return - POJO
      */
     public <T> T getInfo( String source, String key, Class<T> clazz )
@@ -321,7 +325,7 @@ public class DbManagerImpl implements DbManager
         {
 
             ResultSet rs =
-                executeQuery( "select info from environment_info where source = ? and key = ?", source, key );
+                    executeQuery( "select info from environment_info where source = ? and key = ?", source, key );
             if ( rs != null )
             {
                 Row row = rs.one();
@@ -345,7 +349,8 @@ public class DbManagerImpl implements DbManager
      * Returns all POJOs from DB identified by source key
      *
      * @param source - source key
-     * @param clazz  - class of POJO
+     * @param clazz - class of POJO
+     *
      * @return - list of POJOs
      */
     public <T> List<T> getInfo( String source, Class<T> clazz )
@@ -398,7 +403,8 @@ public class DbManagerImpl implements DbManager
      * deletes POJO from DB
      *
      * @param source - source key
-     * @param key    - POJO key
+     * @param key - POJO key
+     *
      * @return true if all went well and false if exception was raised
      */
     public boolean deleteInfo( String source, String key )

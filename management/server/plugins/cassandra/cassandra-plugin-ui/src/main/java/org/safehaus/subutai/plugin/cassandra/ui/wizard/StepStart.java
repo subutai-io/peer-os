@@ -20,9 +20,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class StepStart extends VerticalLayout {
+public class StepStart extends VerticalLayout
+{
 
-    public StepStart( final Wizard wizard ) {
+    public StepStart( final Wizard wizard )
+    {
         setSizeFull();
 
         GridLayout gridLayout = new GridLayout( 10, 6 );
@@ -46,9 +48,11 @@ public class StepStart extends VerticalLayout {
         gridLayout.addComponent( next, 6, 4, 6, 4 );
         gridLayout.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.getConfig().reset();
                 wizard.next();
             }

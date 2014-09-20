@@ -20,7 +20,8 @@ import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 /**
  * @author dilshat
  */
-public class CheckTask implements Runnable {
+public class CheckTask implements Runnable
+{
 
     private final String clusterName, lxcHostname;
     private final CompleteEvent completeEvent;
@@ -28,8 +29,8 @@ public class CheckTask implements Runnable {
     private final Tracker tracker;
 
 
-    public CheckTask( Solr solr, Tracker tracker, String clusterName, String lxcHostname,
-                      CompleteEvent completeEvent ) {
+    public CheckTask( Solr solr, Tracker tracker, String clusterName, String lxcHostname, CompleteEvent completeEvent )
+    {
         this.solr = solr;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -38,32 +39,41 @@ public class CheckTask implements Runnable {
     }
 
 
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = solr.checkNode( clusterName, lxcHostname );
 
         NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( SolrClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( po.getLog().contains( NodeState.STOPPED.toString() ) ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
+                    if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
+                    {
                         state = NodeState.STOPPED;
                     }
-                    else if ( po.getLog().contains( NodeState.RUNNING.toString() ) ) {
+                    else if ( po.getLog().contains( NodeState.RUNNING.toString() ) )
+                    {
                         state = NodeState.RUNNING;
                     }
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 ) {
+            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
+            {
                 break;
             }
         }

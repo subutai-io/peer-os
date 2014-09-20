@@ -27,8 +27,9 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
-public class Manager extends VerticalLayout {
+@SuppressWarnings("serial")
+public class Manager extends VerticalLayout
+{
 
     private final static String physicalHostLabel = "Physical Host";
     private final Label indicator;
@@ -39,11 +40,12 @@ public class Manager extends VerticalLayout {
     private final TreeTable lxcTable;
     private final ContainerManager containerManager;
     private final AgentManager agentManager;
-    private volatile boolean isDestroyAllButtonClicked = false;
     private final ExecutorService executorService;
+    private volatile boolean isDestroyAllButtonClicked = false;
 
 
-    public Manager( ExecutorService executorService, AgentManager agentManager, ContainerManager containerManager ) {
+    public Manager( ExecutorService executorService, AgentManager agentManager, ContainerManager containerManager )
+    {
 
         this.executorService = executorService;
 
@@ -57,22 +59,28 @@ public class Manager extends VerticalLayout {
 
         infoBtn = new Button( Buttons.INFO.getButtonLabel() );
         infoBtn.addStyleName( "default" );
-        infoBtn.addClickListener( new Button.ClickListener() {
+        infoBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 getLxcInfo();
             }
         } );
 
         stopAllBtn = new Button( Buttons.STOP_ALL.getButtonLabel() );
         stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
+        stopAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                for ( Object o : lxcTable.getItemIds() ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                for ( Object o : lxcTable.getItemIds() )
+                {
                     Item row = lxcTable.getItem( o );
                     Button stopBtn = ( Button ) ( row.getItemProperty( Buttons.STOP.getButtonLabel() ).getValue() );
-                    if ( stopBtn != null ) {
+                    if ( stopBtn != null )
+                    {
                         stopBtn.click();
                     }
                 }
@@ -80,13 +88,17 @@ public class Manager extends VerticalLayout {
         } );
         startAllBtn = new Button( Buttons.START_ALL.getButtonLabel() );
         startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
+        startAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                for ( Object o : lxcTable.getItemIds() ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                for ( Object o : lxcTable.getItemIds() )
+                {
                     Item row = lxcTable.getItem( o );
                     Button startBtn = ( Button ) ( row.getItemProperty( Buttons.START.getButtonLabel() ).getValue() );
-                    if ( startBtn != null ) {
+                    if ( startBtn != null )
+                    {
                         startBtn.click();
                     }
                 }
@@ -94,20 +106,26 @@ public class Manager extends VerticalLayout {
         } );
         destroyAllBtn = new Button( Buttons.DESTROY_ALL.getButtonLabel() );
         destroyAllBtn.addStyleName( "default" );
-        destroyAllBtn.addClickListener( new Button.ClickListener() {
+        destroyAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 ConfirmationDialog alert =
                         new ConfirmationDialog( "Do you want to destroy all lxc nodes?", "Yes", "No" );
-                alert.getOk().addClickListener( new Button.ClickListener() {
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
                     @Override
-                    public void buttonClick( Button.ClickEvent clickEvent ) {
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
                         isDestroyAllButtonClicked = true;
-                        for ( Object o : lxcTable.getItemIds() ) {
+                        for ( Object o : lxcTable.getItemIds() )
+                        {
                             Item row = lxcTable.getItem( o );
                             Button destroyBtn =
                                     ( Button ) ( row.getItemProperty( Buttons.DESTROY.getButtonLabel() ).getValue() );
-                            if ( destroyBtn != null && row.getItemProperty( physicalHostLabel ).getValue() == null ) {
+                            if ( destroyBtn != null && row.getItemProperty( physicalHostLabel ).getValue() == null )
+                            {
                                 destroyBtn.click();
                             }
                         }
@@ -141,7 +159,8 @@ public class Manager extends VerticalLayout {
     }
 
 
-    private TreeTable createTableTemplate( String caption, int size ) {
+    private TreeTable createTableTemplate( String caption, int size )
+    {
         TreeTable table = new TreeTable( caption );
         table.addContainerProperty( physicalHostLabel, String.class, null );
         table.addContainerProperty( "Lxc Host", String.class, null );
@@ -158,27 +177,39 @@ public class Manager extends VerticalLayout {
     }
 
 
-    public void getLxcInfo() {
+    public void getLxcInfo()
+    {
         lxcTable.setEnabled( false );
         indicator.setVisible( true );
-        executorService.execute( new Runnable() {
+        executorService.execute( new Runnable()
+        {
 
-            public void run() {
-                Map<String, EnumMap<ContainerState, List<String>>> agentFamilies;
+            public void run()
+            {
+                final Map<String, EnumMap<ContainerState, List<String>>> agentFamilies;
                 agentFamilies = containerManager.getContainersOnPhysicalServers();
-                populateTable( agentFamilies );
-                clearEmptyParents();
-                lxcTable.setEnabled( true );
-                indicator.setVisible( false );
+                getUI().access( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        populateTable( agentFamilies );
+                        clearEmptyParents();
+                        lxcTable.setEnabled( true );
+                        indicator.setVisible( false );
+                    }
+                } );
             }
         } );
     }
 
 
-    private void populateTable( Map<String, EnumMap<ContainerState, List<String>>> agentFamilies ) {
+    private void populateTable( Map<String, EnumMap<ContainerState, List<String>>> agentFamilies )
+    {
         lxcTable.removeAllItems();
 
-        for ( Map.Entry<String, EnumMap<ContainerState, List<String>>> agentFamily : agentFamilies.entrySet() ) {
+        for ( Map.Entry<String, EnumMap<ContainerState, List<String>>> agentFamily : agentFamilies.entrySet() )
+        {
             final String parentHostname = agentFamily.getKey();
             final Button startAllChildrenBtn = new Button( Buttons.START.getButtonLabel() );
             startAllChildrenBtn.addStyleName( "default" );
@@ -191,16 +222,21 @@ public class Manager extends VerticalLayout {
             }, parentHostname );
             lxcTable.setCollapsed( parentHostname, false );
 
-            startAllChildrenBtn.addClickListener( new Button.ClickListener() {
+            startAllChildrenBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     Collection col = lxcTable.getChildren( parentId );
-                    if ( col != null ) {
-                        for ( Object aCol : col ) {
+                    if ( col != null )
+                    {
+                        for ( Object aCol : col )
+                        {
                             Item row = lxcTable.getItem( aCol );
                             Button startBtn =
                                     ( Button ) ( row.getItemProperty( Buttons.START.getButtonLabel() ).getValue() );
-                            if ( startBtn != null ) {
+                            if ( startBtn != null )
+                            {
                                 startBtn.addStyleName( "default" );
                                 startBtn.click();
                             }
@@ -209,16 +245,21 @@ public class Manager extends VerticalLayout {
                 }
             } );
 
-            stopAllChildrenBtn.addClickListener( new Button.ClickListener() {
+            stopAllChildrenBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     Collection col = lxcTable.getChildren( parentId );
-                    if ( col != null ) {
-                        for ( Object aCol : col ) {
+                    if ( col != null )
+                    {
+                        for ( Object aCol : col )
+                        {
                             Item row = lxcTable.getItem( aCol );
                             Button stopBtn =
                                     ( Button ) ( row.getItemProperty( Buttons.STOP.getButtonLabel() ).getValue() );
-                            if ( stopBtn != null ) {
+                            if ( stopBtn != null )
+                            {
                                 stopBtn.addStyleName( "default" );
                                 stopBtn.click();
                             }
@@ -227,25 +268,32 @@ public class Manager extends VerticalLayout {
                 }
             } );
 
-            destroyAllChildrenBtn.addClickListener( new Button.ClickListener() {
+            destroyAllChildrenBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
 
                     ConfirmationDialog alert =
                             new ConfirmationDialog( "Do you want to destroy all lxc nodes on this physical node?",
                                     "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             Collection col = lxcTable.getChildren( parentId );
-                            if ( col != null ) {
+                            if ( col != null )
+                            {
                                 isDestroyAllButtonClicked = true;
-                                for ( Object aCol : col ) {
+                                for ( Object aCol : col )
+                                {
                                     Item row = lxcTable.getItem( aCol );
                                     Button destroyBtn =
                                             ( Button ) ( row.getItemProperty( Buttons.DESTROY.getButtonLabel() )
                                                             .getValue() );
-                                    if ( destroyBtn != null ) {
+                                    if ( destroyBtn != null )
+                                    {
                                         destroyBtn.click();
                                     }
                                 }
@@ -258,9 +306,11 @@ public class Manager extends VerticalLayout {
                 }
             } );
 
-            for ( Map.Entry<ContainerState, List<String>> lxcs : agentFamily.getValue().entrySet() ) {
+            for ( Map.Entry<ContainerState, List<String>> lxcs : agentFamily.getValue().entrySet() )
+            {
 
-                for ( final String lxcHostname : lxcs.getValue() ) {
+                for ( final String lxcHostname : lxcs.getValue() )
+                {
                     final Button startBtn = new Button( Buttons.START.getButtonLabel() );
                     startBtn.addStyleName( "default" );
                     final Button stopBtn = new Button( Buttons.STOP.getButtonLabel() );
@@ -270,10 +320,12 @@ public class Manager extends VerticalLayout {
                     final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
                     progressIcon.setVisible( false );
 
-                    if ( lxcs.getKey() == ContainerState.RUNNING ) {
+                    if ( lxcs.getKey() == ContainerState.RUNNING )
+                    {
                         startBtn.setEnabled( false );
                     }
-                    else if ( lxcs.getKey() == ContainerState.STOPPED ) {
+                    else if ( lxcs.getKey() == ContainerState.STOPPED )
+                    {
                         stopBtn.setEnabled( false );
                     }
                     final Object rowId = lxcTable.addItem( new Object[] {
@@ -283,22 +335,29 @@ public class Manager extends VerticalLayout {
                     lxcTable.setParent( lxcHostname, parentHostname );
                     lxcTable.setChildrenAllowed( lxcHostname, false );
 
-                    startBtn.addClickListener( new Button.ClickListener() {
+                    startBtn.addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             final Agent physicalAgent = agentManager.getAgentByHostname( parentHostname );
-                            if ( physicalAgent != null ) {
+                            if ( physicalAgent != null )
+                            {
                                 startBtn.setEnabled( false );
                                 destroyBtn.setEnabled( false );
                                 progressIcon.setVisible( true );
-                                executorService.execute( new Runnable() {
+                                executorService.execute( new Runnable()
+                                {
 
-                                    public void run() {
+                                    public void run()
+                                    {
                                         boolean success = containerManager.startLxcOnHost( physicalAgent, lxcHostname );
-                                        if ( success ) {
+                                        if ( success )
+                                        {
                                             stopBtn.setEnabled( true );
                                         }
-                                        else {
+                                        else
+                                        {
                                             startBtn.setEnabled( true );
                                         }
                                         destroyBtn.setEnabled( true );
@@ -308,22 +367,29 @@ public class Manager extends VerticalLayout {
                             }
                         }
                     } );
-                    stopBtn.addClickListener( new Button.ClickListener() {
+                    stopBtn.addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             final Agent physicalAgent = agentManager.getAgentByHostname( parentHostname );
-                            if ( physicalAgent != null ) {
+                            if ( physicalAgent != null )
+                            {
                                 stopBtn.setEnabled( false );
                                 destroyBtn.setEnabled( false );
                                 progressIcon.setVisible( true );
-                                executorService.execute( new Runnable() {
+                                executorService.execute( new Runnable()
+                                {
 
-                                    public void run() {
+                                    public void run()
+                                    {
                                         boolean success = containerManager.stopLxcOnHost( physicalAgent, lxcHostname );
-                                        if ( !success ) {
+                                        if ( !success )
+                                        {
                                             stopBtn.setEnabled( true );
                                         }
-                                        else {
+                                        else
+                                        {
                                             startBtn.setEnabled( true );
                                         }
                                         destroyBtn.setEnabled( true );
@@ -333,33 +399,43 @@ public class Manager extends VerticalLayout {
                             }
                         }
                     } );
-                    destroyBtn.addClickListener( new Button.ClickListener() {
+                    destroyBtn.addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            if ( !isDestroyAllButtonClicked ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            if ( !isDestroyAllButtonClicked )
+                            {
 
                                 ConfirmationDialog alert =
                                         new ConfirmationDialog( "Do you want to destroy this lxc node?", "Yes", "No" );
-                                alert.getOk().addClickListener( new Button.ClickListener() {
+                                alert.getOk().addClickListener( new Button.ClickListener()
+                                {
                                     @Override
-                                    public void buttonClick( Button.ClickEvent clickEvent ) {
+                                    public void buttonClick( Button.ClickEvent clickEvent )
+                                    {
                                         final Agent physicalAgent = agentManager.getAgentByHostname( parentHostname );
-                                        if ( physicalAgent != null ) {
+                                        if ( physicalAgent != null )
+                                        {
                                             startBtn.setEnabled( false );
                                             stopBtn.setEnabled( false );
                                             destroyBtn.setEnabled( false );
                                             progressIcon.setVisible( true );
-                                            executorService.execute( new Runnable() {
+                                            executorService.execute( new Runnable()
+                                            {
 
-                                                public void run() {
-                                                    try {
+                                                public void run()
+                                                {
+                                                    try
+                                                    {
                                                         containerManager
                                                                 .destroy( physicalAgent.getHostname(), lxcHostname );
                                                         //remove row
                                                         lxcTable.removeItem( rowId );
                                                         clearEmptyParents();
                                                     }
-                                                    catch ( ContainerDestroyException cde ) {
+                                                    catch ( ContainerDestroyException cde )
+                                                    {
                                                         stopBtn.setEnabled( true );
                                                         destroyBtn.setEnabled( true );
                                                         progressIcon.setVisible( false );
@@ -372,24 +448,30 @@ public class Manager extends VerticalLayout {
 
                                 getUI().addWindow( alert.getAlert() );
                             }
-                            else {
+                            else
+                            {
 
                                 final Agent physicalAgent = agentManager.getAgentByHostname( parentHostname );
-                                if ( physicalAgent != null ) {
+                                if ( physicalAgent != null )
+                                {
                                     startBtn.setEnabled( false );
                                     stopBtn.setEnabled( false );
                                     destroyBtn.setEnabled( false );
                                     progressIcon.setVisible( true );
-                                    executorService.execute( new Runnable() {
+                                    executorService.execute( new Runnable()
+                                    {
 
-                                        public void run() {
-                                            try {
+                                        public void run()
+                                        {
+                                            try
+                                            {
                                                 containerManager.destroy( physicalAgent.getHostname(), lxcHostname );
                                                 //remove row
                                                 lxcTable.removeItem( rowId );
                                                 clearEmptyParents();
                                             }
-                                            catch ( ContainerDestroyException cde ) {
+                                            catch ( ContainerDestroyException cde )
+                                            {
                                                 stopBtn.setEnabled( true );
                                                 destroyBtn.setEnabled( true );
                                                 progressIcon.setVisible( false );
@@ -406,12 +488,15 @@ public class Manager extends VerticalLayout {
     }
 
 
-    private void clearEmptyParents() {
+    private void clearEmptyParents()
+    {
         //clear empty parents
-        for ( Object rowId : lxcTable.getItemIds() ) {
+        for ( Object rowId : lxcTable.getItemIds() )
+        {
             Item row = lxcTable.getItem( rowId );
             if ( row != null && row.getItemProperty( physicalHostLabel ).getValue() != null && (
-                    lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) ) {
+                    lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) )
+            {
                 lxcTable.removeItem( rowId );
             }
         }

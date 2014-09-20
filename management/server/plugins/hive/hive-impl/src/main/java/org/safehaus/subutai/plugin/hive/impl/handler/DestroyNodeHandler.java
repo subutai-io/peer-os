@@ -15,12 +15,14 @@ import org.safehaus.subutai.plugin.hive.impl.HiveImpl;
 import org.safehaus.subutai.plugin.hive.impl.Product;
 
 
-public class DestroyNodeHandler extends AbstractHandler {
+public class DestroyNodeHandler extends AbstractHandler
+{
 
     private final String hostname;
 
 
-    public DestroyNodeHandler( HiveImpl manager, String clusterName, String hostname ) {
+    public DestroyNodeHandler( HiveImpl manager, String clusterName, String hostname )
+    {
         super( manager, clusterName );
         this.hostname = hostname;
         this.productOperation = manager.getTracker().createProductOperation( HiveConfig.PRODUCT_KEY,
@@ -29,7 +31,8 @@ public class DestroyNodeHandler extends AbstractHandler {
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         ProductOperation po = productOperation;
         HiveConfig config = manager.getCluster( clusterName );
         if ( config == null )

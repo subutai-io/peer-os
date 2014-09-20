@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
@@ -15,13 +14,15 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 import com.google.common.collect.Sets;
 
 
-public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl> {
+public class DestroyNodeOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
+{
 
     private static final Logger LOG = Logger.getLogger( DestroyNodeOperationHandler.class.getName() );
     private final String lxcHostname;
 
 
-    public DestroyNodeOperationHandler( ElasticsearchImpl manager, String clusterName, String lxcHostname ) {
+    public DestroyNodeOperationHandler( ElasticsearchImpl manager, String clusterName, String lxcHostname )
+    {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
@@ -30,7 +31,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
@@ -72,7 +74,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
                 if ( result.getStdOut().contains( "Package ksks-elasticsearch is not installed, so not removed" ) )
                 {
                     productOperation.addLog( String.format( "Elasticsearch is not installed, so not removed on node %s",
-                                    agent.getHostname() ) );
+                            agent.getHostname() ) );
                 }
                 else
                 {

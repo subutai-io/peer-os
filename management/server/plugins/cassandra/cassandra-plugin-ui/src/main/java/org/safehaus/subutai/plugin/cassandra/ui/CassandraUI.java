@@ -6,7 +6,10 @@
 package org.safehaus.subutai.plugin.cassandra.ui;
 
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -14,12 +17,11 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.vaadin.ui.Component;
 
 
-public class CassandraUI implements PortalModule {
+public class CassandraUI implements PortalModule
+{
 
     public final String MODULE_IMAGE = "cassandra.png";
     public final String PRODUCT_KEY = "Cassandra";
@@ -33,7 +35,8 @@ public class CassandraUI implements PortalModule {
 
 
     public CassandraUI( AgentManager agentManager, Cassandra cassandraManager, Tracker tracker,
-                        CommandRunner commandRunner ) {
+                        CommandRunner commandRunner )
+    {
         this.cassandraManager = cassandraManager;
         this.agentManager = agentManager;
         this.tracker = tracker;
@@ -41,37 +44,44 @@ public class CassandraUI implements PortalModule {
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager()
+    {
         return cassandraManager;
     }
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         cassandraManager = null;
         agentManager = null;
         tracker = null;
@@ -80,28 +90,34 @@ public class CassandraUI implements PortalModule {
 
 
     @Override
-    public String getId() {
+    public String getId()
+    {
         return PRODUCT_KEY;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return PRODUCT_KEY;
     }
 
 
     @Override
-    public File getImage() {
+    public File getImage()
+    {
         return FileUtil.getFile( MODULE_IMAGE, this );
     }
 
 
-    public Component createComponent() {
-        return new CassandraForm(this);
+    public Component createComponent()
+    {
+        return new CassandraForm( this );
     }
 
+
     @Override
-    public Boolean isCorePlugin() {
+    public Boolean isCorePlugin()
+    {
         return false;
     }
 }

@@ -17,14 +17,16 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 
 
-public class ExportPanel extends ImportExportBase {
+public class ExportPanel extends ImportExportBase
+{
 
-    AbstractTextField hdfsPathField = UIUtil.getTextField( "HDFS file path:", 300 );
     private final Sqoop sqoop;
     private final ExecutorService executorService;
+    AbstractTextField hdfsPathField = UIUtil.getTextField( "HDFS file path:", 300 );
 
 
-    public ExportPanel(Sqoop sqoop, ExecutorService executorService, Tracker tracker ) {
+    public ExportPanel( Sqoop sqoop, ExecutorService executorService, Tracker tracker )
+    {
         super( tracker );
         this.sqoop = sqoop;
         this.executorService = executorService;
@@ -34,14 +36,16 @@ public class ExportPanel extends ImportExportBase {
 
 
     @Override
-    public void setAgent( Agent agent ) {
+    public void setAgent( Agent agent )
+    {
         super.setAgent( agent );
         init();
     }
 
 
     @Override
-    ExportSetting makeSettings() {
+    ExportSetting makeSettings()
+    {
         ExportSetting s = new ExportSetting();
         s.setClusterName( clusterName );
         s.setHostname( agent.getHostname() );
@@ -56,10 +60,12 @@ public class ExportPanel extends ImportExportBase {
 
 
     @Override
-    final void init() {
+    final void init()
+    {
         removeAllComponents();
 
-        if ( agent == null ) {
+        if ( agent == null )
+        {
             addComponent( UIUtil.getLabel( "<h1>No node selected</h1>", 200 ) );
             return;
         }
@@ -68,12 +74,15 @@ public class ExportPanel extends ImportExportBase {
         fields.add( hdfsPathField );
 
         HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent( UIUtil.getButton( "Export", 120, new Button.ClickListener() {
+        buttons.addComponent( UIUtil.getButton( "Export", 120, new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 clearLogMessages();
-                if ( !checkFields() ) {
+                if ( !checkFields() )
+                {
                     return;
                 }
                 setFieldsEnabled( false );
@@ -81,20 +90,24 @@ public class ExportPanel extends ImportExportBase {
                 final UUID trackId = sqoop.exportData( es );
 
                 OperationWatcher watcher = new OperationWatcher( trackId );
-                watcher.setCallback( new OperationCallback() {
+                watcher.setCallback( new OperationCallback()
+                {
 
                     @Override
-                    public void onComplete() {
+                    public void onComplete()
+                    {
                         setFieldsEnabled( true );
                     }
                 } );
                 executorService.execute( watcher );
             }
         } ) );
-        buttons.addComponent( UIUtil.getButton( "Cancel", 120, new Button.ClickListener() {
+        buttons.addComponent( UIUtil.getButton( "Cancel", 120, new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 detachFromParent();
             }
         } ) );
@@ -114,12 +127,16 @@ public class ExportPanel extends ImportExportBase {
 
 
     @Override
-    boolean checkFields() {
-        if ( super.checkFields() ) {
-            if ( !hasValue( tableField, "Table name not specified" ) ) {
+    boolean checkFields()
+    {
+        if ( super.checkFields() )
+        {
+            if ( !hasValue( tableField, "Table name not specified" ) )
+            {
                 return false;
             }
-            if ( !hasValue( hdfsPathField, "HDFS file path not specified" ) ) {
+            if ( !hasValue( hdfsPathField, "HDFS file path not specified" ) )
+            {
                 return false;
             }
             // every field has value

@@ -24,9 +24,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class StepSetBackupMasters extends VerticalLayout {
+public class StepSetBackupMasters extends VerticalLayout
+{
 
-    public StepSetBackupMasters( final Wizard wizard ) {
+    public StepSetBackupMasters( final Wizard wizard )
+    {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         verticalLayout.setMargin( true );
@@ -67,14 +69,18 @@ public class StepSetBackupMasters extends VerticalLayout {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.getConfig().setBackupMasters( ( String ) select.getValue() );
-                if ( wizard.getConfig().getBackupMasters() == null ) {
+                if ( wizard.getConfig().getBackupMasters() == null )
+                {
                     show( "Please add backup servers" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -82,9 +88,11 @@ public class StepSetBackupMasters extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -102,7 +110,8 @@ public class StepSetBackupMasters extends VerticalLayout {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

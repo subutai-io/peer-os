@@ -11,14 +11,16 @@ import com.google.common.base.Preconditions;
 /**
  * Created by dilshat on 9/8/14.
  */
-public class RemoteResponse {
+public class RemoteResponse
+{
 
     private final UUID commandId;
     private final UUID agentId;
     private final Response response;
 
 
-    public RemoteResponse( final Response response ) {
+    public RemoteResponse( final Response response )
+    {
         Preconditions.checkNotNull( response, "Response is null" );
 
         this.commandId = response.getTaskUuid();
@@ -27,17 +29,20 @@ public class RemoteResponse {
     }
 
 
-    public UUID getAgentId() {
+    public UUID getAgentId()
+    {
         return agentId;
     }
 
 
-    public UUID getCommandId() {
+    public UUID getCommandId()
+    {
         return commandId;
     }
 
 
-    public Response getResponse() {
+    public Response getResponse()
+    {
         return response;
     }
 }

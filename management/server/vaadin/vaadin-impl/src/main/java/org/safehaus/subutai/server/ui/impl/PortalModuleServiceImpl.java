@@ -11,7 +11,8 @@ import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
 
-public class PortalModuleServiceImpl implements PortalModuleService {
+public class PortalModuleServiceImpl implements PortalModuleService
+{
 
     private static final Logger LOG = Logger.getLogger( PortalModuleServiceImpl.class.getName() );
     private List<PortalModule> modules = Collections.synchronizedList( new ArrayList<PortalModule>() );
@@ -20,7 +21,8 @@ public class PortalModuleServiceImpl implements PortalModuleService {
             Collections.synchronizedList( new ArrayList<PortalModuleListener>() );
 
 
-    public synchronized void registerModule( PortalModule module ) {
+    public synchronized void registerModule( PortalModule module )
+    {
         if ( module != null )
         {
             LOG.info( "Registering module " + module.getId() );
@@ -33,7 +35,8 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
 
-    public synchronized void unregisterModule( PortalModule module ) {
+    public synchronized void unregisterModule( PortalModule module )
+    {
         if ( module != null )
         {
             LOG.info( "Unregister module " + module.getId() );
@@ -47,7 +50,8 @@ public class PortalModuleServiceImpl implements PortalModuleService {
 
 
     @Override
-    public PortalModule getModule( String pModuleId ) {
+    public PortalModule getModule( String pModuleId )
+    {
         for ( PortalModule module : modules )
         {
             if ( pModuleId.equals( module.getId() ) )
@@ -59,7 +63,8 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
 
-    public List<PortalModule> getModules() {
+    public List<PortalModule> getModules()
+    {
         List<PortalModule> pluginModules = Collections.synchronizedList( new ArrayList<PortalModule>() );
         for ( PortalModule module : modules )
         {
@@ -72,7 +77,8 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
 
-    public List<PortalModule> getCoreModules() {
+    public List<PortalModule> getCoreModules()
+    {
         List<PortalModule> coreModules = Collections.synchronizedList( new ArrayList<PortalModule>() );
         for ( PortalModule module : modules )
         {
@@ -86,13 +92,15 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
 
-    public synchronized void addListener( PortalModuleListener listener ) {
+    public synchronized void addListener( PortalModuleListener listener )
+    {
         LOG.info( "Adding listener " + listener );
         listeners.add( listener );
     }
 
 
-    public synchronized void removeListener( PortalModuleListener listener ) {
+    public synchronized void removeListener( PortalModuleListener listener )
+    {
         if ( listener != null )
         {
             LOG.info( "Removing listener " + listener );

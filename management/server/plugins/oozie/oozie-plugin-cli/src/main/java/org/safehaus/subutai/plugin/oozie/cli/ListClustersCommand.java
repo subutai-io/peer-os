@@ -13,30 +13,37 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "oozie", name = "list-clusters", description = "mydescription")
-public class ListClustersCommand extends OsgiCommandSupport {
+@Command( scope = "oozie", name = "list-clusters", description = "mydescription" )
+public class ListClustersCommand extends OsgiCommandSupport
+{
 
     private Oozie oozieManager;
 
 
-    public Oozie getOozieManager() {
+    public Oozie getOozieManager()
+    {
         return oozieManager;
     }
 
 
-    public void setOozieManager( Oozie oozieManager ) {
+    public void setOozieManager( Oozie oozieManager )
+    {
         this.oozieManager = oozieManager;
     }
 
 
-    protected Object doExecute() {
+    protected Object doExecute()
+    {
         List<OozieClusterConfig> configList = oozieManager.getClusters();
-        if ( !configList.isEmpty() ) {
-            for ( OozieClusterConfig config : configList ) {
+        if ( !configList.isEmpty() )
+        {
+            for ( OozieClusterConfig config : configList )
+            {
                 System.out.println( config.getClusterName() );
             }
         }
-        else {
+        else
+        {
             System.out.println( "No Oozie cluster" );
         }
 

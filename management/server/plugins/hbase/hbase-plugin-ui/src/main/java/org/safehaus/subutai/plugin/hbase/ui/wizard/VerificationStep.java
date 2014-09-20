@@ -23,9 +23,11 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class VerificationStep extends VerticalLayout {
+public class VerificationStep extends VerticalLayout
+{
 
-    public VerificationStep( final Wizard wizard ) {
+    public VerificationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -41,10 +43,12 @@ public class VerificationStep extends VerticalLayout {
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
         cfgView.addStringCfg( "Master", wizard.getConfig().getMaster() + "\n" );
-        for ( String hostname : wizard.getConfig().getRegion() ) {
+        for ( String hostname : wizard.getConfig().getRegion() )
+        {
             cfgView.addStringCfg( "Region", hostname + "\n" );
         }
-        for ( String hostname : wizard.getConfig().getQuorum() ) {
+        for ( String hostname : wizard.getConfig().getQuorum() )
+        {
             cfgView.addStringCfg( "Quorum", hostname + "\n" );
         }
         cfgView.addStringCfg( "Backup master", wizard.getConfig().getBackupMasters() + "\n" );
@@ -52,15 +56,20 @@ public class VerificationStep extends VerticalLayout {
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 UUID trackID = wizard.gethBaseUI().getHbaseManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( wizard.gethBaseUI().getExecutor(), wizard.gethBaseUI().getTracker(), trackID,
-                        HBaseClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                ProgressWindow window =
+                        new ProgressWindow( wizard.gethBaseUI().getExecutor(), wizard.gethBaseUI().getTracker(),
+                                trackID, HBaseClusterConfig.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -70,9 +79,11 @@ public class VerificationStep extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );

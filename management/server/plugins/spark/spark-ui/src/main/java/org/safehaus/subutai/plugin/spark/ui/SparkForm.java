@@ -14,9 +14,11 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class SparkForm extends CustomComponent {
+public class SparkForm extends CustomComponent
+{
 
-    public SparkForm( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException {
+    public SparkForm( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();

@@ -22,9 +22,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ZookeeperForm extends CustomComponent {
+public class ZookeeperForm extends CustomComponent
+{
 
-    public ZookeeperForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public ZookeeperForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -37,12 +39,15 @@ public class ZookeeperForm extends CustomComponent {
         Wizard wizard = new Wizard( executorService, serviceLocator );
         zookeeperSheet.addTab( wizard.getContent(), "Install" );
         zookeeperSheet.addTab( manager.getContent(), "Manage" );
-        zookeeperSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+        zookeeperSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
             @Override
-            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
                 TabSheet tabsheet = event.getTabSheet();
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if ( caption.equals( "Manage" ) ) {
+                if ( caption.equals( "Manage" ) )
+                {
                     manager.refreshClustersInfo();
                 }
             }

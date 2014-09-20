@@ -14,7 +14,8 @@ import com.google.common.base.Preconditions;
 /**
  * Batch request
  */
-class BatchRequest {
+class BatchRequest
+{
 
     private final Request request;
     private final Set<UUID> agentIds = new HashSet<>();
@@ -22,7 +23,8 @@ class BatchRequest {
     private final UUID environmentId;
 
 
-    public BatchRequest( final Request request, UUID agentId, UUID environmentId ) {
+    public BatchRequest( final Request request, UUID agentId, UUID environmentId )
+    {
         Preconditions.checkNotNull( request, "Request is null" );
         Preconditions.checkNotNull( agentId, "Agent id is null" );
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
@@ -33,34 +35,40 @@ class BatchRequest {
     }
 
 
-    public UUID getEnvironmentId() {
+    public UUID getEnvironmentId()
+    {
         return environmentId;
     }
 
 
-    public void addAgentId( UUID agentId ) {
+    public void addAgentId( UUID agentId )
+    {
         Preconditions.checkNotNull( agentId, "Agent id is null" );
 
         agentIds.add( agentId );
     }
 
 
-    public Set<UUID> getAgentIds() {
+    public Set<UUID> getAgentIds()
+    {
         return Collections.unmodifiableSet( agentIds );
     }
 
 
-    public int getRequestsCount() {
+    public int getRequestsCount()
+    {
         return agentIds.size();
     }
 
 
-    public UUID getCommandId() {
+    public UUID getCommandId()
+    {
         return request.getTaskUuid();
     }
 
 
-    public Set<Request> getRequests() {
+    public Set<Request> getRequests()
+    {
         Set<Request> requests = new HashSet<>();
         for ( UUID agentId : agentIds )
         {

@@ -31,7 +31,8 @@ import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
-public class FlumeImpl implements Flume {
+public class FlumeImpl implements Flume
+{
 
 
     private CommandRunner commandRunner;
@@ -46,103 +47,123 @@ public class FlumeImpl implements Flume {
     private ExecutorService executor;
 
 
-    public FlumeImpl() {
+    public FlumeImpl()
+    {
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public CommandRunner getCommandRunner()
+    {
         return commandRunner;
     }
 
 
-    public void setCommandRunner( CommandRunner commandRunner ) {
+    public void setCommandRunner( CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( AgentManager agentManager ) {
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker ) {
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
 
-    public DbManager getDbManager() {
+    public DbManager getDbManager()
+    {
         return dbManager;
     }
 
 
-    public void setDbManager( DbManager dbManager ) {
+    public void setDbManager( DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
-    public PluginDAO getPluginDao() {
+    public PluginDAO getPluginDao()
+    {
         return pluginDao;
     }
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
 
-    public void setEnvironmentManager( EnvironmentManager environmentManager ) {
+    public void setEnvironmentManager( EnvironmentManager environmentManager )
+    {
         this.environmentManager = environmentManager;
     }
 
 
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void setContainerManager( ContainerManager containerManager ) {
+    public void setContainerManager( ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public void setHadoopManager( Hadoop hadoopManager ) {
+    public void setHadoopManager( Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
 
-    public void init() {
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
         pluginDao = new PluginDAO( dbManager );
     }
 
 
-    public void destroy() {
+    public void destroy()
+    {
         executor.shutdown();
     }
 
 
     @Override
-    public UUID installCluster( final FlumeConfig config ) {
+    public UUID installCluster( final FlumeConfig config )
+    {
         AbstractOperationHandler h = new InstallHandler( this, config );
         executor.execute( h );
         return h.getTrackerId();
@@ -150,7 +171,8 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName ) {
+    public UUID uninstallCluster( final String clusterName )
+    {
         AbstractOperationHandler h = new UninstallHandler( this, clusterName );
         executor.execute( h );
         return h.getTrackerId();
@@ -158,19 +180,22 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public List<FlumeConfig> getClusters() {
+    public List<FlumeConfig> getClusters()
+    {
         return pluginDao.getInfo( FlumeConfig.PRODUCT_KEY, FlumeConfig.class );
     }
 
 
     @Override
-    public FlumeConfig getCluster( String clusterName ) {
+    public FlumeConfig getCluster( String clusterName )
+    {
         return pluginDao.getInfo( FlumeConfig.PRODUCT_KEY, clusterName, FlumeConfig.class );
     }
 
 
     @Override
-    public UUID installCluster( FlumeConfig config, HadoopClusterConfig hadoopConfig ) {
+    public UUID installCluster( FlumeConfig config, HadoopClusterConfig hadoopConfig )
+    {
         InstallHandler h = new InstallHandler( this, config );
         h.setHadoopConfig( hadoopConfig );
         executor.execute( h );
@@ -179,7 +204,8 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public UUID startNode( final String clusterName, final String hostname ) {
+    public UUID startNode( final String clusterName, final String hostname )
+    {
         AbstractOperationHandler h = new StartHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -187,7 +213,8 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public UUID stopNode( final String clusterName, final String hostname ) {
+    public UUID stopNode( final String clusterName, final String hostname )
+    {
         AbstractOperationHandler h = new StopHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -195,7 +222,8 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public UUID checkNode( final String clusterName, final String hostname ) {
+    public UUID checkNode( final String clusterName, final String hostname )
+    {
         AbstractOperationHandler h = new StatusHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -203,7 +231,8 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public UUID addNode( final String clusterName, final String hostname ) {
+    public UUID addNode( final String clusterName, final String hostname )
+    {
         AbstractOperationHandler h = new AddNodeHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -211,7 +240,8 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public UUID destroyNode( final String clusterName, final String hostname ) {
+    public UUID destroyNode( final String clusterName, final String hostname )
+    {
         AbstractOperationHandler h = new DestroyNodeHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
@@ -219,7 +249,8 @@ public class FlumeImpl implements Flume {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, FlumeConfig config, ProductOperation po ) {
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, FlumeConfig config, ProductOperation po )
+    {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             return new OverHadoopSetupStrategy( this, config, po );

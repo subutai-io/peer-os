@@ -21,7 +21,8 @@ import com.google.common.base.Strings;
 /**
  * Created by bahadyr on 8/22/14.
  */
-public class CassandraSetupStrategy implements ClusterSetupStrategy {
+public class CassandraSetupStrategy implements ClusterSetupStrategy
+{
 
     private Environment environment;
     private CassandraClusterConfig config;
@@ -30,7 +31,8 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
 
 
     public CassandraSetupStrategy( final Environment environment, final CassandraClusterConfig config,
-                                   final ProductOperation po, final CassandraImpl cassandra ) {
+                                   final ProductOperation po, final CassandraImpl cassandra )
+    {
 
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( config, "Cluster config is null" );
@@ -44,7 +46,8 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public CassandraClusterConfig setup() throws ClusterSetupException {
+    public CassandraClusterConfig setup() throws ClusterSetupException
+    {
 
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 Strings.isNullOrEmpty( config.getCommitLogDirectory() ) ||
@@ -52,36 +55,43 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
                 Strings.isNullOrEmpty( config.getSavedCachesDirectory() ) ||
                 Strings.isNullOrEmpty( config.getDomainName() ) ||
                 Strings.isNullOrEmpty( config.getProductName() ) ||
-                Strings.isNullOrEmpty( config.getTemplateName() ) ) {
+                Strings.isNullOrEmpty( config.getTemplateName() ) )
+        {
             throw new ClusterSetupException( "Malformed cluster configuration" );
         }
 
-        if ( cassandraManager.getCluster( config.getClusterName() ) != null ) {
+        if ( cassandraManager.getCluster( config.getClusterName() ) != null )
+        {
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
         Set<Agent> cassNodes = new HashSet<Agent>();
-        for ( Node node : environment.getNodes() ) {
+        for ( Node node : environment.getNodes() )
+        {
             cassNodes.add( node.getAgent() );
         }
         config.setNodes( cassNodes );
 
         Iterator nodesItr = cassNodes.iterator();
         Set<Agent> seedNodes = new HashSet<Agent>();
-        while ( nodesItr.hasNext() ) {
+        while ( nodesItr.hasNext() )
+        {
             seedNodes.add( ( Agent ) nodesItr.next() );
-            if ( seedNodes.size() == config.getNumberOfSeeds() ) {
+            if ( seedNodes.size() == config.getNumberOfSeeds() )
+            {
                 break;
             }
         }
         config.setSeedNodes( seedNodes );
 
 
-        try {
+        try
+        {
             new ClusterConfiguration( productOperation, cassandraManager ).configureCluster( config );
         }
-        catch ( ClusterConfigurationException e ) {
+        catch ( ClusterConfigurationException e )
+        {
             throw new ClusterSetupException( e.getMessage() );
         }
 

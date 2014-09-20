@@ -4,17 +4,16 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -23,7 +22,8 @@ import com.google.common.base.Strings;
 /**
  * This is a standalone zk cluster setup strategy.
  */
-public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
+public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
+{
 
     private final ZookeeperClusterConfig zookeeperClusterConfig;
     private final ZookeeperImpl zookeeperManager;
@@ -33,7 +33,8 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
     public ZookeeperStandaloneSetupStrategy( final Environment environment,
                                              final ZookeeperClusterConfig zookeeperClusterConfig, ProductOperation po,
-                                             ZookeeperImpl zookeeperManager ) {
+                                             ZookeeperImpl zookeeperManager )
+    {
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( zookeeperClusterConfig, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -46,38 +47,46 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public static PlacementStrategy getNodePlacementStrategy() {
+    public static PlacementStrategy getNodePlacementStrategy()
+    {
         return PlacementStrategy.ROUND_ROBIN;
     }
 
 
     @Override
-    public ZookeeperClusterConfig setup() throws ClusterSetupException {
+    public ZookeeperClusterConfig setup() throws ClusterSetupException
+    {
         if ( Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
                 Strings.isNullOrEmpty( zookeeperClusterConfig.getTemplateName() ) ||
-                zookeeperClusterConfig.getNumberOfNodes() <= 0 ) {
+                zookeeperClusterConfig.getNumberOfNodes() <= 0 )
+        {
             throw new ClusterSetupException( "Malformed configuration" );
         }
 
-        if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null ) {
+        if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null )
+        {
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists", zookeeperClusterConfig.getClusterName() ) );
         }
 
-        if ( environment.getNodes().size() < zookeeperClusterConfig.getNumberOfNodes() ) {
+        if ( environment.getNodes().size() < zookeeperClusterConfig.getNumberOfNodes() )
+        {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
                     zookeeperClusterConfig.getNumberOfNodes(), environment.getNodes().size() ) );
         }
 
         Set<Agent> zkAgents = new HashSet<>();
-        for ( Node node : environment.getNodes() ) {
+        for ( Node node : environment.getNodes() )
+        {
             if ( node.getTemplate().getProducts()
-                     .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) ) {
+                     .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
+            {
                 zkAgents.add( node.getAgent() );
             }
         }
 
-        if ( zkAgents.size() < zookeeperClusterConfig.getNumberOfNodes() ) {
+        if ( zkAgents.size() < zookeeperClusterConfig.getNumberOfNodes() )
+        {
             throw new ClusterSetupException( String.format(
                     "Environment needs to have %d nodes with ZK installed but has only %d nodes with Zk installed",
                     zookeeperClusterConfig.getNumberOfNodes(), zkAgents.size() ) );
@@ -86,17 +95,21 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
         zookeeperClusterConfig.setNodes( zkAgents );
 
         //check if node agent is connected
-        for ( Agent node : zookeeperClusterConfig.getNodes() ) {
-            if ( zookeeperManager.getAgentManager().getAgentByHostname( node.getHostname() ) == null ) {
+        for ( Agent node : zookeeperClusterConfig.getNodes() )
+        {
+            if ( zookeeperManager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
+            {
                 throw new ClusterSetupException( String.format( "Node %s is not connected", node.getHostname() ) );
             }
         }
 
-        try {
+        try
+        {
 
             new ClusterConfiguration( zookeeperManager, po ).configureCluster( zookeeperClusterConfig );
         }
-        catch ( ClusterConfigurationException ex ) {
+        catch ( ClusterConfigurationException ex )
+        {
             throw new ClusterSetupException( ex.getMessage() );
         }
 

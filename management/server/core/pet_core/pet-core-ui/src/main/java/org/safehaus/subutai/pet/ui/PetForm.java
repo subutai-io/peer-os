@@ -13,9 +13,11 @@ import com.vaadin.ui.themes.Runo;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public class PetForm extends CustomComponent implements Disposable {
+public class PetForm extends CustomComponent implements Disposable
+{
 
-    public PetForm() {
+    public PetForm()
+    {
         setHeight( 100, UNITS_PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -25,7 +27,7 @@ public class PetForm extends CustomComponent implements Disposable {
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        sheet.addTab( new Button("test beta new"), "Environments" );
+        sheet.addTab( new Button( "test beta new" ), "Environments" );
         verticalLayout.addComponent( sheet );
 
 
@@ -34,7 +36,8 @@ public class PetForm extends CustomComponent implements Disposable {
 
 
     @Override
-    public void dispose() {
+    public void dispose()
+    {
 
     }
 }

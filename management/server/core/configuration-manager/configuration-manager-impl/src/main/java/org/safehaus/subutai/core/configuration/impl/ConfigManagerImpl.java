@@ -32,25 +32,29 @@ import com.google.gson.JsonObject;
 /**
  * This is an implementation of LxcManager
  */
-public class ConfigManagerImpl implements ConfigManager {
+public class ConfigManagerImpl implements ConfigManager
+{
 
     private static final Logger LOG = Logger.getLogger( ConfigManagerImpl.class.getName() );
     private TextInjector textInjector;
 
 
-    public TextInjector getTextInjector() {
+    public TextInjector getTextInjector()
+    {
         return textInjector;
     }
 
 
-    public void setTextInjector( final TextInjector textInjector ) {
+    public void setTextInjector( final TextInjector textInjector )
+    {
         this.textInjector = textInjector;
     }
 
 
     @Override
     public boolean injectConfiguration( String hostname, String configFilePath, String jsonObjectConfig,
-                                        ConfigTypeEnum configTypeEnum ) {
+                                        ConfigTypeEnum configTypeEnum )
+    {
 
         //TODO echo to given agent
         ConfigurationLoader configurationLoader = null;
@@ -97,8 +101,8 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public JsonObject getConfiguration( String agentHostname, String configPathFilename,
-                                        ConfigTypeEnum configTypeEnum ) {
+    public JsonObject getConfiguration( String agentHostname, String configPathFilename, ConfigTypeEnum configTypeEnum )
+    {
         ConfigurationLoader loader = null;
         switch ( configTypeEnum )
         {
@@ -143,7 +147,8 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public String getProperty( JsonObject config, String path, ConfigTypeEnum configTypeEnum ) {
+    public String getProperty( JsonObject config, String path, ConfigTypeEnum configTypeEnum )
+    {
         /*ConfigParser configParser = null;
         String content = FileUtil.getContent( configPathFilename, this );
         try {
@@ -171,7 +176,8 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public void setProperty( JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum ) {
+    public void setProperty( JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum )
+    {
         /*ConfigParser configParser = null;
 //        String content = FileUtil.getContent(configPathFilename , this ); try {
             switch ( configTypeEnum ) {
@@ -197,7 +203,8 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum ) {
+    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum )
+    {
         String content = FileUtil.getContent( configPathFilename, this );
         try
         {

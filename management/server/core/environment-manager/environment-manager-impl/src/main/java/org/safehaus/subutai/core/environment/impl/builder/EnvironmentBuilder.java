@@ -29,7 +29,8 @@ import com.google.common.collect.Lists;
 /**
  * This class creates containers according to supplied Environment Blueprint
  */
-public class EnvironmentBuilder {
+public class EnvironmentBuilder
+{
 
     private final TemplateRegistryManager templateRegistryManager;
     private final AgentManager agentManager;
@@ -37,7 +38,8 @@ public class EnvironmentBuilder {
 
 
     public EnvironmentBuilder( final TemplateRegistryManager templateRegistryManager, final AgentManager agentManager,
-                               NetworkManager networkManager ) {
+                               NetworkManager networkManager )
+    {
         this.templateRegistryManager = templateRegistryManager;
         this.agentManager = agentManager;
         this.networkManager = networkManager;
@@ -46,7 +48,8 @@ public class EnvironmentBuilder {
 
     //@todo destroy all containers of all groups inside environment on any failure ???
     public Environment build( final EnvironmentBuildTask environmentBuildTask, ContainerManager containerManager )
-            throws EnvironmentBuildException {
+            throws EnvironmentBuildException
+    {
 
 
         EnvironmentBlueprint blueprint = environmentBuildTask.getEnvironmentBlueprint();
@@ -165,7 +168,8 @@ public class EnvironmentBuilder {
     }
 
 
-    public void destroy( final Environment environment ) throws EnvironmentDestroyException {
+    public void destroy( final Environment environment ) throws EnvironmentDestroyException
+    {
         //TODO destroy environment code goes here
         //        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
         //            nodeGroupBuilder.destroy( nodeGroup );

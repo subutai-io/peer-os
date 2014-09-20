@@ -1,32 +1,37 @@
 package org.safehaus.subutai.core.configpointtracker.cli;
 
+
+import org.safehaus.subutai.core.configpointtracker.api.ConfigPointTracker;
+
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.core.configpointtracker.api.ConfigPointTracker;
 
 
-@Command (scope = "config-point-tracker", name = "add")
-public class AddCommand extends OsgiCommandSupport {
+@Command(scope = "config-point-tracker", name = "add")
+public class AddCommand extends OsgiCommandSupport
+{
 
-	@Argument (index = 0, name = "templateName", required = true)
-	private String templateName;
+    @Argument(index = 0, name = "templateName", required = true)
+    private String templateName;
 
-	@Argument (index = 1, name = "configPath", required = true)
-	private String configPath;
+    @Argument(index = 1, name = "configPath", required = true)
+    private String configPath;
 
-	private ConfigPointTracker configPointTracker;
-
-
-	public void setConfigPointTracker(ConfigPointTracker configPointTracker) {
-		this.configPointTracker = configPointTracker;
-	}
+    private ConfigPointTracker configPointTracker;
 
 
-	protected Object doExecute() {
+    public void setConfigPointTracker( ConfigPointTracker configPointTracker )
+    {
+        this.configPointTracker = configPointTracker;
+    }
 
-		configPointTracker.add(templateName, configPath);
 
-		return null;
-	}
+    protected Object doExecute()
+    {
+
+        configPointTracker.add( templateName, configPath );
+
+        return null;
+    }
 }

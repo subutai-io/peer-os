@@ -12,18 +12,18 @@ import com.google.gson.JsonObject;
 /**
  *
  */
-public interface ConfigManager {
+public interface ConfigManager
+{
 
-	public boolean injectConfiguration(String hostname, String configFilePath, String config,
-	                                   ConfigTypeEnum configTypeEnum);
+    public boolean injectConfiguration( String hostname, String configFilePath, String config,
+                                        ConfigTypeEnum configTypeEnum );
 
-	public JsonObject getConfiguration(String hostname, String configPathFilename,
-	                                   ConfigTypeEnum configTypeEnum);
+    public JsonObject getConfiguration( String hostname, String configPathFilename, ConfigTypeEnum configTypeEnum );
 
-	public String getProperty(JsonObject config, String key, ConfigTypeEnum configTypeEnum);
+    public String getProperty( JsonObject config, String key, ConfigTypeEnum configTypeEnum );
 
-	public void setProperty(JsonObject config, String key, String value, ConfigTypeEnum configTypeEnum);
+    public void setProperty( JsonObject config, String key, String value, ConfigTypeEnum configTypeEnum );
 
 
-	public JsonObject getJsonObjectFromResources(String configPathFilename, ConfigTypeEnum configTypeEnum);
+    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum );
 }

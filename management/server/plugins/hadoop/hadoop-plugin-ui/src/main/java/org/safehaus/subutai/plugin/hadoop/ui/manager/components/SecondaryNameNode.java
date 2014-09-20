@@ -14,14 +14,16 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class SecondaryNameNode extends ClusterNode {
+public class SecondaryNameNode extends ClusterNode
+{
     private final ExecutorService executorService;
     private final Hadoop hadoop;
     private final Tracker tracker;
 
 
     public SecondaryNameNode( Hadoop hadoop, Tracker tracker, final ExecutorService executorService,
-                              HadoopClusterConfig cluster ) {
+                              HadoopClusterConfig cluster )
+    {
         super( cluster );
         this.hadoop = hadoop;
         this.tracker = tracker;
@@ -37,18 +39,24 @@ public class SecondaryNameNode extends ClusterNode {
 
 
     @Override
-    protected void getStatus( UUID trackID ) {
+    protected void getStatus( UUID trackID )
+    {
         setLoading( true );
 
-        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent() {
+        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent()
+        {
 
-            public void onComplete( NodeState state ) {
-                synchronized ( progressButton ) {
+            public void onComplete( NodeState state )
+            {
+                synchronized ( progressButton )
+                {
                     boolean isRunning = false;
-                    if ( state == NodeState.RUNNING ) {
+                    if ( state == NodeState.RUNNING )
+                    {
                         isRunning = true;
                     }
-                    else if ( state == NodeState.STOPPED ) {
+                    else if ( state == NodeState.STOPPED )
+                    {
                         isRunning = false;
                     }
 
@@ -62,7 +70,8 @@ public class SecondaryNameNode extends ClusterNode {
 
 
     @Override
-    protected void setLoading( boolean isLoading ) {
+    protected void setLoading( boolean isLoading )
+    {
         startButton.setVisible( !isLoading );
         stopButton.setVisible( !isLoading );
         progressButton.setVisible( isLoading );

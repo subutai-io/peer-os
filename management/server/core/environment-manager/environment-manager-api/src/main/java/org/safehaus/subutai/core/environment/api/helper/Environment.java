@@ -9,7 +9,8 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 6/24/14.
  */
-public class Environment {
+public class Environment
+{
 
     private UUID uuid;
     private Set<Node> nodes;
@@ -18,7 +19,8 @@ public class Environment {
     private String peerUuid;
 
 
-    public Environment( String name, String peerUuid ) {
+    public Environment( String name, String peerUuid )
+    {
         this.uuid = UUID.randomUUID();
         this.nodes = new HashSet<>();
         this.name = name;
@@ -27,38 +29,45 @@ public class Environment {
     }
 
 
-    public void addContainer( String containerUuid ) {
+    public void addContainer( String containerUuid )
+    {
         this.containers.add( containerUuid );
     }
 
 
-    public Set<String> getContainers() {
+    public Set<String> getContainers()
+    {
         return containers;
     }
 
 
-    public void setContainers( final Set<String> containers ) {
+    public void setContainers( final Set<String> containers )
+    {
         this.containers = containers;
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
 
-    public Set<Node> getNodes() {
+    public Set<Node> getNodes()
+    {
         return nodes;
     }
 
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Environment{" +
                 "uuid=" + uuid +
                 ", nodes=" + nodes +

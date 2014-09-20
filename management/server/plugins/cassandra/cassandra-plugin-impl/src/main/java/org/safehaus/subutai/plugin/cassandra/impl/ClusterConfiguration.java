@@ -9,14 +9,14 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
 /**
  * Created by bahadyr on 9/1/14.
  */
-public class ClusterConfiguration {
+public class ClusterConfiguration
+{
 
     private final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
 
@@ -24,13 +24,15 @@ public class ClusterConfiguration {
     private CassandraImpl cassandraManager;
 
 
-    public ClusterConfiguration( final ProductOperation productOperation, final CassandraImpl cassandraManager ) {
+    public ClusterConfiguration( final ProductOperation productOperation, final CassandraImpl cassandraManager )
+    {
         this.po = productOperation;
         this.cassandraManager = cassandraManager;
     }
 
 
-    public void configureCluster( CassandraClusterConfig config ) throws ClusterConfigurationException {
+    public void configureCluster( CassandraClusterConfig config ) throws ClusterConfigurationException
+    {
 
         // setting cluster name
         po.addLog( "Setting cluster name " + config.getClusterName() );
@@ -38,10 +40,12 @@ public class ClusterConfiguration {
                 Commands.getConfigureCommand( config.getNodes(), "cluster_name " + config.getClusterName() );
         cassandraManager.getCommandRunner().runCommand( setClusterNameCommand );
 
-        if ( setClusterNameCommand.hasSucceeded() ) {
+        if ( setClusterNameCommand.hasSucceeded() )
+        {
             po.addLog( "Configure cluster name succeeded" );
         }
-        else {
+        else
+        {
             po.addLogFailed( String.format( "Installation failed, %s", setClusterNameCommand.getAllErrors() ) );
             return;
         }
@@ -52,10 +56,12 @@ public class ClusterConfiguration {
                 Commands.getConfigureCommand( config.getNodes(), "data_dir " + config.getDataDirectory() );
         cassandraManager.getCommandRunner().runCommand( setDataDirCommand );
 
-        if ( setDataDirCommand.hasSucceeded() ) {
+        if ( setDataDirCommand.hasSucceeded() )
+        {
             po.addLog( "Configure data directory succeeded" );
         }
-        else {
+        else
+        {
             po.addLogFailed( String.format( "Installation failed, %s", setDataDirCommand.getAllErrors() ) );
             return;
         }
@@ -66,10 +72,12 @@ public class ClusterConfiguration {
                 Commands.getConfigureCommand( config.getNodes(), "commitlog_dir " + config.getCommitLogDirectory() );
         cassandraManager.getCommandRunner().runCommand( setCommitDirCommand );
 
-        if ( setCommitDirCommand.hasSucceeded() ) {
+        if ( setCommitDirCommand.hasSucceeded() )
+        {
             po.addLog( "Configure commit directory succeeded" );
         }
-        else {
+        else
+        {
             po.addLogFailed( String.format( "Installation failed, %s", setCommitDirCommand.getAllErrors() ) );
             return;
         }
@@ -80,10 +88,12 @@ public class ClusterConfiguration {
                 "saved_cache_dir " + config.getSavedCachesDirectory() );
         cassandraManager.getCommandRunner().runCommand( setSavedCacheDirCommand );
 
-        if ( setSavedCacheDirCommand.hasSucceeded() ) {
+        if ( setSavedCacheDirCommand.hasSucceeded() )
+        {
             po.addLog( "Configure saved cache directory succeeded" );
         }
-        else {
+        else
+        {
             po.addLogFailed( String.format( "Installation failed, %s", setSavedCacheDirCommand.getAllErrors() ) );
             return;
         }
@@ -94,10 +104,12 @@ public class ClusterConfiguration {
                 Commands.getConfigureRpcAndListenAddressesCommand( config.getNodes(), "rpc_address" );
         cassandraManager.getCommandRunner().runCommand( setRpcAddressCommand );
 
-        if ( setRpcAddressCommand.hasSucceeded() ) {
+        if ( setRpcAddressCommand.hasSucceeded() )
+        {
             po.addLog( "Configure rpc address succeeded" );
         }
-        else {
+        else
+        {
             po.addLogFailed( String.format( "Installation failed, %s", setRpcAddressCommand.getAllErrors() ) );
             return;
         }
@@ -108,10 +120,12 @@ public class ClusterConfiguration {
                 Commands.getConfigureRpcAndListenAddressesCommand( config.getNodes(), "listen_address" );
         cassandraManager.getCommandRunner().runCommand( setListenAddressCommand );
 
-        if ( setListenAddressCommand.hasSucceeded() ) {
+        if ( setListenAddressCommand.hasSucceeded() )
+        {
             po.addLog( "Configure listen address succeeded" );
         }
-        else {
+        else
+        {
             po.addLogFailed( String.format( "Installation failed, %s", setListenAddressCommand.getAllErrors() ) );
             return;
         }
@@ -119,7 +133,8 @@ public class ClusterConfiguration {
         // setting seeds
         StringBuilder sb = new StringBuilder();
         //                        sb.append('"');
-        for ( Agent seed : config.getSeedNodes() ) {
+        for ( Agent seed : config.getSeedNodes() )
+        {
             sb.append( AgentUtil.getAgentIpByMask( seed, Common.IP_MASK ) ).append( "," );
         }
         sb.replace( sb.toString().length() - 1, sb.toString().length(), "" );
@@ -129,16 +144,17 @@ public class ClusterConfiguration {
         Command setSeedsCommand = Commands.getConfigureCommand( config.getNodes(), "seeds " + sb.toString() );
         cassandraManager.getCommandRunner().runCommand( setSeedsCommand );
 
-        if ( setSeedsCommand.hasSucceeded() ) {
+        if ( setSeedsCommand.hasSucceeded() )
+        {
             po.addLog( "Configure seeds succeeded" );
         }
-        else {
+        else
+        {
             po.addLogFailed( String.format( "Installation failed, %s", setSeedsCommand.getAllErrors() ) );
             return;
         }
 
         po.addLog( "Cassandra cluster data saved into database" );
-        cassandraManager.getPluginDAO()
-                        .saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        cassandraManager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
     }
 }

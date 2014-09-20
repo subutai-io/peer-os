@@ -14,8 +14,8 @@ public class RemoteRequest
 
     private final UUID peerId;
     private final UUID commandId;
-    private long timestamp;
     private final int requestCount;
+    private long timestamp;
     private int attempts;
     private int requestsCompleted;
 

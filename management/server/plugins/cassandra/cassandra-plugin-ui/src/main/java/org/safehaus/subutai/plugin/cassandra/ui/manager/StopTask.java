@@ -8,14 +8,16 @@ import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
-public class StopTask implements Runnable {
+public class StopTask implements Runnable
+{
 
     private final String clusterName, hostname;
     private final CompleteEvent completeEvent;
     private Manager manager;
 
 
-    public StopTask( String clusterName, String lxcHostname, CompleteEvent completeEvent ) {
+    public StopTask( String clusterName, String lxcHostname, CompleteEvent completeEvent )
+    {
         this.clusterName = clusterName;
         this.hostname = lxcHostname;
         this.completeEvent = completeEvent;
@@ -23,27 +25,34 @@ public class StopTask implements Runnable {
 
 
     @Override
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = manager.getCassandraUI().getCassandraManager().stopService( clusterName, hostname );
 
         long start = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = manager.getCassandraUI().getTracker()
                                              .getProductOperation( CassandraClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 ) {
+            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
+            {
                 break;
             }
         }

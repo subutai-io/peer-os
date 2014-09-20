@@ -17,13 +17,15 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class OozieForm extends CustomComponent {
+public class OozieForm extends CustomComponent
+{
 
     private final Wizard wizard;
     private final Manager manager;
 
 
-    public OozieForm( OozieUI oozieUI ) {
+    public OozieForm( OozieUI oozieUI )
+    {
 
 
         setSizeFull();

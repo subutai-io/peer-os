@@ -9,12 +9,13 @@ package org.safehaus.subutai.common.command;
 /**
  * This interface should be implemented for supplying expiry callbacks for entries to {@code ExpiringCache}
  */
-public interface EntryExpiryCallback<ValueType> {
+public interface EntryExpiryCallback<ValueType>
+{
 
-	/**
-	 * This method of callback is called when entry expires
-	 *
-	 * @param entry - cache entry being expired
-	 */
-	public void onEntryExpiry(ValueType entry);
+    /**
+     * This method of callback is called when entry expires
+     *
+     * @param entry - cache entry being expired
+     */
+    public void onEntryExpiry( ValueType entry );
 }

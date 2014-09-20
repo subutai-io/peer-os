@@ -9,7 +9,8 @@ package org.safehaus.subutai.plugin.mongodb.api;
 /**
  * Contains mongo cluster node types
  */
-public enum NodeType {
+public enum NodeType
+{
 
-	CONFIG_NODE, ROUTER_NODE, DATA_NODE
+    CONFIG_NODE, ROUTER_NODE, DATA_NODE
 }

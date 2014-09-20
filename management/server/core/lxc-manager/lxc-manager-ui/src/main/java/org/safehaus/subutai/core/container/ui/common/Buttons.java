@@ -9,7 +9,8 @@ package org.safehaus.subutai.core.container.ui.common;
 /**
  *
  */
-public enum Buttons {
+public enum Buttons
+{
 
     INFO( "Info" ), START( "Start" ), STOP( "Stop" ), DESTROY( "Destroy" ), START_ALL( "Start All" ),
     STOP_ALL( "Stop All" ), DESTROY_ALL( "Destroy All" );
@@ -17,12 +18,14 @@ public enum Buttons {
     private final String buttonLabel;
 
 
-    private Buttons( String buttonLabel ) {
+    private Buttons( String buttonLabel )
+    {
         this.buttonLabel = buttonLabel;
     }
 
 
-    public String getButtonLabel() {
+    public String getButtonLabel()
+    {
         return buttonLabel;
     }
 

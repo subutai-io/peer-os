@@ -44,13 +44,13 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
 
-public class Manager {
+public class Manager
+{
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private final String COORDINATOR_PREFIX = "Coordinator: ";
-    private PrestoClusterConfig config;
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final String message = "No cluster is installed !";
     private final ExecutorService executorService;
@@ -59,9 +59,11 @@ public class Manager {
     private final Tracker tracker;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
+    private PrestoClusterConfig config;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.executorService = executorService;
         this.presto = serviceLocator.getService( Presto.class );
@@ -91,9 +93,11 @@ public class Manager {
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 config = ( PrestoClusterConfig ) event.getProperty().getValue();
                 refreshUI();
                 checkAllNodes();
@@ -105,9 +109,11 @@ public class Manager {
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 refreshClustersInfo();
             }
         } );
@@ -116,13 +122,17 @@ public class Manager {
 
         Button checkAllBtn = new Button( "Check All" );
         checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener() {
+        checkAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
                 }
-                else {
+                else
+                {
                     checkAllNodes();
                 }
             }
@@ -132,13 +142,17 @@ public class Manager {
 
         Button startAllBtn = new Button( "Start All" );
         startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
+        startAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
                 }
-                else {
+                else
+                {
                     startAllNodes();
                 }
             }
@@ -148,13 +162,17 @@ public class Manager {
 
         final Button stopAllBtn = new Button( "Stop All" );
         stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
+        stopAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( message );
                 }
-                else {
+                else
+                {
                     stopAllNodes();
                 }
             }
@@ -164,24 +182,31 @@ public class Manager {
 
         Button destroyClusterBtn = new Button( "Destroy cluster" );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
                             "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             /** before destroying cluster, stop it first to not leave background zombie processes **/
                             stopAllBtn.click();
                             UUID trackID = presto.uninstallCluster( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     PrestoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -191,7 +216,8 @@ public class Manager {
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
-                else {
+                else
+                {
                     show( "Please, select cluster" );
                 }
             }
@@ -202,48 +228,62 @@ public class Manager {
 
         Button addNodeBtn = new Button( "Add Node" );
         addNodeBtn.addStyleName( "default" );
-        addNodeBtn.addClickListener( new Button.ClickListener() {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
                     show( "Please, select cluster" );
                 }
 
-                if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
                     String hn = config.getHadoopClusterName();
-                    if ( hn == null || hn.isEmpty() ) {
+                    if ( hn == null || hn.isEmpty() )
+                    {
                         show( "Undefined Hadoop cluster name" );
                         return;
                     }
                     HadoopClusterConfig info = hadoop.getCluster( hn );
-                    if ( info != null ) {
+                    if ( info != null )
+                    {
                         HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
                         nodes.removeAll( config.getAllNodes() );
-                        if ( !nodes.isEmpty() ) {
+                        if ( !nodes.isEmpty() )
+                        {
                             AddNodeWindow addNodeWindow =
                                     new AddNodeWindow( presto, executorService, tracker, config, nodes );
                             contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener() {
+                            addNodeWindow.addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
                         }
-                        else {
+                        else
+                        {
                             show( "All nodes in corresponding Hadoop cluster have Presto installed" );
                         }
                     }
-                    else {
+                    else
+                    {
                         show( "Hadoop cluster info not found" );
                     }
                 }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
                     ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
-                    d.getOk().addClickListener( new Button.ClickListener() {
+                    d.getOk().addClickListener( new Button.ClickListener()
+                    {
 
                         @Override
-                        public void buttonClick( Button.ClickEvent event ) {
+                        public void buttonClick( Button.ClickEvent event )
+                        {
                             UUID trackId = presto.addWorkerNode( config.getClusterName(), null );
                             ProgressWindow w = new ProgressWindow( executorService, tracker, trackId,
                                     PrestoClusterConfig.PRODUCT_KEY );
@@ -264,7 +304,8 @@ public class Manager {
     }
 
 
-    private Table createTableTemplate( String caption ) {
+    private Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
@@ -281,21 +322,26 @@ public class Manager {
         table.setColumnCollapsingAllowed( true );
         table.setColumnCollapsed( "Check", true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent =
                             agentManager.getAgentByHostname( lxcHostname.replaceAll( COORDINATOR_PREFIX, "" ) );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
@@ -305,106 +351,32 @@ public class Manager {
     }
 
 
-    /**
-     * @param agent agent
-     *
-     * @return Yes if give agent is among seeds, otherwise returns No
-     */
-    public String checkIfCoordinator( Agent agent ) {
-        if ( config.getCoordinatorNode().equals( agent ) ) {
-            return "Coordinator";
-        }
-        return "Worker";
+    private void show( String notification )
+    {
+        Notification.show( notification );
     }
 
 
-    /**
-     * Parses supplied string argument to extract external IP.
-     *
-     * @param ipList ex: [10.10.10.10, 127.0.0.1]
-     *
-     * @return 10.10.10.10
-     */
-    public String parseIPList( String ipList ) {
-        return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," ) );
-    }
-
-
-    private void refreshUI() {
-        if ( config != null ) {
+    private void refreshUI()
+    {
+        if ( config != null )
+        {
             populateTable( nodesTable, config.getWorkers(), config.getCoordinatorNode() );
         }
-        else {
+        else
+        {
             nodesTable.removeAllItems();
         }
     }
 
 
-    public void refreshClustersInfo() {
-        List<PrestoClusterConfig> clustersInfo = presto.getClusters();
-        PrestoClusterConfig clusterInfo = ( PrestoClusterConfig ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 ) {
-            for ( PrestoClusterConfig c : clustersInfo ) {
-                clusterCombo.addItem( c );
-                clusterCombo.setItemCaption( c, c.getClusterName() );
-            }
-            if ( clusterInfo != null ) {
-                for ( PrestoClusterConfig c : clustersInfo ) {
-                    if ( c.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                        clusterCombo.setValue( c );
-                        return;
-                    }
-                }
-            }
-            else {
-                clusterCombo.setValue( clustersInfo.iterator().next() );
-            }
-        }
-        progressIcon.setVisible( false );
-    }
-
-
-    public void checkAllNodes() {
-        for ( Object o : nodesTable.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    public void startAllNodes() {
-        for ( Object o : nodesTable.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    public void stopAllNodes() {
-        for ( Object o : nodesTable.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
-    private void show( String notification ) {
-        Notification.show( notification );
-    }
-
-
-    private void populateTable( final Table table, Set<Agent> workers, final Agent coordinator ) {
+    private void populateTable( final Table table, Set<Agent> workers, final Agent coordinator )
+    {
 
         table.removeAllItems();
 
-        for ( final Agent agent : workers ) {
+        for ( final Agent agent : workers )
+        {
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
@@ -424,9 +396,11 @@ public class Manager {
                     checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn
             }, null );
 
-            checkBtn.addClickListener( new Button.ClickListener() {
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -435,15 +409,20 @@ public class Manager {
 
                     executorService.execute(
                             new CheckTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
                                         @Override
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else if ( state == NodeState.STOPPED ) {
+                                                else if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 setCoordinatorBtn.setEnabled( true );
@@ -455,9 +434,11 @@ public class Manager {
                 }
             } );
 
-            startBtn.addClickListener( new Button.ClickListener() {
+            startBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -466,15 +447,20 @@ public class Manager {
 
                     executorService.execute(
                             new StartTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
                                         @Override
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else if ( state == NodeState.STOPPED ) {
+                                                else if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 setCoordinatorBtn.setEnabled( true );
@@ -486,9 +472,11 @@ public class Manager {
                 }
             } );
 
-            stopBtn.addClickListener( new Button.ClickListener() {
+            stopBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
@@ -497,15 +485,20 @@ public class Manager {
 
                     executorService.execute(
                             new StopTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
+                                    new CompleteEvent()
+                                    {
 
                                         @Override
-                                        public void onComplete( NodeState state ) {
-                                            synchronized ( progressIcon ) {
-                                                if ( state == NodeState.RUNNING ) {
+                                        public void onComplete( NodeState state )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                if ( state == NodeState.RUNNING )
+                                                {
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                else if ( state == NodeState.STOPPED ) {
+                                                else if ( state == NodeState.STOPPED )
+                                                {
                                                     startBtn.setEnabled( true );
                                                 }
                                                 setCoordinatorBtn.setEnabled( true );
@@ -517,21 +510,27 @@ public class Manager {
                 }
             } );
 
-            setCoordinatorBtn.addClickListener( new Button.ClickListener() {
+            setCoordinatorBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to set %s as coordinator node?", agent.getHostname() ), "Yes",
                             "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = presto.changeCoordinatorNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     PrestoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -543,20 +542,26 @@ public class Manager {
                 }
             } );
 
-            destroyBtn.addClickListener( new Button.ClickListener() {
+            destroyBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
                         @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
                             UUID trackID = presto.destroyWorkerNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     PrestoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
                                 @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
                                     refreshClustersInfo();
                                 }
                             } );
@@ -586,24 +591,31 @@ public class Manager {
                 checkIfCoordinator( coordinator ), checkBtn, startBtn, stopBtn, null, null
         }, null );
 
-        checkBtn.addClickListener( new Button.ClickListener() {
+        checkBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
                 executorService.execute(
                         new CheckTask( presto, tracker, config.getClusterName(), coordinator.getHostname(),
-                                new CompleteEvent() {
+                                new CompleteEvent()
+                                {
 
                                     @Override
-                                    public void onComplete( NodeState state ) {
-                                        synchronized ( progressIcon ) {
-                                            if ( state == NodeState.RUNNING ) {
+                                    public void onComplete( NodeState state )
+                                    {
+                                        synchronized ( progressIcon )
+                                        {
+                                            if ( state == NodeState.RUNNING )
+                                            {
                                                 stopBtn.setEnabled( true );
                                             }
-                                            else if ( state == NodeState.STOPPED ) {
+                                            else if ( state == NodeState.STOPPED )
+                                            {
                                                 startBtn.setEnabled( true );
                                             }
                                             progressIcon.setVisible( false );
@@ -613,24 +625,31 @@ public class Manager {
             }
         } );
 
-        startBtn.addClickListener( new Button.ClickListener() {
+        startBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
                 executorService.execute(
                         new StartTask( presto, tracker, config.getClusterName(), coordinator.getHostname(),
-                                new CompleteEvent() {
+                                new CompleteEvent()
+                                {
 
                                     @Override
-                                    public void onComplete( NodeState state ) {
-                                        synchronized ( progressIcon ) {
-                                            if ( state == NodeState.RUNNING ) {
+                                    public void onComplete( NodeState state )
+                                    {
+                                        synchronized ( progressIcon )
+                                        {
+                                            if ( state == NodeState.RUNNING )
+                                            {
                                                 stopBtn.setEnabled( true );
                                             }
-                                            else if ( state == NodeState.STOPPED ) {
+                                            else if ( state == NodeState.STOPPED )
+                                            {
                                                 startBtn.setEnabled( true );
                                             }
                                             progressIcon.setVisible( false );
@@ -640,24 +659,31 @@ public class Manager {
             }
         } );
 
-        stopBtn.addClickListener( new Button.ClickListener() {
+        stopBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 progressIcon.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
                 executorService.execute(
                         new StopTask( presto, tracker, config.getClusterName(), coordinator.getHostname(),
-                                new CompleteEvent() {
+                                new CompleteEvent()
+                                {
 
                                     @Override
-                                    public void onComplete( NodeState state ) {
-                                        synchronized ( progressIcon ) {
-                                            if ( state == NodeState.RUNNING ) {
+                                    public void onComplete( NodeState state )
+                                    {
+                                        synchronized ( progressIcon )
+                                        {
+                                            if ( state == NodeState.RUNNING )
+                                            {
                                                 stopBtn.setEnabled( true );
                                             }
-                                            else if ( state == NodeState.STOPPED ) {
+                                            else if ( state == NodeState.STOPPED )
+                                            {
                                                 startBtn.setEnabled( true );
                                             }
                                             progressIcon.setVisible( false );
@@ -669,7 +695,104 @@ public class Manager {
     }
 
 
-    public Component getContent() {
+    /**
+     * @param agent agent
+     *
+     * @return Yes if give agent is among seeds, otherwise returns No
+     */
+    public String checkIfCoordinator( Agent agent )
+    {
+        if ( config.getCoordinatorNode().equals( agent ) )
+        {
+            return "Coordinator";
+        }
+        return "Worker";
+    }
+
+
+    /**
+     * Parses supplied string argument to extract external IP.
+     *
+     * @param ipList ex: [10.10.10.10, 127.0.0.1]
+     *
+     * @return 10.10.10.10
+     */
+    public String parseIPList( String ipList )
+    {
+        return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," ) );
+    }
+
+
+    public void refreshClustersInfo()
+    {
+        List<PrestoClusterConfig> clustersInfo = presto.getClusters();
+        PrestoClusterConfig clusterInfo = ( PrestoClusterConfig ) clusterCombo.getValue();
+        clusterCombo.removeAllItems();
+        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        {
+            for ( PrestoClusterConfig c : clustersInfo )
+            {
+                clusterCombo.addItem( c );
+                clusterCombo.setItemCaption( c, c.getClusterName() );
+            }
+            if ( clusterInfo != null )
+            {
+                for ( PrestoClusterConfig c : clustersInfo )
+                {
+                    if ( c.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    {
+                        clusterCombo.setValue( c );
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                clusterCombo.setValue( clustersInfo.iterator().next() );
+            }
+        }
+        progressIcon.setVisible( false );
+    }
+
+
+    public void checkAllNodes()
+    {
+        for ( Object o : nodesTable.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = nodesTable.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
+            checkBtn.click();
+        }
+    }
+
+
+    public void startAllNodes()
+    {
+        for ( Object o : nodesTable.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = nodesTable.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
+            checkBtn.click();
+        }
+    }
+
+
+    public void stopAllNodes()
+    {
+        for ( Object o : nodesTable.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = nodesTable.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
+            checkBtn.click();
+        }
+    }
+
+
+    public Component getContent()
+    {
         return contentRoot;
     }
 }

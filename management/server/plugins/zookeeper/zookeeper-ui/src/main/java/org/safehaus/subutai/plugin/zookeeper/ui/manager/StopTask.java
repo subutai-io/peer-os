@@ -20,7 +20,8 @@ import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 /**
  * @author dilshat
  */
-public class StopTask implements Runnable {
+public class StopTask implements Runnable
+{
 
     private final String clusterName, lxcHostname;
     private final CompleteEvent completeEvent;
@@ -29,7 +30,8 @@ public class StopTask implements Runnable {
 
 
     public StopTask( Zookeeper zookeeper, Tracker tracker, String clusterName, String lxcHostname,
-                     CompleteEvent completeEvent ) {
+                     CompleteEvent completeEvent )
+    {
         this.zookeeper = zookeeper;
         this.tracker = tracker;
         this.clusterName = clusterName;
@@ -38,30 +40,38 @@ public class StopTask implements Runnable {
     }
 
 
-    public void run() {
+    public void run()
+    {
 
         UUID trackID = zookeeper.stopNode( clusterName, lxcHostname );
 
         long start = System.currentTimeMillis();
         NodeState state = NodeState.UNKNOWN;
 
-        while ( !Thread.interrupted() ) {
+        while ( !Thread.interrupted() )
+        {
             ProductOperationView po = tracker.getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( po.getState() == ProductOperationState.SUCCEEDED ) {
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
+                    if ( po.getState() == ProductOperationState.SUCCEEDED )
+                    {
                         state = NodeState.STOPPED;
                     }
                     break;
                 }
             }
-            try {
+            try
+            {
                 Thread.sleep( 1000 );
             }
-            catch ( InterruptedException ex ) {
+            catch ( InterruptedException ex )
+            {
                 break;
             }
-            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 ) {
+            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
+            {
                 break;
             }
         }

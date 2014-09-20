@@ -22,9 +22,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class SharkForm extends CustomComponent {
+public class SharkForm extends CustomComponent
+{
 
-    public SharkForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public SharkForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
@@ -33,8 +35,8 @@ public class SharkForm extends CustomComponent {
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
 
-        Manager manager = new Manager(executorService, serviceLocator);
-        Wizard wizard = new Wizard(executorService, serviceLocator);
+        Manager manager = new Manager( executorService, serviceLocator );
+        Wizard wizard = new Wizard( executorService, serviceLocator );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
         verticalLayout.addComponent( mongoSheet );

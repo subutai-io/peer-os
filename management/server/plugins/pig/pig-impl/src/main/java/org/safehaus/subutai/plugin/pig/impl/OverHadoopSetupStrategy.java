@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.pig.impl;
 
+
 import java.util.Iterator;
 
 import org.safehaus.subutai.common.command.AgentResult;
@@ -14,26 +15,30 @@ import org.safehaus.subutai.plugin.pig.api.Config;
 import com.google.common.base.Strings;
 
 
-class OverHadoopSetupStrategy extends PigSetupStrategy {
+class OverHadoopSetupStrategy extends PigSetupStrategy
+{
 
-    public OverHadoopSetupStrategy(PigImpl manager, Config config, ProductOperation po) {
-        super(manager, config, po);
+    public OverHadoopSetupStrategy( PigImpl manager, Config config, ProductOperation po )
+    {
+        super( manager, config, po );
     }
+
 
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
 
         if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || CollectionUtil
-            .isCollectionEmpty( config.getNodes() ) )
+                .isCollectionEmpty( config.getNodes() ) )
         {
-            throw new ClusterSetupException("Malformed configuration\nInstallation aborted");
+            throw new ClusterSetupException( "Malformed configuration\nInstallation aborted" );
         }
 
         if ( manager.getCluster( config.getClusterName() ) != null )
         {
-            throw new ClusterSetupException(String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                            config.getClusterName() ));
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                            config.getClusterName() ) );
         }
 
         // Check if node agent is connected
@@ -43,8 +48,8 @@ class OverHadoopSetupStrategy extends PigSetupStrategy {
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
                 productOperation.addLog(
-                    String.format( "Node %s is not connected. Omitting this node from installation",
-                        node.getHostname() ) );
+                        String.format( "Node %s is not connected. Omitting this node from installation",
+                                node.getHostname() ) );
                 it.remove();
             }
         }
@@ -74,8 +79,8 @@ class OverHadoopSetupStrategy extends PigSetupStrategy {
             if ( result.getStdOut().contains( Config.PRODUCT_PACKAGE ) )
             {
                 productOperation.addLog(
-                    String.format( "Node %s already has Pig installed. Omitting this node from installation",
-                        node.getHostname() ) );
+                        String.format( "Node %s already has Pig installed. Omitting this node from installation",
+                                node.getHostname() ) );
                 it.remove();
             }
         }
@@ -102,7 +107,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy {
             else
             {
                 productOperation
-                    .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
             }
         }
         else
@@ -112,5 +117,4 @@ class OverHadoopSetupStrategy extends PigSetupStrategy {
 
         return config;
     }
-
 }

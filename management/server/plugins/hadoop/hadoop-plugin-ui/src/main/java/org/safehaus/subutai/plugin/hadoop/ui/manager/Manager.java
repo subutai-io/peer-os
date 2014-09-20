@@ -22,17 +22,19 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class Manager extends VerticalLayout {
+public class Manager extends VerticalLayout
+{
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
     private HorizontalLayout horizontalLayout, buttonsLayout;
     private Embedded indicator;
     private Button refreshButton;
     private HadoopTable table;
-    private final Hadoop hadoop;
-    private final Tracker tracker;
-    private final ExecutorService executorService;
 
 
-    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         setSizeFull();
 
         this.executorService = executorService;
@@ -86,12 +88,15 @@ public class Manager extends VerticalLayout {
     }
 
 
-    private Button getButtonRefresh() {
+    private Button getButtonRefresh()
+    {
         refreshButton = new Button( "Refresh" );
         refreshButton.addStyleName( "default" );
-        refreshButton.addClickListener( new Button.ClickListener() {
+        refreshButton.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 table.refreshDataSource();
             }
         } );
@@ -100,7 +105,8 @@ public class Manager extends VerticalLayout {
     }
 
 
-    private Embedded getIndicator() {
+    private Embedded getIndicator()
+    {
         indicator = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
         indicator.setHeight( 11, Unit.PIXELS );
         indicator.setWidth( 50, Unit.PIXELS );
@@ -110,8 +116,10 @@ public class Manager extends VerticalLayout {
     }
 
 
-    private HadoopTable getHadoopTable() {
-        if ( table == null ) {
+    private HadoopTable getHadoopTable()
+    {
+        if ( table == null )
+        {
             table = new HadoopTable( hadoop, tracker, executorService, "Hadoop Clusters", indicator );
             table.setMultiSelect( false );
             table.setSizeFull();

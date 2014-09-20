@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -10,7 +11,6 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.InstallClusterHandler;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
@@ -21,12 +21,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class InstallServiceHandlerTest {
+
+public class InstallServiceHandlerTest
+{
 
     CassandraImpl cassandraMock;
 
+
     @Before
-    public void setup() throws DBException {
+    public void setup() throws DBException
+    {
         cassandraMock = mock( CassandraImpl.class );
         when( cassandraMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
         when( cassandraMock.getCommandRunner() ).thenReturn( mock( CommandRunner.class ) );
@@ -34,12 +38,15 @@ public class InstallServiceHandlerTest {
         when( cassandraMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
         when( cassandraMock.getCluster( anyString() ) ).thenReturn( null );
         when( cassandraMock.getPluginDAO() ).thenReturn( mock( PluginDAO.class ) );
-        when( cassandraMock.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), "Cassandra", CassandraClusterConfig.class ) ).thenReturn( null );
+        when( cassandraMock.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), "Cassandra",
+                CassandraClusterConfig.class ) ).thenReturn( null );
     }
+
 
     @Ignore
     @Test
-    public void testWithoutCluster(){
+    public void testWithoutCluster()
+    {
 
         CassandraClusterConfig config = mock( CassandraClusterConfig.class );
         when( config.getClusterName() ).thenReturn( "test-cluster" );

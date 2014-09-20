@@ -12,37 +12,36 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 
 
-public interface ContainerManager {
+public interface ContainerManager
+{
 
-	public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
-	                        PlacementStrategy... strategy) throws LxcCreateException;
+    public Set<Agent> clone( UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
+                             PlacementStrategy... strategy ) throws LxcCreateException;
 
-	/**
-	 * Clones containers in parallel, simultaneously
-	 */
-	public Set<Agent> clone(String templateName, int nodesCount, Collection<Agent> hosts,
-	                        PlacementStrategy... strategy) throws LxcCreateException;
+    /**
+     * Clones containers in parallel, simultaneously
+     */
+    public Set<Agent> clone( String templateName, int nodesCount, Collection<Agent> hosts,
+                             PlacementStrategy... strategy ) throws LxcCreateException;
 
-	public boolean attachAndExecute(Agent physicalHost, String cloneName, String cmd);
+    public boolean attachAndExecute( Agent physicalHost, String cloneName, String cmd );
 
-	public boolean attachAndExecute(Agent physicalHost, String cloneName, String cmd, long t, TimeUnit unit);
+    public boolean attachAndExecute( Agent physicalHost, String cloneName, String cmd, long t, TimeUnit unit );
 
-	public void cloneDestroy(String hostName, String cloneName) throws LxcDestroyException;
+    public void cloneDestroy( String hostName, String cloneName ) throws LxcDestroyException;
 
-	/**
-	 * Destroys containers in parallel, simultaneously
-	 */
-	public void clonesDestroyByHostname(Set<String> cloneNames) throws LxcDestroyException;
+    /**
+     * Destroys containers in parallel, simultaneously
+     */
+    public void clonesDestroyByHostname( Set<String> cloneNames ) throws LxcDestroyException;
 
-	/**
-	 * Destroys containers in parallel, simultaneously
-	 */
-	public void clonesDestroy(Set<Agent> lxcAgents) throws LxcDestroyException;
+    /**
+     * Destroys containers in parallel, simultaneously
+     */
+    public void clonesDestroy( Set<Agent> lxcAgents ) throws LxcDestroyException;
 
-	public void clonesDestroy(final String hostName, final Set<String> cloneNames) throws LxcDestroyException;
+    public void clonesDestroy( final String hostName, final Set<String> cloneNames ) throws LxcDestroyException;
 
-	public void clonesCreate(final String hostName, final String templateName, final Set<String> cloneNames)
-			throws LxcCreateException;
-
-
+    public void clonesCreate( final String hostName, final String templateName, final Set<String> cloneNames )
+            throws LxcCreateException;
 }

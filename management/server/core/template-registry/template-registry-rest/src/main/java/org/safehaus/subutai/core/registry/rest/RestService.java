@@ -13,7 +13,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
-public interface RestService {
+public interface RestService
+{
 
     @GET
     @Path("templates/{templateName}")
@@ -44,7 +45,7 @@ public interface RestService {
     @Path("templates/{childTemplateName}/arch/{lxcArch}/parent")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getParentTemplate( @PathParam("childTemplateName") String childTemplateName,
-                                     @PathParam("lxcArch") String lxcArch );
+                                       @PathParam("lxcArch") String lxcArch );
 
     @GET
     @Path("templates/{childTemplateName}/parents")
@@ -55,7 +56,7 @@ public interface RestService {
     @Path("templates/{childTemplateName}/arch/{lxcArch}/parents")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getParentTemplates( @PathParam("childTemplateName") String childTemplateName,
-                                      @PathParam("lxcArch") String lxcArch );
+                                        @PathParam("lxcArch") String lxcArch );
 
     @GET
     @Path("templates/{parentTemplateName}/children")
@@ -66,7 +67,7 @@ public interface RestService {
     @Path("templates/{parentTemplateName}/arch/{lxcArch}/children")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName,
-                                     @PathParam("lxcArch") String lxcArch );
+                                       @PathParam("lxcArch") String lxcArch );
 
     @GET
     @Path("templates/tree")

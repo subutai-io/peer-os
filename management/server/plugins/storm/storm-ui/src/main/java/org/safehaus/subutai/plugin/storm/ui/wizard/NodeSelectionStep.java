@@ -24,9 +24,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class NodeSelectionStep extends Panel {
+public class NodeSelectionStep extends Panel
+{
 
-    public NodeSelectionStep( final Zookeeper zookeeper, final Wizard wizard ) {
+    public NodeSelectionStep( final Zookeeper zookeeper, final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -37,16 +39,19 @@ public class NodeSelectionStep extends Panel {
 
         TextField clusterNameTxt = new TextField( "Cluster name" );
         clusterNameTxt.setRequired( true );
-        clusterNameTxt.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterNameTxt.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent e ) {
+            public void valueChange( Property.ValueChangeEvent e )
+            {
                 wizard.getConfig().setClusterName( e.getProperty().getValue().toString().trim() );
             }
         } );
 
         Component nimbusElem;
-        if ( wizard.getConfig().isExternalZookeeper() ) {
+        if ( wizard.getConfig().isExternalZookeeper() )
+        {
             ComboBox zkClustersCombo = new ComboBox( "Zookeeper cluster" );
             final ComboBox masterNodeCombo = makeMasterNodeComboBox( wizard );
 
@@ -54,18 +59,23 @@ public class NodeSelectionStep extends Panel {
             zkClustersCombo.setTextInputAllowed( false );
             zkClustersCombo.setRequired( true );
             zkClustersCombo.setNullSelectionAllowed( false );
-            zkClustersCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            zkClustersCombo.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent e ) {
+                public void valueChange( Property.ValueChangeEvent e )
+                {
                     masterNodeCombo.removeAllItems();
-                    if ( e.getProperty().getValue() != null ) {
+                    if ( e.getProperty().getValue() != null )
+                    {
                         ZookeeperClusterConfig zk = ( ZookeeperClusterConfig ) e.getProperty().getValue();
-                        for ( Agent a : zk.getNodes() ) {
+                        for ( Agent a : zk.getNodes() )
+                        {
                             masterNodeCombo.addItem( a );
                             masterNodeCombo.setItemCaption( a, a.getHostname() );
                         }
                         // do select if values exist
-                        if ( wizard.getConfig().getNimbus() != null ) {
+                        if ( wizard.getConfig().getNimbus() != null )
+                        {
                             masterNodeCombo.setValue( wizard.getConfig().getNimbus() );
                         }
 
@@ -74,14 +84,17 @@ public class NodeSelectionStep extends Panel {
                 }
             } );
             List<ZookeeperClusterConfig> zk_list = zookeeper.getClusters();
-            for ( ZookeeperClusterConfig zkc : zk_list ) {
+            for ( ZookeeperClusterConfig zkc : zk_list )
+            {
                 zkClustersCombo.addItem( zkc );
                 zkClustersCombo.setItemCaption( zkc, zkc.getClusterName() );
-                if ( zkc.getClusterName().equals( wizard.getConfig().getZookeeperClusterName() ) ) {
+                if ( zkc.getClusterName().equals( wizard.getConfig().getZookeeperClusterName() ) )
+                {
                     zkClustersCombo.setValue( zkc );
                 }
             }
-            if ( wizard.getConfig().getNimbus() != null ) {
+            if ( wizard.getConfig().getNimbus() != null )
+            {
                 masterNodeCombo.setValue( wizard.getConfig().getNimbus() );
             }
 
@@ -90,7 +103,8 @@ public class NodeSelectionStep extends Panel {
             nimbusElem.setSizeUndefined();
             nimbusElem.setStyleName( "default" );
         }
-        else {
+        else
+        {
             String s = "<b>A new nimbus node will be created with Zookeeper instance installed</b>";
             nimbusElem = new Label( s, ContentMode.HTML );
         }
@@ -102,38 +116,48 @@ public class NodeSelectionStep extends Panel {
         nodesCountCmb.setTextInputAllowed( false );
         nodesCountCmb.setNullSelectionAllowed( false );
         nodesCountCmb.setValue( wizard.getConfig().getSupervisorsCount() );
-        nodesCountCmb.addValueChangeListener( new Property.ValueChangeListener() {
+        nodesCountCmb.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getConfig().setSupervisorsCount( ( Integer ) event.getProperty().getValue() );
             }
         } );
 
         // set selected values
-        if ( wizard.getConfig().getClusterName() != null ) {
+        if ( wizard.getConfig().getClusterName() != null )
+        {
             clusterNameTxt.setValue( wizard.getConfig().getClusterName() );
         }
-        if ( wizard.getConfig().getSupervisorsCount() > 0 ) {
+        if ( wizard.getConfig().getSupervisorsCount() > 0 )
+        {
             nodesCountCmb.setValue( wizard.getConfig().getSupervisorsCount() );
         }
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 StormConfig config = wizard.getConfig();
-                if ( Strings.isNullOrEmpty( config.getClusterName() ) ) {
+                if ( Strings.isNullOrEmpty( config.getClusterName() ) )
+                {
                     show( "Enter cluster name" );
                 }
-                else if ( config.isExternalZookeeper() && config.getNimbus() == null ) {
+                else if ( config.isExternalZookeeper() && config.getNimbus() == null )
+                {
                     show( "Select master node" );
                 }
-                else if ( config.getSupervisorsCount() <= 0 ) {
+                else if ( config.getSupervisorsCount() <= 0 )
+                {
                     show( "Select supervisor nodes count" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -141,9 +165,11 @@ public class NodeSelectionStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.back();
             }
         } );
@@ -166,17 +192,20 @@ public class NodeSelectionStep extends Panel {
     }
 
 
-    private ComboBox makeMasterNodeComboBox( final Wizard wizard ) {
+    private ComboBox makeMasterNodeComboBox( final Wizard wizard )
+    {
         ComboBox cb = new ComboBox( "Nodes" );
 
         cb.setImmediate( true );
         cb.setTextInputAllowed( false );
         cb.setRequired( true );
         cb.setNullSelectionAllowed( false );
-        cb.addValueChangeListener( new Property.ValueChangeListener() {
+        cb.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 Agent serverNode = ( Agent ) event.getProperty().getValue();
                 wizard.getConfig().setNimbus( serverNode );
             }
@@ -185,7 +214,8 @@ public class NodeSelectionStep extends Panel {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

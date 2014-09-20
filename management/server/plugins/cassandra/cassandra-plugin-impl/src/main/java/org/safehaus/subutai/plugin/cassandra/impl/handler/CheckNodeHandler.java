@@ -14,13 +14,15 @@ import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 
-public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
+public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
+{
 
     private String clusterName;
     private String lxcHostname;
 
 
-    public CheckNodeHandler( final CassandraImpl manager, String clusterName, String lxcHostname ) {
+    public CheckNodeHandler( final CassandraImpl manager, String clusterName, String lxcHostname )
+    {
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
@@ -29,41 +31,24 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
-
-        StringBuilder log = new StringBuilder();
-
-        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
-
-            String status = "UNKNOWN";
-            if ( e.getValue().getExitCode() == 0 ) {
-                status = "Cassandra is running";
-            }
-            else if ( e.getValue().getExitCode() == 768 ) {
-                status = "Cassandra is not running";
-            }
-
-            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );
-        }
-
-        po.addLogDone( log.toString() );
-    }
-
-
     @Override
-    public void run() {
+    public void run()
+    {
         CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
-        if ( cassandraConfig == null ) {
+        if ( cassandraConfig == null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( node == null ) {
+        if ( node == null )
+        {
             productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) ) {
+        if ( !cassandraConfig.getNodes().contains( node ) )
+        {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
@@ -72,12 +57,39 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
         Command checkNodeCommand = Commands.getStatusCommand( node );
         manager.getCommandRunner().runCommand( checkNodeCommand );
 
-        if ( checkNodeCommand.hasSucceeded() ) {
+        if ( checkNodeCommand.hasSucceeded() )
+        {
             productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
                     checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
-        else {
+        else
+        {
             logStatusResults( productOperation, checkNodeCommand );
         }
+    }
+
+
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    {
+
+        StringBuilder log = new StringBuilder();
+
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
+        {
+
+            String status = "UNKNOWN";
+            if ( e.getValue().getExitCode() == 0 )
+            {
+                status = "Cassandra is running";
+            }
+            else if ( e.getValue().getExitCode() == 768 )
+            {
+                status = "Cassandra is not running";
+            }
+
+            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );
+        }
+
+        po.addLogDone( log.toString() );
     }
 }

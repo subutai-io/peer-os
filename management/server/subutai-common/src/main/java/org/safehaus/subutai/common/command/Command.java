@@ -13,7 +13,8 @@ import java.util.UUID;
 /**
  * Command to execute on agent(s)
  */
-public interface Command {
+public interface Command
+{
 
     /**
      * Shows if command has completed. The same as checking command.getCommandStatus == CommandStatus.SUCCEEDED ||

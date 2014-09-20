@@ -21,19 +21,21 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class ImportPanel extends ImportExportBase {
+public class ImportPanel extends ImportExportBase
+{
 
+    private final Sqoop sqoop;
+    private final ExecutorService executorService;
     DataSourceType type;
     CheckBox chkImportAllTables = new CheckBox( "Import all tables" );
     AbstractTextField hbaseTableNameField = UIUtil.getTextField( "Table name:", 300 );
     AbstractTextField hbaseColumnFamilyField = UIUtil.getTextField( "Column family:", 300 );
     AbstractTextField hiveDatabaseField = UIUtil.getTextField( "Database:", 300 );
     AbstractTextField hiveTableNameField = UIUtil.getTextField( "Table name:", 300 );
-    private final Sqoop sqoop;
-    private final ExecutorService executorService;
 
 
-    public ImportPanel( Sqoop sqoop, ExecutorService executorService, Tracker tracker ) {
+    public ImportPanel( Sqoop sqoop, ExecutorService executorService, Tracker tracker )
+    {
         super( tracker );
         this.sqoop = sqoop;
         this.executorService = executorService;
@@ -42,19 +44,22 @@ public class ImportPanel extends ImportExportBase {
     }
 
 
-    public DataSourceType getType() {
+    public DataSourceType getType()
+    {
         return type;
     }
 
 
-    public void setType( DataSourceType type ) {
+    public void setType( DataSourceType type )
+    {
         this.type = type;
         init();
     }
 
 
     @Override
-    public ImportSetting makeSettings() {
+    public ImportSetting makeSettings()
+    {
         ImportSetting s = new ImportSetting();
         s.setType( type );
         s.setClusterName( clusterName );
@@ -64,7 +69,8 @@ public class ImportPanel extends ImportExportBase {
         s.setUsername( usernameField.getValue() );
         s.setPassword( passwordField.getValue() );
         s.setOptionalParameters( optionalParams.getValue() );
-        switch ( type ) {
+        switch ( type )
+        {
             case HDFS:
                 s.addParameter( ImportParameter.IMPORT_ALL_TABLES, chkImportAllTables.getValue() );
                 break;
@@ -84,28 +90,35 @@ public class ImportPanel extends ImportExportBase {
 
 
     @Override
-    final void init() {
+    final void init()
+    {
         removeAllComponents();
 
-        if ( type == null ) {
+        if ( type == null )
+        {
             VerticalLayout layout = new VerticalLayout();
             layout.addComponent( UIUtil.getLabel( "Select data source type<br/>", 200 ) );
-            for ( final DataSourceType dst : DataSourceType.values() ) {
+            for ( final DataSourceType dst : DataSourceType.values() )
+            {
                 Button btn = UIUtil.getButton( dst.toString(), 100 );
-                btn.addClickListener( new Button.ClickListener() {
+                btn.addClickListener( new Button.ClickListener()
+                {
 
                     @Override
-                    public void buttonClick( Button.ClickEvent event ) {
+                    public void buttonClick( Button.ClickEvent event )
+                    {
                         setType( dst );
                     }
                 } );
                 layout.addComponent( btn );
             }
             Button btn = UIUtil.getButton( "Cancel", 100 );
-            btn.addClickListener( new Button.ClickListener() {
+            btn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     detachFromParent();
                 }
             } );
@@ -114,28 +127,34 @@ public class ImportPanel extends ImportExportBase {
             addComponent( layout );
             return;
         }
-        if ( agent == null ) {
+        if ( agent == null )
+        {
             addComponent( UIUtil.getLabel( "<h1>No node selected</h1>", 200 ) );
             return;
         }
 
         super.init();
-        chkImportAllTables.addValueChangeListener( new Property.ValueChangeListener() {
+        chkImportAllTables.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent e ) {
+            public void valueChange( Property.ValueChangeEvent e )
+            {
                 String v = e.getProperty().getValue().toString();
                 tableField.setEnabled( !Boolean.parseBoolean( v ) );
             }
         } );
 
         HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent( UIUtil.getButton( "Import", 120, new Button.ClickListener() {
+        buttons.addComponent( UIUtil.getButton( "Import", 120, new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 clearLogMessages();
-                if ( !checkFields() ) {
+                if ( !checkFields() )
+                {
                     return;
                 }
                 setFieldsEnabled( false );
@@ -143,20 +162,24 @@ public class ImportPanel extends ImportExportBase {
                 final UUID trackId = sqoop.importData( sett );
 
                 OperationWatcher watcher = new OperationWatcher( trackId );
-                watcher.setCallback( new OperationCallback() {
+                watcher.setCallback( new OperationCallback()
+                {
 
                     @Override
-                    public void onComplete() {
+                    public void onComplete()
+                    {
                         setFieldsEnabled( true );
                     }
                 } );
                 executorService.execute( watcher );
             }
         } ) );
-        buttons.addComponent( UIUtil.getButton( "Back", 120, new Button.ClickListener() {
+        buttons.addComponent( UIUtil.getButton( "Back", 120, new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 reset();
                 setType( null );
             }
@@ -170,7 +193,8 @@ public class ImportPanel extends ImportExportBase {
         ls.add( usernameField );
         ls.add( passwordField );
 
-        switch ( type ) {
+        switch ( type )
+        {
             case HDFS:
                 ls.add( 3, chkImportAllTables );
                 this.fields.add( chkImportAllTables );
@@ -202,34 +226,45 @@ public class ImportPanel extends ImportExportBase {
 
 
     @Override
-    boolean checkFields() {
-        if ( super.checkFields() ) {
-            switch ( type ) {
+    boolean checkFields()
+    {
+        if ( super.checkFields() )
+        {
+            switch ( type )
+            {
                 case HDFS:
-                    if ( !isChecked( chkImportAllTables ) ) {
-                        if ( !hasValue( tableField, "Table name not specified" ) ) {
+                    if ( !isChecked( chkImportAllTables ) )
+                    {
+                        if ( !hasValue( tableField, "Table name not specified" ) )
+                        {
                             return false;
                         }
                     }
                     break;
                 case HBASE:
-                    if ( !hasValue( hbaseTableNameField, "HBase table name not specified" ) ) {
+                    if ( !hasValue( hbaseTableNameField, "HBase table name not specified" ) )
+                    {
                         return false;
                     }
-                    if ( !hasValue( hbaseColumnFamilyField, "HBase column family not specified" ) ) {
+                    if ( !hasValue( hbaseColumnFamilyField, "HBase column family not specified" ) )
+                    {
                         return false;
                     }
                     break;
                 case HIVE:
-                    if ( !isChecked( chkImportAllTables ) ) {
-                        if ( !hasValue( tableField, "Table name not specified" ) ) {
+                    if ( !isChecked( chkImportAllTables ) )
+                    {
+                        if ( !hasValue( tableField, "Table name not specified" ) )
+                        {
                             return false;
                         }
                     }
-                    if ( !hasValue( hiveDatabaseField, "Hive database not specified" ) ) {
+                    if ( !hasValue( hiveDatabaseField, "Hive database not specified" ) )
+                    {
                         return false;
                     }
-                    if ( !hasValue( hiveTableNameField, "Hive table name not specified" ) ) {
+                    if ( !hasValue( hiveTableNameField, "Hive table name not specified" ) )
+                    {
                         return false;
                     }
                     break;
@@ -242,7 +277,8 @@ public class ImportPanel extends ImportExportBase {
     }
 
 
-    private boolean isChecked( CheckBox chb ) {
+    private boolean isChecked( CheckBox chb )
+    {
         Object v = chb.getValue();
         return v != null ? Boolean.parseBoolean( v.toString() ) : false;
     }

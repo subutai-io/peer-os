@@ -36,12 +36,14 @@ import com.google.common.collect.Sets;
 /**
  * This is an implementation of TemplateRegistryManager
  */
-public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
+public class TemplateRegistryManagerImpl implements TemplateRegistryManager
+{
 
     private final TemplateDAO templateDAO;
 
 
-    public TemplateRegistryManagerImpl( final DbManager dbManager ) {
+    public TemplateRegistryManagerImpl( final DbManager dbManager )
+    {
         Preconditions.checkNotNull( dbManager, "DB Manager is null" );
         templateDAO = new TemplateDAO( dbManager );
     }
@@ -56,7 +58,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      */
     @Override
     public synchronized void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
-            throws RegistryException {
+            throws RegistryException
+    {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
         Preconditions
@@ -65,11 +68,13 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Template template = parseTemplate( configFile, packagesFile, md5sum );
 
         //save template to storage
-        try {
+        try
+        {
 
             templateDAO.saveTemplate( template );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             throw new RegistryException(
                     String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
         }
@@ -85,9 +90,11 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      *
      * @return {@code Template}
      */
-    private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException {
+    private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException
+    {
         Properties properties = new Properties();
-        try {
+        try
+        {
             properties.load( new ByteArrayInputStream( configFile.getBytes( Charset.defaultCharset() ) ) );
             String lxcUtsname = properties.getProperty( "lxc.utsname" );
             String lxcArch = properties.getProperty( "lxc.arch" );
@@ -100,25 +107,30 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
                     subutaiGitUuid, packagesFile, md5sum );
 
             //check if template with such name already exists
-            if ( getTemplate( template.getTemplateName() ) != null ) {
+            if ( getTemplate( template.getTemplateName() ) != null )
+            {
                 throw new RegistryException(
                         String.format( "Template with name %s already exists", template.getTemplateName() ) );
             }
 
             //check if template with supplied md5sum already exists
             List<Template> allTemplates = getAllTemplates( template.getLxcArch() );
-            for ( Template templ : allTemplates ) {
-                if ( StringUtil.areStringsEqual( templ.getMd5sum(), template.getMd5sum() ) ) {
+            for ( Template templ : allTemplates )
+            {
+                if ( StringUtil.areStringsEqual( templ.getMd5sum(), template.getMd5sum() ) )
+                {
                     throw new RegistryException( String.format( "Template %s with the same md5sum already exists",
                             templ.getTemplateName() ) );
                 }
             }
 
-            if ( template.getParentTemplateName() == null ) {
+            if ( template.getParentTemplateName() == null )
+            {
 
                 template.setProducts( getPackagesDiff( null, template ) );
             }
-            else {
+            else
+            {
 
                 Template parentTemplate = getTemplate( template.getParentTemplateName() );
 
@@ -128,30 +140,37 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
             return template;
         }
-        catch ( IOException | RuntimeException e ) {
+        catch ( IOException | RuntimeException e )
+        {
             throw new RegistryException( String.format( "Error parsing template configuration %s", e ) );
         }
     }
 
 
-    private Set<String> getPackagesDiff( Template parent, Template child ) {
-        if ( parent == null ) {
+    private Set<String> getPackagesDiff( Template parent, Template child )
+    {
+        if ( parent == null )
+        {
             return extractPackageNames( Sets.newHashSet( child.getPackagesManifest().split( "\n" ) ) );
         }
-        else {
+        else
+        {
             return getPackagesDiff( Sets.newHashSet( parent.getPackagesManifest().split( "\n" ) ),
                     Sets.newHashSet( child.getPackagesManifest().split( "\n" ) ) );
         }
     }
 
 
-    private Set<String> extractPackageNames( Set<String> ls ) {
+    private Set<String> extractPackageNames( Set<String> ls )
+    {
         Pattern p = Pattern.compile( String.format( "(%s.+?)\\s", Common.PACKAGE_PREFIX ) );
         Matcher m = p.matcher( "" );
 
         SortedSet<String> res = new TreeSet<>();
-        for ( String s : ls ) {
-            if ( m.reset( s ).find() ) {
+        for ( String s : ls )
+        {
+            if ( m.reset( s ).find() )
+            {
                 res.add( m.group( 1 ) );
             }
         }
@@ -160,7 +179,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
-    private Set<String> getPackagesDiff( Set<String> parentPackages, Set<String> childPackages ) {
+    private Set<String> getPackagesDiff( Set<String> parentPackages, Set<String> childPackages )
+    {
         Set<String> p = extractPackageNames( parentPackages );
         Set<String> c = extractPackageNames( childPackages );
         c.removeAll( p );
@@ -175,7 +195,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @param templateName - name of template to remove
      */
     @Override
-    public void unregisterTemplate( final String templateName ) throws RegistryException {
+    public void unregisterTemplate( final String templateName ) throws RegistryException
+    {
         unregisterTemplate( templateName, Common.DEFAULT_LXC_ARCH );
     }
 
@@ -187,39 +208,46 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @param lxcArch - lxc architecture
      */
     @Override
-    public void unregisterTemplate( final String templateName, final String lxcArch ) throws RegistryException {
+    public void unregisterTemplate( final String templateName, final String lxcArch ) throws RegistryException
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
 
         //find template
         Template template = getTemplate( templateName, lxcArch );
 
-        if ( template != null ) {
+        if ( template != null )
+        {
             //check if template is used on FAIs
 
-            if ( template.isInUseOnFAIs() ) {
+            if ( template.isInUseOnFAIs() )
+            {
                 throw new RegistryException( String.format( "Template %s is in use on %s", template.getTemplateName(),
                         template.getFaisUsingThisTemplate() ) );
             }
 
             //check if template has children
             List<Template> children = getChildTemplates( templateName, lxcArch );
-            if ( !children.isEmpty() ) {
+            if ( !children.isEmpty() )
+            {
                 throw new RegistryException(
                         String.format( "Can no delete template %s from registry because it has children",
                                 templateName ) );
             }
 
             //delete template from storage
-            try {
+            try
+            {
                 templateDAO.removeTemplate( template );
             }
-            catch ( DBException e ) {
+            catch ( DBException e )
+            {
                 throw new RegistryException(
                         String.format( "Error deleting template %s, %s", templateName, e.getMessage() ) );
             }
         }
-        else {
+        else
+        {
             throw new RegistryException( String.format( "Template %s not found", templateName ) );
         }
     }
@@ -233,7 +261,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code Template}
      */
     @Override
-    public Template getTemplate( final String templateName ) {
+    public Template getTemplate( final String templateName )
+    {
         return getTemplate( templateName, Common.DEFAULT_LXC_ARCH );
     }
 
@@ -247,15 +276,18 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code Template}
      */
     @Override
-    public Template getTemplate( final String templateName, String lxcArch ) {
+    public Template getTemplate( final String templateName, String lxcArch )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
         //retrieve template from storage
 
-        try {
+        try
+        {
             return templateDAO.getTemplateByName( templateName, lxcArch );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             return null;
         }
     }
@@ -269,7 +301,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code List<Template>}
      */
     @Override
-    public List<Template> getChildTemplates( final String parentTemplateName ) {
+    public List<Template> getChildTemplates( final String parentTemplateName )
+    {
         return getChildTemplates( parentTemplateName, Common.DEFAULT_LXC_ARCH );
     }
 
@@ -283,15 +316,18 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code List<Template>}
      */
     @Override
-    public List<Template> getChildTemplates( final String parentTemplateName, String lxcArch ) {
+    public List<Template> getChildTemplates( final String parentTemplateName, String lxcArch )
+    {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( parentTemplateName ), "Parent template name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
         //retrieve child templates from storage
-        try {
+        try
+        {
             return templateDAO.geChildTemplates( parentTemplateName, lxcArch );
         }
-        catch ( DBException e ) {
+        catch ( DBException e )
+        {
             return Collections.emptyList();
         }
     }
@@ -305,7 +341,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code Template}
      */
     @Override
-    public Template getParentTemplate( final String childTemplateName ) {
+    public Template getParentTemplate( final String childTemplateName )
+    {
         return getParentTemplate( childTemplateName, Common.DEFAULT_LXC_ARCH );
     }
 
@@ -319,15 +356,18 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code Template}
      */
     @Override
-    public Template getParentTemplate( final String childTemplateName, final String lxcArch ) {
+    public Template getParentTemplate( final String childTemplateName, final String lxcArch )
+    {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( childTemplateName ), "Child template name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
         //retrieve parent template from storage
         Template child = getTemplate( childTemplateName, lxcArch );
 
-        if ( child != null ) {
-            if ( !Strings.isNullOrEmpty( child.getParentTemplateName() ) ) {
+        if ( child != null )
+        {
+            if ( !Strings.isNullOrEmpty( child.getParentTemplateName() ) )
+            {
                 return getTemplate( child.getParentTemplateName(), child.getLxcArch() );
             }
         }
@@ -342,16 +382,20 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code TemplateTree}
      */
     @Override
-    public TemplateTree getTemplateTree() {
+    public TemplateTree getTemplateTree()
+    {
         //retrieve all templates and fill template tree
         TemplateTree templateTree = new TemplateTree();
-        try {
+        try
+        {
             List<Template> allTemplates = templateDAO.getAllTemplates();
-            for ( Template template : allTemplates ) {
+            for ( Template template : allTemplates )
+            {
                 templateTree.addTemplate( template );
             }
         }
-        catch ( DBException ignored ) {
+        catch ( DBException ignored )
+        {
         }
         return templateTree;
     }
@@ -365,7 +409,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code List<Template>}
      */
     @Override
-    public List<Template> getParentTemplates( String childTemplateName ) {
+    public List<Template> getParentTemplates( String childTemplateName )
+    {
         return getParentTemplates( childTemplateName, Common.DEFAULT_LXC_ARCH );
     }
 
@@ -379,11 +424,13 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code List<Template>}
      */
     @Override
-    public List<Template> getParentTemplates( final String childTemplateName, final String lxcArch ) {
+    public List<Template> getParentTemplates( final String childTemplateName, final String lxcArch )
+    {
         List<Template> parents = new ArrayList<>();
 
         Template parent = getParentTemplate( childTemplateName, lxcArch );
-        while ( parent != null ) {
+        while ( parent != null )
+        {
             parents.add( parent );
             parent = getParentTemplate( parent.getTemplateName(), lxcArch );
         }
@@ -398,7 +445,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code List<Template>}
      */
     @Override
-    public List<Template> getAllTemplates() {
+    public List<Template> getAllTemplates()
+    {
         return getAllTemplates( Common.DEFAULT_LXC_ARCH );
     }
 
@@ -411,20 +459,25 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return {@code List<Template>}
      */
     @Override
-    public List<Template> getAllTemplates( final String lxcArch ) {
+    public List<Template> getAllTemplates( final String lxcArch )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Lxc Arch is null or empty" );
 
-        try {
+        try
+        {
             List<Template> allTemplates = templateDAO.getAllTemplates();
             List<Template> result = new ArrayList<>();
-            for ( Template template : allTemplates ) {
-                if ( template.getLxcArch().equalsIgnoreCase( lxcArch ) ) {
+            for ( Template template : allTemplates )
+            {
+                if ( template.getLxcArch().equalsIgnoreCase( lxcArch ) )
+                {
                     result.add( template );
                 }
             }
             return result;
         }
-        catch ( DBException ignored ) {
+        catch ( DBException ignored )
+        {
         }
 
         return Collections.emptyList();
@@ -440,21 +493,26 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      */
     @Override
     public synchronized void updateTemplateUsage( final String faiHostname, final String templateName,
-                                                  final boolean inUse ) throws RegistryException {
+                                                  final boolean inUse ) throws RegistryException
+    {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( faiHostname ), "FAI hostname is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
 
         Template template = getTemplate( templateName );
-        if ( template == null ) {
+        if ( template == null )
+        {
             throw new RegistryException( String.format( "Template %s not found", templateName ) );
         }
-        else {
+        else
+        {
             template.setInUseOnFAI( faiHostname, inUse );
-            try {
+            try
+            {
                 templateDAO.saveTemplate( template );
             }
-            catch ( DBException e ) {
+            catch ( DBException e )
+            {
                 throw new RegistryException( String.format( "Error saving template information, %s", e.getMessage() ) );
             }
         }
@@ -469,14 +527,17 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
      * @return true - in use, false - not in use
      */
     @Override
-    public boolean isTemplateInUse( String templateName ) throws RegistryException {
+    public boolean isTemplateInUse( String templateName ) throws RegistryException
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
 
         Template template = getTemplate( templateName );
-        if ( template == null ) {
+        if ( template == null )
+        {
             throw new RegistryException( String.format( "Template %s not found", templateName ) );
         }
-        else {
+        else
+        {
             return template.isInUseOnFAIs();
         }
     }

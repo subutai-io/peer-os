@@ -17,7 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-.v-accordion {
+.v-accordion
+{
     border: 1px solid #bebebe;
     border-radius: 2px;
     -webkit-border-radius: 2px;
@@ -25,11 +26,13 @@
     overflow: hidden;
 }
 
-.v-accordion-item {
+.v-accordion-item
+{
     background-color: #fff;
 }
 
-.v-accordion-item-caption {
+.v-accordion-item-caption
+{
     height: 19px;
     background: #e4e4e4 repeat-x;
     background-image: url(../tabsheet/img/tabbar-bg.png); /** sprite-ref: verticals; sprite-alignment: repeat */
@@ -39,33 +42,40 @@
     text-shadow: #fff 0 1px 0;
 }
 
-.v-accordion-item-first .v-accordion-item-caption {
+.v-accordion-item-first .v-accordion-item-caption
+{
     border-top: none;
 }
 
-.v-accordion-item-caption .v-caption {
+.v-accordion-item-caption .v-caption
+{
     padding: 3px 0 5px 10px;
 }
 
-.v-ie .v-accordion-item-caption .v-caption {
+.v-ie .v-accordion-item-caption .v-caption
+{
     padding: 2px 0 6px 10px;
 }
 
-.v-accordion-item-open .v-accordion-item-caption {
+.v-accordion-item-open .v-accordion-item-caption
+{
     background-image: url(../tabsheet/img/tabbar-bg-sel.png); /** sprite-ref: verticals; sprite-alignment: repeat */
     border-bottom: 1px solid #bbb;
 }
 
-.v-accordion-item-caption .v-icon {
+.v-accordion-item-caption .v-icon
+{
     margin-top: -1px;
 }
 
-.v-ie .v-accordion-item-caption .v-icon {
+.v-ie .v-accordion-item-caption .v-icon
+{
     vertical-align: top;
 }
 
 /* Borderless style */
-.v-accordion-borderless {
+.v-accordion-borderless
+{
     border: none;
     border-radius: 0;
     -webkit-border-radius: 0;

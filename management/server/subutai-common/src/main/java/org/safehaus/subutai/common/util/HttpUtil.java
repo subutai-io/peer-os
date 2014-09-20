@@ -30,13 +30,28 @@ import org.apache.http.util.EntityUtils;
 /**
  * @author daliev
  */
-public class HttpUtil {
+public class HttpUtil
+{
 
     public static final int RESPONSE_OK = 200;
     private static final Logger LOG = Logger.getLogger( HttpUtil.class.getName() );
 
 
-    private static String get( String url, Map<String, String> getParamss ) throws HTTPException {
+    public static String request( RequestType requestType, String url, Map<String, String> params ) throws HTTPException
+    {
+        if ( requestType == RequestType.GET )
+        {
+            return get( url, params );
+        }
+        else
+        {
+            return post( url, params );
+        }
+    }
+
+
+    private static String get( String url, Map<String, String> getParamss ) throws HTTPException
+    {
 
         HttpEntity entity = null;
         CloseableHttpResponse response = null;
@@ -145,7 +160,8 @@ public class HttpUtil {
     }
 
 
-    private static String post( String url, Map<String, String> postParams ) throws HTTPException {
+    private static String post( String url, Map<String, String> postParams ) throws HTTPException
+    {
         HttpEntity entity = null;
         CloseableHttpResponse response = null;
         try
@@ -201,20 +217,8 @@ public class HttpUtil {
     }
 
 
-    public static enum RequestType {
+    public static enum RequestType
+    {
         GET, POST
-    }
-
-
-    public static String request( RequestType requestType, String url, Map<String, String> params )
-            throws HTTPException {
-        if ( requestType == RequestType.GET )
-        {
-            return get( url, params );
-        }
-        else
-        {
-            return post( url, params );
-        }
     }
 }

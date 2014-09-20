@@ -8,11 +8,14 @@ import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 
-public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl> {
+public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
+{
 
     private String clusterName;
 
-    public StartClusterHandler( final CassandraImpl manager, final String clusterName ) {
+
+    public StartClusterHandler( final CassandraImpl manager, final String clusterName )
+    {
         super( manager, clusterName );
         this.clusterName = clusterName;
         productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
@@ -21,9 +24,11 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         CassandraClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        if ( config == null )
+        {
             productOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
@@ -31,10 +36,12 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
         Command startServiceCommand = Commands.getStartCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( startServiceCommand );
 
-        if ( startServiceCommand.hasSucceeded() ) {
+        if ( startServiceCommand.hasSucceeded() )
+        {
             productOperation.addLogDone( "Start succeeded" );
         }
-        else {
+        else
+        {
             productOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
         }
     }

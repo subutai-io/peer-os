@@ -28,10 +28,12 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class VerificationStep extends Panel {
+public class VerificationStep extends Panel
+{
 
     public VerificationStep( final Accumulo accumulo, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard ) {
+                             final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -51,18 +53,22 @@ public class VerificationStep extends Panel {
         cfgView.addStringCfg( "Hadoop cluster", wizard.getConfig().getHadoopClusterName() );
         cfgView.addStringCfg( "Zookeeper cluster", wizard.getConfig().getZookeeperClusterName() );
 
-        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ) {
+        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK )
+        {
             cfgView.addStringCfg( "Master node", wizard.getConfig().getMasterNode().getHostname() );
             cfgView.addStringCfg( "GC node", wizard.getConfig().getGcNode().getHostname() );
             cfgView.addStringCfg( "Monitor node", wizard.getConfig().getMonitor().getHostname() );
-            for ( Agent agent : wizard.getConfig().getTracers() ) {
+            for ( Agent agent : wizard.getConfig().getTracers() )
+            {
                 cfgView.addStringCfg( "Tracers", agent.getHostname() );
             }
-            for ( Agent agent : wizard.getConfig().getSlaves() ) {
+            for ( Agent agent : wizard.getConfig().getSlaves() )
+            {
                 cfgView.addStringCfg( "Slaves", agent.getHostname() );
             }
         }
-        else {
+        else
+        {
             cfgView.addStringCfg( "Number of Hadoop slaves",
                     wizard.getHadoopClusterConfig().getCountOfSlaveNodes() + "" );
             cfgView.addStringCfg( "Hadoop replication factor",
@@ -74,10 +80,12 @@ public class VerificationStep extends Panel {
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
 
                 UUID trackID = wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ?
                                accumulo.installCluster( wizard.getConfig() ) :
@@ -85,9 +93,11 @@ public class VerificationStep extends Panel {
                                        wizard.getZookeeperClusterConfig() );
                 ProgressWindow window =
                         new ProgressWindow( executorService, tracker, trackID, AccumuloClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -97,9 +107,11 @@ public class VerificationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.back();
             }
         } );

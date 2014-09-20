@@ -1,10 +1,10 @@
 package org.safehaus.subutai.common.util;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**

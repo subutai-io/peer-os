@@ -14,7 +14,8 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * Created by daralbaev on 02.04.14.
  */
-public class HadoopClusterConfig implements ConfigBase {
+public class HadoopClusterConfig implements ConfigBase
+{
     public static final String PRODUCT_KEY = "Hadoop";
 
     public static final int DEFAULT_HADOOP_MASTER_NODES_QUANTITY = 3;
@@ -29,7 +30,8 @@ public class HadoopClusterConfig implements ConfigBase {
     private Set<Agent> blockedAgents;
 
 
-    public HadoopClusterConfig() {
+    public HadoopClusterConfig()
+    {
         domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<>();
         taskTrackers = new ArrayList<>();
@@ -37,32 +39,40 @@ public class HadoopClusterConfig implements ConfigBase {
     }
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName( final String templateName )
+    {
         this.templateName = templateName;
     }
 
 
-    public List<Agent> getAllNodes() {
+    public List<Agent> getAllNodes()
+    {
         Set<Agent> allAgents = new HashSet<>();
-        if ( dataNodes != null ) {
+        if ( dataNodes != null )
+        {
             allAgents.addAll( dataNodes );
         }
-        if ( taskTrackers != null ) {
+        if ( taskTrackers != null )
+        {
             allAgents.addAll( taskTrackers );
         }
 
-        if ( nameNode != null ) {
+        if ( nameNode != null )
+        {
             allAgents.add( nameNode );
         }
-        if ( jobTracker != null ) {
+        if ( jobTracker != null )
+        {
             allAgents.add( jobTracker );
         }
-        if ( secondaryNameNode != null ) {
+        if ( secondaryNameNode != null )
+        {
             allAgents.add( secondaryNameNode );
         }
 
@@ -70,12 +80,15 @@ public class HadoopClusterConfig implements ConfigBase {
     }
 
 
-    public List<Agent> getAllSlaveNodes() {
+    public List<Agent> getAllSlaveNodes()
+    {
         Set<Agent> allAgents = new HashSet<>();
-        if ( dataNodes != null ) {
+        if ( dataNodes != null )
+        {
             allAgents.addAll( dataNodes );
         }
-        if ( taskTrackers != null ) {
+        if ( taskTrackers != null )
+        {
             allAgents.addAll( taskTrackers );
         }
 
@@ -83,131 +96,157 @@ public class HadoopClusterConfig implements ConfigBase {
     }
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public void setClusterName( String clusterName ) {
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
 
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_NAME;
     }
 
 
-    public String getDomainName() {
+    public String getDomainName()
+    {
         return domainName;
     }
 
 
-    public void setDomainName( String domainName ) {
+    public void setDomainName( String domainName )
+    {
         this.domainName = domainName;
     }
 
 
-    public Agent getNameNode() {
+    public Agent getNameNode()
+    {
         return nameNode;
     }
 
 
-    public void setNameNode( Agent nameNode ) {
+    public void setNameNode( Agent nameNode )
+    {
         this.nameNode = nameNode;
     }
 
 
-    public Agent getJobTracker() {
+    public Agent getJobTracker()
+    {
         return jobTracker;
     }
 
 
-    public void setJobTracker( Agent jobTracker ) {
+    public void setJobTracker( Agent jobTracker )
+    {
         this.jobTracker = jobTracker;
     }
 
 
-    public Agent getSecondaryNameNode() {
+    public Agent getSecondaryNameNode()
+    {
         return secondaryNameNode;
     }
 
 
-    public void setSecondaryNameNode( Agent secondaryNameNode ) {
+    public void setSecondaryNameNode( Agent secondaryNameNode )
+    {
         this.secondaryNameNode = secondaryNameNode;
     }
 
 
-    public List<Agent> getDataNodes() {
+    public List<Agent> getDataNodes()
+    {
         return dataNodes;
     }
 
 
-    public void setDataNodes( List<Agent> dataNodes ) {
+    public void setDataNodes( List<Agent> dataNodes )
+    {
         this.dataNodes = dataNodes;
     }
 
 
-    public List<Agent> getTaskTrackers() {
+    public List<Agent> getTaskTrackers()
+    {
         return taskTrackers;
     }
 
 
-    public void setTaskTrackers( List<Agent> taskTrackers ) {
+    public void setTaskTrackers( List<Agent> taskTrackers )
+    {
         this.taskTrackers = taskTrackers;
     }
 
 
-    public Integer getReplicationFactor() {
+    public Integer getReplicationFactor()
+    {
         return replicationFactor;
     }
 
 
-    public void setReplicationFactor( Integer replicationFactor ) {
+    public void setReplicationFactor( Integer replicationFactor )
+    {
         this.replicationFactor = replicationFactor;
     }
 
 
-    public Integer getCountOfSlaveNodes() {
+    public Integer getCountOfSlaveNodes()
+    {
         return countOfSlaveNodes;
     }
 
 
-    public void setCountOfSlaveNodes( Integer countOfSlaveNodes ) {
+    public void setCountOfSlaveNodes( Integer countOfSlaveNodes )
+    {
         this.countOfSlaveNodes = countOfSlaveNodes;
     }
 
 
-    public Set<Agent> getBlockedAgents() {
+    public Set<Agent> getBlockedAgents()
+    {
         return blockedAgents;
     }
 
 
-    public void setBlockedAgents( HashSet<Agent> blockedAgents ) {
+    public void setBlockedAgents( HashSet<Agent> blockedAgents )
+    {
         this.blockedAgents = blockedAgents;
     }
 
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return clusterName != null ? clusterName.hashCode() : 0;
     }
 
 
     @Override
-    public boolean equals( Object o ) {
-        if ( this == o ) {
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
             return true;
         }
-        if ( o == null || getClass() != o.getClass() ) {
+        if ( o == null || getClass() != o.getClass() )
+        {
             return false;
         }
 
         HadoopClusterConfig hadoopClusterConfig = ( HadoopClusterConfig ) o;
 
         if ( clusterName != null ? !clusterName.equals( hadoopClusterConfig.clusterName ) :
-             hadoopClusterConfig.clusterName != null ) {
+             hadoopClusterConfig.clusterName != null )
+        {
             return false;
         }
 
@@ -216,7 +255,8 @@ public class HadoopClusterConfig implements ConfigBase {
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Config{" +
                 "clusterName='" + clusterName + '\'' +
                 ", domainName='" + domainName + '\'' +
