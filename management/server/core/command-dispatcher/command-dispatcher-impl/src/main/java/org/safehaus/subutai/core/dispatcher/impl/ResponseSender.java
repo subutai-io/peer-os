@@ -32,6 +32,7 @@ public class ResponseSender
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
     private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
     private static final int RETRY_ATTEMPT_WIDENING_INTERVAL_SEC = 30;
+    private static final int SELECT_RECORDS_LIMIT = 50;
     private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
@@ -73,12 +74,33 @@ public class ResponseSender
     }
 
 
+    public void dispose()
+    {
+        mainLoopExecutor.shutdown();
+        httpRequestsExecutor.shutdown();
+    }
+
+
+    private int calculateOfAttempts()
+    {
+        int attempts = 0;
+        int inactivity_interval_sec = org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
+        while ( inactivity_interval_sec > 0 )
+        {
+            attempts++;
+            inactivity_interval_sec -= attempts * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC;
+        }
+        return attempts;
+    }
+
+
     private void send()
     {
 
         try
         {
-            Set<RemoteRequest> requests = dispatcherDAO.getRemoteRequests( 10, 20 );
+            Set<RemoteRequest> requests =
+                    dispatcherDAO.getRemoteRequests( calculateOfAttempts(), SELECT_RECORDS_LIMIT );
 
             if ( !requests.isEmpty() )
             {
@@ -93,16 +115,29 @@ public class ResponseSender
                         final Set<RemoteResponse> responses =
                                 dispatcherDAO.getRemoteResponses( request.getCommandId() );
 
-                        //if no responses arrived to this request, increment is attempts number
-                        if ( responses.isEmpty() && ( System.currentTimeMillis() - request.getTimestamp()
-                                > ( AGENT_CHUNK_SEND_INTERVAL_SEC + 5 ) * 1000 ) )
+                        if ( responses.isEmpty() )
                         {
-                            request.incrementAttempts();
-                            dispatcherDAO.saveRemoteRequest( request );
-                            //delete previous request (workaround until we change Cassandra to another DB)
-                            dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                            //delete request and responses after inactivity timeout reached
+                            if ( System.currentTimeMillis() - request.getTimestamp()
+                                    > org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC
+                                    * 1000 )
+                            {
+                                dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
+                                dispatcherDAO.deleteRemoteResponses( request.getCommandId() );
+                            }
+
+                            //if no responses arrived to this request within agent notification response interval,
+                            // increment its attempts' number
+                            else if ( ( System.currentTimeMillis() - request.getTimestamp()
+                                    > ( AGENT_CHUNK_SEND_INTERVAL_SEC + 5 ) * 1000 ) )
+                            {
+                                request.incrementAttempts();
+                                dispatcherDAO.saveRemoteRequest( request );
+                                //delete previous request (workaround until we change Cassandra to another DB)
+                                dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                            }
                         }
-                        else if ( !responses.isEmpty() )
+                        else
                         {
 
                             //add task to send responses
@@ -176,7 +211,7 @@ public class ResponseSender
                 //if final response was sent, delete request
                 if ( request.isCompleted() )
                 {
-                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
+                    dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
                 }
                 else
                 {
@@ -204,12 +239,5 @@ public class ResponseSender
         {
             LOG.log( Level.SEVERE, String.format( "Error in sendResponses: %s", e.getMessage() ) );
         }
-    }
-
-
-    public void dispose()
-    {
-        mainLoopExecutor.shutdown();
-        httpRequestsExecutor.shutdown();
     }
 }

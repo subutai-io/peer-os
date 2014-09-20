@@ -306,6 +306,11 @@ public class PeerManagerImpl implements PeerManager
         }
         if ( getPeerByUUID( peer.getId() ) != null )
         {
+
+            if ( peer.getId().compareTo( getSiteId() ) == 0 )
+            {
+                return true;
+            }
             try
             {
                 RestUtil.get( String.format( Common.PING_URL, peer.getIp() ), null );
@@ -333,6 +338,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( IllegalArgumentException e )
         {
+            LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
             throw new PeerException( e.getMessage() );
         }
     }
@@ -349,8 +355,7 @@ public class PeerManagerImpl implements PeerManager
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {
-                }.getType() );
+                {}.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {

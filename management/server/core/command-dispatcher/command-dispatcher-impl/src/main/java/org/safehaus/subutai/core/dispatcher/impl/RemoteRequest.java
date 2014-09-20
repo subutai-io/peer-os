@@ -29,7 +29,7 @@ public class RemoteRequest
         this.commandId = commandId;
         this.timestamp = System.currentTimeMillis();
         this.requestCount = requestsCount;
-        attempts = 0;
+        attempts = 1;
     }
 
 
