@@ -256,7 +256,7 @@ public class Manager
 
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
-
+        progressIcon.setVisible( false );
         controlsContent.addComponent( progressIcon );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -268,7 +268,6 @@ public class Manager
         for ( Agent agent : config.getNodes() )
         {
             progressIcon.setVisible( true );
-            disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                             new CompleteEvent()
@@ -278,7 +277,6 @@ public class Manager
                                 {
                                     synchronized ( progressIcon )
                                     {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
                                         checkAllNodes();
                                     }
                                 }
@@ -292,7 +290,6 @@ public class Manager
         for ( Agent agent : config.getNodes() )
         {
             progressIcon.setVisible( true );
-            disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute( new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                     new CompleteEvent()
                     {
@@ -301,7 +298,6 @@ public class Manager
                         {
                             synchronized ( progressIcon )
                             {
-                                disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();
                             }
                         }
@@ -349,28 +345,6 @@ public class Manager
                 }
             }
             return null;
-        }
-    }
-
-
-    public void disableOREnableAllButtonsOnTable( Table table, boolean value )
-    {
-        if ( table != null )
-        {
-            for ( Object o : table.getItemIds() )
-            {
-                int rowId = ( Integer ) o;
-                Item row = table.getItem( rowId );
-                HorizontalLayout availableOperationsLayout =
-                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-                if ( availableOperationsLayout != null )
-                {
-                    for ( Component component : availableOperationsLayout )
-                    {
-                        component.setEnabled( value );
-                    }
-                }
-            }
         }
     }
 
@@ -472,7 +446,6 @@ public class Manager
         {
             clusterCombo.setValue( config.iterator().next() );
         }
-        progressIcon.setVisible( false );
     }
 
 

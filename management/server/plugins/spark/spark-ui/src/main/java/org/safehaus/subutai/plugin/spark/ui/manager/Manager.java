@@ -183,7 +183,6 @@ public class Manager
                 else
                 {
                     progressIcon.setVisible( true );
-                    disableOREnableAllTopButtons( false );
                     disableOREnableAllButtonsOnTable( nodesTable, false );
                     executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
                             config.getMasterNode().getHostname(), new CompleteEvent()
@@ -195,7 +194,6 @@ public class Manager
                             {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodesStatus();
-                                disableOREnableAllTopButtons( true );
                             }
                         }
                     } ) );
@@ -217,7 +215,6 @@ public class Manager
                 else
                 {
                     progressIcon.setVisible( true );
-                    disableOREnableAllTopButtons( false );
                     disableOREnableAllButtonsOnTable( nodesTable, false );
                     executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
                             config.getMasterNode().getHostname(), new CompleteEvent()
@@ -229,7 +226,6 @@ public class Manager
                             {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodesStatus();
-                                disableOREnableAllTopButtons( true );
                             }
                         }
                     } ) );
@@ -337,21 +333,11 @@ public class Manager
         } );
 
         controlsContent.addComponent( addNodeBtn );
+        progressIcon.setVisible( false );
         controlsContent.addComponent( progressIcon );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
-    }
-
-
-    public void disableOREnableAllTopButtons( boolean value )
-    {
-        refreshClustersBtn.setEnabled( value );
-        startAllNodesBtn.setEnabled( value );
-        stopAllNodesBtn.setEnabled( value );
-        checkAllBtn.setEnabled( value );
-        destroyClusterBtn.setEnabled( value );
-        addNodeBtn.setEnabled( value );
     }
 
 

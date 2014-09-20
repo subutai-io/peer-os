@@ -253,7 +253,7 @@ public class Manager
         } );
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
-
+        progressIcon.setVisible( false );
         controlsContent.addComponent( progressIcon );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -627,7 +627,6 @@ public class Manager
                 clusterCombo.setValue( info.iterator().next() );
             }
         }
-        progressIcon.setVisible( false );
     }
 
 
