@@ -87,6 +87,14 @@ public class DispatcherDAO
     }
 
 
+    public void deleteRemoteResponses( UUID commandId ) throws DBException
+    {
+        Preconditions.checkNotNull( commandId, "Command id is null" );
+
+        dbManager.executeUpdate2( "delete from remote_responses where commandId = ?", commandId.toString() );
+    }
+
+
     public void deleteRemoteResponse( RemoteResponse remoteResponse ) throws DBException
     {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
@@ -127,6 +135,14 @@ public class DispatcherDAO
 
         dbManager.executeUpdate2( "delete from remote_requests where commandId = ? and attempts = ?",
                 commandId.toString(), attempts );
+    }
+
+
+    public void deleteRemoteRequest( UUID commandId ) throws DBException
+    {
+        Preconditions.checkNotNull( commandId, "Command id is null" );
+
+        dbManager.executeUpdate2( "delete from remote_requests where commandId = ?", commandId.toString() );
     }
 
 
