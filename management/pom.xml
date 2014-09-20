@@ -704,6 +704,19 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Peer command Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-command-dispatcher-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-command-dispatcher-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+
       <!-- Container Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>

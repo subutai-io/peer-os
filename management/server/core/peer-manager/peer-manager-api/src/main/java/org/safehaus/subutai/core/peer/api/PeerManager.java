@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
+import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
@@ -14,8 +15,7 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public interface PeerManager
-{
+public interface PeerManager {
 
     boolean register( Peer peer );
 
@@ -44,4 +44,6 @@ public interface PeerManager
     public Set<Agent> getConnectedAgents( Peer peer, String environmentId ) throws PeerException;
 
     public Set<Agent> createContainers( CreateContainersMessage ccm );
+
+    public boolean invoke( PeerCommand peerCommand ) throws PeerException;
 }

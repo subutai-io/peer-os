@@ -8,8 +8,7 @@ import java.util.UUID;
  * Created by bahadyr on 9/6/14.
  */
 //@XmlRootElement(name = "Peer")
-public class Peer
-{
+public class Peer {
 
     private String name;
     private String ip;

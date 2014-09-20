@@ -37,5 +37,6 @@
     <module>pet_core</module>
     <module>peer-manager</module>
     <module>command-dispatcher</module>
+    <module>peer-command-dispatcher</module>
   </modules>
 </project>
