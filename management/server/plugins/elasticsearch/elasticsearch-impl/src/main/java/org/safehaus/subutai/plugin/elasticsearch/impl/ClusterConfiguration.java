@@ -1,13 +1,9 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.common.exception.*;
-import org.safehaus.subutai.common.tracker.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 public class ClusterConfiguration {
@@ -41,14 +37,6 @@ public class ClusterConfiguration {
 
         // Setting master nodes
         po.addLog( "Setting master nodes..." );
-        Set<Agent > masterNodes = new HashSet();
-        for (Agent agent : elasticsearchClusterConfiguration.getNodes()) {
-            masterNodes.add(agent);
-            if (masterNodes.size() == elasticsearchClusterConfiguration.getNumberOfMasterNodes()) {
-                break;
-            }
-        }
-        elasticsearchClusterConfiguration.setMasterNodes(masterNodes);
         Command setMasterNodesCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getMasterNodes(), "node.master true" );
         manager.getCommandRunner().runCommand( setMasterNodesCommand );
 
@@ -61,14 +49,6 @@ public class ClusterConfiguration {
 
         // Setting data nodes
         po.addLog( "Setting data nodes..." );
-        for (Agent agent : elasticsearchClusterConfiguration.getNodes()) {
-            elasticsearchClusterConfiguration.getDataNodes().add(agent);
-            if ( elasticsearchClusterConfiguration.getDataNodes().size() == elasticsearchClusterConfiguration.getNumberOfDataNodes() ) {
-                break;
-            }
-        }
-        elasticsearchClusterConfiguration.setMasterNodes( elasticsearchClusterConfiguration.getNodes() );
-
         Command dataNodesCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getDataNodes(), "node.data true" );
         manager.getCommandRunner().runCommand( dataNodesCommand );
 

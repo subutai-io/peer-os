@@ -592,6 +592,7 @@ public class Manager {
         }
     }
 
+
     /**
      * @param agent agent
      *
@@ -640,8 +641,6 @@ public class Manager {
     }
 
 
-
-
     public void startAllNodes() {
         for( Agent agent : config.getAllNodes() ) {
             progressIcon.setVisible( true );
@@ -657,29 +656,6 @@ public class Manager {
                         }
                     } ) );
         }
-
-
-//        if ( nodesTable != null ) {
-//            for ( Object o : nodesTable.getItemIds() ) {
-//                int rowId = ( Integer ) o;
-//                Item row = nodesTable.getItem( rowId );
-//                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-//                if ( availableOperationsLayout != null ) {
-//                    Button startBtn = getButton( availableOperationsLayout, START_BUTTON_CAPTION );
-//                    if ( startBtn != null ) {
-//                        startBtn.click();
-//                    }
-//                }
-//            }
-//        }
-
-
-//        for ( Object o : nodesTable.getItemIds() ) {
-//            int rowId = ( Integer ) o;
-//            Item row = nodesTable.getItem( rowId );
-//            Button checkBtn = ( Button ) ( row.getItemProperty( "Start" ).getValue() );
-//            checkBtn.click();
-//        }
     }
 
 
@@ -698,27 +674,6 @@ public class Manager {
                         }
                     } ) );
         }
-
-
-//        if ( nodesTable != null ) {
-//            for ( Object o : nodesTable.getItemIds() ) {
-//                int rowId = ( Integer ) o;
-//                Item row = nodesTable.getItem( rowId );
-//                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-//                if ( availableOperationsLayout != null ) {
-//                    Button stopBtn = getButton( availableOperationsLayout, STOP_BUTTON_CAPTION );
-//                    if ( stopBtn != null ) {
-//                        stopBtn.click();
-//                    }
-//                }
-//            }
-//        }
-//        for ( Object o : nodesTable.getItemIds() ) {
-//            int rowId = ( Integer ) o;
-//            Item row = nodesTable.getItem( rowId );
-//            Button checkBtn = ( Button ) ( row.getItemProperty( "Stop" ).getValue() );
-//            checkBtn.click();
-//        }
     }
 
 

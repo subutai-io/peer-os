@@ -1,17 +1,15 @@
 package org.safehaus.subutai.plugin.cassandra.ui;
 
 
-import java.util.concurrent.ExecutorService;
-
-import javax.naming.NamingException;
-
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.cassandra.ui.manager.Manager;
 import org.safehaus.subutai.plugin.cassandra.ui.wizard.Wizard;
+
+import javax.naming.NamingException;
+import java.util.concurrent.ExecutorService;
 
 public class CassandraForm extends CustomComponent {
 
@@ -44,9 +42,6 @@ public class CassandraForm extends CustomComponent {
             }
         } );
         verticalLayout.addComponent( sheet );
-        verticalLayout.addComponent( sheet );
-        verticalLayout.addComponent( sheet );
-
         manager.refreshClustersInfo();
     }
 }

@@ -1,16 +1,14 @@
 package org.safehaus.subutai.plugin.elasticsearch.ui;
 
-import java.util.concurrent.ExecutorService;
-
-import javax.naming.NamingException;
-
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.elasticsearch.ui.manager.*;
-import org.safehaus.subutai.plugin.elasticsearch.ui.wizard.*;
+import org.safehaus.subutai.plugin.elasticsearch.ui.manager.Manager;
+import org.safehaus.subutai.plugin.elasticsearch.ui.wizard.Wizard;
+
+import javax.naming.NamingException;
+import java.util.concurrent.ExecutorService;
 
 public class ElasticsearchForm extends CustomComponent {
 
@@ -43,7 +41,6 @@ public class ElasticsearchForm extends CustomComponent {
             }
         } );
         verticalLayout.addComponent( sheet );
-
 		manager.refreshClustersInfo();
 	}
 }

@@ -100,19 +100,28 @@ public class ElasticsearchClusterConfiguration implements ConfigBase {
 	  }
 
 
+    public void setNodes( Set<Agent> nodes ) {
+        this.nodes = nodes;
+    }
+
+
     public Set<Agent> getMasterNodes() {
         return masterNodes;
     }
 
 
-    public void setMasterNodes(Set<Agent> seedNodes) {
-		    this.masterNodes = seedNodes;
+    public void setMasterNodes(Set<Agent> nodes ) {
+		    this.masterNodes = nodes;
 	  }
 
 
     public Set<Agent> getDataNodes() {
 		    return dataNodes;
 	  }
+
+    public void setDataNodes(Set<Agent> nodes) {
+        this.dataNodes = nodes;
+    }
 
 
     public static String getTemplateName() {

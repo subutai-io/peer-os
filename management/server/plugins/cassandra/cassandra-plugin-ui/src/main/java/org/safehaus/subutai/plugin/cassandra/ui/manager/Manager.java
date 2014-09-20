@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Pattern;
 
 
 public class Manager
@@ -49,7 +48,6 @@ public class Manager
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private CassandraClusterConfig config;
-    private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
     private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String message = "No cluster is installed !";
 
