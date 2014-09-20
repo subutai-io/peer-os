@@ -20,7 +20,8 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private final VerticalLayout vlayout;
     private int step = 1;
@@ -28,7 +29,8 @@ public class Wizard {
     private OozieUI oozieUI;
 
 
-    public Wizard( OozieUI oozieUI ) {
+    public Wizard( OozieUI oozieUI )
+    {
         this.oozieUI = oozieUI;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
@@ -37,26 +39,33 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         vlayout.removeAllComponents();
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 vlayout.addComponent( new StepStart( this ) );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 vlayout.addComponent( new ConfigurationStep( this ) );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 vlayout.addComponent( new StepSetConfig( this ) );
                 break;
             }
-            case 4: {
+            case 4:
+            {
                 vlayout.addComponent( new VerificationStep( this ) );
                 break;
             }
-            default: {
+            default:
+            {
                 step = 1;
                 vlayout.addComponent( new StepStart( this ) );
                 break;
@@ -65,47 +74,55 @@ public class Wizard {
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return vlayout;
     }
 
 
-    public void next() {
+    public void next()
+    {
         step++;
         putForm();
     }
 
 
-    public void back() {
+    public void back()
+    {
         step--;
         putForm();
     }
 
 
-    public void cancel() {
+    public void cancel()
+    {
         step = 1;
         putForm();
     }
 
 
-    public void init() {
+    public void init()
+    {
         step = 1;
         config = new OozieClusterConfig();
         putForm();
     }
 
 
-    public OozieClusterConfig getConfig() {
+    public OozieClusterConfig getConfig()
+    {
         return config;
     }
 
 
-    public OozieUI getOozieUI() {
+    public OozieUI getOozieUI()
+    {
         return oozieUI;
     }
 
 
-    public void setOozieUI( final OozieUI oozieUI ) {
+    public void setOozieUI( final OozieUI oozieUI )
+    {
         this.oozieUI = oozieUI;
     }
 }

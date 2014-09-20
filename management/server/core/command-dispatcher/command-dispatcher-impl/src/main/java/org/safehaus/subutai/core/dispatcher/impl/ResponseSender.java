@@ -25,7 +25,8 @@ import com.google.gson.JsonSyntaxException;
 /**
  * Sends responses produced by remote requests back to owner
  */
-public class ResponseSender {
+public class ResponseSender
+{
     private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
@@ -37,17 +38,21 @@ public class ResponseSender {
     private final PeerManager peerManager;
 
 
-    public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager ) {
+    public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager )
+    {
 
         this.dispatcherDAO = dispatcherDAO;
         this.peerManager = peerManager;
     }
 
 
-    public void init() {
-        mainLoopExecutor.submit( new Runnable() {
+    public void init()
+    {
+        mainLoopExecutor.submit( new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
 
                 while ( !Thread.interrupted() )
                 {
@@ -68,13 +73,8 @@ public class ResponseSender {
     }
 
 
-    public void dispose() {
-        mainLoopExecutor.shutdown();
-        httpRequestsExecutor.shutdown();
-    }
-
-
-    private void send() {
+    private void send()
+    {
 
         try
         {
@@ -106,9 +106,11 @@ public class ResponseSender {
                         {
 
                             //add task to send responses
-                            todo.add( Executors.callable( new Runnable() {
+                            todo.add( Executors.callable( new Runnable()
+                            {
                                 @Override
-                                public void run() {
+                                public void run()
+                                {
                                     sendResponses( request, responses );
                                 }
                             } ) );
@@ -133,13 +135,16 @@ public class ResponseSender {
     }
 
 
-    private void sendResponses( RemoteRequest request, Set<RemoteResponse> responses ) {
+    private void sendResponses( RemoteRequest request, Set<RemoteResponse> responses )
+    {
         try
         {
             //sort responses by responseNumber
-            Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
+            Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>()
+            {
                 @Override
-                public int compare( final Response o1, final Response o2 ) {
+                public int compare( final Response o1, final Response o2 )
+                {
                     int compareAgents = o1.getUuid().compareTo( o2.getUuid() );
                     return compareAgents == 0 ?
                            o1.getResponseSequenceNumber().compareTo( o2.getResponseSequenceNumber() ) : compareAgents;
@@ -199,5 +204,12 @@ public class ResponseSender {
         {
             LOG.log( Level.SEVERE, String.format( "Error in sendResponses: %s", e.getMessage() ) );
         }
+    }
+
+
+    public void dispose()
+    {
+        mainLoopExecutor.shutdown();
+        httpRequestsExecutor.shutdown();
     }
 }

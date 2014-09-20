@@ -9,28 +9,33 @@ import org.safehaus.subutai.pet.api.PetManager;
  * Created by bahadyr on 5/6/14.
  */
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
 
-    private PetManager petManager;
     private static final String MSG_RESPONSE = "MSG_RESPONSE";
+    private PetManager petManager;
 
 
-    public PetManager getPetManager() {
+    public RestServiceImpl()
+    {
+    }
+
+
+    public PetManager getPetManager()
+    {
         return petManager;
     }
 
 
-    public void setPetManager( final PetManager petManager ) {
+    public void setPetManager( final PetManager petManager )
+    {
         this.petManager = petManager;
     }
 
 
-    public RestServiceImpl() {
-    }
-
-
     @Override
-    public String welcome( String name ) {
+    public String welcome( String name )
+    {
 
         String hello = petManager.helloPet( name );
         return JsonUtil.toJson( MSG_RESPONSE, hello );
@@ -38,7 +43,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public void somePost() {
+    public void somePost()
+    {
 
     }
 }

@@ -31,11 +31,13 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends Panel
+{
     private final Hadoop hadoop;
 
 
-    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard ) {
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
+    {
 
         this.hadoop = hadoop;
         setSizeFull();
@@ -47,10 +49,12 @@ public class ConfigurationStep extends Panel {
 
         TextField nameTxt = new TextField( "Cluster name" );
         nameTxt.setRequired( true );
-        nameTxt.addValueChangeListener( new Property.ValueChangeListener() {
+        nameTxt.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent e ) {
+            public void valueChange( Property.ValueChangeEvent e )
+            {
                 wizard.getConfig().setClusterName( e.getProperty().getValue().toString().trim() );
             }
         } );
@@ -58,18 +62,22 @@ public class ConfigurationStep extends Panel {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 nextClickHandler( wizard );
             }
         } );
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -84,10 +92,12 @@ public class ConfigurationStep extends Panel {
         buttons.addComponent( next );
 
         content.addComponent( nameTxt );
-        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP ) {
+        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
+        {
             addOverHadoopComponents( content, wizard.getConfig() );
         }
-        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
+        {
             addWithHadoopComponents( content, wizard.getConfig(), wizard.getHadoopConfig() );
         }
         content.addComponent( buttons );
@@ -96,7 +106,8 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private void addOverHadoopComponents( ComponentContainer parent, final SparkClusterConfig config ) {
+    private void addOverHadoopComponents( ComponentContainer parent, final SparkClusterConfig config )
+    {
         final ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
         final ComboBox masterNodeCombo = new ComboBox( "Master node" );
         final TwinColSelect slaveNodesSelect = new TwinColSelect( "Slave nodes", new ArrayList<Agent>() );
@@ -122,51 +133,63 @@ public class ConfigurationStep extends Panel {
 
         List<HadoopClusterConfig> clusters = hadoop.getClusters();
 
-        if ( clusters.size() > 0 ) {
-            for ( HadoopClusterConfig hadoopClusterInfo : clusters ) {
+        if ( clusters.size() > 0 )
+        {
+            for ( HadoopClusterConfig hadoopClusterInfo : clusters )
+            {
                 hadoopClustersCombo.addItem( hadoopClusterInfo );
                 hadoopClustersCombo.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
             }
         }
 
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) ) {
-            if ( clusters.size() > 0 ) {
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) )
+        {
+            if ( clusters.size() > 0 )
+            {
                 hadoopClustersCombo.setValue( clusters.iterator().next() );
             }
         }
-        else {
+        else
+        {
             HadoopClusterConfig info = hadoop.getCluster( config.getClusterName() );
             if ( info != null )
             //restore cluster
             {
                 hadoopClustersCombo.setValue( info );
             }
-            else if ( clusters.size() > 0 ) {
+            else if ( clusters.size() > 0 )
+            {
                 hadoopClustersCombo.setValue( clusters.iterator().next() );
             }
         }
 
-        if ( hadoopClustersCombo.getValue() != null ) {
+        if ( hadoopClustersCombo.getValue() != null )
+        {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
             config.setHadoopClusterName( hadoopInfo.getClusterName() );
             slaveNodesSelect.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-            for ( Agent agent : hadoopInfo.getAllNodes() ) {
+            for ( Agent agent : hadoopInfo.getAllNodes() )
+            {
                 masterNodeCombo.addItem( agent );
                 masterNodeCombo.setItemCaption( agent, agent.getHostname() );
             }
         }
 
-        hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     slaveNodesSelect.setValue( null );
                     slaveNodesSelect
                             .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
                     masterNodeCombo.setValue( null );
                     masterNodeCombo.removeAllItems();
-                    for ( Agent agent : hadoopInfo.getAllNodes() ) {
+                    for ( Agent agent : hadoopInfo.getAllNodes() )
+                    {
                         masterNodeCombo.addItem( agent );
                         masterNodeCombo.setItemCaption( agent, agent.getHostname() );
                     }
@@ -177,51 +200,63 @@ public class ConfigurationStep extends Panel {
             }
         } );
 
-        masterNodeCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        masterNodeCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     Agent master = ( Agent ) event.getProperty().getValue();
                     config.setMasterNode( master );
 
                     //fill slave nodes without newly selected master node
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
-                    if ( config.getSlaveNodes() != null && !config.getSlaveNodes().isEmpty() ) {
+                    if ( config.getSlaveNodes() != null && !config.getSlaveNodes().isEmpty() )
+                    {
                         config.getSlaveNodes().remove( master );
                     }
                     List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.remove( master );
                     slaveNodesSelect.getContainerDataSource().removeAllItems();
-                    for ( Agent agent : hadoopNodes ) {
+                    for ( Agent agent : hadoopNodes )
+                    {
                         slaveNodesSelect.getContainerDataSource().addItem( agent );
                     }
 
                     Collection ls = slaveNodesSelect.getListeners( Property.ValueChangeListener.class );
                     Property.ValueChangeListener h =
                             ls.isEmpty() ? null : ( Property.ValueChangeListener ) ls.iterator().next();
-                    if ( h != null ) {
+                    if ( h != null )
+                    {
                         slaveNodesSelect.removeValueChangeListener( h );
                     }
                     slaveNodesSelect.setValue( config.getSlaveNodes() );
-                    if ( h != null ) {
+                    if ( h != null )
+                    {
                         slaveNodesSelect.addValueChangeListener( h );
                     }
                 }
             }
         } );
 
-        if ( config.getMasterNode() != null ) {
+        if ( config.getMasterNode() != null )
+        {
             masterNodeCombo.setValue( config.getMasterNode() );
         }
 
-        if ( !CollectionUtil.isCollectionEmpty( config.getSlaveNodes() ) ) {
+        if ( !CollectionUtil.isCollectionEmpty( config.getSlaveNodes() ) )
+        {
             slaveNodesSelect.setValue( config.getSlaveNodes() );
         }
 
-        slaveNodesSelect.addValueChangeListener( new Property.ValueChangeListener() {
+        slaveNodesSelect.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
                     config.setSlaveNodes( agentList );
                 }
@@ -235,19 +270,23 @@ public class ConfigurationStep extends Panel {
 
 
     private void addWithHadoopComponents( ComponentContainer parent, final SparkClusterConfig config,
-                                          final HadoopClusterConfig hadoopConfig ) {
+                                          final HadoopClusterConfig hadoopConfig )
+    {
 
         Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
 
         final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
         txtHadoopClusterName.setRequired( true );
         txtHadoopClusterName.setMaxLength( 20 );
-        if ( hadoopConfig.getClusterName() != null ) {
+        if ( hadoopConfig.getClusterName() != null )
+        {
             txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
         }
-        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener() {
+        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String name = event.getProperty().getValue().toString().trim();
                 config.setHadoopClusterName( name );
                 hadoopConfig.setClusterName( name );
@@ -259,9 +298,11 @@ public class ConfigurationStep extends Panel {
         cmbSlaveNodes.setTextInputAllowed( false );
         cmbSlaveNodes.setNullSelectionAllowed( false );
         cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
-        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener() {
+        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -271,9 +312,11 @@ public class ConfigurationStep extends Panel {
         cmbReplFactor.setTextInputAllowed( false );
         cmbReplFactor.setNullSelectionAllowed( false );
         cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
-        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener() {
+        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -282,11 +325,14 @@ public class ConfigurationStep extends Panel {
         txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
         txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
         txtHadoopDomain.setMaxLength( 20 );
-        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener() {
+        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String val = event.getProperty().getValue().toString().trim();
-                if ( !val.isEmpty() ) {
+                if ( !val.isEmpty() )
+                {
                     hadoopConfig.setDomainName( val );
                 }
             }
@@ -300,52 +346,67 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private void nextClickHandler( Wizard wizard ) {
+    private void nextClickHandler( Wizard wizard )
+    {
         SparkClusterConfig config = wizard.getConfig();
-        if ( config.getClusterName() == null || config.getClusterName().isEmpty() ) {
+        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+        {
             show( "Enter cluster name" );
             return;
         }
 
-        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
-            if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) ) {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
+            if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) )
+            {
                 show( "Please, select Hadoop cluster" );
             }
-            else if ( config.getMasterNode() == null ) {
+            else if ( config.getMasterNode() == null )
+            {
                 show( "Please, select master node" );
             }
-            else if ( CollectionUtil.isCollectionEmpty( config.getSlaveNodes() ) ) {
+            else if ( CollectionUtil.isCollectionEmpty( config.getSlaveNodes() ) )
+            {
                 show( "Please, select slave node(s)" );
             }
-            else {
+            else
+            {
                 wizard.next();
             }
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() ) {
+            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() )
+            {
                 show( "Enter Hadoop cluster name" );
             }
-            else if ( hc.getCountOfSlaveNodes() <= 0 ) {
+            else if ( hc.getCountOfSlaveNodes() <= 0 )
+            {
                 show( "Invalid number of Hadoop slave nodes" );
             }
-            else if ( hc.getReplicationFactor() <= 0 ) {
+            else if ( hc.getReplicationFactor() <= 0 )
+            {
                 show( "Invalid replication factor" );
             }
-            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() ) {
+            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() )
+            {
                 show( "Enter Hadoop domain name" );
             }
-            else {
+            else
+            {
                 wizard.next();
             }
         }
-        else {
+        else
+        {
             show( "Installation type not supported" );
         }
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

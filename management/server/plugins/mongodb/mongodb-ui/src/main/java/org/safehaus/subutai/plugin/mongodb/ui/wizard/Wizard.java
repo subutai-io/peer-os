@@ -22,17 +22,19 @@ import com.vaadin.ui.GridLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private final GridLayout grid;
-    private int step = 1;
-    private MongoClusterConfig mongoClusterConfig = new MongoClusterConfig();
     private final Mongo mongo;
     private final Tracker tracker;
     private final ExecutorService executorService;
+    private int step = 1;
+    private MongoClusterConfig mongoClusterConfig = new MongoClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         this.executorService = executorService;
         this.mongo = serviceLocator.getService( Mongo.class );
         this.tracker = serviceLocator.getService( Tracker.class );
@@ -44,58 +46,70 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         grid.removeComponent( 0, 1 );
         Component component = null;
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 component = new WelcomeStep( this );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 component = new ConfigurationStep( this );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 component = new VerificationStep( mongo, executorService, tracker, this );
                 break;
             }
-            default: {
+            default:
+            {
                 break;
             }
         }
 
-        if ( component != null ) {
+        if ( component != null )
+        {
             grid.addComponent( component, 0, 1, 0, 19 );
         }
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         mongoClusterConfig = new MongoClusterConfig();
         putForm();
     }
 
 
-    public MongoClusterConfig getMongoClusterConfig() {
+    public MongoClusterConfig getMongoClusterConfig()
+    {
         return mongoClusterConfig;
     }
 }

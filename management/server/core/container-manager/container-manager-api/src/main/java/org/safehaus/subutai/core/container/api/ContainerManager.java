@@ -15,7 +15,8 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
 /**
  * Created by timur on 9/4/14.
  */
-public interface ContainerManager {
+public interface ContainerManager
+{
 
     /**
      * Returns all registered containers.

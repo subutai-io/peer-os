@@ -26,11 +26,13 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class NodeSelectionStep extends VerticalLayout {
+public class NodeSelectionStep extends VerticalLayout
+{
     private final Hadoop hadoop;
 
 
-    public NodeSelectionStep( final Hadoop hadoop, final Wizard wizard ) {
+    public NodeSelectionStep( final Hadoop hadoop, final Wizard wizard )
+    {
 
         this.hadoop = hadoop;
 
@@ -48,12 +50,15 @@ public class NodeSelectionStep extends VerticalLayout {
 
         TextField txtClusterName = new TextField( "Sqoop installation name: " );
         txtClusterName.setRequired( true );
-        txtClusterName.addValueChangeListener( new Property.ValueChangeListener() {
+        txtClusterName.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 Object v = event.getProperty().getValue();
-                if ( v != null ) {
+                if ( v != null )
+                {
                     wizard.getConfig().setClusterName( v.toString().trim() );
                 }
             }
@@ -63,28 +68,34 @@ public class NodeSelectionStep extends VerticalLayout {
         content.addComponent( txtClusterName );
 
         SetupType st = wizard.getConfig().getSetupType();
-        if ( st == SetupType.OVER_HADOOP ) {
+        if ( st == SetupType.OVER_HADOOP )
+        {
             addOverHadoopControls( content, wizard.getConfig() );
         }
-        else if ( st == SetupType.WITH_HADOOP ) {
+        else if ( st == SetupType.WITH_HADOOP )
+        {
             addWithHadoopControls( content, wizard.getConfig(), wizard.getHadoopConfig() );
         }
 
         // --- buttons ---
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 nextButtonClickHandler( wizard );
             }
         } );
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -99,7 +110,8 @@ public class NodeSelectionStep extends VerticalLayout {
     }
 
 
-    private void addOverHadoopControls( ComponentContainer parent, final SqoopConfig config ) {
+    private void addOverHadoopControls( ComponentContainer parent, final SqoopConfig config )
+    {
         final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
@@ -107,10 +119,13 @@ public class NodeSelectionStep extends VerticalLayout {
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
-        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener() {
+        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
@@ -121,21 +136,26 @@ public class NodeSelectionStep extends VerticalLayout {
 
         Hadoop hadoopManager = hadoop;
         List<HadoopClusterConfig> clusters = hadoopManager.getClusters();
-        if ( clusters != null ) {
-            for ( HadoopClusterConfig hadoopClusterInfo : clusters ) {
+        if ( clusters != null )
+        {
+            for ( HadoopClusterConfig hadoopClusterInfo : clusters )
+            {
                 hadoopClusters.addItem( hadoopClusterInfo );
                 hadoopClusters.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
             }
         }
 
         String hcn = config.getHadoopClusterName();
-        if ( hcn != null && !hcn.isEmpty() ) {
+        if ( hcn != null && !hcn.isEmpty() )
+        {
             HadoopClusterConfig info = hadoopManager.getCluster( hcn );
-            if ( info != null ) {
+            if ( info != null )
+            {
                 hadoopClusters.setValue( info );
             }
         }
-        else if ( clusters != null && clusters.size() > 0 ) {
+        else if ( clusters != null && clusters.size() > 0 )
+        {
             hadoopClusters.setValue( clusters.iterator().next() );
         }
 
@@ -147,14 +167,18 @@ public class NodeSelectionStep extends VerticalLayout {
         select.setRightColumnCaption( "Selected Nodes" );
         select.setWidth( 100, Unit.PERCENTAGE );
         select.setRequired( true );
-        if ( config.getNodes() != null && !config.getNodes().isEmpty() ) {
+        if ( config.getNodes() != null && !config.getNodes().isEmpty() )
+        {
             select.setValue( config.getNodes() );
         }
-        select.addValueChangeListener( new Property.ValueChangeListener() {
+        select.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 config.getNodes().clear();
-                if ( event.getProperty().getValue() != null ) {
+                if ( event.getProperty().getValue() != null )
+                {
                     Collection agentList = ( Collection ) event.getProperty().getValue();
                     config.getNodes().addAll( agentList );
                 }
@@ -167,19 +191,23 @@ public class NodeSelectionStep extends VerticalLayout {
 
 
     private void addWithHadoopControls( ComponentContainer content, final SqoopConfig config,
-                                        final HadoopClusterConfig hadoopConfig ) {
+                                        final HadoopClusterConfig hadoopConfig )
+    {
 
         Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
 
         final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
         txtHadoopClusterName.setRequired( true );
         txtHadoopClusterName.setMaxLength( 20 );
-        if ( hadoopConfig.getClusterName() != null ) {
+        if ( hadoopConfig.getClusterName() != null )
+        {
             txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
         }
-        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener() {
+        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String name = event.getProperty().getValue().toString().trim();
                 config.setHadoopClusterName( name );
                 hadoopConfig.setClusterName( name );
@@ -191,9 +219,11 @@ public class NodeSelectionStep extends VerticalLayout {
         cmbSlaveNodes.setTextInputAllowed( false );
         cmbSlaveNodes.setNullSelectionAllowed( false );
         cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
-        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener() {
+        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -203,9 +233,11 @@ public class NodeSelectionStep extends VerticalLayout {
         cmbReplFactor.setTextInputAllowed( false );
         cmbReplFactor.setNullSelectionAllowed( false );
         cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
-        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener() {
+        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -214,11 +246,14 @@ public class NodeSelectionStep extends VerticalLayout {
         txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
         txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
         txtHadoopDomain.setMaxLength( 20 );
-        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener() {
+        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String val = event.getProperty().getValue().toString().trim();
-                if ( !val.isEmpty() ) {
+                if ( !val.isEmpty() )
+                {
                     hadoopConfig.setDomainName( val );
                 }
             }
@@ -232,49 +267,63 @@ public class NodeSelectionStep extends VerticalLayout {
     }
 
 
-    private void nextButtonClickHandler( Wizard wizard ) {
+    private void nextButtonClickHandler( Wizard wizard )
+    {
         SqoopConfig config = wizard.getConfig();
-        if ( config.getClusterName() == null || config.getClusterName().isEmpty() ) {
+        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+        {
             show( "Enter installation name" );
             return;
         }
-        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
             String name = config.getHadoopClusterName();
-            if ( name == null || name.isEmpty() ) {
+            if ( name == null || name.isEmpty() )
+            {
                 show( "Select Hadoop cluster" );
             }
-            else if ( config.getNodes() == null || config.getNodes().isEmpty() ) {
+            else if ( config.getNodes() == null || config.getNodes().isEmpty() )
+            {
                 show( "Select target nodes" );
             }
-            else {
+            else
+            {
                 wizard.next();
             }
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() ) {
+            if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() )
+            {
                 show( "Enter Hadoop cluster name" );
             }
-            else if ( hc.getCountOfSlaveNodes() <= 0 ) {
+            else if ( hc.getCountOfSlaveNodes() <= 0 )
+            {
                 show( "Invalid number of Hadoop slave nodes" );
             }
-            else if ( hc.getReplicationFactor() <= 0 ) {
+            else if ( hc.getReplicationFactor() <= 0 )
+            {
                 show( "Invalid replication factor" );
             }
-            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() ) {
+            else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() )
+            {
                 show( "Enter Hadoop domain name" );
             }
-            else {
+            else
+            {
                 wizard.next();
             }
         }
-        else {
+        else
+        {
             show( "Installation type not supported" );
         }
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

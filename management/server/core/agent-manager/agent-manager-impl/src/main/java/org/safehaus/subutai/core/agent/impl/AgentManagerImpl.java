@@ -41,7 +41,8 @@ import com.google.common.cache.CacheBuilder;
 /**
  * Implementation of Agent Manager Interface
  */
-public class AgentManagerImpl implements ResponseListener, AgentManager {
+public class AgentManagerImpl implements ResponseListener, AgentManager
+{
 
     private static final Logger LOG = Logger.getLogger( AgentManagerImpl.class.getName() );
     /**
@@ -289,7 +290,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Initialized agent manager
      */
-    public void init() {
+    public void init()
+    {
         try
         {
 
@@ -302,7 +304,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             communicationService.addListener( this );
 
             exec = Executors.newSingleThreadExecutor();
-            exec.execute( new Runnable() {
+            exec.execute( new Runnable()
+            {
 
                 public void run()
                 {
@@ -454,7 +457,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Removes agent from the cache of connected agents
      */
-    private void removeAgent( Response response ) {
+    private void removeAgent( Response response )
+    {
         try
         {
             if ( response != null && response.getTransportId() != null )

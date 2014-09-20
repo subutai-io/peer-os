@@ -21,24 +21,24 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="vaadin-portal" version="2.5">
-    <display-name>Vaadin Web Application</display-name>
-    <context-param>
-        <description>Vaadin production mode</description>
-        <param-name>productionMode</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    <servlet>
-        <servlet-name>Portal Vaadin App</servlet-name>
-        <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
-        <init-param>
-            <description>Vaadin UI</description>
-            <param-name>UI</param-name>
-            <param-value>org.safehaus.subutai.server.ui.MainUI</param-value>
-        </init-param>
-        <async-supported>true</async-supported>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Portal Vaadin App</servlet-name>
-        <url-pattern>/*</url-pattern>
-    </servlet-mapping>
+  <display-name>Vaadin Web Application</display-name>
+  <context-param>
+    <description>Vaadin production mode</description>
+    <param-name>productionMode</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  <servlet>
+    <servlet-name>Portal Vaadin App</servlet-name>
+    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+    <init-param>
+      <description>Vaadin UI</description>
+      <param-name>UI</param-name>
+      <param-value>org.safehaus.subutai.server.ui.MainUI</param-value>
+    </init-param>
+    <async-supported>true</async-supported>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Portal Vaadin App</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
 </web-app>

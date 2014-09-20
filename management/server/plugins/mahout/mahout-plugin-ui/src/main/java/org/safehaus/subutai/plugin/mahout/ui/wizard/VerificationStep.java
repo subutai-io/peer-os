@@ -24,9 +24,11 @@ import com.vaadin.ui.Window;
 /**
  * @author dilshat
  */
-public class VerificationStep extends Panel {
+public class VerificationStep extends Panel
+{
 
-    public VerificationStep( final Wizard wizard ) {
+    public VerificationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -41,21 +43,27 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        for ( Agent agent : wizard.getConfig().getNodes() ) {
+        for ( Agent agent : wizard.getConfig().getNodes() )
+        {
             cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
         }
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 UUID trackID = wizard.getMahoutUI().getMahoutManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( wizard.getMahoutUI().getExecutor(), wizard.getMahoutUI().getTracker(), trackID,
-                        MahoutClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                ProgressWindow window =
+                        new ProgressWindow( wizard.getMahoutUI().getExecutor(), wizard.getMahoutUI().getTracker(),
+                                trackID, MahoutClusterConfig.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -65,9 +73,11 @@ public class VerificationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );

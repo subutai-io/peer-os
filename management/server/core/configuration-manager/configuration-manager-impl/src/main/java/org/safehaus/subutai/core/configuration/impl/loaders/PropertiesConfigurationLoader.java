@@ -23,17 +23,22 @@ import com.google.gson.JsonObject;
 /**
  * Created by bahadyr on 7/16/14.
  */
-public class PropertiesConfigurationLoader implements ConfigurationLoader {
+public class PropertiesConfigurationLoader implements ConfigurationLoader
+{
 
     private static final Logger LOG = Logger.getLogger( PropertiesConfigurationLoader.class.getName() );
     private TextInjector textInjector;
-    public PropertiesConfigurationLoader( final TextInjector textInjector ) {
+
+
+    public PropertiesConfigurationLoader( final TextInjector textInjector )
+    {
         this.textInjector = textInjector;
     }
 
 
     @Override
-    public JsonObject getConfiguration( String hostname, String configPathFilename ) {
+    public JsonObject getConfiguration( String hostname, String configPathFilename )
+    {
 
         TextInjectorImpl configurationInjector = new TextInjectorImpl();
         String content = configurationInjector.catFile( hostname, configPathFilename );
@@ -66,7 +71,8 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
 
     @Override
-    public boolean setConfiguration( final String hostname, String configFilePath, String jsonObjectConfig ) {
+    public boolean setConfiguration( final String hostname, String configFilePath, String jsonObjectConfig )
+    {
         // TODO Read config from instance, set values from Config, inject Config
 
         String content = textInjector.catFile( hostname, configFilePath );

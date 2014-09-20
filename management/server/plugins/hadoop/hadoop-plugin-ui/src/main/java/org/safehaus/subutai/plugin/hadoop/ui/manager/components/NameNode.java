@@ -16,7 +16,8 @@ import com.vaadin.event.MouseEvents;
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class NameNode extends ClusterNode {
+public class NameNode extends ClusterNode
+{
 
     private final Hadoop hadoop;
     private final Tracker tracker;
@@ -24,32 +25,39 @@ public class NameNode extends ClusterNode {
 
 
     public NameNode( final Hadoop hadoop, Tracker tracker, final ExecutorService executorService,
-                     final HadoopClusterConfig cluster ) {
+                     final HadoopClusterConfig cluster )
+    {
         super( cluster );
         this.executorService = executorService;
         this.hadoop = hadoop;
         this.tracker = tracker;
         setHostname( cluster.getNameNode().getHostname() );
 
-        startButton.addClickListener( new MouseEvents.ClickListener() {
+        startButton.addClickListener( new MouseEvents.ClickListener()
+        {
             @Override
-            public void click( MouseEvents.ClickEvent clickEvent ) {
+            public void click( MouseEvents.ClickEvent clickEvent )
+            {
                 setLoading( true );
                 getStatus( hadoop.startNameNode( cluster ) );
             }
         } );
 
-        stopButton.addClickListener( new MouseEvents.ClickListener() {
+        stopButton.addClickListener( new MouseEvents.ClickListener()
+        {
             @Override
-            public void click( MouseEvents.ClickEvent clickEvent ) {
+            public void click( MouseEvents.ClickEvent clickEvent )
+            {
                 setLoading( true );
                 getStatus( hadoop.stopNameNode( cluster ) );
             }
         } );
 
-        restartButton.addClickListener( new MouseEvents.ClickListener() {
+        restartButton.addClickListener( new MouseEvents.ClickListener()
+        {
             @Override
-            public void click( MouseEvents.ClickEvent clickEvent ) {
+            public void click( MouseEvents.ClickEvent clickEvent )
+            {
                 setLoading( true );
                 getStatus( hadoop.restartNameNode( cluster ) );
             }
@@ -60,21 +68,28 @@ public class NameNode extends ClusterNode {
 
 
     @Override
-    protected void getStatus( UUID trackID ) {
+    protected void getStatus( UUID trackID )
+    {
         setLoading( true );
-        for ( ClusterNode slaveNode : slaveNodes ) {
+        for ( ClusterNode slaveNode : slaveNodes )
+        {
             slaveNode.setLoading( true );
         }
 
-        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent() {
+        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent()
+        {
 
-            public void onComplete( NodeState state ) {
-                synchronized ( progressButton ) {
+            public void onComplete( NodeState state )
+            {
+                synchronized ( progressButton )
+                {
                     boolean isRunning = false;
-                    if ( state == NodeState.RUNNING ) {
+                    if ( state == NodeState.RUNNING )
+                    {
                         isRunning = true;
                     }
-                    else if ( state == NodeState.STOPPED ) {
+                    else if ( state == NodeState.STOPPED )
+                    {
                         isRunning = false;
                     }
 
@@ -82,7 +97,8 @@ public class NameNode extends ClusterNode {
                     restartButton.setEnabled( isRunning );
                     stopButton.setEnabled( isRunning );
 
-                    for ( ClusterNode slaveNode : slaveNodes ) {
+                    for ( ClusterNode slaveNode : slaveNodes )
+                    {
                         slaveNode.getStatus( null );
                     }
 
@@ -94,7 +110,8 @@ public class NameNode extends ClusterNode {
 
 
     @Override
-    protected void setLoading( boolean isLoading ) {
+    protected void setLoading( boolean isLoading )
+    {
         startButton.setVisible( !isLoading );
         stopButton.setVisible( !isLoading );
         restartButton.setVisible( !isLoading );

@@ -1,51 +1,72 @@
 package org.safehaus.subutai.core.container.ui.executor;
 
+
 /**
  * Created by timur on 9/8/14.
  */
-public class AgentExecutionEvent {
+public class AgentExecutionEvent
+{
     private String hostName;
     private String containerName;
     private String description;
     private AgentExecutionEventType eventType;
 
-    public AgentExecutionEvent(String hostName, String containerName, AgentExecutionEventType eventType, String description) {
+
+    public AgentExecutionEvent( String hostName, String containerName, AgentExecutionEventType eventType,
+                                String description )
+    {
         this.hostName = hostName;
         this.containerName = containerName;
         this.eventType = eventType;
         this.description = description;
     }
 
-    public String getHostName() {
+
+    public String getHostName()
+    {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
+
+    public void setHostName( String hostName )
+    {
         this.hostName = hostName;
     }
 
-    public String getContainerName() {
+
+    public String getContainerName()
+    {
         return containerName;
     }
 
-    public void setContainerName(String containerName) {
+
+    public void setContainerName( String containerName )
+    {
         this.containerName = containerName;
     }
 
-    public String getDescription() {
+
+    public String getDescription()
+    {
         return description;
     }
 
-    public void setDescription(String description) {
+
+    public void setDescription( String description )
+    {
         this.description = description;
     }
 
-    public AgentExecutionEventType getEventType() {
+
+    public AgentExecutionEventType getEventType()
+    {
         return eventType;
     }
 
+
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "AgentExecutionEvent{" +
                 "hostName='" + hostName + '\'' +
                 ", containerName='" + containerName + '\'' +

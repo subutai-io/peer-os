@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.sqoop.api;
 
-public enum DataSourceType {
+
+public enum DataSourceType
+{
 
     HDFS,
     HBASE,

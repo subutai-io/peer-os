@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
-    <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
-    <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
-    <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.db.api.DbManager"/>
-    <reference id="containerManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
-    <reference id="networkManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.network.api.NetworkManager"/>
-    <reference id="environmentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.environment.api.EnvironmentManager"/>
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+  <reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.db.api.DbManager" />
+  <reference id="containerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
+  <reference id="networkManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
-    <bean id="hadoop-impl" scope="singleton" class="org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl"
-          init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="commandRunner"/>
-        <argument ref="dbManager"/>
-        <argument ref="networkManager"/>
-        <argument ref="containerManager"/>
-        <argument ref="environmentManager"/>
-    </bean>
+  <bean id="hadoop-impl" scope="singleton" class="org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl"
+        init-method="init" destroy-method="destroy">
+    <argument ref="agentManager" />
+    <argument ref="tracker" />
+    <argument ref="commandRunner" />
+    <argument ref="dbManager" />
+    <argument ref="networkManager" />
+    <argument ref="containerManager" />
+    <argument ref="environmentManager" />
+  </bean>
 
-    <service ref="hadoop-impl" interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
+  <service ref="hadoop-impl" interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
 
 </blueprint>

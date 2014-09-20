@@ -18,7 +18,8 @@ import com.google.common.base.Preconditions;
  * Represents command to agent. This class is used when for each agent there is a specific custom command, not common to
  * all agents
  */
-public class AgentRequestBuilder extends RequestBuilder {
+public class AgentRequestBuilder extends RequestBuilder
+{
 
     //target agent
     private final Agent agent;
@@ -30,7 +31,8 @@ public class AgentRequestBuilder extends RequestBuilder {
      * @param agent - target agent
      * @param command - command to run
      */
-    public AgentRequestBuilder( Agent agent, String command ) {
+    public AgentRequestBuilder( Agent agent, String command )
+    {
         super( command );
         Preconditions.checkNotNull( agent, "Agent is null" );
 
@@ -43,12 +45,14 @@ public class AgentRequestBuilder extends RequestBuilder {
      *
      * @return - agent
      */
-    public Agent getAgent() {
+    public Agent getAgent()
+    {
         return agent;
     }
 
 
-    public Request build( final UUID taskUUID ) {
+    public Request build( final UUID taskUUID )
+    {
         return super.build( agent.getUuid(), taskUUID );
     }
 }

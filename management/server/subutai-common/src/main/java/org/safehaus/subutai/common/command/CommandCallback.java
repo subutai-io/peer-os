@@ -12,7 +12,8 @@ import org.safehaus.subutai.common.protocol.Response;
 /**
  * Command callback triggered every time a response is received from agent
  */
-public abstract class CommandCallback {
+public abstract class CommandCallback
+{
 
     private volatile boolean stopped;
 
@@ -31,7 +32,8 @@ public abstract class CommandCallback {
      * Causes the call to runCommand to return, associated callback (if any) no longer receives responses from agent
      * even (if any). Command status is not changed by this call
      */
-    public final void stop() {
+    public final void stop()
+    {
         stopped = true;
     }
 
@@ -41,7 +43,8 @@ public abstract class CommandCallback {
      *
      * @return true - callback is stopped from being triggered, true- callback continues to be triggered
      */
-    public final boolean isStopped() {
+    public final boolean isStopped()
+    {
         return stopped;
     }
 }

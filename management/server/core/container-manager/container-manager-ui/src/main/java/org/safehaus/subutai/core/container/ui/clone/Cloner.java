@@ -56,7 +56,8 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout implements AgentExecutionListener {
+public class Cloner extends VerticalLayout implements AgentExecutionListener
+{
     private static final Logger LOG = Logger.getLogger( Cloner.class.getName() );
 
     private final AgentTree agentTree;
@@ -118,7 +119,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
 
         cloneBtn = new Button( "Clone" );
         cloneBtn.addStyleName( "default" );
-        cloneBtn.addClickListener( new Button.ClickListener() {
+        cloneBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
@@ -128,7 +130,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
 
         Button clearBtn = new Button( "Clear" );
         clearBtn.addStyleName( "default" );
-        clearBtn.addClickListener( new Button.ClickListener() {
+        clearBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
@@ -179,7 +182,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         strategy.setImmediate( true );
         strategy.setTextInputAllowed( false );
         strategy.setNullSelectionAllowed( false );
-        Property.ValueChangeListener listener = new Property.ValueChangeListener() {
+        Property.ValueChangeListener listener = new Property.ValueChangeListener()
+        {
             public void valueChange( Property.ValueChangeEvent event )
             {
                 criteriaLayout.removeAllComponents();
@@ -194,7 +198,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
                 criteriaTable.setSelectable( false );
 
                 criteriaTable.setImmediate( true );
-                criteriaTable.setTableFieldFactory( new TableFieldFactory() {
+                criteriaTable.setTableFieldFactory( new TableFieldFactory()
+                {
                     @Override
                     public Field<?> createField( Container container, Object itemId, Object propertyId,
                                                  Component component )
@@ -411,7 +416,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
 
     private void updateContainerStatus( final AgentExecutionEvent event )
     {
-        getUI().access( new Runnable() {
+        getUI().access( new Runnable()
+        {
             @Override
             public void run()
             {

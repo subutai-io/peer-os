@@ -35,9 +35,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class StepSetConfig extends Panel {
+public class StepSetConfig extends Panel
+{
 
-    public StepSetConfig( final Wizard wizard ) {
+    public StepSetConfig( final Wizard wizard )
+    {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         verticalLayout.setHeight( 100, Unit.PERCENTAGE );
@@ -74,14 +76,16 @@ public class StepSetConfig extends Panel {
 
         HadoopClusterConfig hcc =
                 wizard.getOozieUI().getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
-        for ( Agent agent : hcc.getAllNodes() ) {
+        for ( Agent agent : hcc.getAllNodes() )
+        {
             cbServers.addItem( agent.getHostname() );
             cbServers.setItemCaption( agent.getHostname(), agent.getHostname() );
         }
 
         vl.addComponent( cbServers );
 
-        if ( !Strings.isNullOrEmpty( wizard.getConfig().getServer() ) ) {
+        if ( !Strings.isNullOrEmpty( wizard.getConfig().getServer() ) )
+        {
             cbServers.setValue( wizard.getConfig().getServer() );
         }
 
@@ -97,7 +101,8 @@ public class StepSetConfig extends Panel {
         selectClients.setRequired( true );
         selectClients.setContainerDataSource( new BeanItemContainer<>( Agent.class, hcc.getAllNodes() ) );
 
-        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getClients() ) ) {
+        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getClients() ) )
+        {
             selectClients.setValue( wizard.getConfig().getClients() );
         }
 
@@ -107,23 +112,30 @@ public class StepSetConfig extends Panel {
         grid.setComponentAlignment( vl, Alignment.TOP_CENTER );
 
         Button next = new Button( "Next" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.getConfig().setServer( ( String ) cbServers.getValue() );
                 wizard.getConfig().setClients( ( Set<String> ) selectClients.getValue() );
 
-                if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getClients() ) ) {
+                if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getClients() ) )
+                {
                     show( "Please select nodes for Oozie clients" );
                 }
-                else if ( wizard.getConfig().getServer() == null ) {
+                else if ( wizard.getConfig().getServer() == null )
+                {
                     show( "Please select node for Oozie server" );
                 }
-                else {
-                    if ( wizard.getConfig().getClients().contains( wizard.getConfig().getServer() ) ) {
+                else
+                {
+                    if ( wizard.getConfig().getClients().contains( wizard.getConfig().getServer() ) )
+                    {
                         show( "Oozie server and client can not be installed on the same host" );
                     }
-                    else {
+                    else
+                    {
                         wizard.next();
                     }
                 }
@@ -131,9 +143,11 @@ public class StepSetConfig extends Panel {
         } );
 
         Button back = new Button( "Back" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -149,7 +163,8 @@ public class StepSetConfig extends Panel {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

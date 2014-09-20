@@ -48,7 +48,8 @@ import com.vaadin.ui.TextField;
 /**
  * Command Runner UI - Terminal
  */
-public class TerminalForm extends CustomComponent implements Disposable {
+public class TerminalForm extends CustomComponent implements Disposable
+{
 
     private final AgentTree agentTree;
     private final TextArea commandOutputTxtArea;
@@ -56,7 +57,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
     private ExecutorService executor;
 
 
-    public TerminalForm( final CommandDispatcher commandRunner, final AgentManager agentManager ) {
+    public TerminalForm( final CommandDispatcher commandRunner, final AgentManager agentManager )
+    {
         setSizeFull();
 
         executor = Executors.newCachedThreadPool();
@@ -123,86 +125,112 @@ public class TerminalForm extends CustomComponent implements Disposable {
         horizontalSplit.setSecondComponent( grid );
         setCompositionRoot( horizontalSplit );
 
-        programTxtFld.addShortcutListener( new ShortcutListener( "Shortcut Name", ShortcutAction.KeyCode.ENTER, null ) {
+        programTxtFld.addShortcutListener( new ShortcutListener( "Shortcut Name", ShortcutAction.KeyCode.ENTER, null )
+        {
             @Override
-            public void handleAction( Object sender, Object target ) {
+            public void handleAction( Object sender, Object target )
+            {
                 sendBtn.click();
             }
         } );
-        sendBtn.addClickListener( new Button.ClickListener() {
+        sendBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 Set<Agent> agents = agentTree.getSelectedAgents();
-                if ( agents.isEmpty() ) {
+                if ( agents.isEmpty() )
+                {
                     show( "Please, select nodes" );
                 }
-                else if ( programTxtFld.getValue() == null || Strings.isNullOrEmpty( programTxtFld.getValue() ) ) {
+                else if ( programTxtFld.getValue() == null || Strings.isNullOrEmpty( programTxtFld.getValue() ) )
+                {
                     show( "Please, enter command" );
                 }
-                else {
+                else
+                {
 
                     RequestBuilder requestBuilder = new RequestBuilder( programTxtFld.getValue() );
 
-                    if ( requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST ) {
+                    if ( requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
+                    {
                         if ( StringUtil.isNumeric( programTxtFld.getValue() )
-                                && Integer.valueOf( programTxtFld.getValue() ) > 0 ) {
+                                && Integer.valueOf( programTxtFld.getValue() ) > 0 )
+                        {
                             requestBuilder.withPid( Integer.valueOf( programTxtFld.getValue() ) );
                             requestBuilder.withType( RequestType.TERMINATE_REQUEST );
                         }
-                        else {
+                        else
+                        {
                             show( "Please, enter numeric PID greater than 0 to kill" );
                             return;
                         }
                     }
-                    else if ( requestTypeCombo.getValue() == RequestType.PS_REQUEST ) {
+                    else if ( requestTypeCombo.getValue() == RequestType.PS_REQUEST )
+                    {
                         requestBuilder.withType( RequestType.PS_REQUEST );
                     }
 
-                    if ( timeoutTxtFld.getValue() != null && StringUtil.isNumeric( timeoutTxtFld.getValue() ) ) {
+                    if ( timeoutTxtFld.getValue() != null && StringUtil.isNumeric( timeoutTxtFld.getValue() ) )
+                    {
                         int timeout = Integer.valueOf( timeoutTxtFld.getValue() );
-                        if ( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC ) {
+                        if ( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC )
+                        {
                             requestBuilder.withTimeout( timeout );
                         }
                     }
 
-                    if ( workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( workDirTxtFld.getValue() ) ) {
+                    if ( workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( workDirTxtFld.getValue() ) )
+                    {
                         requestBuilder.withCwd( workDirTxtFld.getValue() );
                     }
                     final Command command = commandRunner.createCommand( requestBuilder, agents );
                     indicator.setVisible( true );
                     taskCount.incrementAndGet();
-                    executor.execute( new Runnable() {
+                    executor.execute( new Runnable()
+                    {
 
-                        public void run() {
-                            try {
-                                command.execute( new CommandCallback() {
+                        public void run()
+                        {
+                            try
+                            {
+                                command.execute( new CommandCallback()
+                                {
 
                                     @Override
                                     public void onResponse( Response response, AgentResult agentResult,
-                                                            Command command ) {
+                                                            Command command )
+                                    {
                                         StringBuilder out = new StringBuilder();
                                         if ( !Strings.isNullOrEmpty( response.getStdOut() ) || !Strings
-                                                .isNullOrEmpty( response.getStdErr() ) ) {
+                                                .isNullOrEmpty( response.getStdErr() ) )
+                                        {
 
-                                            if ( !Strings.isNullOrEmpty( response.getStdOut() ) ) {
+                                            if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
+                                            {
                                                 out.append( response.getStdOut() ).append( "\n" );
                                             }
-                                            if ( !Strings.isNullOrEmpty( response.getStdErr() ) ) {
+                                            if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
+                                            {
                                                 out.append( response.getStdErr() ).append( "\n" );
                                             }
                                         }
-                                        if ( response.isFinal() ) {
+                                        if ( response.isFinal() )
+                                        {
                                             if ( response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
-                                                    && response.getExitCode() != 0 ) {
+                                                    && response.getExitCode() != 0 )
+                                            {
                                                 out.append( "Exit code: " ).append( response.getExitCode() )
                                                    .append( "\n\n" );
                                             }
-                                            else if ( response.getType() != ResponseType.EXECUTE_RESPONSE_DONE ) {
+                                            else if ( response.getType() != ResponseType.EXECUTE_RESPONSE_DONE )
+                                            {
                                                 out.append( response.getType() ).append( "\n\n" );
                                             }
                                         }
 
-                                        if ( out.length() > 0 ) {
+                                        if ( out.length() > 0 )
+                                        {
                                             Agent agent = agentManager.getAgentByUUID( response.getUuid() );
                                             StringBuilder host = new StringBuilder(
                                                     agent == null ? String.format( "Offline[%s]", response.getUuid() ) :
@@ -216,12 +244,14 @@ public class TerminalForm extends CustomComponent implements Disposable {
                                     }
                                 } );
                             }
-                            catch ( CommandException e ) {
+                            catch ( CommandException e )
+                            {
                                 show( e.getMessage() );
                             }
 
                             taskCount.decrementAndGet();
-                            if ( taskCount.get() == 0 ) {
+                            if ( taskCount.get() == 0 )
+                            {
                                 indicator.setVisible( false );
                             }
                         }
@@ -229,29 +259,35 @@ public class TerminalForm extends CustomComponent implements Disposable {
                 }
             }
         } );
-        clearBtn.addClickListener( new Button.ClickListener() {
+        clearBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 commandOutputTxtArea.setValue( "" );
             }
         } );
     }
 
 
-    private void show( String msg ) {
+    private void show( String msg )
+    {
         Notification.show( msg );
     }
 
 
-    private void addOutput( String output ) {
-        if ( !Strings.isNullOrEmpty( output ) ) {
+    private void addOutput( String output )
+    {
+        if ( !Strings.isNullOrEmpty( output ) )
+        {
             commandOutputTxtArea.setValue( String.format( "%s%s", commandOutputTxtArea.getValue(), output ) );
             commandOutputTxtArea.setCursorPosition( commandOutputTxtArea.getValue().length() - 1 );
         }
     }
 
 
-    public void dispose() {
+    public void dispose()
+    {
         agentTree.dispose();
         executor.shutdown();
     }

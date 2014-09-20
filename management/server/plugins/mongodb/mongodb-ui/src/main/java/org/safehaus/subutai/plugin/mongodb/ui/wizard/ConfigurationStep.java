@@ -25,9 +25,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends VerticalLayout {
+public class ConfigurationStep extends VerticalLayout
+{
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -41,9 +43,11 @@ public class ConfigurationStep extends VerticalLayout {
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setMaxLength( 20 );
         clusterNameTxtFld.setValue( wizard.getMongoClusterConfig().getClusterName() );
-        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getMongoClusterConfig().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -56,9 +60,11 @@ public class ConfigurationStep extends VerticalLayout {
         cfgSrvsCombo.setNullSelectionAllowed( false );
         cfgSrvsCombo.setValue( wizard.getMongoClusterConfig().getNumberOfConfigServers() );
 
-        cfgSrvsCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        cfgSrvsCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getMongoClusterConfig().setNumberOfConfigServers( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -71,9 +77,11 @@ public class ConfigurationStep extends VerticalLayout {
         routersCombo.setNullSelectionAllowed( false );
         routersCombo.setValue( wizard.getMongoClusterConfig().getNumberOfRouters() );
 
-        routersCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        routersCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getMongoClusterConfig().setNumberOfRouters( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -85,9 +93,11 @@ public class ConfigurationStep extends VerticalLayout {
         dataNodesCombo.setNullSelectionAllowed( false );
         dataNodesCombo.setValue( wizard.getMongoClusterConfig().getNumberOfDataNodes() );
 
-        dataNodesCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        dataNodesCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getMongoClusterConfig().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
             }
         } );
@@ -95,11 +105,14 @@ public class ConfigurationStep extends VerticalLayout {
         TextField replicaSetName = new TextField( "Enter replica set name" );
         replicaSetName.setInputPrompt( wizard.getMongoClusterConfig().getReplicaSetName() );
         replicaSetName.setMaxLength( 20 );
-        replicaSetName.addValueChangeListener( new Property.ValueChangeListener() {
+        replicaSetName.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String value = event.getProperty().getValue().toString().trim();
-                if ( !Strings.isNullOrEmpty( value ) ) {
+                if ( !Strings.isNullOrEmpty( value ) )
+                {
                     wizard.getMongoClusterConfig().setReplicaSetName( value );
                 }
             }
@@ -108,11 +121,14 @@ public class ConfigurationStep extends VerticalLayout {
         TextField cfgSrvPort = new TextField( "Enter port for configuration servers" );
         cfgSrvPort.setInputPrompt( wizard.getMongoClusterConfig().getCfgSrvPort() + "" );
         cfgSrvPort.setMaxLength( 5 );
-        cfgSrvPort.addValueChangeListener( new Property.ValueChangeListener() {
+        cfgSrvPort.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String value = event.getProperty().getValue().toString().trim();
-                if ( StringUtil.isNumeric( value ) ) {
+                if ( StringUtil.isNumeric( value ) )
+                {
                     wizard.getMongoClusterConfig().setCfgSrvPort( Integer.parseInt( value ) );
                 }
             }
@@ -121,11 +137,14 @@ public class ConfigurationStep extends VerticalLayout {
         TextField routerPort = new TextField( "Enter port for routers" );
         routerPort.setInputPrompt( wizard.getMongoClusterConfig().getRouterPort() + "" );
         routerPort.setMaxLength( 5 );
-        routerPort.addValueChangeListener( new Property.ValueChangeListener() {
+        routerPort.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String value = event.getProperty().getValue().toString().trim();
-                if ( StringUtil.isNumeric( value ) ) {
+                if ( StringUtil.isNumeric( value ) )
+                {
                     wizard.getMongoClusterConfig().setRouterPort( Integer.parseInt( value ) );
                 }
             }
@@ -134,11 +153,14 @@ public class ConfigurationStep extends VerticalLayout {
         TextField dataNodePort = new TextField( "Enter port for data nodes" );
         dataNodePort.setInputPrompt( wizard.getMongoClusterConfig().getDataNodePort() + "" );
         dataNodePort.setMaxLength( 5 );
-        dataNodePort.addValueChangeListener( new Property.ValueChangeListener() {
+        dataNodePort.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String value = event.getProperty().getValue().toString().trim();
-                if ( StringUtil.isNumeric( value ) ) {
+                if ( StringUtil.isNumeric( value ) )
+                {
                     wizard.getMongoClusterConfig().setDataNodePort( Integer.parseInt( value ) );
                 }
             }
@@ -147,11 +169,14 @@ public class ConfigurationStep extends VerticalLayout {
         TextField domain = new TextField( "Enter domain name" );
         domain.setInputPrompt( wizard.getMongoClusterConfig().getDomainName() );
         domain.setMaxLength( 20 );
-        domain.addValueChangeListener( new Property.ValueChangeListener() {
+        domain.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 String value = event.getProperty().getValue().toString().trim();
-                if ( !Strings.isNullOrEmpty( value ) ) {
+                if ( !Strings.isNullOrEmpty( value ) )
+                {
                     wizard.getMongoClusterConfig().setDomainName( value );
                 }
             }
@@ -159,13 +184,17 @@ public class ConfigurationStep extends VerticalLayout {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getMongoClusterConfig().getClusterName() ) ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( Strings.isNullOrEmpty( wizard.getMongoClusterConfig().getClusterName() ) )
+                {
                     show( "Please provide cluster name" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -173,9 +202,11 @@ public class ConfigurationStep extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -207,7 +238,8 @@ public class ConfigurationStep extends VerticalLayout {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

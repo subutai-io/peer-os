@@ -26,7 +26,8 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Created by talas on 9/17/14.
  */
-public class CoreModulesView extends VerticalLayout implements View, PortalModuleListener {
+public class CoreModulesView extends VerticalLayout implements View, PortalModuleListener
+{
 
     private static final Logger LOG = Logger.getLogger( MainUI.class.getName() );
     private TabSheet editors;
@@ -36,7 +37,8 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
 
 
     @Override
-    public void enter( ViewChangeListener.ViewChangeEvent event ) {
+    public void enter( ViewChangeListener.ViewChangeEvent event )
+    {
         setSizeFull();
         addStyleName( "reports" );
 
@@ -45,15 +47,18 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     }
 
 
-    private Component buildDraftsView() {
+    private Component buildDraftsView()
+    {
         editors = new TabSheet();
         editors.setSizeFull();
         editors.addStyleName( "borderless" );
         editors.addStyleName( "editors" );
 
-        editors.setCloseHandler( new TabSheet.CloseHandler() {
+        editors.setCloseHandler( new TabSheet.CloseHandler()
+        {
             @Override
-            public void onTabClose( TabSheet components, Component component ) {
+            public void onTabClose( TabSheet components, Component component )
+            {
                 editors.removeComponent( component );
                 modules.remove( component.getId() );
             }
@@ -86,7 +91,8 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     }
 
 
-    public static PortalModuleService getPortalModuleService() {
+    public static PortalModuleService getPortalModuleService()
+    {
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle( PortalModuleService.class ).getBundleContext();
         if ( ctx != null )
@@ -102,11 +108,14 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     }
 
 
-    private void addModule( final PortalModule module ) {
+    private void addModule( final PortalModule module )
+    {
 
-        ModuleView moduleView = new ModuleView( module, new ModuleView.ModuleViewListener() {
+        ModuleView moduleView = new ModuleView( module, new ModuleView.ModuleViewListener()
+        {
             @Override
-            public void OnModuleClick( PortalModule module ) {
+            public void OnModuleClick( PortalModule module )
+            {
                 if ( !modules.containsKey( module.getId() ) )
                 {
                     autoCreate( module );
@@ -119,7 +128,8 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     }
 
 
-    public void autoCreate( PortalModule module ) {
+    public void autoCreate( PortalModule module )
+    {
         Component component = module.createComponent();
         component.setId( module.getId() );
         TabSheet.Tab tab = editors.addTab( component );
@@ -130,7 +140,8 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
 
 
     @Override
-    public void moduleRegistered( PortalModule module ) {
+    public void moduleRegistered( PortalModule module )
+    {
         if ( module.isCorePlugin() )
         {
             addModule( module );
@@ -139,12 +150,14 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
 
 
     @Override
-    public void moduleUnregistered( PortalModule module ) {
+    public void moduleUnregistered( PortalModule module )
+    {
         removeModule( module );
     }
 
 
-    private void removeModule( PortalModule module ) {
+    private void removeModule( PortalModule module )
+    {
         ModuleView moduleView = ( ModuleView ) moduleViews.get( module.getId() );
         if ( moduleView != null )
         {

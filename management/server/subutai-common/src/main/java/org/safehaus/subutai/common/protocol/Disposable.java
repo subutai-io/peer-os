@@ -5,10 +5,12 @@
  */
 package org.safehaus.subutai.common.protocol;
 
+
 /**
  * @author dilshat
  */
-public interface Disposable {
+public interface Disposable
+{
 
-	public void dispose();
+    public void dispose();
 }

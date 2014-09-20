@@ -15,36 +15,42 @@ import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import static org.mockito.Mockito.mock;
 
 
-public class SolrImplMock extends SolrImpl {
+public class SolrImplMock extends SolrImpl
+{
 
     private SolrClusterConfig clusterSolrClusterConfig = null;
 
 
-    public SolrImplMock() {
+    public SolrImplMock()
+    {
         super( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
                 mock( EnvironmentManager.class ), mock( ContainerManager.class ) );
     }
 
 
-    public SolrImplMock setCommands( Commands commands ) {
+    public SolrImplMock setCommands( Commands commands )
+    {
         this.commands = commands;
         return this;
     }
 
 
-    public SolrImplMock setClusterSolrClusterConfig( SolrClusterConfig clusterSolrClusterConfig ) {
+    public SolrImplMock setClusterSolrClusterConfig( SolrClusterConfig clusterSolrClusterConfig )
+    {
         this.clusterSolrClusterConfig = clusterSolrClusterConfig;
         return this;
     }
 
 
     @Override
-    public SolrClusterConfig getCluster( String clusterName ) {
+    public SolrClusterConfig getCluster( String clusterName )
+    {
         return clusterSolrClusterConfig;
     }
 
 
-    public SolrImplMock setAgentManager( AgentManager agentManager ) {
+    public SolrImplMock setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
         return this;
     }

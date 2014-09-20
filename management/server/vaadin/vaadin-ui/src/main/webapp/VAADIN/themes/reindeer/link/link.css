@@ -17,14 +17,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-.v-link a:link span {
+.v-link a:link span
+{
     color: #1b699f;
 }
 
-.v-link a:visited span {
+.v-link a:visited span
+{
     color: #5c7485;
 }
 
-.v-link a:hover span {
+.v-link a:hover span
+{
     color: #2483c4;
 }

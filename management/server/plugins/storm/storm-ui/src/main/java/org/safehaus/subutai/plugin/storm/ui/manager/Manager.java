@@ -39,21 +39,22 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
 
-public class Manager {
+public class Manager
+{
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table masterTable, workersTable;
-    private StormConfig config;
-
     private final Storm storm;
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
+    private StormConfig config;
 
 
-    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         this.executorService = executorService;
         this.storm = serviceLocator.getService( Storm.class );
         this.tracker = serviceLocator.getService( Tracker.class );
@@ -83,10 +84,12 @@ public class Manager {
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
 
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 config = ( StormConfig ) event.getProperty().getValue();
                 refreshUI();
             }
@@ -94,21 +97,26 @@ public class Manager {
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 refreshClustersInfo();
             }
         } );
 
         Button destroyClusterBtn = new Button( "Destroy cluster" );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
+                if ( config == null )
+                {
                     show( "Select cluster" );
                     return;
                 }
@@ -116,9 +124,11 @@ public class Manager {
                 ConfirmationDialog alert = new ConfirmationDialog(
                         String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
                         "No" );
-                alert.getOk().addClickListener( new Button.ClickListener() {
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
                     @Override
-                    public void buttonClick( Button.ClickEvent clickEvent ) {
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
                         destroyClusterHandler();
                     }
                 } );
@@ -129,21 +139,26 @@ public class Manager {
 
         Button addNodeBtn = new Button( "Add Node" );
         addNodeBtn.addStyleName( "default" );
-        addNodeBtn.addClickListener( new Button.ClickListener() {
+        addNodeBtn.addClickListener( new Button.ClickListener()
+        {
 
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
-                if ( config == null ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
+                if ( config == null )
+                {
                     show( "Select cluster" );
                     return;
                 }
 
                 UUID trackId = storm.addNode( config.getClusterName() );
                 ProgressWindow pw = new ProgressWindow( executorService, tracker, trackId, StormConfig.PRODUCT_NAME );
-                pw.getWindow().addCloseListener( new Window.CloseListener() {
+                pw.getWindow().addCloseListener( new Window.CloseListener()
+                {
 
                     @Override
-                    public void windowClose( Window.CloseEvent e ) {
+                    public void windowClose( Window.CloseEvent e )
+                    {
                         refreshClustersInfo();
                     }
                 } );
@@ -166,14 +181,16 @@ public class Manager {
     }
 
 
-    private Table createTableTemplate( String caption, boolean master ) {
+    private Table createTableTemplate( String caption, boolean master )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
         table.addContainerProperty( "Restart", Button.class, null );
-        if ( !master ) {
+        if ( !master )
+        {
             table.addContainerProperty( "Destroy", Button.class, null );
         }
         table.addContainerProperty( "Status", Embedded.class, null );
@@ -183,20 +200,25 @@ public class Manager {
         table.setSelectable( false );
         table.setImmediate( true );
 
-        table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener( new ItemClickEvent.ItemClickListener()
+        {
             @Override
-            public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+            public void itemClick( ItemClickEvent event )
+            {
+                if ( event.isDoubleClick() )
+                {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if ( lxcAgent != null )
+                    {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
                                         agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
-                    else {
+                    else
+                    {
                         show( "Agent is not connected" );
                     }
                 }
@@ -206,80 +228,34 @@ public class Manager {
     }
 
 
-    private void refreshUI() {
-        if ( config != null ) {
+    private void show( String notification )
+    {
+        Notification.show( notification );
+    }
+
+
+    private void refreshUI()
+    {
+        if ( config != null )
+        {
             populateTable( masterTable, true, config.getNimbus() );
             populateTable( workersTable, false, config.getSupervisors().toArray( new Agent[0] ) );
         }
-        else {
+        else
+        {
             masterTable.removeAllItems();
             workersTable.removeAllItems();
         }
     }
 
 
-    public void refreshClustersInfo() {
-        StormConfig current = ( StormConfig ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        List<StormConfig> clustersInfo = storm.getClusters();
-        if ( clustersInfo != null && clustersInfo.size() > 0 ) {
-            for ( StormConfig ci : clustersInfo ) {
-                clusterCombo.addItem( ci );
-                clusterCombo.setItemCaption( ci, ci.getClusterName() );
-            }
-            clusterCombo.setValue( current );
-        }
-    }
-
-
-    private void show( String notification ) {
-        Notification.show( notification );
-    }
-
-
-    private void destroyClusterHandler() {
-
-        UUID trackID = storm.uninstallCluster( config.getClusterName() );
-
-        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, StormConfig.PRODUCT_NAME );
-        window.getWindow().addCloseListener( new Window.CloseListener() {
-            @Override
-            public void windowClose( Window.CloseEvent closeEvent ) {
-                refreshClustersInfo();
-            }
-        } );
-        contentRoot.getUI().addWindow( window.getWindow() );
-    }
-
-
-    private Button makeBatchOperationButton( String caption, final String itemProperty ) {
-        Button btn = new Button( caption );
-        btn.addStyleName( "default" );
-        btn.addClickListener( new Button.ClickListener() {
-
-            @Override
-            public void buttonClick( Button.ClickEvent event ) {
-                Table[] tables = new Table[] { masterTable, workersTable };
-                for ( Table t : tables ) {
-                    for ( Object itemId : t.getItemIds() ) {
-                        Item item = t.getItem( itemId );
-                        Property p = item.getItemProperty( itemProperty );
-                        if ( p != null && p.getValue() instanceof Button ) {
-                            ( ( Button ) p.getValue() ).click();
-                        }
-                    }
-                }
-            }
-        } );
-        return btn;
-    }
-
-
-    private void populateTable( final Table table, boolean server, Agent... agents ) {
+    private void populateTable( final Table table, boolean server, Agent... agents )
+    {
 
         table.removeAllItems();
 
-        for ( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
@@ -289,7 +265,8 @@ public class Manager {
             final Button restartBtn = new Button( "Restart" );
             restartBtn.addStyleName( "default" );
             final Button destroyBtn = !server ? new Button( "Destroy" ) : null;
-            if ( destroyBtn != null ) {
+            if ( destroyBtn != null )
+            {
                 destroyBtn.addStyleName( "default" );
             }
             final Embedded icon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
@@ -305,25 +282,32 @@ public class Manager {
             items.add( startBtn );
             items.add( stopBtn );
             items.add( restartBtn );
-            if ( destroyBtn != null ) {
+            if ( destroyBtn != null )
+            {
                 items.add( destroyBtn );
-                destroyBtn.addClickListener( new Button.ClickListener() {
+                destroyBtn.addClickListener( new Button.ClickListener()
+                {
 
                     @Override
-                    public void buttonClick( Button.ClickEvent event ) {
+                    public void buttonClick( Button.ClickEvent event )
+                    {
 
                         ConfirmationDialog alert = new ConfirmationDialog(
                                 String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes",
                                 "No" );
-                        alert.getOk().addClickListener( new Button.ClickListener() {
+                        alert.getOk().addClickListener( new Button.ClickListener()
+                        {
                             @Override
-                            public void buttonClick( Button.ClickEvent clickEvent ) {
+                            public void buttonClick( Button.ClickEvent clickEvent )
+                            {
                                 UUID trackID = storm.destroyNode( config.getClusterName(), agent.getHostname() );
                                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                         StormConfig.PRODUCT_NAME );
-                                window.getWindow().addCloseListener( new Window.CloseListener() {
+                                window.getWindow().addCloseListener( new Window.CloseListener()
+                                {
                                     @Override
-                                    public void windowClose( Window.CloseEvent closeEvent ) {
+                                    public void windowClose( Window.CloseEvent closeEvent )
+                                    {
                                         refreshClustersInfo();
                                     }
                                 } );
@@ -339,22 +323,29 @@ public class Manager {
 
             table.addItem( items.toArray(), null );
 
-            checkBtn.addClickListener( new Button.ClickListener() {
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     icon.setVisible( true );
-                    for ( Object e : items ) {
-                        if ( e instanceof Button ) {
+                    for ( Object e : items )
+                    {
+                        if ( e instanceof Button )
+                        {
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
                     final UUID trackId = storm.statusCheck( config.getClusterName(), agent.getHostname() );
-                    executorService.execute( new Runnable() {
+                    executorService.execute( new Runnable()
+                    {
 
                         @Override
-                        public void run() {
+                        public void run()
+                        {
                             ProductOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING ) {
+                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            {
                                 po = tracker.getProductOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
                             boolean running = po.getState() == ProductOperationState.SUCCEEDED;
@@ -362,7 +353,8 @@ public class Manager {
                             startBtn.setEnabled( !running );
                             stopBtn.setEnabled( running );
                             restartBtn.setEnabled( running );
-                            if ( destroyBtn != null ) {
+                            if ( destroyBtn != null )
+                            {
                                 destroyBtn.setEnabled( true );
                             }
                             icon.setVisible( false );
@@ -371,24 +363,31 @@ public class Manager {
                 }
             } );
 
-            startBtn.addClickListener( new Button.ClickListener() {
+            startBtn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     icon.setVisible( true );
-                    for ( Object e : items ) {
-                        if ( e instanceof Button ) {
+                    for ( Object e : items )
+                    {
+                        if ( e instanceof Button )
+                        {
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
                     final UUID trackId = storm.startNode( config.getClusterName(), agent.getHostname() );
 
-                    executorService.execute( new Runnable() {
+                    executorService.execute( new Runnable()
+                    {
 
                         @Override
-                        public void run() {
+                        public void run()
+                        {
                             ProductOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING ) {
+                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            {
                                 po = tracker.getProductOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
                             boolean started = po.getState() == ProductOperationState.SUCCEEDED;
@@ -396,7 +395,8 @@ public class Manager {
                             startBtn.setEnabled( !started );
                             stopBtn.setEnabled( started );
                             restartBtn.setEnabled( started );
-                            if ( destroyBtn != null ) {
+                            if ( destroyBtn != null )
+                            {
                                 destroyBtn.setEnabled( true );
                             }
                             icon.setVisible( false );
@@ -405,24 +405,31 @@ public class Manager {
                 }
             } );
 
-            stopBtn.addClickListener( new Button.ClickListener() {
+            stopBtn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     icon.setVisible( true );
-                    for ( Object e : items ) {
-                        if ( e instanceof Button ) {
+                    for ( Object e : items )
+                    {
+                        if ( e instanceof Button )
+                        {
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
                     final UUID trackId = storm.stopNode( config.getClusterName(), agent.getHostname() );
 
-                    executorService.execute( new Runnable() {
+                    executorService.execute( new Runnable()
+                    {
 
                         @Override
-                        public void run() {
+                        public void run()
+                        {
                             ProductOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING ) {
+                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            {
                                 po = tracker.getProductOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
                             boolean stopped = po.getState() == ProductOperationState.SUCCEEDED;
@@ -430,7 +437,8 @@ public class Manager {
                             startBtn.setEnabled( stopped );
                             stopBtn.setEnabled( !stopped );
                             restartBtn.setEnabled( !stopped );
-                            if ( destroyBtn != null ) {
+                            if ( destroyBtn != null )
+                            {
                                 destroyBtn.setEnabled( true );
                             }
                             icon.setVisible( false );
@@ -439,24 +447,31 @@ public class Manager {
                 }
             } );
 
-            restartBtn.addClickListener( new Button.ClickListener() {
+            restartBtn.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     icon.setVisible( true );
-                    for ( Object e : items ) {
-                        if ( e instanceof Button ) {
+                    for ( Object e : items )
+                    {
+                        if ( e instanceof Button )
+                        {
                             ( ( Button ) e ).setEnabled( false );
                         }
                     }
                     final UUID trackId = storm.restartNode( config.getClusterName(), agent.getHostname() );
 
-                    executorService.execute( new Runnable() {
+                    executorService.execute( new Runnable()
+                    {
 
                         @Override
-                        public void run() {
+                        public void run()
+                        {
                             ProductOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING ) {
+                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            {
                                 po = tracker.getProductOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
                             boolean ok = po.getState() == ProductOperationState.SUCCEEDED;
@@ -464,7 +479,8 @@ public class Manager {
                             startBtn.setEnabled( !ok );
                             stopBtn.setEnabled( ok );
                             restartBtn.setEnabled( true );
-                            if ( destroyBtn != null ) {
+                            if ( destroyBtn != null )
+                            {
                                 destroyBtn.setEnabled( true );
                             }
                             icon.setVisible( false );
@@ -476,7 +492,72 @@ public class Manager {
     }
 
 
-    public Component getContent() {
+    public void refreshClustersInfo()
+    {
+        StormConfig current = ( StormConfig ) clusterCombo.getValue();
+        clusterCombo.removeAllItems();
+        List<StormConfig> clustersInfo = storm.getClusters();
+        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        {
+            for ( StormConfig ci : clustersInfo )
+            {
+                clusterCombo.addItem( ci );
+                clusterCombo.setItemCaption( ci, ci.getClusterName() );
+            }
+            clusterCombo.setValue( current );
+        }
+    }
+
+
+    private void destroyClusterHandler()
+    {
+
+        UUID trackID = storm.uninstallCluster( config.getClusterName() );
+
+        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID, StormConfig.PRODUCT_NAME );
+        window.getWindow().addCloseListener( new Window.CloseListener()
+        {
+            @Override
+            public void windowClose( Window.CloseEvent closeEvent )
+            {
+                refreshClustersInfo();
+            }
+        } );
+        contentRoot.getUI().addWindow( window.getWindow() );
+    }
+
+
+    private Button makeBatchOperationButton( String caption, final String itemProperty )
+    {
+        Button btn = new Button( caption );
+        btn.addStyleName( "default" );
+        btn.addClickListener( new Button.ClickListener()
+        {
+
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                Table[] tables = new Table[] { masterTable, workersTable };
+                for ( Table t : tables )
+                {
+                    for ( Object itemId : t.getItemIds() )
+                    {
+                        Item item = t.getItem( itemId );
+                        Property p = item.getItemProperty( itemProperty );
+                        if ( p != null && p.getValue() instanceof Button )
+                        {
+                            ( ( Button ) p.getValue() ).click();
+                        }
+                    }
+                }
+            }
+        } );
+        return btn;
+    }
+
+
+    public Component getContent()
+    {
         return contentRoot;
     }
 }

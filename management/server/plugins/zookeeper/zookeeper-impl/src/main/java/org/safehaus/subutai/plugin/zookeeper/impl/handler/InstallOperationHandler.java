@@ -1,7 +1,8 @@
 package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 
-import com.google.common.base.Strings;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -13,18 +14,28 @@ import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
-import java.util.UUID;
+import com.google.common.base.Strings;
 
 
 /**
  * Sets up Zookeeper cluster either a standalone ZK cluster or over hadoop cluster nodes or together with hadoop
  */
-public class InstallOperationHandler  extends AbstractOperationHandler<ZookeeperImpl> {
+public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperImpl>
+{
     private final ZookeeperClusterConfig config;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-    public InstallOperationHandler( ZookeeperImpl manager, ZookeeperClusterConfig config ) {
+    public InstallOperationHandler( final ZookeeperImpl manager, ZookeeperClusterConfig config,
+                                    final HadoopClusterConfig hadoopClusterConfig )
+    {
+        this( manager, config );
+        this.hadoopClusterConfig = hadoopClusterConfig;
+    }
+
+
+    public InstallOperationHandler( ZookeeperImpl manager, ZookeeperClusterConfig config )
+    {
 
         super( manager, config.getClusterName() );
         this.config = config;
@@ -33,75 +44,70 @@ public class InstallOperationHandler  extends AbstractOperationHandler<Zookeeper
     }
 
 
-    public InstallOperationHandler( final ZookeeperImpl manager, ZookeeperClusterConfig config,
-                                    final HadoopClusterConfig hadoopClusterConfig ) {
-        this( manager, config );
-        this.hadoopClusterConfig = hadoopClusterConfig;
-    }
-
-
     @Override
-    public UUID getTrackerId() {
+    public UUID getTrackerId()
+    {
         return productOperation.getId();
     }
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         if ( Strings.isNullOrEmpty( config.getClusterName() )
                 //either number of nodes to create or hadoop cluster nodes must be present
                 || ( config.getSetupType() == SetupType.STANDALONE && config.getNumberOfNodes() <= 0 ) || (
                 config.getSetupType() == SetupType.OVER_HADOOP && CollectionUtil.isCollectionEmpty( config.getNodes() )
                         && Strings.isNullOrEmpty( config.getHadoopClusterName() ) ) ||
-                ( config.getSetupType() == SetupType.WITH_HADOOP && hadoopClusterConfig == null ) ) {
+                ( config.getSetupType() == SetupType.WITH_HADOOP && hadoopClusterConfig == null ) )
+        {
             productOperation.addLogFailed( "Malformed configuration" );
             return;
         }
 
-        if ( manager.getCluster( clusterName ) != null ) {
+        if ( manager.getCluster( clusterName ) != null )
+        {
             productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
             return;
         }
 
-        if ( config.getSetupType() == SetupType.STANDALONE ) {
+        if ( config.getSetupType() == SetupType.STANDALONE )
+        {
             setupStandalone();
         }
-        else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
             setupOverHadoop();
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             setupWithHadoop();
         }
-        else {
+        else
+        {
             productOperation.addLogFailed( "Wrong setup type !" );
             return;
         }
     }
 
 
-    public HadoopClusterConfig getHadoopClusterConfig() {
-        return hadoopClusterConfig;
-    }
-
-
-    public void setHadoopClusterConfig( HadoopClusterConfig hadoopClusterConfig ) {
-        this.hadoopClusterConfig = hadoopClusterConfig;
-    }
-
-
     /**
      * Sets up ZK cluster over supplied Hadoop cluster nodes
      */
-    private void setupOverHadoop() {
+    private void setupOverHadoop()
+    {
 
-        try {
+        try
+        {
             //setup ZK cluster
-            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( null, config, productOperation );
+            ClusterSetupStrategy zkClusterSetupStrategy =
+                    manager.getClusterSetupStrategy( null, config, productOperation );
             zkClusterSetupStrategy.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( ClusterSetupException e ) {
+        catch ( ClusterSetupException e )
+        {
             productOperation.addLogFailed(
                     String.format( "Failed to setup an over-Hadoop ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
@@ -111,20 +117,24 @@ public class InstallOperationHandler  extends AbstractOperationHandler<Zookeeper
     /**
      * Sets up a standalone Zk cluster
      */
-    private void setupStandalone() {
+    private void setupStandalone()
+    {
 
-        try {
+        try
+        {
             //create environment
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
 
             //setup ZK cluster
-            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( env, config, productOperation );
+            ClusterSetupStrategy zkClusterSetupStrategy =
+                    manager.getClusterSetupStrategy( env, config, productOperation );
             zkClusterSetupStrategy.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( EnvironmentBuildException | ClusterSetupException e ) {
+        catch ( EnvironmentBuildException | ClusterSetupException e )
+        {
             productOperation.addLogFailed(
                     String.format( "Failed to setup a standalone ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
@@ -134,9 +144,11 @@ public class InstallOperationHandler  extends AbstractOperationHandler<Zookeeper
     /**
      * Sets up ZK cluster together with Hadoop cluster
      */
-    private void setupWithHadoop() {
+    private void setupWithHadoop()
+    {
 
-        try {
+        try
+        {
 
             final String COMBO_TEMPLATE_NAME = "hadoopnzk";
             hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
@@ -150,14 +162,28 @@ public class InstallOperationHandler  extends AbstractOperationHandler<Zookeeper
             hadoopClusterSetupStrategy.setup();
 
             //setup ZK cluster
-            ClusterSetupStrategy zkClusterSetupStrategy = manager.getClusterSetupStrategy( env, config, productOperation );
+            ClusterSetupStrategy zkClusterSetupStrategy =
+                    manager.getClusterSetupStrategy( env, config, productOperation );
             zkClusterSetupStrategy.setup();
 
             productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( EnvironmentBuildException | ClusterSetupException e ) {
+        catch ( EnvironmentBuildException | ClusterSetupException e )
+        {
             productOperation.addLogFailed(
                     String.format( "Failed to setup a standalone ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
+    }
+
+
+    public HadoopClusterConfig getHadoopClusterConfig()
+    {
+        return hadoopClusterConfig;
+    }
+
+
+    public void setHadoopClusterConfig( HadoopClusterConfig hadoopClusterConfig )
+    {
+        this.hadoopClusterConfig = hadoopClusterConfig;
     }
 }

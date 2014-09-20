@@ -10,7 +10,8 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 /**
  * Created by timur on 9/8/14.
  */
-public class CloneCommand implements AgentCommand {
+public class CloneCommand implements AgentCommand
+{
     private ContainerManager containerManager;
     private String hostName;
     private String templateName;
@@ -34,7 +35,7 @@ public class CloneCommand implements AgentCommand {
     {
         try
         {
-            containerManager.clone(envId, hostName, templateName, cloneName );
+            containerManager.clone( envId, hostName, templateName, cloneName );
         }
         catch ( ContainerCreateException e )
         {

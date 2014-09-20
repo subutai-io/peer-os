@@ -1,8 +1,10 @@
 package org.safehaus.subutai.core.container.api;
 
+
 /**
  * Type of agent
  */
-public enum ContainerType {
+public enum ContainerType
+{
     PHYSICAL, LOGICAL;
 }

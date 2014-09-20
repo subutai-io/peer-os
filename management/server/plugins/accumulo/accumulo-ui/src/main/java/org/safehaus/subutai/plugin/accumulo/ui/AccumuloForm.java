@@ -22,9 +22,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class AccumuloForm extends CustomComponent {
+public class AccumuloForm extends CustomComponent
+{
 
-    public AccumuloForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public AccumuloForm( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         setSizeFull();
 
@@ -35,8 +37,8 @@ public class AccumuloForm extends CustomComponent {
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
 
-        Manager manager = new Manager(executorService, serviceLocator);
-        Wizard wizard = new Wizard(executorService, serviceLocator);
+        Manager manager = new Manager( executorService, serviceLocator );
+        Wizard wizard = new Wizard( executorService, serviceLocator );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
         verticalLayout.addComponent( mongoSheet );

@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.sqoop.api;
 
+
 import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -9,18 +11,19 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 
-public interface Sqoop extends ApiBase<SqoopConfig> {
 
-    public UUID isInstalled(String clusterName, String hostname);
+public interface Sqoop extends ApiBase<SqoopConfig>
+{
 
-    public UUID installCluster(SqoopConfig config, HadoopClusterConfig hadoopConfig);
+    public UUID isInstalled( String clusterName, String hostname );
 
-    public UUID destroyNode(String clusterName, String hostname);
+    public UUID installCluster( SqoopConfig config, HadoopClusterConfig hadoopConfig );
 
-    public UUID exportData(ExportSetting settings);
+    public UUID destroyNode( String clusterName, String hostname );
 
-    public UUID importData(ImportSetting settings);
+    public UUID exportData( ExportSetting settings );
 
-    public ClusterSetupStrategy getClusterSetupStrategy(Environment env,
-            SqoopConfig config, ProductOperation po);
+    public UUID importData( ImportSetting settings );
+
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, SqoopConfig config, ProductOperation po );
 }

@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -8,7 +9,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallClusterHandler;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 
@@ -18,12 +18,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class UnistallClusterHandlerTest {
+
+public class UnistallClusterHandlerTest
+{
 
     CassandraImpl cassandraMock;
 
+
     @Before
-    public void setup(){
+    public void setup()
+    {
         cassandraMock = mock( CassandraImpl.class );
         when( cassandraMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );
         when( cassandraMock.getCommandRunner() ).thenReturn( mock( CommandRunner.class ) );
@@ -32,8 +36,10 @@ public class UnistallClusterHandlerTest {
         when( cassandraMock.getCluster( anyString() ) ).thenReturn( null );
     }
 
+
     @Test
-    public void testWithoutCluster() throws DBException {
+    public void testWithoutCluster() throws DBException
+    {
         AbstractOperationHandler operationHandler = new UninstallClusterHandler( cassandraMock, "test-cluster" );
         operationHandler.run();
         assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );

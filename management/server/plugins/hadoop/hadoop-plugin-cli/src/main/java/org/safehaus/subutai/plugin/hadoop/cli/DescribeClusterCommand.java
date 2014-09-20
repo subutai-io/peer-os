@@ -14,7 +14,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  * Displays the last log entries
  */
 @Command(scope = "hadoop", name = "describe-clusters", description = "Shows the details of Hadoop cluster")
-public class DescribeClusterCommand extends OsgiCommandSupport {
+public class DescribeClusterCommand extends OsgiCommandSupport
+{
 
     @Argument(index = 0, name = "clusterName", required = true, multiValued = false,
             description = "The name of the Hadoop cluster")
@@ -22,36 +23,44 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
     private Hadoop hadoopManager;
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public void setHadoopManager( Hadoop hadoopManager ) {
+    public void setHadoopManager( Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
 
-    protected Object doExecute() {
+    protected Object doExecute()
+    {
         HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster( clusterName );
-        if ( hadoopClusterConfig != null ) {
+        if ( hadoopClusterConfig != null )
+        {
             StringBuilder sb = new StringBuilder();
             sb.append( "Cluster name: " ).append( hadoopClusterConfig.getClusterName() ).append( "\n" );
             sb.append( "Domain name: " ).append( hadoopClusterConfig.getDomainName() ).append( "\n" );
             sb.append( "All nodes:" ).append( "\n" );
-            for ( Agent agent : hadoopClusterConfig.getAllNodes() ) {
+            for ( Agent agent : hadoopClusterConfig.getAllNodes() )
+            {
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( "\n" );
             }
             sb.append( "Slave nodes:" ).append( "\n" );
-            for ( Agent agent : hadoopClusterConfig.getAllSlaveNodes() ) {
+            for ( Agent agent : hadoopClusterConfig.getAllSlaveNodes() )
+            {
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( "\n" );
             }
             sb.append( "Data nodes:" ).append( "\n" );
-            for ( Agent agent : hadoopClusterConfig.getDataNodes() ) {
+            for ( Agent agent : hadoopClusterConfig.getDataNodes() )
+            {
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( "\n" );
             }
             sb.append( "Task trackers:" ).append( "\n" );
-            for ( Agent agent : hadoopClusterConfig.getTaskTrackers() ) {
+            for ( Agent agent : hadoopClusterConfig.getTaskTrackers() )
+            {
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( "\n" );
             }
             Agent jt = hadoopClusterConfig.getJobTracker();
@@ -63,7 +72,8 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
             sb.append( "UUID:" ).append( jt.getUuid() ).append( "\n" );
             System.out.println( sb.toString() );
         }
-        else {
+        else
+        {
             System.out.println( "No clusters found..." );
         }
 

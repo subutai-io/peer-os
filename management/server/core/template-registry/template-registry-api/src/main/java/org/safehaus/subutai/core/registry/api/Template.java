@@ -1,16 +1,22 @@
 package org.safehaus.subutai.core.registry.api;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Expose;
-import java.util.*;
 
 
 /**
  * Template represents template entry in registry
  */
-public class Template {
+public class Template
+{
 
     //name of template
     @Expose
@@ -67,7 +73,8 @@ public class Template {
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
                      final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
-                     final String packagesManifest, final String md5sum ) {
+                     final String packagesManifest, final String md5sum )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
         Preconditions
@@ -90,102 +97,159 @@ public class Template {
         this.parentTemplateName = subutaiParent;
         this.md5sum = md5sum;
 
-        if ( templateName.equalsIgnoreCase( parentTemplateName ) ) {
+        if ( templateName.equalsIgnoreCase( parentTemplateName ) )
+        {
             parentTemplateName = null;
         }
     }
 
 
-    public boolean isInUseOnFAIs() {
+    public boolean isInUseOnFAIs()
+    {
         return faisUsingThisTemplate != null && !faisUsingThisTemplate.isEmpty();
     }
 
 
-    public void setInUseOnFAI( final String faiHostname, final boolean inUseOnFAI ) {
-        if ( inUseOnFAI ) {
+    public void setInUseOnFAI( final String faiHostname, final boolean inUseOnFAI )
+    {
+        if ( inUseOnFAI )
+        {
             faisUsingThisTemplate.add( faiHostname );
         }
-        else {
+        else
+        {
             faisUsingThisTemplate.remove( faiHostname );
         }
     }
 
 
-    public Set<String> getFaisUsingThisTemplate() {
+    public Set<String> getFaisUsingThisTemplate()
+    {
         return Collections.unmodifiableSet( faisUsingThisTemplate );
     }
 
 
-    public void addChildren( List<Template> children ) {
-        if ( this.children == null ) {
+    public void addChildren( List<Template> children )
+    {
+        if ( this.children == null )
+        {
             this.children = new ArrayList<>();
         }
         this.children.addAll( children );
     }
 
 
-    public String getMd5sum() {
+    public String getMd5sum()
+    {
         return md5sum;
     }
 
 
-    public Set<String> getProducts() {
+    public Set<String> getProducts()
+    {
         return products;
     }
 
 
-    public void setProducts( final Set<String> products ) {
+    public void setProducts( final Set<String> products )
+    {
         this.products = products;
     }
 
 
-    public String getLxcArch() {
+    public String getLxcArch()
+    {
         return lxcArch;
     }
 
 
-    public String getLxcUtsname() {
+    public String getLxcUtsname()
+    {
         return lxcUtsname;
     }
 
 
-    public String getSubutaiConfigPath() {
+    public String getSubutaiConfigPath()
+    {
         return subutaiConfigPath;
     }
 
 
-    public String getSubutaiParent() {
+    public String getSubutaiParent()
+    {
         return subutaiParent;
     }
 
 
-    public String getSubutaiGitBranch() {
+    public String getSubutaiGitBranch()
+    {
         return subutaiGitBranch;
     }
 
 
-    public String getSubutaiGitUuid() {
+    public String getSubutaiGitUuid()
+    {
         return subutaiGitUuid;
     }
 
 
-    public String getPackagesManifest() {
+    public String getPackagesManifest()
+    {
         return packagesManifest;
     }
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public String getParentTemplateName() {
+    public String getParentTemplateName()
+    {
         return parentTemplateName;
     }
 
 
     @Override
-    public String toString() {
+    public int hashCode()
+    {
+        int result = templateName.hashCode();
+        result = 31 * result + lxcArch.hashCode();
+        return result;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final Template template = ( Template ) o;
+
+        if ( !lxcArch.equals( template.lxcArch ) )
+        {
+            return false;
+        }
+        if ( !templateName.equals( template.templateName ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public String toString()
+    {
         return "Template{" +
                 "templateName='" + templateName + '\'' +
                 ", parentTemplateName='" + parentTemplateName + '\'' +
@@ -197,35 +261,5 @@ public class Template {
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
                 ", products=" + products +
                 '}';
-    }
-
-
-    @Override
-    public boolean equals( final Object o ) {
-        if ( this == o ) {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() ) {
-            return false;
-        }
-
-        final Template template = ( Template ) o;
-
-        if ( !lxcArch.equals( template.lxcArch ) ) {
-            return false;
-        }
-        if ( !templateName.equals( template.templateName ) ) {
-            return false;
-        }
-
-        return true;
-    }
-
-
-    @Override
-    public int hashCode() {
-        int result = templateName.hashCode();
-        result = 31 * result + lxcArch.hashCode();
-        return result;
     }
 }

@@ -9,7 +9,8 @@ package org.safehaus.subutai.plugin.mongodb.api;
 /**
  * Holds mongo node operation timeouts
  */
-public class Timeouts {
+public class Timeouts
+{
 
     public static final int CHECK_NODE_STATUS_TIMEOUT_SEC = 20;
     public static final int STOP_NODE_TIMEOUT_SEC = 60;

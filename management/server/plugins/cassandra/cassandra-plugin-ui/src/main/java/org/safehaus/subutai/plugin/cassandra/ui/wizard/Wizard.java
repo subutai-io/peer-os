@@ -18,7 +18,8 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private static final int MAX_STEPS = 3;
     private final VerticalLayout verticalLayout;
@@ -28,7 +29,8 @@ public class Wizard {
     private CassandraUI cassandraUI;
 
 
-    public Wizard( CassandraUI cassandraUI ) {
+    public Wizard( CassandraUI cassandraUI )
+    {
 
         this.cassandraUI = cassandraUI;
         verticalLayout = new VerticalLayout();
@@ -43,32 +45,28 @@ public class Wizard {
     }
 
 
-    public CassandraUI getCassandraUI() {
-        return cassandraUI;
-    }
-
-
-    public void setCassandraUI( final CassandraUI cassandraUI ) {
-        this.cassandraUI = cassandraUI;
-    }
-
-
-    private void putForm() {
+    private void putForm()
+    {
         verticalLayout.removeAllComponents();
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 verticalLayout.addComponent( new StepStart( this ) );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 verticalLayout.addComponent( new ConfigurationStep( this ) );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 verticalLayout.addComponent( new VerificationStep( this ) );
                 break;
             }
-            default: {
+            default:
+            {
                 step = 1;
                 verticalLayout.addComponent( new StepStart( this ) );
                 break;
@@ -77,35 +75,53 @@ public class Wizard {
     }
 
 
-    public Component getContent() {
+    public CassandraUI getCassandraUI()
+    {
+        return cassandraUI;
+    }
+
+
+    public void setCassandraUI( final CassandraUI cassandraUI )
+    {
+        this.cassandraUI = cassandraUI;
+    }
+
+
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void cancel() {
+    protected void cancel()
+    {
         step = 1;
         putForm();
     }
 
 
-    public CassandraClusterConfig getConfig() {
+    public CassandraClusterConfig getConfig()
+    {
         return config;
     }
 
 
-    public void init() {
+    public void init()
+    {
         step = 1;
         config = new CassandraClusterConfig();
         putForm();

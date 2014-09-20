@@ -12,7 +12,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by timur on 9/13/14.
  */
-public interface Container {
+public interface Container
+{
 
     /**
      * Execute command
@@ -21,9 +22,6 @@ public interface Container {
 
     /**
      * Execute command
-     *
-     * @param requestBuilder
-     * @throws CommandException
      */
     public void execute( RequestBuilder requestBuilder ) throws CommandException;
 
@@ -50,8 +48,6 @@ public interface Container {
 
     /**
      * Returns state of container
-     *
-     * @return
      */
     public ContainerState getContainerState();
 
@@ -69,15 +65,11 @@ public interface Container {
 
     /**
      * Returns set of logical containers
-     *
-     * @return
      */
     public Set<Container> getLogicalContainers();
 
     /**
      * Returns Agent
-     *
-     * @return
      */
     Agent getAgent();
 }

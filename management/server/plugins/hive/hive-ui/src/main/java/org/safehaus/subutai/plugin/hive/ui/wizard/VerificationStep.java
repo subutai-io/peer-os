@@ -21,10 +21,12 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-public class VerificationStep extends Panel {
+public class VerificationStep extends Panel
+{
 
     public VerificationStep( final Hive hive, final ExecutorService executorService, final Tracker tracker,
-                             final Wizard wizard ) {
+                             final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -41,13 +43,16 @@ public class VerificationStep extends Panel {
         final HadoopClusterConfig hc = wizard.getHadoopConfig();
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Installation name", config.getClusterName() );
-        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
             cfgView.addStringCfg( "Server node", config.getServer().getHostname() );
-            for ( Agent agent : config.getClients() ) {
+            for ( Agent agent : config.getClients() )
+            {
                 cfgView.addStringCfg( "Node(s) to install", agent.getHostname() + "" );
             }
         }
-        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
             cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
             cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
             cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
@@ -56,20 +61,26 @@ public class VerificationStep extends Panel {
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 UUID trackId = null;
-                if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
                     trackId = hive.installCluster( config );
                 }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
                     trackId = hive.installCluster( config, hc );
                 }
                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, HiveConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );
@@ -79,9 +90,11 @@ public class VerificationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );

@@ -1,58 +1,67 @@
 package org.safehaus.subutai.core.git.cli;
 
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import java.util.List;
+
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitBranch;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
-import org.safehaus.subutai.common.protocol.Agent;
 
-import java.util.List;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Displays branches
  */
-@Command (scope = "git", name = "list-branches", description = "List local/remote branches")
-public class ListBranches extends OsgiCommandSupport {
+@Command(scope = "git", name = "list-branches", description = "List local/remote branches")
+public class ListBranches extends OsgiCommandSupport
+{
 
-	@Argument (index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
-	String hostname;
-	@Argument (index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
-	String repoPath;
-	@Argument (index = 2, name = "remote", required = false, multiValued = false,
-			description = "list remote branches (true/false = default)")
-	boolean remote;
-	private AgentManager agentManager;
-	private GitManager gitManager;
-
-
-	public void setAgentManager(AgentManager agentManager) {
-		this.agentManager = agentManager;
-	}
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    String hostname;
+    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    String repoPath;
+    @Argument(index = 2, name = "remote", required = false, multiValued = false,
+            description = "list remote branches (true/false = default)")
+    boolean remote;
+    private AgentManager agentManager;
+    private GitManager gitManager;
 
 
-	public void setGitManager(final GitManager gitManager) {
-		this.gitManager = gitManager;
-	}
+    public void setAgentManager( AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
 
 
-	protected Object doExecute() {
+    public void setGitManager( final GitManager gitManager )
+    {
+        this.gitManager = gitManager;
+    }
 
-		Agent agent = agentManager.getAgentByHostname(hostname);
 
-		try {
-			List<GitBranch> branches = gitManager.listBranches(agent, repoPath, remote);
-			for (GitBranch branch : branches) {
-				System.out.println(branch);
-			}
-		} catch (GitException e) {
-			System.out.println(e);
-		}
+    protected Object doExecute()
+    {
 
-		return null;
-	}
+        Agent agent = agentManager.getAgentByHostname( hostname );
+
+        try
+        {
+            List<GitBranch> branches = gitManager.listBranches( agent, repoPath, remote );
+            for ( GitBranch branch : branches )
+            {
+                System.out.println( branch );
+            }
+        }
+        catch ( GitException e )
+        {
+            System.out.println( e );
+        }
+
+        return null;
+    }
 }

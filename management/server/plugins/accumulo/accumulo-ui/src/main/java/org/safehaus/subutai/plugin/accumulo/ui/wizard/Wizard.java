@@ -26,21 +26,23 @@ import com.vaadin.ui.GridLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private final GridLayout grid;
-    private int step = 1;
-    private AccumuloClusterConfig config = new AccumuloClusterConfig();
-    private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
-    private ZookeeperClusterConfig zookeeperClusterConfig = new ZookeeperClusterConfig();
     private final Hadoop hadoop;
     private final Accumulo accumulo;
     private final Zookeeper zookeeper;
     private final Tracker tracker;
     private final ExecutorService executorService;
+    private int step = 1;
+    private AccumuloClusterConfig config = new AccumuloClusterConfig();
+    private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
+    private ZookeeperClusterConfig zookeeperClusterConfig = new ZookeeperClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
 
         this.executorService = executorService;
         this.accumulo = serviceLocator.getService( Accumulo.class );
@@ -56,51 +58,62 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         grid.removeComponent( 0, 1 );
         Component component = null;
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 component = new WelcomeStep( this );
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 component = new ConfigurationStep( hadoop, zookeeper, this );
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 component = new VerificationStep( accumulo, executorService, tracker, this );
                 break;
             }
-            default: {
+            default:
+            {
                 break;
             }
         }
 
-        if ( component != null ) {
+        if ( component != null )
+        {
             grid.addComponent( component, 0, 1, 0, 19 );
         }
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         config = new AccumuloClusterConfig();
         hadoopClusterConfig = new HadoopClusterConfig();
@@ -109,17 +122,20 @@ public class Wizard {
     }
 
 
-    public AccumuloClusterConfig getConfig() {
+    public AccumuloClusterConfig getConfig()
+    {
         return config;
     }
 
 
-    public HadoopClusterConfig getHadoopClusterConfig() {
+    public HadoopClusterConfig getHadoopClusterConfig()
+    {
         return hadoopClusterConfig;
     }
 
 
-    public ZookeeperClusterConfig getZookeeperClusterConfig() {
+    public ZookeeperClusterConfig getZookeeperClusterConfig()
+    {
         return zookeeperClusterConfig;
     }
 }
