@@ -13,8 +13,9 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 
 /**
- * Created by timur on 9/4/14.
+ * Container Manager provides methods for working with LXC containers.
  */
+
 public interface ContainerManager
 {
 
@@ -47,6 +48,15 @@ public interface ContainerManager
     public Set<Agent> clone( UUID envId, String templateName, int numOfContainers, String strategyId,
                              List<Criteria> criteria ) throws ContainerCreateException;
 
+    /**
+     * Clones set of containers by given parameters.
+     *
+     * @param envId environment ID
+     * @param templateName template name
+     * @param cloneName name of cloning container
+     *
+     * @return cloned container agent
+     */
     public Agent clone( UUID envId, final String hostName, final String templateName, final String cloneName )
             throws ContainerCreateException;
 
@@ -58,6 +68,12 @@ public interface ContainerManager
      */
     public void destroy( final String hostName, final Set<String> cloneNames ) throws ContainerDestroyException;
 
+    /**
+     * Destroys container on physical host
+     *
+     * @param hostName physical host         s
+     * @param cloneName the name of container
+     */
     public void destroy( final String hostName, final String cloneName ) throws ContainerDestroyException;
 
     /**
@@ -91,7 +107,15 @@ public interface ContainerManager
      */
     public boolean stopLxcOnHost( Agent physicalAgent, String lxcHostname );
 
+    /**
+     * Adds container event listener
+     * @param listener
+     */
     public void addListener( ContainerEventListener listener );
 
+    /**
+     * Removes container event listener
+     * @param listener
+     */
     public void removeListener( ContainerEventListener listener );
 }
