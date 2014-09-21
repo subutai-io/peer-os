@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>file-tracker-impl</artifactId>
-  <name>Subutai File Tracker Impl</name>
+  <name>Subutai File Tracker</name>
   <packaging>bundle</packaging>
 
   <dependencies>

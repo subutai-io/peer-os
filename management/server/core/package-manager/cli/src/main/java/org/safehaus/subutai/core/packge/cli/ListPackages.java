@@ -6,19 +6,19 @@ import java.util.Collection;
 import org.safehaus.subutai.core.packge.api.PackageInfo;
 import org.safehaus.subutai.core.packge.api.PackageManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "deb-package", name = "list", description = "list packages")
+@Command( scope = "deb-package", name = "list", description = "list packages" )
 public class ListPackages extends OsgiCommandSupport
 {
 
     private PackageManager packageManager;
-    @Argument(index = 0, required = true)
+    @Argument( index = 0, required = true )
     private String hostname;
-    @Argument(index = 1, description = "package name pattern")
+    @Argument( index = 1, description = "package name pattern" )
     private String namePattern;
 
 

@@ -50,6 +50,6 @@ public class DebPackageManager extends DebPackageManagerBase
     {
         DeleteHandler h = new DeleteHandler( this, hostname );
         Boolean b = h.performAction();
-        return b != null ? b.booleanValue() : false;
+        return b != null && b;
     }
 }
