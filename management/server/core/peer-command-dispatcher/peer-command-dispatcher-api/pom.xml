@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>peer-manager-parent</artifactId>
+    <artifactId>peer-command-dispatcher-parent</artifactId>
     <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>peer-manager-api</artifactId>
-  <name>Subutai Peer Manager Api</name>
-  <description>Subutai Peer Manager Api</description>
+  <artifactId>peer-command-dispatcher-api</artifactId>
+  <name>Subutai Peer Command Dispatcher Api</name>
+  <description>Subutai Peer Command Dispatcher Api</description>
 
   <packaging>bundle</packaging>
 
@@ -24,17 +24,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>container-manager-api</artifactId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -48,7 +41,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.peer.api</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.peer.command.dispatcher.api</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

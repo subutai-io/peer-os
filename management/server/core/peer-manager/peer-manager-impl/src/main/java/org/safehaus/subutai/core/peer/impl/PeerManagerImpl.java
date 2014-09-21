@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -27,9 +29,11 @@ import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
+import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
@@ -43,8 +47,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager
-{
+public class PeerManagerImpl implements PeerManager {
 
     private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
@@ -53,6 +56,7 @@ public class PeerManagerImpl implements PeerManager
     private AgentManager agentManager;
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
+    private Set<PeerContainer> containers = new HashSet<>();
 
 
     public void init()
@@ -354,8 +358,8 @@ public class PeerManagerImpl implements PeerManager
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {}.getType() );
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -437,5 +441,65 @@ public class PeerManagerImpl implements PeerManager
     public Collection<PeerMessageListener> getPeerMessageListeners()
     {
         return Collections.unmodifiableCollection( peerMessageListeners );
+    }
+
+
+    public boolean invoke( PeerCommand peerCommand ) throws PeerException
+    {
+        boolean result = false;
+        UUID agentId = peerCommand.getPeerCommandMessage().getAgentId();
+        PeerContainer container = findPeerContainer( agentId );
+        if ( container == null )
+        {
+            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
+        }
+        switch ( peerCommand.getType() )
+        {
+            case CLONE:
+                break;
+            case START:
+                start( container );
+                break;
+            case STOP:
+                stop( container );
+                break;
+            case ISCONNECTED:
+                break;
+            default:
+                //TODO: log or exception?
+        }
+        return result;
+    }
+
+
+    private PeerContainer findPeerContainer( final UUID agentId )
+    {
+        PeerContainer result = null;
+        Iterator iterator = containers.iterator();
+        while ( result == null && iterator.hasNext() )
+        {
+            PeerContainer c = ( PeerContainer ) iterator.next();
+            if ( c.getAgentId().equals( agentId ) )
+            {
+                result = c;
+            }
+        }
+        return result;
+    }
+
+
+    private boolean start( PeerContainer container )
+    {
+
+        Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
+        return containerManager.startLxcOnHost( physicalAgent, container.getHostname() );
+    }
+
+
+    private boolean stop( PeerContainer container )
+    {
+
+        Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
+        return containerManager.stopLxcOnHost( physicalAgent, container.getHostname() );
     }
 }
