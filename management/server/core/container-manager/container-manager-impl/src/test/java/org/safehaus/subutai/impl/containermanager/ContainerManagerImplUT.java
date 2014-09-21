@@ -6,16 +6,13 @@
 package org.safehaus.subutai.impl.containermanager;
 
 
-import org.safehaus.subutai.core.container.api.ContainerManager;
-
-
 /**
  * Test for ContainerManagerImpl class
  */
 public class ContainerManagerImplUT
 {
 
-    private ContainerManager lxcManager;
+    //    private ContainerManager lxcManager;
 
 /*
     @Before

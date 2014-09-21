@@ -376,7 +376,6 @@ public class ContainerManagerImpl extends ContainerManagerBase
      *
      * @return map of metrics where key is a physical agent and value is a metric
      */
-    @Override
     public Map<Agent, ServerMetric> getPhysicalServerMetrics()
     {
         final Map<Agent, ServerMetric> serverMetrics = new HashMap<>();
@@ -529,6 +528,47 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
 
     /**
+     * Adds listener which wants to be notified when agents connect/disconnect
+     *
+     * @param listener - listener to add
+     */
+    @Override
+    public void addListener( ContainerEventListener listener )
+    {
+        try
+        {
+            if ( !listeners.contains( listener ) )
+            {
+                listeners.add( listener );
+            }
+        }
+        catch ( Exception ex )
+        {
+            //LOG.error( "Error on adding container event listener", ex );
+        }
+    }
+
+
+    /**
+     * Removes listener
+     *
+     * @param listener - - listener to remove
+     */
+    @Override
+    public void removeListener( ContainerEventListener listener )
+    {
+        try
+        {
+            listeners.remove( listener );
+        }
+        catch ( Exception ex )
+        {
+            //LOG.error( "Error on removing container event listener", ex );
+        }
+    }
+
+
+    /**
      * Gather metrics from elastic search for a one week period
      */
     private Map<Metric, Double> gatherAvgMetrics( Agent agent )
@@ -659,9 +699,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         }
         if ( parseOk )
         {
-            ServerMetric serverMetric =
-                    new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
-            return serverMetric;
+            return new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
         }
         else
         {
@@ -723,47 +761,6 @@ public class ContainerManagerImpl extends ContainerManagerBase
             }
         }
         return lxcHostNames;
-    }
-
-
-    /**
-     * Adds listener which wants to be notified when agents connect/disconnect
-     *
-     * @param listener - listener to add
-     */
-    @Override
-    public void addListener( ContainerEventListener listener )
-    {
-        try
-        {
-            if ( !listeners.contains( listener ) )
-            {
-                listeners.add( listener );
-            }
-        }
-        catch ( Exception ex )
-        {
-            //LOG.error( "Error on adding container event listener", ex );
-        }
-    }
-
-
-    /**
-     * Removes listener
-     *
-     * @param listener - - listener to remove
-     */
-    @Override
-    public void removeListener( ContainerEventListener listener )
-    {
-        try
-        {
-            listeners.remove( listener );
-        }
-        catch ( Exception ex )
-        {
-            //LOG.error( "Error on removing container event listener", ex );
-        }
     }
 
 
