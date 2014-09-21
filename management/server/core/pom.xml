@@ -21,7 +21,7 @@
     <!--<module>command-dispatcher</module>-->
     <module>command-runner</module>
     <module>communication-manager</module>
-    <!--<module>config-point-tracker</module>-->
+    <module>config-point-tracker</module>
     <!--<module>configuration-manager</module>-->
     <!--<module>container-manager</module>-->
     <!--<module>environment-manager</module>-->
