@@ -29,7 +29,7 @@
     <module>file-tracker</module>
     <module>git-manager</module>
     <!--<module>lxc-manager</module>-->
-    <!--<module>monitoring</module>-->
+    <module>monitoring</module>
     <!--<module>network-manager</module>-->
     <!--<module>package-manager</module>-->
     <!--<module>peer-manager</module>-->

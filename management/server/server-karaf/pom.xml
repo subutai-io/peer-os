@@ -230,18 +230,18 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- monitoring -->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>monitoring-api</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>monitoring-impl</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>monitoring-cli</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>monitoring-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>monitoring-impl</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>monitoring-cli</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- network-manager -->
@@ -406,18 +406,18 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- monitoring -->
-                <!--<artifactItem>-->
-                <!--<groupId>commons-io</groupId>-->
-                <!--<artifactId>commons-io</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>org.codehaus.jackson</groupId>-->
-                <!--<artifactId>jackson-mapper-asl</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>org.codehaus.jackson</groupId>-->
-                <!--<artifactId>jackson-core-asl</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>commons-io</groupId>
+                  <artifactId>commons-io</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.codehaus.jackson</groupId>
+                  <artifactId>jackson-mapper-asl</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.codehaus.jackson</groupId>
+                  <artifactId>jackson-core-asl</artifactId>
+                </artifactItem>
 
               </artifactItems>
             </configuration>
