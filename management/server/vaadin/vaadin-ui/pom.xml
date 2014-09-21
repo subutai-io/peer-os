@@ -157,6 +157,11 @@
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared-deps</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
     </dependency>
     <dependency>
