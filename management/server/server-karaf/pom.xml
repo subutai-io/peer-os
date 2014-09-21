@@ -109,6 +109,7 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>vaadin-ui</artifactId>
+                  <destFileName>vaadin-ui.war</destFileName>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
