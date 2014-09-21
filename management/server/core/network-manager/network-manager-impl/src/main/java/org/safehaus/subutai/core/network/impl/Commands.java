@@ -37,7 +37,7 @@ public class Commands
         return commandRunner.createCommand( new RequestBuilder( "rm -Rf /root/.ssh && " +
                 "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
-                "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" ), new HashSet<>( agentList ) );
+                "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" ), new HashSet<Agent>( agentList ) );
     }
 
 

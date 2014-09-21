@@ -10,15 +10,12 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import com.google.common.base.Preconditions;
 
 
-/**
- * Created by daralbaev on 04.04.14.
- */
-public class NetwokManagerImpl implements NetworkManager
+public class NetworkManagerImpl implements NetworkManager
 {
     private final Commands commands;
 
 
-    public NetwokManagerImpl( final CommandRunner commandRunner )
+    public NetworkManagerImpl( final CommandRunner commandRunner )
     {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
 

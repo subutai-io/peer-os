@@ -245,14 +245,14 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- network-manager -->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>network-manager-api</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>network-manager-impl</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>network-manager-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>network-manager-impl</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- package-manager -->
@@ -354,6 +354,7 @@
                   <groupId>org.apache.httpcomponents</groupId>
                   <artifactId>httpcore-osgi</artifactId>
                 </artifactItem>
+
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
                 <artifactItem>

@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>monitoring-impl</artifactId>
-  <name>Subutai Monitoring Impl</name>
+  <name>Subutai Monitoring</name>
   <packaging>bundle</packaging>
 
   <dependencies>

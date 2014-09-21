@@ -13,9 +13,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import com.google.common.base.Strings;
 
 
-/**
- * Created by daralbaev on 04.04.14.
- */
 public class SshManager
 {
 
@@ -95,14 +92,7 @@ public class SshManager
         }
         keys = value.toString();
 
-        if ( !Strings.isNullOrEmpty( keys ) && command.hasSucceeded() )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
     }
 
 
@@ -173,7 +163,6 @@ public class SshManager
         {
             LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
         }
-        ;
 
         return command.hasSucceeded();
     }
