@@ -25,7 +25,7 @@
     <!--<module>configuration-manager</module>-->
     <!--<module>container-manager</module>-->
     <!--<module>environment-manager</module>-->
-    <!--<module>db-manager</module>-->
+    <module>db-manager</module>
     <!--<module>file-tracker</module>-->
     <!--<module>git-manager</module>-->
     <!--<module>lxc-manager</module>-->

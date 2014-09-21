@@ -33,7 +33,8 @@ import com.google.gson.JsonSyntaxException;
 /**
  * Implementation of DbManager
  */
-public class DbManagerImpl implements DbManager {
+public class DbManagerImpl implements DbManager
+{
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger( DbManagerImpl.class.getName() );
