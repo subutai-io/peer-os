@@ -16,7 +16,7 @@
   <modules>
     <module>core</module>
     <module>subutai-common</module>
-    <!--<module>vaadin</module>-->
+    <module>vaadin</module>
     <!--<module>plugins</module>-->
 
     <module>server-karaf</module>

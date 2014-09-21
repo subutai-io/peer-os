@@ -87,7 +87,7 @@ public final class AgentTree extends ConcurrentComponent implements AgentListene
                 {
                     Tree t = ( Tree ) event.getProperty();
 
-                    Set<Agent> selectedList = new HashSet<Agent>();
+                    Set<Agent> selectedList = new HashSet<>();
 
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
