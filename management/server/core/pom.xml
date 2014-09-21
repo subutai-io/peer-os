@@ -35,7 +35,7 @@
     <!--<module>peer-manager</module>-->
     <module>strategy-manager</module>
     <!--<module>template-manager</module>-->
-    <!--<module>template-registry</module>-->
+    <module>template-registry</module>
     <!--<module>tracker</module>-->
     <!--
     <module>pet_core</module>

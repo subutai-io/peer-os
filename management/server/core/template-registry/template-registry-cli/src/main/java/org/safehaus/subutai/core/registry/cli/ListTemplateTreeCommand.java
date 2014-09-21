@@ -7,14 +7,14 @@ import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * CLI for TemplateRegistryManager.ListTemplateTreeCommand command
  */
-@Command(scope = "registry", name = "list-template-tree", description = "List templates tree")
+@Command( scope = "registry", name = "list-template-tree", description = "List templates tree" )
 public class ListTemplateTreeCommand extends OsgiCommandSupport
 {
 
