@@ -17,11 +17,6 @@
   <description>Parent project for the Subutai Project Artifacts</description>
 
   <repositories>
-    <repository>
-      <id>maven-restlet</id>
-      <name>Restlet repository</name>
-      <url>http://maven.restlet.com</url>
-    </repository>
   </repositories>
 
   <properties>

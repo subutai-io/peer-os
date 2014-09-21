@@ -101,22 +101,22 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- agent-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-rest</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>agent-manager-api</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>agent-manager-impl</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>agent-manager-cli</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>agent-manager-rest</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- apt-repository-manager -->
@@ -356,30 +356,30 @@
                 </artifactItem>
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
-                <!--<artifactItem>-->
-                <!--<groupId>org.apache.activemq</groupId>-->
-                <!--<artifactId>activemq-client</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>org.apache.activemq</groupId>-->
-                <!--<artifactId>activemq-pool</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>org.apache.activemq</groupId>-->
-                <!--<artifactId>activemq-jms-pool</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>javax.management.j2ee</groupId>-->
-                <!--<artifactId>management-api</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>commons-pool</groupId>-->
-                <!--<artifactId>commons-pool</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>org.apache.servicemix.bundles</groupId>-->
-                <!--<artifactId>org.apache.servicemix.bundles.junit</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-client</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-pool</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-jms-pool</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>javax.management.j2ee</groupId>
+                  <artifactId>management-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>commons-pool</groupId>
+                  <artifactId>commons-pool</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.servicemix.bundles</groupId>
+                  <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- db-manager -->

@@ -7,7 +7,8 @@ import java.util.UUID;
 /**
  * Created by timur on 9/20/14.
  */
-public class Container {
+public class Container
+{
     private UUID agentId;
     private UUID peerId;
     private String hostname;
