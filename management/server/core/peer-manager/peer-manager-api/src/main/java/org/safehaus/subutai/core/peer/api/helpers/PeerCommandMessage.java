@@ -7,7 +7,8 @@ import java.util.UUID;
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerCommandMessage {
+public class PeerCommandMessage
+{
     private UUID agentId;
     private UUID peerId;
 

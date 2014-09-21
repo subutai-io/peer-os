@@ -7,14 +7,14 @@ import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Needed mostly for testing FileTracker
  */
-@Command(scope = "file-tracker", name = "test")
+@Command( scope = "file-tracker", name = "test" )
 public class CliTest extends OsgiCommandSupport implements ResponseListener
 {
 

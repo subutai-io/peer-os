@@ -17,7 +17,8 @@ import org.safehaus.subutai.core.filetracker.api.FileTracker;
 import com.google.common.collect.Sets;
 
 
-public class FileTrackerImpl implements FileTracker, ResponseListener {
+public class FileTrackerImpl implements FileTracker, ResponseListener
+{
 
     private final HashSet<ResponseListener> listeners = new HashSet<>();
 

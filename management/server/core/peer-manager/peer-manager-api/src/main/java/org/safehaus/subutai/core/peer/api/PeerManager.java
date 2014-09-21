@@ -15,7 +15,8 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public interface PeerManager {
+public interface PeerManager
+{
 
     boolean register( Peer peer );
 
