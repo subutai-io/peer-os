@@ -55,6 +55,7 @@
               com.vaadin.server.*;
               com.vaadin.event.*;
               com.vaadin.client.*;
+              com.vaadin.shared.*;
               com.google.gwt.*;
             </Export-Package>
 
@@ -147,6 +148,11 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
