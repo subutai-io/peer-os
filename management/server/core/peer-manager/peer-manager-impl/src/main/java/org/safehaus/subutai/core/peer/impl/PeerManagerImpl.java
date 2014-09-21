@@ -47,7 +47,8 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager {
+public class PeerManagerImpl implements PeerManager
+{
 
     private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
@@ -358,7 +359,8 @@ public class PeerManagerImpl implements PeerManager {
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
+                {
                 }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
@@ -404,43 +406,6 @@ public class PeerManagerImpl implements PeerManager {
             LOG.severe( e.getMessage() );
         }
         return null;
-    }
-
-
-    private String getLocalIp()
-    {
-        Enumeration<NetworkInterface> n;
-        try
-        {
-            n = NetworkInterface.getNetworkInterfaces();
-            for (; n.hasMoreElements(); )
-            {
-                NetworkInterface e = n.nextElement();
-
-                Enumeration<InetAddress> a = e.getInetAddresses();
-                for (; a.hasMoreElements(); )
-                {
-                    InetAddress addr = a.nextElement();
-                    if ( addr.getHostAddress().startsWith( "172" ) )
-                    {
-                        return addr.getHostAddress();
-                    }
-                }
-            }
-        }
-        catch ( SocketException e )
-        {
-            LOG.severe( e.getMessage() );
-        }
-
-
-        return "127.0.0.1";
-    }
-
-
-    public Collection<PeerMessageListener> getPeerMessageListeners()
-    {
-        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 
 
@@ -501,5 +466,42 @@ public class PeerManagerImpl implements PeerManager {
 
         Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
         return containerManager.stopLxcOnHost( physicalAgent, container.getHostname() );
+    }
+
+
+    private String getLocalIp()
+    {
+        Enumeration<NetworkInterface> n;
+        try
+        {
+            n = NetworkInterface.getNetworkInterfaces();
+            for (; n.hasMoreElements(); )
+            {
+                NetworkInterface e = n.nextElement();
+
+                Enumeration<InetAddress> a = e.getInetAddresses();
+                for (; a.hasMoreElements(); )
+                {
+                    InetAddress addr = a.nextElement();
+                    if ( addr.getHostAddress().startsWith( "172" ) )
+                    {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        }
+        catch ( SocketException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
+
+
+        return "127.0.0.1";
+    }
+
+
+    public Collection<PeerMessageListener> getPeerMessageListeners()
+    {
+        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 }
