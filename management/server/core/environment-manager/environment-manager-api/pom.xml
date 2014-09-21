@@ -20,6 +20,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>template-registry-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

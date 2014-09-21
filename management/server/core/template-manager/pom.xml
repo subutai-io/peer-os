@@ -16,9 +16,9 @@
 
   <modules>
     <module>template-manager-api</module>
-    <module>template-manager-impl</module>
-    <module>template-manager-cli</module>
-    <module>template-manager-rest</module>
+    <!--<module>template-manager-impl</module>-->
+    <!--<module>template-manager-cli</module>-->
+    <!--<module>template-manager-rest</module>-->
     <!--<module>template-manager-ui</module>-->
   </modules>
 </project>

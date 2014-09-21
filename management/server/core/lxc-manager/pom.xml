@@ -16,7 +16,7 @@
 
   <modules>
     <module>lxc-manager-api</module>
-    <module>lxc-manager-impl</module>
-    <module>lxc-manager-ui</module>
+    <!--<module>lxc-manager-impl</module>-->
+    <!--<module>lxc-manager-ui</module>-->
   </modules>
 </project>

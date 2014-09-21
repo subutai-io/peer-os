@@ -17,10 +17,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -31,11 +27,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>monitoring-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>environment-manager-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
@@ -52,7 +43,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.lxc.api</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
+              {local-packages}.*;version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>
