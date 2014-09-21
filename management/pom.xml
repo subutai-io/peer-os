@@ -523,6 +523,16 @@
         <artifactId>vaadin-themes</artifactId>
         <version>7.3.1</version>
       </dependency>
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-shared</artifactId>
+        <version>7.3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-shared-deps</artifactId>
+        <version>1.0.2</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--REST dependencies-->

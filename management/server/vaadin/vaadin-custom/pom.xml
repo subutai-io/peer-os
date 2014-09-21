@@ -24,7 +24,12 @@
       <artifactId>vaadin-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+    <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
