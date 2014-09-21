@@ -19,7 +19,8 @@ import com.google.common.base.Preconditions;
 /**
  * This is an implementation of ProductOperationView
  */
-public class ProductOperationViewImpl implements ProductOperationView {
+public class ProductOperationViewImpl implements ProductOperationView
+{
 
     /**
      * id of product operation

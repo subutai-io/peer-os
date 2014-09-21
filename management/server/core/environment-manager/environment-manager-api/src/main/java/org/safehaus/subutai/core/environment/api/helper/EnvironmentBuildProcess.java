@@ -23,7 +23,7 @@ public class EnvironmentBuildProcess
     public EnvironmentBuildProcess()
     {
         this.uuid = UUID.randomUUID();
-        this.containerBuildMessages = new ArrayList<>();
+        this.containerBuildMessages = new ArrayList<ContainerBuildMessage>();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
     }
 

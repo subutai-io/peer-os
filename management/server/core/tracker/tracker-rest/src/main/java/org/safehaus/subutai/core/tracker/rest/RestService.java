@@ -13,19 +13,20 @@ public interface RestService
 {
 
     @GET
-    @Path("operations/{source}/{uuid}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getProductOperation( @PathParam("source") String source, @PathParam("uuid") String uuid );
+    @Path( "operations/{source}/{uuid}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getProductOperation( @PathParam( "source" ) String source, @PathParam( "uuid" ) String uuid );
 
 
     @GET
-    @Path("operations/{source}/{dateFrom}/{dateTo}/{limit}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getProductOperations( @PathParam("source") String source, @PathParam("dateFrom") String fromDate,
-                                          @PathParam("dateTo") String toDate, @PathParam("limit") int limit );
+    @Path( "operations/{source}/{dateFrom}/{dateTo}/{limit}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getProductOperations( @PathParam( "source" ) String source,
+                                          @PathParam( "dateFrom" ) String fromDate,
+                                          @PathParam( "dateTo" ) String toDate, @PathParam( "limit" ) int limit );
 
     @GET
-    @Path("operations/sources")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "operations/sources" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getProductOperationSources();
 }

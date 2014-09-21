@@ -16,6 +16,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -53,9 +57,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.template.impl</Bundle-SymbolicName>
-            <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
-            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

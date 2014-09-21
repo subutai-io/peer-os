@@ -327,14 +327,18 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- tracker -->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>tracker-api</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>tracker-impl</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>tracker-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>tracker-impl</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>tracker-rest</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- REST -->

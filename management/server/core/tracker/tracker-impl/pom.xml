@@ -31,7 +31,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>db-manager-impl</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * This is an implementaion of ProductOperation
+ * This is an implementation of ProductOperation
  */
 public class ProductOperationImpl implements ProductOperation
 {
