@@ -139,6 +139,18 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>command-dispatcher-api</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>command-dispatcher-impl</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>command-dispatcher-cli</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>command-dispatcher-rest</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- command-runner -->
@@ -157,14 +169,14 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>container-manager-api</artifactId>
                 </artifactItem>
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>container-manager-impl</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>container-manager-cli</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>container-manager-impl</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>container-manager-cli</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
