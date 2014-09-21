@@ -20,6 +20,17 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>container-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>agent-manager-api</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -35,7 +46,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.peer.api</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

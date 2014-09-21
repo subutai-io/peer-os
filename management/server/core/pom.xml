@@ -23,7 +23,7 @@
     <module>communication-manager</module>
     <module>config-point-tracker</module>
     <!--<module>configuration-manager</module>-->
-    <!--<module>container-manager</module>-->
+    <module>container-manager</module>
     <!--<module>environment-manager</module>-->
     <module>db-manager</module>
     <module>file-tracker</module>

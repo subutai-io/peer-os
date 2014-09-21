@@ -1,11 +1,13 @@
 package org.safehaus.subutai.core.peer.api.helpers;
 
 
+import java.util.UUID;
+
+
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerCommand
-{
+public class PeerCommand {
     private PeerCommandMessage peerCommandMessage;
     private PeerCommandType type;
 

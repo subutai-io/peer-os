@@ -11,8 +11,8 @@ import org.safehaus.subutai.core.container.api.ContainerEvent;
 import org.safehaus.subutai.core.container.api.ContainerEventListener;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 

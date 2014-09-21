@@ -16,12 +16,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
+      <artifactId>agent-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -31,19 +31,9 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>strategy-manager-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.apache.karaf.shell</groupId>
       <artifactId>org.apache.karaf.shell.console</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
     </dependency>
   </dependencies>
 
@@ -58,12 +48,6 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>
-              org.apache.felix.service.command,
-              org.apache.felix.gogo.commands,
-              org.apache.karaf.shell.console,
-              *
-            </Import-Package>
           </instructions>
         </configuration>
       </plugin>

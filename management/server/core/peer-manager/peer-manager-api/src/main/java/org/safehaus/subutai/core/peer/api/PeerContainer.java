@@ -9,8 +9,7 @@ import org.safehaus.subutai.common.protocol.Container;
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerContainer extends Container
-{
+public class PeerContainer extends Container {
     // UUID of physical agent
     private UUID parentHostId;
 

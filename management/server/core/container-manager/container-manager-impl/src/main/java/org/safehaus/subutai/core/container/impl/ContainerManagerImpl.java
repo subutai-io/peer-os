@@ -59,7 +59,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class ContainerManagerImpl extends ContainerManagerBase {
+public class ContainerManagerImpl extends ContainerManagerBase
+{
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
@@ -195,7 +196,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         final ContainerManager self = this;
         for ( final Map.Entry<Agent, Set<String>> e : cloneNames.entrySet() )
         {
-            completionService.submit( new Callable<Set<Agent>>() {
+            completionService.submit( new Callable<Set<Agent>>()
+            {
                 @Override
                 public Set<Agent> call() throws Exception
                 {
@@ -527,47 +529,6 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
 
     /**
-     * Adds listener which wants to be notified when agents connect/disconnect
-     *
-     * @param listener - listener to add
-     */
-    @Override
-    public void addListener( ContainerEventListener listener )
-    {
-        try
-        {
-            if ( !listeners.contains( listener ) )
-            {
-                listeners.add( listener );
-            }
-        }
-        catch ( Exception ex )
-        {
-            //LOG.error( "Error on adding container event listener", ex );
-        }
-    }
-
-
-    /**
-     * Removes listener
-     *
-     * @param listener - - listener to remove
-     */
-    @Override
-    public void removeListener( ContainerEventListener listener )
-    {
-        try
-        {
-            listeners.remove( listener );
-        }
-        catch ( Exception ex )
-        {
-            //LOG.error( "Error on removing container event listener", ex );
-        }
-    }
-
-
-    /**
      * Gather metrics from elastic search for a one week period
      */
     private Map<Metric, Double> gatherAvgMetrics( Agent agent )
@@ -765,6 +726,47 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
+    /**
+     * Adds listener which wants to be notified when agents connect/disconnect
+     *
+     * @param listener - listener to add
+     */
+    @Override
+    public void addListener( ContainerEventListener listener )
+    {
+        try
+        {
+            if ( !listeners.contains( listener ) )
+            {
+                listeners.add( listener );
+            }
+        }
+        catch ( Exception ex )
+        {
+            //LOG.error( "Error on adding container event listener", ex );
+        }
+    }
+
+
+    /**
+     * Removes listener
+     *
+     * @param listener - - listener to remove
+     */
+    @Override
+    public void removeListener( ContainerEventListener listener )
+    {
+        try
+        {
+            listeners.remove( listener );
+        }
+        catch ( Exception ex )
+        {
+            //LOG.error( "Error on removing container event listener", ex );
+        }
+    }
+
+
     private void execute( Agent agent, UUID envId, String templateName, Set<String> cloneNames,
                           ExecutorService executor, ContainerAction containerAction ) throws ContainerException
     {
@@ -824,7 +826,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
-    private class ContainerEventListenerImpl implements ContainerEventListener {
+    private class ContainerEventListenerImpl implements ContainerEventListener
+    {
         private Set<Agent> successfullyClonedContainers;
 
 
