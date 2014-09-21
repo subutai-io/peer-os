@@ -9,15 +9,15 @@ import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.apt.api.PackageInfo;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "apt", name = "list-packages", description = "List packages in apt repository by pattern")
+@Command( scope = "apt", name = "list-packages", description = "List packages in apt repository by pattern" )
 public class ListPackagesCommand extends OsgiCommandSupport
 {
-    @Argument(index = 0, name = "pattern", required = true, multiValued = false, description = "search pattern")
+    @Argument( index = 0, name = "pattern", required = true, multiValued = false, description = "search pattern" )
     String pattern;
 
     private AptRepositoryManager aptRepositoryManager;

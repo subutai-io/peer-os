@@ -6,16 +6,16 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "apt", name = "add-package", description = "Add package to apt repository by path")
+@Command( scope = "apt", name = "add-package", description = "Add package to apt repository by path" )
 public class AddPackageCommand extends OsgiCommandSupport
 {
-    @Argument(index = 0, name = "package path", required = true, multiValued = false,
-            description = "path to package")
+    @Argument( index = 0, name = "package path", required = true, multiValued = false,
+            description = "path to package" )
     String packagePath;
 
     private AptRepositoryManager aptRepositoryManager;

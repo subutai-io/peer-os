@@ -10,19 +10,19 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "apt", name = "read-files", description = "Read files inside deb package")
+@Command( scope = "apt", name = "read-files", description = "Read files inside deb package" )
 public class ReadFilesCommand extends OsgiCommandSupport
 {
-    @Argument(index = 0, name = "package path", required = true, multiValued = false,
-            description = "path to package")
+    @Argument( index = 0, name = "package path", required = true, multiValued = false,
+            description = "path to package" )
     String packagePath;
-    @Argument(index = 1, name = "file path(s)", required = true, multiValued = true,
-            description = "relative file path(s) to read")
+    @Argument( index = 1, name = "file path(s)", required = true, multiValued = true,
+            description = "relative file path(s) to read" )
     Collection<String> filesPaths;
 
     private AptRepositoryManager aptRepositoryManager;
