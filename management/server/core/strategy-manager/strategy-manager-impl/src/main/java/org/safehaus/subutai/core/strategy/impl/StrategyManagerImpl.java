@@ -18,7 +18,8 @@ import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
 /**
  * Created by timur on 9/18/14.
  */
-public class StrategyManagerImpl implements StrategyManager {
+public class StrategyManagerImpl implements StrategyManager
+{
 
     List<ContainerPlacementStrategy> placementStrategies =
             Collections.synchronizedList( new ArrayList<ContainerPlacementStrategy>() );

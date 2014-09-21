@@ -21,12 +21,12 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
 public class DefaultContainerPlacementStrategy extends AbstractContainerPlacementStrategy
 {
     public static final String defaultNodeType = "default";
-    private final double MIN_HDD_LXC_MB = 5 * 1024;
-    private final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
-    private final double MIN_RAM_LXC_MB = 512;          // 1G
-    private final double MIN_RAM_IN_RESERVE_MB = 1024;   // 1G
-    private final double MIN_CPU_LXC_PERCENT = 5;           // 5%
-    private final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
+    private static final double MIN_HDD_LXC_MB = 5 * 1024;
+    private static final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
+    private static final double MIN_RAM_LXC_MB = 512;          // 1G
+    private static final double MIN_RAM_IN_RESERVE_MB = 1024;   // 1G
+    private static final double MIN_CPU_LXC_PERCENT = 5;           // 5%
+    private static final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
     Logger LOG = Logger.getLogger( DefaultContainerPlacementStrategy.class.getName() );
 
 

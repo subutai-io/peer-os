@@ -285,6 +285,17 @@
                 <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- strategy-manager -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>strategy-manager-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>strategy-manager-impl</artifactId>
+                </artifactItem>
+
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- template-manager -->
                 <!--<artifactItem>-->
                 <!--<groupId>${project.groupId}</groupId>-->

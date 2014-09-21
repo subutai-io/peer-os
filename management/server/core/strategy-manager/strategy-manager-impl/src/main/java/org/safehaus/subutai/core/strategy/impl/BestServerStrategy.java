@@ -13,8 +13,9 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 
-public class BestServerStrategy extends RoundRobinStrategy {
-    private List<Criteria> criteria = new ArrayList<Criteria>();
+public class BestServerStrategy extends RoundRobinStrategy
+{
+    private List<Criteria> criteria = new ArrayList<>();
 
 
     @Override
@@ -35,7 +36,7 @@ public class BestServerStrategy extends RoundRobinStrategy {
     protected List<Agent> sortServers( Map<Agent, ServerMetric> serverMetrics )
     {
         // using each strategy criteria, grade servers one by one
-        Map<Agent, Integer> grades = new HashMap<Agent, Integer>();
+        Map<Agent, Integer> grades = new HashMap<>();
         for ( Agent a : serverMetrics.keySet() )
         {
             grades.put( a, 0 );
@@ -58,8 +59,9 @@ public class BestServerStrategy extends RoundRobinStrategy {
         }
 
         // sort servers by their grades in decreasing order
-        ArrayList<Map.Entry<Agent, Integer>> ls = new ArrayList<Map.Entry<Agent, Integer>>( grades.entrySet() );
-        Collections.sort( ls, new Comparator<Map.Entry>() {
+        ArrayList<Map.Entry<Agent, Integer>> ls = new ArrayList<>( grades.entrySet() );
+        Collections.sort( ls, new Comparator<Map.Entry>()
+        {
 
             @Override
             public int compare( Map.Entry o1, Map.Entry o2 )
@@ -70,7 +72,7 @@ public class BestServerStrategy extends RoundRobinStrategy {
             }
         } );
 
-        List<Agent> servers = new ArrayList<Agent>();
+        List<Agent> servers = new ArrayList<>();
         for ( Map.Entry<Agent, Integer> e : ls )
         {
             servers.add( e.getKey() );
@@ -82,9 +84,9 @@ public class BestServerStrategy extends RoundRobinStrategy {
     private Agent getBestMatch( Map<Agent, ServerMetric> serverMetrics, final MetricComparator mc )
     {
 
-        List<Map.Entry<Agent, ServerMetric>> ls =
-                new ArrayList<Map.Entry<Agent, ServerMetric>>( serverMetrics.entrySet() );
-        Collections.sort( ls, new Comparator<Map.Entry>() {
+        List<Map.Entry<Agent, ServerMetric>> ls = new ArrayList<>( serverMetrics.entrySet() );
+        Collections.sort( ls, new Comparator<Map.Entry>()
+        {
 
             @Override
             public int compare( Map.Entry o1, Map.Entry o2 )
@@ -110,12 +112,12 @@ public class BestServerStrategy extends RoundRobinStrategy {
     @Override
     public List<Criteria> getCriteria()
     {
-        List<Criteria> criteria = new ArrayList<Criteria>();
-        Criteria c = new Criteria( "MORE_HDD", "More HDD", new Boolean( false ) );
+        List<Criteria> criteria = new ArrayList<>();
+        Criteria c = new Criteria( "MORE_HDD", "More HDD", Boolean.FALSE );
         criteria.add( c );
-        c = new Criteria( "MORE_RAM", "More RAM", new Boolean( false ) );
+        c = new Criteria( "MORE_RAM", "More RAM", Boolean.FALSE );
         criteria.add( c );
-        c = new Criteria( "MORE_CPU", "More CPU", new Boolean( false ) );
+        c = new Criteria( "MORE_CPU", "More CPU", Boolean.FALSE );
         criteria.add( c );
 
         return Collections.unmodifiableList( criteria );
