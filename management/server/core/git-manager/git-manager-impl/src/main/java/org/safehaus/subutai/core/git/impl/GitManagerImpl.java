@@ -214,7 +214,7 @@ public class GitManagerImpl implements GitManager
         }
         else if ( output )
         {
-            AgentResult agentResult = command.getResults().get( host.getUuid() );
+            command.getResults().get( host.getUuid() );
         }
     }
 

@@ -27,7 +27,7 @@
     <!--<module>environment-manager</module>-->
     <module>db-manager</module>
     <module>file-tracker</module>
-    <!--<module>git-manager</module>-->
+    <module>git-manager</module>
     <!--<module>lxc-manager</module>-->
     <!--<module>monitoring</module>-->
     <!--<module>network-manager</module>-->
