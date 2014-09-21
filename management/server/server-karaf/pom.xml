@@ -50,6 +50,7 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -111,6 +112,7 @@
                   <artifactId>vaadin-ui</artifactId>
                   <destFileName>vaadin-ui.war</destFileName>
                   <outputDirectory>target/assembly/deploy</outputDirectory>
+                  <type>war</type>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
