@@ -323,18 +323,18 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>template-manager-api</artifactId>
                 </artifactItem>
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>template-manager-impl</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>template-manager-cli</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>template-manager-rest</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>template-manager-impl</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>template-manager-cli</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>template-manager-rest</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- template-registry -->

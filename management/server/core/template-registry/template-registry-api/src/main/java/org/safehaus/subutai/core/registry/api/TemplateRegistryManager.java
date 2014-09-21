@@ -8,6 +8,8 @@ package org.safehaus.subutai.core.registry.api;
 
 import java.util.List;
 
+import org.safehaus.subutai.common.protocol.Template;
+
 
 /**
  * Class to work with templates registry, templates metadata

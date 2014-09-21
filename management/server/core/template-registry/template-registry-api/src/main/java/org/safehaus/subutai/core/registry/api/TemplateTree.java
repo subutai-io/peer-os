@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.safehaus.subutai.common.protocol.Template;
+
 import com.google.common.base.Strings;
 
 
@@ -37,9 +39,8 @@ public class TemplateTree
             parentChild.put( parentTemplateName, children );
         }
         children.add( template );
-        childParent.put( String
-                .format( "%s-%s", template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() ),
-                parentTemplateName );
+        childParent.put( String.format( "%s-%s", template.getTemplateName().toLowerCase(),
+                        template.getLxcArch().toLowerCase() ), parentTemplateName );
     }
 
 

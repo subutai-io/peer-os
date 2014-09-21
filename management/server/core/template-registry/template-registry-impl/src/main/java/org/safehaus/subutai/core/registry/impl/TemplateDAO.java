@@ -4,9 +4,9 @@ package org.safehaus.subutai.core.registry.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.registry.api.Template;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;

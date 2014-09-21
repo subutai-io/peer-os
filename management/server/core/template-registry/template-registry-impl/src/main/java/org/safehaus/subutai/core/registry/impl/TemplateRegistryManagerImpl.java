@@ -19,12 +19,12 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 

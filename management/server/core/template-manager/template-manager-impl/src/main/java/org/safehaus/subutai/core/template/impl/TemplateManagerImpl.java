@@ -15,7 +15,7 @@ import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
