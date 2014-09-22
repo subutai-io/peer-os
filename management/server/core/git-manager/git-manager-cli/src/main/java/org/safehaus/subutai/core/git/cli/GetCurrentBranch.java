@@ -51,7 +51,7 @@ public class GetCurrentBranch extends OsgiCommandSupport
         try
         {
             GitBranch gitBranch = gitManager.currentBranch( agent, repoPath );
-            LOG.info( gitBranch.toString() );
+            System.out.println( gitBranch.toString() );
         }
         catch ( GitException e )
         {

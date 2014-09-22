@@ -59,7 +59,7 @@ public class ListBranches extends OsgiCommandSupport
             List<GitBranch> branches = gitManager.listBranches( agent, repoPath, remote );
             for ( GitBranch branch : branches )
             {
-                LOG.info( branch.toString() );
+                System.out.println( branch.toString() );
             }
         }
         catch ( GitException e )

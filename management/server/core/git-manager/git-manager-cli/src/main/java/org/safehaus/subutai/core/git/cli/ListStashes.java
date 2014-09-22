@@ -55,7 +55,7 @@ public class ListStashes extends OsgiCommandSupport
             List<String> stashes = gitManager.listStashes( agent, repoPath );
             for ( String stash : stashes )
             {
-                LOG.info( stash.toString() );
+                System.out.println( stash.toString() );
             }
         }
         catch ( GitException e )

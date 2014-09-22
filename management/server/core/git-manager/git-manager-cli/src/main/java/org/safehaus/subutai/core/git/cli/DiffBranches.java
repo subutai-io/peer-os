@@ -69,7 +69,7 @@ public class DiffBranches extends OsgiCommandSupport
 
             for ( GitChangedFile gf : changedFileList )
             {
-                LOG.info( gf.toString() );
+                System.out.println( gf.toString() );
             }
         }
         catch ( GitException e )
