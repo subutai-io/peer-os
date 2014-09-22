@@ -17,10 +17,6 @@
   <description>Parent project for the Subutai Project Artifacts</description>
 
   <repositories>
-    <repository>
-      <id>central</id>
-      <url>http://repo1.maven.org/maven2/</url>
-    </repository>
   </repositories>
 
   <properties>
@@ -554,11 +550,6 @@
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>1.7.3</version>
-      </dependency>
-      <dependency>
-        <groupId>com.vaadin.external.google</groupId>
-        <artifactId>android-json</artifactId>
-        <version>0.0.20131108.vaadin1</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
