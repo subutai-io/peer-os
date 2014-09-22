@@ -462,7 +462,31 @@
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- Vaadin -->
                 <artifactItem>
-                  <groupId>org.jsoup</groupId>
+                  <groupId>com.vaadin</groupId>
+                  <artifactId>vaadin-server</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.vaadin</groupId>
+                  <artifactId>vaadin-client-compiled</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.vaadin</groupId>
+                  <artifactId>vaadin-client</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.vaadin</groupId>
+                  <artifactId>vaadin-themes</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.vaadin</groupId>
+                  <artifactId>vaadin-shared</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.vaadin</groupId>
+                  <artifactId>vaadin-shared-deps</artifactId>
+                </artifactItem>
+                <artifactItem>
+                <groupId>org.jsoup</groupId>
                   <artifactId>jsoup</artifactId>
                 </artifactItem>
 
