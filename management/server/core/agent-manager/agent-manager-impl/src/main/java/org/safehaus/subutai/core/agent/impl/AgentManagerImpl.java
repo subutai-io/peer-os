@@ -16,8 +16,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -30,6 +28,8 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -43,7 +43,7 @@ import com.google.common.cache.CacheBuilder;
 public class AgentManagerImpl implements ResponseListener, AgentManager
 {
 
-    private static final Logger LOG = Logger.getLogger( AgentManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AgentManagerImpl.class.getName() );
     /**
      * list of agent listeners
      */
@@ -217,7 +217,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in addListener", ex );
+            LOG.error( "Error in addListener", ex );
         }
     }
 
@@ -236,7 +236,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in removeListener", ex );
+            LOG.error( "Error in removeListener", ex );
         }
     }
 
@@ -319,7 +319,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in init", ex );
+            LOG.error( "Error in init", ex );
         }
     }
 
@@ -337,7 +337,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in destroy", ex );
+            LOG.error( "Error in destroy", ex );
         }
     }
 
@@ -409,7 +409,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         }
         catch ( Exception e )
         {
-            LOG.log( Level.SEVERE, "Error in addAgent", e );
+            LOG.error( "Error in addAgent", e );
         }
     }
 
@@ -448,7 +448,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         }
         catch ( Exception e )
         {
-            LOG.log( Level.SEVERE, "Error in removeAgent", e );
+            LOG.error( "Error in removeAgent", e );
         }
     }
 }
