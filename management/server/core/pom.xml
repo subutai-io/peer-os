@@ -38,8 +38,6 @@
     <module>template-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
-    <!--
-    <module>pet_core</module>
-    -->
+    <!--<module>pet_core</module>-->
   </modules>
 </project>
