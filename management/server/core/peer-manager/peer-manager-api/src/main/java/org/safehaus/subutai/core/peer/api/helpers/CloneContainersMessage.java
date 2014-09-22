@@ -8,14 +8,13 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 9/19/14.
  */
-public class CreateContainersMessage extends PeerCommandMessage
+public class CloneContainersMessage extends PeerCommandMessage
 {
     private UUID envId;
     private String template;
     private int numberOfNodes;
     private String Strategy;
     private List<String> criteria;
-    private UUID targetPeerId;
 
 
     public UUID getEnvId()
@@ -77,29 +76,4 @@ public class CreateContainersMessage extends PeerCommandMessage
         this.criteria = criteria;
     }
 
-
-    public UUID getTargetPeerId()
-    {
-        return targetPeerId;
-    }
-
-
-    public void setTargetPeerId( final UUID targetPeerId )
-    {
-        this.targetPeerId = targetPeerId;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "CreateContainersMessage{" +
-                "envId=" + envId +
-                ", template='" + template + '\'' +
-                ", numberOfNodes=" + numberOfNodes +
-                ", Strategy='" + Strategy + '\'' +
-                ", criteria=" + criteria +
-                ", targetPeerId=" + targetPeerId +
-                '}';
-    }
 }

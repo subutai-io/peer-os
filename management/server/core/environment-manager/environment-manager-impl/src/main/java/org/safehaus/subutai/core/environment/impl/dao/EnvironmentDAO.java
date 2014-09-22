@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.impl.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
@@ -49,7 +50,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return false;
     }
@@ -82,13 +83,13 @@ public class EnvironmentDAO
                 }
             }
         }
-        catch ( JsonSyntaxException ex )
+        catch ( JsonSyntaxException e )
         {
-            LOG.info( ex.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return list;
     }
@@ -125,13 +126,13 @@ public class EnvironmentDAO
                 }
             }
         }
-        catch ( JsonSyntaxException ex )
+        catch ( JsonSyntaxException e )
         {
-            LOG.info( ex.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return null;
     }
@@ -156,7 +157,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return false;
     }

@@ -11,8 +11,22 @@ import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandExceptio
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerCommandDispatcherImpl implements PeerCommandDispatcher {
+public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
+{
     private PeerManager peerManager;
+    private RemotePeerRestClient remotePeerRestClient;
+
+
+    public RemotePeerRestClient getRemotePeerRestClient()
+    {
+        return remotePeerRestClient;
+    }
+
+
+    public void setRemotePeerRestClient( final RemotePeerRestClient remotePeerRestClient )
+    {
+        this.remotePeerRestClient = remotePeerRestClient;
+    }
 
 
     public PeerManager getPeerManager()
@@ -45,7 +59,12 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher {
         }
         else
         {
+
+//            result =  remotePeerRestClient
             //TODO: remote peer invoke
+
+
+
         }
         return result;
     }
