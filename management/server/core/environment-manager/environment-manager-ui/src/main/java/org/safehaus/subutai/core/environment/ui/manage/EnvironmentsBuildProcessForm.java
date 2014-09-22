@@ -57,7 +57,7 @@ public class EnvironmentsBuildProcessForm
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
 
-                EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
+                /*EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
                 ContainerBuildMessage message = new ContainerBuildMessage();
                 message.setNumberOfContainers( 2 );
                 message.setTemplateName( "master" );
@@ -74,7 +74,7 @@ public class EnvironmentsBuildProcessForm
                 //                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
                 message2.setTargetPeerId( UUID.fromString( "7e363225-2c4b-3ce3-8b33-d026d3367771" ) );
                 environmentBuildProcess.addBuildBlock( message2 );
-                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );*/
             }
         } );
 

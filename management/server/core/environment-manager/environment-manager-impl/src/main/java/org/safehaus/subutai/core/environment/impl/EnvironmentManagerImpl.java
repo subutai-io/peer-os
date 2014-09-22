@@ -7,11 +7,9 @@ package org.safehaus.subutai.core.environment.impl;
 
 
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -20,7 +18,6 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
-import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
@@ -28,7 +25,7 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
@@ -54,10 +51,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private DbManager dbManager;
     private PeerManager peerManager;
+    private PeerCommandDispatcher peerCommandDispatcher;
 
 
     public EnvironmentManagerImpl()
     {
+    }
+
+
+    public PeerCommandDispatcher getPeerCommandDispatcher()
+    {
+        return peerCommandDispatcher;
+    }
+
+
+    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
+    {
+        this.peerCommandDispatcher = peerCommandDispatcher;
     }
 
 
@@ -308,20 +318,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
     {
-        for ( ContainerBuildMessage cbm : environmentBuildProcess.getContainerBuildMessages() )
+        /*for ( CreateContainersMessage ccm : environmentBuildProcess.getCreateContainersMessages() )
         {
 
-            CreateContainersMessage ccm = new CreateContainersMessage();
-            ccm.setTemplate( cbm.getTemplateName() );
-            ccm.setTargetPeerId( cbm.getTargetPeerId() );
-            ccm.setNumberOfNodes( cbm.getNumberOfContainers() );
-            ccm.setEnvId( cbm.getEnvironmentUuid() );
-            ccm.setStrategy( cbm.getStrategy() );
-            ccm.setCriteria( cbm.getCriteria() );
             LOG.info( "SENDING MESSAGE TO " + ccm.getTargetPeerId() );
+            PeerCommand peerCommand = new PeerCommand();
+            peerCommand.setPeerCommandMessage( ccm );
+            peerCommand.setType( PeerCommandType.CLONE );
 
-            Set<Agent> agents = peerManager.createContainers( ccm );
-        }
+            peerCommandDispatcher.invoke( peerCommand )  ;
+//            Set<Agent> agents = peerManager.createContainers( ccm );
+        }*/
     }
 
 

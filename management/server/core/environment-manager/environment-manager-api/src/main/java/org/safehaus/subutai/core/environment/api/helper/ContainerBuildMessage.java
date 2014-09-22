@@ -11,6 +11,7 @@ import java.util.UUID;
 public class ContainerBuildMessage
 {
 
+
     private int numberOfContainers;
     private String templateName;
     private String strategy;
