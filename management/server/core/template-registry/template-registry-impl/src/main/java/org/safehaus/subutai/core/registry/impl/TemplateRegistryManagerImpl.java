@@ -27,6 +27,8 @@ import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -38,6 +40,8 @@ import com.google.common.collect.Sets;
  */
 public class TemplateRegistryManagerImpl implements TemplateRegistryManager
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( TemplateRegistryManagerImpl.class.getName() );
 
     private final TemplateDAO templateDAO;
 
@@ -75,6 +79,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
         }
         catch ( DBException e )
         {
+            LOG.error( "Error in registerTemplate", e );
             throw new RegistryException(
                     String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
         }
@@ -142,6 +147,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
         }
         catch ( IOException | RuntimeException e )
         {
+            LOG.error( "Error in parseTemplate", e );
             throw new RegistryException( String.format( "Error parsing template configuration %s", e ) );
         }
     }
@@ -242,6 +248,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
             }
             catch ( DBException e )
             {
+                LOG.error( "Error in unregisterTemplate", e );
                 throw new RegistryException(
                         String.format( "Error deleting template %s, %s", templateName, e.getMessage() ) );
             }
@@ -288,6 +295,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
         }
         catch ( DBException e )
         {
+            LOG.error( "Error in getTemplate", e );
             return null;
         }
     }
@@ -328,6 +336,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
         }
         catch ( DBException e )
         {
+            LOG.error( "Error in getChildTemplates", e );
             return Collections.emptyList();
         }
     }
@@ -394,8 +403,9 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
                 templateTree.addTemplate( template );
             }
         }
-        catch ( DBException ignored )
+        catch ( DBException e )
         {
+            LOG.error( "Error in getTemplateTree", e );
         }
         return templateTree;
     }
@@ -476,8 +486,9 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
             }
             return result;
         }
-        catch ( DBException ignored )
+        catch ( DBException e )
         {
+            LOG.error( "Error in getAllTemplates", e );
         }
 
         return Collections.emptyList();
@@ -513,6 +524,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
             }
             catch ( DBException e )
             {
+                LOG.error( "Error in updateTemplateUsage", e );
                 throw new RegistryException( String.format( "Error saving template information, %s", e.getMessage() ) );
             }
         }

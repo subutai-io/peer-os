@@ -12,7 +12,6 @@ package org.safehaus.subutai.server.ui.views;
 
 
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -21,6 +20,8 @@ import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -36,7 +37,7 @@ import com.vaadin.ui.VerticalLayout;
 public class ModulesView extends VerticalLayout implements View, PortalModuleListener
 {
 
-    private static final Logger LOG = Logger.getLogger( MainUI.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MainUI.class.getName() );
     private TabSheet editors;
     private CssLayout modulesLayout;
     private HashMap<String, PortalModule> modules = new HashMap<>();

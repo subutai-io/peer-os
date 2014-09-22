@@ -2,13 +2,13 @@ package org.safehaus.subutai.core.git.cli;
 
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -22,7 +22,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 public class ListStashes extends OsgiCommandSupport
 {
 
-    protected static final Logger LOG = Logger.getLogger( ListStashes.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ListStashes.class.getName() );
 
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
@@ -55,12 +55,12 @@ public class ListStashes extends OsgiCommandSupport
             List<String> stashes = gitManager.listStashes( agent, repoPath );
             for ( String stash : stashes )
             {
-                LOG.info( stash.toString() );
+                System.out.println( stash.toString() );
             }
         }
         catch ( GitException e )
         {
-            LOG.log( Level.SEVERE, "Error in doExecute", e );
+            LOG.error( "Error in doExecute", e );
         }
 
         return null;

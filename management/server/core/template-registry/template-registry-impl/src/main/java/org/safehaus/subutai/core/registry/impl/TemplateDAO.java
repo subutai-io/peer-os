@@ -7,6 +7,8 @@ import java.util.List;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.registry.api.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -22,8 +24,8 @@ import com.google.gson.JsonSyntaxException;
  */
 public class TemplateDAO
 {
-
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Logger LOG = LoggerFactory.getLogger( TemplateDAO.class.getName() );
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private DbManager dbManager;
 
 
@@ -50,7 +52,7 @@ public class TemplateDAO
                 for ( Row row : rs )
                 {
                     String info = row.getString( "info" );
-                    Template template = gson.fromJson( info, Template.class );
+                    Template template = GSON.fromJson( info, Template.class );
                     if ( template != null )
                     {
 
@@ -61,6 +63,7 @@ public class TemplateDAO
         }
         catch ( JsonSyntaxException ex )
         {
+            LOG.error( "Error in getAllTemplates", ex );
             throw new DBException( String.format( "Error in getAllTemplates %s", ex ) );
         }
 
@@ -90,7 +93,7 @@ public class TemplateDAO
                     for ( Row row : rs )
                     {
                         String info = row.getString( "info" );
-                        Template template = gson.fromJson( info, Template.class );
+                        Template template = GSON.fromJson( info, Template.class );
                         if ( template != null )
                         {
 
@@ -101,7 +104,8 @@ public class TemplateDAO
             }
             catch ( JsonSyntaxException ex )
             {
-                throw new DBException( String.format( "Error in getAllTemplates %s", ex ) );
+                LOG.error( "Error in geChildTemplates", ex );
+                throw new DBException( String.format( "Error in geChildTemplates %s", ex ) );
             }
         }
         return list;
@@ -131,12 +135,13 @@ public class TemplateDAO
                     {
                         String info = row.getString( "info" );
 
-                        return gson.fromJson( info, Template.class );
+                        return GSON.fromJson( info, Template.class );
                     }
                 }
             }
             catch ( JsonSyntaxException ex )
             {
+                LOG.error( "Error in getTemplateByName", ex );
                 throw new DBException( String.format( "Error in getTemplateByName %s", ex ) );
             }
         }
@@ -156,7 +161,7 @@ public class TemplateDAO
                 String.format( "%s-%s", template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() ),
                 Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
                 String.format( "%s-%s", template.getParentTemplateName().toLowerCase(),
-                        template.getLxcArch().toLowerCase() ), gson.toJson( template ) );
+                        template.getLxcArch().toLowerCase() ), GSON.toJson( template ) );
     }
 
 

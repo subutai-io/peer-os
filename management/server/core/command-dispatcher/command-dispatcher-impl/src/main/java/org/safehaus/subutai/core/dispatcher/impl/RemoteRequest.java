@@ -7,7 +7,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * Created by dilshat on 9/8/14.
+ * Wrapper around Request from remote peer
  */
 public class RemoteRequest
 {
