@@ -47,7 +47,8 @@ public class BestServerStrategy extends RoundRobinStrategy {
                 Agent a = getBestMatch( serverMetrics, MetricComparator.create( sf ) );
                 if ( a != null )
                 {
-                    grades.put( a, grades.get( a ) + 1 );
+                    Integer newValue = grades.get( a ) + 1;
+                    grades.put( a,  newValue);
                 }
             }
             catch ( Exception ex )
