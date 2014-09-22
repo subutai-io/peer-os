@@ -1,26 +1,30 @@
 package org.safehaus.subutai.core.peer.api.helpers;
 
 
-import java.util.UUID;
-
-
 /**
  * Created by timur on 9/20/14.
  */
 public class PeerCommand {
-    private PeerCommandMessage peerCommandMessage;
+    private PeerCommandMessage message;
     private PeerCommandType type;
 
 
-    public PeerCommandMessage getPeerCommandMessage()
+    public PeerCommand( PeerCommandType commandType, PeerCommandMessage message )
     {
-        return peerCommandMessage;
+        this.type = commandType;
+        this.message = message;
     }
 
 
-    public void setPeerCommandMessage( final PeerCommandMessage peerCommandMessage )
+    public PeerCommandMessage getMessage()
     {
-        this.peerCommandMessage = peerCommandMessage;
+        return message;
+    }
+
+
+    public void setMessage( final PeerCommandMessage message )
+    {
+        this.message = message;
     }
 
 

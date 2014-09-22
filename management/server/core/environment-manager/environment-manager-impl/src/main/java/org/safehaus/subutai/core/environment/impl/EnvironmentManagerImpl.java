@@ -6,7 +6,9 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +17,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
@@ -25,6 +28,9 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
+import org.safehaus.subutai.core.peer.api.helpers.PeerCommandMessage;
+import org.safehaus.subutai.core.peer.api.helpers.PeerCommandType;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
@@ -35,8 +41,7 @@ import com.google.gson.JsonSyntaxException;
 /**
  * This is an implementation of EnvironmentManager
  */
-public class EnvironmentManagerImpl implements EnvironmentManager
-{
+public class EnvironmentManagerImpl implements EnvironmentManager {
 
     private static final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
     private static final String ENVIRONMENT = "ENVIRONMENT";
@@ -52,6 +57,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private DbManager dbManager;
     private PeerManager peerManager;
     private PeerCommandDispatcher peerCommandDispatcher;
+    private Set<EnvironmentContainer> containers = new HashSet<>();
 
 
     public EnvironmentManagerImpl()
@@ -323,7 +329,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             LOG.info( "SENDING MESSAGE TO " + ccm.getTargetPeerId() );
             PeerCommand peerCommand = new PeerCommand();
-            peerCommand.setPeerCommandMessage( ccm );
+            peerCommand.setMessage( ccm );
             peerCommand.setType( PeerCommandType.CLONE );
 
             peerCommandDispatcher.invoke( peerCommand )  ;
@@ -356,5 +362,52 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
         return false;
+    }
+
+
+    @Override
+    public Set<EnvironmentContainer> getContainers()
+    {
+        return containers;
+    }
+
+
+    @Override
+    public void addContainer( final EnvironmentContainer container )
+    {
+        if ( container == null )
+        {
+            throw new IllegalArgumentException( "Environment container could not be null." );
+        }
+
+        container.setEnvironmentManager( this );
+        containers.add( container );
+    }
+
+
+    @Override
+    public boolean startContainer( final EnvironmentContainer container )
+    {
+        PeerCommand peerCommand = new PeerCommand( PeerCommandType.START,
+                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
+        return peerCommandDispatcher.invoke( peerCommand );
+    }
+
+
+    @Override
+    public boolean stopContainer( final EnvironmentContainer container )
+    {
+        PeerCommand peerCommand = new PeerCommand( PeerCommandType.STOP,
+                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
+        return peerCommandDispatcher.invoke( peerCommand );
+    }
+
+
+    @Override
+    public boolean isContainerConnected( final EnvironmentContainer container )
+    {
+        PeerCommand peerCommand = new PeerCommand( PeerCommandType.ISCONNECTED,
+                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
+        return peerCommandDispatcher.invoke( peerCommand );
     }
 }

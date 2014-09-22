@@ -12,6 +12,19 @@ public class PeerCommandMessage {
     private UUID peerId;
 
 
+    public PeerCommandMessage()
+    {
+
+    }
+
+
+    public PeerCommandMessage( UUID peerId, UUID agentId )
+    {
+        this.peerId = peerId;
+        this.agentId = agentId;
+    }
+
+
     public UUID getAgentId()
     {
         return agentId;
