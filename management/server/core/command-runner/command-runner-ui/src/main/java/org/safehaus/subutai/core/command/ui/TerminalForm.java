@@ -179,7 +179,6 @@ public class TerminalForm extends CustomComponent implements Disposable
             requestBuilder.withTimeout( Integer.parseInt( timeoutTxtFld.getValue() ) );
             requestBuilder.withCwd( workDirTxtFld.getValue() );
 
-            //			getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
             createCommand( requestBuilder, agents );
         }
     }
@@ -240,43 +239,65 @@ public class TerminalForm extends CustomComponent implements Disposable
     private void createCommand( RequestBuilder requestBuilder, Set<Agent> agents )
     {
         final Command command = commandRunner.createCommand( requestBuilder, agents );
-        final String[] output = { "" };
         indicator.setVisible( true );
         taskCount.incrementAndGet();
-        executor.execute( new Runnable()
+        executor.execute( new ExecuteCommandTask( commandRunner, command, taskCount, indicator, this ) );
+    }
+
+
+    private static class ExecuteCommandTask implements Runnable
+    {
+
+        private final CommandRunner commandRunner;
+        private final Command command;
+        private final AtomicInteger taskCount;
+        private final Label indicator;
+        private final TerminalForm form;
+
+        private final StringBuffer stringBuffer = new StringBuffer();
+
+
+        private ExecuteCommandTask( final CommandRunner commandRunner, final Command command,
+                                    final AtomicInteger taskCount, final Label indicator, final TerminalForm form )
         {
+            this.commandRunner = commandRunner;
+            this.command = command;
+            this.taskCount = taskCount;
+            this.indicator = indicator;
+            this.form = form;
+        }
 
-            public void run()
+
+        public void run()
+        {
+            commandRunner.runCommand( command, new CommandCallback()
             {
-                commandRunner.runCommand( command, new CommandCallback()
-                {
 
-                    @Override
-                    public void onResponse( Response response, AgentResult agentResult, Command command )
+                @Override
+                public void onResponse( Response response, AgentResult agentResult, Command command )
+                {
+                    StringBuilder out = new StringBuilder( "" );
+
+                    if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
                     {
-                        StringBuilder out = new StringBuilder( "" );
-
-                        if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
-                        {
-                            out.append( response.getStdOut() );
-                        }
-                        if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
-                        {
-                            out.append( response.getStdErr() );
-                        }
-
-                        output[0] += out.toString();
+                        out.append( response.getStdOut() );
                     }
-                } );
+                    if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
+                    {
+                        out.append( response.getStdErr() );
+                    }
 
-                taskCount.decrementAndGet();
-                if ( taskCount.get() == 0 )
-                {
-                    show( output[0] );
-                    indicator.setVisible( false );
+                    stringBuffer.append( out.toString() );
                 }
+            } );
+
+            taskCount.decrementAndGet();
+            if ( taskCount.get() == 0 )
+            {
+                form.show( stringBuffer.toString() );
+                indicator.setVisible( false );
             }
-        } );
+        }
     }
 
 
