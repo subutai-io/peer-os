@@ -39,7 +39,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
 
 
     private static final String LINE_SEPARATOR = "\n";
-    private final Logger LOG = Logger.getLogger( AptRepositoryManagerImpl.class.getName() );
+    private static final Logger LOG = Logger.getLogger( AptRepositoryManagerImpl.class.getName() );
     private CommandRunner commandRunner;
 
 
