@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.git.cli;
 
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitException;
@@ -17,6 +20,9 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "git", name = "commit-all", description = "Commit all files")
 public class CommitAll extends OsgiCommandSupport
 {
+
+    protected static final Logger LOG = Logger.getLogger( CommitAll.class.getName() );
+
 
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
@@ -48,11 +54,12 @@ public class CommitAll extends OsgiCommandSupport
         try
         {
             String commitId = gitManager.commitAll( agent, repoPath, message );
-            System.out.println( String.format( "Commit ID : %s", commitId ) );
+
+            LOG.info( String.format( "Commit ID : %s", commitId ) );
         }
         catch ( GitException e )
         {
-            System.out.println( e );
+            LOG.log( Level.SEVERE, "Error in doExecute", e );
         }
 
         return null;

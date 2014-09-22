@@ -37,6 +37,9 @@ public class GitManagerImpl implements GitManager
 
     private static final String MASTER_BRANCH = "master";
     private static final String LINE_SEPARATOR = "\n";
+    private static final String FILES_IS_EMPTY_MSG = "Files is null or empty";
+    private static final String BRANCH_NAME_IS_EMPTY_MSG = "Branch name is null or empty";
+
     private CommandRunner commandRunner;
 
 
@@ -45,16 +48,6 @@ public class GitManagerImpl implements GitManager
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
 
         this.commandRunner = commandRunner;
-    }
-
-
-    public void init()
-    {
-    }
-
-
-    public void destroy()
-    {
     }
 
 
@@ -234,7 +227,7 @@ public class GitManagerImpl implements GitManager
     public void add( final Agent host, final String repositoryRoot, final List<String> filePaths ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
 
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git add" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
@@ -273,7 +266,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
 
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git rm" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
@@ -299,7 +292,7 @@ public class GitManagerImpl implements GitManager
                           final String message, boolean afterConflictResolved ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is null or empty" );
 
         Command addCommand = commandRunner.createCommand( new RequestBuilder(
@@ -365,7 +358,7 @@ public class GitManagerImpl implements GitManager
     public void clone( final Agent host, final String newBranchName, final String targetDir ) throws GitException
     {
         validateHostNRepoRoot( host, targetDir );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newBranchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newBranchName ), BRANCH_NAME_IS_EMPTY_MSG );
 
         Command cloneCommand = commandRunner.createCommand( new RequestBuilder(
                 String.format( "git clone -b %s %s %s", newBranchName, Common.GIT_REPO_URL, targetDir ) )
@@ -388,7 +381,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), BRANCH_NAME_IS_EMPTY_MSG );
 
         String command = create ? String.format( "git checkout --track -b %s", branchName ) :
                          String.format( "git checkout %s", branchName );
@@ -411,7 +404,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), BRANCH_NAME_IS_EMPTY_MSG );
 
         Command checkoutCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git branch -d %s", branchName ) ).withCwd( repositoryRoot ),
@@ -445,7 +438,7 @@ public class GitManagerImpl implements GitManager
     public void merge( final Agent host, final String repositoryRoot, final String branchName ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), BRANCH_NAME_IS_EMPTY_MSG );
 
         Command mergeCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git merge %s", branchName ) ).withCwd( repositoryRoot ),
@@ -466,7 +459,7 @@ public class GitManagerImpl implements GitManager
     public void pull( final Agent host, final String repositoryRoot, final String branchName ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), BRANCH_NAME_IS_EMPTY_MSG );
 
         Command pullCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git pull origin %s", branchName ) ).withCwd( repositoryRoot ),
@@ -577,7 +570,7 @@ public class GitManagerImpl implements GitManager
     public void push( final Agent host, final String repositoryRoot, final String branchName ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), BRANCH_NAME_IS_EMPTY_MSG );
 
         if ( branchName.toLowerCase().contains( MASTER_BRANCH ) )
         {
@@ -604,7 +597,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
 
         Command undoCommand = commandRunner.createCommand(
                 new RequestBuilder( "git checkout --" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
@@ -625,7 +618,7 @@ public class GitManagerImpl implements GitManager
     public void undoHard( final Agent host, final String repositoryRoot, final String branchName ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), BRANCH_NAME_IS_EMPTY_MSG );
 
         Command undoCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git fetch origin && git reset --hard origin/%s", branchName ) )
