@@ -489,6 +489,10 @@
                   <groupId>org.jsoup</groupId>
                   <artifactId>jsoup</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>com.vaadin.external.google</groupId>
+                  <artifactId>android-json</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
