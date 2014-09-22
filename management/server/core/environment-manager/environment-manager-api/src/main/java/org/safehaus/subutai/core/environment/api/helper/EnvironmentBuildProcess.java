@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+
 //import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
+
 
 /**
  * Created by bahadyr on 9/14/14.
@@ -18,13 +21,26 @@ public class EnvironmentBuildProcess
     private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
     private int timestamp;
-//    private List<CloneContainersMessage> cloneContainersMessages = new ArrayList<>();
+    private List<CloneContainersMessage> cloneContainersMessages;
 
 
     public EnvironmentBuildProcess()
     {
         this.uuid = UUID.randomUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
+        this.cloneContainersMessages = new ArrayList<>();
+    }
+
+
+    public List<CloneContainersMessage> getCloneContainersMessages()
+    {
+        return cloneContainersMessages;
+    }
+
+
+    public void addCloneContainerMessage( CloneContainersMessage ccm )
+    {
+        this.cloneContainersMessages.add( ccm );
     }
 
 

@@ -17,5 +17,6 @@
   <modules>
     <module>peer-command-dispatcher-api</module>
     <module>peer-command-dispatcher-impl</module>
+    <module>peer-command-dispatcher-rest</module>
   </modules>
 </project>

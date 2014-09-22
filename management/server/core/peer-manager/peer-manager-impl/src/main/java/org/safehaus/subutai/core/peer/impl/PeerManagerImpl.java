@@ -16,8 +16,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -32,12 +30,14 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
@@ -49,7 +49,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class PeerManagerImpl implements PeerManager {
 
-    private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
     private DbManager dbManager;
@@ -159,7 +159,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in addPeerMessageListener", ex );
+            LOG.error( "Error in addPeerMessageListener", ex );
         }
     }
 
@@ -173,7 +173,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in removePeerMessageListener", ex );
+            LOG.error( "Error in removePeerMessageListener", ex );
         }
     }
 
@@ -209,20 +209,20 @@ public class PeerManagerImpl implements PeerManager {
                 }
                 catch ( HTTPException e )
                 {
-                    LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
+                    LOG.error( "Error in sendPeerMessage", e );
                     throw new PeerMessageException( e.getMessage() );
                 }
             }
             else
             {
                 String err = "Peer is not reachable";
-                LOG.log( Level.SEVERE, "Error in sendPeerMessage", err );
+                LOG.error( "Error in sendPeerMessage", err );
                 throw new PeerMessageException( err );
             }
         }
         catch ( PeerException e )
         {
-            LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
+            LOG.error( "Error in sendPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
     }
@@ -264,38 +264,38 @@ public class PeerManagerImpl implements PeerManager {
                                 }
                                 catch ( Exception e )
                                 {
-                                    LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                                    LOG.error( "Error in processPeerMessage", e );
                                     throw new PeerMessageException( e.getMessage() );
                                 }
                             }
                         }
                         String err = String.format( "Recipient %s not found", recipient );
-                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                        LOG.error( "Error in processPeerMessage", err );
                         throw new PeerMessageException( err );
                     }
                     else
                     {
                         String err = String.format( "Peer is not reachable %s", senderPeer );
-                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                        LOG.error( "Error in processPeerMessage", err );
                         throw new PeerMessageException( err );
                     }
                 }
                 catch ( PeerException e )
                 {
-                    LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                    LOG.error( "Error in processPeerMessage", e );
                     throw new PeerMessageException( e.getMessage() );
                 }
             }
             else
             {
                 String err = String.format( "Peer %s not found", peerId );
-                LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                LOG.error( "Error in processPeerMessage", err );
                 throw new PeerMessageException( err );
             }
         }
         catch ( IllegalArgumentException e )
         {
-            LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+            LOG.error( "Error in processPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
     }
@@ -342,7 +342,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( IllegalArgumentException e )
         {
-            LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
+            LOG.error( "Error in getConnectedAgents", e );
             throw new PeerException( e.getMessage() );
         }
     }
@@ -363,14 +363,14 @@ public class PeerManagerImpl implements PeerManager {
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
-                LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
+                LOG.error( "Error in getConnectedAgents", e );
                 throw new PeerException( e.getMessage() );
             }
         }
         else
         {
             String err = String.format( "Peer is not reachable %s", peer );
-            LOG.log( Level.SEVERE, "Error in getConnectedAgents", err );
+            LOG.error( "Error in getConnectedAgents", err );
             throw new PeerException( err );
         }
     }
@@ -389,7 +389,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( ContainerCreateException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         //TODO: replace with empty set;
         return null;
@@ -463,7 +463,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( SocketException e )
         {
-            LOG.log(Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
 
 
