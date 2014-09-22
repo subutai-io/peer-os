@@ -47,7 +47,7 @@ public class GetPhysicalAgentsCommand extends OsgiCommandSupport
               .append( agent.getListIP() ).append( " " ).append( "\n" );
         }
 
-        LOG.info( sb.toString() );
+        System.out.println( sb.toString() );
         return null;
     }
 }

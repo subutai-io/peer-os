@@ -1,11 +1,10 @@
 package org.safehaus.subutai.core.agent.cli;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -51,7 +50,7 @@ public class GetAgentByHostnameCommand extends OsgiCommandSupport
         sb.append( "Parent hostname: " ).append( agent.getParentHostName() ).append( "\n" );
         sb.append( "Transport ID: " ).append( agent.getTransportId() ).append( "\n" );
         sb.append( "UUID: " ).append( agent.getUuid() ).append( "\n" );
-        LOG.info( sb.toString() );
+        System.out.println( sb.toString() );
         return null;
     }
 }

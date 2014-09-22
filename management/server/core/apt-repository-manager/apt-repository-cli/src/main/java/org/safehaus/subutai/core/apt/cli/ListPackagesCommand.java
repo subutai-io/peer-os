@@ -51,7 +51,7 @@ public class ListPackagesCommand extends OsgiCommandSupport
                     .listPackages( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ), pattern );
             for ( PackageInfo packageInfo : packageInfoList )
             {
-                LOG.info( packageInfo.toString() );
+                System.out.println( packageInfo.toString() );
             }
         }
         catch ( AptRepoException e )
