@@ -47,8 +47,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager
-{
+public class PeerManagerImpl implements PeerManager {
 
     private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
@@ -359,8 +358,7 @@ public class PeerManagerImpl implements PeerManager
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
                 }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
@@ -412,12 +410,13 @@ public class PeerManagerImpl implements PeerManager
             case CLONE:
                 break;
             case START:
-                start( container );
+                result = startContainer( container );
                 break;
             case STOP:
-                stop( container );
+                result = stopContainer( container );
                 break;
             case ISCONNECTED:
+                result = isContainerConnected( container );
                 break;
             default:
                 //TODO: log or exception?
@@ -440,23 +439,6 @@ public class PeerManagerImpl implements PeerManager
         }
         return result;
     }
-
-
-    private boolean start( PeerContainer container )
-    {
-
-        Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
-        return containerManager.startLxcOnHost( physicalAgent, container.getHostname() );
-    }
-
-
-    private boolean stop( PeerContainer container )
-    {
-
-        Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
-        return containerManager.stopLxcOnHost( physicalAgent, container.getHostname() );
-    }
-
 
     private String getLocalIp()
     {
@@ -486,6 +468,57 @@ public class PeerManagerImpl implements PeerManager
 
 
         return "127.0.0.1";
+    }
+
+
+    @Override
+    public boolean startContainer( final PeerContainer container )
+    {
+        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
+        if ( parentAgent == null )
+        {
+            return false;
+        }
+        return containerManager.startLxcOnHost( parentAgent, container.getHostname() );
+    }
+
+
+    @Override
+    public boolean stopContainer( final PeerContainer container )
+    {
+        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
+        if ( parentAgent == null )
+        {
+            return false;
+        }
+        return containerManager.stopLxcOnHost( parentAgent, container.getHostname() );
+    }
+
+
+    @Override
+    public boolean isContainerConnected( final PeerContainer container )
+    {
+        return agentManager.getAgentByUUID( container.getAgentId() ) != null;
+    }
+
+
+    @Override
+    public Set<PeerContainer> getContainers()
+    {
+        return containers;
+    }
+
+
+    @Override
+    public void addContainer( final PeerContainer peerContainer )
+    {
+        if ( peerContainer == null )
+        {
+            throw new IllegalArgumentException( "Peer container could not be null." );
+        }
+
+        peerContainer.setPeerManager( this );
+        containers.add( peerContainer );
     }
 
 
