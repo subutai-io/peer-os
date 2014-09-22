@@ -7,23 +7,12 @@ package org.safehaus.subutai.core.command.ui.old;
 
 
 import java.util.Arrays;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
-import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.server.ui.component.AgentTree;
@@ -51,9 +40,14 @@ import com.vaadin.ui.TextField;
 public class TerminalForm extends CustomComponent implements Disposable
 {
 
-    private final AgentTree agentTree;
+    protected final AgentTree agentTree;
     private final TextArea commandOutputTxtArea;
-    private AtomicInteger taskCount = new AtomicInteger();
+    protected final TextField programTxtFld;
+    protected final TextField timeoutTxtFld;
+    protected final TextField workDirTxtFld;
+    protected final ComboBox requestTypeCombo;
+    protected final Label indicator;
+    protected AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
 
@@ -81,25 +75,25 @@ public class TerminalForm extends CustomComponent implements Disposable
         HorizontalLayout controls = new HorizontalLayout();
         controls.setSpacing( true );
         Label programLbl = new Label( "Program" );
-        final TextField programTxtFld = new TextField();
+        programTxtFld = new TextField();
         programTxtFld.setValue( "pwd" );
         programTxtFld.setWidth( 300, Unit.PIXELS );
         controls.addComponent( programLbl );
         controls.addComponent( programTxtFld );
         Label workDirLbl = new Label( "Cwd" );
-        final TextField workDirTxtFld = new TextField();
+        workDirTxtFld = new TextField();
         workDirTxtFld.setValue( "/" );
         controls.addComponent( workDirLbl );
         controls.addComponent( workDirTxtFld );
         Label timeoutLbl = new Label( "Timeout" );
-        final TextField timeoutTxtFld = new TextField();
+        timeoutTxtFld = new TextField();
         timeoutTxtFld.setValue( "30" );
         timeoutTxtFld.setWidth( 30, Unit.PIXELS );
         controls.addComponent( timeoutLbl );
         controls.addComponent( timeoutTxtFld );
         Label requestTypeLabel = new Label( "Req Type" );
         controls.addComponent( requestTypeLabel );
-        final ComboBox requestTypeCombo = new ComboBox( null,
+        requestTypeCombo = new ComboBox( null,
                 Arrays.asList( RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST, RequestType.PS_REQUEST ) );
         requestTypeCombo.setImmediate( true );
         requestTypeCombo.setTextInputAllowed( false );
@@ -111,7 +105,7 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
         controls.addComponent( sendBtn );
-        final Label indicator = new Label();
+        indicator = new Label();
         indicator.setId( "terminal_indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
@@ -133,132 +127,9 @@ public class TerminalForm extends CustomComponent implements Disposable
                 sendBtn.click();
             }
         } );
-        sendBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
-                Set<Agent> agents = agentTree.getSelectedAgents();
-                if ( agents.isEmpty() )
-                {
-                    show( "Please, select nodes" );
-                }
-                else if ( programTxtFld.getValue() == null || Strings.isNullOrEmpty( programTxtFld.getValue() ) )
-                {
-                    show( "Please, enter command" );
-                }
-                else
-                {
 
-                    RequestBuilder requestBuilder = new RequestBuilder( programTxtFld.getValue() );
+        sendBtn.addClickListener( new SendButtonListener( this, agentManager, commandRunner, executor ) );
 
-                    if ( requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
-                    {
-                        if ( StringUtil.isNumeric( programTxtFld.getValue() )
-                                && Integer.valueOf( programTxtFld.getValue() ) > 0 )
-                        {
-                            requestBuilder.withPid( Integer.valueOf( programTxtFld.getValue() ) );
-                            requestBuilder.withType( RequestType.TERMINATE_REQUEST );
-                        }
-                        else
-                        {
-                            show( "Please, enter numeric PID greater than 0 to kill" );
-                            return;
-                        }
-                    }
-                    else if ( requestTypeCombo.getValue() == RequestType.PS_REQUEST )
-                    {
-                        requestBuilder.withType( RequestType.PS_REQUEST );
-                    }
-
-                    if ( timeoutTxtFld.getValue() != null && StringUtil.isNumeric( timeoutTxtFld.getValue() ) )
-                    {
-                        int timeout = Integer.valueOf( timeoutTxtFld.getValue() );
-                        if ( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC )
-                        {
-                            requestBuilder.withTimeout( timeout );
-                        }
-                    }
-
-                    if ( workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( workDirTxtFld.getValue() ) )
-                    {
-                        requestBuilder.withCwd( workDirTxtFld.getValue() );
-                    }
-                    final Command command = commandRunner.createCommand( requestBuilder, agents );
-                    indicator.setVisible( true );
-                    taskCount.incrementAndGet();
-                    executor.execute( new Runnable()
-                    {
-
-                        public void run()
-                        {
-                            try
-                            {
-                                command.execute( new CommandCallback()
-                                {
-
-                                    @Override
-                                    public void onResponse( Response response, AgentResult agentResult,
-                                                            Command command )
-                                    {
-                                        StringBuilder out = new StringBuilder();
-                                        if ( !Strings.isNullOrEmpty( response.getStdOut() ) || !Strings
-                                                .isNullOrEmpty( response.getStdErr() ) )
-                                        {
-
-                                            if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
-                                            {
-                                                out.append( response.getStdOut() ).append( "\n" );
-                                            }
-                                            if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
-                                            {
-                                                out.append( response.getStdErr() ).append( "\n" );
-                                            }
-                                        }
-                                        if ( response.isFinal() )
-                                        {
-                                            if ( response.getType() == ResponseType.EXECUTE_RESPONSE_DONE
-                                                    && response.getExitCode() != 0 )
-                                            {
-                                                out.append( "Exit code: " ).append( response.getExitCode() )
-                                                   .append( "\n\n" );
-                                            }
-                                            else if ( response.getType() != ResponseType.EXECUTE_RESPONSE_DONE )
-                                            {
-                                                out.append( response.getType() ).append( "\n\n" );
-                                            }
-                                        }
-
-                                        if ( out.length() > 0 )
-                                        {
-                                            Agent agent = agentManager.getAgentByUUID( response.getUuid() );
-                                            StringBuilder host = new StringBuilder(
-                                                    agent == null ? String.format( "Offline[%s]", response.getUuid() ) :
-                                                    agent.getHostname() );
-
-                                            host.append( " [" ).append( response.getPid() ).append( "]" )
-                                                .append( ":\n" );
-                                            out.insert( 0, host );
-                                            addOutput( out.toString() );
-                                        }
-                                    }
-                                } );
-                            }
-                            catch ( CommandException e )
-                            {
-                                show( e.getMessage() );
-                            }
-
-                            taskCount.decrementAndGet();
-                            if ( taskCount.get() == 0 )
-                            {
-                                indicator.setVisible( false );
-                            }
-                        }
-                    } );
-                }
-            }
-        } );
         clearBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -270,13 +141,13 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
-    private void show( String msg )
+    protected void show( String msg )
     {
         Notification.show( msg );
     }
 
 
-    private void addOutput( String output )
+    protected void addOutput( String output )
     {
         if ( !Strings.isNullOrEmpty( output ) )
         {

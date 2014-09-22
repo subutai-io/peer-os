@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.apt.cli;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -18,6 +20,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "apt", name = "read-files", description = "Read files inside deb package")
 public class ReadFilesCommand extends OsgiCommandSupport
 {
+    private static final Logger LOG = Logger.getLogger( ReadFilesCommand.class.getName() );
+
     @Argument(index = 0, name = "package path", required = true, multiValued = false,
             description = "path to package")
     String packagePath;
@@ -58,7 +62,7 @@ public class ReadFilesCommand extends OsgiCommandSupport
         }
         catch ( AptRepoException e )
         {
-            System.out.println( e );
+            LOG.log( Level.SEVERE, "Error in doExecute", e );
         }
         return null;
     }

@@ -2,6 +2,8 @@ package org.safehaus.subutai.core.apt.cli;
 
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -17,6 +19,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "apt", name = "list-packages", description = "List packages in apt repository by pattern")
 public class ListPackagesCommand extends OsgiCommandSupport
 {
+    private static final Logger LOG = Logger.getLogger( ListPackagesCommand.class.getName() );
+
     @Argument(index = 0, name = "pattern", required = true, multiValued = false, description = "search pattern")
     String pattern;
 
@@ -46,12 +50,12 @@ public class ListPackagesCommand extends OsgiCommandSupport
                     .listPackages( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ), pattern );
             for ( PackageInfo packageInfo : packageInfoList )
             {
-                System.out.println( packageInfo );
+                LOG.info( packageInfo.toString() );
             }
         }
         catch ( AptRepoException e )
         {
-            System.out.println( e );
+            LOG.log( Level.SEVERE, "Error in doExecute", e );
         }
         return null;
     }

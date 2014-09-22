@@ -81,9 +81,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void executeCommand( CommandImpl command )
+    private void checkRemoteConnectivity( CommandImpl command )
     {
-
         for ( Map.Entry<UUID, Set<BatchRequest>> entry : command.getRemoteRequests().entrySet() )
         {
             //check if peer is registered
@@ -106,38 +105,47 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                 }
                 else
                 {
-                    //check if all agents required for command execution are connected on remote peer
-                    UUID environmentId = entry.getValue().iterator().next().getEnvironmentId();
-
-                    Set<Agent> agents = peerManager.getConnectedAgents( peer, environmentId.toString() );
-
-                    Set<UUID> connectedAgentsIds = new HashSet<>();
-                    for ( Agent agent : agents )
-                    {
-                        connectedAgentsIds.add( agent.getUuid() );
-                    }
-                    Set<UUID> requestAgentsIds = new HashSet<>();
-                    for ( BatchRequest batchRequest : entry.getValue() )
-                    {
-                        requestAgentsIds.addAll( batchRequest.getAgentIds() );
-                    }
-
-                    if ( !connectedAgentsIds.containsAll( requestAgentsIds ) )
-                    {
-                        CollectionUtil.removeValues( requestAgentsIds, connectedAgentsIds );
-                        throw new RunCommandException(
-                                String.format( "Agents %s are not connected", requestAgentsIds ) );
-                    }
+                    checkIfRemoteAgentsConnected( peer, entry.getValue() );
                 }
             }
             catch ( PeerException e )
             {
                 String err = String.format( "Error in executeCommand: %s", e.getMessage() );
-                LOG.log(Level.SEVERE, err );
+                LOG.log( Level.SEVERE, err, e );
                 throw new RunCommandException( err );
             }
         }
+    }
 
+
+    private void checkIfRemoteAgentsConnected( Peer peer, Set<BatchRequest> requests ) throws PeerException
+    {
+        //check if all agents required for command execution are connected on remote peer
+        UUID environmentId = requests.iterator().next().getEnvironmentId();
+
+        Set<Agent> agents = peerManager.getConnectedAgents( peer, environmentId.toString() );
+
+        Set<UUID> connectedAgentsIds = new HashSet<>();
+        for ( Agent agent : agents )
+        {
+            connectedAgentsIds.add( agent.getUuid() );
+        }
+        Set<UUID> requestAgentsIds = new HashSet<>();
+        for ( BatchRequest batchRequest : requests )
+        {
+            requestAgentsIds.addAll( batchRequest.getAgentIds() );
+        }
+
+        if ( !connectedAgentsIds.containsAll( requestAgentsIds ) )
+        {
+            CollectionUtil.removeValues( requestAgentsIds, connectedAgentsIds );
+            throw new RunCommandException( String.format( "Agents %s are not connected", requestAgentsIds ) );
+        }
+    }
+
+
+    private void checkIfLocalAgentsConnected( CommandImpl command )
+    {
         //check if local agents are connected
         Set<UUID> localIds = new HashSet<>();
         for ( Request request : command.getRequests() )
@@ -151,6 +159,13 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         {
             throw new RunCommandException( String.format( "Agents %s are not connected", localIds ) );
         }
+    }
+
+
+    private void executeCommand( CommandImpl command )
+    {
+        checkRemoteConnectivity( command );
+        checkIfLocalAgentsConnected( command );
 
         //send remote requests
         if ( !command.getRemoteRequests().isEmpty() )
@@ -182,7 +197,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             }
             catch ( CommandException e )
             {
-                LOG.log(Level.SEVERE, String.format( "Error executing local requests: %s", e.getMessage() ) );
+                LOG.log( Level.SEVERE, "Error executing local requests", e );
             }
         }
     }
@@ -205,7 +220,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             {
                 String errString = String.format( "Error in sendRequests for peer %s: %s", peer, e.getMessage() );
 
-                LOG.log( Level.SEVERE, errString );
+                LOG.log( Level.SEVERE, errString, e );
                 throw new RunCommandException( errString );
             }
         }
@@ -264,19 +279,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                     public void onResponse( final Response response, final AgentResult agentResult,
                                             final Command command )
                     {
-                        try
-                        {
-
-                            //save response to db
-                            dispatcherDAO.saveRemoteResponse( new RemoteResponse( response ) );
-                        }
-                        catch ( DBException e )
-                        {
-                            LOG.log( Level.SEVERE,
-                                    String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(),
-                                            response ) );
-                            throw new RunCommandException( e.getMessage() );
-                        }
+                        saveResponse( response );
                     }
                 } );
             }
@@ -288,8 +291,24 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         }
         catch ( CommandException | DBException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ) );
+            LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ), e );
             throw new PeerMessageException( e.getMessage() );
+        }
+    }
+
+
+    private void saveResponse( Response response )
+    {
+        try
+        {
+            //save response to db
+            dispatcherDAO.saveRemoteResponse( new RemoteResponse( response ) );
+        }
+        catch ( DBException e )
+        {
+            LOG.log( Level.SEVERE,
+                    String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(), response ), e );
+            throw new RunCommandException( e.getMessage() );
         }
     }
 
@@ -380,6 +399,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         }
         catch ( RuntimeException e )
         {
+            LOG.log( Level.SEVERE, "Error in onMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
         return null;
