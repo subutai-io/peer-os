@@ -36,7 +36,7 @@ import com.google.gson.JsonSyntaxException;
 public class DbManagerImpl implements DbManager
 {
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = Logger.getLogger( DbManagerImpl.class.getName() );
     private final Map<String, PreparedStatement> statements = new ConcurrentHashMap<>();
     /**
@@ -122,6 +122,7 @@ public class DbManagerImpl implements DbManager
         }
         catch ( Exception e )
         {
+            LOG.log( Level.WARNING, "ignore", e );
         }
         try
         {
@@ -129,6 +130,7 @@ public class DbManagerImpl implements DbManager
         }
         catch ( Exception e )
         {
+            LOG.log( Level.WARNING, "ignore", e );
         }
         LOG.log( Level.INFO, "DbManager stopped" );
     }
@@ -187,6 +189,7 @@ public class DbManagerImpl implements DbManager
         }
         catch ( RuntimeException ex )
         {
+            LOG.log( Level.SEVERE, "Error in executeQuery2", ex );
             throw new DBException( ex.getMessage() );
         }
     }
@@ -194,7 +197,7 @@ public class DbManagerImpl implements DbManager
 
     public void saveInfo2( String source, String key, Object info ) throws DBException
     {
-        executeUpdate2( "insert into product_info(source,key,info) values (?,?,?)", source, key, gson.toJson( info ) );
+        executeUpdate2( "insert into product_info(source,key,info) values (?,?,?)", source, key, GSON.toJson( info ) );
     }
 
 
@@ -223,6 +226,7 @@ public class DbManagerImpl implements DbManager
         }
         catch ( RuntimeException ex )
         {
+            LOG.log( Level.SEVERE, "Error in executeUpdate2", ex );
             throw new DBException( ex.getMessage() );
         }
     }
@@ -274,14 +278,14 @@ public class DbManagerImpl implements DbManager
     public boolean saveInfo( String source, String key, Object info )
     {
         return executeUpdate( "insert into product_info(source,key,info) values (?,?,?)", source, key,
-                gson.toJson( info ) );
+                GSON.toJson( info ) );
     }
 
 
     public boolean saveEnvironmentInfo( String source, String key, Object info )
     {
         return executeUpdate( "insert into environment_info(source,key,info) values (?,?,?)", source, key,
-                gson.toJson( info ) );
+                GSON.toJson( info ) );
     }
 
 
@@ -307,7 +311,7 @@ public class DbManagerImpl implements DbManager
                 {
 
                     String info = row.getString( "info" );
-                    return gson.fromJson( info, clazz );
+                    return GSON.fromJson( info, clazz );
                 }
             }
         }
@@ -333,7 +337,7 @@ public class DbManagerImpl implements DbManager
                 {
 
                     String info = row.getString( "info" );
-                    return gson.fromJson( info, clazz );
+                    return GSON.fromJson( info, clazz );
                 }
             }
         }
@@ -364,7 +368,7 @@ public class DbManagerImpl implements DbManager
                 for ( Row row : rs )
                 {
                     String info = row.getString( "info" );
-                    list.add( gson.fromJson( info, clazz ) );
+                    list.add( GSON.fromJson( info, clazz ) );
                 }
             }
         }
@@ -387,7 +391,7 @@ public class DbManagerImpl implements DbManager
                 for ( Row row : rs )
                 {
                     String info = row.getString( "info" );
-                    list.add( gson.fromJson( info, clazz ) );
+                    list.add( GSON.fromJson( info, clazz ) );
                 }
             }
         }
