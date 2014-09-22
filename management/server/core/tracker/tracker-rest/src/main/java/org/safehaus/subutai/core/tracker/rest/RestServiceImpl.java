@@ -6,13 +6,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,7 +25,7 @@ import com.google.gson.GsonBuilder;
 public class RestServiceImpl implements RestService
 {
 
-    private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private Tracker tracker;
@@ -54,7 +54,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( IllegalArgumentException e )
         {
-            LOG.log( Level.SEVERE, "Error in getProductOperation", e );
+            LOG.error( "Error in getProductOperation", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -76,7 +76,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( ParseException e )
         {
-            LOG.log( Level.SEVERE, "Error in getProductOperations", e );
+            LOG.error( "Error in getProductOperations", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
