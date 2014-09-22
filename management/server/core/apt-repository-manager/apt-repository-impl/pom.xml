@@ -11,7 +11,7 @@
 
   <artifactId>apt-repository-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Apt Repository Tracker</name>
+  <name>Subutai Apt Repository Impl</name>
   <description>Subutai Apt Repository Impl</description>
 
   <dependencies>
@@ -38,6 +38,10 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>

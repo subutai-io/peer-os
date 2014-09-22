@@ -15,9 +15,9 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>communication-manager</module>
     <module>agent-manager</module>
     <module>db-manager</module>
-    <module>communication-manager</module>
     <module>strategy-manager</module>
     <module>container-manager</module>
     <module>lxc-manager</module>
