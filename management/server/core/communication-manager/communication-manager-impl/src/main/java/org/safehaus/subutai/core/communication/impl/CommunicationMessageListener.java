@@ -47,22 +47,14 @@ class CommunicationMessageListener implements MessageListener
             {
                 BytesMessage msg = ( BytesMessage ) message;
 
-                byte[] msg_bytes = new byte[( int ) msg.getBodyLength()];
-                msg.readBytes( msg_bytes );
-                String jsonCmd = new String( msg_bytes, "UTF-8" );
+                byte[] msgBytes = new byte[( int ) msg.getBodyLength()];
+                msg.readBytes( msgBytes );
+                String jsonCmd = new String( msgBytes, "UTF-8" );
                 Response response = CommandJson.getResponse( jsonCmd );
 
                 if ( response != null )
                 {
-                    if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE )
-                    {
-                        LOG.log( Level.INFO, "\nReceived {0}",
-                                CommandJson.getJson( CommandJson.getCommand( jsonCmd ) ) );
-                    }
-                    else
-                    {
-                        LOG.log( Level.INFO, "Heartbeat from {0}", response.getHostname() );
-                    }
+                    logResponse( response, jsonCmd );
                     response.setTransportId( ( ( ActiveMQMessage ) message ).getProducerId().toString() );
                     notifyListeners( response );
                 }
@@ -92,6 +84,19 @@ class CommunicationMessageListener implements MessageListener
     }
 
 
+    private void logResponse( Response response, String json )
+    {
+        if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE )
+        {
+            LOG.log( Level.INFO, "\nReceived {0}", CommandJson.getJson( CommandJson.getCommand( json ) ) );
+        }
+        else
+        {
+            LOG.log( Level.INFO, "Heartbeat from {0}", response.getHostname() );
+        }
+    }
+
+
     /**
      * Notifies listeners on new response
      *
@@ -103,15 +108,10 @@ class CommunicationMessageListener implements MessageListener
         {
             for ( Iterator<ResponseListener> it = listeners.iterator(); it.hasNext(); )
             {
-                ResponseListener ai = it.next();
-                try
-                {
-                    ai.onResponse( response );
-                }
-                catch ( Exception e )
+                ResponseListener listener = it.next();
+                if ( !notifyListener( listener, response ) )
                 {
                     it.remove();
-                    LOG.log( Level.SEVERE, "Error notifying message listeners, removing faulting listener", e );
                 }
             }
         }
@@ -119,6 +119,21 @@ class CommunicationMessageListener implements MessageListener
         {
             LOG.log( Level.SEVERE, "Error in notifyListeners", ex );
         }
+    }
+
+
+    private boolean notifyListener( ResponseListener listener, Response response )
+    {
+        try
+        {
+            listener.onResponse( response );
+            return true;
+        }
+        catch ( Exception e )
+        {
+            LOG.log( Level.SEVERE, "Error notifying message listeners", e );
+        }
+        return false;
     }
 
 

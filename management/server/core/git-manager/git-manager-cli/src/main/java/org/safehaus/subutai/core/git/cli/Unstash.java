@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.git.cli;
 
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitException;
@@ -17,6 +20,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "git", name = "unstash", description = "Apply all stashed changes to current branch")
 public class Unstash extends OsgiCommandSupport
 {
+
+    protected static final Logger LOG = Logger.getLogger( Unstash.class.getName() );
 
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
@@ -53,7 +58,7 @@ public class Unstash extends OsgiCommandSupport
         }
         catch ( GitException e )
         {
-            System.out.println( e );
+            LOG.log( Level.SEVERE, "Error in doExecute", e );
         }
 
         return null;

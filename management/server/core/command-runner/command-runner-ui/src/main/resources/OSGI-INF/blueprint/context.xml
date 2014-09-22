@@ -8,8 +8,7 @@
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.command.ui.CommandRunnerUI"
-        init-method="init" destroy-method="destroy">
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.command.ui.CommandRunnerUI">
     <property name="commandRunner" ref="commandRunner" />
     <property name="agentManager" ref="agentManager" />
   </bean>
