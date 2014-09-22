@@ -9,7 +9,6 @@ package org.safehaus.subutai.plugin.zookeeper.ui;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 import javax.naming.NamingException;
 
@@ -17,6 +16,8 @@ import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.ui.Component;
 
@@ -27,7 +28,7 @@ import com.vaadin.ui.Component;
 public class ZookeeperUI implements PortalModule
 {
     public static final String MODULE_IMAGE = "zookeeper.png";
-    protected static final Logger LOG = Logger.getLogger( ZookeeperUI.class.getName() );
+    protected static final Logger LOG = LoggerFactory.getLogger( ZookeeperUI.class.getName() );
     private final ServiceLocator serviceLocator;
     private ExecutorService executor;
 
@@ -78,7 +79,7 @@ public class ZookeeperUI implements PortalModule
         }
         catch ( NamingException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return null;
     }
