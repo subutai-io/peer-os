@@ -31,7 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 public class Manager extends VerticalLayout
 {
 
-    private final static String physicalHostLabel = "Physical Host";
+    private static final String PHYSICAL_HOST_LABEL = "Physical Host";
     private final Label indicator;
     private final Button infoBtn;
     private final Button startAllBtn;
@@ -124,7 +124,7 @@ public class Manager extends VerticalLayout
                             Item row = lxcTable.getItem( o );
                             Button destroyBtn =
                                     ( Button ) ( row.getItemProperty( Buttons.DESTROY.getButtonLabel() ).getValue() );
-                            if ( destroyBtn != null && row.getItemProperty( physicalHostLabel ).getValue() == null )
+                            if ( destroyBtn != null && row.getItemProperty( PHYSICAL_HOST_LABEL ).getValue() == null )
                             {
                                 destroyBtn.click();
                             }
@@ -162,7 +162,7 @@ public class Manager extends VerticalLayout
     private TreeTable createTableTemplate( String caption, int size )
     {
         TreeTable table = new TreeTable( caption );
-        table.addContainerProperty( physicalHostLabel, String.class, null );
+        table.addContainerProperty( PHYSICAL_HOST_LABEL, String.class, null );
         table.addContainerProperty( "Lxc Host", String.class, null );
         table.addContainerProperty( Buttons.START.getButtonLabel(), Button.class, null );
         table.addContainerProperty( Buttons.STOP.getButtonLabel(), Button.class, null );
@@ -494,7 +494,7 @@ public class Manager extends VerticalLayout
         for ( Object rowId : lxcTable.getItemIds() )
         {
             Item row = lxcTable.getItem( rowId );
-            if ( row != null && row.getItemProperty( physicalHostLabel ).getValue() != null && (
+            if ( row != null && row.getItemProperty( PHYSICAL_HOST_LABEL ).getValue() != null && (
                     lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) )
             {
                 lxcTable.removeItem( rowId );

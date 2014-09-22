@@ -27,7 +27,7 @@ public class RequestBuilder
 {
 
     //source of command
-    private final static String source = "COMMAND-RUNNER";
+    private static final String source = "COMMAND-RUNNER";
 
     //the same for all commands
     private final Integer requestSequenceNumber = 1;

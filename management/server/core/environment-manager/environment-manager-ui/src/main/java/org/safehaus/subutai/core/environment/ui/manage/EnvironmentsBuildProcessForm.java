@@ -23,7 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentsBuildProcessForm
 {
 
-    private final static Logger LOG = Logger.getLogger( EnvironmentsBuildProcessForm.class.getName() );
+    private static final Logger LOG = Logger.getLogger( EnvironmentsBuildProcessForm.class.getName() );
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
@@ -57,7 +57,7 @@ public class EnvironmentsBuildProcessForm
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
 
-                EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
+                /*EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
                 ContainerBuildMessage message = new ContainerBuildMessage();
                 message.setNumberOfContainers( 2 );
                 message.setTemplateName( "master" );
@@ -74,7 +74,7 @@ public class EnvironmentsBuildProcessForm
                 //                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
                 message2.setTargetPeerId( UUID.fromString( "7e363225-2c4b-3ce3-8b33-d026d3367771" ) );
                 environmentBuildProcess.addBuildBlock( message2 );
-                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );*/
             }
         } );
 
@@ -211,10 +211,13 @@ public class EnvironmentsBuildProcessForm
                     } );
                     break;
                 }
+                default:{
+                    break;
+                }
             }
 
 
-            final Object rowId = environmentsTable.addItem( new Object[] {
+            environmentsTable.addItem( new Object[] {
                     environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
                     destroyButton
             }, null );

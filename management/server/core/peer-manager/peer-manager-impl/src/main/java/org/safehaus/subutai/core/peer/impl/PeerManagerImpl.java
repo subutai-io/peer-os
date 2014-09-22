@@ -32,7 +32,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
+import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
 import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -47,7 +47,8 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager {
+public class PeerManagerImpl implements PeerManager
+{
 
     private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
@@ -138,13 +139,13 @@ public class PeerManagerImpl implements PeerManager {
     }
 
 
-    @Override
+    /*@Override
     public String getRemoteId( final String baseUrl )
     {
         RemotePeerClient client = new RemotePeerClient();
         client.setBaseUrl( baseUrl );
         return client.callRemoteRest();
-    }
+    }*/
 
 
     @Override
@@ -358,7 +359,8 @@ public class PeerManagerImpl implements PeerManager {
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
+                {
                 }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
@@ -377,70 +379,22 @@ public class PeerManagerImpl implements PeerManager {
 
 
     @Override
-    public Set<Agent> createContainers( CreateContainersMessage ccm )
+    public Set<Agent> createContainers( CloneContainersMessage ccm )
     {
-
+        UUID envId = ccm.getEnvId();
+        String template = ccm.getTemplate();
+        int numberOfNodes = ccm.getNumberOfNodes();
+        String strategy = ccm.getStrategy();
         try
         {
-            if ( getSiteId().toString().equals( ccm.getTargetPeerId().toString() ) )
-            {
-                UUID envId = ccm.getEnvId();
-                String template = ccm.getTemplate();
-                int numberOfNodes = ccm.getNumberOfNodes();
-                String strategy = ccm.getStrategy();
-                return containerManager.clone( envId, template, numberOfNodes, strategy, null );
-            }
-            else
-            {
-                RemotePeerClient client = new RemotePeerClient();
-                Peer remotePeer = getPeerByUUID( ccm.getTargetPeerId() );
-                String baseUrl = "http://" + remotePeer.getIp() + ":8181/cxf";
-                client.setBaseUrl( baseUrl );
-                String response = client.createRemoteContainers( ccm );
-            }
+            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
         }
         catch ( ContainerCreateException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
+        //TODO: replace with empty set;
         return null;
-    }
-
-
-    private String getLocalIp()
-    {
-        Enumeration<NetworkInterface> n;
-        try
-        {
-            n = NetworkInterface.getNetworkInterfaces();
-            for (; n.hasMoreElements(); )
-            {
-                NetworkInterface e = n.nextElement();
-
-                Enumeration<InetAddress> a = e.getInetAddresses();
-                for (; a.hasMoreElements(); )
-                {
-                    InetAddress addr = a.nextElement();
-                    if ( addr.getHostAddress().startsWith( "172" ) )
-                    {
-                        return addr.getHostAddress();
-                    }
-                }
-            }
-        }
-        catch ( SocketException e )
-        {
-            LOG.severe( e.getMessage() );
-        }
-
-
-        return "127.0.0.1";
-    }
-
-
-    public Collection<PeerMessageListener> getPeerMessageListeners()
-    {
-        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 
 
@@ -501,5 +455,42 @@ public class PeerManagerImpl implements PeerManager {
 
         Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
         return containerManager.stopLxcOnHost( physicalAgent, container.getHostname() );
+    }
+
+
+    private String getLocalIp()
+    {
+        Enumeration<NetworkInterface> n;
+        try
+        {
+            n = NetworkInterface.getNetworkInterfaces();
+            for (; n.hasMoreElements(); )
+            {
+                NetworkInterface e = n.nextElement();
+
+                Enumeration<InetAddress> a = e.getInetAddresses();
+                for (; a.hasMoreElements(); )
+                {
+                    InetAddress addr = a.nextElement();
+                    if ( addr.getHostAddress().startsWith( "172" ) )
+                    {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        }
+        catch ( SocketException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
+
+
+        return "127.0.0.1";
+    }
+
+
+    public Collection<PeerMessageListener> getPeerMessageListeners()
+    {
+        return Collections.unmodifiableCollection( peerMessageListeners );
     }
 }

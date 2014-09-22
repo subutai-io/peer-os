@@ -1,4 +1,4 @@
-package org.safehaus.subuta.environment.rest;
+package org.safehaus.subutai.environment.rest;
 
 
 import java.util.logging.Logger;

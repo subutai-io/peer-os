@@ -24,8 +24,7 @@ import org.slf4j.LoggerFactory;
 public class MonitorImpl implements Monitor
 {
 
-    private final static Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
-
+    private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json" );
     private final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
