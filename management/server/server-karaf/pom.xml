@@ -762,7 +762,7 @@
                   <artifactId>command-dispatcher-impl</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
-                <!--<artifactItem>
+                <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>command-dispatcher-cli</artifactId>
                   <version>${project.version}</version>
@@ -771,7 +771,7 @@
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>command-dispatcher-rest</artifactId>
                   <version>${project.version}</version>
-                </artifactItem>-->
+                </artifactItem>
 
                 <!-- Agent Manager -->
                 <artifactItem>
@@ -1019,6 +1019,11 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>peer-command-dispatcher-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>peer-command-dispatcher-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
