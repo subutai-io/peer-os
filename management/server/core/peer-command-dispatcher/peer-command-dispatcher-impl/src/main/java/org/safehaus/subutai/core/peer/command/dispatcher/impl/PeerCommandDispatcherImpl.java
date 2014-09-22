@@ -29,6 +29,18 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     }
 
 
+    public void init()
+    {
+
+    }
+
+
+    public void destroy()
+    {
+
+    }
+
+
     public PeerManager getPeerManager()
     {
         return peerManager;
@@ -60,9 +72,8 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
         else
         {
 
-//            result =  remotePeerRestClient
+            //            result =  remotePeerRestClient
             //TODO: remote peer invoke
-
 
 
         }

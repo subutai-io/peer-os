@@ -133,7 +133,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             catch ( PeerException e )
             {
                 String err = String.format( "Error in executeCommand: %s", e.getMessage() );
-                LOG.severe( err );
+                LOG.log(Level.SEVERE, err );
                 throw new RunCommandException( err );
             }
         }
@@ -182,7 +182,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             }
             catch ( CommandException e )
             {
-                LOG.severe( String.format( "Error executing local requests: %s", e.getMessage() ) );
+                LOG.log(Level.SEVERE, String.format( "Error executing local requests: %s", e.getMessage() ) );
             }
         }
     }

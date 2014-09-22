@@ -463,7 +463,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( SocketException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log(Level.SEVERE, e.getMessage() );
         }
 
 
