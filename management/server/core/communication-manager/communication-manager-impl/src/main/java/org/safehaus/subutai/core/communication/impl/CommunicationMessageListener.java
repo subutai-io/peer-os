@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.Message;
@@ -17,6 +15,8 @@ import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.communication.api.CommandJson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.RemoveInfo;
@@ -28,7 +28,7 @@ import org.apache.activemq.command.RemoveInfo;
 class CommunicationMessageListener implements MessageListener
 {
 
-    private static final Logger LOG = Logger.getLogger( CommunicationMessageListener.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommunicationMessageListener.class.getName() );
 
     private final Queue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
 
@@ -60,7 +60,7 @@ class CommunicationMessageListener implements MessageListener
                 }
                 else
                 {
-                    LOG.log( Level.WARNING, "Could not parse response{0}", jsonCmd );
+                    LOG.warn( "Could not parse response{0}", jsonCmd );
                 }
             }
             else if ( message instanceof ActiveMQMessage )
@@ -79,7 +79,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in onMessage", ex );
+            LOG.error( "Error in onMessage", ex );
         }
     }
 
@@ -88,11 +88,11 @@ class CommunicationMessageListener implements MessageListener
     {
         if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE )
         {
-            LOG.log( Level.INFO, "\nReceived {0}", CommandJson.getJson( CommandJson.getCommand( json ) ) );
+            LOG.info( "\nReceived {0}", CommandJson.getJson( CommandJson.getCommand( json ) ) );
         }
         else
         {
-            LOG.log( Level.INFO, "Heartbeat from {0}", response.getHostname() );
+            LOG.info( "Heartbeat from {0}", response.getHostname() );
         }
     }
 
@@ -117,7 +117,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in notifyListeners", ex );
+            LOG.error(  "Error in notifyListeners", ex );
         }
     }
 
@@ -131,7 +131,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception e )
         {
-            LOG.log( Level.SEVERE, "Error notifying message listeners", e );
+            LOG.error(  "Error notifying message listeners", e );
         }
         return false;
     }
@@ -153,7 +153,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error to add a listener:", ex );
+            LOG.error(  "Error to add a listener:", ex );
         }
     }
 
@@ -171,7 +171,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in removeListener", ex );
+            LOG.error(  "Error in removeListener", ex );
         }
     }
 

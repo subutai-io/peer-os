@@ -3,12 +3,12 @@ package org.safehaus.subutai.core.agent.impl;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -16,7 +16,7 @@ import org.safehaus.subutai.core.agent.api.AgentListener;
  */
 public class AgentNotifier implements Runnable
 {
-    private static final Logger LOG = Logger.getLogger( AgentNotifier.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AgentNotifier.class.getName() );
 
     private final AgentManagerImpl agentManager;
 
@@ -50,7 +50,7 @@ public class AgentNotifier implements Runnable
                         catch ( Exception e )
                         {
                             it.remove();
-                            LOG.log( Level.SEVERE, "Error notifying agent listeners, removing faulting listener", e );
+                            LOG.error( "Error notifying agent listeners, removing faulting listener", e );
                         }
                     }
                 }

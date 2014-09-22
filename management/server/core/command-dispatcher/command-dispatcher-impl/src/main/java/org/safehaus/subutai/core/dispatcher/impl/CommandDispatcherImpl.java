@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.safehaus.subutai.common.command.AbstractCommandRunner;
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
@@ -111,7 +110,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             catch ( PeerException e )
             {
                 String err = String.format( "Error in executeCommand: %s", e.getMessage() );
-                LOG.log( Level.SEVERE, err, e );
+                LOG.error( err, e );
                 throw new RunCommandException( err );
             }
         }
@@ -170,7 +169,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         //send remote requests
         if ( !command.getRemoteRequests().isEmpty() )
         {
-            LOG.warning( "executing remote requests" );
+            LOG.warn( "executing remote requests" );
 
             sendRequests( command.getRemoteRequests() );
         }
@@ -179,7 +178,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         if ( !command.getRequests().isEmpty() )
         {
 
-            LOG.warning( "executing local requests" );
+            LOG.warn( "executing local requests" );
 
             Command localCommand = new CommandImpl( command.getRequests(), commandRunner );
             final CommandDispatcherImpl self = this;
@@ -197,7 +196,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             }
             catch ( CommandException e )
             {
-                LOG.log( Level.SEVERE, "Error executing local requests", e );
+                LOG.error( "Error executing local requests", e );
             }
         }
     }
@@ -220,7 +219,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             {
                 String errString = String.format( "Error in sendRequests for peer %s: %s", peer, e.getMessage() );
 
-                LOG.log( Level.SEVERE, errString, e );
+                LOG.error( errString, e );
                 throw new RunCommandException( errString );
             }
         }
@@ -291,7 +290,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         }
         catch ( CommandException | DBException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ), e );
+            LOG.error( String.format( "Error in executeRequests: [%s]", e.getMessage() ), e );
             throw new PeerMessageException( e.getMessage() );
         }
     }
@@ -306,8 +305,8 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE,
-                    String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(), response ), e );
+            LOG.error( String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(), response ),
+                    e );
             throw new RunCommandException( e.getMessage() );
         }
     }
@@ -399,7 +398,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
         }
         catch ( RuntimeException e )
         {
-            LOG.log( Level.SEVERE, "Error in onMessage", e );
+            LOG.error( "Error in onMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
         return null;

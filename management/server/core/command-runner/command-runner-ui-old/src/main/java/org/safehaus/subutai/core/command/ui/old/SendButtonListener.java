@@ -3,8 +3,6 @@ package org.safehaus.subutai.core.command.ui.old;
 
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
@@ -19,6 +17,8 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.vaadin.ui.Button;
@@ -29,7 +29,7 @@ import com.vaadin.ui.Button;
  */
 public class SendButtonListener implements Button.ClickListener
 {
-    private static final Logger LOG = Logger.getLogger( SendButtonListener.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SendButtonListener.class.getName() );
 
     private final TerminalForm form;
     private final AgentManager agentManager;
@@ -143,7 +143,7 @@ public class SendButtonListener implements Button.ClickListener
             }
             catch ( CommandException e )
             {
-                LOG.log( Level.SEVERE, "Error in ExecuteCommandTask", e );
+                LOG.error( "Error in ExecuteCommandTask", e );
                 form.show( e.getMessage() );
             }
 
