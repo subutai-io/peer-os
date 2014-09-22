@@ -4,8 +4,6 @@ package org.safehaus.subutai.core.communication.impl;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -16,6 +14,7 @@ import javax.jms.Session;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.slf4j.LoggerFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.advisory.AdvisorySupport;
@@ -31,7 +30,8 @@ import com.google.common.base.Strings;
 public class CommunicationManagerImpl implements CommunicationManager
 {
 
-    private static final Logger LOG = Logger.getLogger( CommunicationManagerImpl.class.getName() );
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
+
     /**
      * broker
      */
@@ -163,7 +163,7 @@ public class CommunicationManagerImpl implements CommunicationManager
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in addListener", ex );
+            LOG.error( "Error in addListener", ex );
         }
     }
 
@@ -185,7 +185,7 @@ public class CommunicationManagerImpl implements CommunicationManager
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in removeListener", ex );
+            LOG.error( "Error in removeListener", ex );
         }
     }
 
@@ -209,27 +209,7 @@ public class CommunicationManagerImpl implements CommunicationManager
         Preconditions.checkArgument( amqMaxPooledConnections >= 1, "Max Pool Connections size must be greater than 0" );
         Preconditions.checkArgument( amqMaxSenderPoolSize >= 1, "Max Sender Pool size must be greater than 0" );
 
-        if ( pooledConnectionFactory != null )
-        {
-            try
-            {
-                pooledConnectionFactory.stop();
-            }
-            catch ( Exception e )
-            {
-            }
-        }
-
-        if ( communicationMessageListener != null )
-        {
-            try
-            {
-                communicationMessageListener.destroy();
-            }
-            catch ( Exception e )
-            {
-            }
-        }
+        cleanup();
 
         try
         {
@@ -242,11 +222,11 @@ public class CommunicationManagerImpl implements CommunicationManager
             pooledConnectionFactory.setMaxConnections( amqMaxPooledConnections );
             pooledConnectionFactory.start();
             setupListener();
-            LOG.log( Level.INFO, "Communication Manager started..." );
+            LOG.info( "Communication Manager started..." );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in init", ex );
+            LOG.error( "Error in init", ex );
         }
     }
 
@@ -279,7 +259,7 @@ public class CommunicationManagerImpl implements CommunicationManager
         }
         catch ( JMSException ex )
         {
-            LOG.log( Level.SEVERE, "Error in setupListener", ex );
+            LOG.error( "Error in setupListener", ex );
         }
     }
 
@@ -291,33 +271,42 @@ public class CommunicationManagerImpl implements CommunicationManager
     {
         try
         {
-            if ( pooledConnectionFactory != null )
-            {
-                try
-                {
-                    pooledConnectionFactory.stop();
-                }
-                catch ( Exception e )
-                {
-                }
-            }
-            if ( communicationMessageListener != null )
-            {
-                try
-                {
-                    communicationMessageListener.destroy();
-                }
-                catch ( Exception e )
-                {
-                }
-            }
+            cleanup();
+
             exec.shutdown();
 
-            LOG.log( Level.INFO, "Communication Manager stopped..." );
+            LOG.info( "Communication Manager stopped..." );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in destroy", ex );
+            LOG.error( "Error in destroy", ex );
+        }
+    }
+
+
+    private void cleanup()
+    {
+        if ( pooledConnectionFactory != null )
+        {
+            try
+            {
+                pooledConnectionFactory.stop();
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "ignore", e );
+            }
+        }
+        if ( communicationMessageListener != null )
+        {
+            try
+            {
+                communicationMessageListener.destroy();
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "ignore", e );
+            }
         }
     }
 }
