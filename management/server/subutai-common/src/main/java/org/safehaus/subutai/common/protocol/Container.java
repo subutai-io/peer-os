@@ -3,16 +3,18 @@ package org.safehaus.subutai.common.protocol;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.ContainerException;
+
 
 /**
  * Created by timur on 9/20/14.
  */
-public class Container {
-    private UUID agentId;
-    private UUID peerId;
-    private String hostname;
-    private String name;
-    private String description;
+public abstract class Container {
+    protected UUID agentId;
+    protected UUID peerId;
+    protected String hostname;
+    protected String name;
+    protected String description;
 
 
     public UUID getAgentId()
@@ -73,4 +75,11 @@ public class Container {
     {
         this.description = description;
     }
+
+    public abstract boolean start() throws ContainerException;
+
+    public abstract boolean stop() throws ContainerException;
+
+    public abstract boolean isConnected() throws ContainerException;
+
 }

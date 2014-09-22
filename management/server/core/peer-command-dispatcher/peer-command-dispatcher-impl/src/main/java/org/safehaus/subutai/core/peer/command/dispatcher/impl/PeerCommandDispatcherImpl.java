@@ -29,6 +29,18 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     }
 
 
+    public void init()
+    {
+
+    }
+
+
+    public void destroy()
+    {
+
+    }
+
+
     public PeerManager getPeerManager()
     {
         return peerManager;
@@ -45,7 +57,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     public boolean invoke( final PeerCommand peerCommand ) throws PeerCommandException
     {
         boolean result = false;
-        if ( peerManager.getSiteId().equals( peerCommand.getPeerCommandMessage().getPeerId() ) )
+        if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
         {
 
             try
@@ -60,9 +72,8 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
         else
         {
 
-//            result =  remotePeerRestClient
+            //            result =  remotePeerRestClient
             //TODO: remote peer invoke
-
 
 
         }

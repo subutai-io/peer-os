@@ -622,7 +622,7 @@
         <artifactId>command-dispatcher-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+      <!--<dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>command-dispatcher-cli</artifactId>
         <version>${project.version}</version>
@@ -631,7 +631,7 @@
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>command-dispatcher-rest</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency>-->
 
       <!-- Command Runner -->
       <dependency>

@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
@@ -62,7 +63,7 @@ public class RemotePeerRestClient
             }
             catch ( Exception e )
             {
-                LOG.severe( e.getMessage() );
+                LOG.log( Level.SEVERE, e.getMessage() );
             }
 
             return null;

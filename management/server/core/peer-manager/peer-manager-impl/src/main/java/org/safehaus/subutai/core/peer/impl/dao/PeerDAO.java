@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.impl.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
@@ -49,7 +50,7 @@ public class PeerDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return false;
     }
@@ -82,13 +83,13 @@ public class PeerDAO
                 }
             }
         }
-        catch ( JsonSyntaxException ex )
+        catch ( JsonSyntaxException e )
         {
-            LOG.severe( ex.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return list;
     }
@@ -126,13 +127,13 @@ public class PeerDAO
                 }
             }
         }
-        catch ( JsonSyntaxException ex )
+        catch ( JsonSyntaxException e )
         {
-            LOG.severe( ex.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
         return null;
     }
@@ -157,7 +158,7 @@ public class PeerDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
 
         return false;

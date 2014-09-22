@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.container.ui;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.NamingException;
@@ -73,7 +74,7 @@ public class ContainerUI implements PortalModule
         }
         catch ( NamingException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
 
         return null;

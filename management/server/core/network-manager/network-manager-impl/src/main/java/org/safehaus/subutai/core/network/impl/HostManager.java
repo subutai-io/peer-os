@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.Command;
@@ -53,7 +54,7 @@ public class HostManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ) );
         }
 
         return command.hasSucceeded();

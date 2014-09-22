@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.HTTPException;
@@ -133,7 +134,7 @@ public class HttpUtil
         }
         catch ( IOException | URISyntaxException e )
         {
-            LOG.severe( String.format( "Error in get: %s", e.getMessage() ) );
+            LOG.log( Level.SEVERE, String.format( "Error in get: %s", e.getMessage() ) );
             throw new HTTPException( e.getMessage() );
         }
         finally
@@ -190,7 +191,7 @@ public class HttpUtil
         }
         catch ( IOException e )
         {
-            LOG.severe( String.format( "Error in post: %s", e.getMessage() ) );
+            LOG.log(Level.SEVERE, String.format( "Error in post: %s", e.getMessage() ) );
             throw new HTTPException( e.getMessage() );
         }
         finally
