@@ -11,10 +11,11 @@
 package org.safehaus.subutai.server.ui.views;
 
 
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Parameters;
 import org.safehaus.subutai.common.protocol.Setting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.vaadin.data.Property;
@@ -121,7 +122,7 @@ public class MonitorView extends VerticalLayout implements View
             "        }\n" +
             "    ]\n" +
             "}";
-    private final Logger LOG = Logger.getLogger( MonitorView.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MonitorView.class.getName() );
 
 
     @Override
