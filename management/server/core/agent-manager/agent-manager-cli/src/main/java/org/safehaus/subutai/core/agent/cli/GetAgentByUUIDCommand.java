@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.agent.cli;
 
 
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -17,6 +18,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "agent", name = "get-agent-by-uuid", description = "get agent by uuid")
 public class GetAgentByUUIDCommand extends OsgiCommandSupport
 {
+    private static final Logger LOG = Logger.getLogger( GetAgentByUUIDCommand.class.getName() );
 
     @Argument(index = 0, name = "uuid", required = true, multiValued = false, description = "agent UUID")
     String uuid;
@@ -49,7 +51,7 @@ public class GetAgentByUUIDCommand extends OsgiCommandSupport
         sb.append( "Parent hostname: " ).append( agent.getParentHostName() ).append( "\n" );
         sb.append( "Transport ID: " ).append( agent.getTransportId() ).append( "\n" );
         sb.append( "UUID: " ).append( agent.getUuid() ).append( "\n" );
-        System.out.println( sb.toString() );
+        LOG.info( sb.toString() );
         return null;
     }
 }

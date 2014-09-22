@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +32,8 @@ import com.google.common.collect.Sets;
  */
 public class GitManagerImpl implements GitManager
 {
+    protected static final Logger LOG = Logger.getLogger( GitManagerImpl.class.getName() );
+
 
     private static final String MASTER_BRANCH = "master";
     private static final String LINE_SEPARATOR = "\n";
@@ -215,6 +218,7 @@ public class GitManagerImpl implements GitManager
         else if ( output )
         {
             AgentResult agentResult = command.getResults().get( host.getUuid() );
+            LOG.info( agentResult.getStdOut() );
         }
     }
 
