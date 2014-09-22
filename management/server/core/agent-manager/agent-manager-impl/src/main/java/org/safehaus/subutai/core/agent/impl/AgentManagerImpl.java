@@ -9,7 +9,6 @@ package org.safehaus.subutai.core.agent.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -36,7 +35,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -49,7 +47,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     /**
      * list of agent listeners
      */
-    private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<>();
+    protected final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<>();
     /**
      * reference to communication manager
      */
@@ -75,6 +73,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     }
 
 
+    public boolean isNotifyAgentListeners()
+    {
+        return notifyAgentListeners;
+    }
+
+
+    public void setNotifyAgentListeners( final boolean notifyAgentListeners )
+    {
+        this.notifyAgentListeners = notifyAgentListeners;
+    }
+
+
     public Collection<AgentListener> getListeners()
     {
         return Collections.unmodifiableCollection( listeners );
@@ -88,7 +98,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     public Set<Agent> getAgents()
     {
-        return Sets.newHashSet( agents.asMap().values() );
+        return new HashSet( agents.asMap().values() );
     }
 
 
@@ -280,6 +290,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
             }
             catch ( InterruptedException ignore )
             {
+                break;
             }
             result = getAgentByHostname( hostname );
         }
@@ -304,46 +315,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
             communicationService.addListener( this );
 
             exec = Executors.newSingleThreadExecutor();
-            exec.execute( new Runnable()
-            {
-
-                public void run()
-                {
-                    long lastNotify = System.currentTimeMillis();
-                    while ( !Thread.interrupted() )
-                    {
-                        try
-                        {
-                            if ( notifyAgentListeners || System.currentTimeMillis() - lastNotify
-                                    > Common.AGENT_FRESHNESS_MIN * 60 * 1000 / 2 )
-                            {
-                                lastNotify = System.currentTimeMillis();
-                                notifyAgentListeners = false;
-                                Set<Agent> freshAgents = Sets.newHashSet( agents.asMap().values() );
-                                for ( Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); )
-                                {
-                                    AgentListener listener = it.next();
-                                    try
-                                    {
-                                        listener.onAgent( freshAgents );
-                                    }
-                                    catch ( Exception e )
-                                    {
-                                        it.remove();
-                                        LOG.log( Level.SEVERE,
-                                                "Error notifying agent listeners, removing faulting listener", e );
-                                    }
-                                }
-                            }
-                            Thread.sleep( 1000 );
-                        }
-                        catch ( InterruptedException ex )
-                        {
-                            break;
-                        }
-                    }
-                }
-            } );
+            exec.execute( new AgentNotifier( this ) );
         }
         catch ( Exception ex )
         {
