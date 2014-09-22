@@ -3,6 +3,8 @@ package org.safehaus.subutai.core.git.cli;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -20,6 +22,9 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "git", name = "commit-files", description = "Commit files")
 public class CommitFiles extends OsgiCommandSupport
 {
+
+    protected static final Logger LOG = Logger.getLogger( CommitFiles.class.getName() );
+
 
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
@@ -57,11 +62,12 @@ public class CommitFiles extends OsgiCommandSupport
         {
             String commitId =
                     gitManager.commit( agent, repoPath, new ArrayList<>( files ), message, afterConflictResolved );
-            System.out.println( String.format( "Commit ID : %s", commitId ) );
+
+            LOG.info( String.format( "Commit ID : %s", commitId ) );
         }
         catch ( GitException e )
         {
-            System.out.println( e );
+            LOG.log( Level.SEVERE, "Error in doExecute", e );
         }
 
         return null;

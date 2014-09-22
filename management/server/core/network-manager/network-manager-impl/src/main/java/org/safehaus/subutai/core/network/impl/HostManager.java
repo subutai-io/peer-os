@@ -13,11 +13,11 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Created by daralbaev on 04.04.14.
+ * HostManager enables to register agent's hostname in /etc/hosts file of other agents
  */
 public class HostManager
 {
-    protected static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
+    private static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
 
     private List<Agent> agentList;
     private String domainName;
@@ -45,8 +45,7 @@ public class HostManager
 
     private boolean write()
     {
-        //        String hosts = prepareHost();
-        //        Command command = commands.getWriteHostsCommand(agentList, hosts);
+
         Command command = commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( agentList ) );
         try
         {
@@ -54,7 +53,7 @@ public class HostManager
         }
         catch ( CommandException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();
@@ -71,23 +70,4 @@ public class HostManager
 
         return false;
     }
-
-
-    //    private String prepareHost() {
-    //        StringBuilder value = new StringBuilder();
-    //
-    //        for ( Agent agent : agentList ) {
-    //            value.append( agent.getListIP().get( 0 ) );
-    //            value.append( "\t" );
-    //            value.append( agent.getHostname() );
-    //            value.append( "." );
-    //            value.append( domainName );
-    //            value.append( "\t" );
-    //            value.append( agent.getHostname() );
-    //            value.append( "\n" );
-    //        }
-    //        value.append( "127.0.0.1\tlocalhost" );
-    //
-    //        return value.toString();
-    //    }
 }

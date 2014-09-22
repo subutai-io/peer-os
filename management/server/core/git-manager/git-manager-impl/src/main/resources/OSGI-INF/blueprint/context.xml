@@ -4,8 +4,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="gitmanager" scope="singleton" class="org.safehaus.subutai.core.git.impl.GitManagerImpl"
-        init-method="init" destroy-method="destroy">
+  <bean id="gitmanager" scope="singleton" class="org.safehaus.subutai.core.git.impl.GitManagerImpl">
     <argument ref="commandRunner" />
   </bean>
 
