@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -19,14 +20,17 @@ public class HBaseClusterConfig implements ConfigBase
     private String templateName = PRODUCT_NAME;
     private int numberOfNodes = 4;
     private UUID uuid;
-    private String master;
-    private String backupMasters;
+
+
     private String clusterName = "";
     private String hadoopNameNode;
 
-    private Set<String> nodes = Sets.newHashSet();
-    private Set<String> region = Sets.newHashSet();
-    private Set<String> quorum = Sets.newHashSet();
+    private String hadoopClusterName;
+    private Agent hbaseMaster;
+    private Set<Agent> hadoopNodes = Sets.newHashSet();
+    private Set<Agent> regionServers = Sets.newHashSet();
+    private Set<Agent> quorumPeers = Sets.newHashSet();
+    private Set<Agent> backupMasters = Sets.newHashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private SetupType setupType;
 
@@ -90,6 +94,13 @@ public class HBaseClusterConfig implements ConfigBase
         this.hadoopNameNode = hadoopNameNode;
     }
 
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+    public void setHadoopClusterName( String hadoopClusterName ) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
 
     public UUID getUuid()
     {
@@ -105,72 +116,72 @@ public class HBaseClusterConfig implements ConfigBase
 
     public void reset()
     {
-        this.master = null;
-        this.region = null;
-        this.quorum = null;
+        this.hbaseMaster = null;
+        this.regionServers = null;
+        this.quorumPeers = null;
         this.backupMasters = null;
         this.domainName = "";
         this.clusterName = "";
     }
 
 
-    public String getMaster()
+    public Agent getHbaseMaster()
     {
-        return master;
+        return hbaseMaster;
     }
 
 
-    public void setMaster( String master )
+    public void setHbaseMaster( Agent hbaseMaster )
     {
-        this.master = master;
+        this.hbaseMaster = hbaseMaster;
     }
 
 
-    public Set<String> getRegion()
+    public Set<Agent> getRegionServers()
     {
-        return region;
+        return regionServers;
     }
 
 
-    public void setRegion( Set<String> region )
+    public void setRegionServers( Set< Agent > regionServers )
     {
-        this.region = region;
+        this.regionServers = regionServers;
     }
 
 
-    public Set<String> getQuorum()
+    public Set<Agent> getQuorumPeers()
     {
-        return quorum;
+        return quorumPeers;
     }
 
 
-    public void setQuorum( Set<String> quorum )
+    public void setQuorumPeers( Set< Agent > quorumPeers )
     {
-        this.quorum = quorum;
+        this.quorumPeers = quorumPeers;
     }
 
 
-    public String getBackupMasters()
+    public Set<Agent> getBackupMasters()
     {
         return backupMasters;
     }
 
 
-    public void setBackupMasters( String backupMasters )
+    public void setBackupMasters( Set< Agent > backupMasters )
     {
         this.backupMasters = backupMasters;
     }
 
 
-    public Set<String> getNodes()
+    public Set<Agent> getHadoopNodes()
     {
-        return nodes;
+        return hadoopNodes;
     }
 
 
-    public void setNodes( Set<String> nodes )
+    public void setHadoopNodes( Set< Agent > hadoopNodes )
     {
-        this.nodes = nodes;
+        this.hadoopNodes = hadoopNodes;
     }
 
 
@@ -211,12 +222,12 @@ public class HBaseClusterConfig implements ConfigBase
         return "HBaseConfig{" +
                 "numberOfNodes=" + numberOfNodes +
                 ", uuid=" + uuid +
-                ", master='" + master + '\'' +
-                ", region=" + region +
-                ", quorum=" + quorum +
+                ", hbaseMaster='" + hbaseMaster + '\'' +
+                ", regionServers=" + regionServers +
+                ", quorumPeers=" + quorumPeers +
                 ", backupMasters='" + backupMasters + '\'' +
                 ", domainName='" + domainName + '\'' +
-                ", nodes=" + nodes +
+                ", hadoopNodes=" + hadoopNodes +
                 ", clusterName='" + clusterName + '\'' +
                 ", hadoopNameNode='" + hadoopNameNode + '\'' +
                 '}';

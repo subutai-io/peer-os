@@ -10,8 +10,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseType;
 import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
@@ -37,27 +45,63 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import javax.naming.NamingException;
+
 
 /**
  * @author dilshat
  */
 public class Manager
 {
+    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected final static String CHECK_BUTTON_CAPTION = "Check";
+    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
+    protected final static String START_BUTTON_CAPTION = "Start";
+    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected final static String STOP_BUTTON_CAPTION = "Stop";
+    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected final static String HOST_COLUMN_CAPTION = "Host";
+    protected final static String IP_COLUMN_CAPTION = "IP List";
+    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected final static String STATUS_COLUMN_CAPTION = "Status";
+    protected final static String ADD_NODE_CAPTION = "Add Node";
+
+    protected final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn;
 
     private final VerticalLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table masterTable;
     private final Table regionTable;
     private final Table quorumTable;
-    private final Table bmasterTable;
+    private final Table backUpMasterTable;
+    private final ExecutorService executor;
     private HBaseClusterConfig config;
     private HBaseUI hBaseUI;
 
+    private final HBase hbase;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
+    private final String message = "No cluster is installed !";
+    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
 
-    public Manager( final HBaseUI hBaseUI )
+
+
+    public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
     {
+        Preconditions.checkNotNull( executor, "Executor is null" );
+        Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
 
-        this.hBaseUI = hBaseUI;
+        this.hbase = serviceLocator.getService( HBase.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.executor = executor;
+
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setSizeFull();
@@ -73,7 +117,7 @@ public class Manager
         masterTable = createTableTemplate( "Master" );
         regionTable = createTableTemplate( "Region" );
         quorumTable = createTableTemplate( "Quorum" );
-        bmasterTable = createTableTemplate( "Backup master" );
+        backUpMasterTable = createTableTemplate( "Backup master" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -99,7 +143,7 @@ public class Manager
 
         controlsContent.addComponent( clusterCombo );
 
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -112,100 +156,79 @@ public class Manager
 
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button startClustersBtn = new Button( "Start cluster" );
-        startClustersBtn.addStyleName( "default" );
-        startClustersBtn.addClickListener( new Button.ClickListener()
-        {
+        startAllNodesBtn = new Button( "Start cluster" );
+        startAllNodesBtn.addStyleName( "default" );
+        startAllNodesBtn.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    UUID trackID = hBaseUI.getHbaseManager().startCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if( config != null ) {
+                    UUID trackID = hbase.startCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( executor, tracker, trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
-                    window.getWindow().addCloseListener( new Window.CloseListener()
-                    {
+                    window.getWindow().addCloseListener( new Window.CloseListener() {
                         @Override
-                        public void windowClose( Window.CloseEvent closeEvent )
-                        {
+                        public void windowClose( Window.CloseEvent closeEvent ) {
                             refreshClustersInfo();
                         }
                     } );
                     contentRoot.getUI().addWindow( window.getWindow() );
-                }
-                else
-                {
+                } else {
                     show( "Please, select cluster" );
                 }
             }
         } );
 
-        controlsContent.addComponent( startClustersBtn );
+        controlsContent.addComponent( startAllNodesBtn );
 
-        Button stopClustersBtn = new Button( "Stop cluster" );
-        stopClustersBtn.addStyleName( "default" );
-        stopClustersBtn.addClickListener( new Button.ClickListener()
-        {
+        stopAllNodesBtn = new Button( "Stop cluster" );
+        stopAllNodesBtn.addStyleName( "default" );
+        stopAllNodesBtn.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    UUID trackID = hBaseUI.getHbaseManager().stopCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if( config != null ) {
+                    UUID trackID = hbase.stopCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( executor, tracker, trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
-                    window.getWindow().addCloseListener( new Window.CloseListener()
-                    {
+                    window.getWindow().addCloseListener( new Window.CloseListener() {
                         @Override
-                        public void windowClose( Window.CloseEvent closeEvent )
-                        {
+                        public void windowClose( Window.CloseEvent closeEvent ) {
                             refreshClustersInfo();
                         }
                     } );
                     contentRoot.getUI().addWindow( window.getWindow() );
-                }
-                else
-                {
+                } else {
                     show( "Please, select cluster" );
                 }
             }
         } );
 
-        controlsContent.addComponent( stopClustersBtn );
+        controlsContent.addComponent( stopAllNodesBtn );
 
-        Button checkClustersBtn = new Button( "Check cluster" );
-        checkClustersBtn.addStyleName( "default" );
-        checkClustersBtn.addClickListener( new Button.ClickListener()
-        {
+        checkAllBtn = new Button( "Check cluster" );
+        checkAllBtn.addStyleName( "default" );
+        checkAllBtn.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    UUID trackID = hBaseUI.getHbaseManager().checkCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if( config != null ) {
+                    UUID trackID = hbase.checkCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( executor, tracker, trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
-                    window.getWindow().addCloseListener( new Window.CloseListener()
-                    {
+                    window.getWindow().addCloseListener( new Window.CloseListener() {
                         @Override
-                        public void windowClose( Window.CloseEvent closeEvent )
-                        {
+                        public void windowClose( Window.CloseEvent closeEvent ) {
                             refreshClustersInfo();
                         }
                     } );
                     contentRoot.getUI().addWindow( window.getWindow() );
-                }
-                else
-                {
+                } else {
                     show( "Please, select cluster" );
                 }
             }
         } );
 
-        controlsContent.addComponent( checkClustersBtn );
+        controlsContent.addComponent( checkAllBtn );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        destroyClusterBtn = new Button( "Destroy cluster" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -222,9 +245,9 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = hBaseUI.getHbaseManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = hbase.uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+                                    new ProgressWindow( executor, tracker, trackID,
                                             HBaseClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
@@ -252,7 +275,7 @@ public class Manager
         content.addComponent( masterTable );
         content.addComponent( regionTable );
         content.addComponent( quorumTable );
-        content.addComponent( bmasterTable );
+        content.addComponent( backUpMasterTable );
     }
 
 
@@ -260,76 +283,228 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( quorumTable, config.getQuorum(), HBaseType.HQuorumPeer );
-            populateTable( regionTable, config.getRegion(), HBaseType.HRegionServer );
+            populateTable( regionTable, config.getRegionServers(), HBaseType.HRegionServer  );
+            populateTable( quorumTable, config.getQuorumPeers(), HBaseType.HRegionServer  );
+            populateTable( backUpMasterTable, config.getBackupMasters(), HBaseType.BackupMaster );
 
-            Set<String> masterSet = new HashSet<>();
-            masterSet.add( config.getMaster() );
+            Set<Agent> masterSet = new HashSet<>();
+            masterSet.add( config.getHbaseMaster() );
             populateMasterTable( masterTable, masterSet, HBaseType.HMaster );
-
-            Set<String> bmasterSet = new HashSet<>();
-            bmasterSet.add( config.getBackupMasters() );
-            populateTable( bmasterTable, bmasterSet, HBaseType.BackupMaster );
         }
         else
         {
             regionTable.removeAllItems();
             quorumTable.removeAllItems();
-            bmasterTable.removeAllItems();
+            backUpMasterTable.removeAllItems();
             masterTable.removeAllItems();
         }
     }
 
 
-    private void populateMasterTable( final Table table, Set<String> agents, final HBaseType type )
+    private void populateMasterTable( final Table table, Set<Agent> agents, final HBaseType type )
     {
 
         table.removeAllItems();
 
-        for ( final String hostname : agents )
+        for ( final Agent agent : agents )
         {
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
 
-            Agent a = hBaseUI.getAgentManager().getAgentByHostname( hostname );
-            if ( a == null )
-            {
+            if ( agent == null ){
                 continue;
             }
 
             final Object rowId = table.addItem( new Object[] {
-                    a.getHostname(), type, progressIcon
+                    agent.getHostname(), type, progressIcon
             }, null );
         }
     }
 
 
-    private void populateTable( final Table table, Set<String> agents, final HBaseType type )
+    private void populateTable( final Table table, Set<Agent> agents,  final HBaseType type )
     {
 
         table.removeAllItems();
 
-        for ( final String hostname : agents )
+        for ( final Agent agent : agents )
         {
-            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+            final Label resultHolder = new Label();
+            final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
+            checkBtn.addStyleName( "default" );
+            final Button startBtn = new Button( START_BUTTON_CAPTION );
+            startBtn.addStyleName( "default" );
+            final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
+            stopBtn.addStyleName( "default" );
+
+            final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            destroyBtn.addStyleName( "default" );
+            stopBtn.setEnabled( false );
+            startBtn.setEnabled( false );
             progressIcon.setVisible( false );
 
-            Agent a = hBaseUI.getAgentManager().getAgentByHostname( hostname );
-            if ( a == null )
-            {
-                continue;
-            }
+            final HorizontalLayout availableOperations = new HorizontalLayout();
+            availableOperations.addStyleName( "default" );
+            availableOperations.setSpacing( true );
 
-            final Object rowId = table.addItem( new Object[] {
-                    a.getHostname(), type, progressIcon
+            availableOperations.addComponent( checkBtn );
+            availableOperations.addComponent( startBtn );
+            availableOperations.addComponent( stopBtn );
+            availableOperations.addComponent( destroyBtn );
+
+            table.addItem( new Object[] {
+                    agent.getHostname(), agent.getListIP().get( 0 ), "fill here !", resultHolder,
+                    availableOperations
             }, null );
+
+//            checkBtn.addClickListener( new Button.ClickListener()
+//            {
+//                @Override
+//                public void buttonClick( Button.ClickEvent clickEvent )
+//                {
+//                    progressIcon.setVisible( true );
+//                    startBtn.setEnabled( false );
+//                    stopBtn.setEnabled( false );
+//                    checkBtn.setEnabled( false );
+//                    destroyBtn.setEnabled( false );
+//
+//                    executor.execute( new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(),
+//                            new CompleteEvent()
+//                            {
+//                                @Override
+//                                public void onComplete( String result )
+//                                {
+//                                    synchronized ( progressIcon )
+//                                    {
+//                                        resultHolder.setValue( result );
+//                                        if ( result.contains( "NOT" ) )
+//                                        {
+//                                            startBtn.setEnabled( true );
+//                                            stopBtn.setEnabled( false );
+//                                        }
+//                                        else
+//                                        {
+//                                            startBtn.setEnabled( false );
+//                                            stopBtn.setEnabled( true );
+//                                        }
+//                                        progressIcon.setVisible( false );
+//                                        destroyBtn.setEnabled( true );
+//                                        checkBtn.setEnabled( true );
+//                                    }
+//                                }
+//                            } ) );
+//                }
+//            } );
+//
+//            startBtn.addClickListener( new Button.ClickListener()
+//            {
+//                @Override
+//                public void buttonClick( Button.ClickEvent clickEvent )
+//                {
+//                    progressIcon.setVisible( true );
+//                    startBtn.setEnabled( false );
+//                    stopBtn.setEnabled( false );
+//                    destroyBtn.setEnabled( false );
+//                    checkBtn.setEnabled( false );
+//
+//                    executor.execute(
+//                            new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
+//                                    new CompleteEvent()
+//                                    {
+//                                        @Override
+//                                        public void onComplete( String result )
+//                                        {
+//                                            synchronized ( progressIcon )
+//                                            {
+//                                                checkBtn.click();
+//                                            }
+//                                        }
+//                                    } ) );
+//                }
+//            } );
+//
+//            stopBtn.addClickListener( new Button.ClickListener()
+//            {
+//                @Override
+//                public void buttonClick( Button.ClickEvent clickEvent )
+//                {
+//                    progressIcon.setVisible( true );
+//                    startBtn.setEnabled( false );
+//                    stopBtn.setEnabled( false );
+//                    destroyBtn.setEnabled( false );
+//                    checkBtn.setEnabled( false );
+//                    executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), false,
+//                            new CompleteEvent()
+//                            {
+//                                @Override
+//                                public void onComplete( String result )
+//                                {
+//                                    synchronized ( progressIcon )
+//                                    {
+//                                        checkBtn.click();
+//                                    }
+//                                }
+//                            } ) );
+//                }
+//            } );
+//            destroyBtn.addClickListener( new Button.ClickListener()
+//            {
+//                @Override
+//                public void buttonClick( Button.ClickEvent clickEvent )
+//                {
+//                    ConfirmationDialog alert = new ConfirmationDialog(
+//                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+//                    alert.getOk().addClickListener( new Button.ClickListener()
+//                    {
+//                        @Override
+//                        public void buttonClick( Button.ClickEvent clickEvent )
+//                        {
+//                            UUID trackID = spark.destroySlaveNode( config.getClusterName(), agent.getHostname() );
+//                            ProgressWindow window =
+//                                    new ProgressWindow( executor, tracker, trackID, SparkClusterConfig.PRODUCT_KEY );
+//                            window.getWindow().addCloseListener( new Window.CloseListener()
+//                            {
+//                                @Override
+//                                public void windowClose( Window.CloseEvent closeEvent )
+//                                {
+//                                    refreshClustersInfo();
+//                                }
+//                            } );
+//                            contentRoot.getUI().addWindow( window.getWindow() );
+//                        }
+//                    } );
+//
+//                    contentRoot.getUI().addWindow( alert.getAlert() );
+//                }
+//            } );
         }
     }
+//    private void populateTable( final Table table, Set<String> agents, final HBaseType type )
+//    {
+//
+//        table.removeAllItems();
+//
+//        for ( final String hostname : agents )
+//        {
+//            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+//            progressIcon.setVisible( false );
+//
+//            Agent a = agentManager.getAgentByHostname( hostname );
+//            if ( a == null )
+//            {
+//                continue;
+//            }
+//
+//            final Object rowId = table.addItem( new Object[] {
+//                    a.getHostname(), type, progressIcon
+//            }, null );
+//        }
+//    }
 
 
     public void refreshClustersInfo()
     {
-        List<HBaseClusterConfig> clusters = hBaseUI.getHbaseManager().getClusters();
+        List<HBaseClusterConfig> clusters = hbase.getClusters();
         HBaseClusterConfig clusterInfo = ( HBaseClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clusters != null && clusters.size() > 0 )
@@ -379,12 +554,12 @@ public class Manager
                 {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = hBaseUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hBaseUI.getExecutor(),
-                                        hBaseUI.getCommandRunner(), hBaseUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executor,
+                                        commandRunner, agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else

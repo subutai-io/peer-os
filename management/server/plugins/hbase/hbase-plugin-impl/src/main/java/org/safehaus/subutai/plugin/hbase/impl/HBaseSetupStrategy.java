@@ -8,9 +8,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class HBaseSetupStrategy implements ClusterSetupStrategy
 {
 
@@ -30,8 +27,6 @@ public class HBaseSetupStrategy implements ClusterSetupStrategy
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
-
-
         return config;
     }
 }

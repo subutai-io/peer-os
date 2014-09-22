@@ -6,6 +6,7 @@
 package org.safehaus.subutai.plugin.hbase.ui;
 
 
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.hbase.ui.manager.Manager;
 import org.safehaus.subutai.plugin.hbase.ui.wizard.Wizard;
 
@@ -13,18 +14,14 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
+import javax.naming.NamingException;
+import java.util.concurrent.ExecutorService;
 
-/**
- * @author dilshat
- */
+
 public class HBaseForm extends CustomComponent
 {
 
-    private final Wizard wizard;
-    private final Manager manager;
-
-
-    public HBaseForm( HBaseUI hBaseUI )
+    public HBaseForm( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
     {
         setSizeFull();
 
@@ -32,14 +29,23 @@ public class HBaseForm extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
-        manager = new Manager( hBaseUI );
-        wizard = new Wizard( hBaseUI );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
-
-        verticalLayout.addComponent( mongoSheet );
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
+        final Manager manager = new Manager( executor, serviceLocator );
+        Wizard wizard = new Wizard( executor, serviceLocator );
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if( caption.equals( "Manage" ) ) {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }

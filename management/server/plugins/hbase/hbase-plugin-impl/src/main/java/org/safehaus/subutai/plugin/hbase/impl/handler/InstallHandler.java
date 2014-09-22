@@ -10,21 +10,16 @@ import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
-    private ProductOperation po;
     private HBaseClusterConfig config;
-
 
     public InstallHandler( final HBaseImpl manager, final HBaseClusterConfig config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 

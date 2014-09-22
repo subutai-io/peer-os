@@ -1,9 +1,6 @@
 package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -11,6 +8,9 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -93,33 +93,37 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
     {
         final Set<Agent> allNodes = new HashSet<>();
 
-        if ( manager.getAgentManager().getAgentByHostname( config.getMaster() ) == null )
+        if ( config.getHbaseMaster() == null )
         {
-            throw new Exception( String.format( "Master node %s not connected", config.getMaster() ) );
+            throw new Exception( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
         }
-        allNodes.add( manager.getAgentManager().getAgentByHostname( config.getMaster() ) );
-        if ( manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ) == null )
-        {
-            throw new Exception( String.format( "Backup master node %s not connected", config.getBackupMasters() ) );
-        }
-        allNodes.add( manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ) );
+        allNodes.add(  config.getHbaseMaster()  );
 
-        for ( String hostname : config.getRegion() )
+        for ( Agent agent : config.getRegionServers() )
         {
-            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null )
+            if (  agent  == null )
             {
-                throw new Exception( String.format( "Region server node %s not connected", hostname ) );
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
             }
-            allNodes.add( manager.getAgentManager().getAgentByHostname( hostname ) );
+            allNodes.add( agent  );
         }
 
-        for ( String hostname : config.getQuorum() )
+        for ( Agent agent : config.getQuorumPeers() )
         {
-            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null )
+            if (  agent  == null )
             {
-                throw new Exception( String.format( "Quorum node %s not connected", hostname ) );
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
             }
-            allNodes.add( manager.getAgentManager().getAgentByHostname( hostname ) );
+            allNodes.add( agent  );
+        }
+
+        for ( Agent agent : config.getBackupMasters() )
+        {
+            if (  agent  == null )
+            {
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
+            }
+            allNodes.add( agent  );
         }
 
         return allNodes;

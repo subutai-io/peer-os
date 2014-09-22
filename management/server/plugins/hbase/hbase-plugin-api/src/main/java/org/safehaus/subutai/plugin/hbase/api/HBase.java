@@ -16,9 +16,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
-/**
- * @author dilshat
- */
 public interface HBase extends ApiBase<HBaseClusterConfig>
 {
 

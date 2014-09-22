@@ -1,9 +1,6 @@
 package org.safehaus.subutai.plugin.hbase.api;
 
 
-/**
- * Created by bahadyr on 4/10/14.
- */
 public enum HBaseType
 {
 

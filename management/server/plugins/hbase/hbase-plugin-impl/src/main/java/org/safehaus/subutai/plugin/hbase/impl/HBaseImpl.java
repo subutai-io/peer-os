@@ -190,7 +190,7 @@ public class HBaseImpl implements HBase
 
     public List<HBaseClusterConfig> getClusters()
     {
-        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
+        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
     }
 
 
@@ -295,7 +295,7 @@ public class HBaseImpl implements HBase
     @Override
     public HBaseClusterConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
+        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
     }
 
 
@@ -303,33 +303,37 @@ public class HBaseImpl implements HBase
     {
         final Set<Agent> allNodes = new HashSet<>();
 
-        if ( agentManager.getAgentByHostname( config.getMaster() ) == null )
+        if ( config.getHbaseMaster() == null )
         {
-            throw new Exception( String.format( "Master node %s not connected", config.getMaster() ) );
+            throw new Exception( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
         }
-        allNodes.add( agentManager.getAgentByHostname( config.getMaster() ) );
-        if ( agentManager.getAgentByHostname( config.getBackupMasters() ) == null )
-        {
-            throw new Exception( String.format( "Backup master node %s not connected", config.getBackupMasters() ) );
-        }
-        allNodes.add( agentManager.getAgentByHostname( config.getBackupMasters() ) );
+        allNodes.add(  config.getHbaseMaster()  );
 
-        for ( String hostname : config.getRegion() )
+        for ( Agent agent : config.getRegionServers() )
         {
-            if ( agentManager.getAgentByHostname( hostname ) == null )
+            if (  agent  == null )
             {
-                throw new Exception( String.format( "Region server node %s not connected", hostname ) );
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
             }
-            allNodes.add( agentManager.getAgentByHostname( hostname ) );
+            allNodes.add( agent  );
         }
 
-        for ( String hostname : config.getQuorum() )
+        for ( Agent agent : config.getQuorumPeers() )
         {
-            if ( agentManager.getAgentByHostname( hostname ) == null )
+            if (  agent  == null )
             {
-                throw new Exception( String.format( "Quorum node %s not connected", hostname ) );
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
             }
-            allNodes.add( agentManager.getAgentByHostname( hostname ) );
+            allNodes.add( agent  );
+        }
+
+        for ( Agent agent : config.getBackupMasters() )
+        {
+            if (  agent  == null )
+            {
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
+            }
+            allNodes.add( agent  );
         }
 
         return allNodes;

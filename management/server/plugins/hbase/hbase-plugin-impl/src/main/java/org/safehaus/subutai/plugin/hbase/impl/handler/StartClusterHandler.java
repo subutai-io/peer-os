@@ -51,10 +51,10 @@ public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
                     return;
                 }
 
-                Agent master = manager.getAgentManager().getAgentByHostname( config.getMaster() );
+                Agent master = config.getHbaseMaster();
                 if ( master == null )
                 {
-                    po.addLogFailed( String.format( "Master node %s not connected", config.getMaster() ) );
+                    po.addLogFailed( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
                     return;
                 }
 
