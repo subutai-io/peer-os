@@ -3,12 +3,13 @@ package org.safehaus.subutai.core.strategy.impl;
 
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 
 abstract class MetricComparator
 {
 
-    static MetricComparator create( Criteria criteria )
+    static MetricComparator create( Criteria criteria ) throws StrategyException
     {
         MetricComparator mc = null;
         if ( "MORE_HDD".equals( criteria.getId() ) )
@@ -50,6 +51,11 @@ abstract class MetricComparator
                     return true;
                 }
             };
+        }
+        else
+        {
+            throw new StrategyException(
+                    String.format( "Comparator not defined for criteria [%s]", criteria.getId() ) );
         }
         return mc;
     }

@@ -15,7 +15,7 @@
 
   <bean id="strategyManager" scope="singleton"
         class="org.safehaus.subutai.core.strategy.impl.StrategyManagerImpl"
-        init-method="init" destroy-method="destroy">
+        destroy-method="destroy">
   </bean>
 
   <reference-list id="placementStrategies"
