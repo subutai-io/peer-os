@@ -9,7 +9,6 @@ package org.safehaus.subutai.core.environment.api;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -21,7 +20,8 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 /**
  *
  */
-public interface EnvironmentManager {
+public interface EnvironmentManager
+{
 
     /**
      * Builds the environment with a given blueprint descriptor.

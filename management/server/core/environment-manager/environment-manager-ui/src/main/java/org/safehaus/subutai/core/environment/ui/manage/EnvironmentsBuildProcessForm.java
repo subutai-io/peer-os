@@ -49,36 +49,6 @@ public class EnvironmentsBuildProcessForm
             }
         } );
         contentRoot.addComponent( getEnvironmentsButton );
-
-        //        Button saveBuildProcessButton = new Button( "Add" );
-        //        saveBuildProcessButton.addClickListener( new Button.ClickListener()
-        //        {
-        //            @Override
-        //            public void buttonClick( final Button.ClickEvent clickEvent )
-        //            {
-
-                /*EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
-                ContainerBuildMessage message = new ContainerBuildMessage();
-                message.setNumberOfContainers( 2 );
-                message.setTemplateName( "master" );
-                message.setStrategy( "ROUND_ROBIN" );
-                message.setEnvironmentUuid( UUID.randomUUID() );
-                //                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
-                message.setTargetPeerId( UUID.fromString( "66ccf4d9-8ab4-3286-bb9a-8fe14bd19ea5" ) );
-                environmentBuildProcess.addBuildBlock( message );
-                ContainerBuildMessage message2 = new ContainerBuildMessage();
-                message2.setNumberOfContainers( 2 );
-                message2.setTemplateName( "master" );
-                message2.setStrategy( "ROUND_ROBIN" );
-                message2.setEnvironmentUuid( UUID.randomUUID() );
-                //                message.setTargetPeerId( managerUI.getPeerManager().getSiteId() );
-                message2.setTargetPeerId( UUID.fromString( "7e363225-2c4b-3ce3-8b33-d026d3367771" ) );
-                environmentBuildProcess.addBuildBlock( message2 );
-                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );*/
-        //            }
-        //        } );
-        //
-        //        contentRoot.addComponent( saveBuildProcessButton );
         contentRoot.addComponent( environmentsTable );
     }
 

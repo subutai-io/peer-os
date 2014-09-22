@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommand;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
+
 
 /**
  * This is an implementation of EnvironmentManager
@@ -323,17 +325,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
     {
-        /*for ( CreateContainersMessage ccm : environmentBuildProcess.getCreateContainersMessages() )
+        for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 
-            LOG.info( "SENDING MESSAGE TO " + ccm.getTargetPeerId() );
-            PeerCommand peerCommand = new PeerCommand();
-            peerCommand.setMessage( ccm );
-            peerCommand.setType( PeerCommandType.CLONE );
-
-            peerCommandDispatcher.invoke( peerCommand )  ;
-//            Set<Agent> agents = peerManager.createContainers( ccm );
-        }*/
+            PeerCommand peerCommand = new PeerCommand( PeerCommandType.CLONE, ccm );
+            boolean result = peerCommandDispatcher.invoke( peerCommand );
+            LOG.info( "RESULT OF CLONE OPERATION " + result );
+        }
     }
 
 

@@ -20,11 +20,9 @@ import com.google.gson.GsonBuilder;
 public class RemotePeerRestClient
 {
 
-    //    executeRemoteCommand(C)
-
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private String baseUrl;
+    private String baseUrl = "http://%s:%s/cxf";
 
 
     public String getBaseUrl()
@@ -47,24 +45,26 @@ public class RemotePeerRestClient
     }
 
 
-    public String createRemoteContainers( CloneContainersMessage ccm )
+    public boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
     {
+        String path = "peer/containers";
         try
         {
-            WebClient client = WebClient.create( baseUrl );
+            WebClient client = WebClient.create( String.format( baseUrl, ip, port ) );
             String ccmString = GSON.toJson( ccm, CloneContainersMessage.class );
 
-            Response response =
-                    client.path( "peer/containers" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
-                          .post( ccmString );
+            Response response = client.path( path ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
+                                      .post( ccmString );
 
-            return response.toString();
+            LOG.info( response.toString() );
+
+            return true;
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
         }
 
-        return null;
+        return false;
     }
 }
