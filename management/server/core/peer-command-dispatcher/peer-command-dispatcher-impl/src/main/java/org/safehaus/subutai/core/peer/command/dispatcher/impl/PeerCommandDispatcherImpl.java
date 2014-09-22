@@ -45,7 +45,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     public boolean invoke( final PeerCommand peerCommand ) throws PeerCommandException
     {
         boolean result = false;
-        if ( peerManager.getSiteId().equals( peerCommand.getPeerCommandMessage().getPeerId() ) )
+        if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
         {
 
             try

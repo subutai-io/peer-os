@@ -399,7 +399,7 @@ public class PeerManagerImpl implements PeerManager {
     public boolean invoke( PeerCommand peerCommand ) throws PeerException
     {
         boolean result = false;
-        UUID agentId = peerCommand.getPeerCommandMessage().getAgentId();
+        UUID agentId = peerCommand.getMessage().getAgentId();
         PeerContainer container = findPeerContainer( agentId );
         if ( container == null )
         {
