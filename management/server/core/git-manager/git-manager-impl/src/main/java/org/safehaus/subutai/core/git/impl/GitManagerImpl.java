@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +20,8 @@ import org.safehaus.subutai.core.git.api.GitCommand;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -32,7 +33,7 @@ import com.google.common.collect.Sets;
  */
 public class GitManagerImpl implements GitManager
 {
-    protected static final Logger LOG = Logger.getLogger( GitManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( GitManagerImpl.class.getName() );
 
 
     private static final String MASTER_BRANCH = "master";

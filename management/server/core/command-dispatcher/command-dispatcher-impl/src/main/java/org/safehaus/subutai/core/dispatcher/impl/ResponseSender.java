@@ -9,8 +9,6 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -18,6 +16,8 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -27,7 +27,7 @@ import com.google.gson.JsonSyntaxException;
  */
 public class ResponseSender
 {
-    private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
     private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
@@ -118,7 +118,7 @@ public class ResponseSender
         }
         catch ( InterruptedException | DBException e )
         {
-            LOG.log( Level.SEVERE, "Error in send", e );
+            LOG.error( "Error in send", e );
         }
     }
 
@@ -166,7 +166,7 @@ public class ResponseSender
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, "Error in sendRequest", e );
+            LOG.error( "Error in sendRequest", e );
         }
 
         return todo;
@@ -197,7 +197,7 @@ public class ResponseSender
         }
         catch ( JsonSyntaxException | DBException e )
         {
-            LOG.log( Level.SEVERE, "Error in sendResponses", e );
+            LOG.error( "Error in sendResponses", e );
         }
     }
 
@@ -238,7 +238,7 @@ public class ResponseSender
 
         catch ( PeerMessageException e )
         {
-            LOG.log( Level.SEVERE, "Error in sendResponses", e );
+            LOG.error( "Error in sendResponses", e );
 
             //increment attempts based on widening intervals
             if ( System.currentTimeMillis() - request.getTimestamp()
