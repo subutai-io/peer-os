@@ -15,6 +15,8 @@ import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
@@ -28,10 +30,12 @@ import com.google.gson.GsonBuilder;
 public class RestServiceImpl implements RestService
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
+
     private static final String TEMPLATE_PARENT_DELIMITER = " ";
     private static final String TEMPLATES_DELIMITER = "\n";
 
-    private static final Gson gson =
+    private static final Gson GSON =
             new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
     private TemplateRegistryManager templateRegistryManager;
 
@@ -48,7 +52,7 @@ public class RestServiceImpl implements RestService
         Template template = templateRegistryManager.getTemplate( templateName );
         if ( template != null )
         {
-            return Response.ok().entity( gson.toJson( template ) ).build();
+            return Response.ok().entity( GSON.toJson( template ) ).build();
         }
         else
         {
@@ -70,6 +74,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( IOException | RegistryException | RuntimeException e )
         {
+            LOG.error( "Error in registerTemplate", e );
             return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
         }
     }
@@ -87,6 +92,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( RegistryException | RuntimeException e )
         {
+            LOG.error( "Error in unregisterTemplate", e );
             return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
         }
     }
@@ -98,7 +104,7 @@ public class RestServiceImpl implements RestService
         Template template = templateRegistryManager.getTemplate( templateName, lxcArch );
         if ( template != null )
         {
-            return Response.ok().entity( gson.toJson( template ) ).build();
+            return Response.ok().entity( GSON.toJson( template ) ).build();
         }
         else
         {
@@ -113,7 +119,7 @@ public class RestServiceImpl implements RestService
         Template template = templateRegistryManager.getParentTemplate( childTemplateName );
         if ( template != null )
         {
-            return Response.ok().entity( gson.toJson( template ) ).build();
+            return Response.ok().entity( GSON.toJson( template ) ).build();
         }
         else
         {
@@ -128,7 +134,7 @@ public class RestServiceImpl implements RestService
         Template template = templateRegistryManager.getParentTemplate( childTemplateName, lxcArch );
         if ( template != null )
         {
-            return Response.ok().entity( gson.toJson( template ) ).build();
+            return Response.ok().entity( GSON.toJson( template ) ).build();
         }
         else
         {
@@ -145,7 +151,7 @@ public class RestServiceImpl implements RestService
         {
             parents.add( template.getTemplateName() );
         }
-        return Response.ok().entity( gson.toJson( parents ) ).build();
+        return Response.ok().entity( GSON.toJson( parents ) ).build();
     }
 
 
@@ -157,7 +163,7 @@ public class RestServiceImpl implements RestService
         {
             parents.add( template.getTemplateName() );
         }
-        return Response.ok().entity( gson.toJson( parents ) ).build();
+        return Response.ok().entity( GSON.toJson( parents ) ).build();
     }
 
 
@@ -169,7 +175,7 @@ public class RestServiceImpl implements RestService
         {
             children.add( template.getTemplateName() );
         }
-        return Response.ok().entity( gson.toJson( children ) ).build();
+        return Response.ok().entity( GSON.toJson( children ) ).build();
     }
 
 
@@ -181,7 +187,7 @@ public class RestServiceImpl implements RestService
         {
             children.add( template.getTemplateName() );
         }
-        return Response.ok().entity( gson.toJson( children ) ).build();
+        return Response.ok().entity( GSON.toJson( children ) ).build();
     }
 
 
@@ -197,7 +203,7 @@ public class RestServiceImpl implements RestService
                 addChildren( tree, template );
             }
         }
-        return Response.ok().entity( gson.toJson( uberTemplates ) ).build();
+        return Response.ok().entity( GSON.toJson( uberTemplates ) ).build();
     }
 
 
@@ -211,6 +217,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( RegistryException e )
         {
+            LOG.error( "Error in isTemplateInUse", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).header( "exception", e.getMessage() )
                            .build();
         }
@@ -229,6 +236,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( RegistryException e )
         {
+            LOG.error( "Error in setTemplateInUse", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).header( "exception", e.getMessage() )
                            .build();
         }
@@ -243,7 +251,7 @@ public class RestServiceImpl implements RestService
         {
             templates.add( template.getTemplateName() );
         }
-        return Response.ok().entity( gson.toJson( templates ) ).build();
+        return Response.ok().entity( GSON.toJson( templates ) ).build();
     }
 
 
@@ -255,7 +263,7 @@ public class RestServiceImpl implements RestService
         {
             templates.add( template.getTemplateName() );
         }
-        return Response.ok().entity( gson.toJson( templates ) ).build();
+        return Response.ok().entity( GSON.toJson( templates ) ).build();
     }
 
 
@@ -279,7 +287,7 @@ public class RestServiceImpl implements RestService
                   .append( TEMPLATES_DELIMITER );
         }
 
-        return Response.ok().entity( gson.toJson( output.toString() ) ).build();
+        return Response.ok().entity( GSON.toJson( output.toString() ) ).build();
     }
 
 

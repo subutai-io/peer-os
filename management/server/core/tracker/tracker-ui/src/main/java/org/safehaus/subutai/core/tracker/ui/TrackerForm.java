@@ -14,12 +14,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -45,7 +45,7 @@ import com.vaadin.ui.TextArea;
 public class TrackerForm extends CustomComponent
 {
 
-    private static final Logger LOG = Logger.getLogger( TrackerForm.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrackerForm.class.getName() );
     private final Tracker tracker;
     private final ExecutorService executor;
     private Table operationsTable;
@@ -138,7 +138,7 @@ public class TrackerForm extends CustomComponent
         }
         catch ( java.text.ParseException ex )
         {
-            Logger.getLogger( TrackerForm.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.error( "Error in generateDateFormat", ex );
         }
     }
 
@@ -254,7 +254,7 @@ public class TrackerForm extends CustomComponent
                         }
                         catch ( Exception e )
                         {
-                            LOG.log( Level.SEVERE, "Error in tracker", e );
+                            LOG.error( "Error in tracker", e );
                         }
                     }
                 }

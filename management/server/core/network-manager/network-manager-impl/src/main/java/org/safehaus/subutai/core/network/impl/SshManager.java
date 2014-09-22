@@ -3,13 +3,13 @@ package org.safehaus.subutai.core.network.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
@@ -20,7 +20,7 @@ import com.google.common.base.Strings;
 public class SshManager
 {
 
-    private static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SshManager.class.getName() );
 
     private List<Agent> agentList;
     private String keys;
@@ -49,7 +49,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();
@@ -65,7 +65,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         StringBuilder value = new StringBuilder();
@@ -95,7 +95,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
 
@@ -112,7 +112,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
 
@@ -142,7 +142,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();

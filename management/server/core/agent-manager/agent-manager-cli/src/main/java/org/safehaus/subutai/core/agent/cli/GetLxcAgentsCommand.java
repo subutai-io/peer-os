@@ -2,10 +2,11 @@ package org.safehaus.subutai.core.agent.cli;
 
 
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -14,10 +15,10 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "agent", name = "get-lxc-agents", description = "get lxc agents")
+@Command( scope = "agent", name = "get-lxc-agents", description = "get lxc agents" )
 public class GetLxcAgentsCommand extends OsgiCommandSupport
 {
-    private static final Logger LOG = Logger.getLogger( GetLxcAgentsCommand.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( GetLxcAgentsCommand.class.getName() );
 
     private AgentManager agentManager;
 
@@ -46,7 +47,7 @@ public class GetLxcAgentsCommand extends OsgiCommandSupport
               .append( agent.getListIP() ).append( " " ).append( "\n" );
         }
 
-        LOG.info( sb.toString() );
+        System.out.println( sb.toString() );
         return null;
     }
 }

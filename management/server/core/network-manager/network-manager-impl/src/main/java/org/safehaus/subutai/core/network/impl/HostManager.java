@@ -2,12 +2,12 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
@@ -17,7 +17,7 @@ import com.google.common.collect.Sets;
  */
 public class HostManager
 {
-    private static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HostManager.class.getName() );
 
     private List<Agent> agentList;
     private String domainName;
@@ -53,7 +53,7 @@ public class HostManager
         }
         catch ( CommandException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();

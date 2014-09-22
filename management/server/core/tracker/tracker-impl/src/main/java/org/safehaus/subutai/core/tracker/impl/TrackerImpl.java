@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
@@ -19,6 +17,8 @@ import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -39,7 +39,7 @@ public class TrackerImpl implements Tracker
      * Used to serialize/deserialize product operation to/from json format
      */
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final Logger LOG = Logger.getLogger( TrackerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrackerImpl.class.getName() );
     private static final String SOURCE_IS_EMPTY_MSG = "Source is null or empty";
 
     /**
@@ -78,7 +78,7 @@ public class TrackerImpl implements Tracker
         }
         catch ( DBException | JsonSyntaxException ex )
         {
-            LOG.log( Level.SEVERE, "Error in getProductOperation", ex );
+            LOG.error( "Error in getProductOperation", ex );
         }
         return null;
     }
@@ -117,7 +117,7 @@ public class TrackerImpl implements Tracker
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, "Error in saveProductOperation", e );
+            LOG.error( "Error in saveProductOperation", e );
         }
 
         return false;
@@ -182,7 +182,7 @@ public class TrackerImpl implements Tracker
         }
         catch ( DBException | JsonSyntaxException ex )
         {
-            LOG.log( Level.SEVERE, "Error in getProductOperations", ex );
+            LOG.error( "Error in getProductOperations", ex );
         }
         return list;
     }
@@ -211,7 +211,7 @@ public class TrackerImpl implements Tracker
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, "Error in getProductOperationSources", e );
+            LOG.error( "Error in getProductOperationSources", e );
         }
 
         return sources;
@@ -261,7 +261,7 @@ public class TrackerImpl implements Tracker
             }
             else
             {
-                LOG.warning( "Product operation not found" );
+                LOG.warn( "Product operation not found" );
                 return;
             }
         }

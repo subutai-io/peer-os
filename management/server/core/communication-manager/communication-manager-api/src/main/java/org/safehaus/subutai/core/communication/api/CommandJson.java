@@ -5,12 +5,11 @@
 package org.safehaus.subutai.core.communication.api;
 
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +21,7 @@ import com.google.gson.GsonBuilder;
 public class CommandJson
 {
 
-    private static final Logger LOG = Logger.getLogger( CommandJson.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommandJson.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().addDeserializationExclusionStrategy(
             new SkipNullsExclusionStrategy() ).disableHtmlEscaping().create();
 
@@ -118,7 +117,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getRequest", ex );
+            LOG.error( "Error in getRequest", ex );
         }
 
         return null;
@@ -144,7 +143,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getResponse", ex );
+            LOG.error( "Error in getResponse", ex );
         }
 
         return null;
@@ -166,7 +165,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getCommand", ex );
+            LOG.error( "Error in getCommand", ex );
         }
 
         return null;
@@ -188,7 +187,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getJson", ex );
+            LOG.error( "Error in getJson", ex );
         }
         return null;
     }
@@ -209,7 +208,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getResponse", ex );
+            LOG.error( "Error in getResponse", ex );
         }
         return null;
     }
@@ -230,7 +229,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getJson", ex );
+            LOG.error( "Error in getJson", ex );
         }
         return null;
     }
@@ -251,7 +250,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getAgentJson", ex );
+            LOG.error( "Error in getAgentJson", ex );
         }
         return null;
     }
@@ -276,7 +275,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getAgent", ex );
+            LOG.error( "Error in getAgent", ex );
         }
 
         return null;

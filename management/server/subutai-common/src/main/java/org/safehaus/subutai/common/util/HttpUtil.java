@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.HTTPException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -35,7 +35,7 @@ public class HttpUtil
 {
 
     public static final int RESPONSE_OK = 200;
-    private static final Logger LOG = Logger.getLogger( HttpUtil.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HttpUtil.class.getName() );
 
 
     public static String request( RequestType requestType, String url, Map<String, String> params ) throws HTTPException
@@ -134,7 +134,7 @@ public class HttpUtil
         }
         catch ( IOException | URISyntaxException e )
         {
-            LOG.log( Level.SEVERE, String.format( "Error in get: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in get: %s", e.getMessage() ), e );
             throw new HTTPException( e.getMessage() );
         }
         finally
@@ -191,7 +191,7 @@ public class HttpUtil
         }
         catch ( IOException e )
         {
-            LOG.log(Level.SEVERE, String.format( "Error in post: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in post: %s", e.getMessage() ), e );
             throw new HTTPException( e.getMessage() );
         }
         finally
