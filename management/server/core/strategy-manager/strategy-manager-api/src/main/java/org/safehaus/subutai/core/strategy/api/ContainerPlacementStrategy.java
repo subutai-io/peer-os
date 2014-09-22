@@ -30,7 +30,8 @@ public interface ContainerPlacementStrategy
      *
      * @param serverMetrics - map where key is a physical agent and value is a metric
      */
-    public void calculatePlacement( int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria );
+    public void calculatePlacement( int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria )
+            throws StrategyException;
 
     public Map<Agent, Integer> getPlacementDistribution();
 }

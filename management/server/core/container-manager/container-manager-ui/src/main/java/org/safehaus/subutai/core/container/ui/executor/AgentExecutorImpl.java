@@ -39,22 +39,6 @@ public class AgentExecutorImpl implements AgentExecutor
         }
     }
 
-    //    public String getHostName() {
-    //        return hostName;
-    //    }
-    //
-    //    public void setHostName(String hostName) {
-    //        this.hostName = hostName;
-    //    }
-    //
-    //    public List<String> getContainerNames() {
-    //        return containerNames;
-    //    }
-    //
-    //    public void setContainerNames(List<String> containerNames) {
-    //        this.containerNames = containerNames;
-    //    }
-
 
     @Override
     public void execute( final ExecutorService executor, final AgentCommandFactory commandFactory )
@@ -89,7 +73,7 @@ public class AgentExecutorImpl implements AgentExecutor
             @Override
             public void run()
             {
-                for ( String cn : containerNames )
+                for ( String ignore : containerNames )
                 {
                     try
                     {
