@@ -22,7 +22,6 @@ package org.safehaus.subutai.server.ui;
 
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.server.ui.util.HelpManager;
@@ -30,6 +29,8 @@ import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.views.CoreModulesView;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.safehaus.subutai.server.ui.views.MonitorView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -67,7 +68,7 @@ import com.vaadin.ui.VerticalLayout;
 public class MainUI extends UI
 {
 
-    private static final Logger LOG = Logger.getLogger( MainUI.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MainUI.class.getName() );
     private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<>();
 
     private CssLayout root = new CssLayout();

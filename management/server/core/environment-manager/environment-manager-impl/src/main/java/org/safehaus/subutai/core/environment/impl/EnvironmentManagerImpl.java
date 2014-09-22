@@ -36,10 +36,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
 
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-
-
 /**
  * This is an implementation of EnvironmentManager
  */

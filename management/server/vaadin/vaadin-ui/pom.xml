@@ -202,5 +202,10 @@
       <artifactId>vaadin</artifactId>
       <version>6.8.15</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${org.slf4j.version}</version>
+    </dependency>
   </dependencies>
 </project>
