@@ -32,16 +32,6 @@ public class CommandRunnerUI implements PortalModule
     }
 
 
-    public void init()
-    {
-    }
-
-
-    public void destroy()
-    {
-    }
-
-
     @Override
     public String getId()
     {
