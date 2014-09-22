@@ -12,13 +12,8 @@ import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 import com.google.common.collect.Sets;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
 {
-
-    private ProductOperation po;
 
     private String clusterName;
 
@@ -27,7 +22,7 @@ public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
@@ -35,41 +30,31 @@ public class StartClusterHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        final ProductOperation po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
-                String.format( "Starting cluster %s", clusterName ) );
-        manager.getExecutor().execute( new Runnable()
+        HBaseClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
         {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            return;
+        }
 
-            public void run()
-            {
-                HBaseClusterConfig config = manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName,
-                        HBaseClusterConfig.class );
-                if ( config == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
+        Agent master = config.getHbaseMaster();
+        if ( master == null )
+        {
+            productOperation.addLogFailed( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
+            return;
+        }
 
-                Agent master = config.getHbaseMaster();
-                if ( master == null )
-                {
-                    po.addLogFailed( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
-                    return;
-                }
+        Command startCommand = Commands.getStartCommand( Sets.newHashSet( master ) );
+        manager.getCommandRunner().runCommand( startCommand );
 
-                Command startCommand = Commands.getStartCommand( Sets.newHashSet( master ) );
-                manager.getCommandRunner().runCommand( startCommand );
-
-                if ( startCommand.hasSucceeded() )
-                {
-                    po.addLogDone( "Start success.." );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
-                }
-            }
-        } );
+        if ( startCommand.hasSucceeded() )
+        {
+            productOperation.addLogDone( "Start success.." );
+        }
+        else
+        {
+            productOperation.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
+        }
     }
 }

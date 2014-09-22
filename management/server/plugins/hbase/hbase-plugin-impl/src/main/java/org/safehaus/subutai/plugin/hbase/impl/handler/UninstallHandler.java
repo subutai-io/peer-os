@@ -16,16 +16,13 @@ import java.util.Set;
 
 public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
-
-    private ProductOperation po;
     private String clusterName;
-
 
     public UninstallHandler( final HBaseImpl manager, final String clusterName )
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 
@@ -33,60 +30,43 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        final ProductOperation po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
-
-        manager.getExecutor().execute( new Runnable()
+        HBaseClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
         {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            return;
+        }
 
-            public void run()
-            {
-                HBaseClusterConfig config = manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName,
-                        HBaseClusterConfig.class );
-                if ( config == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
+        Set<Agent> allNodes;
+        try
+        {
+            allNodes = getAllNodes( config );
+        }
+        catch ( Exception e )
+        {
+            productOperation.addLogFailed( e.getMessage() );
+            return;
+        }
 
-                Set<Agent> allNodes;
-                try
-                {
-                    allNodes = getAllNodes( config );
-                }
-                catch ( Exception e )
-                {
-                    po.addLogFailed( e.getMessage() );
-                    return;
-                }
+        productOperation.addLog( "Uninstalling..." );
 
-                po.addLog( "Uninstalling..." );
+        Command installCommand = Commands.getUninstallCommand( allNodes );
+        manager.getCommandRunner().runCommand( installCommand );
 
-                Command installCommand = Commands.getUninstallCommand( allNodes );
-                manager.getCommandRunner().runCommand( installCommand );
+        if ( installCommand.hasSucceeded() )
+        {
+            productOperation.addLog( "Uninstallation success.." );
+        }
+        else
+        {
+            productOperation.addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
+            return;
+        }
 
-                if ( installCommand.hasSucceeded() )
-                {
-                    po.addLog( "Uninstallation success.." );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
-                    return;
-                }
-
-                po.addLog( "Updating db..." );
-                if ( manager.getDbManager().deleteInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName() ) )
-                {
-                    po.addLogDone( "Cluster info deleted from DB\nDone" );
-                }
-                else
-                {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
-                }
-            }
-        } );
+        productOperation.addLog( "Updating db..." );
+        manager.getPluginDAO().deleteInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName() );
+        productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
     }
 
 

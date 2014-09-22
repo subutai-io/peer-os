@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.hbase.api;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,8 +32,10 @@ public class HBaseClusterConfig implements ConfigBase
     private Set<Agent> regionServers = Sets.newHashSet();
     private Set<Agent> quorumPeers = Sets.newHashSet();
     private Set<Agent> backupMasters = Sets.newHashSet();
+    private Set<Agent> allNodes = Sets.newHashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private SetupType setupType;
+
 
 
     public HBaseClusterConfig()
@@ -231,5 +234,28 @@ public class HBaseClusterConfig implements ConfigBase
                 ", clusterName='" + clusterName + '\'' +
                 ", hadoopNameNode='" + hadoopNameNode + '\'' +
                 '}';
+    }
+
+    public Set<Agent> getAllNodes()
+    {
+        final Set<Agent> allNodes = new HashSet<>();
+
+        allNodes.add(  getHbaseMaster()  );
+
+        for ( Agent agent : getRegionServers() )
+        {
+            allNodes.add( agent  );
+        }
+
+        for ( Agent agent : getQuorumPeers() )
+        {
+            allNodes.add( agent  );
+        }
+
+        for ( Agent agent : getBackupMasters() )
+        {
+            allNodes.add( agent  );
+        }
+        return allNodes;
     }
 }

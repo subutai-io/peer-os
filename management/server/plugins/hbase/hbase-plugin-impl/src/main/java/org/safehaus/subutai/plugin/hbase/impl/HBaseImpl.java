@@ -203,18 +203,6 @@ public class HBaseImpl implements HBase
     }
 
 
-    /*@Override
-    public List<HadoopClusterConfig> getHadoopClusters() {
-        return hadoopManager.getClusters();
-    }
-
-
-    @Override
-    public HadoopClusterConfig getHadoopCluster( String clusterName ) {
-        return hadoopManager.getCluster( clusterName );
-    }*/
-
-
     @Override
     public UUID stopCluster( final String clusterName )
     {
