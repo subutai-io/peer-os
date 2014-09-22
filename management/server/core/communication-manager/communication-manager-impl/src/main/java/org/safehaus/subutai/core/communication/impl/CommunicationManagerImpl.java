@@ -14,6 +14,7 @@ import javax.jms.Session;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -30,7 +31,7 @@ import com.google.common.base.Strings;
 public class CommunicationManagerImpl implements CommunicationManager
 {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
 
     /**
      * broker
