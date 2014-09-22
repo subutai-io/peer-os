@@ -485,10 +485,10 @@
                 <!--<groupId>com.vaadin</groupId>-->
                 <!--<artifactId>vaadin-shared-deps</artifactId>-->
                 <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>org.jsoup</groupId>-->
-                <!--<artifactId>jsoup</artifactId>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>org.jsoup</groupId>
+                  <artifactId>jsoup</artifactId>
+                </artifactItem>
                 <!--<artifactItem>-->
                 <!--<groupId>com.vaadin.external.google</groupId>-->
                 <!--<artifactId>android-json</artifactId>-->
