@@ -15,14 +15,14 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "agent", name = "get-lxc-agents-by-parent-hostname",
-        description = "get LXC agents by parent hostname" )
+@Command(scope = "agent", name = "get-lxc-agents-by-parent-hostname",
+        description = "get LXC agents by parent hostname")
 public class GetLxcAgentsByParentHostnameCommand extends OsgiCommandSupport
 {
     private static final Logger LOG = Logger.getLogger( GetLxcAgentsByParentHostnameCommand.class.getName() );
 
-    @Argument( index = 0, name = "parentHostname", required = true, multiValued = false,
-            description = "Parent hostname" )
+    @Argument(index = 0, name = "parentHostname", required = true, multiValued = false,
+            description = "Parent hostname")
     String parentHostname;
     private AgentManager agentManager;
 
