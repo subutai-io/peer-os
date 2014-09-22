@@ -60,7 +60,7 @@ public class ResponseSender
 
                     try
                     {
-                        Thread.sleep( SLEEP_BETWEEN_ITERATIONS_SEC * 1000 );
+                        Thread.sleep( SLEEP_BETWEEN_ITERATIONS_SEC * 1000L );
                     }
                     catch ( InterruptedException e )
                     {
@@ -120,7 +120,7 @@ public class ResponseSender
                             //delete request and responses after inactivity timeout reached
                             if ( System.currentTimeMillis() - request.getTimestamp()
                                     > org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC
-                                    * 1000 )
+                                    * 1000L )
                             {
                                 dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
                                 dispatcherDAO.deleteRemoteResponses( request.getCommandId() );
@@ -129,7 +129,7 @@ public class ResponseSender
                             //if no responses arrived to this request within agent notification response interval,
                             // increment its attempts' number
                             else if ( ( System.currentTimeMillis() - request.getTimestamp()
-                                    > ( AGENT_CHUNK_SEND_INTERVAL_SEC + 5 ) * 1000 ) )
+                                    > ( AGENT_CHUNK_SEND_INTERVAL_SEC + 5 ) * 1000L ) )
                             {
                                 request.incrementAttempts();
                                 dispatcherDAO.saveRemoteRequest( request );
@@ -226,7 +226,7 @@ public class ResponseSender
 
                 //increment attempts based on widening intervals
                 if ( System.currentTimeMillis() - request.getTimestamp()
-                        > request.getAttempts() * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC * 1000 )
+                        > request.getAttempts() * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC * 1000L )
                 {
                     request.incrementAttempts();
                     dispatcherDAO.saveRemoteRequest( request );

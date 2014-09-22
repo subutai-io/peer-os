@@ -32,7 +32,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
+import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
 import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -139,13 +139,13 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @Override
+    /*@Override
     public String getRemoteId( final String baseUrl )
     {
         RemotePeerClient client = new RemotePeerClient();
         client.setBaseUrl( baseUrl );
         return client.callRemoteRest();
-    }
+    }*/
 
 
     @Override
@@ -379,32 +379,21 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( CreateContainersMessage ccm )
+    public Set<Agent> createContainers( CloneContainersMessage ccm )
     {
-
+        UUID envId = ccm.getEnvId();
+        String template = ccm.getTemplate();
+        int numberOfNodes = ccm.getNumberOfNodes();
+        String strategy = ccm.getStrategy();
         try
         {
-            if ( getSiteId().toString().equals( ccm.getTargetPeerId().toString() ) )
-            {
-                UUID envId = ccm.getEnvId();
-                String template = ccm.getTemplate();
-                int numberOfNodes = ccm.getNumberOfNodes();
-                String strategy = ccm.getStrategy();
-                return containerManager.clone( envId, template, numberOfNodes, strategy, null );
-            }
-            else
-            {
-                RemotePeerClient client = new RemotePeerClient();
-                Peer remotePeer = getPeerByUUID( ccm.getTargetPeerId() );
-                String baseUrl = "http://" + remotePeer.getIp() + ":8181/cxf";
-                client.setBaseUrl( baseUrl );
-                String response = client.createRemoteContainers( ccm );
-            }
+            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
         }
         catch ( ContainerCreateException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
+        //TODO: replace with empty set;
         return null;
     }
 

@@ -20,7 +20,7 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentsForm
 {
 
-    private final static Logger LOG = Logger.getLogger( EnvironmentsForm.class.getName() );
+    private static final Logger LOG = Logger.getLogger( EnvironmentsForm.class.getName() );
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;

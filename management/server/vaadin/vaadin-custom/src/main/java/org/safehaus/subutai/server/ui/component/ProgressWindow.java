@@ -6,13 +6,6 @@
 package org.safehaus.subutai.server.ui.component;
 
 
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-
 import com.google.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
@@ -26,6 +19,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 
 public class ProgressWindow
@@ -150,22 +149,17 @@ public class ProgressWindow
         ok.setEnabled( false );
     }
 
-
-    private void setOutput( String output )
-    {
-        try
-        {
-            VaadinSession.getCurrent().getLockInstance().lock();
-            if ( !Strings.isNullOrEmpty( output ) )
-            {
-                outputTxtArea.setValue( output );
-                outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
-            }
-        }
-        finally
-        {
-            VaadinSession.getCurrent().getLockInstance().unlock();
-        }
+    private void setOutput( String output ) {
+//        try {
+//            VaadinSession.getCurrent().getLockInstance().lock();
+//            if ( !Strings.isNullOrEmpty( output ) ) {
+//                outputTxtArea.setValue( output );
+//                outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+//            }
+//        }
+//        finally {
+//            VaadinSession.getCurrent().getLockInstance().unlock();
+//        }
     }
 
 
