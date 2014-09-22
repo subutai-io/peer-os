@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.network.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
@@ -62,7 +63,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ) );
         }
 
         return command.hasSucceeded();
@@ -78,7 +79,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.log(Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ) );
         }
 
         StringBuilder value = new StringBuilder();
@@ -115,7 +116,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.log(Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ) );
         }
 
 
@@ -132,7 +133,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ) );
         }
 
 
@@ -171,9 +172,8 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.log( Level.SEVERE, String.format( "Error in write: %s", e.getMessage() ) );
         }
-        ;
 
         return command.hasSucceeded();
     }

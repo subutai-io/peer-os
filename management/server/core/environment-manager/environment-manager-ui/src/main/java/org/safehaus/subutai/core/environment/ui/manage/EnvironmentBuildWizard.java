@@ -10,11 +10,11 @@ import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -237,8 +237,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
     {
         EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
 
-        Map<UUID, Map<String, ContainerBuildMessage>> buildMessageMap =
-                new HashMap<UUID, Map<String, ContainerBuildMessage>>();
+        Map<UUID, Map<String, CloneContainersMessage>> buildMessageMap = new HashMap<>();
 
         for ( Object itemId : containerToPeerTable.getItemIds() )
         {
@@ -246,28 +245,19 @@ public class EnvironmentBuildWizard extends DetailsWindow
                     ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
             ComboBox selection =
                     ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
-
             UUID peerUuid = ( UUID ) selection.getValue();
-
 
             if ( !buildMessageMap.containsKey( peerUuid ) )
             {
 
-                ContainerBuildMessage cbm = new ContainerBuildMessage();
-                cbm.setTemplateName( templateName );
-                cbm.setPeerId( peerUuid );
-                cbm.setCompleteState( false );
-                cbm.setEnvironmentUuid( environmentBuildTask.getUuid() );
+                CloneContainersMessage ccm = new CloneContainersMessage();
+                ccm.setTemplate( templateName );
+                ccm.setPeerId( peerUuid );
+                ccm.setEnvId( environmentBuildTask.getUuid() );
                 //                buildMessageMap.put(  ).put( templateName, cbm );
-            }
-            else
-            {
-                buildMessageMap.get( peerUuid ).get( templateName ).incrementNumOfCont();
             }
         }
 
-        String json = gson.toJson( environmentBuildProcess );
-        LOG.info( json );
         managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
     }
 }
