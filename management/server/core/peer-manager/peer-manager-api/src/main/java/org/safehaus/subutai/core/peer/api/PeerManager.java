@@ -6,10 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 

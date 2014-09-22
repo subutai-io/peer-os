@@ -27,10 +27,9 @@ import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommandMessage;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommandType;
+import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
@@ -55,7 +54,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private DbManager dbManager;
-    private PeerManager peerManager;
+//    private PeerManager peerManager;
     private PeerCommandDispatcher peerCommandDispatcher;
     private Set<EnvironmentContainer> containers = new HashSet<>();
 
@@ -77,7 +76,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public PeerManager getPeerManager()
+    /*public PeerManager getPeerManager()
     {
         return peerManager;
     }
@@ -86,7 +85,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-    }
+    }*/
 
 
     public void init()
@@ -107,7 +106,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         this.agentManager = null;
         this.networkManager = null;
         this.dbManager = null;
-        this.peerManager = null;
+//        this.peerManager = null;
     }
 
 

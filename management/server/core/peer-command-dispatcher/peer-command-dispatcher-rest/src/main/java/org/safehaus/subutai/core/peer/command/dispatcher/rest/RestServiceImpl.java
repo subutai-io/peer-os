@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.rest;
+package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 
 
 import java.util.Set;
@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 
 import com.google.gson.Gson;

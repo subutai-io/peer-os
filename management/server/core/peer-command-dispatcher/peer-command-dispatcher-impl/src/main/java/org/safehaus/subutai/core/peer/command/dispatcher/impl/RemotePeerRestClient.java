@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 

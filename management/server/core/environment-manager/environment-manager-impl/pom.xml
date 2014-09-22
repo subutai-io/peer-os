@@ -69,10 +69,10 @@
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>network-manager-api</artifactId>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>peer-manager-api</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>peer-command-dispatcher-api</artifactId>

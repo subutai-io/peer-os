@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 
