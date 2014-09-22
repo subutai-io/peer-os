@@ -3,13 +3,12 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,7 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentsBuildProcessForm
 {
 
-    private static final Logger LOG = Logger.getLogger( EnvironmentsBuildProcessForm.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsBuildProcessForm.class.getName() );
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
@@ -51,12 +50,12 @@ public class EnvironmentsBuildProcessForm
         } );
         contentRoot.addComponent( getEnvironmentsButton );
 
-//        Button saveBuildProcessButton = new Button( "Add" );
-//        saveBuildProcessButton.addClickListener( new Button.ClickListener()
-//        {
-//            @Override
-//            public void buttonClick( final Button.ClickEvent clickEvent )
-//            {
+        //        Button saveBuildProcessButton = new Button( "Add" );
+        //        saveBuildProcessButton.addClickListener( new Button.ClickListener()
+        //        {
+        //            @Override
+        //            public void buttonClick( final Button.ClickEvent clickEvent )
+        //            {
 
                 /*EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
                 ContainerBuildMessage message = new ContainerBuildMessage();
@@ -76,10 +75,10 @@ public class EnvironmentsBuildProcessForm
                 message2.setTargetPeerId( UUID.fromString( "7e363225-2c4b-3ce3-8b33-d026d3367771" ) );
                 environmentBuildProcess.addBuildBlock( message2 );
                 managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );*/
-//            }
-//        } );
-//
-//        contentRoot.addComponent( saveBuildProcessButton );
+        //            }
+        //        } );
+        //
+        //        contentRoot.addComponent( saveBuildProcessButton );
         contentRoot.addComponent( environmentsTable );
     }
 
@@ -147,7 +146,7 @@ public class EnvironmentsBuildProcessForm
                             }
                             catch ( NullPointerException e )
                             {
-                                LOG.log( Level.SEVERE, e.getMessage() );
+                                LOG.error( e.getMessage() );
                             }
                         }
                     } );
@@ -212,7 +211,8 @@ public class EnvironmentsBuildProcessForm
                     } );
                     break;
                 }
-                default:{
+                default:
+                {
                     break;
                 }
             }

@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -13,6 +12,8 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,7 +33,7 @@ import com.vaadin.ui.themes.Runo;
 public class EnvironmentBuildWizard extends DetailsWindow
 {
 
-    private static final Logger LOG = Logger.getLogger( EnvironmentBuildWizard.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentBuildWizard.class.getName() );
 
     Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     int step = 0;

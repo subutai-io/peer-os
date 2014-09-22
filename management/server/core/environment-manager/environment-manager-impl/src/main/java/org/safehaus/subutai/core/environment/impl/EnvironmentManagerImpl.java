@@ -9,11 +9,12 @@ package org.safehaus.subutai.core.environment.impl;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -27,22 +28,25 @@ import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.common.protocol.PeerCommand;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
+
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 
 
 /**
  * This is an implementation of EnvironmentManager
  */
-public class EnvironmentManagerImpl implements EnvironmentManager {
+public class EnvironmentManagerImpl implements EnvironmentManager
+{
 
-    private static final Logger LOG = Logger.getLogger( EnvironmentManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
     private static final String ENVIRONMENT = "ENVIRONMENT";
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
@@ -54,7 +58,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private DbManager dbManager;
-//    private PeerManager peerManager;
+    //    private PeerManager peerManager;
     private PeerCommandDispatcher peerCommandDispatcher;
     private Set<EnvironmentContainer> containers = new HashSet<>();
 
@@ -106,7 +110,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         this.agentManager = null;
         this.networkManager = null;
         this.dbManager = null;
-//        this.peerManager = null;
+        //        this.peerManager = null;
     }
 
 
@@ -251,7 +255,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         }
         catch ( EnvironmentDestroyException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return false;
     }
@@ -272,7 +276,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return false;
     }
@@ -344,26 +348,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    private boolean build( EnvironmentBuildTask environmentBuildTask )
-    {
-
-        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
-                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) )
-        {
-            try
-            {
-                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
-                return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-            }
-            catch ( EnvironmentBuildException e )
-            {
-                LOG.log( Level.SEVERE, e.getMessage() );
-            }
-        }
-        return false;
-    }
-
-
     @Override
     public Set<EnvironmentContainer> getContainers()
     {
@@ -408,5 +392,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         PeerCommand peerCommand = new PeerCommand( PeerCommandType.ISCONNECTED,
                 new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
         return peerCommandDispatcher.invoke( peerCommand );
+    }
+
+
+    private boolean build( EnvironmentBuildTask environmentBuildTask )
+    {
+
+        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
+                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) )
+        {
+            try
+            {
+                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
+                return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+            }
+            catch ( EnvironmentBuildException e )
+            {
+                LOG.error( e.getMessage() );
+            }
+        }
+        return false;
     }
 }
