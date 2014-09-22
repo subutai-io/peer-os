@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-//import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
-
+//import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
 
 /**
  * Created by bahadyr on 9/14/14.
@@ -14,12 +13,12 @@ import java.util.UUID;
 public class EnvironmentBuildProcess
 {
 
-    String environmentName;
+    private String environmentName;
     private UUID uuid;
     private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
     private int timestamp;
-//    private List<CreateContainersMessage> createContainersMessages = new ArrayList<>();
+//    private List<CloneContainersMessage> cloneContainersMessages = new ArrayList<>();
 
 
     public EnvironmentBuildProcess()
@@ -75,23 +74,6 @@ public class EnvironmentBuildProcess
     {
         this.completeStatus = completeStatus;
     }
-
-
-    /*public List<CreateContainersMessage> getCreateContainersMessages()
-    {
-        return createContainersMessages;
-    }
-
-    public void addCreateContainerMessage(CreateContainersMessage createContainersMessage)
-    {
-        this.createContainersMessages.add( createContainersMessage );
-    }
-
-
-    public void setCreateContainersMessages( final List<CreateContainersMessage> createContainersMessages )
-    {
-        this.createContainersMessages = createContainersMessages;
-    }*/
 
 
     public String getEnvironmentName()
