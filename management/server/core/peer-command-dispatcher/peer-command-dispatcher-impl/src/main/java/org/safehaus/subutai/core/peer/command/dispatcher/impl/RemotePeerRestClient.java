@@ -20,52 +20,51 @@ import com.google.gson.GsonBuilder;
 public class RemotePeerRestClient
 {
 
-//    executeRemoteCommand(C)
+    //    executeRemoteCommand(C)
 
     private static final Logger LOG = Logger.getLogger( RemotePeerRestClient.class.getName() );
-        public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-        private String baseUrl;
+    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private String baseUrl;
 
 
-        public String getBaseUrl()
-        {
-            return baseUrl;
-        }
+    public String getBaseUrl()
+    {
+        return baseUrl;
+    }
 
 
-        public void setBaseUrl( final String baseUrl )
-        {
-            this.baseUrl = baseUrl;
-        }
+    public void setBaseUrl( final String baseUrl )
+    {
+        this.baseUrl = baseUrl;
+    }
 
 
-        public String callRemoteRest()
+    public String callRemoteRest()
+    {
+        WebClient client = WebClient.create( baseUrl );
+        String response = client.path( "peer/id" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
+        return response;
+    }
+
+
+    public String createRemoteContainers( CloneContainersMessage ccm )
+    {
+        try
         {
             WebClient client = WebClient.create( baseUrl );
-            String response = client.path( "peer/id" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
-            return response;
+            String ccmString = GSON.toJson( ccm, CloneContainersMessage.class );
+
+            Response response =
+                    client.path( "peer/containers" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
+                          .post( ccmString );
+
+            return response.toString();
         }
-
-
-        public String createRemoteContainers( CloneContainersMessage ccm )
+        catch ( Exception e )
         {
-            try
-            {
-                WebClient client = WebClient.create( baseUrl );
-                String ccmString = GSON.toJson( ccm, CloneContainersMessage.class );
-
-                Response response =
-                        client.path( "peer/containers" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
-                              .post( ccmString );
-
-                return response.toString();
-            }
-            catch ( Exception e )
-            {
-                LOG.severe( e.getMessage() );
-            }
-
-            return null;
+            LOG.severe( e.getMessage() );
         }
 
+        return null;
+    }
 }

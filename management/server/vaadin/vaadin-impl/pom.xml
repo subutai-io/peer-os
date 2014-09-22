@@ -15,12 +15,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-server</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>vaadin-api</artifactId>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-server</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

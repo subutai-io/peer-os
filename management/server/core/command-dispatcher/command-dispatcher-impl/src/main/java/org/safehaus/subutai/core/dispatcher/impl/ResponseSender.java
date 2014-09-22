@@ -74,26 +74,6 @@ public class ResponseSender
     }
 
 
-    public void dispose()
-    {
-        mainLoopExecutor.shutdown();
-        httpRequestsExecutor.shutdown();
-    }
-
-
-    private int calculateOfAttempts()
-    {
-        int attempts = 0;
-        int inactivity_interval_sec = org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
-        while ( inactivity_interval_sec > 0 )
-        {
-            attempts++;
-            inactivity_interval_sec -= attempts * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC;
-        }
-        return attempts;
-    }
-
-
     private void send()
     {
 
@@ -170,6 +150,19 @@ public class ResponseSender
     }
 
 
+    private int calculateOfAttempts()
+    {
+        int attempts = 0;
+        int inactivity_interval_sec = org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
+        while ( inactivity_interval_sec > 0 )
+        {
+            attempts++;
+            inactivity_interval_sec -= attempts * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC;
+        }
+        return attempts;
+    }
+
+
     private void sendResponses( RemoteRequest request, Set<RemoteResponse> responses )
     {
         try
@@ -239,5 +232,12 @@ public class ResponseSender
         {
             LOG.log( Level.SEVERE, String.format( "Error in sendResponses: %s", e.getMessage() ) );
         }
+    }
+
+
+    public void dispose()
+    {
+        mainLoopExecutor.shutdown();
+        httpRequestsExecutor.shutdown();
     }
 }

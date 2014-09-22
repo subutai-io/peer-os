@@ -33,6 +33,7 @@
     <module>network-manager</module>
     <module>package-manager</module>
     <module>peer-manager</module>
+    <module>peer-command-dispatcher</module>
     <module>strategy-manager</module>
     <module>template-manager</module>
     <module>template-registry</module>

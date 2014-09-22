@@ -1,8 +1,6 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 //import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
@@ -19,7 +17,7 @@ public class EnvironmentBuildProcess
     private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
     private int timestamp;
-//    private List<CreateContainersMessage> createContainersMessages = new ArrayList<>();
+    //    private List<CreateContainersMessage> createContainersMessages = new ArrayList<>();
 
 
     public EnvironmentBuildProcess()

@@ -60,9 +60,8 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
         else
         {
 
-//            result =  remotePeerRestClient
+            //            result =  remotePeerRestClient
             //TODO: remote peer invoke
-
 
 
         }
