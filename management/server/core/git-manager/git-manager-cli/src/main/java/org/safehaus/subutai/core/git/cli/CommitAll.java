@@ -54,7 +54,7 @@ public class CommitAll extends OsgiCommandSupport
         {
             String commitId = gitManager.commitAll( agent, repoPath, message );
 
-            LOG.info( String.format( "Commit ID : %s", commitId ) );
+            System.out.println( String.format( "Commit ID : %s", commitId ) );
         }
         catch ( GitException e )
         {

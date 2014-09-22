@@ -67,7 +67,7 @@ public class DiffFile extends OsgiCommandSupport
                 diff = gitManager.diffFile( agent, repoPath, branchName1, filePath );
             }
 
-            LOG.info( diff );
+            System.out.println( diff );
         }
         catch ( GitException e )
         {

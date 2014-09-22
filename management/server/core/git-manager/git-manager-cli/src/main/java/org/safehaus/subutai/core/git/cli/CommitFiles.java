@@ -62,7 +62,7 @@ public class CommitFiles extends OsgiCommandSupport
             String commitId =
                     gitManager.commit( agent, repoPath, new ArrayList<>( files ), message, afterConflictResolved );
 
-            LOG.info( String.format( "Commit ID : %s", commitId ) );
+            System.out.println( String.format( "Commit ID : %s", commitId ) );
         }
         catch ( GitException e )
         {
