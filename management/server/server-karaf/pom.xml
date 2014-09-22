@@ -486,8 +486,12 @@
                   <artifactId>vaadin-shared-deps</artifactId>
                 </artifactItem>
                 <artifactItem>
-                <groupId>org.jsoup</groupId>
+                  <groupId>org.jsoup</groupId>
                   <artifactId>jsoup</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.json</groupId>
+                  <artifactId>json</artifactId>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
