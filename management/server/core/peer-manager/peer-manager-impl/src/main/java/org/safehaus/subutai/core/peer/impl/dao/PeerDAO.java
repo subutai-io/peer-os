@@ -3,11 +3,11 @@ package org.safehaus.subutai.core.peer.impl.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -25,7 +25,7 @@ public class PeerDAO
 {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private final Logger LOG = Logger.getLogger( PeerDAO.class.getName() );
+    private final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
     private final DbManager dbManager;
 
 
@@ -50,7 +50,7 @@ public class PeerDAO
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return false;
     }
@@ -85,11 +85,11 @@ public class PeerDAO
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return list;
     }
@@ -129,11 +129,11 @@ public class PeerDAO
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return null;
     }
@@ -158,7 +158,7 @@ public class PeerDAO
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
 
         return false;

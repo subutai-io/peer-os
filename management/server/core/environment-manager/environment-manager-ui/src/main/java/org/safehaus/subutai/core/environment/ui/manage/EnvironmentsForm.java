@@ -3,12 +3,13 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -20,7 +21,7 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentsForm
 {
 
-    private static final Logger LOG = Logger.getLogger( EnvironmentsForm.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsForm.class.getName() );
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;

@@ -12,8 +12,8 @@
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager" />
   <reference id="networkManager" availability="mandatory"
              interface="org.safehaus.subutai.core.network.api.NetworkManager" />
-  <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <!--<reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />-->
   <reference id="peerCommandDispatcher" interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />
 
   <bean id="environmentManager" scope="singleton"
@@ -25,7 +25,7 @@
     <property name="dbManager" ref="dbManager" />
     <property name="agentManager" ref="agentManager" />
     <property name="networkManager" ref="networkManager" />
-    <property name="peerManager" ref="peerManager" />
+    <!--<property name="peerManager" ref="peerManager" />-->
     <property name="peerCommandDispatcher" ref="peerCommandDispatcher" />
   </bean>
 

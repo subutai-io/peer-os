@@ -64,11 +64,6 @@
       <artifactId>org.apache.servicemix.bundles.junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>zookeeper-plugin-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!--CXF-->
     <dependency>
       <groupId>org.apache.cxf</groupId>
