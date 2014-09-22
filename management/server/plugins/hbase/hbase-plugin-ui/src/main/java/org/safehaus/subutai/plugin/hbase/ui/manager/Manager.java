@@ -6,27 +6,7 @@
 package org.safehaus.subutai.plugin.hbase.ui.manager;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
 import com.google.common.base.Preconditions;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.plugin.hbase.api.HBaseType;
-import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -44,8 +24,24 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseType;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import javax.naming.NamingException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 
 public class Manager
@@ -85,7 +81,6 @@ public class Manager
 
     private final HBase hbase;
     private final Tracker tracker;
-    private final Hadoop hadoop;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
     private final String message = "No cluster is installed !";
@@ -100,7 +95,6 @@ public class Manager
 
         this.hbase = serviceLocator.getService( HBase.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.hadoop = serviceLocator.getService( Hadoop.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
         this.commandRunner = serviceLocator.getService( CommandRunner.class );
         this.executor = executor;
@@ -121,7 +115,7 @@ public class Manager
         regionTable = createTableTemplate( REGION_SERVERS_TABLE_CAPTION );
         quorumTable = createTableTemplate( QUORUM_PEERS_TABLE_CAPTION );
         backUpMasterTable = createTableTemplate( BACKUP_MASTERS_TABLE_CAPTION );
-        //tables go here
+
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -146,6 +140,7 @@ public class Manager
         controlsContent.addComponent( clusterCombo );
 
 
+        /** Refresh Cluster button */
         refreshClustersBtn = new Button( REFRESH_CLUSTER_CAPTION );
         refreshClustersBtn.addStyleName( BUTTON_STYLE_NAME );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
@@ -159,6 +154,7 @@ public class Manager
         controlsContent.addComponent( refreshClustersBtn );
 
 
+        /** Check All button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
         checkAllBtn.addStyleName(BUTTON_STYLE_NAME );
         checkAllBtn.addClickListener( new Button.ClickListener() {
@@ -183,6 +179,7 @@ public class Manager
         controlsContent.addComponent( checkAllBtn );
 
 
+        /** Start All button */
         startAllNodesBtn = new Button( START_ALL_BUTTON_CAPTION );
         startAllNodesBtn.addStyleName( BUTTON_STYLE_NAME );
         startAllNodesBtn.addClickListener( new Button.ClickListener() {
@@ -207,6 +204,7 @@ public class Manager
         controlsContent.addComponent( startAllNodesBtn );
 
 
+        /** Stop All button */
         stopAllNodesBtn = new Button( STOP_ALL_BUTTON_CAPTION );
         stopAllNodesBtn.addStyleName( BUTTON_STYLE_NAME );
         stopAllNodesBtn.addClickListener( new Button.ClickListener() {
@@ -231,6 +229,7 @@ public class Manager
         controlsContent.addComponent( stopAllNodesBtn );
 
 
+        /** Destroy All button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( BUTTON_STYLE_NAME );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
