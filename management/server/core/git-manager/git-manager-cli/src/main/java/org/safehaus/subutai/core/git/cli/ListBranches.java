@@ -8,6 +8,8 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitBranch;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -20,6 +22,9 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "git", name = "list-branches", description = "List local/remote branches")
 public class ListBranches extends OsgiCommandSupport
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( ListBranches.class.getName() );
+
 
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
@@ -54,12 +59,12 @@ public class ListBranches extends OsgiCommandSupport
             List<GitBranch> branches = gitManager.listBranches( agent, repoPath, remote );
             for ( GitBranch branch : branches )
             {
-                System.out.println( branch );
+                System.out.println( branch.toString() );
             }
         }
         catch ( GitException e )
         {
-            System.out.println( e );
+            LOG.error( "Error in doExecute", e );
         }
 
         return null;

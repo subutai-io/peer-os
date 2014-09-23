@@ -17,7 +17,7 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.rest.RestServiceImpl">
+  <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.command.dispatcher.rest.RestServiceImpl">
     <property name="peerManager" ref="peerManager" />
   </bean>
 

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.api.helpers;
+package org.safehaus.subutai.common.protocol;
 
 
 import java.util.UUID;
@@ -10,6 +10,19 @@ import java.util.UUID;
 public class PeerCommandMessage {
     private UUID agentId;
     private UUID peerId;
+
+
+    public PeerCommandMessage()
+    {
+
+    }
+
+
+    public PeerCommandMessage( UUID peerId, UUID agentId )
+    {
+        this.peerId = peerId;
+        this.agentId = agentId;
+    }
 
 
     public UUID getAgentId()

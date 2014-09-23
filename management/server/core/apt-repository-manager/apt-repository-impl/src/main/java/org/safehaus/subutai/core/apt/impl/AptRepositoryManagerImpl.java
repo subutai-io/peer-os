@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
@@ -24,6 +23,8 @@ import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.apt.api.PackageInfo;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -39,7 +40,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
 
 
     private static final String LINE_SEPARATOR = "\n";
-    private final Logger LOG = Logger.getLogger( AptRepositoryManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AptRepositoryManagerImpl.class.getName() );
     private CommandRunner commandRunner;
 
 

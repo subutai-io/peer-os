@@ -147,7 +147,7 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     show( "Please provide domain name !" );
                 }
-                else if ( nodesCountCombo.getValue() == null | seedsCountCombo.getValue() == null )
+                else if ( nodesCountCombo.getValue() == null || seedsCountCombo.getValue() == null )
                 {
                     show( "Please provide number of nodes and seeds !" );
                 }

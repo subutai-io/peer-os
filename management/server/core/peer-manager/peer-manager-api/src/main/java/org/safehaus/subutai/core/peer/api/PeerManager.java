@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
@@ -27,7 +27,7 @@ public interface PeerManager {
 
     public Peer getPeerByUUID( UUID uuid );
 
-//    public String getRemoteId( String baseUrl );
+    //    public String getRemoteId( String baseUrl );
 
     public void addPeerMessageListener( PeerMessageListener listener );
 
@@ -44,6 +44,16 @@ public interface PeerManager {
     public Set<Agent> getConnectedAgents( Peer peer, String environmentId ) throws PeerException;
 
     public Set<Agent> createContainers( CloneContainersMessage ccm );
+
+    public boolean startContainer(PeerContainer container);
+
+    public boolean stopContainer(PeerContainer container);
+
+    public boolean isContainerConnected(PeerContainer container);
+
+    public Set<PeerContainer> getContainers();
+
+    public void addContainer(PeerContainer peerContainer);
 
     public boolean invoke( PeerCommand peerCommand ) throws PeerException;
 }

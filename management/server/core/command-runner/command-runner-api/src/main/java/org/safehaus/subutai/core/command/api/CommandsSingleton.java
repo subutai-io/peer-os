@@ -52,10 +52,9 @@ public class CommandsSingleton
 
     private static CommandRunner getCommandRunner()
     {
-        if ( INSTANCE.commandRunner == null )
-        {
-            throw new RuntimeException( "Command Runner is null or not set. Call init method first" );
-        }
+        Preconditions
+                .checkNotNull( INSTANCE.commandRunner, "Command Runner is null or not set. Call init method first" );
+
         return INSTANCE.commandRunner;
     }
 

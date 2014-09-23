@@ -1,12 +1,12 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
-import java.util.logging.Logger;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
@@ -20,52 +20,51 @@ import com.google.gson.GsonBuilder;
 public class RemotePeerRestClient
 {
 
-//    executeRemoteCommand(C)
+    //    executeRemoteCommand(C)
 
-    private static final Logger LOG = Logger.getLogger( RemotePeerRestClient.class.getName() );
-        public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-        private String baseUrl;
-
-
-        public String getBaseUrl()
-        {
-            return baseUrl;
-        }
+    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
+    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private String baseUrl;
 
 
-        public void setBaseUrl( final String baseUrl )
-        {
-            this.baseUrl = baseUrl;
-        }
+    public String getBaseUrl()
+    {
+        return baseUrl;
+    }
 
 
-        public String callRemoteRest()
+    public void setBaseUrl( final String baseUrl )
+    {
+        this.baseUrl = baseUrl;
+    }
+
+
+    public String callRemoteRest()
+    {
+        WebClient client = WebClient.create( baseUrl );
+        String response = client.path( "peer/id" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
+        return response;
+    }
+
+
+    public String createRemoteContainers( CloneContainersMessage ccm )
+    {
+        try
         {
             WebClient client = WebClient.create( baseUrl );
-            String response = client.path( "peer/id" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
-            return response;
+            String ccmString = GSON.toJson( ccm, CloneContainersMessage.class );
+
+            Response response =
+                    client.path( "peer/containers" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
+                          .post( ccmString );
+
+            return response.toString();
         }
-
-
-        public String createRemoteContainers( CloneContainersMessage ccm )
+        catch ( Exception e )
         {
-            try
-            {
-                WebClient client = WebClient.create( baseUrl );
-                String ccmString = GSON.toJson( ccm, CloneContainersMessage.class );
-
-                Response response =
-                        client.path( "peer/containers" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
-                              .post( ccmString );
-
-                return response.toString();
-            }
-            catch ( Exception e )
-            {
-                LOG.severe( e.getMessage() );
-            }
-
-            return null;
+            LOG.error( e.getMessage() );
         }
 
+        return null;
+    }
 }

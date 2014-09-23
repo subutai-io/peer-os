@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <service ref="peerCommandDispatcher" interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />
+
+  <reference id="peerManager" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
+  <bean id="peerCommandDispatcher" scope="singleton"
+        init-method="init"
+        destroy-method="destroy"
+        class="org.safehaus.subutai.core.peer.command.dispatcher.impl.PeerCommandDispatcherImpl">
+    <property name="peerManager" ref="peerManager" />
+  </bean>
+
+</blueprint>

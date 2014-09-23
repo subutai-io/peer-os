@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.rest;
+package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 
 
 import javax.ws.rs.Consumes;

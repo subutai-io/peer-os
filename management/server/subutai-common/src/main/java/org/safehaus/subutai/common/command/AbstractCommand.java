@@ -11,10 +11,11 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -25,7 +26,7 @@ import com.google.common.base.Strings;
  */
 public abstract class AbstractCommand implements Command
 {
-    protected static final Logger LOG = Logger.getLogger( AbstractCommand.class.getName() );
+    protected static final Logger LOG = LoggerFactory.getLogger( AbstractCommand.class.getName() );
     //subset of requests to send to agents
     protected final Set<Request> requests = new HashSet<>();
     //lock used to synchronize update of command state between command executor thread and cache evictor thread

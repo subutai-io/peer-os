@@ -1,9 +1,8 @@
-package org.safehaus.subutai.core.peer.rest;
+package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 
 
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
@@ -12,8 +11,10 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,7 +29,7 @@ public class RestServiceImpl implements RestService
 {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
 
 

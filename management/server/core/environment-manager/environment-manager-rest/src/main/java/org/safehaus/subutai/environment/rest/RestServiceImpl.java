@@ -1,9 +1,9 @@
 package org.safehaus.subutai.environment.rest;
 
 
-import java.util.logging.Logger;
-
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,7 +17,7 @@ public class RestServiceImpl implements RestService
 {
 
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private final static Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private EnvironmentManager environmentManager;
 
 
