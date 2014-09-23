@@ -3,15 +3,26 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEvent;
+import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEventType;
+import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionListener;
+import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutor;
+import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutorImpl;
+import org.safehaus.subutai.core.environment.ui.executor.CloneCommandFactory;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
@@ -21,10 +32,15 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings( "serial" )
-public class EnvironmentsBuildProcessForm
+public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListener
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsBuildProcessForm.class.getName() );
+    private final String okIconSource = "img/ok.png";
+    private final String errorIconSource = "img/cancel.png";
+    private final String loadIconSource = "img/spinner.gif";
+    AtomicInteger countProcessed = null;
+    AtomicInteger errorProcessed = null;
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
@@ -107,21 +123,13 @@ public class EnvironmentsBuildProcessForm
                         processButton = new Button( "Build" );
                         progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
                         progressIcon.setVisible( false );
+
                         processButton.addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                // TODO create build task
-                                try
-                                {
-                                    LOG.info( "Build button clicked" );
-                                    managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
-                                }
-                                catch ( NullPointerException e )
-                                {
-                                    LOG.error( e.getMessage() );
-                                }
+                                startBuildProcess( environmentBuildProcess );
                             }
                         } );
 
@@ -131,9 +139,10 @@ public class EnvironmentsBuildProcessForm
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+                                destroyBuildProcess( environmentBuildProcess );
                             }
                         } );
+
 
                         break;
                     }
@@ -147,8 +156,7 @@ public class EnvironmentsBuildProcessForm
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                // TODO create terminate task
-
+                                terminateBuildProcess( environmentBuildProcess );
                             }
                         } );
                         break;
@@ -163,8 +171,7 @@ public class EnvironmentsBuildProcessForm
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                // TODO create destroy task
-
+                                destroyBuildProcess( environmentBuildProcess );
                             }
                         } );
                         break;
@@ -181,6 +188,7 @@ public class EnvironmentsBuildProcessForm
                             {
                                 // TODO create configure logic
 
+                                configureEnvironment( environmentBuildProcess );
                             }
                         } );
                         break;
@@ -190,8 +198,6 @@ public class EnvironmentsBuildProcessForm
                         break;
                     }
                 }
-
-
                 environmentsTable.addItem( new Object[] {
                         environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
                         destroyButton
@@ -203,6 +209,88 @@ public class EnvironmentsBuildProcessForm
             Notification.show( "No build process tasks", Notification.Type.HUMANIZED_MESSAGE );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private void configureEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+        //TODO: configure code
+    }
+
+
+    private void terminateBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+
+        //TODO:terminate code
+    }
+
+
+    private void destroyBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+        managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+    }
+
+
+    private void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+
+        errorProcessed = new AtomicInteger( 0 );
+
+        BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl();
+        buildProcessExecutor.addListener( this );
+        ExecutorService executor = Executors.newFixedThreadPool( 1 );
+        buildProcessExecutor.execute( executor,
+                new CloneCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
+        executor.shutdown();
+    }
+
+
+    @Override
+    public void onExecutionEvent( final BuildProcessExecutionEvent event )
+    {
+        LOG.info( event.toString() );
+        updateEnvironmentsTableStatus( event );
+    }
+
+
+    private void updateEnvironmentsTableStatus( final BuildProcessExecutionEvent event )
+    {
+        contentRoot.getUI().access( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Item row = environmentsTable.getItem( event.getName() );
+                if ( row != null )
+                {
+                    Property p = row.getItemProperty( "Status" );
+                    if ( BuildProcessExecutionEventType.START.equals( event.getEventType() ) )
+                    {
+                        p.setValue( new Embedded( "", new ThemeResource( loadIconSource ) ) );
+                    }
+                    else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
+                    {
+                        p.setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
+                    }
+                    else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
+                    {
+                        p.setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
+
+                        errorProcessed.incrementAndGet();
+                    }
+                }
+
+
+                if ( errorProcessed.intValue() == 0 )
+                {
+                    Notification.show( "Cloning containers finished successfully." );
+                }
+                else
+                {
+                    Notification.show( "Not all containers successfully created." );
+                }
+            }
+        } );
     }
 
 
