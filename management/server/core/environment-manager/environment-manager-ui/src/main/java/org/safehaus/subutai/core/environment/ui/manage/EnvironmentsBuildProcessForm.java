@@ -3,9 +3,12 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionListener;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +24,7 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings( "serial" )
-public class EnvironmentsBuildProcessForm
+public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListener
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsBuildProcessForm.class.getName() );
@@ -107,21 +110,13 @@ public class EnvironmentsBuildProcessForm
                         processButton = new Button( "Build" );
                         progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
                         progressIcon.setVisible( false );
+
                         processButton.addClickListener( new Button.ClickListener()
                         {
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                // TODO create build task
-                                try
-                                {
-                                    LOG.info( "Build button clicked" );
-                                    managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
-                                }
-                                catch ( NullPointerException e )
-                                {
-                                    LOG.error( e.getMessage(), e );
-                                }
+                                startBuildProcess( environmentBuildProcess );
                             }
                         } );
 
@@ -134,6 +129,7 @@ public class EnvironmentsBuildProcessForm
                                 managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
                             }
                         } );
+
 
                         break;
                     }
@@ -190,8 +186,6 @@ public class EnvironmentsBuildProcessForm
                         break;
                     }
                 }
-
-
                 environmentsTable.addItem( new Object[] {
                         environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
                         destroyButton
@@ -203,6 +197,23 @@ public class EnvironmentsBuildProcessForm
             Notification.show( "No build process tasks", Notification.Type.HUMANIZED_MESSAGE );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+
+        ExecutorService executorService = Executors.newFixedThreadPool( 1 );
+        executorService.execute( new Runnable()
+        {
+            public void run()
+            {
+                System.out.println( "Asynchronous task" );
+                managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
+            }
+        } );
+
+        executorService.shutdown();
     }
 
 
