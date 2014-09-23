@@ -339,7 +339,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 boolean result = peerCommandDispatcher.invoke( peerCommand );
                 if ( result )
                 {
-                    LOG.info( "Clone commad executed successfully" );
+
+                    //TODO: Assign data from set of agents received
 
                     EnvironmentContainer container = new EnvironmentContainer();
                     container.setPeerId( ccm.getPeerId() );
