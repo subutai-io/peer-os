@@ -66,8 +66,8 @@ public class Manager
     private final ComboBox clusterCombo;
     private final Table nodesTable;
     private final String COORDINATOR_PREFIX = "Coordinator: ";
-    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private final String message = "No cluster is installed !";
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final String MESSAGE = "No cluster is installed !";
     private final ExecutorService executorService;
     private final Presto presto;
     private final Hadoop hadoop;
@@ -144,7 +144,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -164,7 +164,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -184,7 +184,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -312,8 +312,8 @@ public class Manager
 
         controlsContent.addComponent( addNodeBtn );
         controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
-        progressIcon.setVisible( false );
-        controlsContent.addComponent( progressIcon );
+        PROGRESS_ICON.setVisible( false );
+        controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
@@ -339,7 +339,7 @@ public class Manager
             destroyBtn.addStyleName( "default" );
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
-            progressIcon.setVisible( false );
+            PROGRESS_ICON.setVisible( false );
 
 
             HorizontalLayout availableOperations = new HorizontalLayout();
@@ -363,7 +363,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     checkBtn.setEnabled( false );
@@ -377,7 +377,7 @@ public class Manager
                                         @Override
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 resultHolder.setValue( result );
                                                 if ( result.contains( "Not" ) )
@@ -390,7 +390,7 @@ public class Manager
                                                     startBtn.setEnabled( false );
                                                     stopBtn.setEnabled( true );
                                                 }
-                                                progressIcon.setVisible( false );
+                                                PROGRESS_ICON.setVisible( false );
                                                 destroyBtn.setEnabled( true );
                                                 setCoordinatorBtn.setEnabled( true );
                                                 checkBtn.setEnabled( true );
@@ -405,7 +405,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     setCoordinatorBtn.setEnabled( false );
@@ -418,7 +418,7 @@ public class Manager
                                         @Override
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 checkBtn.click();
                                             }
@@ -432,7 +432,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     setCoordinatorBtn.setEnabled( false );
@@ -445,7 +445,7 @@ public class Manager
                                         @Override
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 checkBtn.click();
                                             }
@@ -529,7 +529,7 @@ public class Manager
 
         stopBtn.setEnabled( false );
         startBtn.setEnabled( false );
-        progressIcon.setVisible( false );
+        PROGRESS_ICON.setVisible( false );
 
         HorizontalLayout availableOperations = new HorizontalLayout();
         availableOperations.setSpacing( true );
@@ -549,7 +549,7 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                progressIcon.setVisible( true );
+                PROGRESS_ICON.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
                 checkBtn.setEnabled( false );
@@ -561,7 +561,7 @@ public class Manager
                                     @Override
                                     public void onComplete( String result )
                                     {
-                                        synchronized ( progressIcon )
+                                        synchronized ( PROGRESS_ICON )
                                         {
                                             resultHolder.setValue( result );
                                             if ( result.contains( "Not" ) )
@@ -574,7 +574,7 @@ public class Manager
                                                 startBtn.setEnabled( false );
                                                 stopBtn.setEnabled( true );
                                             }
-                                            progressIcon.setVisible( false );
+                                            PROGRESS_ICON.setVisible( false );
                                             checkBtn.setEnabled( true );
                                         }
                                     }
@@ -587,7 +587,7 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                progressIcon.setVisible( true );
+                PROGRESS_ICON.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
@@ -598,7 +598,7 @@ public class Manager
                                     @Override
                                     public void onComplete( String result )
                                     {
-                                        synchronized ( progressIcon )
+                                        synchronized ( PROGRESS_ICON )
                                         {
                                             checkBtn.click();
                                         }
@@ -612,7 +612,7 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                progressIcon.setVisible( true );
+                PROGRESS_ICON.setVisible( true );
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
@@ -623,7 +623,7 @@ public class Manager
                                     @Override
                                     public void onComplete( String result )
                                     {
-                                        synchronized ( progressIcon )
+                                        synchronized ( PROGRESS_ICON )
                                         {
                                             checkBtn.click();
                                         }
@@ -762,7 +762,7 @@ public class Manager
     {
         for ( Agent agent : config.getAllNodes() )
         {
-            progressIcon.setVisible( true );
+            PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new StartTask( presto, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
@@ -770,7 +770,7 @@ public class Manager
                         @Override
                         public void onComplete( String result )
                         {
-                            synchronized ( progressIcon )
+                            synchronized ( PROGRESS_ICON )
                             {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();
@@ -785,7 +785,7 @@ public class Manager
     {
         for ( Agent agent : config.getAllNodes() )
         {
-            progressIcon.setVisible( true );
+            PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new StopTask( presto, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
@@ -793,7 +793,7 @@ public class Manager
                         @Override
                         public void onComplete( String result )
                         {
-                            synchronized ( progressIcon )
+                            synchronized ( PROGRESS_ICON )
                             {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();

@@ -58,9 +58,9 @@ public class Manager
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String ADD_NODE_CAPTION = "Add Node";
-    private static final String message = "No cluster is installed !";
-    private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
+    private static final String MESSAGE = "No cluster is installed !";
+    private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private static final Pattern ELASTICSEARCH_PATTERN = Pattern.compile( ".*(elasticsearch.+?g).*" );
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
     private final Table nodesTable;
     private final ExecutorService executorService;
@@ -147,7 +147,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -170,7 +170,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -193,7 +193,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -253,8 +253,8 @@ public class Manager
 
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
-        progressIcon.setVisible( false );
-        controlsContent.addComponent( progressIcon );
+        PROGRESS_ICON.setVisible( false );
+        controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
@@ -266,7 +266,7 @@ public class Manager
     public static String parseServiceResult( String result )
     {
         StringBuilder parsedResult = new StringBuilder();
-        Matcher tracersMatcher = elasticsearchPattern.matcher( result );
+        Matcher tracersMatcher = ELASTICSEARCH_PATTERN.matcher( result );
         if ( tracersMatcher.find() )
         {
             parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
@@ -280,7 +280,7 @@ public class Manager
     {
         for ( Agent agent : config.getNodes() )
         {
-            progressIcon.setVisible( true );
+            PROGRESS_ICON.setVisible( true );
             executorService.execute(
                     new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                             new CompleteEvent()
@@ -288,7 +288,7 @@ public class Manager
                                 @Override
                                 public void onComplete( String result )
                                 {
-                                    synchronized ( progressIcon )
+                                    synchronized ( PROGRESS_ICON )
                                     {
                                         checkAllNodes();
                                     }
@@ -302,14 +302,14 @@ public class Manager
     {
         for ( Agent agent : config.getNodes() )
         {
-            progressIcon.setVisible( true );
+            PROGRESS_ICON.setVisible( true );
             executorService.execute( new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                     new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
                         {
-                            synchronized ( progressIcon )
+                            synchronized ( PROGRESS_ICON )
                             {
                                 checkAllNodes();
                             }
@@ -434,7 +434,7 @@ public class Manager
 
         if ( config == null || config.isEmpty() )
         {
-            progressIcon.setVisible( false );
+            PROGRESS_ICON.setVisible( false );
             return;
         }
 
@@ -488,7 +488,7 @@ public class Manager
 
             startButton.setEnabled( false );
             stopButton.setEnabled( false );
-            progressIcon.setVisible( false );
+            PROGRESS_ICON.setVisible( false );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -508,7 +508,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent event )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
@@ -518,7 +518,7 @@ public class Manager
                                     {
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 String status = parseServiceResult( result );
                                                 resultHolder.setValue( status );
@@ -532,7 +532,7 @@ public class Manager
                                                     startButton.setEnabled( false );
                                                     stopButton.setEnabled( true );
                                                 }
-                                                progressIcon.setVisible( false );
+                                                PROGRESS_ICON.setVisible( false );
                                                 checkButton.setEnabled( true );
                                             }
                                         }
@@ -545,7 +545,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
@@ -556,7 +556,7 @@ public class Manager
                                         @Override
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 startButton.setEnabled( true );
                                                 stopButton.setEnabled( true );
@@ -573,7 +573,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
@@ -584,7 +584,7 @@ public class Manager
                                         @Override
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 startButton.setEnabled( true );
                                                 stopButton.setEnabled( true );
