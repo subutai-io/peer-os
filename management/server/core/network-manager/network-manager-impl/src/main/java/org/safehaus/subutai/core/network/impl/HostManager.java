@@ -2,18 +2,22 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
 
+/**
+ * HostManager enables to register agent's hostname in /etc/hosts file of other agents
+ */
 public class HostManager
 {
-    protected static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HostManager.class.getName() );
 
     private List<Agent> agentList;
     private String domainName;
@@ -30,12 +34,18 @@ public class HostManager
 
     public boolean execute()
     {
-        return agentList != null && !agentList.isEmpty() && write();
+        if ( agentList != null && !agentList.isEmpty() )
+        {
+            return write();
+        }
+
+        return false;
     }
 
 
     private boolean write()
     {
+
         Command command = commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( agentList ) );
         try
         {
@@ -43,7 +53,7 @@ public class HostManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();

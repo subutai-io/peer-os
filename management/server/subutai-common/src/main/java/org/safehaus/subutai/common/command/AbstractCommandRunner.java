@@ -3,20 +3,20 @@ package org.safehaus.subutai.common.command;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
- * Created by dilshat on 9/15/14.
+ * Abstract base class for Command Runner implementations
  */
 public abstract class AbstractCommandRunner implements CommandRunnerBase, ResponseListener
 {
 
-    protected static final Logger LOG = Logger.getLogger( AbstractCommandRunner.class.getName() );
+    protected static final Logger LOG = LoggerFactory.getLogger( AbstractCommand.class.getName() );
     protected ExpiringCache<UUID, CommandExecutor> commandExecutors;
 
 
@@ -79,7 +79,7 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
                                 }
                                 catch ( Exception e )
                                 {
-                                    LOG.log( Level.SEVERE, "Error in callback {0}", e );
+                                    LOG.error( "Error in callback {0}", e );
                                 }
 
                                 //do cleanup on command completion or interruption by user

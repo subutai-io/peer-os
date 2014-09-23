@@ -13,27 +13,20 @@ import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.strategy.api.StrategyNotAvailable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
- * Created by timur on 9/18/14.
+ * Strategy Manager implementation
  */
 public class StrategyManagerImpl implements StrategyManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( StrategyManagerImpl.class );
+
 
     List<ContainerPlacementStrategy> placementStrategies =
             Collections.synchronizedList( new ArrayList<ContainerPlacementStrategy>() );
-
-
-    public StrategyManagerImpl()
-    {
-        init();
-    }
-
-
-    public void init()
-    {
-    }
 
 
     public void destroy()
@@ -44,8 +37,7 @@ public class StrategyManagerImpl implements StrategyManager
 
     public synchronized void registerStrategy( ContainerPlacementStrategy containerPlacementStrategy )
     {
-        System.out.println(
-                String.format( "Registering container placement strategy: %s", containerPlacementStrategy.getId() ) );
+        LOG.info( String.format( "Registering container placement strategy: %s", containerPlacementStrategy.getId() ) );
         placementStrategies.add( containerPlacementStrategy );
     }
 
@@ -54,7 +46,7 @@ public class StrategyManagerImpl implements StrategyManager
     {
         if ( containerPlacementStrategy != null )
         {
-            System.out.println( String.format( "Unregistering container placement strategy: %s",
+            LOG.info( String.format( "Unregistering container placement strategy: %s",
                     containerPlacementStrategy.getId() ) );
             placementStrategies.remove( containerPlacementStrategy );
         }
@@ -73,11 +65,6 @@ public class StrategyManagerImpl implements StrategyManager
             throws StrategyException
     {
         ContainerPlacementStrategy containerPlacementStrategy = findStrategyById( strategyId );
-        if ( containerPlacementStrategy == null )
-        {
-            throw new StrategyNotAvailable(
-                    String.format( "Container placement strategy [%s] not available.", strategyId ) );
-        }
 
         containerPlacementStrategy.calculatePlacement( nodesCount, serverMetrics, criteria );
 
@@ -117,7 +104,8 @@ public class StrategyManagerImpl implements StrategyManager
         }
         if ( placementStrategy == null )
         {
-            throw new StrategyNotAvailable( "Strategy not available." );
+            throw new StrategyNotAvailable(
+                    String.format( "Container placement strategy [%s] not available.", strategyId ) );
         }
         return placementStrategy;
     }

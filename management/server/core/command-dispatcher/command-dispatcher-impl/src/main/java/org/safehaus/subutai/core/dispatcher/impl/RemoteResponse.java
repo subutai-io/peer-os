@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * Created by dilshat on 9/8/14.
+ * Wrapper around Response for sending back to remote peer
  */
 public class RemoteResponse
 {

@@ -8,6 +8,8 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -20,6 +22,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "git", name = "diff-branches", description = "Diff branches to see changed files")
 public class DiffBranches extends OsgiCommandSupport
 {
+    private static final Logger LOG = LoggerFactory.getLogger( DiffBranches.class.getName() );
 
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
@@ -66,12 +69,12 @@ public class DiffBranches extends OsgiCommandSupport
 
             for ( GitChangedFile gf : changedFileList )
             {
-                System.out.println( gf );
+                System.out.println( gf.toString() );
             }
         }
         catch ( GitException e )
         {
-            System.out.println( e );
+            LOG.error( "Error in doExecute", e );
         }
 
         return null;

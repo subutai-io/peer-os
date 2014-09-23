@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -35,7 +35,7 @@ import com.vaadin.ui.UI;
 public final class AgentTree extends ConcurrentComponent implements AgentListener, Disposable
 {
 
-    private static final Logger LOG = Logger.getLogger( UI.getCurrent().getClass().getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
     private final AgentManager agentManager;
     private final Tree tree;
     private HierarchicalContainer container;
@@ -285,7 +285,7 @@ public final class AgentTree extends ConcurrentComponent implements AgentListene
             }
             catch ( Property.ReadOnlyException | Converter.ConversionException ex )
             {
-                LOG.log( Level.SEVERE, "Error in refreshAgents", ex );
+                LOG.error( "Error in refreshAgents", ex );
             }
         }
     }

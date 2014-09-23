@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 
@@ -29,6 +29,18 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     }
 
 
+    public void init()
+    {
+
+    }
+
+
+    public void destroy()
+    {
+
+    }
+
+
     public PeerManager getPeerManager()
     {
         return peerManager;
@@ -45,7 +57,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     public boolean invoke( final PeerCommand peerCommand ) throws PeerCommandException
     {
         boolean result = false;
-        if ( peerManager.getSiteId().equals( peerCommand.getPeerCommandMessage().getPeerId() ) )
+        if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
         {
 
             try

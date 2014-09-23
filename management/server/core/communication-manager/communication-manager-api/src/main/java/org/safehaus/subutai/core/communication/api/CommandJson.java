@@ -5,12 +5,11 @@
 package org.safehaus.subutai.core.communication.api;
 
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,35 +21,12 @@ import com.google.gson.GsonBuilder;
 public class CommandJson
 {
 
-    private static final Logger LOG = Logger.getLogger( CommandJson.class.getName() );
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().addDeserializationExclusionStrategy(
+    private static final Logger LOG = LoggerFactory.getLogger( CommandJson.class.getName() );
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().addDeserializationExclusionStrategy(
             new SkipNullsExclusionStrategy() ).disableHtmlEscaping().create();
 
 
-    /**
-     * Returns deserialized request from json string
-     *
-     * @param json - request in json format
-     *
-     * @return request
-     */
-    public static Request getRequest( String json )
-    {
-        try
-        {
-            Command cmd = gson.fromJson( escape( json ), CommandImpl.class );
-            if ( cmd.getRequest() != null )
-            {
-                return cmd.getRequest();
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.log( Level.SEVERE, "Error in getRequest", ex );
-        }
-
-        return null;
-    }
+    private CommandJson() {}
 
 
     /**
@@ -93,24 +69,58 @@ public class CommandJson
                     sb.append( "\\/" );
                     break;
                 default:
-                    if ( ( ch >= '\u0000' && ch <= '\u001F' ) || ( ch >= '\u007F' && ch <= '\u009F' ) || (
-                            ch >= '\u2000' && ch <= '\u20FF' ) )
-                    {
-                        String ss = Integer.toHexString( ch );
-                        sb.append( "\\u" );
-                        for ( int k = 0; k < 4 - ss.length(); k++ )
-                        {
-                            sb.append( '0' );
-                        }
-                        sb.append( ss.toUpperCase() );
-                    }
-                    else
-                    {
-                        sb.append( ch );
-                    }
+                    sb.append( processDefaultCase( ch ) );
             }
         }
         return sb.toString();
+    }
+
+
+    private static String processDefaultCase( char ch )
+    {
+        StringBuilder sb = new StringBuilder();
+        if ( ( ch >= '\u0000' && ch <= '\u001F' ) || ( ch >= '\u007F' && ch <= '\u009F' ) || ( ch >= '\u2000'
+                && ch <= '\u20FF' ) )
+        {
+            String ss = Integer.toHexString( ch );
+            sb.append( "\\u" );
+            for ( int k = 0; k < 4 - ss.length(); k++ )
+            {
+                sb.append( '0' );
+            }
+            sb.append( ss.toUpperCase() );
+        }
+        else
+        {
+            sb.append( ch );
+        }
+        return sb.toString();
+    }
+
+
+    /**
+     * Returns deserialized request from json string
+     *
+     * @param json - request in json format
+     *
+     * @return request
+     */
+    public static Request getRequest( String json )
+    {
+        try
+        {
+            Command cmd = getCommand( json );
+            if ( cmd.getRequest() != null )
+            {
+                return cmd.getRequest();
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in getRequest", ex );
+        }
+
+        return null;
     }
 
 
@@ -125,7 +135,7 @@ public class CommandJson
     {
         try
         {
-            Command cmd = gson.fromJson( escape( json ), CommandImpl.class );
+            Command cmd = getCommand( json );
             if ( cmd.getResponse() != null )
             {
                 return cmd.getResponse();
@@ -133,7 +143,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getResponse", ex );
+            LOG.error( "Error in getResponse", ex );
         }
 
         return null;
@@ -151,11 +161,11 @@ public class CommandJson
     {
         try
         {
-            return gson.fromJson( escape( json ), CommandImpl.class );
+            return GSON.fromJson( escape( json ), CommandImpl.class );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getCommand", ex );
+            LOG.error( "Error in getCommand", ex );
         }
 
         return null;
@@ -173,11 +183,11 @@ public class CommandJson
     {
         try
         {
-            return gson.toJson( new CommandImpl( cmd ) );
+            return GSON.toJson( new CommandImpl( cmd ) );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getJson", ex );
+            LOG.error( "Error in getJson", ex );
         }
         return null;
     }
@@ -194,11 +204,11 @@ public class CommandJson
     {
         try
         {
-            return gson.toJson( new CommandImpl( cmd ) );
+            return GSON.toJson( new CommandImpl( cmd ) );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getResponse", ex );
+            LOG.error( "Error in getResponse", ex );
         }
         return null;
     }
@@ -215,11 +225,11 @@ public class CommandJson
     {
         try
         {
-            return gson.toJson( cmd );
+            return GSON.toJson( cmd );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getJson", ex );
+            LOG.error( "Error in getJson", ex );
         }
         return null;
     }
@@ -236,11 +246,11 @@ public class CommandJson
     {
         try
         {
-            return gson.toJson( agent );
+            return GSON.toJson( agent );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getAgentJson", ex );
+            LOG.error( "Error in getAgentJson", ex );
         }
         return null;
     }
@@ -257,7 +267,7 @@ public class CommandJson
     {
         try
         {
-            Agent agent = gson.fromJson( escape( json ), Agent.class );
+            Agent agent = GSON.fromJson( escape( json ), Agent.class );
             if ( agent != null )
             {
                 return agent;
@@ -265,7 +275,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in getAgent", ex );
+            LOG.error( "Error in getAgent", ex );
         }
 
         return null;

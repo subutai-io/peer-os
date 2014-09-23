@@ -1,12 +1,12 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
-import java.util.logging.Logger;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
@@ -22,7 +22,7 @@ public class RemotePeerRestClient
 
     //    executeRemoteCommand(C)
 
-    private static final Logger LOG = Logger.getLogger( RemotePeerRestClient.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl;
 
@@ -62,7 +62,7 @@ public class RemotePeerRestClient
         }
         catch ( Exception e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
 
         return null;

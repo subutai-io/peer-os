@@ -6,12 +6,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,9 +25,9 @@ import com.google.gson.GsonBuilder;
 public class RestServiceImpl implements RestService
 {
 
-    private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private Tracker tracker;
 
 
@@ -47,12 +48,13 @@ public class RestServiceImpl implements RestService
 
             if ( productOperationView != null )
             {
-                return Response.ok().entity( gson.toJson( productOperationView ) ).build();
+                return Response.ok().entity( GSON.toJson( productOperationView ) ).build();
             }
             return null;
         }
         catch ( IllegalArgumentException e )
         {
+            LOG.error( "Error in getProductOperation", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -70,10 +72,11 @@ public class RestServiceImpl implements RestService
 
             List<ProductOperationView> pos = tracker.getProductOperations( source, fromDat, toDat, limit );
 
-            return Response.ok().entity( gson.toJson( pos ) ).build();
+            return Response.ok().entity( GSON.toJson( pos ) ).build();
         }
         catch ( ParseException e )
         {
+            LOG.error( "Error in getProductOperations", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -82,6 +85,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getProductOperationSources()
     {
-        return Response.ok().entity( gson.toJson( tracker.getProductOperationSources() ) ).build();
+        return Response.ok().entity( GSON.toJson( tracker.getProductOperationSources() ) ).build();
     }
 }

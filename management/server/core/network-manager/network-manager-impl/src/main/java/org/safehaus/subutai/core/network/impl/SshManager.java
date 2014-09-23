@@ -3,20 +3,24 @@ package org.safehaus.subutai.core.network.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
 
+/**
+ * Ssh manager for exchanging ssh keys and enabling passwordless communication
+ */
 public class SshManager
 {
 
-    protected static final Logger LOG = Logger.getLogger( HostManager.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SshManager.class.getName() );
 
     private List<Agent> agentList;
     private String keys;
@@ -32,21 +36,7 @@ public class SshManager
 
     public boolean execute()
     {
-        if ( agentList != null && !agentList.isEmpty() )
-        {
-            if ( create() )
-            {
-                if ( read() )
-                {
-                    if ( write() )
-                    {
-                        return config();
-                    }
-                }
-            }
-        }
-
-        return false;
+        return agentList != null && !agentList.isEmpty() && create() && read() && write() && config();
     }
 
 
@@ -59,7 +49,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();
@@ -75,7 +65,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         StringBuilder value = new StringBuilder();
@@ -105,7 +95,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
 
@@ -122,7 +112,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
 
@@ -132,20 +122,11 @@ public class SshManager
 
     public boolean execute( Agent agent )
     {
-        if ( agentList != null && !agentList.isEmpty() && agent != null )
+        if ( agentList != null && !agentList.isEmpty() && agent != null && create( agent ) )
         {
-            if ( create( agent ) )
-            {
-                agentList.add( agent );
+            agentList.add( agent );
 
-                if ( read() )
-                {
-                    if ( write() )
-                    {
-                        return config();
-                    }
-                }
-            }
+            return read() && write() && config();
         }
 
         return false;
@@ -161,7 +142,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.severe( String.format( "Error in write: %s", e.getMessage() ) );
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();

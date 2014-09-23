@@ -3,11 +3,11 @@ package org.safehaus.subutai.core.environment.impl.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -24,7 +24,7 @@ import com.google.gson.JsonSyntaxException;
 public class EnvironmentDAO
 {
 
-    private static final Logger LOG = Logger.getLogger( EnvironmentDAO.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DbManager dbManager;
 
@@ -50,7 +50,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return false;
     }
@@ -85,11 +85,11 @@ public class EnvironmentDAO
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return list;
     }
@@ -128,11 +128,11 @@ public class EnvironmentDAO
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return null;
     }
@@ -157,7 +157,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return false;
     }

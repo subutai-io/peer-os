@@ -75,7 +75,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
     private void logStatusResults( ProductOperation po, Command checkStatusCommand )
     {
 
-        String log = "";
+        StringBuilder log = new StringBuilder();
 
         for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
         {
@@ -90,9 +90,9 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
                 status = "elasticsearch is not running";
             }
 
-            log += String.format( "%s\n", status );
+            log.append( String.format( "%s\n", status ) ).append( "\n" );
         }
 
-        po.addLogDone( log );
+        po.addLogDone( log.toString() );
     }
 }

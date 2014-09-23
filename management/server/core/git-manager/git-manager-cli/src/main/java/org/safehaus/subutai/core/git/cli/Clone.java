@@ -5,6 +5,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -17,6 +19,9 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "git", name = "clone", description = "Clone master repo")
 public class Clone extends OsgiCommandSupport
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( Clone.class.getName() );
+
 
     @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
@@ -53,7 +58,7 @@ public class Clone extends OsgiCommandSupport
         }
         catch ( GitException e )
         {
-            System.out.println( e );
+            LOG.error( "Error in doExecute", e );
         }
 
         return null;

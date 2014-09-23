@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.api;
 
 
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 
 
 /**
