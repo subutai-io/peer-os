@@ -10,8 +10,8 @@
   </parent>
 
   <artifactId>command-dispatcher-rest</artifactId>
-  <name>Subutai Command Dispatcher Rest</name>
-  <description>Subutai Command Dispatcher Rest</description>
+  <name>Subutai Command Dispatcher REST</name>
+  <description>Subutai Command Dispatcher REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>
