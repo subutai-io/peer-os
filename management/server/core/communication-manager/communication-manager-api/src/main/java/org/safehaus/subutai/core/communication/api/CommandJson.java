@@ -26,7 +26,10 @@ public class CommandJson
             new SkipNullsExclusionStrategy() ).disableHtmlEscaping().create();
 
 
-    private CommandJson() {}
+    private CommandJson()
+    {
+
+    }
 
 
     /**

@@ -6,14 +6,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
 
 
 public class FileUtil
 {
 
-    private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( FileUtil.class.getName() );
 
     private static URLClassLoader classLoader;
 
@@ -28,7 +28,7 @@ public class FileUtil
         }
         catch ( Exception e )
         {
-            log.log( Level.SEVERE, "Error while reading file: " + e );
+            LOG.error( "Error while reading file", e );
         }
 
         return content;

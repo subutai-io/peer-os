@@ -79,39 +79,53 @@ class CommandProducer implements Runnable
         }
         finally
         {
-            if ( producer != null )
-            {
-                try
-                {
-                    producer.close();
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( "ignore", e );
-                }
-            }
-            if ( session != null )
-            {
-                try
-                {
-                    session.close();
-                }
-                catch ( Exception e )
+            closeSilently( producer );
+            closeSilently( session );
+            closeSilently( connection );
+        }
+    }
 
-                {
-                    LOG.warn( "ignore", e );
-                }
-            }
-            if ( connection != null )
+
+    private void closeSilently( MessageProducer producer )
+    {
+        if ( producer != null )
+        {
+            try
             {
-                try
-                {
-                    connection.close();
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( "ignore", e );
-                }
+                producer.close();
+            }
+            catch ( Exception ignore )
+            {
+            }
+        }
+    }
+
+
+    private void closeSilently( Session session )
+    {
+        if ( session != null )
+        {
+            try
+            {
+                session.close();
+            }
+            catch ( Exception ignore )
+            {
+            }
+        }
+    }
+
+
+    private void closeSilently( Connection connection )
+    {
+        if ( connection != null )
+        {
+            try
+            {
+                connection.close();
+            }
+            catch ( Exception ignore )
+            {
             }
         }
     }

@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -25,6 +26,8 @@ import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.server.ui.component.AgentTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
@@ -42,6 +45,8 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class TerminalForm extends CustomComponent implements Disposable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( TerminalForm.class.getName() );
+
 
     final CommandRunner commandRunner;
     final AgentManager agentManager;
@@ -238,63 +243,70 @@ public class TerminalForm extends CustomComponent implements Disposable
 
     private void createCommand( RequestBuilder requestBuilder, Set<Agent> agents )
     {
-        final Command command = commandRunner.createCommand( requestBuilder, agents );
         indicator.setVisible( true );
-        taskCount.incrementAndGet();
-        executor.execute( new ExecuteCommandTask( commandRunner, command, taskCount, indicator, this ) );
+        executor.execute(
+                new ExecuteCommandTask( commandRunner.createCommand( requestBuilder, agents ), taskCount, indicator,
+                        this ) );
     }
 
 
     private static class ExecuteCommandTask implements Runnable
     {
 
-        private final CommandRunner commandRunner;
         private final Command command;
         private final AtomicInteger taskCount;
         private final Label indicator;
         private final TerminalForm form;
 
-        private final StringBuffer stringBuffer = new StringBuffer();
+        private final StringBuilder output = new StringBuilder();
 
 
-        private ExecuteCommandTask( final CommandRunner commandRunner, final Command command,
-                                    final AtomicInteger taskCount, final Label indicator, final TerminalForm form )
+        private ExecuteCommandTask( final Command command, final AtomicInteger taskCount, final Label indicator,
+                                    final TerminalForm form )
         {
-            this.commandRunner = commandRunner;
             this.command = command;
             this.taskCount = taskCount;
             this.indicator = indicator;
             this.form = form;
+            taskCount.incrementAndGet();
         }
 
 
         public void run()
         {
-            commandRunner.runCommand( command, new CommandCallback()
+            try
             {
-
-                @Override
-                public void onResponse( Response response, AgentResult agentResult, Command command )
+                command.execute( new CommandCallback()
                 {
-                    StringBuilder out = new StringBuilder( "" );
 
-                    if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
+                    @Override
+                    public void onResponse( Response response, AgentResult agentResult, Command command )
                     {
-                        out.append( response.getStdOut() );
-                    }
-                    if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
-                    {
-                        out.append( response.getStdErr() );
-                    }
+                        StringBuilder out = new StringBuilder( "" );
 
-                    stringBuffer.append( out.toString() );
-                }
-            } );
+                        if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
+                        {
+                            out.append( response.getStdOut() );
+                        }
+                        if ( !Strings.isNullOrEmpty( response.getStdErr() ) )
+                        {
+                            out.append( response.getStdErr() );
+                        }
+
+                        output.append( out.toString() );
+                    }
+                } );
+            }
+            catch ( CommandException e )
+            {
+                LOG.error( "Error in ExecuteCommandTask", e );
+                form.show( e.getMessage() );
+            }
 
             taskCount.decrementAndGet();
             if ( taskCount.get() == 0 )
             {
-                form.show( stringBuffer.toString() );
+                form.show( output.toString() );
                 indicator.setVisible( false );
             }
         }
