@@ -39,26 +39,31 @@ public class AgentNotifier implements Runnable
                 {
                     lastNotify = System.currentTimeMillis();
                     agentManager.setNotifyAgentListeners( false );
-                    Set<Agent> freshAgents = agentManager.getAgents();
-                    for ( Iterator<AgentListener> it = agentManager.listeners.iterator(); it.hasNext(); )
-                    {
-                        AgentListener listener = it.next();
-                        try
-                        {
-                            listener.onAgent( freshAgents );
-                        }
-                        catch ( Exception e )
-                        {
-                            it.remove();
-                            LOG.error( "Error notifying agent listeners, removing faulting listener", e );
-                        }
-                    }
+                    notifyListeners( agentManager.getAgents() );
                 }
                 Thread.sleep( 1000L );
             }
             catch ( InterruptedException ex )
             {
                 break;
+            }
+        }
+    }
+
+
+    private void notifyListeners( Set<Agent> agents )
+    {
+        for ( Iterator<AgentListener> it = agentManager.listeners.iterator(); it.hasNext(); )
+        {
+            AgentListener listener = it.next();
+            try
+            {
+                listener.onAgent( agents );
+            }
+            catch ( Exception e )
+            {
+                it.remove();
+                LOG.error( "Error notifying agent listeners, removing faulting listener", e );
             }
         }
     }
