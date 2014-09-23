@@ -26,7 +26,57 @@ public class CommandJson
             new SkipNullsExclusionStrategy() ).disableHtmlEscaping().create();
 
 
-    private CommandJson() {}
+    private CommandJson()
+    {
+    }
+
+
+    /**
+     * Returns deserialized request from json string
+     *
+     * @param json - request in json format
+     *
+     * @return request
+     */
+    public static Request getRequest( String json )
+    {
+        try
+        {
+            Command cmd = getCommand( json );
+            if ( cmd.getRequest() != null )
+            {
+                return cmd.getRequest();
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in getRequest", ex );
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Returns deserialized command from json string
+     *
+     * @param json - command in json format
+     *
+     * @return command
+     */
+    public static Command getCommand( String json )
+    {
+        try
+        {
+            return GSON.fromJson( escape( json ), CommandImpl.class );
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in getCommand", ex );
+        }
+
+        return null;
+    }
 
 
     /**
@@ -99,32 +149,6 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized request from json string
-     *
-     * @param json - request in json format
-     *
-     * @return request
-     */
-    public static Request getRequest( String json )
-    {
-        try
-        {
-            Command cmd = getCommand( json );
-            if ( cmd.getRequest() != null )
-            {
-                return cmd.getRequest();
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in getRequest", ex );
-        }
-
-        return null;
-    }
-
-
-    /**
      * Returns deserialized response from json string
      *
      * @param json - response in json format
@@ -144,28 +168,6 @@ public class CommandJson
         catch ( Exception ex )
         {
             LOG.error( "Error in getResponse", ex );
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Returns deserialized command from json string
-     *
-     * @param json - command in json format
-     *
-     * @return command
-     */
-    public static Command getCommand( String json )
-    {
-        try
-        {
-            return GSON.fromJson( escape( json ), CommandImpl.class );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in getCommand", ex );
         }
 
         return null;

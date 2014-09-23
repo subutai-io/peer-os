@@ -7,11 +7,11 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

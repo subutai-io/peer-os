@@ -9,5 +9,7 @@ public class Common
     public static final String DISPATCHER_NAME = "dispatcher";
 
 
-    private Common() {}
+    private Common()
+    {
+    }
 }

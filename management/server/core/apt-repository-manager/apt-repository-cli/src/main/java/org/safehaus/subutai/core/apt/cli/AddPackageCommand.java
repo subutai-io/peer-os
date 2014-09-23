@@ -13,13 +13,13 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "apt", name = "add-package", description = "Add package to apt repository by path")
+@Command( scope = "apt", name = "add-package", description = "Add package to apt repository by path" )
 public class AddPackageCommand extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( AddPackageCommand.class.getName() );
 
-    @Argument(index = 0, name = "package path", required = true, multiValued = false,
-            description = "path to package")
+    @Argument( index = 0, name = "package path", required = true, multiValued = false,
+            description = "path to package" )
     String packagePath;
 
     private AptRepositoryManager aptRepositoryManager;

@@ -16,8 +16,8 @@ import com.google.gson.GsonBuilder;
 public class RestServiceImpl implements RestService
 {
 
-    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final static Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
+    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private EnvironmentManager environmentManager;
 
 

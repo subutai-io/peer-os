@@ -11,7 +11,6 @@
 package org.safehaus.subutai.server.ui.views;
 
 
-
 import org.safehaus.subutai.common.protocol.Parameters;
 import org.safehaus.subutai.common.protocol.Setting;
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 public class MonitorView extends VerticalLayout implements View
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( MonitorView.class.getName() );
     private static String jsonString = "{\n" +
             "    \"parameters\": [\n" +
             "        {\n" +
@@ -122,7 +122,6 @@ public class MonitorView extends VerticalLayout implements View
             "        }\n" +
             "    ]\n" +
             "}";
-    private static final Logger LOG = LoggerFactory.getLogger( MonitorView.class.getName() );
 
 
     @Override

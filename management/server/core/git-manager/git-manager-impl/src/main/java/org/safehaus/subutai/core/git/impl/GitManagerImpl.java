@@ -115,6 +115,40 @@ public class GitManagerImpl implements GitManager
     }
 
 
+    private void validateHostNRepoRoot( Agent host, String repositoryRoot )
+    {
+        Preconditions.checkNotNull( host, "Agent is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( repositoryRoot ), "Repository root is null or empty" );
+    }
+
+
+    private void runCommand( Command command, Agent host, GitCommand gitCommand, boolean output ) throws GitException
+    {
+        commandRunner.runCommand( command );
+
+        if ( !command.hasSucceeded() )
+        {
+            if ( command.hasCompleted() )
+            {
+                AgentResult agentResult = command.getResults().get( host.getUuid() );
+                throw new GitException(
+                        String.format( "Error while performing [git %s]: %s%n%s, exit code %s", gitCommand.getCommand(),
+                                agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
+            }
+            else
+            {
+                throw new GitException( String.format( "Error while performing [git %s]: Command timed out",
+                        gitCommand.getCommand() ) );
+            }
+        }
+        else if ( output )
+        {
+            AgentResult agentResult = command.getResults().get( host.getUuid() );
+            LOG.info( agentResult.getStdOut() );
+        }
+    }
+
+
     /**
      * Returns diff in file between specified branch and master branch
      *
@@ -177,43 +211,9 @@ public class GitManagerImpl implements GitManager
     }
 
 
-    private void validateHostNRepoRoot( Agent host, String repositoryRoot )
-    {
-        Preconditions.checkNotNull( host, "Agent is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( repositoryRoot ), "Repository root is null or empty" );
-    }
-
-
     private void runCommand( Command command, Agent host, GitCommand gitCommand ) throws GitException
     {
         runCommand( command, host, gitCommand, true );
-    }
-
-
-    private void runCommand( Command command, Agent host, GitCommand gitCommand, boolean output ) throws GitException
-    {
-        commandRunner.runCommand( command );
-
-        if ( !command.hasSucceeded() )
-        {
-            if ( command.hasCompleted() )
-            {
-                AgentResult agentResult = command.getResults().get( host.getUuid() );
-                throw new GitException(
-                        String.format( "Error while performing [git %s]: %s%n%s, exit code %s", gitCommand.getCommand(),
-                                agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
-            }
-            else
-            {
-                throw new GitException( String.format( "Error while performing [git %s]: Command timed out",
-                        gitCommand.getCommand() ) );
-            }
-        }
-        else if ( output )
-        {
-            AgentResult agentResult = command.getResults().get( host.getUuid() );
-            LOG.info( agentResult.getStdOut() );
-        }
     }
 
 
@@ -450,6 +450,19 @@ public class GitManagerImpl implements GitManager
 
 
     /**
+     * Pulls from remote master branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
+    @Override
+    public void pull( final Agent host, final String repositoryRoot ) throws GitException
+    {
+        pull( host, repositoryRoot, MASTER_BRANCH );
+    }
+
+
+    /**
      * Pulls from remote branch
      *
      * @param host - agent of node
@@ -467,19 +480,6 @@ public class GitManagerImpl implements GitManager
                 Sets.newHashSet( host ) );
 
         runCommand( pullCommand, host, GitCommand.PULL );
-    }
-
-
-    /**
-     * Pulls from remote master branch
-     *
-     * @param host - agent of node
-     * @param repositoryRoot - path to repo
-     */
-    @Override
-    public void pull( final Agent host, final String repositoryRoot ) throws GitException
-    {
-        pull( host, repositoryRoot, MASTER_BRANCH );
     }
 
 
@@ -609,6 +609,20 @@ public class GitManagerImpl implements GitManager
 
 
     /**
+     * Brings current branch to the state of remote master branch, effectively undoing all local changes
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
+    @Override
+    public void undoHard( final Agent host, final String repositoryRoot ) throws GitException
+    {
+
+        undoHard( host, repositoryRoot, MASTER_BRANCH );
+    }
+
+
+    /**
      * Brings current branch to the state of the specified remote branch, effectively undoing all local changes
      *
      * @param host - agent of node
@@ -626,20 +640,6 @@ public class GitManagerImpl implements GitManager
                         .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
 
         runCommand( undoCommand, host, GitCommand.FETCH );
-    }
-
-
-    /**
-     * Brings current branch to the state of remote master branch, effectively undoing all local changes
-     *
-     * @param host - agent of node
-     * @param repositoryRoot - path to repo
-     */
-    @Override
-    public void undoHard( final Agent host, final String repositoryRoot ) throws GitException
-    {
-
-        undoHard( host, repositoryRoot, MASTER_BRANCH );
     }
 
 
