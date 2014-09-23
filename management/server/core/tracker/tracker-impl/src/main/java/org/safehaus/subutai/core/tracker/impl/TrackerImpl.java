@@ -241,15 +241,12 @@ public class TrackerImpl implements Tracker
                     logSize = po.getLog().length();
                 }
                 //return if operation is completed
-                if ( po.getState() != ProductOperationState.RUNNING )
+                //or if time limit is reached
+                if ( po.getState() != ProductOperationState.RUNNING  || System.currentTimeMillis() - startedTs > maxOperationDurationMs)
                 {
                     return;
                 }
-                //return if time limit is reached
-                if ( System.currentTimeMillis() - startedTs > maxOperationDurationMs )
-                {
-                    return;
-                }
+
                 try
                 {
                     Thread.sleep( 100 );
