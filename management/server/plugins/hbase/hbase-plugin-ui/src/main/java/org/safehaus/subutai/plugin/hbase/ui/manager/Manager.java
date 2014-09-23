@@ -297,7 +297,7 @@ public class Manager
                 continue;
             }
 
-            final Object rowId = table.addItem( new Object[] {
+            table.addItem( new Object[] {
                     a.getHostname(), type, progressIcon
             }, null );
         }

@@ -380,7 +380,7 @@ public class Manager
 
             String isSeed = checkIfSeed( agent );
 
-            final Object rowId = table.addItem( new Object[] {
+            table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
             }, null );
 
