@@ -4,14 +4,14 @@ package org.safehaus.subutai.core.configuration.impl.loaders;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
 import org.safehaus.subutai.core.configuration.api.TextInjector;
 import org.safehaus.subutai.core.configuration.impl.command.TextInjectorImpl;
 import org.safehaus.subutai.core.configuration.impl.utils.ConfigBuilder;
 import org.safehaus.subutai.core.configuration.impl.utils.IniParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
 public class PropertiesConfigurationLoader implements ConfigurationLoader
 {
 
-    private static final Logger LOG = Logger.getLogger( PropertiesConfigurationLoader.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PropertiesConfigurationLoader.class.getName() );
     private TextInjector textInjector;
 
 
@@ -65,7 +65,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader
         }
         catch ( ConfigurationException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return null;
     }
@@ -97,7 +97,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader
         }
         catch ( ConfigurationException e )
         {
-            LOG.log( Level.SEVERE, e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
