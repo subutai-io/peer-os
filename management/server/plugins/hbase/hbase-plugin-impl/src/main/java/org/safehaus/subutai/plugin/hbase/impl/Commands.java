@@ -58,7 +58,7 @@ public class Commands extends CommandsSingleton
 
     public static Command getStartCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service hbase start &" ), agents );
+        return createCommand( new RequestBuilder( "service hbase start" ), agents );
     }
 
 
@@ -71,7 +71,7 @@ public class Commands extends CommandsSingleton
 
     public static Command getStopCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service hbase stop &" ), agents );
+        return createCommand( new RequestBuilder( "service hbase stop" ), agents );
     }
 
 

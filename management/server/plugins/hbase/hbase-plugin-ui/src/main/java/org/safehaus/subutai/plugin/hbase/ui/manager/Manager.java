@@ -42,6 +42,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.lang.Enum.valueOf;
+import static org.safehaus.subutai.plugin.hbase.api.HBaseType.HRegionServer;
 
 
 public class Manager
@@ -83,8 +88,11 @@ public class Manager
     private final Tracker tracker;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
-    private final String message = "No cluster is installed !";
-    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final String MESSAGE = "No cluster is installed !";
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final Pattern HMASTER_PATTERN = Pattern.compile( ".*(HMaster.+?g).*" );
+    private final Pattern REGION_PATTERN = Pattern.compile( ".*(HRegionServer.+?g).*" );
+    private final Pattern QUORUM_PATTERN = Pattern.compile( ".*(HQuorumPeer.+?g).*" );
 
 
 
@@ -160,19 +168,16 @@ public class Manager
         checkAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                if( config != null ) {
-                    UUID trackID = hbase.checkCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( executor, tracker, trackID,
-                            HBaseClusterConfig.PRODUCT_KEY );
-                    window.getWindow().addCloseListener( new Window.CloseListener() {
-                        @Override
-                        public void windowClose( Window.CloseEvent closeEvent ) {
-                            refreshClustersInfo();
-                        }
-                    } );
-                    contentRoot.getUI().addWindow( window.getWindow() );
-                } else {
-                    show( "Please, select cluster" );
+                if ( config == null )
+                {
+                    show( MESSAGE );
+                }
+                else
+                {
+                    checkAllNodes( masterTable );
+                    checkAllNodes( regionTable );
+                    checkAllNodes( quorumTable );
+                    checkAllNodes( backUpMasterTable );
                 }
             }
         } );
@@ -273,6 +278,10 @@ public class Manager
         } );
 
         controlsContent.addComponent( destroyClusterBtn );
+
+        PROGRESS_ICON.setVisible( false );
+        controlsContent.addComponent( PROGRESS_ICON );
+
         content.addComponent( controlsContent );
         content.addComponent( masterTable );
         content.addComponent( regionTable );
@@ -281,17 +290,59 @@ public class Manager
     }
 
 
+    public void checkAllNodes( Table table)
+    {
+        if ( table != null )
+        {
+            for ( Object o : table.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = table.getItem( rowId );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
+                    if ( checkBtn != null )
+                    {
+                        checkBtn.click();
+                    }
+                }
+            }
+        }
+    }
+
+
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
     private void refreshUI()
     {
         if ( config != null )
         {
-            populateTable( regionTable, config.getRegionServers(), "Region Server"  );
-            populateTable( quorumTable, config.getQuorumPeers(), "Quorum Peer"  );
-            populateTable( backUpMasterTable, config.getBackupMasters(), "Backup Master");
+            populateTable( regionTable, config.getRegionServers(), HBaseType.HRegionServer );
+            populateTable( quorumTable, config.getQuorumPeers(), HBaseType.HQuorumPeer );
+            populateTable( backUpMasterTable, config.getBackupMasters(), HBaseType.BackupMaster );
 
             Set<Agent> masterSet = new HashSet<>();
             masterSet.add( config.getHbaseMaster() );
-            populateMasterTable( masterTable, masterSet, HBaseType.HMaster );
+            populateMasterTable( masterTable, masterSet );
         }
         else
         {
@@ -303,7 +354,7 @@ public class Manager
     }
 
 
-    private void populateMasterTable( final Table table, Set<Agent> agents, final HBaseType type )
+    private void populateMasterTable( final Table table, Set<Agent> agents )
     {
         table.removeAllItems();
         for ( final Agent agent : agents )
@@ -316,29 +367,65 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             stopBtn.addStyleName( BUTTON_STYLE_NAME );
 
-            final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.addStyleName( BUTTON_STYLE_NAME );
+
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
-            progressIcon.setVisible( false );
+            PROGRESS_ICON.setVisible( false );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.addStyleName( BUTTON_STYLE_NAME );
             availableOperations.setSpacing( true );
 
             availableOperations.addComponent( checkBtn );
-            availableOperations.addComponent( startBtn );
-            availableOperations.addComponent( stopBtn );
-            availableOperations.addComponent( destroyBtn );
+//            availableOperations.addComponent( startBtn );
+//            availableOperations.addComponent( stopBtn );
+
 
             table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), "HMaster", resultHolder, availableOperations
             }, null );
+
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent event )
+                {
+                    PROGRESS_ICON.setVisible( true );
+                    startBtn.setEnabled( false );
+                    stopBtn.setEnabled( false );
+                    checkBtn.setEnabled( false );
+                    executor.execute(
+                            new CheckTask( hbase, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( PROGRESS_ICON )
+                                            {
+
+                                                resultHolder.setValue( parseStatus( result, HMASTER_PATTERN ));
+                                                if ( result.contains( "NOT" ) )
+                                                {
+                                                    startBtn.setEnabled( true );
+                                                    stopBtn.setEnabled( false );
+                                                }
+                                                else
+                                                {
+                                                    startBtn.setEnabled( false );
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                PROGRESS_ICON.setVisible( false );
+                                                checkBtn.setEnabled( true );
+                                            }
+                                        }
+                                    } ) );
+                }
+            } );
         }
     }
 
 
-    private void populateTable( final Table table, Set<Agent> agents, String role )
+    private void populateTable( final Table table, Set<Agent> agents, final HBaseType role )
     {
 
         table.removeAllItems();
@@ -353,24 +440,72 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             stopBtn.addStyleName( BUTTON_STYLE_NAME );
 
-            final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.addStyleName( BUTTON_STYLE_NAME );
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
-            progressIcon.setVisible( false );
+            PROGRESS_ICON.setVisible( false );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.addStyleName( BUTTON_STYLE_NAME );
             availableOperations.setSpacing( true );
 
             availableOperations.addComponent( checkBtn );
-            availableOperations.addComponent( startBtn );
-            availableOperations.addComponent( stopBtn );
-            availableOperations.addComponent( destroyBtn );
+//            availableOperations.addComponent( startBtn );
+//            availableOperations.addComponent( stopBtn );
+
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), role, resultHolder, availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ), role.name(), resultHolder, availableOperations
             }, null );
+
+
+            checkBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent event )
+                {
+                    PROGRESS_ICON.setVisible( true );
+                    startBtn.setEnabled( false );
+                    stopBtn.setEnabled( false );
+                    checkBtn.setEnabled( false );
+                    executor.execute(
+                            new CheckTask( hbase, tracker, config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent()
+                                    {
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( PROGRESS_ICON )
+                                            {
+                                                String status = "UNKNOWN";
+                                                switch( role ) {
+                                                    case HRegionServer:
+                                                        status = parseStatus( result, REGION_PATTERN );
+                                                        break;
+                                                    case HQuorumPeer:
+                                                        status = parseStatus( result, QUORUM_PATTERN );
+                                                        break;
+                                                    case BackupMaster:
+                                                        status = parseStatus( result, HMASTER_PATTERN );
+                                                        break;
+                                                }
+                                                resultHolder.setValue( status );
+                                                if ( result.contains( "NOT" ) )
+                                                {
+                                                    startBtn.setEnabled( true );
+                                                    stopBtn.setEnabled( false );
+                                                }
+                                                else
+                                                {
+                                                    startBtn.setEnabled( false );
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                PROGRESS_ICON.setVisible( false );
+                                                checkBtn.setEnabled( true );
+                                            }
+                                        }
+                                    } ) );
+                }
+            } );
+
         }
     }
 
@@ -403,6 +538,17 @@ public class Manager
                 clusterCombo.setValue( clusters.iterator().next() );
             }
         }
+    }
+
+    private String parseStatus( String result, Pattern pattern)
+    {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher masterMatcher = pattern.matcher( result );
+        if ( masterMatcher.find() )
+        {
+            parsedResult.append( masterMatcher.group( 1 ) ).append( " " );
+        }
+        return parsedResult.toString();
     }
 
 

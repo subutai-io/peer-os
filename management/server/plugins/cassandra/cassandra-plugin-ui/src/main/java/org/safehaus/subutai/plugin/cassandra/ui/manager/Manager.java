@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
@@ -46,22 +47,6 @@ import com.vaadin.ui.Window;
 
 public class Manager
 {
-
-    private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
-    private final Table nodesTable;
-    private GridLayout contentRoot;
-    private ComboBox clusterCombo;
-    private CassandraClusterConfig config;
-
-    private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private static final String message = "No cluster is installed !";
-
-    private final ExecutorService executorService;
-    private final Tracker tracker;
-    private final AgentManager agentManager;
-    private final Cassandra cassandra;
-    private final CommandRunner commandRunner;
-
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
     protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
@@ -77,6 +62,22 @@ public class Manager
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String ADD_NODE_CAPTION = "Add Node";
+
+    private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private static final String MESSAGE = "No cluster is installed !";
+
+
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final AgentManager agentManager;
+    private final Cassandra cassandra;
+    private final CommandRunner commandRunner;
+    private final Table nodesTable;
+    private GridLayout contentRoot;
+    private ComboBox clusterCombo;
+    private CassandraClusterConfig config;
+
+
 
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
 
@@ -153,7 +154,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -174,7 +175,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -195,7 +196,7 @@ public class Manager
             {
                 if ( config == null )
                 {
-                    show( message );
+                    show( MESSAGE );
                 }
                 else
                 {
@@ -253,8 +254,8 @@ public class Manager
         } );
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
-        progressIcon.setVisible( false );
-        controlsContent.addComponent( progressIcon );
+        PROGRESS_ICON.setVisible( false );
+        controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
@@ -368,7 +369,7 @@ public class Manager
 
             startButton.setEnabled( false );
             stopButton.setEnabled( false );
-            progressIcon.setVisible( false );
+            PROGRESS_ICON.setVisible( false );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.addStyleName( "default" );
@@ -389,7 +390,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent event )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
@@ -399,7 +400,7 @@ public class Manager
                                     {
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 resultHolder.setValue( result );
                                                 if ( result.contains( "not" ) )
@@ -412,7 +413,7 @@ public class Manager
                                                     startButton.setEnabled( false );
                                                     stopButton.setEnabled( true );
                                                 }
-                                                progressIcon.setVisible( false );
+                                                PROGRESS_ICON.setVisible( false );
                                                 checkButton.setEnabled( true );
                                             }
                                         }
@@ -425,7 +426,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
@@ -436,7 +437,7 @@ public class Manager
                                         @Override
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 checkButton.setEnabled( true );
                                                 checkButton.click();
@@ -451,7 +452,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    progressIcon.setVisible( true );
+                    PROGRESS_ICON.setVisible( true );
                     startButton.setEnabled( false );
                     stopButton.setEnabled( false );
                     checkButton.setEnabled( false );
@@ -462,7 +463,7 @@ public class Manager
                                         @Override
                                         public void onComplete( String result )
                                         {
-                                            synchronized ( progressIcon )
+                                            synchronized ( PROGRESS_ICON )
                                             {
                                                 checkButton.setEnabled( true );
                                                 checkButton.click();
@@ -479,7 +480,7 @@ public class Manager
     {
         for ( Agent agent : config.getNodes() )
         {
-            progressIcon.setVisible( true );
+            PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
@@ -487,7 +488,7 @@ public class Manager
                         @Override
                         public void onComplete( String result )
                         {
-                            synchronized ( progressIcon )
+                            synchronized ( PROGRESS_ICON )
                             {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();
@@ -502,7 +503,7 @@ public class Manager
     {
         for ( Agent agent : config.getNodes() )
         {
-            progressIcon.setVisible( true );
+            PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
@@ -510,7 +511,7 @@ public class Manager
                         @Override
                         public void onComplete( String result )
                         {
-                            synchronized ( progressIcon )
+                            synchronized ( PROGRESS_ICON )
                             {
                                 disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();

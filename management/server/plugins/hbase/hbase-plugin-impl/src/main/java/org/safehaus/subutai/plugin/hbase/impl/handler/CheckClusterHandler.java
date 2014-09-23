@@ -13,9 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
