@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.NumUtil;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -158,8 +159,10 @@ public class RequestBuilder
      */
     public RequestBuilder withTimeout( int timeout )
     {
-        Preconditions.checkArgument( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC,
-                String.format( "Timeout is not in range 1 to %s", Common.MAX_COMMAND_TIMEOUT_SEC ) );
+        Preconditions.checkArgument(
+                NumUtil.isNumBetween( timeout, Common.MIN_COMMAND_TIMEOUT_SEC, Common.MAX_COMMAND_TIMEOUT_SEC ),
+                String.format( "Timeout is not in range %d to %d", Common.MIN_COMMAND_TIMEOUT_SEC,
+                        Common.MAX_COMMAND_TIMEOUT_SEC ) );
 
         this.timeout = timeout;
 
