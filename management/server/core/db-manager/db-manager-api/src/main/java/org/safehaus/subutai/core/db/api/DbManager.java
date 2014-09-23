@@ -24,6 +24,8 @@ public interface DbManager
      * @param values - bind parameters
      *
      * @return - resultset
+     *
+     * @deprecated - use executeQuery2 instead
      */
     @Deprecated
     public ResultSet executeQuery( String cql, Object... values );
@@ -35,6 +37,8 @@ public interface DbManager
      * @param values - bind parameters
      *
      * @return true if all went well and false if exception was raised
+     *
+     * @deprecated - use executeUpdate2 instead
      */
     @Deprecated
     public boolean executeUpdate( String cql, Object... values );
@@ -47,10 +51,15 @@ public interface DbManager
      * @param info - custom object
      *
      * @return true if all went well and false if exception was raised
+     *
+     * @deprecated - use PluginDAO instead
      */
     @Deprecated
     public boolean saveInfo( String source, String key, Object info );
 
+    /**
+     * @deprecated - use DAO instead
+     */
     @Deprecated
     public boolean saveEnvironmentInfo( String source, String key, Object info );
 
@@ -62,10 +71,15 @@ public interface DbManager
      * @param clazz - class of POJO
      *
      * @return - POJO
+     *
+     * @deprecated - use Plugin DAO instead
      */
     @Deprecated
     public <T> T getInfo( String source, String key, Class<T> clazz );
 
+    /**
+     * @deprecated - use DAO instead
+     */
     @Deprecated
     public <T> T getEnvironmentInfo( String source, String key, Class<T> clazz );
 
@@ -76,10 +90,15 @@ public interface DbManager
      * @param clazz - class of POJO
      *
      * @return - list of POJOs
+     *
+     * @deprecated - use Plugin DAO instead
      */
     @Deprecated
     public <T> List<T> getInfo( String source, Class<T> clazz );
 
+    /**
+     * @deprecated - use DAO instead
+     */
     @Deprecated
     public <T> List<T> getEnvironmentInfo( String source, Class<T> clazz );
 
@@ -90,6 +109,8 @@ public interface DbManager
      * @param key - POJO key
      *
      * @return true if all went well and false if exception was raised
+     *
+     * @deprecated - use Plugin DAO instead
      */
     @Deprecated
     public boolean deleteInfo( String source, String key );
@@ -98,9 +119,15 @@ public interface DbManager
 
     public void executeUpdate2( String cql, Object... values ) throws DBException;
 
+    /**
+     * @deprecated - use Plugin DAO instead
+     */
     @Deprecated
     public void saveInfo2( String source, String key, Object info ) throws DBException;
 
+    /**
+     * @deprecated - use Plugin DAO instead
+     */
     @Deprecated
     public void deleteInfo2( String source, String key ) throws DBException;
 }

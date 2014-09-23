@@ -50,7 +50,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
@@ -85,11 +85,11 @@ public class EnvironmentDAO
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         catch ( DBException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return list;
     }
@@ -128,11 +128,11 @@ public class EnvironmentDAO
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         catch ( DBException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return null;
     }
@@ -157,7 +157,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }

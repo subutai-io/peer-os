@@ -7,6 +7,7 @@ package org.safehaus.subutai.core.db.impl;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -302,15 +303,10 @@ public class DbManagerImpl implements DbManager
         {
 
             ResultSet rs = executeQuery( "select info from product_info where source = ? and key = ?", source, key );
-            if ( rs != null )
+            List<T> list = getListFromResultSet( rs, clazz );
+            if ( !list.isEmpty() )
             {
-                Row row = rs.one();
-                if ( row != null )
-                {
-
-                    String info = row.getString( "info" );
-                    return GSON.fromJson( info, clazz );
-                }
+                return list.iterator().next();
             }
         }
         catch ( JsonSyntaxException ex )
@@ -328,15 +324,10 @@ public class DbManagerImpl implements DbManager
 
             ResultSet rs =
                     executeQuery( "select info from environment_info where source = ? and key = ?", source, key );
-            if ( rs != null )
+            List<T> list = getListFromResultSet( rs, clazz );
+            if ( !list.isEmpty() )
             {
-                Row row = rs.one();
-                if ( row != null )
-                {
-
-                    String info = row.getString( "info" );
-                    return GSON.fromJson( info, clazz );
-                }
+                return list.iterator().next();
             }
         }
         catch ( JsonSyntaxException ex )
@@ -357,45 +348,44 @@ public class DbManagerImpl implements DbManager
      */
     public <T> List<T> getInfo( String source, Class<T> clazz )
     {
-        List<T> list = new ArrayList<>();
         try
         {
             ResultSet rs = executeQuery( "select info from product_info where source = ?", source );
-            if ( rs != null )
-            {
-                for ( Row row : rs )
-                {
-                    String info = row.getString( "info" );
-                    list.add( GSON.fromJson( info, clazz ) );
-                }
-            }
+            return getListFromResultSet( rs, clazz );
         }
         catch ( JsonSyntaxException ex )
         {
             LOG.error( "Error in List<T> getInfo", ex );
         }
-        return list;
+        return Collections.emptyList();
     }
 
 
     public <T> List<T> getEnvironmentInfo( String source, Class<T> clazz )
     {
-        List<T> list = new ArrayList<>();
         try
         {
             ResultSet rs = executeQuery( "select info from environment_info where source = ?", source );
-            if ( rs != null )
-            {
-                for ( Row row : rs )
-                {
-                    String info = row.getString( "info" );
-                    list.add( GSON.fromJson( info, clazz ) );
-                }
-            }
+            return getListFromResultSet( rs, clazz );
         }
         catch ( JsonSyntaxException ex )
         {
             LOG.error( "Error in List<T> getInfo", ex );
+        }
+        return Collections.emptyList();
+    }
+
+
+    private <T> List<T> getListFromResultSet( ResultSet rs, Class<T> clazz )
+    {
+        List<T> list = new ArrayList<>();
+        if ( rs != null )
+        {
+            for ( Row row : rs )
+            {
+                String info = row.getString( "info" );
+                list.add( GSON.fromJson( info, clazz ) );
+            }
         }
         return list;
     }

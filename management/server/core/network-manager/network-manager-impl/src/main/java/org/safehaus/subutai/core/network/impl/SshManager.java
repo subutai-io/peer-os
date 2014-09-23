@@ -36,7 +36,11 @@ public class SshManager
 
     public boolean execute()
     {
-        return agentList != null && !agentList.isEmpty() && create() && read() && write() && config();
+        if ( agentList != null && !agentList.isEmpty() )
+        {
+            return create() && read() && write() && config();
+        }
+        return false;
     }
 
 
@@ -49,7 +53,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();
@@ -65,7 +69,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
         }
 
         StringBuilder value = new StringBuilder();
@@ -112,7 +116,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
         }
 
 

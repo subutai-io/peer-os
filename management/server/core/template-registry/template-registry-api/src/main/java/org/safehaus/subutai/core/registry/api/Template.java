@@ -234,16 +234,7 @@ public class Template
 
         final Template template = ( Template ) o;
 
-        if ( !lxcArch.equals( template.lxcArch ) )
-        {
-            return false;
-        }
-        if ( !templateName.equals( template.templateName ) )
-        {
-            return false;
-        }
-
-        return true;
+        return lxcArch.equals( template.lxcArch ) && templateName.equals( template.templateName );
     }
 
 
