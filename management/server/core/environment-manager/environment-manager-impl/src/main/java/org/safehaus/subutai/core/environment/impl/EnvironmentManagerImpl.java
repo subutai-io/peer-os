@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommand;
@@ -326,21 +327,34 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
     {
+
+
+        Environment environment = new Environment( "environment", environmentBuildProcess.getUuid() );
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 
-            LOG.info( "buildEnvironment called" );
             PeerCommand peerCommand = new PeerCommand( PeerCommandType.CLONE, ccm );
             try
             {
-                LOG.info( "invoke called" );
                 boolean result = peerCommandDispatcher.invoke( peerCommand );
-                LOG.info( "RESULT OF CLONE OPERATION " + result );
+                if ( result )
+                {
+                    LOG.info( "Clone commad executed successfully" );
+
+                    EnvironmentContainer container = new EnvironmentContainer();
+                    container.setPeerId( ccm.getPeerId() );
+                    //                    container.setAgentId(  );
+                    //                    container.setHostname(  );
+                    container.setDescription( ccm.getTemplate() );
+                    container.setName( ccm.getTemplate() );
+                    environment.addContainer( container );
+                }
             }
             catch ( PeerCommandException e )
             {
                 LOG.error( e.getMessage() );
             }
+            saveEnvironment( environment );
         }
     }
 

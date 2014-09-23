@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
@@ -49,24 +51,8 @@ public class EnvironmentsForm
             }
         } );
 
-        Button addEnvironmentButton = new Button( "Add" );
-        addEnvironmentButton.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent clickEvent )
-            {
-                String siteId = managerUI.getPeerManager().getSiteId().toString();
-                Environment environment = new Environment( "environment", siteId );
-                environment.addContainer( "Container 1" );
-                environment.addContainer( "Container 2" );
-                environment.addContainer( "Container 3" );
-                managerUI.getEnvironmentManager().saveEnvironment( environment );
-            }
-        } );
-
 
         contentRoot.addComponent( getEnvironmentsButton );
-        contentRoot.addComponent( addEnvironmentButton );
         contentRoot.addComponent( environmentsTable );
     }
 
@@ -119,12 +105,12 @@ public class EnvironmentsForm
                     containersTable.setSizeFull();
 
 
-                    Set<String> containers = environment.getContainers();
-                    for ( String container : containers )
+                    Set<EnvironmentContainer> containers = environment.getContainers();
+                    for ( Container container : containers )
                     {
 
                         containersTable.addItem( new Object[] {
-                                container, new Button( "Destroy" )
+                                container.getName(), new Button( "Destroy" )
                         }, null );
                     }
 

@@ -15,11 +15,12 @@ import com.google.gson.GsonBuilder;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsBuildProcessForm
 {
 
@@ -75,124 +76,131 @@ public class EnvironmentsBuildProcessForm
         environmentsTable.removeAllItems();
         List<EnvironmentBuildProcess> environmentBuildProcessList =
                 managerUI.getEnvironmentManager().getBuildProcesses();
-        for ( final EnvironmentBuildProcess environmentBuildProcess : environmentBuildProcessList )
+        if ( !environmentBuildProcessList.isEmpty() )
         {
-            Button viewEnvironmentInfoButton = new Button( "Info" );
-            viewEnvironmentInfoButton.addClickListener( new Button.ClickListener()
+            for ( final EnvironmentBuildProcess environmentBuildProcess : environmentBuildProcessList )
             {
-                @Override
-                public void buttonClick( final Button.ClickEvent clickEvent )
+                Button viewEnvironmentInfoButton = new Button( "Info" );
+                viewEnvironmentInfoButton.addClickListener( new Button.ClickListener()
                 {
-                    EnvironmentBuildProcessDetails detailsWindow =
-                            new EnvironmentBuildProcessDetails( "Environment details" );
-                    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-                    String json = gson.toJson( environmentBuildProcess, EnvironmentBuildProcess.class );
-                    detailsWindow.setContent( json );
-                    contentRoot.getUI().addWindow( detailsWindow );
-                    detailsWindow.setVisible( true );
-                }
-            } );
-
-            Button processButton = null;
-            Embedded progressIcon = null;
-            Button destroyButton = null;
-
-            switch ( environmentBuildProcess.getProcessStatusEnum() )
-            {
-                case NEW_PROCESS:
-                {
-                    processButton = new Button( "Build" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-                    progressIcon.setVisible( false );
-                    processButton.addClickListener( new Button.ClickListener()
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        @Override
-                        public void buttonClick( final Button.ClickEvent clickEvent )
+                        EnvironmentBuildProcessDetails detailsWindow =
+                                new EnvironmentBuildProcessDetails( "Environment details" );
+                        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+                        String json = gson.toJson( environmentBuildProcess, EnvironmentBuildProcess.class );
+                        detailsWindow.setContent( json );
+                        contentRoot.getUI().addWindow( detailsWindow );
+                        detailsWindow.setVisible( true );
+                    }
+                } );
+
+                Button processButton = null;
+                Embedded progressIcon = null;
+                Button destroyButton = null;
+
+                switch ( environmentBuildProcess.getProcessStatusEnum() )
+                {
+                    case NEW_PROCESS:
+                    {
+                        processButton = new Button( "Build" );
+                        progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                        progressIcon.setVisible( false );
+                        processButton.addClickListener( new Button.ClickListener()
                         {
-                            // TODO create build task
-                            try
+                            @Override
+                            public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                LOG.info( "Build button clicked" );
-                                managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
+                                // TODO create build task
+                                try
+                                {
+                                    LOG.info( "Build button clicked" );
+                                    managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
+                                }
+                                catch ( NullPointerException e )
+                                {
+                                    LOG.error( e.getMessage() );
+                                }
                             }
-                            catch ( NullPointerException e )
+                        } );
+
+                        destroyButton = new Button( "Destroy" );
+                        destroyButton.addClickListener( new Button.ClickListener()
+                        {
+                            @Override
+                            public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                LOG.error( e.getMessage() );
+                                managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
                             }
-                        }
-                    } );
+                        } );
 
-                    destroyButton = new Button( "Destroy" );
-                    destroyButton.addClickListener( new Button.ClickListener()
+                        break;
+                    }
+                    case IN_PROGRESS:
                     {
-                        @Override
-                        public void buttonClick( final Button.ClickEvent clickEvent )
+                        processButton = new Button( "Terminate" );
+                        progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                        progressIcon.setVisible( true );
+                        processButton.addClickListener( new Button.ClickListener()
                         {
-                            managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
-                        }
-                    } );
+                            @Override
+                            public void buttonClick( final Button.ClickEvent clickEvent )
+                            {
+                                // TODO create terminate task
 
-                    break;
-                }
-                case IN_PROGRESS:
-                {
-                    processButton = new Button( "Terminate" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-                    progressIcon.setVisible( true );
-                    processButton.addClickListener( new Button.ClickListener()
+                            }
+                        } );
+                        break;
+                    }
+                    case FAILED:
                     {
-                        @Override
-                        public void buttonClick( final Button.ClickEvent clickEvent )
+                        processButton = new Button( "Destroy" );
+                        progressIcon = new Embedded( "", new ThemeResource( "img/cancel.png" ) );
+                        progressIcon.setVisible( true );
+                        processButton.addClickListener( new Button.ClickListener()
                         {
-                            // TODO create terminate task
+                            @Override
+                            public void buttonClick( final Button.ClickEvent clickEvent )
+                            {
+                                // TODO create destroy task
 
-                        }
-                    } );
-                    break;
-                }
-                case FAILED:
-                {
-                    processButton = new Button( "Destroy" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/cancel.png" ) );
-                    progressIcon.setVisible( true );
-                    processButton.addClickListener( new Button.ClickListener()
+                            }
+                        } );
+                        break;
+                    }
+                    case SUCCESSFUL:
                     {
-                        @Override
-                        public void buttonClick( final Button.ClickEvent clickEvent )
+                        processButton = new Button( "Configure" );
+                        progressIcon = new Embedded( "", new ThemeResource( "img/ok.png" ) );
+                        progressIcon.setVisible( true );
+                        processButton.addClickListener( new Button.ClickListener()
                         {
-                            // TODO create destroy task
+                            @Override
+                            public void buttonClick( final Button.ClickEvent clickEvent )
+                            {
+                                // TODO create configure logic
 
-                        }
-                    } );
-                    break;
-                }
-                case SUCCESSFUL:
-                {
-                    processButton = new Button( "Configure" );
-                    progressIcon = new Embedded( "", new ThemeResource( "img/ok.png" ) );
-                    progressIcon.setVisible( true );
-                    processButton.addClickListener( new Button.ClickListener()
+                            }
+                        } );
+                        break;
+                    }
+                    default:
                     {
-                        @Override
-                        public void buttonClick( final Button.ClickEvent clickEvent )
-                        {
-                            // TODO create configure logic
+                        break;
+                    }
+                }
 
-                        }
-                    } );
-                    break;
-                }
-                default:
-                {
-                    break;
-                }
+
+                environmentsTable.addItem( new Object[] {
+                        environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
+                        destroyButton
+                }, null );
             }
-
-
-            environmentsTable.addItem( new Object[] {
-                    environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
-                    destroyButton
-            }, null );
+        }
+        else
+        {
+            Notification.show( "No build process tasks", Notification.Type.HUMANIZED_MESSAGE );
         }
         environmentsTable.refreshRowCache();
     }

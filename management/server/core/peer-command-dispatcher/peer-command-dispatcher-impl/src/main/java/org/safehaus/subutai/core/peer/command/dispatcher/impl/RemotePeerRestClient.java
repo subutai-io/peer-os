@@ -12,6 +12,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 
 /**
@@ -58,9 +59,14 @@ public class RemotePeerRestClient
             Response response = client.path( path ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
                                       .post( ccmString );
 
-            LOG.info( response.toString() );
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+//                JsonObject jsonObject = ( JsonObject ) response.;
 
-            return true;
+                LOG.info( response.toString() );
+                return true;
+            }
+            return false;
         }
         catch ( Exception e )
         {
