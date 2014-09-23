@@ -32,6 +32,7 @@ public class RestServiceImpl implements RestService
 
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
+    private static final String EXCEPTION_HEADER = "exception";
     private static final String TEMPLATE_PARENT_DELIMITER = " ";
     private static final String TEMPLATES_DELIMITER = "\n";
 
@@ -75,7 +76,7 @@ public class RestServiceImpl implements RestService
         catch ( IOException | RegistryException | RuntimeException e )
         {
             LOG.error( "Error in registerTemplate", e );
-            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).header( EXCEPTION_HEADER, e.getMessage() ).build();
         }
     }
 
@@ -93,7 +94,7 @@ public class RestServiceImpl implements RestService
         catch ( RegistryException | RuntimeException e )
         {
             LOG.error( "Error in unregisterTemplate", e );
-            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).header( EXCEPTION_HEADER, e.getMessage() ).build();
         }
     }
 
@@ -218,7 +219,7 @@ public class RestServiceImpl implements RestService
         catch ( RegistryException e )
         {
             LOG.error( "Error in isTemplateInUse", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).header( "exception", e.getMessage() )
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).header( EXCEPTION_HEADER, e.getMessage() )
                            .build();
         }
     }
@@ -237,7 +238,7 @@ public class RestServiceImpl implements RestService
         catch ( RegistryException e )
         {
             LOG.error( "Error in setTemplateInUse", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).header( "exception", e.getMessage() )
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).header( EXCEPTION_HEADER, e.getMessage() )
                            .build();
         }
     }
