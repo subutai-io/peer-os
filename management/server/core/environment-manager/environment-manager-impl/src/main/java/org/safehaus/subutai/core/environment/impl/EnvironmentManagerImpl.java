@@ -354,6 +354,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             catch ( PeerCommandException e )
             {
                 LOG.error( e.getMessage(), e );
+                throw e;
             }
             saveEnvironment( environment );
         }
