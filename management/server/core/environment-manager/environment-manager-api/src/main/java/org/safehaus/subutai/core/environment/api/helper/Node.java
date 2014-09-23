@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.environment.api.helper;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.registry.api.Template;
 
 
 /**

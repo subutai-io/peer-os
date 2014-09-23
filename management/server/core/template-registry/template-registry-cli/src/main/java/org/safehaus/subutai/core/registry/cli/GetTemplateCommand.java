@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
-import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import org.apache.karaf.shell.commands.Argument;

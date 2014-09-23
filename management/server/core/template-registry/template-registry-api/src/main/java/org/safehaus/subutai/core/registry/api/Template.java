@@ -1,4 +1,4 @@
-package org.safehaus.subutai.common.protocol;
+package org.safehaus.subutai.core.registry.api;
 
 
 import java.util.ArrayList;
