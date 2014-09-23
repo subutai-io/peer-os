@@ -48,10 +48,11 @@ public class RemotePeerRestClient
     public boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
     {
         String path = "peer/containers";
-        LOG.info( "create remote container called" );
         try
         {
-            WebClient client = WebClient.create( String.format( baseUrl, ip, port ) );
+            baseUrl = String.format( baseUrl, ip, port );
+            LOG.info( baseUrl );
+            WebClient client = WebClient.create( baseUrl );
             String ccmString = GSON.toJson( ccm, CloneContainersMessage.class );
 
             Response response = client.path( path ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
