@@ -39,7 +39,7 @@ public class NewConfigManagerImpl implements ConfigManager
     public void setProperty( final JsonObject config, final String key, final String value,
                              final ConfigTypeEnum configTypeEnum )
     {
-
+        // TODO describe method
     }
 
 

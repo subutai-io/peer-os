@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.configpointtracker.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.safehaus.subutai.core.configpointtracker.api.ConfigPointTracker;
@@ -12,7 +13,7 @@ public class ConfigPointTrackerImpl implements ConfigPointTracker
 {
 
     // <templateName, configPoints>
-    private final HashMap<String, Set<String>> configPoints = new HashMap<>();
+    private final Map<String, Set<String>> configPoints = new HashMap<>();
 
 
     @Override

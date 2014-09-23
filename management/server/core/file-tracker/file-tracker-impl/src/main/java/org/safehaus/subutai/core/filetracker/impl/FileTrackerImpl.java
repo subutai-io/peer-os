@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.filetracker.impl;
 
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -20,7 +21,7 @@ import com.google.common.collect.Sets;
 public class FileTrackerImpl implements FileTracker, ResponseListener
 {
 
-    private final HashSet<ResponseListener> listeners = new HashSet<>();
+    private final Set<ResponseListener> listeners = new HashSet<>();
 
     private CommandRunner commandRunner;
 
@@ -66,7 +67,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
 
     @Override
-    public void createConfigPoints( Agent agent, String configPoints[] )
+    public void createConfigPoints( Agent agent, String[] configPoints )
     {
 
         Command command = commandRunner.createCommand(
@@ -78,7 +79,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
 
     @Override
-    public void removeConfigPoints( Agent agent, String configPoints[] )
+    public void removeConfigPoints( Agent agent, String[] configPoints )
     {
 
         Command command = commandRunner.createCommand(
@@ -99,7 +100,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
         commandRunner.runCommandAsync( command );
 
-        return null;
+        return new String[] { };
     }
 
 
