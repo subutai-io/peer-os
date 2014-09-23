@@ -36,7 +36,11 @@ public class SshManager
 
     public boolean execute()
     {
-        return agentList != null && !agentList.isEmpty() && create() && read() && write() && config();
+        if ( agentList != null && !agentList.isEmpty() )
+        {
+            return create() && read() && write() && config();
+        }
+        return false;
     }
 
 

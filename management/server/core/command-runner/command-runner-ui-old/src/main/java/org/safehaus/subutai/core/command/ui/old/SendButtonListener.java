@@ -103,11 +103,11 @@ public class SendButtonListener implements Button.ClickListener
         {
             requestBuilder.withCwd( form.workDirTxtFld.getValue() );
         }
-        final Command command = commandDispatcher.createCommand( requestBuilder, agents );
         form.indicator.setVisible( true );
-        form.taskCount.incrementAndGet();
 
-        executor.execute( new ExecuteCommandTask( command, agentManager, form ) );
+        executor.execute(
+                new ExecuteCommandTask( commandDispatcher.createCommand( requestBuilder, agents ), agentManager,
+                        form ) );
     }
 
 
@@ -124,6 +124,7 @@ public class SendButtonListener implements Button.ClickListener
             this.command = command;
             this.agentManager = agentManager;
             this.form = form;
+            form.taskCount.incrementAndGet();
         }
 
 

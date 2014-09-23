@@ -15,6 +15,11 @@ import com.vaadin.ui.PopupDateField;
 public class UIUtil
 {
 
+    private UIUtil()
+    {
+    }
+
+
     public static ComboBox getComboBox( String label, String... values )
     {
 
