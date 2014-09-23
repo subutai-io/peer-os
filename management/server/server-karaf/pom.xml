@@ -528,6 +528,10 @@
                   <groupId>org.slf4j</groupId>
                   <artifactId>slf4j-simple</artifactId>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>slf4j-api</artifactId>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
