@@ -120,7 +120,7 @@ public class EnvironmentsBuildProcessForm
                                 }
                                 catch ( NullPointerException e )
                                 {
-                                    LOG.error( e.getMessage() );
+                                    LOG.error( e.getMessage(), e );
                                 }
                             }
                         } );
