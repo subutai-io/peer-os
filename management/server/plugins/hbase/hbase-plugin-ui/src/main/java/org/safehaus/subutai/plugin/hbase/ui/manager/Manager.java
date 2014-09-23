@@ -443,7 +443,6 @@ public class Manager
 
     private String findNodeRoles( Agent node )
     {
-
         StringBuilder sb = new StringBuilder();
         if ( config.getHbaseMaster() == node )
         {
@@ -461,8 +460,10 @@ public class Manager
         {
             sb.append( HBaseType.BackupMaster.name() ).append( ", " );
         }
-
-        return sb.toString().substring( 0, ( sb.length() - 2 ) );
+        if ( sb.length() > 0 ){
+            return sb.toString().substring( 0, ( sb.length() - 2 ) );
+        }
+        return null;
     }
 
 
