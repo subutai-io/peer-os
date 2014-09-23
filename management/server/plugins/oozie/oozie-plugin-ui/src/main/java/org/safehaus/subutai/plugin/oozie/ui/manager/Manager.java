@@ -282,7 +282,7 @@ public class Manager
         List<OozieClusterConfig> info = oozieUI.getOozieManager().getClusters();
         OozieClusterConfig clusterInfo = ( OozieClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( info != null && info.size() > 0 )
+        if ( info != null && !info.isEmpty() )
         {
             for ( OozieClusterConfig oozieConfig : info )
             {

@@ -49,7 +49,7 @@ public class ListClustersCommand extends OsgiCommandSupport
     protected Object doExecute()
     {
         List<CassandraClusterConfig> list = cassandraManager.getClusters();
-        if ( list.size() > 0 )
+        if ( !list.isEmpty() )
         {
             StringBuilder sb = new StringBuilder();
 

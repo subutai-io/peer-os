@@ -57,7 +57,7 @@ public class ConfigurationStep extends VerticalLayout
         hadoopClusters.setNullSelectionAllowed( false );
 
         List<HadoopClusterConfig> clusters = wizard.gethBaseUI().getHadoopManager().getClusters();
-        if ( clusters.size() > 0 )
+        if ( !clusters.isEmpty() )
         {
             for ( HadoopClusterConfig config : clusters )
             {
@@ -73,7 +73,7 @@ public class ConfigurationStep extends VerticalLayout
         {
             hadoopClusters.setValue( info );
         }
-        else if ( clusters.size() > 0 )
+        else if ( !clusters.isEmpty() )
         {
             hadoopClusters.setValue( clusters.iterator().next() );
         }
@@ -113,7 +113,6 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        //        select.setItemCaptionPropertyId( "hostname" );
         select.setRows( 7 );
         select.setNullSelectionAllowed( false );
         select.setMultiSelect( true );

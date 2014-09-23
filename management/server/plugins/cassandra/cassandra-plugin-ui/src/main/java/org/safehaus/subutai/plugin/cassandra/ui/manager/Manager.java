@@ -604,7 +604,7 @@ public class Manager
         List<CassandraClusterConfig> info = cassandra.getClusters();
         CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( info != null && info.size() > 0 )
+        if ( info != null && !info.isEmpty() )
         {
             for ( CassandraClusterConfig cassandraInfo : info )
             {
