@@ -255,7 +255,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( EnvironmentDestroyException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
@@ -276,7 +276,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
@@ -352,7 +352,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             catch ( PeerCommandException e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
             saveEnvironment( environment );
         }
@@ -426,7 +426,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             catch ( EnvironmentBuildException e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
         }
         return false;
