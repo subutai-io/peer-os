@@ -104,14 +104,13 @@ public class SendButtonListener implements Button.ClickListener
 
     private boolean checkRequest( RequestBuilder requestBuilder )
     {
-        if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
+        if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && !(
+                StringUtil.isNumeric( form.programTxtFld.getValue() )
+                        && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
         {
-            if ( !( StringUtil.isNumeric( form.programTxtFld.getValue() )
-                    && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
-            {
-                form.show( "Please, enter numeric PID greater than 0 to kill" );
-                return false;
-            }
+
+            form.show( "Please, enter numeric PID greater than 0 to kill" );
+            return false;
         }
 
         if ( !( StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) && NumUtil
