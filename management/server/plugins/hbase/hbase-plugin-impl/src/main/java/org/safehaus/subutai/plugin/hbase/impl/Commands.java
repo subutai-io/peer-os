@@ -58,20 +58,13 @@ public class Commands extends CommandsSingleton
 
     public static Command getStartCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service hbase start" ), agents );
+        return createCommand( new RequestBuilder( "service hbase start &" ), agents );
     }
-
-
-    public static Command getStartCluster( Agent hmaster )
-    {
-        return createCommand( new RequestBuilder( "service hbase start &" ), Sets.newHashSet( hmaster ) );
-    }
-
 
 
     public static Command getStopCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service hbase stop" ), agents );
+        return createCommand( new RequestBuilder( "service hbase stop" ).withTimeout( 360 ), agents );
     }
 
 

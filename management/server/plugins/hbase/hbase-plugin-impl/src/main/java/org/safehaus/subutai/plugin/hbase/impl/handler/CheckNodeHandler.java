@@ -21,7 +21,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
-                String.format( "Checking %s cluster...", clusterName ) );
+                String.format( "Checking %s cluster node %s ...", clusterName, lxcHostname ) );
     }
 
 
@@ -39,7 +39,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
+            productOperation.addLogFailed( String.format( "Agent is not connected !" ) );
             return;
         }
 

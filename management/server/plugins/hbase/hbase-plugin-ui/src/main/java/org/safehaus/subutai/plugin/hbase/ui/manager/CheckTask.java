@@ -57,7 +57,7 @@ public class CheckTask implements Runnable
                 break;
             }
 
-            if ( System.currentTimeMillis() - start > 30 * 1000 )
+            if ( System.currentTimeMillis() - start > 60 * 1000 )
             {
                 break;
             }

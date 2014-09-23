@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -113,7 +114,7 @@ public class SetupHelper
     {
         po.addLog( "Starting cluster..." );
 
-        Command cmd = Commands.getStartCluster( config.getHbaseMaster() );
+        Command cmd = Commands.getStartCommand( Sets.newHashSet( config.getHbaseMaster() ));
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

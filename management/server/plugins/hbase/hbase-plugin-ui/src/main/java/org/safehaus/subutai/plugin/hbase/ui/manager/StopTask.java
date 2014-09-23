@@ -57,7 +57,7 @@ public class StopTask implements Runnable
             {
                 break;
             }
-            if ( System.currentTimeMillis() - start > 30 * 1000 )
+            if ( System.currentTimeMillis() - start > 120 * 1000 )
             {
                 break;
             }

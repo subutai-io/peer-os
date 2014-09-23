@@ -32,7 +32,6 @@ public class StartTask implements Runnable
     @Override
     public void run()
     {
-
         UUID trackID = hbase.startCluster( clusterName );
 
         long start = System.currentTimeMillis();
@@ -44,6 +43,12 @@ public class StartTask implements Runnable
             {
                 if ( po.getState() != ProductOperationState.RUNNING )
                 {
+                    /** Since start command does not return, we have wait here some time to update status columns of nodes correctly  */
+                    try {
+                        Thread.sleep( 10000 );
+                    } catch( InterruptedException e ) {
+                        e.printStackTrace();
+                    }
                     completeEvent.onComplete( po.getLog() );
                     break;
                 }
@@ -57,7 +62,7 @@ public class StartTask implements Runnable
             {
                 break;
             }
-            if ( System.currentTimeMillis() - start > 60 * 1000 )
+            if ( System.currentTimeMillis() - start > 120 * 1000 )
             {
                 break;
             }

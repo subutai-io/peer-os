@@ -22,7 +22,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
         super( manager, clusterName );
         this.clusterName = clusterName;
         productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
-                String.format( "Setting up %s cluster...", clusterName ) );
+                String.format( "Stopping %s cluster...", clusterName ) );
     }
 
 
