@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
+
 
 /**
  * Created by bahadyr on 6/24/14.
@@ -15,33 +18,39 @@ public class Environment
     private UUID uuid;
     private Set<Node> nodes;
     private String name;
-    private Set<String> containers;
-    private String peerUuid;
+    private Set<EnvironmentContainer> containers;
+    //    private String peerUuid;
 
 
-    public Environment( String name, String peerUuid )
+    public Environment( String name, UUID envId )
     {
-        this.uuid = UUID.randomUUID();
+        this.uuid = envId;
         this.nodes = new HashSet<>();
         this.name = name;
         this.containers = new HashSet<>();
-        this.peerUuid = peerUuid;
+        //        this.peerUuid = peerUuid;
     }
 
 
-    public void addContainer( String containerUuid )
+    public Environment( final String name, final String peerUuid )
+    {
+
+    }
+
+
+    public void addContainer( EnvironmentContainer containerUuid )
     {
         this.containers.add( containerUuid );
     }
 
 
-    public Set<String> getContainers()
+    public Set<EnvironmentContainer> getContainers()
     {
         return containers;
     }
 
 
-    public void setContainers( final Set<String> containers )
+    public void setContainers( final Set<EnvironmentContainer> containers )
     {
         this.containers = containers;
     }

@@ -12,6 +12,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 
 /**
@@ -20,11 +21,9 @@ import com.google.gson.GsonBuilder;
 public class RemotePeerRestClient
 {
 
-    //    executeRemoteCommand(C)
-
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private String baseUrl;
+    private String baseUrl = "http://%s:%s/cxf";
 
 
     public String getBaseUrl()
@@ -47,24 +46,33 @@ public class RemotePeerRestClient
     }
 
 
-    public String createRemoteContainers( CloneContainersMessage ccm )
+    public boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
     {
+        String path = "peer/containers";
         try
         {
+            baseUrl = String.format( baseUrl, ip, port );
+            LOG.info( baseUrl );
             WebClient client = WebClient.create( baseUrl );
             String ccmString = GSON.toJson( ccm, CloneContainersMessage.class );
 
-            Response response =
-                    client.path( "peer/containers" ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
-                          .post( ccmString );
+            Response response = client.path( path ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON )
+                                      .post( ccmString );
 
-            return response.toString();
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+//                JsonObject jsonObject = ( JsonObject ) response.;
+
+                LOG.info( response.toString() );
+                return true;
+            }
+            return false;
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
         }
 
-        return null;
+        return false;
     }
 }

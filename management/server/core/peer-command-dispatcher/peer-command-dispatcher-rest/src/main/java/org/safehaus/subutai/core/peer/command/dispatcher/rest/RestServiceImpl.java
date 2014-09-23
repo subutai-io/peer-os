@@ -7,11 +7,11 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,9 +70,8 @@ public class RestServiceImpl implements RestService
     public String createContainers( final String createContainersMsg )
     {
         CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
-
+        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
         Set<Agent> list = ( Set<Agent> ) peerManager.createContainers( ccm );
-
         return JsonUtil.toJson( list );
     }
 
