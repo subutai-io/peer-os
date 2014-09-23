@@ -6,8 +6,6 @@
 package org.safehaus.subutai.core.configuration.impl;
 
 
-import java.util.logging.Logger;
-
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.configuration.api.ConfigManager;
 import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
@@ -23,6 +21,8 @@ import org.safehaus.subutai.core.configuration.impl.utils.IniParser;
 import org.safehaus.subutai.core.configuration.impl.utils.PlainParser;
 import org.safehaus.subutai.core.configuration.impl.utils.ShellParser;
 import org.safehaus.subutai.core.configuration.impl.utils.XmlParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -35,7 +35,7 @@ import com.google.gson.JsonObject;
 public class ConfigManagerImpl implements ConfigManager
 {
 
-    private static final Logger LOG = Logger.getLogger( ConfigManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ConfigManagerImpl.class.getName() );
     private TextInjector textInjector;
 
 
@@ -91,12 +91,11 @@ public class ConfigManagerImpl implements ConfigManager
             default:
                 break;
         }
-        if ( configurationLoader != null )
+        if ( configurationLoader == null )
         {
-            return configurationLoader.setConfiguration( hostname, configFilePath, jsonObjectConfig );
+            return false;
         }
-
-        return false;
+        return configurationLoader.setConfiguration( hostname, configFilePath, jsonObjectConfig );
     }
 
 
@@ -149,28 +148,7 @@ public class ConfigManagerImpl implements ConfigManager
     @Override
     public String getProperty( JsonObject config, String path, ConfigTypeEnum configTypeEnum )
     {
-        /*ConfigParser configParser = null;
-        String content = FileUtil.getContent( configPathFilename, this );
-        try {
-            switch ( configTypeEnum ) {
-                case YAML: {
-                    configParser = new XmlParser( content );
-                    break;
-                }
-                case PROPERTIES: {
-                    configParser = new IniParser( content );
-                    break;
-                }
-                case XML: {
-                    configParser = new XmlParser( content );
-                    break;
-                }
-            }
-            configParser.getProperty( path );
-        }
-        catch ( ConfigurationException e ) {
-             LOG.info(e.getMessage());
-        }*/
+        // TODO complete setProperty function
         return null;
     }
 
@@ -178,27 +156,7 @@ public class ConfigManagerImpl implements ConfigManager
     @Override
     public void setProperty( JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum )
     {
-        /*ConfigParser configParser = null;
-//        String content = FileUtil.getContent(configPathFilename , this ); try {
-            switch ( configTypeEnum ) {
-                case YAML: {
-                    configParser = new XmlParser( config );
-                    break;
-                }
-                case PROPERTIES: {
-                    configParser = new IniParser( content );
-                    break;
-                }
-                case XML: {
-                    configParser = new XmlParser( content );
-                    break;
-                }
-            }
-            configParser.setProperty( path, value );
-        }
-        catch ( ConfigurationException e ) {
-             LOG.info(e.getMessage());
-        }*/
+        //TODO setProperty function is empty
     }
 
 
@@ -246,7 +204,7 @@ public class ConfigManagerImpl implements ConfigManager
         }
         catch ( ConfigurationException e )
         {
-            LOG.info( e.getMessage() );
+            LOG.info( "ConfigManagerImpl@getJsonObjectFromResources: " + e.getMessage() );
         }
         return null;
     }
