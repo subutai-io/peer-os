@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
@@ -73,6 +74,25 @@ public class SendButtonListener implements Button.ClickListener
 
         if ( checkRequest( requestBuilder ) )
         {
+
+            if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
+            {
+                requestBuilder.withPid( Integer.valueOf( form.programTxtFld.getValue() ) );
+                requestBuilder.withType( RequestType.TERMINATE_REQUEST );
+            }
+            else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
+            {
+                requestBuilder.withType( RequestType.PS_REQUEST );
+            }
+
+            if ( form.workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( form.workDirTxtFld.getValue() ) )
+            {
+                requestBuilder.withCwd( form.workDirTxtFld.getValue() );
+            }
+
+            int timeout = Integer.valueOf( form.timeoutTxtFld.getValue() );
+            requestBuilder.withTimeout( timeout );
+
             form.indicator.setVisible( true );
 
             executor.execute(
@@ -86,36 +106,25 @@ public class SendButtonListener implements Button.ClickListener
     {
         if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
         {
-            if ( StringUtil.isNumeric( form.programTxtFld.getValue() )
-                    && Integer.valueOf( form.programTxtFld.getValue() ) > 0 )
-            {
-                requestBuilder.withPid( Integer.valueOf( form.programTxtFld.getValue() ) );
-                requestBuilder.withType( RequestType.TERMINATE_REQUEST );
-            }
-            else
+            if ( !( StringUtil.isNumeric( form.programTxtFld.getValue() )
+                    && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
             {
                 form.show( "Please, enter numeric PID greater than 0 to kill" );
                 return false;
             }
         }
-        else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
+
+        if ( !( StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) && NumUtil
+                .isNumBetween( Integer.valueOf( form.timeoutTxtFld.getValue() ), Common.MIN_COMMAND_TIMEOUT_SEC,
+                        Common.MAX_COMMAND_TIMEOUT_SEC ) ) )
         {
-            requestBuilder.withType( RequestType.PS_REQUEST );
+
+            form.show( String.format( "Timeout must be between %d and %d", Common.MIN_COMMAND_TIMEOUT_SEC,
+                    Common.MAX_COMMAND_TIMEOUT_SEC ) );
+            return false;
         }
 
-        if ( form.timeoutTxtFld.getValue() != null && StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) )
-        {
-            int timeout = Integer.valueOf( form.timeoutTxtFld.getValue() );
-            if ( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC )
-            {
-                requestBuilder.withTimeout( timeout );
-            }
-        }
 
-        if ( form.workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( form.workDirTxtFld.getValue() ) )
-        {
-            requestBuilder.withCwd( form.workDirTxtFld.getValue() );
-        }
         return true;
     }
 
