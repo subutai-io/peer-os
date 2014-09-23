@@ -30,6 +30,7 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -328,9 +329,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 
+            LOG.info( "buildEnvironment called" );
             PeerCommand peerCommand = new PeerCommand( PeerCommandType.CLONE, ccm );
-            boolean result = peerCommandDispatcher.invoke( peerCommand );
-            LOG.info( "RESULT OF CLONE OPERATION " + result );
+            try
+            {
+                LOG.info( "invoke called" );
+                boolean result = peerCommandDispatcher.invoke( peerCommand );
+                LOG.info( "RESULT OF CLONE OPERATION " + result );
+            }
+            catch ( PeerCommandException e )
+            {
+                LOG.error( e.getMessage() );
+            }
         }
     }
 

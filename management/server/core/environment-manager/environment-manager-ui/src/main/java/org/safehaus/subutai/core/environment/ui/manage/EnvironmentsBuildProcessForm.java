@@ -112,6 +112,7 @@ public class EnvironmentsBuildProcessForm
                             // TODO create build task
                             try
                             {
+                                LOG.info( "Build button clicked" );
                                 managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
                             }
                             catch ( NullPointerException e )

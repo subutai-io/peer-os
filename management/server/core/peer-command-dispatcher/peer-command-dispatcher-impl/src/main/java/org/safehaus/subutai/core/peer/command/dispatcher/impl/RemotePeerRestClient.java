@@ -48,6 +48,7 @@ public class RemotePeerRestClient
     public boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
     {
         String path = "peer/containers";
+        LOG.info( "create remote container called" );
         try
         {
             WebClient client = WebClient.create( String.format( baseUrl, ip, port ) );

@@ -65,12 +65,14 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
         if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
         {
 
+            LOG.info( "invoke called in PCD impl" );
             try
             {
                 result = peerManager.invoke( peerCommand );
             }
             catch ( PeerException pe )
             {
+                LOG.error( pe.getMessage() );
                 throw new PeerCommandException( pe.getMessage() );
             }
         }
@@ -78,6 +80,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
         {
             Peer peer = peerManager.getPeerByUUID( peerCommand.getMessage().getPeerId() );
             CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+            LOG.info( "Sending command to peer: " + peer.getIp() + ", Peer ID: " + peer.getId() );
             result = remotePeerRestClient.createRemoteContainers( peer.getIp(), "8181", ccm );
         }
         return result;
