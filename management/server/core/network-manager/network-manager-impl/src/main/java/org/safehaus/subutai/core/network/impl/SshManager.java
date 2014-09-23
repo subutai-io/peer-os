@@ -53,7 +53,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
         }
 
         return command.hasSucceeded();
@@ -69,7 +69,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
         }
 
         StringBuilder value = new StringBuilder();
@@ -116,7 +116,7 @@ public class SshManager
         }
         catch ( CommandException e )
         {
-            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+            LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
         }
 
 
