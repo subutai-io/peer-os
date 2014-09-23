@@ -38,7 +38,6 @@ public class StopTask implements Runnable
         UUID trackID = presto.stopNode( clusterName, hostname );
 
         long start = System.currentTimeMillis();
-        NodeState state = NodeState.UNKNOWN;
 
         while ( !Thread.interrupted() )
         {

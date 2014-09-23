@@ -32,6 +32,8 @@ public class PortalModuleServiceImpl implements PortalModuleService
             {
                 listener.moduleRegistered( module );
             }
+        } else {
+            LOG.info( "Register module invoked." );
         }
     }
 

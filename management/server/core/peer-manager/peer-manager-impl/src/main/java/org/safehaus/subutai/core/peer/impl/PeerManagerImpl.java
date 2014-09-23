@@ -408,6 +408,7 @@ public class PeerManagerImpl implements PeerManager {
         switch ( peerCommand.getType() )
         {
             case CLONE:
+                LOG.info( "CLONE" );
                 break;
             case START:
                 result = startContainer( container );

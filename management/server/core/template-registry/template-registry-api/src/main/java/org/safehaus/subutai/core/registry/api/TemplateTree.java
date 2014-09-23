@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.registry.api;
 
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,7 @@ import com.google.common.base.Strings;
  */
 public class TemplateTree
 {
+    private static final String TEMPLATE_ARCH_FORMAT = "%s-%s";
 
     Map<String, List<Template>> parentChild = new HashMap<>();
     Map<String, String> childParent = new HashMap<>();
@@ -28,7 +30,7 @@ public class TemplateTree
     public void addTemplate( Template template )
     {
         String parentTemplateName = Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
-                                    String.format( "%s-%s", template.getParentTemplateName().toLowerCase(),
+                                    String.format( TEMPLATE_ARCH_FORMAT, template.getParentTemplateName().toLowerCase(),
                                             template.getLxcArch().toLowerCase() );
         List<Template> children = parentChild.get( parentTemplateName );
         if ( children == null )
@@ -37,9 +39,8 @@ public class TemplateTree
             parentChild.put( parentTemplateName, children );
         }
         children.add( template );
-        childParent.put( String
-                .format( "%s-%s", template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() ),
-                parentTemplateName );
+        childParent.put( String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
+                template.getLxcArch().toLowerCase() ), parentTemplateName );
     }
 
 
@@ -71,16 +72,14 @@ public class TemplateTree
         {
             List<Template> templates =
                     getChildrenTemplates( getParentTemplateName( parentTemplateName, lxcArch ), lxcArch );
-            if ( templates != null )
+
+            for ( Template template : templates )
             {
-                for ( Template template : templates )
+                if ( parentTemplateName.equalsIgnoreCase( template.getTemplateName() ) && template.getLxcArch()
+                                                                                                  .equalsIgnoreCase(
+                                                                                                          lxcArch ) )
                 {
-                    if ( parentTemplateName.equalsIgnoreCase( template.getTemplateName() ) && template.getLxcArch()
-                                                                                                      .equalsIgnoreCase(
-                                                                                                              lxcArch ) )
-                    {
-                        return template;
-                    }
+                    return template;
                 }
             }
         }
@@ -101,7 +100,8 @@ public class TemplateTree
         if ( lxcArch != null )
         {
             String childName = childTemplateName != null ?
-                               String.format( "%s-%s", childTemplateName.toLowerCase(), lxcArch.toLowerCase() ) : null;
+                               String.format( TEMPLATE_ARCH_FORMAT, childTemplateName.toLowerCase(),
+                                       lxcArch.toLowerCase() ) : null;
             String parentName = childParent.get( childName );
 
             if ( parentName != null )
@@ -126,11 +126,15 @@ public class TemplateTree
         if ( lxcArch != null )
         {
             String parentName = parentTemplateName != null ?
-                                String.format( "%s-%s", parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) :
-                                null;
-            return parentChild.get( parentName );
+                                String.format( TEMPLATE_ARCH_FORMAT, parentTemplateName.toLowerCase(),
+                                        lxcArch.toLowerCase() ) : null;
+            List<Template> templates = parentChild.get( parentName );
+            if ( templates != null )
+            {
+                return templates;
+            }
         }
-        return null;
+        return Collections.emptyList();
     }
 
 

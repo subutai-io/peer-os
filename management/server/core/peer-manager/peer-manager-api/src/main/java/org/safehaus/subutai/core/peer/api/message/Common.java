@@ -7,6 +7,11 @@ package org.safehaus.subutai.core.peer.api.message;
 public class Common
 {
 
+    private Common()
+    {
+    }
+
+
     public static final String PING_URL = "http://%s:8181/cxf/peer/ping";
     public static final String GET_AGENTS_URL = "http://%s:8181/cxf/peer/agents";
     public static final String ENV_ID_PARAM_NAME = "envId";

@@ -47,8 +47,7 @@ public class BestServerStrategy extends RoundRobinStrategy
             Agent a = getBestMatch( serverMetrics, MetricComparator.create( sf ) );
             if ( a != null )
             {
-                Integer newValue = grades.get( a ) + 1;
-                grades.put( a, newValue );
+                incrementGrade( grades, a );
             }
         }
 
@@ -72,6 +71,19 @@ public class BestServerStrategy extends RoundRobinStrategy
             servers.add( e.getKey() );
         }
         return servers;
+    }
+
+
+    private void incrementGrade( Map<Agent, Integer> grades, Agent a )
+    {
+        for ( Map.Entry<Agent, Integer> entry : grades.entrySet() )
+        {
+            if ( entry.getKey().equals( a ) )
+            {
+                entry.setValue( entry.getValue() + 1 );
+                break;
+            }
+        }
     }
 
 

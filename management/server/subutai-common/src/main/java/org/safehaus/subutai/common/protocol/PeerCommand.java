@@ -4,7 +4,8 @@ package org.safehaus.subutai.common.protocol;
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerCommand {
+public class PeerCommand
+{
     private PeerCommandMessage message;
     private PeerCommandType type;
 
