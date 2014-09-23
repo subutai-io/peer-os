@@ -14,10 +14,13 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class BestServerStrategy extends RoundRobinStrategy
 {
+    private static final Logger LOG = LoggerFactory.getLogger( BestServerStrategy.class.getName() );
 
     private Set<PlacementStrategy> strategyFactors;
 
@@ -51,13 +54,12 @@ public class BestServerStrategy extends RoundRobinStrategy
             }
             catch ( Exception ex )
             {
-                // comparator not defined for strategy
-                // TODO: log
+                LOG.error( "Error in sortServers", ex );
             }
         }
 
         // sort servers by their grades in decreasing order
-        ArrayList<Map.Entry<Agent, Integer>> ls = new ArrayList<>( grades.entrySet() );
+        List<Map.Entry<Agent, Integer>> ls = new ArrayList<>( grades.entrySet() );
         Collections.sort( ls, new Comparator<Map.Entry>()
         {
 
