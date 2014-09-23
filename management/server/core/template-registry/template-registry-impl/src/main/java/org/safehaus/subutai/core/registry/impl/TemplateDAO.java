@@ -27,7 +27,7 @@ public class TemplateDAO
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateDAO.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final String KEY_FORMAT = "%s-%s";
+    private static final String TEMPLATE_ARCH_FORMAT = "%s-%s";
     private DbManager dbManager;
 
 
@@ -75,7 +75,7 @@ public class TemplateDAO
             try
             {
                 ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where parent = ?",
-                        String.format( KEY_FORMAT, parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
+                        String.format( TEMPLATE_ARCH_FORMAT, parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
 
                 return getTemplatesFromResultSet( rs );
             }
@@ -124,7 +124,7 @@ public class TemplateDAO
             try
             {
                 ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where template = ?",
-                        String.format( KEY_FORMAT, templateName.toLowerCase(), lxcArch.toLowerCase() ) );
+                        String.format( TEMPLATE_ARCH_FORMAT, templateName.toLowerCase(), lxcArch.toLowerCase() ) );
 
                 List<Template> list = getTemplatesFromResultSet( rs );
                 if ( !list.isEmpty() )
@@ -151,10 +151,10 @@ public class TemplateDAO
     {
 
         dbManager.executeUpdate2( "insert into template_registry_info(template, parent, info) values(?,?,?)",
-                String.format( KEY_FORMAT, template.getTemplateName().toLowerCase(),
+                String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
                         template.getLxcArch().toLowerCase() ),
                 Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
-                String.format( KEY_FORMAT, template.getParentTemplateName().toLowerCase(),
+                String.format( TEMPLATE_ARCH_FORMAT, template.getParentTemplateName().toLowerCase(),
                         template.getLxcArch().toLowerCase() ), GSON.toJson( template ) );
     }
 
@@ -168,7 +168,7 @@ public class TemplateDAO
     {
 
         dbManager.executeUpdate2( "delete from template_registry_info where template = ?",
-                String.format( KEY_FORMAT, template.getTemplateName().toLowerCase(),
+                String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
                         template.getLxcArch().toLowerCase() ) );
     }
 }
