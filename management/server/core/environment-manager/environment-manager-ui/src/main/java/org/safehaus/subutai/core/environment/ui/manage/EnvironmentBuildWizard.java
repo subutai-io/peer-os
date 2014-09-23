@@ -251,6 +251,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
             ccm.setPeerId( peerUuid );
             ccm.setEnvId( environmentBuildTask.getUuid() );
             ccm.setNumberOfNodes( 2 );
+            ccm.setStrategy( "ROUND_ROBIN" );
             process.getCloneContainersMessages().add( ccm );
         }
 
