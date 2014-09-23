@@ -47,6 +47,7 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
         containerManager.addListener( this );
         UUID envId = UUID.randomUUID();
         List<Criteria> criteria = getCriteria();
+        //TODO:catch clone exception
         Set<Agent> set = containerManager.clone( envId, template, nodesCount, strategyId, criteria );
         if ( set.isEmpty() )
         {

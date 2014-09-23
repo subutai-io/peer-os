@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.configuration.impl.utils;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,6 @@ public class YamlParser implements ConfigParser
 
     public YamlParser( String content ) throws YamlException
     {
-
         YamlReader reader = new YamlReader( content );
         yaml = ( Map ) reader.read();
     }
@@ -62,7 +62,7 @@ public class YamlParser implements ConfigParser
         {
             return ( List ) yaml.get( propertyName );
         }
-        return null;
+        return Collections.emptyList();
     }
 
 
@@ -96,8 +96,8 @@ public class YamlParser implements ConfigParser
 
         String content = FileUtil.getContent( pathToConfig, this );
 
-        Yaml yaml = new Yaml();
-        Map<String, Object> config = ( Map<String, Object> ) yaml.load( content );
+        Yaml targetYaml = new Yaml();
+        Map<String, Object> config = ( Map<String, Object> ) targetYaml.load( content );
         List<JsonObject> fields = new ArrayList<>();
         for ( Map.Entry<String, Object> entry : config.entrySet() )
         {
@@ -107,21 +107,6 @@ public class YamlParser implements ConfigParser
             fields.add( field );
         }
 
-        JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
-        return njo;
+        return configBuilder.addJsonArrayToConfig( jo, fields );
     }
-
-
-    /*private String getValuePath( StringBuilder sb, Object obj ) {
-        return sb.toString();
-        if ( obj instanceof Map ) {
-            Map m = ( Map ) obj;
-
-            for ( Object o : m.keySet() ) {
-
-                getValuePath( sb, obj );
-            }
-            getValuePath( sb, obj );
-        }
-    }*/
 }

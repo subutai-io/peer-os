@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -20,7 +18,6 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
         description = "get LXC agents by parent hostname")
 public class GetLxcAgentsByParentHostnameCommand extends OsgiCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( GetLxcAgentsByParentHostnameCommand.class.getName() );
 
     @Argument(index = 0, name = "parentHostname", required = true, multiValued = false,
             description = "Parent hostname")

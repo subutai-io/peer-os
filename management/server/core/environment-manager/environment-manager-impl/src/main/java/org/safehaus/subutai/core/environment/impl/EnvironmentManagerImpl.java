@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommand;
@@ -29,6 +31,7 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -252,7 +255,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( EnvironmentDestroyException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
@@ -273,7 +276,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( JsonSyntaxException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
@@ -322,19 +325,39 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException
     {
-        /*for ( CreateContainersMessage ccm : environmentBuildProcess.getCreateContainersMessages() )
+
+
+        Environment environment = new Environment( "environment", environmentBuildProcess.getUuid() );
+        for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 
-            LOG.info( "SENDING MESSAGE TO " + ccm.getTargetPeerId() );
-            PeerCommand peerCommand = new PeerCommand();
-            peerCommand.setMessage( ccm );
-            peerCommand.setType( PeerCommandType.CLONE );
+            PeerCommand peerCommand = new PeerCommand( PeerCommandType.CLONE, ccm );
+            try
+            {
+                boolean result = peerCommandDispatcher.invoke( peerCommand );
+                if ( result )
+                {
 
-            peerCommandDispatcher.invoke( peerCommand )  ;
-//            Set<Agent> agents = peerManager.createContainers( ccm );
-        }*/
+                    //TODO: Assign data from set of agents received
+
+                    EnvironmentContainer container = new EnvironmentContainer();
+                    container.setPeerId( ccm.getPeerId() );
+                    //                    container.setAgentId(  );
+                    //                    container.setHostname(  );
+                    container.setDescription( ccm.getTemplate() );
+                    container.setName( ccm.getTemplate() );
+                    environment.addContainer( container );
+                }
+            }
+            catch ( PeerCommandException e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new EnvironmentBuildException(e.getMessage());
+            }
+            saveEnvironment( environment );
+        }
     }
 
 
@@ -405,7 +428,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             catch ( EnvironmentBuildException e )
             {
-                LOG.error( e.getMessage() );
+                LOG.error( e.getMessage(), e );
             }
         }
         return false;

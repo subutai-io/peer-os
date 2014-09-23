@@ -5,7 +5,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -14,7 +16,7 @@ import java.util.logging.Logger;
 public class FileContentReader
 {
 
-    private final Logger LOG = Logger.getLogger( FileContentReader.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( FileContentReader.class.getName() );
 
 
     public String readFile( String pathToFile )
@@ -35,7 +37,7 @@ public class FileContentReader
         }
         catch ( IOException e )
         {
-            LOG.info( e.getMessage() );
+            LOG.error( "FileContentReader@readFile: " + e.getMessage(), e );
         }
         finally
         {
@@ -48,6 +50,7 @@ public class FileContentReader
             }
             catch ( IOException ignore )
             {
+                LOG.error( "FileContentReader@readFile: ignore" + ignore.getMessage() );
             }
             try
             {
@@ -58,9 +61,9 @@ public class FileContentReader
             }
             catch ( IOException ignore )
             {
+                LOG.error( "FileContentReader@readFile: ignore" + ignore.getMessage() );
             }
         }
-
         return sb.toString();
     }
 }

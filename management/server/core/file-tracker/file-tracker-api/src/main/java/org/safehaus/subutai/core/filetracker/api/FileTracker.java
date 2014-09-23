@@ -12,9 +12,9 @@ public interface FileTracker
 
     public void removeListener( ResponseListener listener );
 
-    public void createConfigPoints( Agent agent, String configPoints[] );
+    public void createConfigPoints( Agent agent, String[] configPoints );
 
-    public void removeConfigPoints( Agent agent, String configPoints[] );
+    public void removeConfigPoints( Agent agent, String[] configPoints );
 
     public String[] listConfigPoints( Agent agent );
 }

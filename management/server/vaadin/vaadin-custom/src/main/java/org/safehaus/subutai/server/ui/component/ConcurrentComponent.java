@@ -24,13 +24,16 @@ public class ConcurrentComponent extends VerticalLayout
             application = UI.getCurrent();
             if ( application == null )
             {
-                update.run();
+                new Thread( update ).start();
+                //                update.run();
                 return;
             }
         }
         synchronized ( application )
         {
-            update.run();
+
+            new Thread( update ).start();
+            //            update.run();
         }
     }
 }

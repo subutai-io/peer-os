@@ -11,6 +11,11 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
 public class PlacementStrategyFactory
 {
 
+    private PlacementStrategyFactory()
+    {
+    }
+
+
     public static LxcPlacementStrategy create( int nodesCount, PlacementStrategy... strategy )
     {
         // round-robin is the default

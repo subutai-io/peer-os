@@ -452,29 +452,42 @@ public class PeerManagerImpl implements PeerManager
     public boolean invoke( PeerCommand peerCommand ) throws PeerException
     {
         boolean result = false;
+        switch ( peerCommand.getType() )
+        {
+            case CLONE:
+                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+                createContainers( ccm );
+                break;
+            case START:
+                PeerContainer peerContainer = containerLookup( peerCommand );
+                result = startContainer( peerContainer );
+                break;
+            case STOP:
+                PeerContainer peerContainer1 = containerLookup( peerCommand );
+                result = stopContainer( peerContainer1 );
+                break;
+            case ISCONNECTED:
+                PeerContainer peerContainer2 = containerLookup( peerCommand );
+                result = isContainerConnected( peerContainer2 );
+                break;
+            default:
+                //TODO: log or exception?
+                break;
+        }
+        return result;
+    }
+
+
+    private PeerContainer containerLookup( PeerCommand peerCommand ) throws PeerException
+    {
+
         UUID agentId = peerCommand.getMessage().getAgentId();
         PeerContainer container = findPeerContainer( agentId );
         if ( container == null )
         {
             throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
         }
-        switch ( peerCommand.getType() )
-        {
-            case CLONE:
-                break;
-            case START:
-                result = startContainer( container );
-                break;
-            case STOP:
-                result = stopContainer( container );
-                break;
-            case ISCONNECTED:
-                result = isContainerConnected( container );
-                break;
-            default:
-                //TODO: log or exception?
-        }
-        return result;
+        return container;
     }
 
 

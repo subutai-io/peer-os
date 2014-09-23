@@ -42,6 +42,9 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( TemplateRegistryManagerImpl.class.getName() );
+    private static final String TEMPLATE_IS_NULL_MSG = "Template name is null or empty";
+    private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
+    private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
 
     private final TemplateDAO templateDAO;
 
@@ -216,8 +219,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     @Override
     public void unregisterTemplate( final String templateName, final String lxcArch ) throws RegistryException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
 
         //find template
         Template template = getTemplate( templateName, lxcArch );
@@ -255,7 +258,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
         }
         else
         {
-            throw new RegistryException( String.format( "Template %s not found", templateName ) );
+            throw new RegistryException( String.format( TEMPLATE_NOT_FOUND_MSG, templateName ) );
         }
     }
 
@@ -285,8 +288,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     @Override
     public Template getTemplate( final String templateName, String lxcArch )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
         //retrieve template from storage
 
         try
@@ -328,7 +331,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( parentTemplateName ), "Parent template name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
         //retrieve child templates from storage
         try
         {
@@ -369,16 +372,13 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( childTemplateName ), "Child template name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "LxcArch is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
         //retrieve parent template from storage
         Template child = getTemplate( childTemplateName, lxcArch );
 
-        if ( child != null )
+        if ( child != null && !Strings.isNullOrEmpty( child.getParentTemplateName() ) )
         {
-            if ( !Strings.isNullOrEmpty( child.getParentTemplateName() ) )
-            {
-                return getTemplate( child.getParentTemplateName(), child.getLxcArch() );
-            }
+            return getTemplate( child.getParentTemplateName(), child.getLxcArch() );
         }
 
         return null;
@@ -471,7 +471,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     @Override
     public List<Template> getAllTemplates( final String lxcArch )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Lxc Arch is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
 
         try
         {
@@ -508,12 +508,12 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( faiHostname ), "FAI hostname is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
 
         Template template = getTemplate( templateName );
         if ( template == null )
         {
-            throw new RegistryException( String.format( "Template %s not found", templateName ) );
+            throw new RegistryException( String.format( TEMPLATE_NOT_FOUND_MSG, templateName ) );
         }
         else
         {
@@ -541,12 +541,12 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     @Override
     public boolean isTemplateInUse( String templateName ) throws RegistryException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
 
         Template template = getTemplate( templateName );
         if ( template == null )
         {
-            throw new RegistryException( String.format( "Template %s not found", templateName ) );
+            throw new RegistryException( String.format( TEMPLATE_NOT_FOUND_MSG, templateName ) );
         }
         else
         {

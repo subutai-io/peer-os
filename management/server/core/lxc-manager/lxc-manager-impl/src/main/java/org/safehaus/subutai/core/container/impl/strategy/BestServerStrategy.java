@@ -14,10 +14,13 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class BestServerStrategy extends RoundRobinStrategy
 {
+    private static final Logger LOG = LoggerFactory.getLogger( BestServerStrategy.class.getName() );
 
     private Set<PlacementStrategy> strategyFactors;
 
@@ -46,18 +49,17 @@ public class BestServerStrategy extends RoundRobinStrategy
                 Agent a = getBestMatch( serverMetrics, MetricComparator.create( sf ) );
                 if ( a != null )
                 {
-                    grades.put( a, grades.get( a ) + 1 );
+                    incrementGrade( grades, a );
                 }
             }
             catch ( Exception ex )
             {
-                // comparator not defined for strategy
-                // TODO: log
+                LOG.error( "Error in sortServers", ex );
             }
         }
 
         // sort servers by their grades in decreasing order
-        ArrayList<Map.Entry<Agent, Integer>> ls = new ArrayList<>( grades.entrySet() );
+        List<Map.Entry<Agent, Integer>> ls = new ArrayList<>( grades.entrySet() );
         Collections.sort( ls, new Comparator<Map.Entry>()
         {
 
@@ -76,6 +78,19 @@ public class BestServerStrategy extends RoundRobinStrategy
             servers.add( e.getKey() );
         }
         return servers;
+    }
+
+
+    private void incrementGrade( Map<Agent, Integer> grades, Agent a )
+    {
+        for ( Map.Entry<Agent, Integer> entry : grades.entrySet() )
+        {
+            if ( entry.getKey().equals( a ) )
+            {
+                entry.setValue( entry.getValue() + 1 );
+                break;
+            }
+        }
     }
 
 

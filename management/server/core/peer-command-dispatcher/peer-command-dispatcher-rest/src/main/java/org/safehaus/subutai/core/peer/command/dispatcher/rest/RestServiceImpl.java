@@ -70,9 +70,8 @@ public class RestServiceImpl implements RestService
     public String createContainers( final String createContainersMsg )
     {
         CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
-
+        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
         Set<Agent> list = ( Set<Agent> ) peerManager.createContainers( ccm );
-
         return JsonUtil.toJson( list );
     }
 

@@ -1,11 +1,15 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -13,6 +17,7 @@ import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandExceptio
  */
 public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 {
+    private static final Logger LOG = LoggerFactory.getLogger( PeerCommandDispatcherImpl.class.getName() );
     private PeerManager peerManager;
     private RemotePeerRestClient remotePeerRestClient;
 
@@ -56,7 +61,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     @Override
     public boolean invoke( final PeerCommand peerCommand ) throws PeerCommandException
     {
-        boolean result = false;
+        boolean result;
         if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
         {
 
@@ -66,16 +71,16 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
             }
             catch ( PeerException pe )
             {
+                LOG.error( pe.getMessage() );
                 throw new PeerCommandException( pe.getMessage() );
             }
         }
         else
         {
-
-            //            result =  remotePeerRestClient
-            //TODO: remote peer invoke
-
-
+            Peer peer = peerManager.getPeerByUUID( peerCommand.getMessage().getPeerId() );
+            CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+            remotePeerRestClient = new RemotePeerRestClient();
+            result = remotePeerRestClient.createRemoteContainers( peer.getIp(), "8181", ccm );
         }
         return result;
     }
