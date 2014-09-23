@@ -71,6 +71,19 @@ public class SendButtonListener implements Button.ClickListener
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
 
+        if ( checkRequest( requestBuilder ) )
+        {
+            form.indicator.setVisible( true );
+
+            executor.execute(
+                    new ExecuteCommandTask( commandDispatcher.createCommand( requestBuilder, agents ), agentManager,
+                            form ) );
+        }
+    }
+
+
+    private boolean checkRequest( RequestBuilder requestBuilder )
+    {
         if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
         {
             if ( StringUtil.isNumeric( form.programTxtFld.getValue() )
@@ -82,7 +95,7 @@ public class SendButtonListener implements Button.ClickListener
             else
             {
                 form.show( "Please, enter numeric PID greater than 0 to kill" );
-                return;
+                return false;
             }
         }
         else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
@@ -103,11 +116,7 @@ public class SendButtonListener implements Button.ClickListener
         {
             requestBuilder.withCwd( form.workDirTxtFld.getValue() );
         }
-        form.indicator.setVisible( true );
-
-        executor.execute(
-                new ExecuteCommandTask( commandDispatcher.createCommand( requestBuilder, agents ), agentManager,
-                        form ) );
+        return true;
     }
 
 
