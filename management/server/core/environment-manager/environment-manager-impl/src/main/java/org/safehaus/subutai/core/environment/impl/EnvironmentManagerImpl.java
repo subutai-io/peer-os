@@ -325,7 +325,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException
     {
 
 
@@ -354,7 +354,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             catch ( PeerCommandException e )
             {
                 LOG.error( e.getMessage(), e );
-                throw e;
+                throw new EnvironmentBuildException(e.getMessage());
             }
             saveEnvironment( environment );
         }

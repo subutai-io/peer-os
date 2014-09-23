@@ -1,12 +1,8 @@
 package org.safehaus.subutai.core.environment.ui.executor;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.core.container.api.ContainerCreateException;
-import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 
 
@@ -15,6 +11,7 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
  */
 public class CloneCommand implements BuildProcessCommand
 {
+
     private EnvironmentManager environmentManager;
     private EnvironmentBuildProcess environmentBuildProcess;
 
@@ -29,12 +26,13 @@ public class CloneCommand implements BuildProcessCommand
     @Override
     public void execute() throws BuildProcessExecutionException
     {
+        try
+        {
             environmentManager.buildEnvironment( environmentBuildProcess );
-
-        /*}
-        catch ( ContainerCreateException e )
+        }
+        catch ( EnvironmentBuildException e )
         {
             throw new BuildProcessExecutionException( e.getMessage() );
-        }*/
+        }
     }
 }

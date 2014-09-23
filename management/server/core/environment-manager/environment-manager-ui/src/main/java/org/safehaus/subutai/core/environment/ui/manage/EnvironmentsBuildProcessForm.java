@@ -238,28 +238,17 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl();
         buildProcessExecutor.addListener( this );
-
         ExecutorService executor = Executors.newFixedThreadPool( 1 );
-
         buildProcessExecutor.execute( executor,
                 new CloneCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
         executor.shutdown();
-
-        /*executorService.execute( new Runnable()
-        {
-            public void run()
-            {
-                managerUI.getEnvironmentManager().buildEnvironment( environmentBuildProcess );
-            }
-        } );
-        executor.shutdown();*/
-
     }
 
 
     @Override
     public void onExecutionEvent( final BuildProcessExecutionEvent event )
     {
+        LOG.info( event.toString() );
         updateEnvironmentsTableStatus( event );
     }
 
