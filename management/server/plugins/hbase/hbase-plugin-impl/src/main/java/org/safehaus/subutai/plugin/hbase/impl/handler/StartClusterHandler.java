@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;

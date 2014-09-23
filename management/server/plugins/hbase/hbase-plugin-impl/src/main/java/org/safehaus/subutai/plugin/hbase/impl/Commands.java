@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.hbase.impl;
 
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
@@ -17,6 +16,7 @@ public class Commands extends CommandsSingleton
 
     protected final static String PACKAGE_NAME = "ksks-hbase";
     protected final static String PACKAGE_PREFIX = "ksks";
+
 
     public Commands( CommandRunner commandRunner )
     {
@@ -39,8 +39,8 @@ public class Commands extends CommandsSingleton
 
         return createCommand(
                 new RequestBuilder( "apt-get --assume-yes --force-yes install " + PACKAGE_NAME ).withTimeout( 360 )
-                                                                                                     .withStdOutRedirection(
-                                                                                                             OutputRedirection.NO ),
+                                                                                                .withStdOutRedirection(
+                                                                                                        OutputRedirection.NO ),
                 agents );
     }
 
@@ -50,8 +50,8 @@ public class Commands extends CommandsSingleton
 
         return createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 360 )
-                                                                                         .withStdOutRedirection(
-                                                                                                 OutputRedirection.NO ),
+                                                                                              .withStdOutRedirection(
+                                                                                                      OutputRedirection.NO ),
                 agents );
     }
 
@@ -76,8 +76,8 @@ public class Commands extends CommandsSingleton
 
     public static Command getConfigBackupMastersCommand( Set<Agent> agents, String backUpMasters )
     {
-        return createCommand( new RequestBuilder( String.format( ". /etc/profile && backUpMasters.sh %s", backUpMasters ) ),
-                agents );
+        return createCommand(
+                new RequestBuilder( String.format( ". /etc/profile && backUpMasters.sh %s", backUpMasters ) ), agents );
     }
 
 
@@ -95,17 +95,17 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getConfigMasterCommand( Set< Agent > agents, String hadoopNameNodeHostname,
+    public static Command getConfigMasterCommand( Set<Agent> agents, String hadoopNameNodeHostname,
                                                   String hMasterMachineHostname )
     {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) ),
-                agents );
+                        String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
+                                hMasterMachineHostname ) ), agents );
     }
+
 
     public static Command getCheckInstalledCommand( Set<Agent> agents )
     {
         return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + PACKAGE_PREFIX ), agents );
     }
-
 }

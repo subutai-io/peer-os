@@ -6,6 +6,10 @@
 package org.safehaus.subutai.plugin.hbase.ui;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.hbase.ui.manager.Manager;
 import org.safehaus.subutai.plugin.hbase.ui.wizard.Wizard;
@@ -13,9 +17,6 @@ import org.safehaus.subutai.plugin.hbase.ui.wizard.Wizard;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-
-import javax.naming.NamingException;
-import java.util.concurrent.ExecutorService;
 
 
 public class HBaseForm extends CustomComponent
@@ -35,12 +36,15 @@ public class HBaseForm extends CustomComponent
         Wizard wizard = new Wizard( executor, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
             @Override
-            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
                 TabSheet tabsheet = event.getTabSheet();
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if( caption.equals( "Manage" ) ) {
+                if ( caption.equals( "Manage" ) )
+                {
                     manager.refreshClustersInfo();
                     manager.checkAllNodes();
                 }

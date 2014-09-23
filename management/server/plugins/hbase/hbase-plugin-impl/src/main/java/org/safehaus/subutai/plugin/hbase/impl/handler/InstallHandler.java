@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
@@ -14,6 +13,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
     private HBaseClusterConfig config;
+
 
     public InstallHandler( final HBaseImpl manager, final HBaseClusterConfig config )
     {

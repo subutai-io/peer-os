@@ -1,14 +1,13 @@
 package org.safehaus.subutai.plugin.hbase.ui.manager;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-
-
-import java.util.UUID;
 
 
 public class StopTask implements Runnable
@@ -20,8 +19,7 @@ public class StopTask implements Runnable
     private final Tracker tracker;
 
 
-    public StopTask( final HBase hbase, final Tracker tracker, String clusterName,
-                     CompleteEvent completeEvent )
+    public StopTask( final HBase hbase, final Tracker tracker, String clusterName, CompleteEvent completeEvent )
     {
         this.clusterName = clusterName;
         this.completeEvent = completeEvent;

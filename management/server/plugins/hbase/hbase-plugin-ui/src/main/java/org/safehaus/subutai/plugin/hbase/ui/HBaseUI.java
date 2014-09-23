@@ -6,17 +6,19 @@
 package org.safehaus.subutai.plugin.hbase.ui;
 
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import javax.naming.NamingException;
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Logger;
+import com.vaadin.ui.Component;
 
 
 public class HBaseUI implements PortalModule

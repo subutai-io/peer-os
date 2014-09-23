@@ -43,20 +43,6 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
-    private final Table nodesTable;
-    private static final String message = "No cluster is installed !";
-    private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
-
-    private final ExecutorService executorService;
-    private final Tracker tracker;
-    private final AgentManager agentManager;
-    private final Elasticsearch elasticsearch;
-    private final CommandRunner commandRunner;
-    private GridLayout contentRoot;
-    private ComboBox clusterCombo;
-    private ElasticsearchClusterConfiguration config;
-
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
     protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
@@ -72,8 +58,19 @@ public class Manager
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String ADD_NODE_CAPTION = "Add Node";
-
+    private static final String message = "No cluster is installed !";
+    private static final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private static final Pattern elasticsearchPattern = Pattern.compile( ".*(elasticsearch.+?g).*" );
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
+    private final Table nodesTable;
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final AgentManager agentManager;
+    private final Elasticsearch elasticsearch;
+    private final CommandRunner commandRunner;
+    private GridLayout contentRoot;
+    private ComboBox clusterCombo;
+    private ElasticsearchClusterConfiguration config;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -260,6 +257,22 @@ public class Manager
         controlsContent.addComponent( progressIcon );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+    }
+
+
+    /**
+     * Parses output of 'service cassandra status' command
+     */
+    public static String parseServiceResult( String result )
+    {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher tracersMatcher = elasticsearchPattern.matcher( result );
+        if ( tracersMatcher.find() )
+        {
+            parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
+        }
+
+        return parsedResult.toString();
     }
 
 
@@ -583,22 +596,6 @@ public class Manager
                 }
             } );
         }
-    }
-
-
-    /**
-     * Parses output of 'service cassandra status' command
-     */
-    public static String parseServiceResult( String result )
-    {
-        StringBuilder parsedResult = new StringBuilder();
-        Matcher tracersMatcher = elasticsearchPattern.matcher( result );
-        if ( tracersMatcher.find() )
-        {
-            parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
-        }
-
-        return parsedResult.toString();
     }
 
 

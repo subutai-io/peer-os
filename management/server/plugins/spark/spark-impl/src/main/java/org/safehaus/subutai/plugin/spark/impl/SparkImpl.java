@@ -52,16 +52,6 @@ public class SparkImpl extends SparkBase implements Spark
 
 
     @Override
-    public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        InstallOperationHandler h = new InstallOperationHandler( this, config );
-        h.setHadoopConfig( hadoopConfig );
-        executor.execute( h );
-        return h.getTrackerId();
-    }
-
-
-    @Override
     public UUID uninstallCluster( final String clusterName )
     {
 
@@ -84,6 +74,16 @@ public class SparkImpl extends SparkBase implements Spark
     public SparkClusterConfig getCluster( String clusterName )
     {
         return pluginDAO.getInfo( SparkClusterConfig.PRODUCT_KEY, clusterName, SparkClusterConfig.class );
+    }
+
+
+    @Override
+    public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        InstallOperationHandler h = new InstallOperationHandler( this, config );
+        h.setHadoopConfig( hadoopConfig );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
 
@@ -170,6 +170,16 @@ public class SparkImpl extends SparkBase implements Spark
 
 
     @Override
+    public UUID checkMasterNode( final String clusterName, final String lxcHostname )
+    {
+        AbstractOperationHandler operationHandler =
+                new CheckMasterNodeOperationHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
     public UUID checkSlaveNode( final String clusterName, final String lxcHostname )
     {
 
@@ -178,16 +188,6 @@ public class SparkImpl extends SparkBase implements Spark
 
         executor.execute( operationHandler );
 
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID checkMasterNode( final String clusterName, final String lxcHostname )
-    {
-        AbstractOperationHandler operationHandler =
-                new CheckMasterNodeOperationHandler( this, clusterName, lxcHostname );
-        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 

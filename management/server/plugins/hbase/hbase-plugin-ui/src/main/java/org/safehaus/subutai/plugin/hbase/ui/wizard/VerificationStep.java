@@ -9,7 +9,6 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import com.vaadin.ui.Panel;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -23,7 +22,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
@@ -53,7 +52,7 @@ public class VerificationStep extends Panel
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
-            cfgView.addStringCfg( "Master Node", wizard.getConfig().getHbaseMaster ().getHostname() );
+            cfgView.addStringCfg( "Master Node", wizard.getConfig().getHbaseMaster().getHostname() );
             for ( Agent agent : wizard.getConfig().getRegionServers() )
             {
                 cfgView.addStringCfg( "Region Servers", agent.getHostname() + "" );
@@ -78,21 +77,28 @@ public class VerificationStep extends Panel
         }
 
         Button install = new Button( "Install" );
-        install.addClickListener( new Button.ClickListener() {
+        install.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 UUID trackId = null;
-                if( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
                     trackId = hbase.installCluster( config );
-                } else if( config.getSetupType() == SetupType.WITH_HADOOP ) {
+                }
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
                     trackId = hbase.installCluster( config );
                 }
 
                 ProgressWindow window =
                         new ProgressWindow( executor, tracker, trackId, HBaseClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
                     @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
                         wizard.init();
                     }
                 } );

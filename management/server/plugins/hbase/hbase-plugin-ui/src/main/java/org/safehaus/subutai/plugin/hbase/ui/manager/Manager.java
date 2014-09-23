@@ -6,6 +6,27 @@
 package org.safehaus.subutai.plugin.hbase.ui.manager;
 
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseType;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
@@ -23,27 +44,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.plugin.hbase.api.HBaseType;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-
-import javax.naming.NamingException;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.safehaus.subutai.plugin.hbase.api.HBaseType.HMaster;
 
@@ -67,16 +68,11 @@ public class Manager
     protected final static String ADD_NODE_CAPTION = "Add Node";
     protected final static String TABLE_CAPTION = "All Nodes";
     protected final static String BUTTON_STYLE_NAME = "default";
-
-
+    private static Table nodesTable = null;
     protected final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn;
-
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
-    private static Table nodesTable = null;
     private final ExecutorService executor;
-    private HBaseClusterConfig config;
-
     private final HBase hbase;
     private final Tracker tracker;
     private final AgentManager agentManager;
@@ -86,7 +82,7 @@ public class Manager
     private final Pattern HMASTER_PATTERN = Pattern.compile( ".*(HMaster.+?g).*" );
     private final Pattern REGION_PATTERN = Pattern.compile( ".*(HRegionServer.+?g).*" );
     private final Pattern QUORUM_PATTERN = Pattern.compile( ".*(HQuorumPeer.+?g).*" );
-
+    private HBaseClusterConfig config;
 
 
     public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
@@ -154,10 +150,12 @@ public class Manager
 
         /** Check All button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.addStyleName(BUTTON_STYLE_NAME );
-        checkAllBtn.addClickListener( new Button.ClickListener() {
+        checkAllBtn.addStyleName( BUTTON_STYLE_NAME );
+        checkAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 if ( config == null )
                 {
                     show( MESSAGE );
@@ -175,9 +173,11 @@ public class Manager
         /** Start All button */
         startAllNodesBtn = new Button( START_ALL_BUTTON_CAPTION );
         startAllNodesBtn.addStyleName( BUTTON_STYLE_NAME );
-        startAllNodesBtn.addClickListener( new Button.ClickListener() {
+        startAllNodesBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 if ( config == null )
                 {
                     show( MESSAGE );
@@ -195,9 +195,11 @@ public class Manager
         /** Stop All button */
         stopAllNodesBtn = new Button( STOP_ALL_BUTTON_CAPTION );
         stopAllNodesBtn.addStyleName( BUTTON_STYLE_NAME );
-        stopAllNodesBtn.addClickListener( new Button.ClickListener() {
+        stopAllNodesBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 if ( config == null )
                 {
                     show( MESSAGE );
@@ -232,8 +234,7 @@ public class Manager
                         {
                             UUID trackID = hbase.uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( executor, tracker, trackID,
-                                            HBaseClusterConfig.PRODUCT_KEY );
+                                    new ProgressWindow( executor, tracker, trackID, HBaseClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -293,8 +294,7 @@ public class Manager
     {
         PROGRESS_ICON.setVisible( true );
         disableOREnableAllButtonsOnTable( nodesTable, false );
-        executor.execute(
-                new StopTask( hbase, tracker, config.getClusterName(), new CompleteEvent()
+        executor.execute( new StopTask( hbase, tracker, config.getClusterName(), new CompleteEvent()
                 {
                     @Override
                     public void onComplete( String result )
@@ -313,8 +313,7 @@ public class Manager
     {
         PROGRESS_ICON.setVisible( true );
         disableOREnableAllButtonsOnTable( nodesTable, false );
-        executor.execute(
-                new StartTask( hbase, tracker, config.getClusterName(), new CompleteEvent()
+        executor.execute( new StartTask( hbase, tracker, config.getClusterName(), new CompleteEvent()
                 {
                     @Override
                     public void onComplete( String result )
@@ -372,12 +371,13 @@ public class Manager
             availableOperations.setSpacing( true );
 
             availableOperations.addComponent( checkBtn );
-//            availableOperations.addComponent( startBtn );
-//            availableOperations.addComponent( stopBtn );
+            //            availableOperations.addComponent( startBtn );
+            //            availableOperations.addComponent( stopBtn );
 
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), findNodeRoles( agent ), resultHolder, availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ), findNodeRoles( agent ), resultHolder,
+                    availableOperations
             }, null );
 
             checkBtn.addClickListener( new Button.ClickListener()
@@ -389,8 +389,7 @@ public class Manager
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
                     checkBtn.setEnabled( false );
-                    executor.execute(
-                            new CheckTask( hbase, tracker, config.getClusterName(), agent.getHostname(),
+                    executor.execute( new CheckTask( hbase, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent()
                                     {
                                         public void onComplete( String result )
@@ -405,7 +404,6 @@ public class Manager
                                     } ) );
                 }
             } );
-
         }
     }
 
@@ -429,6 +427,7 @@ public class Manager
         }
     }
 
+
     private void refreshUI()
     {
         if ( config != null )
@@ -442,27 +441,28 @@ public class Manager
     }
 
 
-    private String findNodeRoles( Agent node ){
+    private String findNodeRoles( Agent node )
+    {
 
         StringBuilder sb = new StringBuilder();
-        if ( config.getHbaseMaster() == node ){
-            sb.append( HMaster.name() )
-                    .append( ", " );
+        if ( config.getHbaseMaster() == node )
+        {
+            sb.append( HMaster.name() ).append( ", " );
         }
-        if ( config.getRegionServers().contains( node ) ){
-            sb.append( HBaseType.HRegionServer.name() )
-                    .append( ", " );
+        if ( config.getRegionServers().contains( node ) )
+        {
+            sb.append( HBaseType.HRegionServer.name() ).append( ", " );
         }
-        if ( config.getQuorumPeers().contains( node ) ){
-            sb.append( HBaseType.HQuorumPeer.name() )
-                    .append( ", " );
+        if ( config.getQuorumPeers().contains( node ) )
+        {
+            sb.append( HBaseType.HQuorumPeer.name() ).append( ", " );
         }
-        if ( config.getBackupMasters().contains( node ) ){
-            sb.append(  HBaseType.BackupMaster.name() )
-                    .append( ", " );
+        if ( config.getBackupMasters().contains( node ) )
+        {
+            sb.append( HBaseType.BackupMaster.name() ).append( ", " );
         }
 
-        return sb.toString().substring( 0, (sb.length()-2) );
+        return sb.toString().substring( 0, ( sb.length() - 2 ) );
     }
 
 
@@ -497,19 +497,24 @@ public class Manager
     }
 
 
-    private String parseStatus( String result, String roles ){
+    private String parseStatus( String result, String roles )
+    {
         StringBuilder sb = new StringBuilder();
 
-        if ( result.contains( "not connected" ) ){
+        if ( result.contains( "not connected" ) )
+        {
             sb.append( "Agent is not connected !" );
-            return  sb.toString();
+            return sb.toString();
         }
 
         // A nodes has multiple role
-        if ( roles.contains( "," ) ){
+        if ( roles.contains( "," ) )
+        {
             String nodeRoles[] = roles.split( "," );
-            for ( String r : nodeRoles ){
-                switch( r.trim() ) {
+            for ( String r : nodeRoles )
+            {
+                switch ( r.trim() )
+                {
                     case "HMaster":
                         sb.append( parseStatus( result, HMASTER_PATTERN ) ).append( ", " );
                         break;
@@ -525,8 +530,10 @@ public class Manager
                 }
             }
         }
-        else {
-            switch( roles ) {
+        else
+        {
+            switch ( roles )
+            {
                 case "HMaster":
                     sb.append( parseStatus( result, HMASTER_PATTERN ) ).append( ", " );
                     break;
@@ -543,11 +550,11 @@ public class Manager
         }
 
 
-        return sb.toString().substring( 0, (sb.length()-2) );
+        return sb.toString().substring( 0, ( sb.length() - 2 ) );
     }
 
 
-    private String parseStatus( String result, Pattern pattern)
+    private String parseStatus( String result, Pattern pattern )
     {
         StringBuilder parsedResult = new StringBuilder();
         Matcher masterMatcher = pattern.matcher( result );
@@ -592,8 +599,8 @@ public class Manager
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executor,
-                                        commandRunner, agentManager );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executor, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else

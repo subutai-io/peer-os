@@ -24,6 +24,7 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         super( po, manager, config );
     }
 
+
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
@@ -143,7 +144,8 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
             }
         }
 
-        if ( config.getRegionServers().isEmpty() || config.getQuorumPeers().isEmpty() || config.getBackupMasters().isEmpty() )
+        if ( config.getRegionServers().isEmpty() || config.getQuorumPeers().isEmpty() || config.getBackupMasters()
+                                                                                               .isEmpty() )
         {
             throw new ClusterSetupException( "No nodes eligible for installation\nInstallation aborted" );
         }
@@ -152,6 +154,7 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
             throw new ClusterSetupException( "Master node was omitted\nInstallation aborted" );
         }
     }
+
 
     private void configure() throws ClusterSetupException
     {

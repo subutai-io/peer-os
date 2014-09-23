@@ -45,20 +45,6 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
-    private final GridLayout contentRoot;
-    private final ComboBox clusterCombo;
-    private final Table nodesTable;
-    private final String COORDINATOR_PREFIX = "Coordinator: ";
-    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private final String message = "No cluster is installed !";
-    private final ExecutorService executorService;
-    private final Presto presto;
-    private final Hadoop hadoop;
-    private final Tracker tracker;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
-    private PrestoClusterConfig config;
-
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
     protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
@@ -75,8 +61,20 @@ public class Manager
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String ADD_NODE_CAPTION = "Add Node";
-
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
+    private final GridLayout contentRoot;
+    private final ComboBox clusterCombo;
+    private final Table nodesTable;
+    private final String COORDINATOR_PREFIX = "Coordinator: ";
+    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final String message = "No cluster is installed !";
+    private final ExecutorService executorService;
+    private final Presto presto;
+    private final Hadoop hadoop;
+    private final Tracker tracker;
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
+    private PrestoClusterConfig config;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException

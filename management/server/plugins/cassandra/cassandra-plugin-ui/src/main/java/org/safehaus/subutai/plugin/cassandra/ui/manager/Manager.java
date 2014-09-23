@@ -6,6 +6,24 @@
 package org.safehaus.subutai.plugin.cassandra.ui.manager;
 
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -23,22 +41,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
-
-import javax.naming.NamingException;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 
 
 public class Manager
@@ -61,8 +63,7 @@ public class Manager
 
     private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String MESSAGE = "No cluster is installed !";
-
-
+    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final AgentManager agentManager;
@@ -72,10 +73,6 @@ public class Manager
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private CassandraClusterConfig config;
-
-
-
-    final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException

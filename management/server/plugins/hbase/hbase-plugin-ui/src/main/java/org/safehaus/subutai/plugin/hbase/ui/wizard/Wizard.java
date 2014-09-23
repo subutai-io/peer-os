@@ -6,7 +6,10 @@
 package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 
-import com.vaadin.ui.GridLayout;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -15,9 +18,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 import com.vaadin.ui.Component;
-
-import javax.naming.NamingException;
-import java.util.concurrent.ExecutorService;
+import com.vaadin.ui.GridLayout;
 
 
 public class Wizard

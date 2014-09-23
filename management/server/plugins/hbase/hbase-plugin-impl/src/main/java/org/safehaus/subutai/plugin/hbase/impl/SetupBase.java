@@ -1,11 +1,12 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import com.google.common.base.Preconditions;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+
+import com.google.common.base.Preconditions;
 
 
 public class SetupBase

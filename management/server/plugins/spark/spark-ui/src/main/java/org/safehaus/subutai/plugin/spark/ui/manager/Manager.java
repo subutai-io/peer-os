@@ -45,19 +45,6 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
-    private final GridLayout contentRoot;
-    private final ComboBox clusterCombo;
-    private final Table nodesTable;
-    private final ExecutorService executor;
-    private final Spark spark;
-    private final Tracker tracker;
-    private final Hadoop hadoop;
-    private final AgentManager agentManager;
-    private final CommandRunner commandRunner;
-    private final String message = "No cluster is installed !";
-    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private SparkClusterConfig config;
-
     protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
     protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
     protected final static String CHECK_BUTTON_CAPTION = "Check";
@@ -72,8 +59,19 @@ public class Manager
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String ADD_NODE_CAPTION = "Add Node";
-
     final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
+    private final GridLayout contentRoot;
+    private final ComboBox clusterCombo;
+    private final Table nodesTable;
+    private final ExecutorService executor;
+    private final Spark spark;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
+    private final String message = "No cluster is installed !";
+    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private SparkClusterConfig config;
 
 
     public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException

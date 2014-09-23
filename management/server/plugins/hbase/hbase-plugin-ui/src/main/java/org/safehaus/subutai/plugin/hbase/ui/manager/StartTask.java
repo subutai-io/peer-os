@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.hbase.ui.manager;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-
-import java.util.UUID;
 
 
 public class StartTask implements Runnable
@@ -19,8 +19,7 @@ public class StartTask implements Runnable
     private final Tracker tracker;
 
 
-    public StartTask( final HBase hBase, final Tracker tracker, String clusterName,
-                      CompleteEvent completeEvent )
+    public StartTask( final HBase hBase, final Tracker tracker, String clusterName, CompleteEvent completeEvent )
     {
         this.clusterName = clusterName;
         this.completeEvent = completeEvent;
@@ -43,10 +42,14 @@ public class StartTask implements Runnable
             {
                 if ( po.getState() != ProductOperationState.RUNNING )
                 {
-                    /** Since start command does not return, we have wait here some time to update status columns of nodes correctly  */
-                    try {
+                    /** Since start command does not return, we have wait here some time to update status columns of
+                     * nodes correctly  */
+                    try
+                    {
                         Thread.sleep( 10000 );
-                    } catch( InterruptedException e ) {
+                    }
+                    catch ( InterruptedException e )
+                    {
                         e.printStackTrace();
                     }
                     completeEvent.onComplete( po.getLog() );

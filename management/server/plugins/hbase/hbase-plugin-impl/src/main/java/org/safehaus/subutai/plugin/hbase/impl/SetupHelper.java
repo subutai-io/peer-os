@@ -1,14 +1,13 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 
 public class SetupHelper
@@ -26,13 +25,15 @@ public class SetupHelper
         this.po = po;
     }
 
+
     public void configureHMaster() throws ClusterSetupException
     {
         po.addLog( "Setting master" );
         StringBuilder sb = new StringBuilder();
         Agent hmaster = config.getHbaseMaster();
 
-        Command cmd = Commands.getConfigMasterCommand( config.getAllNodes(), config.getHadoopNameNode(), hmaster.getHostname() );
+        Command cmd = Commands.getConfigMasterCommand( config.getAllNodes(), config.getHadoopNameNode(),
+                hmaster.getHostname() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( !cmd.hasSucceeded() )
@@ -42,6 +43,7 @@ public class SetupHelper
 
         po.addLog( "Setting regions servers succeeded" );
     }
+
 
     public void configureRegionServers() throws ClusterSetupException
     {
@@ -109,12 +111,11 @@ public class SetupHelper
     }
 
 
-
     public void startCluster() throws ClusterSetupException
     {
         po.addLog( "Starting cluster..." );
 
-        Command cmd = Commands.getStartCommand( Sets.newHashSet( config.getHbaseMaster() ));
+        Command cmd = Commands.getStartCommand( Sets.newHashSet( config.getHbaseMaster() ) );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

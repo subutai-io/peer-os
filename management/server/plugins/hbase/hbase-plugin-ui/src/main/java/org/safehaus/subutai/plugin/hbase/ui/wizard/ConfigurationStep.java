@@ -7,33 +7,32 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.SetupType;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.plugin.hbase.api.SetupType;
 
 
 public class ConfigurationStep extends Panel
@@ -101,10 +100,10 @@ public class ConfigurationStep extends Panel
         {
             addOverHadoopComponents( content, wizard.getConfig() );
         }
-//        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
-//        {
-//            addWithHadoopComponents( content, wizard.getConfig(), wizard.getHadoopConfig() );
-//        }
+        //        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
+        //        {
+        //            addWithHadoopComponents( content, wizard.getConfig(), wizard.getHadoopConfig() );
+        //        }
         content.addComponent( buttons );
 
         setContent( layout );
@@ -157,7 +156,6 @@ public class ConfigurationStep extends Panel
         backUpMasters.setRightColumnCaption( "Selected Nodes" );
         backUpMasters.setWidth( 100, Unit.PERCENTAGE );
         backUpMasters.setRequired( true );
-
 
 
         List<HadoopClusterConfig> clusters = hadoop.getClusters();
@@ -218,13 +216,16 @@ public class ConfigurationStep extends Panel
                 {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     regionServers.setValue( null );
-                    regionServers.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    regionServers
+                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
 
                     quorumPeers.setValue( null );
-                    quorumPeers.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    quorumPeers
+                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
 
                     backUpMasters.setValue( null );
-                    backUpMasters.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    backUpMasters
+                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
 
                     masterNodeCombo.setValue( null );
                     masterNodeCombo.removeAllItems();
@@ -234,9 +235,9 @@ public class ConfigurationStep extends Panel
                         masterNodeCombo.setItemCaption( agent, agent.getHostname() );
                     }
                     config.setHadoopClusterName( hadoopInfo.getClusterName() );
-                    config.setRegionServers( new HashSet< Agent >() );
-                    config.setQuorumPeers( new HashSet< Agent >() );
-                    config.setBackupMasters( new HashSet< Agent >() );
+                    config.setRegionServers( new HashSet<Agent>() );
+                    config.setQuorumPeers( new HashSet<Agent>() );
+                    config.setBackupMasters( new HashSet<Agent>() );
                     config.setHbaseMaster( null );
                 }
             }
@@ -269,7 +270,8 @@ public class ConfigurationStep extends Panel
                     }
 
                     Collection ls = regionServers.getListeners( Property.ValueChangeListener.class );
-                    Property.ValueChangeListener h = ls.isEmpty() ? null : ( Property.ValueChangeListener ) ls.iterator().next();
+                    Property.ValueChangeListener h =
+                            ls.isEmpty() ? null : ( Property.ValueChangeListener ) ls.iterator().next();
                     if ( h != null )
                     {
                         regionServers.removeValueChangeListener( h );
@@ -341,32 +343,41 @@ public class ConfigurationStep extends Panel
             regionServers.setValue( config.getBackupMasters() );
         }
 
-        regionServers.addValueChangeListener( new Property.ValueChangeListener() {
+        regionServers.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if( event.getProperty().getValue() != null ) {
-                    Set< Agent > agentList = new HashSet<>( ( Collection< Agent > ) event.getProperty().getValue() );
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
+                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
                     config.setRegionServers( agentList );
                 }
             }
         } );
 
-        quorumPeers.addValueChangeListener( new Property.ValueChangeListener() {
+        quorumPeers.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if( event.getProperty().getValue() != null ) {
-                    Set< Agent > agentList = new HashSet<>( ( Collection< Agent > ) event.getProperty().getValue() );
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
+                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
                     config.setQuorumPeers( agentList );
                 }
             }
         } );
 
 
-        backUpMasters.addValueChangeListener( new Property.ValueChangeListener() {
+        backUpMasters.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if( event.getProperty().getValue() != null ) {
-                    Set< Agent > agentList = new HashSet<>( ( Collection< Agent > ) event.getProperty().getValue() );
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
+                    Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
                     config.setBackupMasters( agentList );
                 }
             }
@@ -380,81 +391,81 @@ public class ConfigurationStep extends Panel
     }
 
 
-//    private void addWithHadoopComponents( ComponentContainer parent, final HBaseClusterConfig config,
-//                                          final HadoopClusterConfig hadoopConfig )
-//    {
-//
-//        Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
-//
-//        final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
-//        txtHadoopClusterName.setRequired( true );
-//        txtHadoopClusterName.setMaxLength( 20 );
-//        if ( hadoopConfig.getClusterName() != null )
-//        {
-//            txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
-//        }
-//        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
-//        {
-//            @Override
-//            public void valueChange( Property.ValueChangeEvent event )
-//            {
-//                String name = event.getProperty().getValue().toString().trim();
-//                config.setHadoopClusterName( name );
-//                hadoopConfig.setClusterName( name );
-//            }
-//        } );
-//
-//        ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
-//        cmbSlaveNodes.setImmediate( true );
-//        cmbSlaveNodes.setTextInputAllowed( false );
-//        cmbSlaveNodes.setNullSelectionAllowed( false );
-//        cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
-//        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
-//        {
-//            @Override
-//            public void valueChange( Property.ValueChangeEvent event )
-//            {
-//                hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
-//            }
-//        } );
-//
-//        ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
-//        cmbReplFactor.setImmediate( true );
-//        cmbReplFactor.setTextInputAllowed( false );
-//        cmbReplFactor.setNullSelectionAllowed( false );
-//        cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
-//        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
-//        {
-//            @Override
-//            public void valueChange( Property.ValueChangeEvent event )
-//            {
-//                hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
-//            }
-//        } );
-//
-//        TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
-//        txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
-//        txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
-//        txtHadoopDomain.setMaxLength( 20 );
-//        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
-//        {
-//            @Override
-//            public void valueChange( Property.ValueChangeEvent event )
-//            {
-//                String val = event.getProperty().getValue().toString().trim();
-//                if ( !val.isEmpty() )
-//                {
-//                    hadoopConfig.setDomainName( val );
-//                }
-//            }
-//        } );
-//
-//        parent.addComponent( new Label( "Hadoop settings" ) );
-//        parent.addComponent( txtHadoopClusterName );
-//        parent.addComponent( cmbSlaveNodes );
-//        parent.addComponent( cmbReplFactor );
-//        parent.addComponent( txtHadoopDomain );
-//    }
+    //    private void addWithHadoopComponents( ComponentContainer parent, final HBaseClusterConfig config,
+    //                                          final HadoopClusterConfig hadoopConfig )
+    //    {
+    //
+    //        Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+    //
+    //        final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
+    //        txtHadoopClusterName.setRequired( true );
+    //        txtHadoopClusterName.setMaxLength( 20 );
+    //        if ( hadoopConfig.getClusterName() != null )
+    //        {
+    //            txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
+    //        }
+    //        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
+    //        {
+    //            @Override
+    //            public void valueChange( Property.ValueChangeEvent event )
+    //            {
+    //                String name = event.getProperty().getValue().toString().trim();
+    //                config.setHadoopClusterName( name );
+    //                hadoopConfig.setClusterName( name );
+    //            }
+    //        } );
+    //
+    //        ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
+    //        cmbSlaveNodes.setImmediate( true );
+    //        cmbSlaveNodes.setTextInputAllowed( false );
+    //        cmbSlaveNodes.setNullSelectionAllowed( false );
+    //        cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
+    //        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
+    //        {
+    //            @Override
+    //            public void valueChange( Property.ValueChangeEvent event )
+    //            {
+    //                hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
+    //            }
+    //        } );
+    //
+    //        ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
+    //        cmbReplFactor.setImmediate( true );
+    //        cmbReplFactor.setTextInputAllowed( false );
+    //        cmbReplFactor.setNullSelectionAllowed( false );
+    //        cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
+    //        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
+    //        {
+    //            @Override
+    //            public void valueChange( Property.ValueChangeEvent event )
+    //            {
+    //                hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
+    //            }
+    //        } );
+    //
+    //        TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
+    //        txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
+    //        txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
+    //        txtHadoopDomain.setMaxLength( 20 );
+    //        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
+    //        {
+    //            @Override
+    //            public void valueChange( Property.ValueChangeEvent event )
+    //            {
+    //                String val = event.getProperty().getValue().toString().trim();
+    //                if ( !val.isEmpty() )
+    //                {
+    //                    hadoopConfig.setDomainName( val );
+    //                }
+    //            }
+    //        } );
+    //
+    //        parent.addComponent( new Label( "Hadoop settings" ) );
+    //        parent.addComponent( txtHadoopClusterName );
+    //        parent.addComponent( cmbSlaveNodes );
+    //        parent.addComponent( cmbReplFactor );
+    //        parent.addComponent( txtHadoopDomain );
+    //    }
 
 
     private void nextClickHandler( Wizard wizard )
