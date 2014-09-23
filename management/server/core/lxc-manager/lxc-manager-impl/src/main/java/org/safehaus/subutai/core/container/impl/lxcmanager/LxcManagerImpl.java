@@ -38,6 +38,8 @@ import org.safehaus.subutai.core.container.impl.strategy.DefaultLxcPlacementStra
 import org.safehaus.subutai.core.container.impl.strategy.RoundRobinStrategy;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -45,9 +47,10 @@ import com.google.common.base.Strings;
 
 public class LxcManagerImpl implements LxcManager
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( LxcManagerImpl.class );
 
     private final Pattern p = Pattern.compile( "load average: (.*)" );
-    private final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
@@ -437,6 +440,7 @@ public class LxcManagerImpl implements LxcManager
             }
             catch ( InterruptedException ignore )
             {
+                LOGGER.info( "LxcManagerImpl@startLxcOnHost: " + ignore.getMessage(), ignore );
             }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
@@ -477,6 +481,7 @@ public class LxcManagerImpl implements LxcManager
             }
             catch ( InterruptedException ignore )
             {
+                LOGGER.info( "LxcManagerImpl@stopLxcOnHost: " + ignore.getMessage(), ignore );
             }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
@@ -628,6 +633,7 @@ public class LxcManagerImpl implements LxcManager
             }
             catch ( InterruptedException | ExecutionException ignore )
             {
+                LOGGER.warn( "LxcManagerImpl@destroyLxcsByHostname: " + ignore.getMessage(), ignore );
             }
 
             boolean result = true;
@@ -826,6 +832,7 @@ public class LxcManagerImpl implements LxcManager
                     }
                     catch ( InterruptedException ignore )
                     {
+                        LOGGER.warn( "LxcManagerImpl@createLxcsByStrategy: ", ignore );
                     }
                 }
             }
@@ -899,71 +906,6 @@ public class LxcManagerImpl implements LxcManager
 
         return families;
     }
-
-
-    /*
-     *
-     * public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy( LxcPlacementStrategy strategy ) throws
-     * LxcCreateException {
-     *
-     *
-     * if ( strategy == null ) { throw new LxcCreateException( "LXC placement strategy is null" ); }
-     *
-     * strategy.calculatePlacement( getPhysicalServerMetrics() ); Map<Agent, Map<String, Integer>> placementNodes =
-     * strategy.getPlacementInfoMap();
-     *
-     * //check placement info if ( placementNodes.isEmpty() ) { throw new LxcCreateException( "LXC placement nodes are
-     * empty" ); }
-     *
-     * //resulting collection Map<String, Map<Agent, Set<Agent>>> families = new HashMap<>();
-     *
-     * //create containers CompletionService<LxcInfo> completer = new ExecutorCompletionService<>( executor );
-     * List<LxcInfo> lxcInfos = new ArrayList<>(); for ( Map.Entry<Agent, Map<String, Integer>> placementEntry :
-     * placementNodes.entrySet() ) { Agent physicalNode = placementEntry.getKey(); for ( Map.Entry<String, Integer>
-     * lxcEntry : placementEntry.getValue().entrySet() ) { String nodeType = lxcEntry.getKey(); Integer numOfLxcs =
-     * lxcEntry.getValue();
-     *
-     *
-     * for ( int i = 0; i < numOfLxcs; i++ ) {
-     *
-     * LxcInfo lxcInfo = new LxcInfo( physicalNode, Util.generateTimeBasedUUID().toString(), nodeType ); lxcInfos.add(
-     * lxcInfo ); completer.submit( new LxcActor( lxcInfo, this, LxcAction.CLONE ) ); } } }
-     *
-     * //wait for completion try { for ( LxcInfo ignore : lxcInfos ) { Future<LxcInfo> future = completer.take();
-     * future.get(); } } catch ( InterruptedException | ExecutionException ignore ) { }
-     *
-     * boolean result = true; for ( LxcInfo lxcInfo : lxcInfos ) { result &= lxcInfo.isResult(); }
-     *
-     * if ( !result ) { //cleanup lxcs destroyLxcs( lxcInfos, "Not all lxcs created successfully" ); }
-     *
-     *
-     * //start containers for ( LxcInfo lxcInfo : lxcInfos ) { lxcInfo.setResult( false ); completer.submit( new
-     * LxcActor( lxcInfo, this, LxcAction.START ) ); }
-     *
-     * //wait for completion try { for ( LxcInfo ignore : lxcInfos ) { Future<LxcInfo> future = completer.take();
-     * future.get(); } } catch ( InterruptedException | ExecutionException ignore ) { }
-     *
-     * for ( LxcInfo lxcInfo : lxcInfos ) { result &= lxcInfo.isResult(); }
-     *
-     * if ( result ) {
-     *
-     * //wait for lxc agents to connect long waitStart = System.currentTimeMillis(); while ( !Thread.interrupted() ) {
-     * result = true; for ( LxcInfo lxcInfo : lxcInfos ) { Agent lxcAgent = agentManager.getAgentByHostname(
-     * lxcInfo.getLxcHostname() ); if ( lxcAgent == null ) { result = false; break; } else { //populate families
-     *
-     * Map<Agent, Set<Agent>> family = families.get( lxcInfo.getNodeType() ); if ( family == null ) { family = new
-     * HashMap<>(); families.put( lxcInfo.getNodeType(), family ); } Set<Agent> childs = family.get(
-     * lxcInfo.getPhysicalAgent() ); if ( childs == null ) { childs = new HashSet<>(); family.put(
-     * lxcInfo.getPhysicalAgent(), childs ); }
-     *
-     * childs.add( lxcAgent ); } } if ( result ) { break; } else { if ( System.currentTimeMillis() - waitStart > Math
-     * .max( lxcInfos.size() * 60 * 1000, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 ) ) { break; } else { try {
-     * Thread.sleep( 1000 ); } catch ( InterruptedException ex ) { break; } } } } }
-     *
-     * if ( !result ) { //cleanup lxcs destroyLxcs( lxcInfos, "Waiting interval for lxc agents timed out" ); }
-     *
-     * return families; }
-     */
 
 
     @Override
