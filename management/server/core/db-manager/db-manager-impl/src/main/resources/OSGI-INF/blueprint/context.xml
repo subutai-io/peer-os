@@ -10,7 +10,7 @@
     <cm:default-properties>
       <cm:property name="cassandraHost" value="localhost" />
       <cm:property name="cassandraPort" value="9042" />
-      <cm:property name="cassandraKeyspace" value="kiskis" />
+      <cm:property name="cassandraKeyspace" value="subutai" />
     </cm:default-properties>
   </cm:property-placeholder>
 

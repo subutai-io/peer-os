@@ -7,7 +7,7 @@ echo $BASE
 cd ../workspace
 SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/cassandra-mgmt/cassandra-mgmt"
 TARGET="/var/lib/jenkins/Automation/Bigdata/cassandra-mgmt"
-subutai_schema="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/cassandra-mgmt/"
+subutai_schema="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/management/server/server-karaf/src/main/filtered-resources/etc/"
 echo $SOURCE
 echo $TARGET
 echo $subutai_schema
@@ -42,7 +42,7 @@ cp $BASE/repo/sources.list $LXCSOURCE/$pattern/rootfs/etc/apt/
 
 #Copying logstash&jmxtrans deb files.
 cp $BASE/repo/ksks-cassandra-mgmt-1.0.8-amd64.deb $LXCSOURCE/$pattern/rootfs/root/
-cp $subutai_schema/kiskis.sql $LXCSOURCE/$pattern/rootfs/root/
+cp $subutai_schema/subutai.cql $LXCSOURCE/$pattern/rootfs/root/
 
 #start base-container
 sudo lxc-start -n $pattern -d
@@ -58,7 +58,7 @@ passwd=$(cat password.dat)
 
 #removing cassandra-mgmt and kiskis.sql
 rm $LXCSOURCE/$pattern/rootfs/root/ksks-cassandra-mgmt-1.0.8-amd64.deb
-rm $LXCSOURCE/$pattern/rootfs/root/kiskis.sql
+rm $LXCSOURCE/$pattern/rootfs/root/subutai.cql
 
 cd $LXCSOURCE
 
