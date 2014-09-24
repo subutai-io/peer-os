@@ -150,12 +150,9 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     @Override
     public void moduleRegistered( PortalModule module )
     {
-        if ( module != null )
+        if ( module != null ) if ( !module.isCorePlugin() )
         {
-            if ( !module.isCorePlugin() )
-            {
-                addModule( module );
-            }
+            addModule( module );
         }
     }
 
