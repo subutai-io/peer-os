@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.settings.Common;
 public class EnvironmentBlueprint
 {
 
-    Set<NodeGroup> nodeGroups;
+    private Set<NodeGroup> nodeGroups;
     private String name;
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private boolean linkHosts;

@@ -271,7 +271,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         { // process cloning by selected strategy
 
             //            List<ContainerPlacementStrategy> strategies = containerManager.getPlacementStrategies();
-            if ( placementStrategies == null || placementStrategies.size() == 0 )
+            if ( placementStrategies == null || placementStrategies.isEmpty() )
             {
                 show( "There is no placement strategy." );
                 return;

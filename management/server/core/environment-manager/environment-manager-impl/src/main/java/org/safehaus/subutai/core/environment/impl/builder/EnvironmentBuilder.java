@@ -67,10 +67,9 @@ public class EnvironmentBuilder
                                 nodeGroup.getNumberOfNodes() ) );
             }
 
-            Set<Agent> physicalAgents = null;
-            if ( physicalNodes != null && !physicalNodes.isEmpty() )
+            Set<Agent> physicalAgents = new HashSet<>();
+            if ( !physicalNodes.isEmpty() )
             {
-                physicalAgents = new HashSet<>();
                 for ( String host : physicalNodes )
                 {
                     Agent pAgent = agentManager.getAgentByHostname( host );
