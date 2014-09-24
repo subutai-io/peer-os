@@ -58,7 +58,7 @@ passwd=$(cat password.dat)
 
 #removing cassandra-mgmt and kiskis.sql
 rm $LXCSOURCE/$pattern/rootfs/root/ksks-cassandra-mgmt-1.0.8-amd64.deb
-rm $LXCSOURCE/$pattern/rootfs/root/kiskis.sql
+rm $LXCSOURCE/$pattern/rootfs/root/subutai.cql
 
 cd $LXCSOURCE
 
