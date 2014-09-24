@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 
-import com.google.gson.JsonSyntaxException;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
@@ -33,7 +32,7 @@ public class BlueprintLoadForm
 
         blueprintTxtArea = getTextArea();
 
-        Button loadBlueprintButton = new Button( "Save blueprint" );
+        Button loadBlueprintButton = new Button( "Save" );
 
         loadBlueprintButton.addClickListener( new Button.ClickListener()
         {
@@ -62,29 +61,22 @@ public class BlueprintLoadForm
 
     private void uploadAndSaveBlueprint()
     {
-        try
+        String content = blueprintTxtArea.getValue().toString().trim();
+        if ( content.length() > 0 )
         {
-            String content = blueprintTxtArea.getValue().toString().trim();
-            if ( content.length() > 0 )
+            boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
+            if ( !result )
             {
-                boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
-                if ( !result )
-                {
-                    Notification.show( ERROR_SAVING_BLUEPRINT );
-                }
-                else
-                {
-                    Notification.show( BLUEPRINT_SAVED );
-                }
+                Notification.show( ERROR_SAVING_BLUEPRINT );
             }
             else
             {
-                Notification.show( PLEASE_PROVIDE_A_BLUEPRINT );
+                Notification.show( BLUEPRINT_SAVED );
             }
         }
-        catch ( JsonSyntaxException e )
+        else
         {
-            Notification.show( ERROR_SAVING_BLUEPRINT );
+            Notification.show( PLEASE_PROVIDE_A_BLUEPRINT );
         }
     }
 

@@ -16,7 +16,7 @@ import com.google.gson.JsonSyntaxException;
 public class BlueprintParser
 {
 
-    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    /*Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
     public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) throws EnvironmentManagerException
@@ -42,5 +42,5 @@ public class BlueprintParser
     public Environment parseEnvironment( final String blueprintStr ) throws JsonSyntaxException
     {
         return gson.fromJson( blueprintStr, Environment.class );
-    }
+    }*/
 }

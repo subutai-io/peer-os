@@ -57,8 +57,6 @@ public interface EnvironmentManager
 
     boolean deleteBlueprint( String name );
 
-    String parseBlueprint( EnvironmentBlueprint blueprint );
-
     boolean saveBuildProcess( EnvironmentBuildProcess buildProgress );
 
     List<EnvironmentBuildProcess> getBuildProcesses();

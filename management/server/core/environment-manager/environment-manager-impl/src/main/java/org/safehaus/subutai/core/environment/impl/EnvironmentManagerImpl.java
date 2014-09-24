@@ -23,12 +23,10 @@ import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
-import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
@@ -36,7 +34,9 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 
 /**
@@ -49,9 +49,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String ENVIRONMENT = "ENVIRONMENT";
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
-    private BlueprintParser blueprintParser;
     private ContainerManager containerManager;
     private TemplateRegistryManager templateRegistryManager;
     private AgentManager agentManager;
@@ -80,7 +80,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void init()
     {
-        this.blueprintParser = new BlueprintParser();
+
         this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
     }
@@ -90,13 +90,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.environmentDAO = null;
         this.environmentBuilder = null;
-        this.blueprintParser = null;
         this.containerManager = null;
         this.templateRegistryManager = null;
         this.agentManager = null;
         this.networkManager = null;
         this.dbManager = null;
-        //        this.peerManager = null;
     }
 
 
@@ -121,18 +119,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setEnvironmentBuilder( final EnvironmentBuilder environmentBuilder )
     {
         this.environmentBuilder = environmentBuilder;
-    }
-
-
-    public BlueprintParser getBlueprintParser()
-    {
-        return blueprintParser;
-    }
-
-
-    public void setBlueprintParser( final BlueprintParser blueprintParser )
-    {
-        this.blueprintParser = blueprintParser;
     }
 
 
@@ -252,16 +238,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+            EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprintStr, EnvironmentBlueprint.class );
             EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-            environmentBuildTask.setEnvironmentBlueprint( blueprint );
+            environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
             return environmentDAO
                     .saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
         }
-        catch ( EnvironmentManagerException e )
+        catch ( JsonParseException e )
         {
-            LOG.error( e.getMessage(), e );
+            LOG.info( e.getMessage() );
         }
         return false;
     }
@@ -278,13 +264,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean deleteBlueprint( String uuid )
     {
         return environmentDAO.deleteInfo( BLUEPRINT, uuid );
-    }
-
-
-    @Override
-    public String parseBlueprint( final EnvironmentBlueprint blueprint )
-    {
-        return blueprintParser.parseEnvironmentBlueprint( blueprint );
     }
 
 
