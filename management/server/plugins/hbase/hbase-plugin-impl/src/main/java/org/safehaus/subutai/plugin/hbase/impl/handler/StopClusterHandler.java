@@ -46,7 +46,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
                 if ( config == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 

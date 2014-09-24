@@ -47,7 +47,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
                 if ( config == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 
@@ -59,6 +59,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
                 catch ( Exception e )
                 {
                     po.addLogFailed( e.getMessage() );
+
                     return;
                 }
                 if ( allNodes == null || allNodes.isEmpty() )

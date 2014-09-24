@@ -24,8 +24,8 @@ import com.google.gson.JsonSyntaxException;
 public class PeerDAO
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
     private final DbManager dbManager;
 
 

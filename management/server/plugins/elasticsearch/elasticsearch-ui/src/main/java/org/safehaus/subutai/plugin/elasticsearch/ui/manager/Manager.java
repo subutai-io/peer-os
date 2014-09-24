@@ -485,7 +485,7 @@ public class Manager
             availableOperations.addComponent( startButton );
             availableOperations.addComponent( stopButton );
 
-            final Object rowId = table.addItem( new Object[] {
+            table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder,
                     availableOperations
             }, null );

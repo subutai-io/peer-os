@@ -38,13 +38,13 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
         final PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
         if ( manager.getAgentManager().getAgentByHostname( config.getCoordinatorNode().getHostname() ) == null )
         {
-            po.addLogFailed( String.format( "Coordinator %s is not connected\nOperation aborted",
+            po.addLogFailed( String.format( "Coordinator %s is not connected. Operation aborted",
                     config.getCoordinatorNode().getHostname() ) );
             return;
         }
@@ -52,14 +52,14 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
         Agent newCoordinator = manager.getAgentManager().getAgentByHostname( newCoordinatorHostname );
         if ( newCoordinator == null )
         {
-            po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
+            po.addLogFailed( String.format( "Agent with hostname %s is not connected. Operation aborted",
                     newCoordinatorHostname ) );
             return;
         }
 
         if ( newCoordinator.equals( config.getCoordinatorNode() ) )
         {
-            po.addLogFailed( String.format( "Node %s is already a coordinator node\nOperation aborted",
+            po.addLogFailed( String.format( "Node %s is already a coordinator node. Operation aborted",
                     newCoordinatorHostname ) );
             return;
         }
@@ -67,7 +67,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
         //check if node is in the cluster
         if ( !config.getWorkers().contains( newCoordinator ) )
         {
-            po.addLogFailed( String.format( "Node %s does not belong to this cluster\nOperation aborted",
+            po.addLogFailed( String.format( "Node %s does not belong to this cluster. Operation aborted",
                     newCoordinatorHostname ) );
             return;
         }
@@ -90,7 +90,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
             }
             else
             {
-                po.addLogFailed( String.format( "Failed to configure coordinator, %s\nOperation aborted",
+                po.addLogFailed( String.format( "Failed to configure coordinator, %s. Operation aborted",
                         configureCoordinatorCommand.getAllErrors() ) );
                 return;
             }
@@ -106,7 +106,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
             if ( configureWorkersCommand.hasSucceeded() )
             {
-                po.addLog( "Workers configured successfully\nStarting cluster..." );
+                po.addLog( "Workers configured successfully. Starting cluster..." );
 
                 Command startNodesCommand = Commands.getStartCommand( config.getAllNodes() );
                 final AtomicInteger okCount = new AtomicInteger();
@@ -141,7 +141,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
             }
             else
             {
-                po.addLogFailed( String.format( "Failed to configure workers, %s\nOperation aborted",
+                po.addLogFailed( String.format( "Failed to configure workers, %s. Operation aborted",
                         configureWorkersCommand.getAllErrors() ) );
             }
         }

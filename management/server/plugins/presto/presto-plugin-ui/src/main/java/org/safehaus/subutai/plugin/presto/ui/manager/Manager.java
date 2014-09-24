@@ -734,7 +734,7 @@ public class Manager
         List<PrestoClusterConfig> clustersInfo = presto.getClusters();
         PrestoClusterConfig clusterInfo = ( PrestoClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( PrestoClusterConfig c : clustersInfo )
             {
