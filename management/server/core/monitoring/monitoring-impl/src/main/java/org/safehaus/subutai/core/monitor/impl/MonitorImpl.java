@@ -86,7 +86,9 @@ public class MonitorImpl implements Monitor
         String response = "";
         try
         {
-            response = HttpUtil.request( HttpUtil.RequestType.POST, query, null );
+            Map<String, String> params = new HashMap<>();
+            params.put( "source", query );
+            response = HttpUtil.request( HttpUtil.RequestType.GET, "http://127.0.0.1:9200/_all/logs/_search", params );
         }
         catch ( HTTPException e )
         {
