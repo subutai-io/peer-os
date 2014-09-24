@@ -73,14 +73,18 @@ function git_add_commit {
 
 function git_remote_push {
   local lxc="$1"
-  
-  if [ -z "`lxc-info -n $lxc | grep RUNNING`" ]; then
-    lxc-start -d -n $lxc
-  fi
 
-  lxc-wait -n $lxc -s RUNNING
-  lxc-attach -n $lxc -- git -C / remote 'set-url' upstream $SUBUTAI_SITE_GIT
-  lxc-attach -n $lxc -- git -C / push -u upstream $lxc
+  pushd /var/lib/lxc/$lxc/rootfs > /dev/null
+  git push -u $SUBUTAI_SITE_GIT $lxc 2>&1 > /dev/null
+  status=$?
+  message="    - branch \"$lxc\" pushed to site git repository"
+  if [ "$status" == "0" ]
+  then
+      msg_info "$message"
+  else
+      msg_fail "$message"
+  fi
+  popd > /dev/null
 }
 
 
@@ -95,4 +99,21 @@ function git_rename_branch {
   lxc-wait -n $newname -s RUNNING
   lxc-attach -n $newname -- git -C / branch -m $oldname $newname
 }
- 
+
+
+function git_delete_branch {
+  local branch=$1
+
+  pushd /var/lib/lxc/master/rootfs > /dev/null
+  git push $SUBUTAI_SITE_GIT :$branch 2>&1 > /dev/null
+  status=$?
+  message="    - branch \"$branch\" deleted from site git repository"
+  if [ "$status" == "0" ]
+  then
+      msg_info "$message"
+  else
+      msg_fail "$message"
+  fi
+
+  popd > /dev/null
+} 
