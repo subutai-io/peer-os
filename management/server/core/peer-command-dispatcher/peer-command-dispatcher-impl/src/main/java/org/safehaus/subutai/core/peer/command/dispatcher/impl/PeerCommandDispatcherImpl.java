@@ -36,13 +36,13 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 
     public void init()
     {
-
+        // empty init
     }
 
 
     public void destroy()
     {
-
+        // empty destroy
     }
 
 

@@ -52,8 +52,6 @@ public class ContainerManagerImpl extends ContainerManagerBase
     // number sequences for template names used for new clone name generation
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
-    private List<ContainerInfo> lxcInfos;
-    private String templateName;
     private Map<String, Set<String>> cloneNames;
 
 
@@ -134,7 +132,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         }
 
         // clone specified number of instances and store their names
-        Map<String, Set<String>> cloneNames = new HashMap<>();
+        cloneNames = new HashMap<>();
         Set<String> existingContainerNames = getContainerNames( hosts );
         List<ContainerInfo> lxcInfos = new ArrayList<>();
         for ( Map.Entry<Agent, Integer> e : slots.entrySet() )

@@ -10,7 +10,8 @@ import org.safehaus.subutai.common.protocol.Container;
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerContainer extends Container {
+public class PeerContainer extends Container
+{
     // UUID of physical agent
     private UUID parentHostId;
     private PeerManager peerManager;
@@ -27,9 +28,12 @@ public class PeerContainer extends Container {
         this.parentHostId = parentHostId;
     }
 
-    public void setPeerManager(PeerManager peerManager) {
+
+    public void setPeerManager( PeerManager peerManager )
+    {
         this.peerManager = peerManager;
     }
+
 
     @Override
     public boolean start() throws ContainerException
