@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.configuration.cli;
 
 
-import org.safehaus.subutai.core.configuration.api.ConfigManager;
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,25 +28,26 @@ public class GetConfigJsonCommand extends OsgiCommandSupport
     @Argument( index = 1, name = "type", required = true, multiValued = false, description = "Configuration type" )
     String type;
 
-    private ConfigManager configManager;
+    private ConfigurationManager configurationManager;
 
 
-    public ConfigManager getConfigManager()
+    public ConfigurationManager getConfigurationManager()
     {
-        return configManager;
+        return configurationManager;
     }
 
 
-    public void setConfigManager( final ConfigManager configManager )
+    public void setConfigurationManager( final ConfigurationManager configurationManager )
     {
-        this.configManager = configManager;
+        this.configurationManager = configurationManager;
     }
 
 
     protected Object doExecute()
     {
 
-        JsonObject jsonObject = configManager.getJsonObjectFromResources( pathToFile, ConfigTypeEnum.valueOf( type ) );
+        JsonObject jsonObject = configurationManager.getJsonObjectFromResources( pathToFile, ConfiguraitonTypeEnum
+                .valueOf( type ) );
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         LOG.info( "GetConfigJsonCommand@doExecute: " + gson.toJson( jsonObject ) );

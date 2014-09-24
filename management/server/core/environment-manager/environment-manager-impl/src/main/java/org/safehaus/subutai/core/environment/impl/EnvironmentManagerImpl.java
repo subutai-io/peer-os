@@ -30,7 +30,7 @@ import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private ContainerManager containerManager;
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private DbManager dbManager;
@@ -82,7 +82,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
 
         this.environmentDAO = new EnvironmentDAO( dbManager );
-        environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
+        environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager );
     }
 
 
@@ -91,7 +91,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.environmentDAO = null;
         this.environmentBuilder = null;
         this.containerManager = null;
-        this.templateRegistryManager = null;
+        this.templateRegistry = null;
         this.agentManager = null;
         this.networkManager = null;
         this.dbManager = null;
@@ -134,15 +134,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public TemplateRegistryManager getTemplateRegistryManager()
+    public TemplateRegistry getTemplateRegistry()
     {
-        return templateRegistryManager;
+        return templateRegistry;
     }
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager )
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
     }
 
 

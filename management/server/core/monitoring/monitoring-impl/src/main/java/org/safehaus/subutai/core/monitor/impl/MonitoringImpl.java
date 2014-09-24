@@ -19,17 +19,17 @@ import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.HttpUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class MonitorImpl implements Monitor
+public class MonitoringImpl implements Monitoring
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( MonitoringImpl.class );
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json", MonitorImpl.class );
+    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json", MonitoringImpl.class );
     private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 

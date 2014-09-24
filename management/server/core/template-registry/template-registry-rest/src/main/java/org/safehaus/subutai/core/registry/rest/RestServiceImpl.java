@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,19 +38,19 @@ public class RestServiceImpl implements RestService
 
     private static final Gson GSON =
             new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistryManager( TemplateRegistryManager templateRegistryManager )
+    public void setTemplateRegistry( TemplateRegistry templateRegistry )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
     }
 
 
     @Override
     public Response getTemplate( final String templateName )
     {
-        Template template = templateRegistryManager.getTemplate( templateName );
+        Template template = templateRegistry.getTemplate( templateName );
         if ( template != null )
         {
             return Response.ok().entity( GSON.toJson( template ) ).build();
@@ -68,7 +68,7 @@ public class RestServiceImpl implements RestService
         try
         {
 
-            templateRegistryManager.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
+            templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
                     FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
 
             return Response.ok().build();
@@ -87,7 +87,7 @@ public class RestServiceImpl implements RestService
         try
         {
 
-            templateRegistryManager.unregisterTemplate( templateName );
+            templateRegistry.unregisterTemplate( templateName );
 
             return Response.ok().build();
         }
@@ -102,7 +102,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getTemplate( final String templateName, final String lxcArch )
     {
-        Template template = templateRegistryManager.getTemplate( templateName, lxcArch );
+        Template template = templateRegistry.getTemplate( templateName, lxcArch );
         if ( template != null )
         {
             return Response.ok().entity( GSON.toJson( template ) ).build();
@@ -117,7 +117,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getParentTemplate( final String childTemplateName )
     {
-        Template template = templateRegistryManager.getParentTemplate( childTemplateName );
+        Template template = templateRegistry.getParentTemplate( childTemplateName );
         if ( template != null )
         {
             return Response.ok().entity( GSON.toJson( template ) ).build();
@@ -132,7 +132,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getParentTemplate( final String childTemplateName, final String lxcArch )
     {
-        Template template = templateRegistryManager.getParentTemplate( childTemplateName, lxcArch );
+        Template template = templateRegistry.getParentTemplate( childTemplateName, lxcArch );
         if ( template != null )
         {
             return Response.ok().entity( GSON.toJson( template ) ).build();
@@ -148,7 +148,7 @@ public class RestServiceImpl implements RestService
     public Response getParentTemplates( final String childTemplateName )
     {
         List<String> parents = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName ) )
+        for ( Template template : templateRegistry.getParentTemplates( childTemplateName ) )
         {
             parents.add( template.getTemplateName() );
         }
@@ -160,7 +160,7 @@ public class RestServiceImpl implements RestService
     public Response getParentTemplates( final String childTemplateName, final String lxcArch )
     {
         List<String> parents = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName, lxcArch ) )
+        for ( Template template : templateRegistry.getParentTemplates( childTemplateName, lxcArch ) )
         {
             parents.add( template.getTemplateName() );
         }
@@ -172,7 +172,7 @@ public class RestServiceImpl implements RestService
     public Response getChildTemplates( final String parentTemplateName )
     {
         List<String> children = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getChildTemplates( parentTemplateName ) )
+        for ( Template template : templateRegistry.getChildTemplates( parentTemplateName ) )
         {
             children.add( template.getTemplateName() );
         }
@@ -184,7 +184,7 @@ public class RestServiceImpl implements RestService
     public Response getChildTemplates( final String parentTemplateName, final String lxcArch )
     {
         List<String> children = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) )
+        for ( Template template : templateRegistry.getChildTemplates( parentTemplateName, lxcArch ) )
         {
             children.add( template.getTemplateName() );
         }
@@ -195,7 +195,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getTemplateTree()
     {
-        TemplateTree tree = templateRegistryManager.getTemplateTree();
+        TemplateTree tree = templateRegistry.getTemplateTree();
         List<Template> uberTemplates = tree.getRootTemplates();
         if ( uberTemplates != null )
         {
@@ -214,7 +214,7 @@ public class RestServiceImpl implements RestService
         try
         {
             return Response.ok().entity(
-                    JsonUtil.toJson( "RESULT", templateRegistryManager.isTemplateInUse( templateName ) ) ).build();
+                    JsonUtil.toJson( "RESULT", templateRegistry.isTemplateInUse( templateName ) ) ).build();
         }
         catch ( RegistryException e )
         {
@@ -231,7 +231,7 @@ public class RestServiceImpl implements RestService
         try
         {
 
-            templateRegistryManager.updateTemplateUsage( faiHostname, templateName, Boolean.parseBoolean( isInUse ) );
+            templateRegistry.updateTemplateUsage( faiHostname, templateName, Boolean.parseBoolean( isInUse ) );
 
             return Response.ok().build();
         }
@@ -248,7 +248,7 @@ public class RestServiceImpl implements RestService
     public Response listTemplates()
     {
         List<String> templates = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getAllTemplates() )
+        for ( Template template : templateRegistry.getAllTemplates() )
         {
             templates.add( template.getTemplateName() );
         }
@@ -260,7 +260,7 @@ public class RestServiceImpl implements RestService
     public Response listTemplates( final String lxcArch )
     {
         List<String> templates = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getAllTemplates( lxcArch ) )
+        for ( Template template : templateRegistry.getAllTemplates( lxcArch ) )
         {
             templates.add( template.getTemplateName() );
         }
@@ -279,7 +279,7 @@ public class RestServiceImpl implements RestService
     public Response listTemplatesPlain( final String lxcArch )
     {
         StringBuilder output = new StringBuilder();
-        List<Template> templates = templateRegistryManager.getAllTemplates( lxcArch );
+        List<Template> templates = templateRegistry.getAllTemplates( lxcArch );
 
         for ( final Template template : templates )
         {

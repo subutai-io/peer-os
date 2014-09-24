@@ -7,7 +7,7 @@
     <property name="bcontext" ref="blueprintBundleContext"></property>
   </bean>-->
   <service ref="textInjector" interface="org.safehaus.subutai.core.configuration.api.TextInjector" />
-  <service ref="configManager" interface="org.safehaus.subutai.core.configuration.api.ConfigManager" />
+  <service ref="configManager" interface="org.safehaus.subutai.core.configuration.api.ConfigurationManager" />
   <!--<service ref="agentManager" interface="org.safehaus.subutai.core.agent.api.AgentManager" />-->
   <!--<service ref="textInjector" interface="org.safehaus.subutai.core.configuration.api.TextInjector" />-->
   <reference id="commandRunner" availability="mandatory"
@@ -16,7 +16,7 @@
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <bean id="configManager" scope="singleton"
-        class="org.safehaus.subutai.core.configuration.impl.ConfigManagerImpl">
+        class="org.safehaus.subutai.core.configuration.impl.ConfigurationManagerImpl">
     <!--<property name="bcontext" ref="blueprintBundleContext"></property>-->
     <!--<property name="agentManager" ref="agentManager" />-->
     <property name="textInjector" ref="textInjector" />

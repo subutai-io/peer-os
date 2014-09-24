@@ -45,8 +45,8 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
@@ -69,13 +69,13 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private ExecutorService executor;
 
 
-    public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitor monitor,
-                                 TemplateManager templateManager, TemplateRegistryManager templateRegistry,
+    public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring,
+                                 TemplateManager templateManager, TemplateRegistry templateRegistry,
                                  DbManager dbManager, StrategyManager strategyManager )
     {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
-        this.monitor = monitor;
+        this.monitoring = monitoring;
         this.templateManager = templateManager;
         this.templateRegistry = templateRegistry;
         this.dbManager = dbManager;
@@ -87,7 +87,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     {
         Preconditions.checkNotNull( agentManager, "Agent manager is null" );
         Preconditions.checkNotNull( commandRunner, "Command runner is null" );
-        Preconditions.checkNotNull( monitor, "Monitor is null" );
+        Preconditions.checkNotNull( monitoring, "Monitor is null" );
 
         sequences = new ConcurrentHashMap<>();
         executor = Executors.newCachedThreadPool();
@@ -581,7 +581,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         Map<Metric, Double> averageMetrics = new EnumMap<>( Metric.class );
         for ( Metric metricKey : Metric.values() )
         {
-            Map<Date, Double> metricMap = monitor.getData( agent.getHostname(), metricKey, startDate, endDate );
+            Map<Date, Double> metricMap = monitoring.getData( agent.getHostname(), metricKey, startDate, endDate );
             if ( !metricMap.isEmpty() )
             {
                 double avg = 0;

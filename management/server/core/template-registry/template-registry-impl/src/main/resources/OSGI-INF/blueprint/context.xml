@@ -5,11 +5,11 @@
              interface="org.safehaus.subutai.core.db.api.DbManager" />
 
   <bean id="templateRegistryManager" scope="singleton"
-        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryManagerImpl">
+        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl">
     <argument ref="dbManager" />
   </bean>
 
   <service ref="templateRegistryManager"
-           interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager" />
+           interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
 </blueprint>

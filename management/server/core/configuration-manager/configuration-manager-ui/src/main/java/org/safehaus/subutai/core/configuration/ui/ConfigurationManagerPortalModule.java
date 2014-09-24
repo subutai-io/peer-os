@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.configuration.api.ConfigManager;
+import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -18,7 +18,7 @@ public class ConfigurationManagerPortalModule implements PortalModule
     private static final String IMAGE = "config.png";
     private static final String NAME = "Configuration";
     private ExecutorService executor;
-    private ConfigManager configManager;
+    private ConfigurationManager configurationManager;
 
 
     public ExecutorService getExecutor()
@@ -27,15 +27,15 @@ public class ConfigurationManagerPortalModule implements PortalModule
     }
 
 
-    public ConfigManager getConfigManager()
+    public ConfigurationManager getConfigurationManager()
     {
-        return configManager;
+        return configurationManager;
     }
 
 
-    public void setConfigManager( final ConfigManager configManager )
+    public void setConfigurationManager( final ConfigurationManager configurationManager )
     {
-        this.configManager = configManager;
+        this.configurationManager = configurationManager;
     }
 
 
@@ -47,7 +47,7 @@ public class ConfigurationManagerPortalModule implements PortalModule
 
     public void destroy()
     {
-        this.configManager = null;
+        this.configurationManager = null;
         executor.shutdown();
     }
 
@@ -76,7 +76,7 @@ public class ConfigurationManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new ConfigurationManagerComponent( configManager );
+        return new ConfigurationManagerComponent( configurationManager );
     }
 
 

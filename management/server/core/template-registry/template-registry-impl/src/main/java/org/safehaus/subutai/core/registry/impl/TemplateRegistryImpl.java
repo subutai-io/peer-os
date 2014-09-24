@@ -25,7 +25,7 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +38,10 @@ import com.google.common.collect.Sets;
 /**
  * This is an implementation of TemplateRegistryManager
  */
-public class TemplateRegistryManagerImpl implements TemplateRegistryManager
+public class TemplateRegistryImpl implements TemplateRegistry
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( TemplateRegistryManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TemplateRegistryImpl.class.getName() );
     private static final String TEMPLATE_IS_NULL_MSG = "Template name is null or empty";
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
@@ -49,7 +49,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager
     private final TemplateDAO templateDAO;
 
 
-    public TemplateRegistryManagerImpl( final DbManager dbManager )
+    public TemplateRegistryImpl( final DbManager dbManager )
     {
         Preconditions.checkNotNull( dbManager, "DB Manager is null" );
         templateDAO = new TemplateDAO( dbManager );

@@ -7,8 +7,8 @@ package org.safehaus.subutai.core.configuration.impl;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.configuration.api.ConfigManager;
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
 import org.safehaus.subutai.core.configuration.api.TextInjector;
 import org.safehaus.subutai.core.configuration.impl.loaders.ConfigurationLoader;
 import org.safehaus.subutai.core.configuration.impl.loaders.PlainConfigurationLoader;
@@ -32,10 +32,10 @@ import com.google.gson.JsonObject;
 /**
  * This is an implementation of LxcManager
  */
-public class ConfigManagerImpl implements ConfigManager
+public class ConfigurationManagerImpl implements ConfigurationManager
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ConfigManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ConfigurationManagerImpl.class.getName() );
     private TextInjector textInjector;
 
 
@@ -53,13 +53,13 @@ public class ConfigManagerImpl implements ConfigManager
 
     @Override
     public boolean injectConfiguration( String hostname, String configFilePath, String jsonObjectConfig,
-                                        ConfigTypeEnum configTypeEnum )
+                                        ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
 
         //TODO echo to given agent
         ConfigurationLoader configurationLoader = null;
 
-        switch ( configTypeEnum )
+        switch ( configuraitonTypeEnum )
         {
             case YAML:
             {
@@ -100,10 +100,11 @@ public class ConfigManagerImpl implements ConfigManager
 
 
     @Override
-    public JsonObject getConfiguration( String agentHostname, String configPathFilename, ConfigTypeEnum configTypeEnum )
+    public JsonObject getConfiguration( String agentHostname, String configPathFilename, ConfiguraitonTypeEnum
+            configuraitonTypeEnum )
     {
         ConfigurationLoader loader = null;
-        switch ( configTypeEnum )
+        switch ( configuraitonTypeEnum )
         {
             case YAML:
             {
@@ -146,7 +147,7 @@ public class ConfigManagerImpl implements ConfigManager
 
 
     @Override
-    public String getProperty( JsonObject config, String path, ConfigTypeEnum configTypeEnum )
+    public String getProperty( JsonObject config, String path, ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         // TODO complete setProperty function
         return null;
@@ -154,20 +155,20 @@ public class ConfigManagerImpl implements ConfigManager
 
 
     @Override
-    public void setProperty( JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum )
+    public void setProperty( JsonObject config, String path, String value, ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         //TODO setProperty function is empty
     }
 
 
     @Override
-    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum )
+    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         String content = FileUtil.getContent( configPathFilename, this );
         try
         {
             ConfigParser parser = null;
-            switch ( configTypeEnum )
+            switch ( configuraitonTypeEnum )
             {
                 case YAML:
                 {
@@ -199,7 +200,7 @@ public class ConfigManagerImpl implements ConfigManager
             }
             if ( parser != null )
             {
-                return parser.parserConfig( configPathFilename, configTypeEnum );
+                return parser.parserConfig( configPathFilename, configuraitonTypeEnum );
             }
         }
         catch ( ConfigurationException e )

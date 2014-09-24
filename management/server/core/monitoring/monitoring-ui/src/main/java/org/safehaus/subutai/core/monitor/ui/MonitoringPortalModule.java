@@ -5,7 +5,7 @@ import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -16,7 +16,7 @@ public class MonitoringPortalModule implements PortalModule
 
     public static final String MODULE_IMAGE = "monitoring.png";
     private static final String MODULE_NAME = "Monitoring";
-    private Monitor monitor;
+    private Monitoring monitoring;
     private AgentManager agentManager;
 
 
@@ -44,7 +44,7 @@ public class MonitoringPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new MonitoringComponent( monitor, agentManager );
+        return new MonitoringComponent( monitoring, agentManager );
     }
 
 
@@ -55,9 +55,9 @@ public class MonitoringPortalModule implements PortalModule
     }
 
 
-    public void setMonitor( Monitor monitor )
+    public void setMonitoring( Monitoring monitoring )
     {
-        this.monitor = monitor;
+        this.monitoring = monitoring;
     }
 
 

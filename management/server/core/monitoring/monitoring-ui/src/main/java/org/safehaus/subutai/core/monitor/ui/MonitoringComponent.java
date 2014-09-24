@@ -8,7 +8,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.monitor.ui.util.UIUtil;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
@@ -29,7 +29,7 @@ public class MonitoringComponent extends CustomComponent
 {
 
     private static final int MAX_SIZE = 500;
-    private final Monitor monitor;
+    private final Monitoring monitoring;
     private final AgentManager agentManager;
     private transient Chart chart;
     private AgentTree agentTree;
@@ -38,9 +38,9 @@ public class MonitoringComponent extends CustomComponent
     private ListSelect metricListSelect;
 
 
-    public MonitoringComponent( Monitor monitor, AgentManager agentManager )
+    public MonitoringComponent( Monitoring monitoring, AgentManager agentManager )
     {
-        this.monitor = monitor;
+        this.monitoring = monitoring;
         this.agentManager = agentManager;
         initContent();
     }
@@ -186,7 +186,7 @@ public class MonitoringComponent extends CustomComponent
         Date startDate = startDateField.getValue();
         Date endDate = endDateField.getValue();
 
-        Map<Date, Double> values = monitor.getData( host, metric, startDate, endDate );
+        Map<Date, Double> values = monitoring.getData( host, metric, startDate, endDate );
         chart.load( host, metric, values );
     }
 

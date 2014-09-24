@@ -12,7 +12,7 @@
   </cxf:bus>
 
   <reference id="templateRegistryManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager" />
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
   <bean id="templateRegistryRestImpl" class="org.safehaus.subutai.core.registry.rest.RestServiceImpl">
     <property name="templateRegistryManager" ref="templateRegistryManager" />

@@ -7,7 +7,7 @@ package org.safehaus.subutai.core.configuration.ui;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.configuration.api.ConfigManager;
+import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
 import org.safehaus.subutai.core.configuration.ui.manage.ConfigLoaderForm;
 
 import com.vaadin.ui.CustomComponent;
@@ -23,7 +23,7 @@ public class ConfigurationManagerComponent extends CustomComponent implements Di
 {
 
 
-    public ConfigurationManagerComponent( ConfigManager configManager )
+    public ConfigurationManagerComponent( ConfigurationManager configurationManager )
     {
         setHeight( 100, UNITS_PERCENTAGE );
 
@@ -34,7 +34,7 @@ public class ConfigurationManagerComponent extends CustomComponent implements Di
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        sheet.addTab( new ConfigLoaderForm( configManager ), "Configuration" );
+        sheet.addTab( new ConfigLoaderForm( configurationManager ), "Configuration" );
         verticalLayout.addComponent( sheet );
 
         setCompositionRoot( verticalLayout );

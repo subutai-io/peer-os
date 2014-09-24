@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.registry.ui;
 import java.util.List;
 
 import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 
 import com.vaadin.data.Item;
@@ -42,12 +42,12 @@ public class TemplateRegistryComponent extends CustomComponent
     private static final String VALUE_PROPERTY = "value";
     private static final String PHYSICAL_IMG = "img/lxc/physical.png";
     private static final String ICON = "icon";
-    private final TemplateRegistryManager registryManager;
+    private final TemplateRegistry registryManager;
     private HierarchicalContainer container;
     private Tree templateTree;
 
 
-    public TemplateRegistryComponent( TemplateRegistryManager registryManager )
+    public TemplateRegistryComponent( TemplateRegistry registryManager )
     {
         setHeight( 100, Unit.PERCENTAGE );
 

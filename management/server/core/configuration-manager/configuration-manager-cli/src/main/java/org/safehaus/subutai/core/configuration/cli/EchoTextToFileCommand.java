@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.configuration.cli;
 
 
-import org.safehaus.subutai.core.configuration.api.ConfigManager;
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,25 +28,26 @@ public class EchoTextToFileCommand extends OsgiCommandSupport
     @Argument( index = 3, name = "type", required = true, multiValued = false, description = "Configuration type" )
     String type;
 
-    private ConfigManager configManager;
+    private ConfigurationManager configurationManager;
 
 
-    public ConfigManager getConfigManager()
+    public ConfigurationManager getConfigurationManager()
     {
-        return configManager;
+        return configurationManager;
     }
 
 
-    public void setConfigManager( final ConfigManager configManager )
+    public void setConfigurationManager( final ConfigurationManager configurationManager )
     {
-        this.configManager = configManager;
+        this.configurationManager = configurationManager;
     }
 
 
     protected Object doExecute()
     {
         boolean result =
-                configManager.injectConfiguration( hostname, pathToFile, json, ConfigTypeEnum.valueOf( type ) );
+                configurationManager.injectConfiguration( hostname, pathToFile, json, ConfiguraitonTypeEnum
+                        .valueOf( type ) );
 
         LOG.info( "EchoTextToFileCommand@doExecute: " + result, result );
         return null;
