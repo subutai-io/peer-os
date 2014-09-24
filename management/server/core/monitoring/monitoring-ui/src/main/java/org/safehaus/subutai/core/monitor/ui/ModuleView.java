@@ -145,7 +145,7 @@ public class ModuleView extends CustomComponent
 
         Set<Agent> agents = agentTree.getSelectedAgents();
 
-        return agents == null || agents.size() == 0 ? null : agents.iterator().next().getHostname();
+        return agents == null || agents.isEmpty() ? null : agents.iterator().next().getHostname();
     }
 
 
