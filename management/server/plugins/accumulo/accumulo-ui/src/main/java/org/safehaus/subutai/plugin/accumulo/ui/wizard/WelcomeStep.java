@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
+import org.safehaus.subutai.plugin.accumulo.ui.AccumuloPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -41,7 +41,7 @@ public class WelcomeStep extends Panel
 
         Label logoImg = new Label();
         // Image as a file resource
-        logoImg.setIcon( new FileResource( FileUtil.getFile( AccumuloUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( AccumuloPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 56, Unit.PIXELS );
         logoImg.setWidth( 220, Unit.PIXELS );

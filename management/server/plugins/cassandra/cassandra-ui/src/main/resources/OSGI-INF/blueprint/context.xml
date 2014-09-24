@@ -10,7 +10,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.ui.CassandraUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.ui.CassandraPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
 

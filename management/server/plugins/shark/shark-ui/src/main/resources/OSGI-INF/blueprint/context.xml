@@ -12,7 +12,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.shark.ui.SharkUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.shark.ui.SharkPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
 

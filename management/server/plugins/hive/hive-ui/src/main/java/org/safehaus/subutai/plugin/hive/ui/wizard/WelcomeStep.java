@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hive.ui.wizard;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
-import org.safehaus.subutai.plugin.hive.ui.HiveUI;
+import org.safehaus.subutai.plugin.hive.ui.HivePortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -32,7 +32,7 @@ public class WelcomeStep extends Panel
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( HiveUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( HivePortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 150, Unit.PIXELS );
         logoImg.setWidth( 150, Unit.PIXELS );

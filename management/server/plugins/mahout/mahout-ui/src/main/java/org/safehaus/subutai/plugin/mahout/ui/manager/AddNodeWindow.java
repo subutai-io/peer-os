@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
+import org.safehaus.subutai.plugin.mahout.ui.MahoutPortalModule;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
@@ -35,15 +35,15 @@ public class AddNodeWindow extends Window
     private final String clusterName;
 
     private final ArrayList<String> selectedNodes = new ArrayList<>();
-    private MahoutUI mahoutUI;
+    private MahoutPortalModule mahoutPortalModule;
 
 
-    public AddNodeWindow( final MahoutClusterConfig config, Set<Agent> nodes, MahoutUI mahoutUi )
+    public AddNodeWindow( final MahoutClusterConfig config, Set<Agent> nodes, MahoutPortalModule mahoutPortalModule )
     {
 
 
         super( "Add New Node" );
-        this.mahoutUI = mahoutUi;
+        this.mahoutPortalModule = mahoutPortalModule;
         clusterName = config.getClusterName();
 
         setModal( true );
@@ -150,16 +150,16 @@ public class AddNodeWindow extends Window
 
         showProgress();
 
-        final UUID trackID = mahoutUI.getMahoutManager().addNode( clusterName, hostname );
+        final UUID trackID = mahoutPortalModule.getMahoutManager().addNode( clusterName, hostname );
 
-        mahoutUI.getExecutor().execute( new Runnable()
+        mahoutPortalModule.getExecutor().execute( new Runnable()
         {
             public void run()
             {
                 while ( true )
                 {
                     ProductOperationView po =
-                            mahoutUI.getTracker().getProductOperation( MahoutClusterConfig.PRODUCT_KEY, trackID );
+                            mahoutPortalModule.getTracker().getProductOperation( MahoutClusterConfig.PRODUCT_KEY, trackID );
                     if ( po != null )
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );

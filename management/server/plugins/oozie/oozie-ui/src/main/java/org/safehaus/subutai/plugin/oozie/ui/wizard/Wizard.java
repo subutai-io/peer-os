@@ -11,7 +11,7 @@ package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
-import org.safehaus.subutai.plugin.oozie.ui.OozieUI;
+import org.safehaus.subutai.plugin.oozie.ui.OoziePortalModule;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
@@ -26,12 +26,12 @@ public class Wizard
     private final VerticalLayout vlayout;
     private int step = 1;
     private OozieClusterConfig config = new OozieClusterConfig();
-    private OozieUI oozieUI;
+    private OoziePortalModule ooziePortalModule;
 
 
-    public Wizard( OozieUI oozieUI )
+    public Wizard( OoziePortalModule ooziePortalModule )
     {
-        this.oozieUI = oozieUI;
+        this.ooziePortalModule = ooziePortalModule;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin( true );
@@ -115,14 +115,14 @@ public class Wizard
     }
 
 
-    public OozieUI getOozieUI()
+    public OoziePortalModule getOoziePortalModule()
     {
-        return oozieUI;
+        return ooziePortalModule;
     }
 
 
-    public void setOozieUI( final OozieUI oozieUI )
+    public void setOoziePortalModule( final OoziePortalModule ooziePortalModule )
     {
-        this.oozieUI = oozieUI;
+        this.ooziePortalModule = ooziePortalModule;
     }
 }

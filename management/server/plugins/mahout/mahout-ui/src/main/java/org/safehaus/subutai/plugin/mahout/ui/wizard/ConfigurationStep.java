@@ -57,7 +57,7 @@ public class ConfigurationStep extends Panel
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<HadoopClusterConfig> clusters = wizard.getMahoutUI().getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = wizard.getMahoutPortalModule().getHadoopManager().getClusters();
 
         if ( !clusters.isEmpty())
         {
@@ -69,7 +69,7 @@ public class ConfigurationStep extends Panel
         }
 
         HadoopClusterConfig info =
-                wizard.getMahoutUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+                wizard.getMahoutPortalModule().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null )
         {

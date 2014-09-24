@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.mahout.ui.wizard;
 
 
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
+import org.safehaus.subutai.plugin.mahout.ui.MahoutPortalModule;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -19,15 +19,15 @@ import com.vaadin.ui.GridLayout;
 public class Wizard
 {
 
-    private MahoutUI mahoutUI;
+    private MahoutPortalModule mahoutPortalModule;
     private GridLayout grid;
     private int step = 1;
     private MahoutClusterConfig config = new MahoutClusterConfig();
 
 
-    public Wizard( final MahoutUI mahoutUi )
+    public Wizard( final MahoutPortalModule mahoutPortalModule )
     {
-        this.mahoutUI = mahoutUi;
+        this.mahoutPortalModule = mahoutPortalModule;
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
         grid.setSizeFull();
@@ -104,14 +104,14 @@ public class Wizard
     }
 
 
-    public MahoutUI getMahoutUI()
+    public MahoutPortalModule getMahoutPortalModule()
     {
-        return mahoutUI;
+        return mahoutPortalModule;
     }
 
 
-    public void setMahoutUI( final MahoutUI mahoutUI )
+    public void setMahoutPortalModule( final MahoutPortalModule mahoutPortalModule )
     {
-        this.mahoutUI = mahoutUI;
+        this.mahoutPortalModule = mahoutPortalModule;
     }
 }

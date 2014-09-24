@@ -12,7 +12,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.mahout.ui.MahoutUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.mahout.ui.MahoutPortalModule"
         init-method="init" destroy-method="destroy">
     <property name="agentManager" ref="agentManager" />
     <property name="tracker" ref="tracker" />

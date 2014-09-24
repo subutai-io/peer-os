@@ -52,7 +52,7 @@ public class ConfigurationStep extends Panel
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<HadoopClusterConfig> clusters = wizard.getOozieUI().getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = wizard.getOoziePortalModule().getHadoopManager().getClusters();
         if ( !clusters.isEmpty() )
         {
             for ( HadoopClusterConfig config : clusters )
@@ -63,7 +63,7 @@ public class ConfigurationStep extends Panel
         }
 
         HadoopClusterConfig info =
-                wizard.getOozieUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+                wizard.getOoziePortalModule().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null )
         {

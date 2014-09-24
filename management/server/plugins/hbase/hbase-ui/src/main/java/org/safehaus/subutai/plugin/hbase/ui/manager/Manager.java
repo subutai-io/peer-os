@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseType;
-import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
+import org.safehaus.subutai.plugin.hbase.ui.HBasePortalModule;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -51,13 +51,13 @@ public class Manager
     private final Table quorumTable;
     private final Table bmasterTable;
     private HBaseClusterConfig config;
-    private HBaseUI hBaseUI;
+    private HBasePortalModule hBasePortalModule;
 
 
-    public Manager( final HBaseUI hBaseUI )
+    public Manager( final HBasePortalModule hBasePortalModule )
     {
 
-        this.hBaseUI = hBaseUI;
+        this.hBasePortalModule = hBasePortalModule;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setSizeFull();
@@ -121,8 +121,8 @@ public class Manager
             {
                 if ( config != null )
                 {
-                    UUID trackID = hBaseUI.getHbaseManager().startCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+                    UUID trackID = hBasePortalModule.getHbaseManager().startCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
@@ -152,8 +152,8 @@ public class Manager
             {
                 if ( config != null )
                 {
-                    UUID trackID = hBaseUI.getHbaseManager().stopCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+                    UUID trackID = hBasePortalModule.getHbaseManager().stopCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
@@ -183,8 +183,8 @@ public class Manager
             {
                 if ( config != null )
                 {
-                    UUID trackID = hBaseUI.getHbaseManager().checkCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+                    UUID trackID = hBasePortalModule.getHbaseManager().checkCluster( config.getClusterName() );
+                    ProgressWindow window = new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
                             HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
@@ -222,9 +222,9 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = hBaseUI.getHbaseManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = hBasePortalModule.getHbaseManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( hBaseUI.getExecutor(), hBaseUI.getTracker(), trackID,
+                                    new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
                                             HBaseClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
@@ -291,7 +291,7 @@ public class Manager
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
 
-            Agent a = hBaseUI.getAgentManager().getAgentByHostname( hostname );
+            Agent a = hBasePortalModule.getAgentManager().getAgentByHostname( hostname );
             if ( a == null )
             {
                 continue;
@@ -314,7 +314,7 @@ public class Manager
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
 
-            Agent a = hBaseUI.getAgentManager().getAgentByHostname( hostname );
+            Agent a = hBasePortalModule.getAgentManager().getAgentByHostname( hostname );
             if ( a == null )
             {
                 continue;
@@ -329,7 +329,7 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<HBaseClusterConfig> clusters = hBaseUI.getHbaseManager().getClusters();
+        List<HBaseClusterConfig> clusters = hBasePortalModule.getHbaseManager().getClusters();
         HBaseClusterConfig clusterInfo = ( HBaseClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clusters != null && !clusters.isEmpty() )
@@ -379,12 +379,12 @@ public class Manager
                 {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = hBaseUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = hBasePortalModule.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hBaseUI.getExecutor(),
-                                        hBaseUI.getCommandRunner(), hBaseUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), hBasePortalModule.getExecutor(),
+                                        hBasePortalModule.getCommandRunner(), hBasePortalModule.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else

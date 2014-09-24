@@ -75,7 +75,7 @@ public class StepSetConfig extends Panel
         cbServers.setNullSelectionAllowed( false );
 
         HadoopClusterConfig hcc =
-                wizard.getOozieUI().getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
+                wizard.getOoziePortalModule().getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
         for ( Agent agent : hcc.getAllNodes() )
         {
             cbServers.addItem( agent.getHostname() );

@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
-import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
+import org.safehaus.subutai.plugin.hbase.ui.HBasePortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -41,7 +41,7 @@ public class StepStart extends Panel
 
         Label logoImg = new Label();
         // Image as a file resource
-        logoImg.setIcon( new FileResource( FileUtil.getFile( HBaseUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( HBasePortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 56, Unit.PIXELS );
         logoImg.setWidth( 220, Unit.PIXELS );

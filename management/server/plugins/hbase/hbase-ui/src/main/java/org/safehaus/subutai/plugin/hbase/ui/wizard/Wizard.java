@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
+import org.safehaus.subutai.plugin.hbase.ui.HBasePortalModule;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
@@ -22,12 +22,12 @@ public class Wizard
     private final VerticalLayout vlayout;
     private int step = 1;
     private HBaseClusterConfig config = new HBaseClusterConfig();
-    private HBaseUI hBaseUI;
+    private HBasePortalModule hBasePortalModule;
 
 
-    public Wizard( HBaseUI hBaseUI )
+    public Wizard( HBasePortalModule hBasePortalModule )
     {
-        this.hBaseUI = hBaseUI;
+        this.hBasePortalModule = hBasePortalModule;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin( true );
@@ -85,15 +85,15 @@ public class Wizard
     }
 
 
-    public HBaseUI gethBaseUI()
+    public HBasePortalModule gethBasePortalModule()
     {
-        return hBaseUI;
+        return hBasePortalModule;
     }
 
 
-    public void sethBaseUI( final HBaseUI hBaseUI )
+    public void sethBasePortalModule( final HBasePortalModule hBasePortalModule )
     {
-        this.hBaseUI = hBaseUI;
+        this.hBasePortalModule = hBasePortalModule;
     }
 
 

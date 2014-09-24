@@ -55,9 +55,9 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = wizard.getOozieUI().getOozieManager().installCluster( wizard.getConfig() );
+                UUID trackID = wizard.getOoziePortalModule().getOozieManager().installCluster( wizard.getConfig() );
                 ProgressWindow window =
-                        new ProgressWindow( wizard.getOozieUI().getExecutor(), wizard.getOozieUI().getTracker(),
+                        new ProgressWindow( wizard.getOoziePortalModule().getExecutor(), wizard.getOoziePortalModule().getTracker(),
                                 trackID, OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {

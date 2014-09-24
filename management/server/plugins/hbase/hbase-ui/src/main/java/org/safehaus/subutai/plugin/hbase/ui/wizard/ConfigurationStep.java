@@ -56,7 +56,7 @@ public class ConfigurationStep extends VerticalLayout
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<HadoopClusterConfig> clusters = wizard.gethBaseUI().getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = wizard.gethBasePortalModule().getHadoopManager().getClusters();
         if ( !clusters.isEmpty() )
         {
             for ( HadoopClusterConfig config : clusters )
@@ -67,7 +67,7 @@ public class ConfigurationStep extends VerticalLayout
         }
 
         HadoopClusterConfig info =
-                wizard.gethBaseUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+                wizard.gethBasePortalModule().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null )
         {

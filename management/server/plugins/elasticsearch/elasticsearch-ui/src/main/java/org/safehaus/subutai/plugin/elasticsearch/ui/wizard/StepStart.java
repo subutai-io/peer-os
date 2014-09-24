@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.elasticsearch.ui.wizard;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI;
+import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -29,7 +29,7 @@ public class StepStart extends VerticalLayout
         gridLayout.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( ElasticsearchUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( ElasticsearchPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 150, Unit.PIXELS );
         logoImg.setWidth( 220, Unit.PIXELS );

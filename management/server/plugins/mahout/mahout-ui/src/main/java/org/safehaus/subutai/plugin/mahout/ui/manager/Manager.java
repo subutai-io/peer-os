@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
+import org.safehaus.subutai.plugin.mahout.ui.MahoutPortalModule;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -40,16 +40,16 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
-    private MahoutUI mahoutUI;
+    private MahoutPortalModule mahoutPortalModule;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private Table nodesTable;
     private MahoutClusterConfig config;
 
 
-    public Manager( final MahoutUI mahoutUi )
+    public Manager( final MahoutPortalModule mahoutPortalModule )
     {
-        this.mahoutUI = mahoutUi;
+        this.mahoutPortalModule = mahoutPortalModule;
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
@@ -113,9 +113,10 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = mahoutUI.getMahoutManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = Manager.this.mahoutPortalModule.getMahoutManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( mahoutUI.getExecutor(), mahoutUI.getTracker(), trackID,
+                                    new ProgressWindow( Manager.this.mahoutPortalModule
+                                            .getExecutor(), Manager.this.mahoutPortalModule.getTracker(), trackID,
                                             MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
@@ -150,14 +151,15 @@ public class Manager
                 if ( config != null )
                 {
                     HadoopClusterConfig hadoopConfig =
-                            mahoutUI.getHadoopManager().getCluster( config.getClusterName() );
+                            Manager.this.mahoutPortalModule.getHadoopManager().getCluster( config.getClusterName() );
                     if ( hadoopConfig != null )
                     {
                         Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, nodes, mahoutUI );
+                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, nodes,
+                                    Manager.this.mahoutPortalModule );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener()
                             {
@@ -211,12 +213,12 @@ public class Manager
                 {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = mahoutUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = mahoutPortalModule.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), mahoutUI.getExecutor(),
-                                        mahoutUI.getCommandRunner(), mahoutUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), mahoutPortalModule.getExecutor(),
+                                        mahoutPortalModule.getCommandRunner(), mahoutPortalModule.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -274,10 +276,10 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = mahoutUI.getMahoutManager()
+                            UUID trackID = mahoutPortalModule.getMahoutManager()
                                                    .destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
-                                    new ProgressWindow( mahoutUI.getExecutor(), mahoutUI.getTracker(), trackID,
+                                    new ProgressWindow( mahoutPortalModule.getExecutor(), mahoutPortalModule.getTracker(), trackID,
                                             MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
@@ -300,7 +302,7 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<MahoutClusterConfig> clustersInfo = mahoutUI.getMahoutManager().getClusters();
+        List<MahoutClusterConfig> clustersInfo = mahoutPortalModule.getMahoutManager().getClusters();
         MahoutClusterConfig clusterInfo = ( MahoutClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && !clustersInfo.isEmpty() )
