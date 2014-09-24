@@ -7,7 +7,7 @@ echo $BASE
 cd ../workspace
 SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/cassandra-mgmt/cassandra-mgmt"
 TARGET="/var/lib/jenkins/Automation/Bigdata/cassandra-mgmt"
-subutai_schema="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/cassandra-mgmt"
+subutai_schema="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/management/server/server-karaf/src/main/filtered-resources/etc/"
 echo $SOURCE
 echo $TARGET
 echo $subutai_schema
