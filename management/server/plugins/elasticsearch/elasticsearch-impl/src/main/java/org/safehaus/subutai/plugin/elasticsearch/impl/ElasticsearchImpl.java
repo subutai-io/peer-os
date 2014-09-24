@@ -171,10 +171,10 @@ public class ElasticsearchImpl implements Elasticsearch
 
 
     @Override
-    public UUID uninstallCluster( final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    public UUID uninstallCluster( String clusterName )
     {
         AbstractOperationHandler operationHandler =
-                new UninstallOperationHandler( this, elasticsearchClusterConfiguration );
+                new UninstallOperationHandler( this, clusterName );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

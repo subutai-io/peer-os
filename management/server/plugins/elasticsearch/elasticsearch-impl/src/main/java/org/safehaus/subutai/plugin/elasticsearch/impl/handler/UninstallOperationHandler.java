@@ -10,17 +10,11 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 public class UninstallOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
 
-    private final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration;
-
-
-    public UninstallOperationHandler( ElasticsearchImpl manager,
-                                      ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+    public UninstallOperationHandler( ElasticsearchImpl manager, String clusterName )
     {
-
-        super( manager, elasticsearchClusterConfiguration.getClusterName() );
-        this.elasticsearchClusterConfiguration = elasticsearchClusterConfiguration;
+        super( manager, clusterName );
         productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                String.format( "Destroying %s cluster...", elasticsearchClusterConfiguration.getClusterName() ) );
+                String.format( "Destroying %s cluster...", clusterName ) );
     }
 
 
