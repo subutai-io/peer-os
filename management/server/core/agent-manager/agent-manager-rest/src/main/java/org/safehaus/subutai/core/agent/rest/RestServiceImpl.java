@@ -9,10 +9,13 @@ import javax.ws.rs.core.Response;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class RestServiceImpl implements RestService
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
     AgentManager agentManager;
 
@@ -80,6 +83,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( IllegalArgumentException e )
         {
+            LOG.error( "Error in getAgentByUUID", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -104,6 +108,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( IllegalArgumentException e )
         {
+            LOG.error( "Error in getAgentsByEnvironmentId", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }

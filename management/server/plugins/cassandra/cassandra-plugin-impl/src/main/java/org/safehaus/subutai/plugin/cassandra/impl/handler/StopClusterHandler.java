@@ -30,7 +30,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
         if ( config == null )
         {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 

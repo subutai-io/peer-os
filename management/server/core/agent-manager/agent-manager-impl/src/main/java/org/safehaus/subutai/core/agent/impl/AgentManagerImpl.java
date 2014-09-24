@@ -9,7 +9,6 @@ package org.safehaus.subutai.core.agent.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -17,8 +16,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -31,6 +28,8 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -41,13 +40,14 @@ import com.google.common.cache.CacheBuilder;
 /**
  * Implementation of Agent Manager Interface
  */
-public class AgentManagerImpl implements ResponseListener, AgentManager {
+public class AgentManagerImpl implements ResponseListener, AgentManager
+{
 
-    private static final Logger LOG = Logger.getLogger( AgentManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AgentManagerImpl.class.getName() );
     /**
      * list of agent listeners
      */
-    private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<>();
+    protected final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<>();
     /**
      * reference to communication manager
      */
@@ -70,6 +70,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         Preconditions.checkNotNull( communicationService, "Communication Manager is null" );
 
         this.communicationService = communicationService;
+    }
+
+
+    public boolean isNotifyAgentListeners()
+    {
+        return notifyAgentListeners;
+    }
+
+
+    public void setNotifyAgentListeners( final boolean notifyAgentListeners )
+    {
+        this.notifyAgentListeners = notifyAgentListeners;
     }
 
 
@@ -205,7 +217,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in addListener", ex );
+            LOG.error( "Error in addListener", ex );
         }
     }
 
@@ -224,7 +236,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in removeListener", ex );
+            LOG.error( "Error in removeListener", ex );
         }
     }
 
@@ -278,6 +290,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             }
             catch ( InterruptedException ignore )
             {
+                break;
             }
             result = getAgentByHostname( hostname );
         }
@@ -302,49 +315,11 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             communicationService.addListener( this );
 
             exec = Executors.newSingleThreadExecutor();
-            exec.execute( new Runnable() {
-
-                public void run()
-                {
-                    long lastNotify = System.currentTimeMillis();
-                    while ( !Thread.interrupted() )
-                    {
-                        try
-                        {
-                            if ( notifyAgentListeners || System.currentTimeMillis() - lastNotify
-                                    > Common.AGENT_FRESHNESS_MIN * 60 * 1000 / 2 )
-                            {
-                                lastNotify = System.currentTimeMillis();
-                                notifyAgentListeners = false;
-                                Set<Agent> freshAgents = new HashSet( agents.asMap().values() );
-                                for ( Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); )
-                                {
-                                    AgentListener listener = it.next();
-                                    try
-                                    {
-                                        listener.onAgent( freshAgents );
-                                    }
-                                    catch ( Exception e )
-                                    {
-                                        it.remove();
-                                        LOG.log( Level.SEVERE,
-                                                "Error notifying agent listeners, removing faulting listener", e );
-                                    }
-                                }
-                            }
-                            Thread.sleep( 1000 );
-                        }
-                        catch ( InterruptedException ex )
-                        {
-                            break;
-                        }
-                    }
-                }
-            } );
+            exec.execute( new AgentNotifier( this ) );
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in init", ex );
+            LOG.error( "Error in init", ex );
         }
     }
 
@@ -362,7 +337,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in destroy", ex );
+            LOG.error( "Error in destroy", ex );
         }
     }
 
@@ -434,7 +409,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
         catch ( Exception e )
         {
-            LOG.log( Level.SEVERE, "Error in addAgent", e );
+            LOG.error( "Error in addAgent", e );
         }
     }
 
@@ -473,7 +448,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         }
         catch ( Exception e )
         {
-            LOG.log( Level.SEVERE, "Error in removeAgent", e );
+            LOG.error( "Error in removeAgent", e );
         }
     }
 }

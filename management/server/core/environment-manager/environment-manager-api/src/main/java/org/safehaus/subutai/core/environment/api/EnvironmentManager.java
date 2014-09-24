@@ -7,6 +7,7 @@ package org.safehaus.subutai.core.environment.api;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -64,7 +65,17 @@ public interface EnvironmentManager
 
     void saveEnvironment( Environment environment );
 
-    void buildEnvironment( EnvironmentBuildProcess environmentBuildProcess );
+    void buildEnvironment( EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException;
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
+
+    public Set<EnvironmentContainer> getContainers();
+
+    public void addContainer( EnvironmentContainer container );
+
+    public boolean startContainer( EnvironmentContainer container );
+
+    public boolean stopContainer( EnvironmentContainer container );
+
+    public boolean isContainerConnected( EnvironmentContainer container );
 }

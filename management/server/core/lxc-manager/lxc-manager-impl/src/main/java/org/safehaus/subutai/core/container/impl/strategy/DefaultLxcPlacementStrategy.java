@@ -24,15 +24,15 @@ import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
  */
 public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy
 {
-    public static final String defaultNodeType = "default";
-    private final double MIN_HDD_LXC_MB = 5 * 1024;
-    private final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
-    private final double MIN_RAM_LXC_MB = 512;          // 1G
-    private final double MIN_RAM_IN_RESERVE_MB = 1024;   // 1G
-    private final double MIN_CPU_LXC_PERCENT = 5;           // 5%
-    private final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
+    public static final String DEFAULT_NODE_TYPE = "default";
+    private static final double MIN_HDD_LXC_MB = 5 * 1024;
+    private static final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
+    private static final double MIN_RAM_LXC_MB = 512;          // 1G
+    private static final double MIN_RAM_IN_RESERVE_MB = 1024;   // 1G
+    private static final double MIN_CPU_LXC_PERCENT = 5;           // 5%
+    private static final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
     private final int numOfNodes;
-    Logger LOG = Logger.getLogger( DefaultLxcPlacementStrategy.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger( DefaultLxcPlacementStrategy.class.getName() );
 
 
     public DefaultLxcPlacementStrategy( int numOfNodes )
@@ -58,19 +58,14 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy
             for ( Map.Entry<Agent, ServerMetric> entry : serverMetrics.entrySet() )
             {
                 ServerMetric metric = entry.getValue();
-                LOG.log( Level.WARNING, metric.toString() );
+                LOGGER.log( Level.WARNING, metric.toString() );
                 int numOfLxcByRam = ( int ) ( ( metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB ) / MIN_RAM_LXC_MB );
                 int numOfLxcByHdd = ( int ) ( ( metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB ) / MIN_HDD_LXC_MB );
                 int numOfLxcByCpu = ( int ) (
                         ( ( 100 - metric.getCpuLoadPercent() ) - ( MIN_CPU_IN_RESERVE_PERCENT / metric
                                 .getNumOfProcessors() ) ) / ( MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors() ) );
-                LOG.log( Level.WARNING, numOfLxcByRam + " | " + numOfLxcByHdd + " | " + numOfLxcByCpu );
+                LOGGER.log( Level.WARNING, numOfLxcByRam + " | " + numOfLxcByHdd + " | " + numOfLxcByCpu );
 
-                //                if ( numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0 ) {
-                //                    int minNumOfLxcs = Math.min( Math.min( numOfLxcByCpu, numOfLxcByHdd ),
-                // numOfLxcByRam );
-                //                    serverSlots.put( entry.getKey(), minNumOfLxcs );
-                //                }
                 if ( numOfLxcByHdd > 0 && numOfLxcByRam > 0 )
                 {
                     int minNumOfLxcs = Math.min( numOfLxcByHdd, numOfLxcByRam );
@@ -92,7 +87,6 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy
     @Override
     public void calculatePlacement( Map<Agent, ServerMetric> serverMetrics ) throws LxcCreateException
     {
-
         Map<Agent, Integer> serversWithSlots = calculateSlots( serverMetrics );
 
         if ( !serversWithSlots.isEmpty() )
@@ -105,7 +99,6 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy
 
             if ( numOfAvailableLxcSlots >= numOfNodes )
             {
-
                 for ( int i = 0; i < numOfNodes; i++ )
                 {
                     Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( serversWithSlots );
@@ -120,11 +113,11 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy
                     if ( info == null )
                     {
 
-                        addPlacementInfo( physicalNode, defaultNodeType, 1 );
+                        addPlacementInfo( physicalNode, DEFAULT_NODE_TYPE, 1 );
                     }
                     else
                     {
-                        addPlacementInfo( physicalNode, defaultNodeType, info.get( defaultNodeType ) + 1 );
+                        addPlacementInfo( physicalNode, DEFAULT_NODE_TYPE, info.get( DEFAULT_NODE_TYPE ) + 1 );
                     }
                 }
             }

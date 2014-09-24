@@ -82,6 +82,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
+        <version>2.2</version>
         <configuration>
           <webResources>
             <resource>
@@ -117,6 +118,7 @@
           <plugin>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-maven-plugin</artifactId>
+            <version>7.4.0.alpha8</version>
             <configuration>
               <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets/</webappDirectory>
               <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
@@ -198,12 +200,12 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin</artifactId>
-      <version>6.8.2</version>
+      <version>6.8.15</version>
     </dependency>
     <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
-      <version>6.8.2</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${org.slf4j.version}</version>
     </dependency>
   </dependencies>
 </project>

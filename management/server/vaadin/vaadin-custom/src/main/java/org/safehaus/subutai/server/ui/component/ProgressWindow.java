@@ -150,7 +150,7 @@ public class ProgressWindow
     }
 
     private void setOutput( String output ) {
-        try {
+       /* try {
             VaadinSession.getCurrent().getLockInstance().lock();
             if ( !Strings.isNullOrEmpty( output ) ) {
                 outputTxtArea.setValue( output );
@@ -159,7 +159,7 @@ public class ProgressWindow
         }
         finally {
             VaadinSession.getCurrent().getLockInstance().unlock();
-        }
+        }*/
     }
 
 

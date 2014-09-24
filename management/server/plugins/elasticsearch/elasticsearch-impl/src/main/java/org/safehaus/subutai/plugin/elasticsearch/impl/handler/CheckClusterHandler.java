@@ -15,7 +15,6 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 public class CheckClusterHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
-    private String lxcHostname;
     private String clusterName;
 
 
@@ -58,7 +57,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<ElasticsearchI
     private void logStatusResults( ProductOperation po, Command checkStatusCommand )
     {
 
-        String log = "";
+        StringBuilder log = new StringBuilder();
 
         for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
         {
@@ -73,9 +72,9 @@ public class CheckClusterHandler extends AbstractOperationHandler<ElasticsearchI
                 status = "elasticsearch is not running";
             }
 
-            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) ).append( "\n" );
         }
 
-        po.addLogDone( log );
+        po.addLogDone( log.toString() );
     }
 }

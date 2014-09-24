@@ -17,7 +17,7 @@ import org.safehaus.subutai.core.configuration.api.TextInjector;
 public class TextInjectorImpl implements TextInjector
 {
 
-    private static final Logger logger = Logger.getLogger( TextInjector.class.getName() );
+    private static final Logger LOG = Logger.getLogger( TextInjector.class.getName() );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
 
@@ -56,7 +56,7 @@ public class TextInjectorImpl implements TextInjector
 
         if ( !command.hasSucceeded() )
         {
-            logger.info( "Failed to echo content to file" );
+            LOG.info( "Failed to echo content to file" );
             return false;
         }
         return true;
@@ -77,7 +77,7 @@ public class TextInjectorImpl implements TextInjector
         }
         else
         {
-            logger.info( "Failed to cat file" );
+            LOG.info( "Failed to cat file" );
             return "";
         }
     }

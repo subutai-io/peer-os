@@ -138,7 +138,7 @@ public class NodeSelectionStep extends Panel
         } );
 
         List<HadoopClusterConfig> clusters = hadoop.getClusters();
-        if ( clusters.size() > 0 )
+        if ( !clusters.isEmpty() )
         {
             for ( HadoopClusterConfig hci : clusters )
             {

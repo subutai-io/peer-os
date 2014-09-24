@@ -28,6 +28,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>
     </dependency>
+    <!--<dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>-->
   </dependencies>
 
   <build>

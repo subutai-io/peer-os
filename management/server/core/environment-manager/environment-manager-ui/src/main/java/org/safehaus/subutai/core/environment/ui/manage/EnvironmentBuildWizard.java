@@ -2,22 +2,17 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.helper.ContainerBuildMessage;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -34,13 +29,10 @@ import com.vaadin.ui.themes.Runo;
 public class EnvironmentBuildWizard extends DetailsWindow
 {
 
-    private static final Logger LOG = Logger.getLogger( EnvironmentBuildWizard.class.getName() );
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    int step = 0;
-    EnvironmentBuildTask environmentBuildTask;
-    Table peersTable;
-    Table containerToPeerTable;
+    private int step = 0;
+    private EnvironmentBuildTask environmentBuildTask;
+    private Table peersTable;
+    private Table containerToPeerTable;
     private EnvironmentManagerUI managerUI;
 
 
@@ -79,6 +71,10 @@ public class EnvironmentBuildWizard extends DetailsWindow
             {
                 managerUI.getEnvironmentManager().buildEnvironment( environmentBuildTask );
                 close();
+                break;
+            }
+            default:  {
+                setContent( genPeersTable() );
                 break;
             }
         }
@@ -146,7 +142,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                if ( selectedPeers().size() > 0 )
+                if ( !selectedPeers().isEmpty() )
                 {
                     next();
                 }
@@ -187,11 +183,11 @@ public class EnvironmentBuildWizard extends DetailsWindow
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
             {
-                ComboBox box = new ComboBox( "", selectedPeers() );
-                box.setNullSelectionAllowed( false );
-                box.setTextInputAllowed( false );
+                ComboBox comboBox = new ComboBox( "", selectedPeers() );
+                comboBox.setNullSelectionAllowed( false );
+                comboBox.setTextInputAllowed( false );
                 containerToPeerTable.addItem( new Object[] {
-                        ng.getTemplateName(), box
+                        ng.getTemplateName(), comboBox
                 }, null );
             }
         }
@@ -235,10 +231,8 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
     private void createBackgroundEnvironmentBuildProcess()
     {
-        EnvironmentBuildProcess environmentBuildProcess = new EnvironmentBuildProcess();
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess();
 
-        Map<UUID, Map<String, ContainerBuildMessage>> buildMessageMap =
-                new HashMap<UUID, Map<String, ContainerBuildMessage>>();
 
         for ( Object itemId : containerToPeerTable.getItemIds() )
         {
@@ -246,28 +240,19 @@ public class EnvironmentBuildWizard extends DetailsWindow
                     ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
             ComboBox selection =
                     ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
-
             UUID peerUuid = ( UUID ) selection.getValue();
 
 
-            if ( !buildMessageMap.containsKey( peerUuid ) )
-            {
-
-                ContainerBuildMessage cbm = new ContainerBuildMessage();
-                cbm.setTemplateName( templateName );
-                cbm.setPeerId( peerUuid );
-                cbm.setCompleteState( false );
-                cbm.setEnvironmentUuid( environmentBuildTask.getUuid() );
-                //                buildMessageMap.put(  ).put( templateName, cbm );
-            }
-            else
-            {
-                buildMessageMap.get( peerUuid ).get( templateName ).incrementNumOfCont();
-            }
+            CloneContainersMessage ccm = new CloneContainersMessage();
+            ccm.setTemplate( templateName );
+            ccm.setPeerId( peerUuid );
+            ccm.setEnvId( environmentBuildTask.getUuid() );
+            ccm.setNumberOfNodes( 2 );
+            ccm.setStrategy( "ROUND_ROBIN" );
+            process.getCloneContainersMessages().add( ccm );
         }
 
-        String json = gson.toJson( environmentBuildProcess );
-        LOG.info( json );
-        managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+
+        managerUI.getEnvironmentManager().saveBuildProcess( process );
     }
 }

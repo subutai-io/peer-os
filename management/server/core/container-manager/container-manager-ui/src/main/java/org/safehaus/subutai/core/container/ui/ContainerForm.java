@@ -24,7 +24,7 @@ import com.vaadin.ui.themes.Runo;
 public class ContainerForm extends CustomComponent implements Disposable
 {
 
-    private final static String managerTabCaption = "Manage";
+    private static final String MANAGER_TAB_CAPTION = "Manage";
     private final AgentTree agentTree;
     private final ContainerManager containerManager;
     private final StrategyManager strategyManager;
@@ -53,7 +53,7 @@ public class ContainerForm extends CustomComponent implements Disposable
         commandsSheet.setSizeFull();
         final Manager manager = new Manager( executorService, agentManager, containerManager );
         commandsSheet.addTab( new Cloner( containerManager, strategyManager, agentTree ), "Clone" );
-        commandsSheet.addTab( manager, managerTabCaption );
+        commandsSheet.addTab( manager, MANAGER_TAB_CAPTION );
         commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override
@@ -61,7 +61,7 @@ public class ContainerForm extends CustomComponent implements Disposable
             {
                 TabSheet tabsheet = event.getTabSheet();
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if ( caption.equals( managerTabCaption ) )
+                if ( caption.equals( MANAGER_TAB_CAPTION ) )
                 {
                     manager.getLxcInfo();
                 }

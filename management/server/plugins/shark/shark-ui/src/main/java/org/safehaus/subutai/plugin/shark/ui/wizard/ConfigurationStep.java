@@ -47,7 +47,7 @@ public class ConfigurationStep extends Panel
         sparkClusters.setNullSelectionAllowed( false );
 
         List<SparkClusterConfig> clusters = spark.getClusters();
-        if ( clusters.size() > 0 )
+        if ( !clusters.isEmpty() )
         {
             for ( SparkClusterConfig info : clusters )
             {
@@ -73,7 +73,7 @@ public class ConfigurationStep extends Panel
 
         if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
         {
-            if ( clusters.size() > 0 )
+            if ( !clusters.isEmpty() )
             {
                 sparkClusters.setValue( clusters.iterator().next() );
             }
@@ -86,7 +86,7 @@ public class ConfigurationStep extends Panel
                 //restore cluster
                 sparkClusters.setValue( info );
             }
-            else if ( clusters.size() > 0 )
+            else if ( !clusters.isEmpty() )
             {
                 sparkClusters.setValue( clusters.iterator().next() );
             }

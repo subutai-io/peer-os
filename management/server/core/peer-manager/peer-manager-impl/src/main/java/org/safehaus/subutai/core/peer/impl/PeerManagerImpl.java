@@ -16,11 +16,11 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -32,12 +32,12 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.CreateContainersMessage;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
@@ -47,9 +47,10 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager {
+public class PeerManagerImpl implements PeerManager
+{
 
-    private static final Logger LOG = Logger.getLogger( PeerManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
     private DbManager dbManager;
@@ -138,13 +139,13 @@ public class PeerManagerImpl implements PeerManager {
     }
 
 
-    @Override
+    /*@Override
     public String getRemoteId( final String baseUrl )
     {
         RemotePeerClient client = new RemotePeerClient();
         client.setBaseUrl( baseUrl );
         return client.callRemoteRest();
-    }
+    }*/
 
 
     @Override
@@ -159,7 +160,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in addPeerMessageListener", ex );
+            LOG.error( "Error in addPeerMessageListener", ex );
         }
     }
 
@@ -173,7 +174,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( Exception ex )
         {
-            LOG.log( Level.SEVERE, "Error in removePeerMessageListener", ex );
+            LOG.error( "Error in removePeerMessageListener", ex );
         }
     }
 
@@ -209,20 +210,20 @@ public class PeerManagerImpl implements PeerManager {
                 }
                 catch ( HTTPException e )
                 {
-                    LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
+                    LOG.error( "Error in sendPeerMessage", e );
                     throw new PeerMessageException( e.getMessage() );
                 }
             }
             else
             {
                 String err = "Peer is not reachable";
-                LOG.log( Level.SEVERE, "Error in sendPeerMessage", err );
+                LOG.error( "Error in sendPeerMessage", err );
                 throw new PeerMessageException( err );
             }
         }
         catch ( PeerException e )
         {
-            LOG.log( Level.SEVERE, "Error in sendPeerMessage", e );
+            LOG.error( "Error in sendPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
     }
@@ -264,38 +265,38 @@ public class PeerManagerImpl implements PeerManager {
                                 }
                                 catch ( Exception e )
                                 {
-                                    LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                                    LOG.error( "Error in processPeerMessage", e );
                                     throw new PeerMessageException( e.getMessage() );
                                 }
                             }
                         }
                         String err = String.format( "Recipient %s not found", recipient );
-                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                        LOG.error( "Error in processPeerMessage", err );
                         throw new PeerMessageException( err );
                     }
                     else
                     {
                         String err = String.format( "Peer is not reachable %s", senderPeer );
-                        LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                        LOG.error( "Error in processPeerMessage", err );
                         throw new PeerMessageException( err );
                     }
                 }
                 catch ( PeerException e )
                 {
-                    LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+                    LOG.error( "Error in processPeerMessage", e );
                     throw new PeerMessageException( e.getMessage() );
                 }
             }
             else
             {
                 String err = String.format( "Peer %s not found", peerId );
-                LOG.log( Level.SEVERE, "Error in processPeerMessage", err );
+                LOG.error( "Error in processPeerMessage", err );
                 throw new PeerMessageException( err );
             }
         }
         catch ( IllegalArgumentException e )
         {
-            LOG.log( Level.SEVERE, "Error in processPeerMessage", e );
+            LOG.error( "Error in processPeerMessage", e );
             throw new PeerMessageException( e.getMessage() );
         }
     }
@@ -342,7 +343,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( IllegalArgumentException e )
         {
-            LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
+            LOG.error( "Error in getConnectedAgents", e );
             throw new PeerException( e.getMessage() );
         }
     }
@@ -358,52 +359,151 @@ public class PeerManagerImpl implements PeerManager {
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
+                {
                 }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
-                LOG.log( Level.SEVERE, "Error in getConnectedAgents", e );
+                LOG.error( "Error in getConnectedAgents", e );
                 throw new PeerException( e.getMessage() );
             }
         }
         else
         {
             String err = String.format( "Peer is not reachable %s", peer );
-            LOG.log( Level.SEVERE, "Error in getConnectedAgents", err );
+            LOG.error( "Error in getConnectedAgents", err );
             throw new PeerException( err );
         }
     }
 
 
     @Override
-    public Set<Agent> createContainers( CreateContainersMessage ccm )
+    public Set<Agent> createContainers( CloneContainersMessage ccm )
     {
-
+        UUID envId = ccm.getEnvId();
+        String template = ccm.getTemplate();
+        int numberOfNodes = ccm.getNumberOfNodes();
+        String strategy = ccm.getStrategy();
         try
         {
-            if ( getSiteId().toString().equals( ccm.getTargetPeerId().toString() ) )
-            {
-                UUID envId = ccm.getEnvId();
-                String template = ccm.getTemplate();
-                int numberOfNodes = ccm.getNumberOfNodes();
-                String strategy = ccm.getStrategy();
-                return containerManager.clone( envId, template, numberOfNodes, strategy, null );
-            }
-            else
-            {
-                RemotePeerClient client = new RemotePeerClient();
-                Peer remotePeer = getPeerByUUID( ccm.getTargetPeerId() );
-                String baseUrl = "http://" + remotePeer.getIp() + ":8181/cxf";
-                client.setBaseUrl( baseUrl );
-                String response = client.createRemoteContainers( ccm );
-            }
+            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
         }
         catch ( ContainerCreateException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
+        //TODO: replace with empty set;
         return null;
+    }
+
+
+    @Override
+    public boolean startContainer( final PeerContainer container )
+    {
+        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
+        if ( parentAgent == null )
+        {
+            return false;
+        }
+        return containerManager.startLxcOnHost( parentAgent, container.getHostname() );
+    }
+
+
+    @Override
+    public boolean stopContainer( final PeerContainer container )
+    {
+        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
+        if ( parentAgent == null )
+        {
+            return false;
+        }
+        return containerManager.stopLxcOnHost( parentAgent, container.getHostname() );
+    }
+
+
+    @Override
+    public boolean isContainerConnected( final PeerContainer container )
+    {
+        return agentManager.getAgentByUUID( container.getAgentId() ) != null;
+    }
+
+
+    @Override
+    public Set<PeerContainer> getContainers()
+    {
+        return containers;
+    }
+
+
+    @Override
+    public void addContainer( final PeerContainer peerContainer )
+    {
+        if ( peerContainer == null )
+        {
+            throw new IllegalArgumentException( "Peer container could not be null." );
+        }
+
+        peerContainer.setPeerManager( this );
+        containers.add( peerContainer );
+    }
+
+
+    public boolean invoke( PeerCommand peerCommand ) throws PeerException
+    {
+        boolean result = false;
+        switch ( peerCommand.getType() )
+        {
+            case CLONE:
+                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+                createContainers( ccm );
+                break;
+            case START:
+                PeerContainer peerContainer = containerLookup( peerCommand );
+                result = startContainer( peerContainer );
+                break;
+            case STOP:
+                PeerContainer peerContainer1 = containerLookup( peerCommand );
+                result = stopContainer( peerContainer1 );
+                break;
+            case ISCONNECTED:
+                PeerContainer peerContainer2 = containerLookup( peerCommand );
+                result = isContainerConnected( peerContainer2 );
+                break;
+            default:
+                //TODO: log or exception?
+                break;
+        }
+        return result;
+    }
+
+
+    private PeerContainer containerLookup( PeerCommand peerCommand ) throws PeerException
+    {
+
+        UUID agentId = peerCommand.getMessage().getAgentId();
+        PeerContainer container = findPeerContainer( agentId );
+        if ( container == null )
+        {
+            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
+        }
+        return container;
+    }
+
+
+    private PeerContainer findPeerContainer( final UUID agentId )
+    {
+        PeerContainer result = null;
+        Iterator iterator = containers.iterator();
+        while ( result == null && iterator.hasNext() )
+        {
+            PeerContainer c = ( PeerContainer ) iterator.next();
+            if ( c.getAgentId().equals( agentId ) )
+            {
+                result = c;
+            }
+        }
+        return result;
     }
 
 
@@ -430,7 +530,7 @@ public class PeerManagerImpl implements PeerManager {
         }
         catch ( SocketException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
 
 
@@ -441,65 +541,5 @@ public class PeerManagerImpl implements PeerManager {
     public Collection<PeerMessageListener> getPeerMessageListeners()
     {
         return Collections.unmodifiableCollection( peerMessageListeners );
-    }
-
-
-    public boolean invoke( PeerCommand peerCommand ) throws PeerException
-    {
-        boolean result = false;
-        UUID agentId = peerCommand.getPeerCommandMessage().getAgentId();
-        PeerContainer container = findPeerContainer( agentId );
-        if ( container == null )
-        {
-            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
-        }
-        switch ( peerCommand.getType() )
-        {
-            case CLONE:
-                break;
-            case START:
-                start( container );
-                break;
-            case STOP:
-                stop( container );
-                break;
-            case ISCONNECTED:
-                break;
-            default:
-                //TODO: log or exception?
-        }
-        return result;
-    }
-
-
-    private PeerContainer findPeerContainer( final UUID agentId )
-    {
-        PeerContainer result = null;
-        Iterator iterator = containers.iterator();
-        while ( result == null && iterator.hasNext() )
-        {
-            PeerContainer c = ( PeerContainer ) iterator.next();
-            if ( c.getAgentId().equals( agentId ) )
-            {
-                result = c;
-            }
-        }
-        return result;
-    }
-
-
-    private boolean start( PeerContainer container )
-    {
-
-        Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
-        return containerManager.startLxcOnHost( physicalAgent, container.getHostname() );
-    }
-
-
-    private boolean stop( PeerContainer container )
-    {
-
-        Agent physicalAgent = agentManager.getAgentByUUID( container.getParentHostId() );
-        return containerManager.stopLxcOnHost( physicalAgent, container.getHostname() );
     }
 }

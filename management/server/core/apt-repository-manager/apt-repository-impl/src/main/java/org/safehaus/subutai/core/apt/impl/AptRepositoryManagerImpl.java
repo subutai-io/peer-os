@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
@@ -24,6 +23,8 @@ import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.apt.api.PackageInfo;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -38,8 +39,9 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
 {
 
 
+    private static final String AGENT_IS_NULL_MSG = "Agent is null";
     private static final String LINE_SEPARATOR = "\n";
-    private final Logger LOG = Logger.getLogger( AptRepositoryManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AptRepositoryManagerImpl.class.getName() );
     private CommandRunner commandRunner;
 
 
@@ -62,7 +64,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
     @Override
     public List<PackageInfo> listPackages( Agent agent, final String pattern ) throws AptRepoException
     {
-        Preconditions.checkNotNull( agent, "Agent is null" );
+        Preconditions.checkNotNull( agent, AGENT_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( pattern ), "Pattern is null or empty" );
         List<PackageInfo> packages = new LinkedList<>();
 
@@ -131,7 +133,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
     public void addPackageByPath( Agent agent, final String pathToPackageFile, boolean deleteSourcePackage )
             throws AptRepoException
     {
-        Preconditions.checkNotNull( agent, "Agent is null" );
+        Preconditions.checkNotNull( agent, AGENT_IS_NULL_MSG );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package file is null or empty" );
         File packageFile = new File( pathToPackageFile );
@@ -160,7 +162,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
     @Override
     public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException
     {
-        Preconditions.checkNotNull( agent, "Agent is null" );
+        Preconditions.checkNotNull( agent, AGENT_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
 
         Command command = commandRunner.createCommand(
@@ -185,7 +187,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
     public List<String> readFileContents( Agent agent, final String pathToPackageFile,
                                           final List<String> pathsToFilesInsidePackage ) throws AptRepoException
     {
-        Preconditions.checkNotNull( agent, "Agent is null" );
+        Preconditions.checkNotNull( agent, AGENT_IS_NULL_MSG );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package file is null or empty" );
         File packageFile = new File( pathToPackageFile );

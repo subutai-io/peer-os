@@ -2,6 +2,8 @@ package org.safehaus.subutai.core.configuration.cli;
 
 
 import org.safehaus.subutai.core.configuration.api.TextInjector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -11,32 +13,21 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "config", name = "cat", description = "Executes cat command on given host")
+@Command( scope = "config", name = "cat", description = "Executes cat command on given host" )
 public class CatCommand extends OsgiCommandSupport
 {
-
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "Agent hostname")
+    private static final Logger LOG = LoggerFactory.getLogger( CatCommand.class );
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "Agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "pathToFile", required = true, multiValued = false, description = "Path to file")
+    @Argument( index = 1, name = "pathToFile", required = true, multiValued = false, description = "Path to file" )
     String pathToFile;
-    //    private static AgentManager agentManager;
     private TextInjector textInjector;
-
-
-    //    public AgentManager getAgentManager() {
-    //        return agentManager;
-    //    }
 
 
     public TextInjector getTextInjector()
     {
         return textInjector;
     }
-
-
-    //    public void setAgentManager( AgentManager agentManager ) {
-    //        this.agentManager = agentManager;
-    //    }
 
 
     public void setTextInjector( final TextInjector textInjector )
@@ -47,13 +38,8 @@ public class CatCommand extends OsgiCommandSupport
 
     protected Object doExecute()
     {
-
-        //        Agent agent = agentManager.getAgentByHostname( hostname );
         String fileContent = textInjector.catFile( hostname, pathToFile );
-        System.out.println( fileContent );
-
-
-        //        System.out.println( sb.toString() );
+        LOG.info( fileContent );
         return null;
     }
 }

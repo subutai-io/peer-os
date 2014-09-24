@@ -4,10 +4,11 @@ package org.safehaus.subutai.core.dispatcher.impl;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -22,10 +23,11 @@ import com.google.gson.JsonSyntaxException;
  */
 public class DispatcherDAO
 {
-    private static final Logger LOG = Logger.getLogger( DispatcherDAO.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( DispatcherDAO.class.getName() );
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DbManager dbManager;
+    private static final String COMMAND_ID_IS_NULL_MSG = "Command id is null";
 
 
     public DispatcherDAO( final DbManager dbManager )
@@ -51,7 +53,7 @@ public class DispatcherDAO
 
     public Set<RemoteResponse> getRemoteResponses( UUID commandId ) throws DBException
     {
-        Preconditions.checkNotNull( commandId, "Command Id is null" );
+        Preconditions.checkNotNull( commandId, COMMAND_ID_IS_NULL_MSG );
 
         Set<RemoteResponse> responses = new LinkedHashSet<>();
 
@@ -64,12 +66,13 @@ public class DispatcherDAO
                 for ( Row row : rs )
                 {
                     String info = row.getString( "info" );
-                    responses.add( gson.fromJson( info, RemoteResponse.class ) );
+                    responses.add( GSON.fromJson( info, RemoteResponse.class ) );
                 }
             }
         }
         catch ( JsonSyntaxException ex )
         {
+            LOG.error( "Error in getRemoteResponses", ex );
             throw new DBException( ex.getMessage() );
         }
         return responses;
@@ -83,13 +86,13 @@ public class DispatcherDAO
         dbManager.executeUpdate2( "insert into remote_responses(commandId, responseNumber, info) values (?,?,?)",
                 remoteResponse.getCommandId().toString(),
                 String.format( "%s_%s", remoteResponse.getResponse().getUuid(),
-                        remoteResponse.getResponse().getResponseSequenceNumber() ), gson.toJson( remoteResponse ) );
+                        remoteResponse.getResponse().getResponseSequenceNumber() ), GSON.toJson( remoteResponse ) );
     }
 
 
     public void deleteRemoteResponses( UUID commandId ) throws DBException
     {
-        Preconditions.checkNotNull( commandId, "Command id is null" );
+        Preconditions.checkNotNull( commandId, COMMAND_ID_IS_NULL_MSG );
 
         dbManager.executeUpdate2( "delete from remote_responses where commandId = ?", commandId.toString() );
     }
@@ -123,7 +126,7 @@ public class DispatcherDAO
         Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
 
         dbManager.executeUpdate2( "insert into remote_requests(commandId,attempts,info) values (?,?,?)",
-                remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(), gson.toJson( remoteRequest ) );
+                remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(), GSON.toJson( remoteRequest ) );
     }
 
 
@@ -131,7 +134,7 @@ public class DispatcherDAO
     public void deleteRemoteRequest( UUID commandId, int attempts ) throws DBException
     {
         Preconditions.checkArgument( attempts >= 0, "Attempts < 0" );
-        Preconditions.checkNotNull( commandId, "Command id is null" );
+        Preconditions.checkNotNull( commandId, COMMAND_ID_IS_NULL_MSG );
 
         dbManager.executeUpdate2( "delete from remote_requests where commandId = ? and attempts = ?",
                 commandId.toString(), attempts );
@@ -140,7 +143,7 @@ public class DispatcherDAO
 
     public void deleteRemoteRequest( UUID commandId ) throws DBException
     {
-        Preconditions.checkNotNull( commandId, "Command id is null" );
+        Preconditions.checkNotNull( commandId, COMMAND_ID_IS_NULL_MSG );
 
         dbManager.executeUpdate2( "delete from remote_requests where commandId = ?", commandId.toString() );
     }
@@ -148,7 +151,7 @@ public class DispatcherDAO
 
     public RemoteRequest getRemoteRequest( UUID commandId ) throws DBException
     {
-        Preconditions.checkNotNull( commandId, "Command Id is null" );
+        Preconditions.checkNotNull( commandId, COMMAND_ID_IS_NULL_MSG );
 
         ResultSet rs =
                 dbManager.executeQuery2( "select info from remote_requests where commandId = ?", commandId.toString() );
@@ -162,10 +165,12 @@ public class DispatcherDAO
                 String info = row.getString( "info" );
                 try
                 {
-                    return gson.fromJson( info, RemoteRequest.class );
+                    return GSON.fromJson( info, RemoteRequest.class );
                 }
                 catch ( JsonSyntaxException ex )
                 {
+                    LOG.error( "Error in getRemoteRequest", ex );
+
                     throw new DBException( ex.getMessage() );
                 }
             }
@@ -192,12 +197,14 @@ public class DispatcherDAO
                 for ( Row row : rs )
                 {
                     String info = row.getString( "info" );
-                    remoteRequests.add( gson.fromJson( info, RemoteRequest.class ) );
+                    remoteRequests.add( GSON.fromJson( info, RemoteRequest.class ) );
                 }
             }
         }
         catch ( JsonSyntaxException ex )
         {
+            LOG.error( "Error in getRemoteRequests", ex );
+
             throw new DBException( ex.getMessage() );
         }
         return remoteRequests;

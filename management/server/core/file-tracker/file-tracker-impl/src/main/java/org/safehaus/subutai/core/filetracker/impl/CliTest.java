@@ -14,13 +14,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Needed mostly for testing FileTracker
  */
-@Command(scope = "file-tracker", name = "test")
+@Command( scope = "file-tracker", name = "test" )
 public class CliTest extends OsgiCommandSupport implements ResponseListener
 {
 
-    private static final String CONFIG_POINTS[] = {
-            "/etc", "/etc/ksks-agent"
-    };
+    private static final String[] CONFIG_POINTS = new String[] { "/etc", "/etc/ksks-agent" };
 
     private AgentManager agentManager;
 
@@ -48,10 +46,6 @@ public class CliTest extends OsgiCommandSupport implements ResponseListener
 
         fileTracker.createConfigPoints( agent, CONFIG_POINTS );
 
-        //        fileTracker.removeConfigPoints( agent, CONFIG_POINTS );
-
-        //        fileTracker.listConfigPoints( agent );
-
         return null;
     }
 
@@ -74,7 +68,5 @@ public class CliTest extends OsgiCommandSupport implements ResponseListener
     @Override
     public void onResponse( Response response )
     {
-
-
     }
 }

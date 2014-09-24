@@ -3,10 +3,11 @@ package org.safehaus.subutai.core.environment.impl.dao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -23,7 +24,7 @@ import com.google.gson.JsonSyntaxException;
 public class EnvironmentDAO
 {
 
-    private static final Logger LOG = Logger.getLogger( EnvironmentDAO.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DbManager dbManager;
 
@@ -49,7 +50,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
@@ -82,13 +83,13 @@ public class EnvironmentDAO
                 }
             }
         }
-        catch ( JsonSyntaxException ex )
+        catch ( JsonSyntaxException e )
         {
-            LOG.info( ex.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return list;
     }
@@ -125,13 +126,13 @@ public class EnvironmentDAO
                 }
             }
         }
-        catch ( JsonSyntaxException ex )
+        catch ( JsonSyntaxException e )
         {
-            LOG.info( ex.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return null;
     }
@@ -156,7 +157,7 @@ public class EnvironmentDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }

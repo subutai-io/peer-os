@@ -16,10 +16,6 @@ import org.safehaus.subutai.core.communication.api.CommandJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import java.util.logging.Logger;
-
-//import java.util.logging.Logger;
-
 
 /**
  * This class is used internally by CommunicationManagerImpl for sending requests to agents.
@@ -27,7 +23,6 @@ import org.slf4j.LoggerFactory;
 class CommandProducer implements Runnable
 {
 
-    //    private static final Logger LOG = Logger.getLogger( CommandProducer.class.getName() );
     private static final Logger LOG = LoggerFactory.getLogger( CommandProducer.class.getName() );
     private final Request command;
     private final CommunicationManagerImpl communicationManagerImpl;
@@ -72,7 +67,6 @@ class CommandProducer implements Runnable
 
             if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) )
             {
-                //                LOG.log( Level.INFO, "\nSending: {0}", json );
                 LOG.info( "\nSending: {}", json );
             }
 
@@ -81,40 +75,57 @@ class CommandProducer implements Runnable
         }
         catch ( JMSException e )
         {
-            //            LOG.log( Level.SEVERE, "Error in CommandProducer.run", ex );
             LOG.error( "Error to send a message: ", e );
         }
         finally
         {
-            if ( producer != null )
+            closeSilently( producer );
+            closeSilently( session );
+            closeSilently( connection );
+        }
+    }
+
+
+    private void closeSilently( MessageProducer producer )
+    {
+        if ( producer != null )
+        {
+            try
             {
-                try
-                {
-                    producer.close();
-                }
-                catch ( Exception e )
-                {
-                }
+                producer.close();
             }
-            if ( session != null )
+            catch ( Exception ignore )
             {
-                try
-                {
-                    session.close();
-                }
-                catch ( Exception e )
-                {
-                }
             }
-            if ( connection != null )
+        }
+    }
+
+
+    private void closeSilently( Session session )
+    {
+        if ( session != null )
+        {
+            try
             {
-                try
-                {
-                    connection.close();
-                }
-                catch ( Exception e )
-                {
-                }
+                session.close();
+            }
+            catch ( Exception ignore )
+            {
+            }
+        }
+    }
+
+
+    private void closeSilently( Connection connection )
+    {
+        if ( connection != null )
+        {
+            try
+            {
+                connection.close();
+            }
+            catch ( Exception ignore )
+            {
             }
         }
     }

@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -25,6 +26,8 @@ import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.server.ui.component.AgentTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
@@ -42,6 +45,8 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class TerminalForm extends CustomComponent implements Disposable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( TerminalForm.class.getName() );
+
 
     final CommandRunner commandRunner;
     final AgentManager agentManager;
@@ -179,7 +184,6 @@ public class TerminalForm extends CustomComponent implements Disposable
             requestBuilder.withTimeout( Integer.parseInt( timeoutTxtFld.getValue() ) );
             requestBuilder.withCwd( workDirTxtFld.getValue() );
 
-            //			getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
             createCommand( requestBuilder, agents );
         }
     }
@@ -239,16 +243,40 @@ public class TerminalForm extends CustomComponent implements Disposable
 
     private void createCommand( RequestBuilder requestBuilder, Set<Agent> agents )
     {
-        final Command command = commandRunner.createCommand( requestBuilder, agents );
-        final String[] output = { "" };
         indicator.setVisible( true );
-        taskCount.incrementAndGet();
-        executor.execute( new Runnable()
-        {
+        executor.execute(
+                new ExecuteCommandTask( commandRunner.createCommand( requestBuilder, agents ), taskCount, indicator,
+                        this ) );
+    }
 
-            public void run()
+
+    private static class ExecuteCommandTask implements Runnable
+    {
+
+        private final Command command;
+        private final AtomicInteger taskCount;
+        private final Label indicator;
+        private final TerminalForm form;
+
+        private final StringBuilder output = new StringBuilder();
+
+
+        private ExecuteCommandTask( final Command command, final AtomicInteger taskCount, final Label indicator,
+                                    final TerminalForm form )
+        {
+            this.command = command;
+            this.taskCount = taskCount;
+            this.indicator = indicator;
+            this.form = form;
+            taskCount.incrementAndGet();
+        }
+
+
+        public void run()
+        {
+            try
             {
-                commandRunner.runCommand( command, new CommandCallback()
+                command.execute( new CommandCallback()
                 {
 
                     @Override
@@ -265,18 +293,23 @@ public class TerminalForm extends CustomComponent implements Disposable
                             out.append( response.getStdErr() );
                         }
 
-                        output[0] += out.toString();
+                        output.append( out.toString() );
                     }
                 } );
-
-                taskCount.decrementAndGet();
-                if ( taskCount.get() == 0 )
-                {
-                    show( output[0] );
-                    indicator.setVisible( false );
-                }
             }
-        } );
+            catch ( CommandException e )
+            {
+                LOG.error( "Error in ExecuteCommandTask", e );
+                form.show( e.getMessage() );
+            }
+
+            taskCount.decrementAndGet();
+            if ( taskCount.get() == 0 )
+            {
+                form.show( output.toString() );
+                indicator.setVisible( false );
+            }
+        }
     }
 
 

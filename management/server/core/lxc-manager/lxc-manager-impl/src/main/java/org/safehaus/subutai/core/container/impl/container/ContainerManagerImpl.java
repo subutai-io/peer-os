@@ -47,11 +47,12 @@ import com.google.gson.GsonBuilder;
 public class ContainerManagerImpl extends ContainerManagerBase
 {
 
-    private static final Logger logger = LoggerFactory.getLogger( ContainerManager.class );
-    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Logger LOGGER = LoggerFactory.getLogger( ContainerManager.class );
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
     // number sequences for template names used for new clone name generation
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
+    private Map<String, Set<String>> cloneNames;
 
 
     public void init()
@@ -71,7 +72,29 @@ public class ContainerManagerImpl extends ContainerManagerBase
     public Set<Agent> clone( UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
                              PlacementStrategy... strategy ) throws LxcCreateException
     {
+        clonesCreate( hosts, templateName, nodesCount, strategy );
 
+        Set<Agent> clones = processClones( cloneNames );
+
+        try
+        {
+            if ( envId != null )
+            {
+                saveNodeGroup( envId, templateName, clones, strategy );
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Failed to save nodes info", ex );
+        }
+
+        return clones;
+    }
+
+
+    private void clonesCreate( final Collection<Agent> hosts, final String templateName, final int nodesCount,
+                               final PlacementStrategy[] strategy ) throws LxcCreateException
+    {
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
         if ( hosts != null && !hosts.isEmpty() )
@@ -88,6 +111,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
         LxcPlacementStrategy st = PlacementStrategyFactory.create( nodesCount, strategy );
         st.calculatePlacement( metrics );
+
         Map<Agent, Integer> slots = st.getPlacementDistribution();
 
         int totalSlots = 0;
@@ -107,9 +131,8 @@ public class ContainerManagerImpl extends ContainerManagerBase
             throw new LxcCreateException( String.format( "Only %d containers can be created", totalSlots ) );
         }
 
-
         // clone specified number of instances and store their names
-        Map<String, Set<String>> cloneNames = new HashMap<>();
+        cloneNames = new HashMap<>();
         Set<String> existingContainerNames = getContainerNames( hosts );
         List<ContainerInfo> lxcInfos = new ArrayList<>();
         for ( Map.Entry<Agent, Integer> e : slots.entrySet() )
@@ -124,7 +147,6 @@ public class ContainerManagerImpl extends ContainerManagerBase
             ContainerInfo lxcInfo = new ContainerInfo( e.getKey(), hostCloneNames );
             lxcInfos.add( lxcInfo );
         }
-
 
         if ( !lxcInfos.isEmpty() )
         {
@@ -147,6 +169,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
             }
             catch ( InterruptedException | ExecutionException ignore )
             {
+                LOGGER.info( "ContainerManagerImpl@clone: " + ignore.getMessage(), ignore );
             }
 
             boolean result = true;
@@ -165,8 +188,11 @@ public class ContainerManagerImpl extends ContainerManagerBase
         {
             throw new LxcCreateException( "Empty container infos provided" );
         }
+    }
 
 
+    private Set<Agent> processClones( Map<String, Set<String>> cloneNames ) throws LxcCreateException
+    {
         boolean result = true;
         long waitStart = System.currentTimeMillis();
         Set<Agent> clones = new HashSet<>();
@@ -216,9 +242,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
         if ( !result )
         {
-
             //destroy clones
-
             Set<String> names = new HashSet<>();
 
             for ( Map.Entry<String, Set<String>> entry : cloneNames.entrySet() )
@@ -231,25 +255,13 @@ public class ContainerManagerImpl extends ContainerManagerBase
             }
             catch ( LxcDestroyException ignore )
             {
+                LOGGER.warn( "ContainerManagerImpl@" );
             }
 
             throw new LxcCreateException(
                     String.format( "Waiting interval for lxc agents timed out. Use LXC module to cleanup nodes %s",
                             cloneNames ) );
         }
-
-        try
-        {
-            if ( envId != null )
-            {
-                saveNodeGroup( envId, templateName, clones, strategy );
-            }
-        }
-        catch ( Exception ex )
-        {
-            logger.error( "Failed to save nodes info", ex );
-        }
-
         return clones;
     }
 
@@ -457,6 +469,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
             }
             catch ( InterruptedException | ExecutionException ignore )
             {
+                LOGGER.info( "ContainerManagerImpl@clonesDestroy: " + ignore.getMessage(), ignore );
             }
 
             boolean result = true;
@@ -522,7 +535,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         }
 
         Set<String> lxcHostNames = new HashSet<>();
-        for ( EnumMap<LxcState, List<String>> lxcsOnOneHost : map.values() )
+        for ( Map<LxcState, List<String>> lxcsOnOneHost : map.values() )
         {
             for ( List<String> hosts : lxcsOnOneHost.values() )
             {
@@ -553,7 +566,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         for ( Agent a : agents )
         {
             group.setInstanceId( a.getUuid() );
-            dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), gson.toJson( group ) );
+            dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), GSON.toJson( group ) );
         }
     }
 }

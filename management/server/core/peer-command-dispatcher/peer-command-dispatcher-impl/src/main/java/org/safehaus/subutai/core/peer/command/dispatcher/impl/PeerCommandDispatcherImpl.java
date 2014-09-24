@@ -1,18 +1,49 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.core.peer.api.helpers.PeerCommand;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerCommandDispatcherImpl implements PeerCommandDispatcher {
+public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
+{
+    private static final Logger LOG = LoggerFactory.getLogger( PeerCommandDispatcherImpl.class.getName() );
     private PeerManager peerManager;
+    private RemotePeerRestClient remotePeerRestClient;
+
+
+    public RemotePeerRestClient getRemotePeerRestClient()
+    {
+        return remotePeerRestClient;
+    }
+
+
+    public void setRemotePeerRestClient( final RemotePeerRestClient remotePeerRestClient )
+    {
+        this.remotePeerRestClient = remotePeerRestClient;
+    }
+
+
+    public void init()
+    {
+        // empty init
+    }
+
+
+    public void destroy()
+    {
+        // empty destroy
+    }
 
 
     public PeerManager getPeerManager()
@@ -30,8 +61,8 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher {
     @Override
     public boolean invoke( final PeerCommand peerCommand ) throws PeerCommandException
     {
-        boolean result = false;
-        if ( peerManager.getSiteId().equals( peerCommand.getPeerCommandMessage().getPeerId() ) )
+        boolean result;
+        if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
         {
 
             try
@@ -40,12 +71,16 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher {
             }
             catch ( PeerException pe )
             {
+                LOG.error( pe.getMessage() );
                 throw new PeerCommandException( pe.getMessage() );
             }
         }
         else
         {
-            //TODO: remote peer invoke
+            Peer peer = peerManager.getPeerByUUID( peerCommand.getMessage().getPeerId() );
+            CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+            remotePeerRestClient = new RemotePeerRestClient();
+            result = remotePeerRestClient.createRemoteContainers( peer.getIp(), "8181", ccm );
         }
         return result;
     }

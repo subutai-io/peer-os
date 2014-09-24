@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+
+//import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
+
 
 /**
  * Created by bahadyr on 9/14/14.
@@ -12,19 +16,31 @@ import java.util.UUID;
 public class EnvironmentBuildProcess
 {
 
-    String environmentName;
+    private String environmentName;
     private UUID uuid;
     private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
     private int timestamp;
-    private List<ContainerBuildMessage> containerBuildMessages;
+    private List<CloneContainersMessage> cloneContainersMessages;
 
 
     public EnvironmentBuildProcess()
     {
         this.uuid = UUID.randomUUID();
-        this.containerBuildMessages = new ArrayList<ContainerBuildMessage>();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
+        this.cloneContainersMessages = new ArrayList<>();
+    }
+
+
+    public List<CloneContainersMessage> getCloneContainersMessages()
+    {
+        return cloneContainersMessages;
+    }
+
+
+    public void addCloneContainerMessage( CloneContainersMessage ccm )
+    {
+        this.cloneContainersMessages.add( ccm );
     }
 
 
@@ -73,24 +89,6 @@ public class EnvironmentBuildProcess
     public void setCompleteStatus( final boolean completeStatus )
     {
         this.completeStatus = completeStatus;
-    }
-
-
-    public List<ContainerBuildMessage> getContainerBuildMessages()
-    {
-        return containerBuildMessages;
-    }
-
-
-    public void setContainerBuildMessages( final List<ContainerBuildMessage> containerBuildMessages )
-    {
-        this.containerBuildMessages = containerBuildMessages;
-    }
-
-
-    public void addBuildBlock( final ContainerBuildMessage containerBuildMessage )
-    {
-        this.containerBuildMessages.add( containerBuildMessage );
     }
 
 

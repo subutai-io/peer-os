@@ -12,14 +12,15 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class FileUtil
 {
 
-    private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( FileUtil.class.getName() );
 
 
     public static File getFile( String fileName, Object object )
@@ -55,7 +56,7 @@ public class FileUtil
             String currentPath = System.getProperty( "user.dir" ) + "/res/" + fileName;
             inputStream = getClassLoader( object.getClass() ).getResourceAsStream( "img/" + fileName );
             outputStream = new FileOutputStream( new File( currentPath ) );
-            int read = 0;
+            int read;
             byte[] bytes = new byte[1024];
 
             while ( ( read = inputStream.read( bytes ) ) != -1 )
@@ -65,7 +66,7 @@ public class FileUtil
         }
         catch ( Exception ex )
         {
-            log.log( Level.SEVERE, "Error while writing to file: " + ex );
+            LOG.error( "Error while writing to file: " + ex );
         }
         finally
         {
@@ -97,10 +98,8 @@ public class FileUtil
     {
         // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
-        URLClassLoader classLoader =
-                new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
 
-        return classLoader;
+        return new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
     }
 
 
@@ -125,7 +124,7 @@ public class FileUtil
         }
         catch ( Exception e )
         {
-            log.log( Level.SEVERE, "Error while reading file: " + e );
+            LOG.error( "Error while reading file: " + e );
         }
 
         return content;

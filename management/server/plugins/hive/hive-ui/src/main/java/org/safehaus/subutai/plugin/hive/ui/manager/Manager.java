@@ -483,7 +483,7 @@ public class Manager
         HiveConfig current = ( HiveConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         List<HiveConfig> clustersInfo = hive.getClusters();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( HiveConfig ci : clustersInfo )
             {

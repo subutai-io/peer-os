@@ -14,12 +14,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -45,15 +45,11 @@ import com.vaadin.ui.TextArea;
 public class TrackerForm extends CustomComponent
 {
 
-    private static final Logger LOG = Logger.getLogger( TrackerForm.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrackerForm.class.getName() );
     private final Tracker tracker;
     private final ExecutorService executor;
-    private GridLayout content;
     private Table operationsTable;
     private TextArea outputTxtArea;
-    private String okIconSource = "img/ok.png";
-    private String errorIconSource = "img/cancel.png";
-    private String loadIconSource = "img/spinner.gif";
     private PopupDateField fromDate, toDate;
     private ComboBox sourcesCombo, limitCombo;
     private Date fromDateValue, toDateValue;
@@ -62,6 +58,7 @@ public class TrackerForm extends CustomComponent
     private List<ProductOperationView> currentOperations = new ArrayList<>();
     private String source;
     private int limit = 10;
+    private static final String STATUS_PROPERTY = "Status";
 
 
     public TrackerForm( Tracker tracker, ExecutorService executor )
@@ -71,7 +68,7 @@ public class TrackerForm extends CustomComponent
 
         this.tracker = tracker;
         this.executor = executor;
-        content = new GridLayout();
+        final GridLayout content = new GridLayout();
         content.setSpacing( true );
         content.setSizeFull();
         content.setMargin( true );
@@ -135,13 +132,13 @@ public class TrackerForm extends CustomComponent
         try
         {
             fromDateValue = df.parse( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) ) + String
-                    .format( "%02d", ( cal.get( Calendar.MONTH ) + 1 ) ) + cal.get( Calendar.YEAR ) + " 00:00:00" );
+                    .format( "%02d", cal.get( Calendar.MONTH ) + 1 ) + cal.get( Calendar.YEAR ) + " 00:00:00" );
             toDateValue = df.parse( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) ) + String
-                    .format( "%02d", ( cal.get( Calendar.MONTH ) + 1 ) ) + cal.get( Calendar.YEAR ) + " 23:59:59" );
+                    .format( "%02d", cal.get( Calendar.MONTH ) + 1 ) + cal.get( Calendar.YEAR ) + " 23:59:59" );
         }
         catch ( java.text.ParseException ex )
         {
-            Logger.getLogger( TrackerForm.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.error( "Error in generateDateFormat", ex );
         }
     }
 
@@ -218,7 +215,7 @@ public class TrackerForm extends CustomComponent
         table.addContainerProperty( "Date", Date.class, null );
         table.addContainerProperty( "Operation", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
-        table.addContainerProperty( "Status", Embedded.class, null );
+        table.addContainerProperty( STATUS_PROPERTY, Embedded.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -242,7 +239,6 @@ public class TrackerForm extends CustomComponent
         if ( !track )
         {
             track = true;
-
             executor.execute( new Runnable()
             {
                 @Override
@@ -254,18 +250,11 @@ public class TrackerForm extends CustomComponent
                         {
                             populateOperations();
                             populateLogs();
+                            Thread.sleep( 1000 );
                         }
                         catch ( Exception e )
                         {
-                            LOG.log( Level.SEVERE, "Error in tracker", e );
-                        }
-                        try
-                        {
-                            Thread.sleep( 1000 );
-                        }
-                        catch ( InterruptedException ex )
-                        {
-                            break;
+                            LOG.error( "Error in tracker", e );
                         }
                     }
                 }
@@ -296,52 +285,7 @@ public class TrackerForm extends CustomComponent
             boolean sortNeeded = false;
             for ( final ProductOperationView po : operations )
             {
-                Embedded progressIcon;
-                if ( po.getState() == ProductOperationState.RUNNING )
-                {
-                    progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
-                }
-                else if ( po.getState() == ProductOperationState.FAILED )
-                {
-                    progressIcon = new Embedded( "", new ThemeResource( errorIconSource ) );
-                }
-                else
-                {
-                    progressIcon = new Embedded( "", new ThemeResource( okIconSource ) );
-                }
-
-                Item item = container.getItem( po.getId() );
-                if ( item == null )
-                {
-                    final Button trackLogsBtn = new Button( "View logs" );
-                    trackLogsBtn.addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            trackID = po.getId();
-                        }
-                    } );
-
-                    item = container.addItem( po.getId() );
-                    item.getItemProperty( "Date" ).setValue( po.getCreateDate() );
-                    item.getItemProperty( "Operation" ).setValue( po.getDescription() );
-                    item.getItemProperty( "Check" ).setValue( trackLogsBtn );
-                    item.getItemProperty( "Status" ).setValue( progressIcon );
-
-                    sortNeeded = true;
-                }
-                else
-                {
-                    if ( item.getItemProperty( "Status" ) != null && !( ( Embedded ) item.getItemProperty( "Status" )
-                                                                                         .getValue() ).getSource()
-                                                                                                      .equals(
-                                                                                                              progressIcon
-                                                                                                                      .getSource() ) )
-                    {
-                        item.getItemProperty( "Status" ).setValue( progressIcon );
-                    }
-                }
+                sortNeeded |= populateOperation( container, po );
             }
 
             if ( sortNeeded )
@@ -353,6 +297,56 @@ public class TrackerForm extends CustomComponent
 
             currentOperations = operations;
         }
+    }
+
+
+    private boolean populateOperation( final IndexedContainer container, final ProductOperationView po )
+    {
+        boolean sortNeeded = false;
+        Embedded progressIcon;
+        if ( po.getState() == ProductOperationState.RUNNING )
+        {
+            final String loadIconSource = "img/spinner.gif";
+            progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
+        }
+        else if ( po.getState() == ProductOperationState.FAILED )
+        {
+            final String errorIconSource = "img/cancel.png";
+            progressIcon = new Embedded( "", new ThemeResource( errorIconSource ) );
+        }
+        else
+        {
+            final String okIconSource = "img/ok.png";
+            progressIcon = new Embedded( "", new ThemeResource( okIconSource ) );
+        }
+
+        Item item = container.getItem( po.getId() );
+        if ( item == null )
+        {
+            final Button trackLogsBtn = new Button( "View logs" );
+            trackLogsBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( Button.ClickEvent clickEvent )
+                {
+                    trackID = po.getId();
+                }
+            } );
+
+            item = container.addItem( po.getId() );
+            item.getItemProperty( "Date" ).setValue( po.getCreateDate() );
+            item.getItemProperty( "Operation" ).setValue( po.getDescription() );
+            item.getItemProperty( "Check" ).setValue( trackLogsBtn );
+            item.getItemProperty( STATUS_PROPERTY ).setValue( progressIcon );
+
+            sortNeeded = true;
+        }
+        else if ( item.getItemProperty( STATUS_PROPERTY ) != null && !( ( Embedded ) item
+                .getItemProperty( STATUS_PROPERTY ).getValue() ).getSource().equals( progressIcon.getSource() ) )
+        {
+            item.getItemProperty( STATUS_PROPERTY ).setValue( progressIcon );
+        }
+        return sortNeeded;
     }
 
 

@@ -4,17 +4,18 @@ package org.safehaus.subutai.server.ui.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PortalModuleServiceImpl implements PortalModuleService
 {
 
-    private static final Logger LOG = Logger.getLogger( PortalModuleServiceImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PortalModuleServiceImpl.class.getName() );
     private List<PortalModule> modules = Collections.synchronizedList( new ArrayList<PortalModule>() );
 
     private List<PortalModuleListener> listeners =
@@ -31,6 +32,8 @@ public class PortalModuleServiceImpl implements PortalModuleService
             {
                 listener.moduleRegistered( module );
             }
+        } else {
+            LOG.info( "Register module invoked." );
         }
     }
 

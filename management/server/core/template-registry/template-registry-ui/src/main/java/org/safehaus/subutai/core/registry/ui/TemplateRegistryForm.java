@@ -8,8 +8,6 @@ package org.safehaus.subutai.core.registry.ui;
 
 import java.util.List;
 
-import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
@@ -38,21 +36,19 @@ import com.vaadin.ui.themes.Runo;
 /**
  *
  */
-public class TemplateRegistryForm extends CustomComponent implements Disposable
+public class TemplateRegistryForm extends CustomComponent
 {
 
-
-    private final AgentManager agentManager;
+    private static final String VALUE_PROPERTY = "value";
     private final TemplateRegistryManager registryManager;
     private HierarchicalContainer container;
     private Tree templateTree;
 
 
-    public TemplateRegistryForm( AgentManager agentManager, TemplateRegistryManager registryManager )
+    public TemplateRegistryForm( TemplateRegistryManager registryManager )
     {
         setHeight( 100, Unit.PERCENTAGE );
 
-        this.agentManager = agentManager;
         this.registryManager = registryManager;
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
@@ -60,7 +56,7 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
 
         container = new HierarchicalContainer();
-        container.addContainerProperty( "value", Template.class, null );
+        container.addContainerProperty( VALUE_PROPERTY, Template.class, null );
         container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
 
         templateTree = new Tree( "Templates" );
@@ -69,26 +65,19 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable
         templateTree.setImmediate( true );
         templateTree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
         {
-
             @Override
             public String generateDescription( Component source, Object itemId, Object propertyId )
             {
                 String description = "";
-
                 Item item = templateTree.getItem( itemId );
                 if ( item != null )
                 {
-
-                    Template template = ( Template ) item.getItemProperty( "value" ).getValue();
+                    Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                     if ( template != null )
                     {
-                        description = "Name: " + template.getTemplateName() + "<br>" + "Parent: " + template
-                                .getParentTemplateName() + "<br>" + "Arch: " + template.getLxcArch() + "<br>"
-                                + "Utsname: " + template.getLxcUtsname() + "<br>" + "Cfg Path: " + template
-                                .getSubutaiConfigPath();
+                        description = getTemplateDescription( template );
                     }
                 }
-
                 return description;
             }
         } );
@@ -102,7 +91,7 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable
 
                 if ( item != null )
                 {
-                    Template template = ( Template ) item.getItemProperty( "value" ).getValue();
+                    Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
 
                     Notification.show( template.toString() );
                 }
@@ -165,6 +154,18 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable
     }
 
 
+    private String getTemplateDescription( Template template )
+    {
+        if ( template != null )
+        {
+            return "Name: " + template.getTemplateName() + "<br>" + "Parent: " + template.getParentTemplateName()
+                    + "<br>" + "Arch: " + template.getLxcArch() + "<br>" + "Utsname: " + template.getLxcUtsname()
+                    + "<br>" + "Cfg Path: " + template.getSubutaiConfigPath();
+        }
+        return "";
+    }
+
+
     private void fillTemplateTree()
     {
         container.removeAllItems();
@@ -184,7 +185,7 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable
     {
         String itemId = String.format( "%s-%s", currentTemplate.getTemplateName(), currentTemplate.getLxcArch() );
         Item templateItem = container.addItem( itemId );
-        templateItem.getItemProperty( "value" ).setValue( currentTemplate );
+        templateItem.getItemProperty( VALUE_PROPERTY ).setValue( currentTemplate );
         templateTree.setItemCaption( itemId, currentTemplate.getTemplateName() );
 
         Template parent = tree.getParentTemplate( currentTemplate );
@@ -209,11 +210,5 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable
 
             templateTree.expandItem( itemId );
         }
-    }
-
-
-    public void dispose()
-    {
-
     }
 }

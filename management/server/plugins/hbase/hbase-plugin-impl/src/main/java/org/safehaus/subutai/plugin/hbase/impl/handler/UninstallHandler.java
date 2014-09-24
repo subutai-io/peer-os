@@ -48,7 +48,7 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
                 if ( config == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 
@@ -85,7 +85,7 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
                 }
                 else
                 {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs. Failed" );
                 }
             }
         } );

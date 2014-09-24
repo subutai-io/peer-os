@@ -563,7 +563,7 @@ public class Manager
         List<AccumuloClusterConfig> mongoClusterInfos = accumulo.getClusters();
         AccumuloClusterConfig clusterInfo = ( AccumuloClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 )
+        if ( mongoClusterInfos != null && !mongoClusterInfos.isEmpty() )
         {
             for ( AccumuloClusterConfig mongoClusterInfo : mongoClusterInfos )
             {

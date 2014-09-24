@@ -20,7 +20,7 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
 {
 
-    private final Logger logger = Logger.getLogger( CheckServerHandler.class.getName() );
+    private static final Logger logger = Logger.getLogger( CheckServerHandler.class.getName() );
     private ProductOperation po;
     private String clusterName;
 

@@ -365,7 +365,7 @@ public class Manager
 
         SharkClusterConfig clusterInfo = ( SharkClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( SharkClusterConfig mongoClusterInfo : clustersInfo )
             {

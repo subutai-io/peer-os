@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.StrategyException;
 
 
 public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
@@ -35,6 +36,7 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
 
     @Override
     public void calculatePlacement( int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria )
+            throws StrategyException
     {
         if ( serverMetrics == null || serverMetrics.isEmpty() )
         {
@@ -65,7 +67,7 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
     }
 
 
-    protected List<Agent> sortServers( Map<Agent, ServerMetric> serverMetrics )
+    protected List<Agent> sortServers( Map<Agent, ServerMetric> serverMetrics ) throws StrategyException
     {
         List<Agent> ls = new ArrayList( serverMetrics.keySet() );
         Collections.sort( ls );
