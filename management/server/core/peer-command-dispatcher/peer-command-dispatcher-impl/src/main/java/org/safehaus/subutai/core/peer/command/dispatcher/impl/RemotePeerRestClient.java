@@ -91,7 +91,7 @@ public class RemotePeerRestClient
             form.param( "commandType", ccm.getType().toString() );
             form.param( "command", ccm.toJson() );
             Response response =
-                    client.path( path ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON ).post( form );
+                    client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).accept( MediaType.APPLICATION_JSON ).post( form );
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
