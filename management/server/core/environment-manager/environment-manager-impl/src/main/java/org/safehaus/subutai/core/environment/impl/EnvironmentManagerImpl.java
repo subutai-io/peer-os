@@ -23,6 +23,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
@@ -252,14 +253,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-
             EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
             environmentBuildTask.setEnvironmentBlueprint( blueprint );
 
             return environmentDAO
                     .saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
         }
-        catch ( JsonSyntaxException e )
+        catch ( EnvironmentManagerException e )
         {
             LOG.error( e.getMessage(), e );
         }

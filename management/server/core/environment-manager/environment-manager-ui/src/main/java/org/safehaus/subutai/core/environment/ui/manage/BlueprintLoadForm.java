@@ -14,6 +14,9 @@ import com.vaadin.ui.VerticalLayout;
 public class BlueprintLoadForm
 {
 
+    private static final String PLEASE_PROVIDE_A_BLUEPRINT = "Please provide a blueprint";
+    private static final String ERROR_SAVING_BLUEPRINT = "Error saving blueprint";
+    private static final String BLUEPRINT_SAVED = "Blueprint saved";
     private final VerticalLayout contentRoot;
     private TextArea blueprintTxtArea;
     private EnvironmentManagerUI managerUI;
@@ -37,7 +40,7 @@ public class BlueprintLoadForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                uploadBlueprint();
+                uploadAndSaveBlueprint();
             }
         } );
 
@@ -57,9 +60,8 @@ public class BlueprintLoadForm
     }
 
 
-    private void uploadBlueprint()
+    private void uploadAndSaveBlueprint()
     {
-
         try
         {
             String content = blueprintTxtArea.getValue().toString().trim();
@@ -68,22 +70,21 @@ public class BlueprintLoadForm
                 boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
                 if ( !result )
                 {
-                    Notification.show( "Error saving blueprint", "Check blueprint format",
-                            Notification.Type.WARNING_MESSAGE );
+                    Notification.show( ERROR_SAVING_BLUEPRINT );
                 }
                 else
                 {
-                    Notification.show( "Blueprint saved", "Blueprint saved", Notification.Type.HUMANIZED_MESSAGE );
+                    Notification.show( BLUEPRINT_SAVED );
                 }
             }
             else
             {
-                Notification.show( "Please provide a blueprint", "Content is empty", Notification.Type.ERROR_MESSAGE );
+                Notification.show( PLEASE_PROVIDE_A_BLUEPRINT );
             }
         }
         catch ( JsonSyntaxException e )
         {
-            Notification.show( "Error saving blueprint", "Check blueprint format", Notification.Type.WARNING_MESSAGE );
+            Notification.show( ERROR_SAVING_BLUEPRINT );
         }
     }
 
