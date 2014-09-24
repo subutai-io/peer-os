@@ -107,7 +107,7 @@ public class Commands extends CommandsSingleton
                                                String hMasterMachineHostname )
     {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) ),
-                agents );
+                        String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
+                                hMasterMachineHostname ) ), agents );
     }
 }

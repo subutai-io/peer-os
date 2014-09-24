@@ -497,7 +497,7 @@ public class Manager
         StormConfig current = ( StormConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         List<StormConfig> clustersInfo = storm.getClusters();
-        if ( clustersInfo != null && !clustersInfo.isEmpty())
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( StormConfig ci : clustersInfo )
             {

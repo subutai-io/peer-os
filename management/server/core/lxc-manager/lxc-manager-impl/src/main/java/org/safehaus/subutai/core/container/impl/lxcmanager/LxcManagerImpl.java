@@ -48,9 +48,8 @@ import com.google.common.base.Strings;
 public class LxcManagerImpl implements LxcManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( LxcManagerImpl.class );
-
-    private final Pattern loadAvgPattern = Pattern.compile( "load average: (.*)" );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    private final Pattern loadAvgPattern = Pattern.compile( "load average: (.*)" );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;

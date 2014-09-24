@@ -20,7 +20,8 @@ public class ElasticsearchComponent extends CustomComponent
     private final Manager manager;
 
 
-    public ElasticsearchComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public ElasticsearchComponent( ExecutorService executorService, ServiceLocator serviceLocator )
+            throws NamingException
     {
         setSizeFull();
 

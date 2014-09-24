@@ -56,9 +56,8 @@ public class VerificationStep extends Panel
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 UUID trackID = wizard.getMahoutPortalModule().getMahoutManager().installCluster( wizard.getConfig() );
-                ProgressWindow window =
-                        new ProgressWindow( wizard.getMahoutPortalModule().getExecutor(), wizard.getMahoutPortalModule().getTracker(),
-                                trackID, MahoutClusterConfig.PRODUCT_KEY );
+                ProgressWindow window = new ProgressWindow( wizard.getMahoutPortalModule().getExecutor(),
+                        wizard.getMahoutPortalModule().getTracker(), trackID, MahoutClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

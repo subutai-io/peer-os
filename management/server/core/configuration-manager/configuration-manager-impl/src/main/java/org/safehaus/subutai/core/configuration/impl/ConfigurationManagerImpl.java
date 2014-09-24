@@ -100,8 +100,8 @@ public class ConfigurationManagerImpl implements ConfigurationManager
 
 
     @Override
-    public JsonObject getConfiguration( String agentHostname, String configPathFilename, ConfiguraitonTypeEnum
-            configuraitonTypeEnum )
+    public JsonObject getConfiguration( String agentHostname, String configPathFilename,
+                                        ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         ConfigurationLoader loader = null;
         switch ( configuraitonTypeEnum )
@@ -162,7 +162,8 @@ public class ConfigurationManagerImpl implements ConfigurationManager
 
 
     @Override
-    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfiguraitonTypeEnum configuraitonTypeEnum )
+    public JsonObject getJsonObjectFromResources( String configPathFilename,
+                                                  ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         String content = FileUtil.getContent( configPathFilename, this );
         try

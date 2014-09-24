@@ -158,8 +158,9 @@ public class AddNodeWindow extends Window
             {
                 while ( true )
                 {
-                    ProductOperationView po =
-                            mahoutPortalModule.getTracker().getProductOperation( MahoutClusterConfig.PRODUCT_KEY, trackID );
+                    ProductOperationView po = mahoutPortalModule.getTracker()
+                                                                .getProductOperation( MahoutClusterConfig.PRODUCT_KEY,
+                                                                        trackID );
                     if ( po != null )
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );

@@ -130,10 +130,11 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = ooziePortalModule.getOozieManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID =
+                                    ooziePortalModule.getOozieManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(), trackID,
-                                            OozieClusterConfig.PRODUCT_KEY );
+                                    new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(),
+                                            trackID, OozieClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -215,8 +216,9 @@ public class Manager
                 progressIcon.setVisible( true );
 
                 UUID trackID = ooziePortalModule.getOozieManager().checkServerStatus( config );
-                ProgressWindow window = new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(), trackID,
-                        OozieClusterConfig.PRODUCT_KEY );
+                ProgressWindow window =
+                        new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(), trackID,
+                                OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -239,8 +241,9 @@ public class Manager
                 stopBtn.setEnabled( false );
 
                 UUID trackID = ooziePortalModule.getOozieManager().startServer( config );
-                ProgressWindow window = new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(), trackID,
-                        OozieClusterConfig.PRODUCT_KEY );
+                ProgressWindow window =
+                        new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(), trackID,
+                                OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -261,8 +264,9 @@ public class Manager
                 progressIcon.setVisible( true );
 
                 UUID trackID = ooziePortalModule.getOozieManager().stopServer( config );
-                ProgressWindow window = new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(), trackID,
-                        OozieClusterConfig.PRODUCT_KEY );
+                ProgressWindow window =
+                        new ProgressWindow( ooziePortalModule.getExecutor(), ooziePortalModule.getTracker(), trackID,
+                                OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

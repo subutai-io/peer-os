@@ -46,6 +46,7 @@ public class TrackerComponent extends CustomComponent
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( TrackerComponent.class.getName() );
+    private static final String STATUS_PROPERTY = "Status";
     private final Tracker tracker;
     private final ExecutorService executor;
     private Table operationsTable;
@@ -58,7 +59,6 @@ public class TrackerComponent extends CustomComponent
     private List<ProductOperationView> currentOperations = new ArrayList<>();
     private String source;
     private int limit = 10;
-    private static final String STATUS_PROPERTY = "Status";
 
 
     public TrackerComponent( Tracker tracker, ExecutorService executor )

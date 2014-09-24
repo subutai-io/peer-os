@@ -213,8 +213,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok().entity(
-                    JsonUtil.toJson( "RESULT", templateRegistry.isTemplateInUse( templateName ) ) ).build();
+            return Response.ok().entity( JsonUtil.toJson( "RESULT", templateRegistry.isTemplateInUse( templateName ) ) )
+                           .build();
         }
         catch ( RegistryException e )
         {

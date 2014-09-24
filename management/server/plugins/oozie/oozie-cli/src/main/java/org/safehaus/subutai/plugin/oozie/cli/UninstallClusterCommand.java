@@ -17,12 +17,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "oozie", name = "uninstall-cluster", description = "Command to uninstall Oozie cluster" )
+@Command(scope = "oozie", name = "uninstall-cluster", description = "Command to uninstall Oozie cluster")
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false )
+    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false)
     String clusterName = null;
     private Oozie oozieManager;
     private Tracker tracker;

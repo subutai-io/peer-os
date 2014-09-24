@@ -103,8 +103,8 @@ public class Commands extends CommandsSingleton
     {
 
         return createCommand( "Set DataNodes for NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -127,8 +127,8 @@ public class Commands extends CommandsSingleton
     {
 
         return createCommand( "Set TaskTrackers for JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
@@ -136,8 +136,8 @@ public class Commands extends CommandsSingleton
     {
 
         return createCommand( "Remove DataNode from NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -145,8 +145,8 @@ public class Commands extends CommandsSingleton
     {
 
         return createCommand( "Remove TaskTrackers from JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
@@ -169,8 +169,8 @@ public class Commands extends CommandsSingleton
     public static Command getIncludeDataNodeCommand( HadoopClusterConfig hadoopClusterConfig, Agent agent )
     {
         return createCommand( "Add DataNode to dfs blacklist", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh dfs.exclude %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 

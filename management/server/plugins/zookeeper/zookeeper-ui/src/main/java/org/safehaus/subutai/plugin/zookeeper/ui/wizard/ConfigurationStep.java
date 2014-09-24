@@ -160,7 +160,7 @@ public class ConfigurationStep extends Panel
             hadoopClustersCombo.setNullSelectionAllowed( false );
 
             List<HadoopClusterConfig> hadoopClusterConfigs = hadoop.getClusters();
-            if ( !hadoopClusterConfigs.isEmpty())
+            if ( !hadoopClusterConfigs.isEmpty() )
             {
                 for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusterConfigs )
                 {

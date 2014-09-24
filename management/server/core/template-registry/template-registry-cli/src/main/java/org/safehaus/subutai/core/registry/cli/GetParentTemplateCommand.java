@@ -36,9 +36,8 @@ public class GetParentTemplateCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Template template =
-                Strings.isNullOrEmpty( lxcArch ) ? templateRegistry.getParentTemplate( childTemplateName ) :
-                templateRegistry.getParentTemplate( childTemplateName, lxcArch );
+        Template template = Strings.isNullOrEmpty( lxcArch ) ? templateRegistry.getParentTemplate( childTemplateName ) :
+                            templateRegistry.getParentTemplate( childTemplateName, lxcArch );
 
         if ( template != null )
         {

@@ -59,7 +59,7 @@ public class ConfigurationStep extends Panel
 
         List<HadoopClusterConfig> clusters = wizard.getMahoutPortalModule().getHadoopManager().getClusters();
 
-        if ( !clusters.isEmpty())
+        if ( !clusters.isEmpty() )
         {
             for ( HadoopClusterConfig hadoopClusterInfo : clusters )
             {

@@ -62,9 +62,8 @@ public class VerificationStep extends VerticalLayout
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 UUID trackID = wizard.gethBasePortalModule().getHbaseManager().installCluster( wizard.getConfig() );
-                ProgressWindow window =
-                        new ProgressWindow( wizard.gethBasePortalModule().getExecutor(), wizard.gethBasePortalModule().getTracker(),
-                                trackID, HBaseClusterConfig.PRODUCT_KEY );
+                ProgressWindow window = new ProgressWindow( wizard.gethBasePortalModule().getExecutor(),
+                        wizard.gethBasePortalModule().getTracker(), trackID, HBaseClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

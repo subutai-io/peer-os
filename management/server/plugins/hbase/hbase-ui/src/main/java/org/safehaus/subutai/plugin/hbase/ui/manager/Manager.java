@@ -122,8 +122,9 @@ public class Manager
                 if ( config != null )
                 {
                     UUID trackID = hBasePortalModule.getHbaseManager().startCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
-                            HBaseClusterConfig.PRODUCT_KEY );
+                    ProgressWindow window =
+                            new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(),
+                                    trackID, HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
                         @Override
@@ -153,8 +154,9 @@ public class Manager
                 if ( config != null )
                 {
                     UUID trackID = hBasePortalModule.getHbaseManager().stopCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
-                            HBaseClusterConfig.PRODUCT_KEY );
+                    ProgressWindow window =
+                            new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(),
+                                    trackID, HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
                         @Override
@@ -184,8 +186,9 @@ public class Manager
                 if ( config != null )
                 {
                     UUID trackID = hBasePortalModule.getHbaseManager().checkCluster( config.getClusterName() );
-                    ProgressWindow window = new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
-                            HBaseClusterConfig.PRODUCT_KEY );
+                    ProgressWindow window =
+                            new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(),
+                                    trackID, HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
                         @Override
@@ -222,10 +225,11 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = hBasePortalModule.getHbaseManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID =
+                                    hBasePortalModule.getHbaseManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(), trackID,
-                                            HBaseClusterConfig.PRODUCT_KEY );
+                                    new ProgressWindow( hBasePortalModule.getExecutor(), hBasePortalModule.getTracker(),
+                                            trackID, HBaseClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override

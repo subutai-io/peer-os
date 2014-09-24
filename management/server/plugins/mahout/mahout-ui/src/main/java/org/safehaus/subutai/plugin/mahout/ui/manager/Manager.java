@@ -113,11 +113,11 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = Manager.this.mahoutPortalModule.getMahoutManager().uninstallCluster( config.getClusterName() );
-                            ProgressWindow window =
-                                    new ProgressWindow( Manager.this.mahoutPortalModule
-                                            .getExecutor(), Manager.this.mahoutPortalModule.getTracker(), trackID,
-                                            MahoutClusterConfig.PRODUCT_KEY );
+                            UUID trackID = Manager.this.mahoutPortalModule.getMahoutManager()
+                                                                          .uninstallCluster( config.getClusterName() );
+                            ProgressWindow window = new ProgressWindow( Manager.this.mahoutPortalModule.getExecutor(),
+                                    Manager.this.mahoutPortalModule.getTracker(), trackID,
+                                    MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -158,8 +158,8 @@ public class Manager
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, nodes,
-                                    Manager.this.mahoutPortalModule );
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( config, nodes, Manager.this.mahoutPortalModule );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener()
                             {
@@ -276,11 +276,10 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID = mahoutPortalModule.getMahoutManager()
-                                                   .destroyNode( config.getClusterName(), agent.getHostname() );
-                            ProgressWindow window =
-                                    new ProgressWindow( mahoutPortalModule.getExecutor(), mahoutPortalModule.getTracker(), trackID,
-                                            MahoutClusterConfig.PRODUCT_KEY );
+                            UUID trackID = mahoutPortalModule.getMahoutManager().destroyNode( config.getClusterName(),
+                                    agent.getHostname() );
+                            ProgressWindow window = new ProgressWindow( mahoutPortalModule.getExecutor(),
+                                    mahoutPortalModule.getTracker(), trackID, MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override

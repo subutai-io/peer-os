@@ -250,6 +250,13 @@ public class TerminalComponent extends CustomComponent implements Disposable
     }
 
 
+    public void dispose()
+    {
+        agentTree.dispose();
+        executor.shutdown();
+    }
+
+
     private static class ExecuteCommandTask implements Runnable
     {
 
@@ -310,12 +317,5 @@ public class TerminalComponent extends CustomComponent implements Disposable
                 indicator.setVisible( false );
             }
         }
-    }
-
-
-    public void dispose()
-    {
-        agentTree.dispose();
-        executor.shutdown();
     }
 }

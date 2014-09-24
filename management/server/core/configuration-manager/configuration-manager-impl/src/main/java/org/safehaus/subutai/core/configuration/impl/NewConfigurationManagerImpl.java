@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.configuration.impl;
 
 
-import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
 import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfigurationManager;
 
 import com.google.gson.JsonObject;
 
@@ -29,7 +29,8 @@ public class NewConfigurationManagerImpl implements ConfigurationManager
 
 
     @Override
-    public String getProperty( final JsonObject config, final String key, final ConfiguraitonTypeEnum configuraitonTypeEnum )
+    public String getProperty( final JsonObject config, final String key,
+                               final ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         return null;
     }
@@ -44,7 +45,8 @@ public class NewConfigurationManagerImpl implements ConfigurationManager
 
 
     @Override
-    public JsonObject getJsonObjectFromResources( final String configPathFilename, final ConfiguraitonTypeEnum configuraitonTypeEnum )
+    public JsonObject getJsonObjectFromResources( final String configPathFilename,
+                                                  final ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         return null;
     }

@@ -47,16 +47,6 @@ public class PrestoImpl extends PrestoBase implements Presto
 
 
     @Override
-    public UUID installCluster( PrestoClusterConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        InstallOperationHandler h = new InstallOperationHandler( this, config );
-        h.setHadoopConfig( hadoopConfig );
-        executor.execute( h );
-        return h.getTrackerId();
-    }
-
-
-    @Override
     public UUID uninstallCluster( final String clusterName )
     {
 
@@ -79,6 +69,16 @@ public class PrestoImpl extends PrestoBase implements Presto
     public PrestoClusterConfig getCluster( String clusterName )
     {
         return pluginDAO.getInfo( PrestoClusterConfig.PRODUCT_KEY, clusterName, PrestoClusterConfig.class );
+    }
+
+
+    @Override
+    public UUID installCluster( PrestoClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        InstallOperationHandler h = new InstallOperationHandler( this, config );
+        h.setHadoopConfig( hadoopConfig );
+        executor.execute( h );
+        return h.getTrackerId();
     }
 
 

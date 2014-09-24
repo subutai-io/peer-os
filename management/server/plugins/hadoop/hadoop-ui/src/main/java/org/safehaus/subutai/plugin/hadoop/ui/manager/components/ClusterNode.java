@@ -93,7 +93,7 @@ public class ClusterNode extends HorizontalLayout
     {
         restartButton = new Embedded( "", new ThemeResource( "img/btn/update.png" ) );
         restartButton.setDescription( "Restart" );
-		/*restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
+        /*restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
 		restartButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
         return restartButton;

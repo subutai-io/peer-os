@@ -18,12 +18,14 @@ public interface ConfigurationManager
     public boolean injectConfiguration( String hostname, String configFilePath, String config,
                                         ConfiguraitonTypeEnum configuraitonTypeEnum );
 
-    public JsonObject getConfiguration( String hostname, String configPathFilename, ConfiguraitonTypeEnum configuraitonTypeEnum );
+    public JsonObject getConfiguration( String hostname, String configPathFilename,
+                                        ConfiguraitonTypeEnum configuraitonTypeEnum );
 
     public String getProperty( JsonObject config, String key, ConfiguraitonTypeEnum configuraitonTypeEnum );
 
     public void setProperty( JsonObject config, String key, String value, ConfiguraitonTypeEnum configuraitonTypeEnum );
 
 
-    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfiguraitonTypeEnum configuraitonTypeEnum );
+    public JsonObject getJsonObjectFromResources( String configPathFilename,
+                                                  ConfiguraitonTypeEnum configuraitonTypeEnum );
 }

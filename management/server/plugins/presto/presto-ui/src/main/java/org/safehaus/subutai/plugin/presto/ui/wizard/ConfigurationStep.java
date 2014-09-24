@@ -143,7 +143,7 @@ public class ConfigurationStep extends Panel
         List<HadoopClusterConfig> clusters = hadoop.getClusters();
 
         //populate hadoop clusters combo
-        if ( !clusters.isEmpty())
+        if ( !clusters.isEmpty() )
         {
             for ( HadoopClusterConfig hadoopClusterInfo : clusters )
             {

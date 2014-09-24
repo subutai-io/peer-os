@@ -23,16 +23,16 @@ public class PrestoClusterConfig implements ConfigBase
 
 
     @Override
-    public String getProductName()
+    public String getClusterName()
     {
-        return PRODUCT_KEY;
+        return clusterName;
     }
 
 
     @Override
-    public String getClusterName()
+    public String getProductName()
     {
-        return clusterName;
+        return PRODUCT_KEY;
     }
 
 

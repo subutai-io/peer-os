@@ -114,7 +114,7 @@ public class Commands extends CommandsSingleton
     public static Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents )
     {
         return createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
-                                propertyName ) ), agents );
+                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
+                agents );
     }
 }
