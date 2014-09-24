@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 import org.safehaus.subutai.core.configuration.api.TextInjector;
 import org.safehaus.subutai.core.configuration.impl.command.TextInjectorImpl;
 import org.safehaus.subutai.core.configuration.impl.utils.ConfigBuilder;
@@ -52,7 +52,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader
             Iterator<String> iterator = propertiesConfiguration.getKeys();
 
             ConfigBuilder configBuilder = new ConfigBuilder();
-            JsonObject jo = configBuilder.getConfigJsonObject( configPathFilename, ConfigTypeEnum.PROPERTIES );
+            JsonObject jo = configBuilder.getConfigJsonObject( configPathFilename, ConfiguraitonTypeEnum.PROPERTIES );
             List<JsonObject> fields = new ArrayList<>();
             while ( iterator.hasNext() )
             {

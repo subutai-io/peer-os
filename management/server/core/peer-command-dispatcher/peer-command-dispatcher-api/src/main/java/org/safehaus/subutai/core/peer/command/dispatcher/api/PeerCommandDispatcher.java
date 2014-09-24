@@ -7,7 +7,8 @@ import org.safehaus.subutai.common.protocol.PeerCommand;
 /**
  * This class allows to send commands to local and remote agents.
  */
-public interface PeerCommandDispatcher {
+public interface PeerCommandDispatcher
+{
 
-    public boolean invoke(PeerCommand peerCommand) throws PeerCommandException;
+    public boolean invoke( PeerCommand peerCommand ) throws PeerCommandException;
 }

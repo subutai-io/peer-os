@@ -11,8 +11,8 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.monitor.api.Monitor;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
@@ -24,9 +24,9 @@ public abstract class ContainerManagerBase implements ContainerManager
     AgentManager agentManager;
     CommandRunner commandRunner;
     TemplateManager templateManager;
-    TemplateRegistryManager templateRegistry;
+    TemplateRegistry templateRegistry;
     DbManager dbManager;
-    Monitor monitor;
+    Monitoring monitoring;
     StrategyManager strategyManager;
     List<ContainerPlacementStrategy> placementStrategies =
             Collections.synchronizedList( new ArrayList<ContainerPlacementStrategy>() );
@@ -68,13 +68,13 @@ public abstract class ContainerManagerBase implements ContainerManager
     }
 
 
-    public TemplateRegistryManager getTemplateRegistry()
+    public TemplateRegistry getTemplateRegistry()
     {
         return templateRegistry;
     }
 
 
-    public void setTemplateRegistry( TemplateRegistryManager templateRegistry )
+    public void setTemplateRegistry( TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
     }
@@ -104,15 +104,15 @@ public abstract class ContainerManagerBase implements ContainerManager
     }
 
 
-    public Monitor getMonitor()
+    public Monitoring getMonitoring()
     {
-        return monitor;
+        return monitoring;
     }
 
 
-    public void setMonitor( final Monitor monitor )
+    public void setMonitoring( final Monitoring monitoring )
     {
-        this.monitor = monitor;
+        this.monitoring = monitoring;
     }
 
 

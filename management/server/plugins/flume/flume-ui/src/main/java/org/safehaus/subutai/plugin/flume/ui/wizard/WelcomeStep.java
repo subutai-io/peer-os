@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.flume.ui.wizard;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
-import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
+import org.safehaus.subutai.plugin.flume.ui.FlumePortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -32,7 +32,7 @@ public class WelcomeStep extends VerticalLayout
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( FlumeUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( FlumePortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 150, Unit.PIXELS );
         logoImg.setWidth( 150, Unit.PIXELS );

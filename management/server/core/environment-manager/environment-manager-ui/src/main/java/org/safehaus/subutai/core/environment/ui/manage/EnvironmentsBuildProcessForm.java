@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEvent;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEventType;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionListener;
@@ -42,10 +42,10 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private AtomicInteger errorProcessed = null;
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManagerUI managerUI;
+    private EnvironmentManagerPortalModule managerUI;
 
 
-    public EnvironmentsBuildProcessForm( final EnvironmentManagerUI managerUI )
+    public EnvironmentsBuildProcessForm( final EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
 

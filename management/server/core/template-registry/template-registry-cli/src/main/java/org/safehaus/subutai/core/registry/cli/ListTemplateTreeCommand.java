@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.registry.cli;
 import java.util.List;
 
 import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 
 import org.apache.felix.gogo.commands.Command;
@@ -18,7 +18,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 public class ListTemplateTreeCommand extends OsgiCommandSupport
 {
 
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
 
 
     private void listFamily( int level, TemplateTree tree, Template currentTemplate )
@@ -36,9 +36,9 @@ public class ListTemplateTreeCommand extends OsgiCommandSupport
     }
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager )
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -46,7 +46,7 @@ public class ListTemplateTreeCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        TemplateTree tree = templateRegistryManager.getTemplateTree();
+        TemplateTree tree = templateRegistry.getTemplateTree();
         List<Template> uberTemplates = tree.getRootTemplates();
         if ( uberTemplates != null )
         {

@@ -5,12 +5,12 @@
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <reference id="monitor" availability="mandatory"
-             interface="org.safehaus.subutai.core.monitor.api.Monitor" />
+  <reference id="monitoring" availability="mandatory"
+             interface="org.safehaus.subutai.core.monitor.api.Monitoring" />
   <reference id="templateManager" availability="mandatory"
              interface="org.safehaus.subutai.core.template.api.TemplateManager" />
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager" />
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="dbManager" availability="mandatory"
              interface="org.safehaus.subutai.core.db.api.DbManager" />
 
@@ -18,7 +18,7 @@
         init-method="init" destroy-method="destroy">
     <argument ref="agentManager" />
     <argument ref="commandRunner" />
-    <argument ref="monitor" />
+    <argument ref="monitoring" />
   </bean>
 
   <bean id="containerManager" scope="singleton"

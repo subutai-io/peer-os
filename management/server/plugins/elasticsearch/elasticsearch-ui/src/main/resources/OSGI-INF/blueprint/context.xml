@@ -13,7 +13,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
 

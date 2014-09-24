@@ -321,7 +321,7 @@ public class Manager
         List<Config> clustersInfo = lucene.getClusters();
         Config clusterInfo = ( Config ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && !clustersInfo.isEmpty())
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( Config luceneClusterInfo : clustersInfo )
             {

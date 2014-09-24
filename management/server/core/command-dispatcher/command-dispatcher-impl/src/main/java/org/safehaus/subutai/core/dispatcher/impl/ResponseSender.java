@@ -72,27 +72,6 @@ public class ResponseSender
     }
 
 
-    public void dispose()
-    {
-        mainLoopExecutor.shutdown();
-        httpRequestsExecutor.shutdown();
-    }
-
-
-    private int calculateOfAttempts()
-    {
-        int attempts = 0;
-        int inactiveCommandDropTimeoutSec =
-                org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
-        while ( inactiveCommandDropTimeoutSec > 0 )
-        {
-            attempts++;
-            inactiveCommandDropTimeoutSec -= attempts * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC;
-        }
-        return attempts;
-    }
-
-
     private void send()
     {
 
@@ -120,6 +99,20 @@ public class ResponseSender
         {
             LOG.error( "Error in send", e );
         }
+    }
+
+
+    private int calculateOfAttempts()
+    {
+        int attempts = 0;
+        int inactiveCommandDropTimeoutSec =
+                org.safehaus.subutai.common.settings.Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
+        while ( inactiveCommandDropTimeoutSec > 0 )
+        {
+            attempts++;
+            inactiveCommandDropTimeoutSec -= attempts * RETRY_ATTEMPT_WIDENING_INTERVAL_SEC;
+        }
+        return attempts;
     }
 
 
@@ -250,5 +243,12 @@ public class ResponseSender
                 dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
             }
         }
+    }
+
+
+    public void dispose()
+    {
+        mainLoopExecutor.shutdown();
+        httpRequestsExecutor.shutdown();
     }
 }
