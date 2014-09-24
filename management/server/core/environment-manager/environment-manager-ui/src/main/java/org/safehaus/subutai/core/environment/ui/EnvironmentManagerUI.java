@@ -16,8 +16,8 @@ import com.vaadin.ui.Component;
 public class EnvironmentManagerUI implements PortalModule
 {
 
-    public final String MODULE_IMAGE = "env.png";
-    public final String MODULE_NAME = "Environment";
+    public final static String MODULE_IMAGE = "env.png";
+    public final static String MODULE_NAME = "Environment";
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
