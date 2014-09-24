@@ -13,7 +13,14 @@ import java.util.logging.Logger;
 class FileUtil
 {
 
-    private static final Logger log = Logger.getLogger( FileUtil.class.getName() );
+
+    private FileUtil()
+    {
+
+    }
+
+
+    private static final Logger LOG = Logger.getLogger( FileUtil.class.getName() );
 
     private static URLClassLoader classLoader;
 
@@ -28,7 +35,7 @@ class FileUtil
         }
         catch ( Exception e )
         {
-            log.log( Level.SEVERE, "Error while reading file: " + e );
+            LOG.log( Level.SEVERE, "Error while reading file: " + e );
         }
 
         return content;
