@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.pig.cli;
 
 import java.util.List;
 
-import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;

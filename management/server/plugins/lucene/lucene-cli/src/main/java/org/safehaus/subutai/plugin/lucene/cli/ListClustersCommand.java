@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.lucene.cli;
 
 import java.util.List;
 
-import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;

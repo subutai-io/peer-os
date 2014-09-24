@@ -9,8 +9,8 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;

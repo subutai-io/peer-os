@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.lucene.cli;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
