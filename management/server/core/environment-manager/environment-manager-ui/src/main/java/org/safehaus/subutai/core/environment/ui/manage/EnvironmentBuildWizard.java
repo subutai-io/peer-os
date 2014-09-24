@@ -73,6 +73,10 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 close();
                 break;
             }
+            default:  {
+                setContent( genPeersTable() );
+                break;
+            }
         }
     }
 
