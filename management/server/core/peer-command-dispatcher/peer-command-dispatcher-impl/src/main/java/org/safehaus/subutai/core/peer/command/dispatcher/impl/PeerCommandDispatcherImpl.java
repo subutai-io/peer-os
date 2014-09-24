@@ -59,20 +59,22 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     @Override
     public void invoke( final PeerCommandMessage peerCommand )
     {
-        if ( peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
-        {
-            try
-            {
-                peerManager.invoke( peerCommand );
-            }
-            catch ( PeerException pe )
-            {
-                LOG.error( pe.getMessage() );
-                peerCommand.setSuccess( false );
-            }
-        }
-        else
-        {
+        //TODO: for testing only: false
+//        boolean local = false;
+//        if ( local && peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
+//        {
+//            try
+//            {
+//                peerManager.invoke( peerCommand );
+//            }
+//            catch ( PeerException pe )
+//            {
+//                LOG.error( pe.getMessage() );
+//                peerCommand.setSuccess( false );
+//            }
+//        }
+//        else
+//        {
 
             Peer peer = peerManager.getPeerByUUID( peerCommand.getPeerId() );
             //            CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand;
@@ -80,6 +82,6 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
             //            result = remotePeerRestClient.createRemoteContainers( peer.getIp(), "8181", ccm );
             remotePeerRestClient.invoke( peer.getIp(), "8181", peerCommand );
             LOG.info( peerCommand.toString() );
-        }
+//        }
     }
 }

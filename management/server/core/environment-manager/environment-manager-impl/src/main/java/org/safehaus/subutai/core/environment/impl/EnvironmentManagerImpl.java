@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -325,17 +326,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 boolean result = ccm.isSuccess();
                 if ( result )
                 {
-
-                    LOG.info( ccm.getResult().toString() );
-                    //TODO: Assign data from set of agents received
-
-                    EnvironmentContainer container = new EnvironmentContainer();
-                    container.setPeerId( ccm.getPeerId() );
-                    //                    container.setAgentId(  );
-                    //                    container.setHostname(  );
-                    container.setDescription( ccm.getTemplate() );
-                    container.setName( ccm.getTemplate() );
-                    environment.addContainer( container );
+                    Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
+                    for ( Agent agent : agents )
+                    {
+                        LOG.info( String.format( "------------> Adding container: %s", agent.toString() ) );
+                        EnvironmentContainer container = new EnvironmentContainer();
+                        container.setPeerId( agent.getSiteId() );
+                        container.setAgentId( agent.getUuid() );
+                        container.setHostname( agent.getHostname() );
+                        container.setDescription( ccm.getTemplate() );
+                        container.setName( agent.getHostname() );
+                        environment.addContainer( container );
+                    }
                 }
             }
             catch ( PeerCommandException e )

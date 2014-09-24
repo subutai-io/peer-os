@@ -453,7 +453,7 @@ public class PeerManagerImpl implements PeerManager
     public void invoke( PeerCommandMessage peerCommandMessage ) throws PeerException
     {
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
-        LOG.info( String.format( "1=================[%s]", peerCommandMessage ) );
+        LOG.debug( String.format( "1=================[%s]", peerCommandMessage ) );
         switch ( peerCommandMessage.getType() )
         {
             case CLONE:
