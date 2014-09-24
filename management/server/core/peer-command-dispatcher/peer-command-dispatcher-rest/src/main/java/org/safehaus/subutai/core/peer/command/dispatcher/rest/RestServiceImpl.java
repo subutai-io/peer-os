@@ -4,10 +4,13 @@ package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -133,6 +136,40 @@ public class RestServiceImpl implements RestService
         catch ( JsonSyntaxException | PeerException e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response invoke( @FormParam( "commandType" ) final String commandType,
+                            @FormParam( "command" ) final String command )
+    {
+
+        PeerCommandType type = PeerCommandType.valueOf( commandType );
+        Class clazz = getMessageClass( type );
+        PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
+        try
+        {
+            peerManager.invoke( commandMessage );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( e.toString() );
+            commandMessage.setSuccess( false );
+            return Response.ok().entity( commandMessage ).build();
+        }
+        return Response.ok().entity( commandMessage ).build();
+    }
+
+
+    private Class getMessageClass( final PeerCommandType type )
+    {
+        switch ( type )
+        {
+            case CLONE:
+                return CloneContainersMessage.class;
+            default:
+                return PeerCommandMessage.class;
         }
     }
 

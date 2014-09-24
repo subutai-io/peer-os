@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 
@@ -55,5 +56,5 @@ public interface PeerManager {
 
     public void addContainer(PeerContainer peerContainer);
 
-    public boolean invoke( PeerCommand peerCommand ) throws PeerException;
+    public void invoke( PeerCommandMessage peerCommandMessage ) throws PeerException;
 }

@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -449,44 +449,42 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public boolean invoke( PeerCommand peerCommand ) throws PeerException
+    @Override
+    public void invoke( PeerCommandMessage peerCommandMessage ) throws PeerException
     {
-        boolean result = false;
-        switch ( peerCommand.getType() )
+        PeerContainer peerContainer = containerLookup( peerCommandMessage );
+        switch ( peerCommandMessage.getType() )
         {
             case CLONE:
-                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
-                createContainers( ccm );
+                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
+                Set<Agent> agents = createContainers( ccm );
+                ccm.setResult( agents );
+                ccm.setSuccess( true );
                 break;
             case START:
-                PeerContainer peerContainer = containerLookup( peerCommand );
-                result = startContainer( peerContainer );
+                peerCommandMessage.setSuccess( startContainer( peerContainer ) );
                 break;
             case STOP:
-                PeerContainer peerContainer1 = containerLookup( peerCommand );
-                result = stopContainer( peerContainer1 );
+                peerCommandMessage.setSuccess( stopContainer( peerContainer ) );
                 break;
             case ISCONNECTED:
-                PeerContainer peerContainer2 = containerLookup( peerCommand );
-                result = isContainerConnected( peerContainer2 );
+                peerCommandMessage.setSuccess( isContainerConnected( peerContainer ) );
                 break;
             default:
                 //TODO: log or exception?
                 break;
         }
-        return result;
     }
 
 
-    private PeerContainer containerLookup( PeerCommand peerCommand ) throws PeerException
+    private PeerContainer containerLookup( PeerCommandMessage peerCommand )
     {
-
-        UUID agentId = peerCommand.getMessage().getAgentId();
-        PeerContainer container = findPeerContainer( agentId );
-        if ( container == null )
+        if ( peerCommand.getAgentId() == null )
         {
-            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
+            return null;
         }
+        UUID agentId = peerCommand.getAgentId();
+        PeerContainer container = findPeerContainer( agentId );
         return container;
     }
 

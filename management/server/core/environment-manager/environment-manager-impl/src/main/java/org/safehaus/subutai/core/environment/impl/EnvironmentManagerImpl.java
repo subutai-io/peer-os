@@ -13,7 +13,6 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -319,13 +318,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 
-            PeerCommand peerCommand = new PeerCommand( PeerCommandType.CLONE, ccm );
+            ccm.setType( PeerCommandType.CLONE );
             try
             {
-                boolean result = peerCommandDispatcher.invoke( peerCommand );
+                peerCommandDispatcher.invoke( ccm );
+                boolean result = ccm.isSuccess();
                 if ( result )
                 {
 
+                    LOG.info( ccm.getResult().toString() );
                     //TODO: Assign data from set of agents received
 
                     EnvironmentContainer container = new EnvironmentContainer();
@@ -377,26 +378,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public boolean startContainer( final EnvironmentContainer container )
     {
-        PeerCommand peerCommand = new PeerCommand( PeerCommandType.START,
-                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
-        return peerCommandDispatcher.invoke( peerCommand );
+        PeerCommandMessage cm =
+                new PeerCommandMessage( PeerCommandType.START, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
     }
 
 
     @Override
     public boolean stopContainer( final EnvironmentContainer container )
     {
-        PeerCommand peerCommand = new PeerCommand( PeerCommandType.STOP,
-                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
-        return peerCommandDispatcher.invoke( peerCommand );
+        PeerCommandMessage cm =
+                new PeerCommandMessage( PeerCommandType.STOP, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
     }
 
 
     @Override
     public boolean isContainerConnected( final EnvironmentContainer container )
     {
-        PeerCommand peerCommand = new PeerCommand( PeerCommandType.ISCONNECTED,
-                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
-        return peerCommandDispatcher.invoke( peerCommand );
+        PeerCommandMessage cm =
+                new PeerCommandMessage( PeerCommandType.ISCONNECTED, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
     }
 }

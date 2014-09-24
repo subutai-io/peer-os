@@ -1,10 +1,12 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +14,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 
 /**
@@ -61,8 +62,39 @@ public class RemotePeerRestClient
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-//                JsonObject jsonObject = ( JsonObject ) response.;
+                //                JsonObject jsonObject = ( JsonObject ) response.get;
 
+                LOG.info( response.toString() );
+                return true;
+            }
+            return false;
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+
+        return false;
+    }
+
+
+    public boolean invoke( String ip, String port, PeerCommandMessage ccm )
+    {
+        String path = "invoke";
+        try
+        {
+            baseUrl = String.format( baseUrl, ip, port );
+            LOG.info( baseUrl );
+            WebClient client = WebClient.create( baseUrl );
+
+            Form form = new Form();
+            form.param( "commandType", ccm.getType().toString() );
+            form.param( "command", ccm.toJson() );
+            Response response =
+                    client.path( path ).type( MediaType.TEXT_PLAIN ).accept( MediaType.APPLICATION_JSON ).post( form );
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
                 LOG.info( response.toString() );
                 return true;
             }
