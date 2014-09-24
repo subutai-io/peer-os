@@ -25,10 +25,9 @@ public class CassandraUI implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "cassandra.png";
-    protected Logger LOG = Logger.getLogger( CassandraUI.class.getName() );
-
-    private ExecutorService executor;
     private final ServiceLocator serviceLocator;
+    protected Logger LOG = Logger.getLogger( CassandraUI.class.getName() );
+    private ExecutorService executor;
 
 
     public CassandraUI()
@@ -84,7 +83,6 @@ public class CassandraUI implements PortalModule
         catch ( NamingException e )
         {
             LOG.severe( e.getMessage() );
-            ;
         }
         return null;
     }

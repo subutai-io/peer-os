@@ -31,16 +31,15 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListener
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsBuildProcessForm.class.getName() );
-    private final String okIconSource = "img/ok.png";
-    private final String errorIconSource = "img/cancel.png";
-    private final String loadIconSource = "img/spinner.gif";
-    AtomicInteger countProcessed = null;
-    AtomicInteger errorProcessed = null;
+    private static final String OK_ICON_SOURCE = "img/ok.png";
+    private static final String ERROR_ICON_SOURCE = "img/cancel.png";
+    private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
+    private AtomicInteger errorProcessed = null;
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerUI managerUI;
@@ -266,15 +265,15 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     Property p = row.getItemProperty( "Status" );
                     if ( BuildProcessExecutionEventType.START.equals( event.getEventType() ) )
                     {
-                        p.setValue( new Embedded( "", new ThemeResource( loadIconSource ) ) );
+                        p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
-                        p.setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
+                        p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
-                        p.setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
+                        p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
 
                         errorProcessed.incrementAndGet();
                     }
