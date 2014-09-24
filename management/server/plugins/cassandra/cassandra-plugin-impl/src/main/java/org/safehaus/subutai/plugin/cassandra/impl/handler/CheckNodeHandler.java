@@ -88,7 +88,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
                 status = "Cassandra is not running";
             }
 
-            log.append( String.format( "%s\n", status ) );
+            log.append( String.format( "%s", status ) );
         }
         po.addLogDone( log.toString() );
     }

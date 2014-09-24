@@ -350,6 +350,7 @@ public class Manager
     }
 
 
+
     private void populateTable( final Table table, Set<Agent> agents )
     {
         for ( final Agent agent : agents )
@@ -472,7 +473,7 @@ public class Manager
         List<HBaseClusterConfig> clusters = hbase.getClusters();
         HBaseClusterConfig clusterInfo = ( HBaseClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clusters != null && clusters.size() > 0 )
+        if ( clusters != null && !clusters.isEmpty() )
         {
             for ( HBaseClusterConfig info : clusters )
             {

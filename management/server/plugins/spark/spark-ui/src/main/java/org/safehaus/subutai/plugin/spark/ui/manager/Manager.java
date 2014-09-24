@@ -423,7 +423,7 @@ public class Manager
         List<SparkClusterConfig> clustersInfo = spark.getClusters();
         SparkClusterConfig clusterInfo = ( SparkClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( SparkClusterConfig ci : clustersInfo )
             {

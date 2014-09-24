@@ -94,10 +94,8 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        //configuration servers number
         final ComboBox nodesCountCombo =
                 new ComboBox( "Choose number of nodes in cluster", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        //        nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setTextInputAllowed( true );
         nodesCountCombo.setImmediate( true );
@@ -113,10 +111,8 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        //configuration servers number
         final ComboBox seedsCountCombo =
                 new ComboBox( "Choose number of seeds", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        //        seedsCountCombo.setMultiSelect(false);
         seedsCountCombo.setImmediate( true );
         seedsCountCombo.setTextInputAllowed( true );
         seedsCountCombo.setImmediate( true );

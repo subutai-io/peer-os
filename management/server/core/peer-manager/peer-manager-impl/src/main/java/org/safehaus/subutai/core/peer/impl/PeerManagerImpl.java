@@ -19,6 +19,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -30,8 +32,6 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
@@ -47,7 +47,8 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager {
+public class PeerManagerImpl implements PeerManager
+{
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
@@ -358,7 +359,8 @@ public class PeerManagerImpl implements PeerManager {
                 Map<String, String> params = new HashMap<>();
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
-                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>() {
+                return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
+                {
                 }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
@@ -393,82 +395,6 @@ public class PeerManagerImpl implements PeerManager {
         }
         //TODO: replace with empty set;
         return null;
-    }
-
-
-    public boolean invoke( PeerCommand peerCommand ) throws PeerException
-    {
-        boolean result = false;
-        UUID agentId = peerCommand.getMessage().getAgentId();
-        PeerContainer container = findPeerContainer( agentId );
-        if ( container == null )
-        {
-            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
-        }
-        switch ( peerCommand.getType() )
-        {
-            case CLONE:
-                LOG.info( "CLONE" );
-                break;
-            case START:
-                result = startContainer( container );
-                break;
-            case STOP:
-                result = stopContainer( container );
-                break;
-            case ISCONNECTED:
-                result = isContainerConnected( container );
-                break;
-            default:
-                //TODO: log or exception?
-        }
-        return result;
-    }
-
-
-    private PeerContainer findPeerContainer( final UUID agentId )
-    {
-        PeerContainer result = null;
-        Iterator iterator = containers.iterator();
-        while ( result == null && iterator.hasNext() )
-        {
-            PeerContainer c = ( PeerContainer ) iterator.next();
-            if ( c.getAgentId().equals( agentId ) )
-            {
-                result = c;
-            }
-        }
-        return result;
-    }
-
-    private String getLocalIp()
-    {
-        Enumeration<NetworkInterface> n;
-        try
-        {
-            n = NetworkInterface.getNetworkInterfaces();
-            for (; n.hasMoreElements(); )
-            {
-                NetworkInterface e = n.nextElement();
-
-                Enumeration<InetAddress> a = e.getInetAddresses();
-                for (; a.hasMoreElements(); )
-                {
-                    InetAddress addr = a.nextElement();
-                    if ( addr.getHostAddress().startsWith( "172" ) )
-                    {
-                        return addr.getHostAddress();
-                    }
-                }
-            }
-        }
-        catch ( SocketException e )
-        {
-            LOG.error( e.getMessage() );
-        }
-
-
-        return "127.0.0.1";
     }
 
 
@@ -520,6 +446,95 @@ public class PeerManagerImpl implements PeerManager {
 
         peerContainer.setPeerManager( this );
         containers.add( peerContainer );
+    }
+
+
+    public boolean invoke( PeerCommand peerCommand ) throws PeerException
+    {
+        boolean result = false;
+        switch ( peerCommand.getType() )
+        {
+            case CLONE:
+                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+                createContainers( ccm );
+                break;
+            case START:
+                PeerContainer peerContainer = containerLookup( peerCommand );
+                result = startContainer( peerContainer );
+                break;
+            case STOP:
+                PeerContainer peerContainer1 = containerLookup( peerCommand );
+                result = stopContainer( peerContainer1 );
+                break;
+            case ISCONNECTED:
+                PeerContainer peerContainer2 = containerLookup( peerCommand );
+                result = isContainerConnected( peerContainer2 );
+                break;
+            default:
+                //TODO: log or exception?
+                break;
+        }
+        return result;
+    }
+
+
+    private PeerContainer containerLookup( PeerCommand peerCommand ) throws PeerException
+    {
+
+        UUID agentId = peerCommand.getMessage().getAgentId();
+        PeerContainer container = findPeerContainer( agentId );
+        if ( container == null )
+        {
+            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
+        }
+        return container;
+    }
+
+
+    private PeerContainer findPeerContainer( final UUID agentId )
+    {
+        PeerContainer result = null;
+        Iterator iterator = containers.iterator();
+        while ( result == null && iterator.hasNext() )
+        {
+            PeerContainer c = ( PeerContainer ) iterator.next();
+            if ( c.getAgentId().equals( agentId ) )
+            {
+                result = c;
+            }
+        }
+        return result;
+    }
+
+
+    private String getLocalIp()
+    {
+        Enumeration<NetworkInterface> n;
+        try
+        {
+            n = NetworkInterface.getNetworkInterfaces();
+            for (; n.hasMoreElements(); )
+            {
+                NetworkInterface e = n.nextElement();
+
+                Enumeration<InetAddress> a = e.getInetAddresses();
+                for (; a.hasMoreElements(); )
+                {
+                    InetAddress addr = a.nextElement();
+                    if ( addr.getHostAddress().startsWith( "172" ) )
+                    {
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        }
+        catch ( SocketException e )
+        {
+            LOG.error( e.getMessage() );
+        }
+
+
+        return "127.0.0.1";
     }
 
 

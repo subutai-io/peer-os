@@ -1,9 +1,6 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import org.apache.felix.gogo.commands.Argument;
@@ -43,15 +40,5 @@ public class UnregisterCommand extends OsgiCommandSupport
         boolean result = peerManager.unregister( uuid );
         System.out.println( result );
         return null;
-    }
-
-
-    private Peer getSamplePeer()
-    {
-        Peer peer = new Peer();
-        peer.setName( "Peer name" );
-        peer.setIp( "10.10.10.10" );
-        peer.setId( UUID.randomUUID() );
-        return peer;
     }
 }

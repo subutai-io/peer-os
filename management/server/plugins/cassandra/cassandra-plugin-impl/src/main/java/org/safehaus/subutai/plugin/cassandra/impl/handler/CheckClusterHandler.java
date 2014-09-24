@@ -17,8 +17,7 @@ import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
 {
 
-    private final Logger LOG = Logger.getLogger( CheckClusterHandler.class.getName() );
-
+    private static final Logger LOG = Logger.getLogger( CheckClusterHandler.class.getName() );
     private String clusterName;
 
 
@@ -41,7 +40,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
         if ( config == null )
         {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 

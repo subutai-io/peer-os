@@ -15,22 +15,16 @@ import com.vaadin.ui.Component;
 public class ConfigurationManagerUI implements PortalModule
 {
 
-    public final String MODULE_IMAGE = "config.png";
-    public final String MODULE_NAME = "Configuration";
+    private static final String IMAGE = "config.png";
+    private static final String NAME = "Configuration";
     private ExecutorService executor;
     private ConfigManager configManager;
-    //    private AgentManager agentManager;
 
 
     public ExecutorService getExecutor()
     {
         return executor;
     }
-
-
-    //    public void setAgentManager( AgentManager agentManager ) {
-    //        this.agentManager = agentManager;
-    //    }
 
 
     public ConfigManager getConfigManager()
@@ -61,21 +55,21 @@ public class ConfigurationManagerUI implements PortalModule
     @Override
     public String getId()
     {
-        return MODULE_NAME;
+        return NAME;
     }
 
 
     @Override
     public String getName()
     {
-        return MODULE_NAME;
+        return NAME;
     }
 
 
     @Override
     public File getImage()
     {
-        return FileUtil.getFile( MODULE_IMAGE, this );
+        return FileUtil.getFile( IMAGE, this );
     }
 
 

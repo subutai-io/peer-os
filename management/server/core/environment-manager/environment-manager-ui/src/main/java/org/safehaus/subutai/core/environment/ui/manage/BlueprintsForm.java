@@ -69,7 +69,7 @@ public class BlueprintsForm
     {
         environmentsTable.removeAllItems();
         List<EnvironmentBuildTask> environmentBuildTasks = managerUI.getEnvironmentManager().getBlueprints();
-        if ( environmentBuildTasks.size() > 0 )
+        if ( !environmentBuildTasks.isEmpty() )
         {
             for ( final EnvironmentBuildTask environmentBuildTask : environmentBuildTasks )
             {

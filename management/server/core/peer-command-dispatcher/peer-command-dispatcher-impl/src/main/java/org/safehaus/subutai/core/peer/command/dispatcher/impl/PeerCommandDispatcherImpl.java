@@ -61,7 +61,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
     @Override
     public boolean invoke( final PeerCommand peerCommand ) throws PeerCommandException
     {
-        boolean result = false;
+        boolean result;
         if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
         {
 

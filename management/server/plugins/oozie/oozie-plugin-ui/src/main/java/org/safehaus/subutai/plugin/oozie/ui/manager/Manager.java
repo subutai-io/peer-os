@@ -282,7 +282,7 @@ public class Manager
         List<OozieClusterConfig> info = oozieUI.getOozieManager().getClusters();
         OozieClusterConfig clusterInfo = ( OozieClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( info != null && info.size() > 0 )
+        if ( info != null && !info.isEmpty() )
         {
             for ( OozieClusterConfig oozieConfig : info )
             {
@@ -318,7 +318,7 @@ public class Manager
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
 
-            final Object rowId = table.addItem( new Object[] {
+            table.addItem( new Object[] {
                     agent,
             }, null );
         }

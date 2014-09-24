@@ -55,7 +55,6 @@ public class ConfigurationStep extends Panel
         nameTxt.setRequired( true );
         nameTxt.addValueChangeListener( new Property.ValueChangeListener()
         {
-
             @Override
             public void valueChange( Property.ValueChangeEvent e )
             {
@@ -389,83 +388,6 @@ public class ConfigurationStep extends Panel
         parent.addComponent( quorumPeers );
         parent.addComponent( backUpMasters );
     }
-
-
-    //    private void addWithHadoopComponents( ComponentContainer parent, final HBaseClusterConfig config,
-    //                                          final HadoopClusterConfig hadoopConfig )
-    //    {
-    //
-    //        Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
-    //
-    //        final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
-    //        txtHadoopClusterName.setRequired( true );
-    //        txtHadoopClusterName.setMaxLength( 20 );
-    //        if ( hadoopConfig.getClusterName() != null )
-    //        {
-    //            txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
-    //        }
-    //        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
-    //        {
-    //            @Override
-    //            public void valueChange( Property.ValueChangeEvent event )
-    //            {
-    //                String name = event.getProperty().getValue().toString().trim();
-    //                config.setHadoopClusterName( name );
-    //                hadoopConfig.setClusterName( name );
-    //            }
-    //        } );
-    //
-    //        ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
-    //        cmbSlaveNodes.setImmediate( true );
-    //        cmbSlaveNodes.setTextInputAllowed( false );
-    //        cmbSlaveNodes.setNullSelectionAllowed( false );
-    //        cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
-    //        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
-    //        {
-    //            @Override
-    //            public void valueChange( Property.ValueChangeEvent event )
-    //            {
-    //                hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
-    //            }
-    //        } );
-    //
-    //        ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
-    //        cmbReplFactor.setImmediate( true );
-    //        cmbReplFactor.setTextInputAllowed( false );
-    //        cmbReplFactor.setNullSelectionAllowed( false );
-    //        cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
-    //        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
-    //        {
-    //            @Override
-    //            public void valueChange( Property.ValueChangeEvent event )
-    //            {
-    //                hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
-    //            }
-    //        } );
-    //
-    //        TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
-    //        txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
-    //        txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
-    //        txtHadoopDomain.setMaxLength( 20 );
-    //        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
-    //        {
-    //            @Override
-    //            public void valueChange( Property.ValueChangeEvent event )
-    //            {
-    //                String val = event.getProperty().getValue().toString().trim();
-    //                if ( !val.isEmpty() )
-    //                {
-    //                    hadoopConfig.setDomainName( val );
-    //                }
-    //            }
-    //        } );
-    //
-    //        parent.addComponent( new Label( "Hadoop settings" ) );
-    //        parent.addComponent( txtHadoopClusterName );
-    //        parent.addComponent( cmbSlaveNodes );
-    //        parent.addComponent( cmbReplFactor );
-    //        parent.addComponent( txtHadoopDomain );
-    //    }
 
 
     private void nextClickHandler( Wizard wizard )

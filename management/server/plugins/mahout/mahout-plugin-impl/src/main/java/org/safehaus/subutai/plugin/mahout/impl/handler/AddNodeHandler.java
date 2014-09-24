@@ -46,7 +46,7 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
         MahoutClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
@@ -54,7 +54,7 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            po.addLogFailed( String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Node %s is not connected. Operation aborted", lxcHostname ) );
             return;
         }
 
@@ -73,7 +73,7 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            po.addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+            po.addLogFailed( "Failed to check presence of installed ksks packages. Installation aborted" );
             return;
         }
 
@@ -82,12 +82,12 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
         if ( result.getStdOut().contains( "ksks-mahout" ) )
         {
             po.addLogFailed(
-                    String.format( "Node %s already has Mahout installed\nInstallation aborted", lxcHostname ) );
+                    String.format( "Node %s already has Mahout installed. Installation aborted", lxcHostname ) );
             return;
         }
         else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
         {
-            po.addLogFailed( String.format( "Node %s has no Hadoop installation\nInstallation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Node %s has no Hadoop installation. Installation aborted", lxcHostname ) );
             return;
         }
 
@@ -114,7 +114,7 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
         }
         else
         {
-            po.addLogFailed( "Could not update cluster info in DB! Please see logs\nInstallation aborted" );
+            po.addLogFailed( "Could not update cluster info in DB! Please see logs. Installation aborted" );
         }
     }
 }

@@ -15,8 +15,7 @@ import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 public class ClusterConfiguration
 {
 
-    private final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
-
+    private static final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
     private ProductOperation po;
     private CassandraImpl cassandraManager;
 

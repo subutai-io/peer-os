@@ -12,7 +12,6 @@ import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
@@ -96,12 +95,6 @@ public class IniParser implements ConfigParser
 
     public void setValuesFromJsonObject( JsonObject jsonObject )
     {
-        JsonArray jsonArray = jsonObject.getAsJsonArray( "configFields" );
-        for ( int i = 0; i < jsonArray.size(); i++ )
-        {
-            JsonObject jo = ( JsonObject ) jsonArray.get( i );
-            String fieldName = jo.getAsJsonPrimitive( "fieldName" ).getAsString();
-            String value = jo.getAsJsonPrimitive( "value" ).getAsString();
-        }
+        // TODO complete setValues logic
     }
 }

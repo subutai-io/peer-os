@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommand;
@@ -36,7 +35,6 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -58,7 +56,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private DbManager dbManager;
-    //    private PeerManager peerManager;
     private PeerCommandDispatcher peerCommandDispatcher;
     private Set<EnvironmentContainer> containers = new HashSet<>();
 
@@ -78,18 +75,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.peerCommandDispatcher = peerCommandDispatcher;
     }
-
-
-    /*public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }*/
 
 
     public void init()
@@ -326,6 +311,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+            throws EnvironmentBuildException
     {
 
 
@@ -339,7 +325,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 boolean result = peerCommandDispatcher.invoke( peerCommand );
                 if ( result )
                 {
-                    LOG.info( "Clone commad executed successfully" );
+
+                    //TODO: Assign data from set of agents received
 
                     EnvironmentContainer container = new EnvironmentContainer();
                     container.setPeerId( ccm.getPeerId() );
@@ -353,6 +340,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             catch ( PeerCommandException e )
             {
                 LOG.error( e.getMessage(), e );
+                throw new EnvironmentBuildException( e.getMessage() );
             }
             saveEnvironment( environment );
         }
@@ -410,25 +398,5 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         PeerCommand peerCommand = new PeerCommand( PeerCommandType.ISCONNECTED,
                 new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
         return peerCommandDispatcher.invoke( peerCommand );
-    }
-
-
-    private boolean build( EnvironmentBuildTask environmentBuildTask )
-    {
-
-        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
-                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) )
-        {
-            try
-            {
-                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
-                return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-            }
-            catch ( EnvironmentBuildException e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
-        }
-        return false;
     }
 }

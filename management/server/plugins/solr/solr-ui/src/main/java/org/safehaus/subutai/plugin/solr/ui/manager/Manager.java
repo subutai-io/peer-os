@@ -296,7 +296,7 @@ public class Manager
         List<SolrClusterConfig> mongoClusterInfos = solr.getClusters();
         SolrClusterConfig clusterInfo = ( SolrClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 )
+        if ( mongoClusterInfos != null && !mongoClusterInfos.isEmpty() )
         {
             for ( SolrClusterConfig mongoClusterInfo : mongoClusterInfos )
             {

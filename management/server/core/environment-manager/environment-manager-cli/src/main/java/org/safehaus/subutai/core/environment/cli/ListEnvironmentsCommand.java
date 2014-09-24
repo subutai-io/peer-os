@@ -39,7 +39,7 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport
         List<Environment> environments = environmentManager.getEnvironments();
         if ( environments != null )
         {
-            if ( environments.size() > 0 )
+            if ( !environments.isEmpty() )
             {
                 for ( Environment environment : environments )
                 {

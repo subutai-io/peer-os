@@ -303,7 +303,7 @@ public class Manager
         List<MahoutClusterConfig> clustersInfo = mahoutUI.getMahoutManager().getClusters();
         MahoutClusterConfig clusterInfo = ( MahoutClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( MahoutClusterConfig mongoClusterInfo : clustersInfo )
             {

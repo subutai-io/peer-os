@@ -143,7 +143,7 @@ public class ConfigurationStep extends Panel
         List<HadoopClusterConfig> clusters = hadoop.getClusters();
 
         //populate hadoop clusters combo
-        if ( clusters.size() > 0 )
+        if ( !clusters.isEmpty())
         {
             for ( HadoopClusterConfig hadoopClusterInfo : clusters )
             {
@@ -154,7 +154,7 @@ public class ConfigurationStep extends Panel
 
         if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) )
         {
-            if ( clusters.size() > 0 )
+            if ( !clusters.isEmpty() )
             {
                 hadoopClustersCombo.setValue( clusters.iterator().next() );
             }
@@ -167,7 +167,7 @@ public class ConfigurationStep extends Panel
             {
                 hadoopClustersCombo.setValue( info );
             }
-            else if ( clusters.size() > 0 )
+            else if ( !clusters.isEmpty() )
             {
                 hadoopClustersCombo.setValue( clusters.iterator().next() );
             }

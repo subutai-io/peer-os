@@ -48,7 +48,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 if ( config == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 
@@ -59,7 +59,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 {
                     if ( manager.getAgentManager().getAgentByHostname( node ) == null )
                     {
-                        po.addLogFailed( String.format( "Node %s not connected\nAborted", node ) );
+                        po.addLogFailed( String.format( "Node %s not connected. Aborted", node ) );
                         return;
                     }
                 }
@@ -109,7 +109,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 }
                 else
                 {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs. Failed" );
                 }
             }
         } );

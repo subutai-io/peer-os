@@ -136,7 +136,7 @@ public class EnvironmentsForm
                     }
                 }
             } );
-            final Object rowId = environmentsTable.addItem( new Object[] {
+            environmentsTable.addItem( new Object[] {
                     environment.getName(), viewEnvironmentInfoButton, destroyEnvironment
             }, null );
         }

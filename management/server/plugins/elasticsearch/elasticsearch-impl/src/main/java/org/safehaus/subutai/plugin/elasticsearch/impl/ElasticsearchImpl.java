@@ -185,7 +185,7 @@ public class ElasticsearchImpl implements Elasticsearch
                 if ( elasticsearchClusterConfiguration == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 
@@ -243,7 +243,7 @@ public class ElasticsearchImpl implements Elasticsearch
                 if ( elasticsearchClusterConfiguration == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
                 Command startServiceCommand = Commands.getStartCommand( elasticsearchClusterConfiguration.getNodes() );
@@ -279,7 +279,7 @@ public class ElasticsearchImpl implements Elasticsearch
                 if ( elasticsearchClusterConfiguration == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 
@@ -316,7 +316,7 @@ public class ElasticsearchImpl implements Elasticsearch
                 if ( elasticsearchClusterConfiguration == null )
                 {
                     po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 

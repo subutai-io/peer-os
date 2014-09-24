@@ -374,7 +374,7 @@ public class Manager
 
             String isSeed = checkIfSeed( agent );
 
-            final Object rowId = table.addItem( new Object[] {
+            table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
             }, null );
 
@@ -598,7 +598,7 @@ public class Manager
         List<CassandraClusterConfig> info = cassandra.getClusters();
         CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( info != null && info.size() > 0 )
+        if ( info != null && !info.isEmpty() )
         {
             for ( CassandraClusterConfig cassandraInfo : info )
             {

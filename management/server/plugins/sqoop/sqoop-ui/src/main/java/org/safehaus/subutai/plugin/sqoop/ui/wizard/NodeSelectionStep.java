@@ -154,7 +154,7 @@ public class NodeSelectionStep extends VerticalLayout
                 hadoopClusters.setValue( info );
             }
         }
-        else if ( clusters != null && clusters.size() > 0 )
+        else if ( clusters != null && !clusters.isEmpty() )
         {
             hadoopClusters.setValue( clusters.iterator().next() );
         }
