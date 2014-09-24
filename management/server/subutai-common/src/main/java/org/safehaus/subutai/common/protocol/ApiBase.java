@@ -23,11 +23,11 @@ public interface ApiBase<T extends ConfigBase>
     /**
      * Uninstalls the specified cluster
      *
-     * @param clusterName - name of cluster
+     * config - cluster configuration object
      *
      * @return - UUID of operation to track
      */
-    public UUID uninstallCluster( String clusterName );
+    public UUID uninstallCluster( T config );
 
     /**
      * Returns list of configuration objects of installed clusters

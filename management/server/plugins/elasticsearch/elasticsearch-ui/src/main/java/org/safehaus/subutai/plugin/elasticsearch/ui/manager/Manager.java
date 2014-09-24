@@ -219,29 +219,7 @@ public class Manager
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
                             "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-
-                            UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
-
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    ElasticsearchClusterConfiguration.PRODUCT_KEY );
-
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
+                    addConfirmationWindowListener( alert );
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
                 else
@@ -273,6 +251,33 @@ public class Manager
         }
 
         return parsedResult.toString();
+    }
+
+
+    public void addConfirmationWindowListener( ConfirmationDialog alert )
+    {
+        alert.getOk().addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+
+                UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
+
+                ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                        ElasticsearchClusterConfiguration.PRODUCT_KEY );
+
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
+                        refreshClustersInfo();
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
+            }
+        } );
     }
 
 
@@ -371,13 +376,19 @@ public class Manager
         table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
 
-
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
         table.setColumnCollapsingAllowed( true );
 
+        addItemClickListenerToTable( table );
+        return table;
+    }
+
+
+    public void addItemClickListenerToTable( final Table table )
+    {
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
             @Override
@@ -403,7 +414,6 @@ public class Manager
                 }
             }
         } );
-        return table;
     }
 
 
@@ -428,17 +438,17 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<ElasticsearchClusterConfiguration> config = elasticsearch.getClusters();
+        List<ElasticsearchClusterConfiguration> clusters = elasticsearch.getClusters();
         ElasticsearchClusterConfiguration clusterInfo = ( ElasticsearchClusterConfiguration ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
 
-        if ( config == null || config.isEmpty() )
+        if ( clusters == null || clusters.isEmpty() )
         {
             PROGRESS_ICON.setVisible( false );
             return;
         }
 
-        for ( ElasticsearchClusterConfiguration esConfig : config )
+        for ( ElasticsearchClusterConfiguration esConfig : clusters )
         {
             clusterCombo.addItem( esConfig );
             clusterCombo.setItemCaption( esConfig, esConfig.getClusterName() );
@@ -446,7 +456,7 @@ public class Manager
 
         if ( clusterInfo != null )
         {
-            for ( ElasticsearchClusterConfiguration esConfig : config )
+            for ( ElasticsearchClusterConfiguration esConfig : clusters )
             {
                 if ( esConfig.getClusterName().equals( clusterInfo.getClusterName() ) )
                 {
@@ -457,7 +467,7 @@ public class Manager
         }
         else
         {
-            clusterCombo.setValue( config.iterator().next() );
+            clusterCombo.setValue( clusters.iterator().next() );
         }
     }
 
@@ -509,9 +519,7 @@ public class Manager
                 public void buttonClick( Button.ClickEvent event )
                 {
                     PROGRESS_ICON.setVisible( true );
-                    startButton.setEnabled( false );
-                    stopButton.setEnabled( false );
-                    checkButton.setEnabled( false );
+                    disableButtons( startButton, stopButton, checkButton );
                     executorService.execute(
                             new CheckTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent()
@@ -520,9 +528,8 @@ public class Manager
                                         {
                                             synchronized ( PROGRESS_ICON )
                                             {
-                                                String status = parseServiceResult( result );
-                                                resultHolder.setValue( status );
-                                                if ( status.contains( "not" ) )
+                                                resultHolder.setValue( parseServiceResult( result ) );
+                                                if ( resultHolder.getValue().contains( "not" ) )
                                                 {
                                                     startButton.setEnabled( true );
                                                     stopButton.setEnabled( false );
@@ -546,9 +553,7 @@ public class Manager
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
                     PROGRESS_ICON.setVisible( true );
-                    startButton.setEnabled( false );
-                    stopButton.setEnabled( false );
-                    checkButton.setEnabled( false );
+                    disableButtons( startButton, stopButton, checkButton );
                     executorService.execute(
                             new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent()
@@ -558,9 +563,7 @@ public class Manager
                                         {
                                             synchronized ( PROGRESS_ICON )
                                             {
-                                                startButton.setEnabled( true );
-                                                stopButton.setEnabled( true );
-                                                checkButton.setEnabled( true );
+                                                enableButtons( startButton, stopButton, checkButton );
                                                 checkButton.click();
                                             }
                                         }
@@ -574,9 +577,7 @@ public class Manager
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
                     PROGRESS_ICON.setVisible( true );
-                    startButton.setEnabled( false );
-                    stopButton.setEnabled( false );
-                    checkButton.setEnabled( false );
+                    disableButtons( startButton, stopButton, checkButton );
                     executorService.execute(
                             new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent()
@@ -586,15 +587,31 @@ public class Manager
                                         {
                                             synchronized ( PROGRESS_ICON )
                                             {
-                                                startButton.setEnabled( true );
-                                                stopButton.setEnabled( true );
-                                                checkButton.setEnabled( true );
+                                                enableButtons( startButton, stopButton, checkButton );
                                                 checkButton.click();
                                             }
                                         }
                                     } ) );
                 }
             } );
+        }
+    }
+
+
+    public void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    public void enableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( true );
         }
     }
 

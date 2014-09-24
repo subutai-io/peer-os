@@ -13,26 +13,22 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 
-public class CheckClusterHandler extends AbstractOperationHandler<ElasticsearchImpl>
+public class CheckClusterOperationHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
-    private String lxcHostname;
     private String clusterName;
 
 
-    public CheckClusterHandler( final ElasticsearchImpl manager, final String clusterName )
+    public CheckClusterOperationHandler( final ElasticsearchImpl manager, final String clusterName )
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        this.productOperation = manager.getTracker()
-                                       .createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                                               String.format( "Checking %s cluster...", clusterName ) );
+        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+                String.format( "Starting %s cluster...", clusterName ) );
     }
 
 
-    @Override
     public void run()
     {
-
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
