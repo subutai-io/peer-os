@@ -15,10 +15,10 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>presto-plugin-api</module>
-    <module>presto-plugin-impl</module>
-    <module>presto-plugin-ui</module>
-    <module>presto-plugin-cli</module>
-    <module>presto-plugin-rest</module>
+    <module>presto-api</module>
+    <module>presto-impl</module>
+    <module>presto-ui</module>
+    <module>presto-cli</module>
+    <module>presto-rest</module>
   </modules>
 </project>

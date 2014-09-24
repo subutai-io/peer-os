@@ -15,10 +15,10 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>cassandra-plugin-api</module>
-    <module>cassandra-plugin-impl</module>
-    <module>cassandra-plugin-ui</module>
-    <module>cassandra-plugin-cli</module>
-    <module>cassandra-plugin-rest</module>
+    <module>cassandra-api</module>
+    <module>cassandra-impl</module>
+    <module>cassandra-ui</module>
+    <module>cassandra-cli</module>
+    <module>cassandra-rest</module>
   </modules>
 </project>

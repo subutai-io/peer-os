@@ -2,7 +2,7 @@
 
   <reference id="textInjector" availability="mandatory"
              interface="org.safehaus.subutai.core.configuration.api.TextInjector" />
-  <reference id="configManager" availability="mandatory"
+  <reference id="configurationManager" availability="mandatory"
              interface="org.safehaus.subutai.core.configuration.api.ConfigurationManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
@@ -32,7 +32,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="config/get-config-json">
       <action class="org.safehaus.subutai.core.configuration.cli.GetConfigJsonCommand">
-        <property name="configManager" ref="configManager" />
+        <property name="configurationManager" ref="configurationManager" />
       </action>
     </command>
   </command-bundle>
@@ -40,7 +40,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="config/echo-text-to-file">
       <action class="org.safehaus.subutai.core.configuration.cli.EchoTextToFileCommand">
-        <property name="configManager" ref="configManager" />
+        <property name="configurationManager" ref="configurationManager" />
       </action>
     </command>
   </command-bundle>
