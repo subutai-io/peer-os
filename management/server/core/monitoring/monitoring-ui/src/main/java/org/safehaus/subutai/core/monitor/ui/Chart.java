@@ -6,32 +6,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.ui.util.FileUtil;
 
 
 class Chart
 {
 
-    private static final String CHART_TEMPLATE = FileUtil.getContent( "js/chart.js" );
-    private final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+    private static final String CHART_TEMPLATE = FileUtil.getContent( "js/chart.js", Chart.class );
+    private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
     private final int maxSize;
-    //    private final JavaScript javaScript;
 
 
     Chart( int maxSize )
     {
         this.maxSize = maxSize;
-        //        javaScript = new JavaScript( window );
         loadScripts();
     }
 
 
     private void loadScripts()
     {
-        //        javaScript.loadFile( "js/jquery.min.js" );
-        //        javaScript.loadFile( "js/jquery.flot.min.js" );
-        //        javaScript.loadFile( "js/jquery.flot.time.min.js" );
         com.vaadin.ui.JavaScript.getCurrent().execute( "js/jquery.min.js" );
         com.vaadin.ui.JavaScript.getCurrent().execute( "js/jquery.flot.min.js" );
         com.vaadin.ui.JavaScript.getCurrent().execute( "js/jquery.flot.time.min.js" );
@@ -47,7 +42,6 @@ class Chart
         String chart = CHART_TEMPLATE.replace( "$label", label ).replace( "$yTitle", metric.getUnit() )
                                      .replace( "$data", data );
 
-        //        javaScript.execute( chart );
         com.vaadin.ui.JavaScript.getCurrent().execute( chart );
     }
 
@@ -65,8 +59,8 @@ class Chart
                 str.append( ", " );
             }
 
-            str.append( String.format( "[Date.parse('%s'), %s ]", DATE_FORMAT.format( entry.getKey() ),
-                    entry.getValue() ) );
+            str.append(
+                    String.format( "[Date.parse('%s'), %s ]", dateFormat.format( entry.getKey() ), entry.getValue() ) );
             i++;
 
             if ( i > maxSize )

@@ -15,7 +15,6 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 public class CheckClusterHandler extends AbstractOperationHandler<ElasticsearchImpl>
 {
-    private String lxcHostname;
     private String clusterName;
 
 

@@ -169,11 +169,14 @@ public class HttpUtil
         {
             HttpPost req = new HttpPost( url );
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            for ( Map.Entry<String, String> entry : postParams.entrySet() )
+            if ( postParams != null )
             {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                nvps.add( new BasicNameValuePair( key, value ) );
+                for ( Map.Entry<String, String> entry : postParams.entrySet() )
+                {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    nvps.add( new BasicNameValuePair( key, value ) );
+                }
             }
             ( ( HttpPost ) req ).setEntity( new UrlEncodedFormEntity( nvps, Consts.UTF_8 ) );
             CloseableHttpClient httpclient = HttpClients.createDefault();

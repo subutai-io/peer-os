@@ -16,6 +16,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
