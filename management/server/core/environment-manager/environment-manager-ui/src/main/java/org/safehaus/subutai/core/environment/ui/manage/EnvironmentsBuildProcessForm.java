@@ -206,7 +206,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         }
         else
         {
-            Notification.show( "No build process tasks", Notification.Type.HUMANIZED_MESSAGE );
+            Notification.show( EnvAnswer.NO_BUILD_PROCESS.getAnswer());
         }
         environmentsTable.refreshRowCache();
     }
