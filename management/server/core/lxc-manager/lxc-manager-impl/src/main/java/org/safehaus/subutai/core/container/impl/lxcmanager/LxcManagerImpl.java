@@ -49,7 +49,7 @@ public class LxcManagerImpl implements LxcManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( LxcManagerImpl.class );
 
-    private final Pattern p = Pattern.compile( "load average: (.*)" );
+    private final Pattern loadAvgPattern = Pattern.compile( "load average: (.*)" );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
@@ -200,7 +200,7 @@ public class LxcManagerImpl implements LxcManager
                             {
                                 // 09:17:38 up 4 days, 23:06,  0 users,  load average: 2.18, 3.06, 2.12
 
-                                Matcher m = p.matcher( metric );
+                                Matcher m = loadAvgPattern.matcher( metric );
                                 if ( m.find() )
                                 {
                                     String[] loads = m.group( 1 ).split( "," );
