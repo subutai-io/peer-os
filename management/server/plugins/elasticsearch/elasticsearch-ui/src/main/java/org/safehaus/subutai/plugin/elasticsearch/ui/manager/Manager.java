@@ -56,6 +56,7 @@ public class Manager
     protected final static String IP_COLUMN_CAPTION = "IP List";
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
+    protected final static String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
     private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final Pattern ELASTICSEARCH_PATTERN = Pattern.compile( ".*(elasticsearch.+?g).*" );
@@ -121,15 +122,7 @@ public class Manager
 
         /**  Refresh clusters button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                refreshClustersInfo();
-            }
-        } );
+        addClickListener( refreshClustersBtn );
 
         controlsContent.addComponent( refreshClustersBtn );
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
@@ -137,98 +130,33 @@ public class Manager
 
         /** Check all button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    checkAllNodes();
-                }
-            }
-        } );
-
+        addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
 
         /**  Start all button */
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    startAllNodes();
-                }
-            }
-        } );
-
+        addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
 
         /**  Stop all button  */
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    stopAllNodes();
-                }
-            }
-        } );
-
+        addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
 
         /**  Destroy cluster button  */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
-                            "No" );
-                    addConfirmationWindowListener( alert );
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else
-                {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
-
+        addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
+
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
+
         PROGRESS_ICON.setVisible( false );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -252,27 +180,72 @@ public class Manager
     }
 
 
-    public void addConfirmationWindowListener( ConfirmationDialog alert )
+    public void addClickListener( Button button )
     {
-        alert.getOk().addClickListener( new Button.ClickListener()
+        if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) )
+        {
+            refreshClustersInfo();
+        }
+
+        if ( config == null )
+        {
+            show( MESSAGE );
+            return;
+        }
+        switch ( button.getCaption() )
+        {
+            case CHECK_ALL_BUTTON_CAPTION:
+                checkAllNodes();
+                break;
+            case START_ALL_BUTTON_CAPTION:
+                startAllNodes();
+                break;
+            case STOP_ALL_BUTTON_CAPTION:
+                stopAllNodes();
+                break;
+        }
+    }
+
+
+    public void addClickListenerToDestroyClusterButton()
+    {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
-
-                ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                        ElasticsearchClusterConfiguration.PRODUCT_KEY );
-
-                window.getWindow().addCloseListener( new Window.CloseListener()
+                if ( config != null )
                 {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent )
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
                     {
-                        refreshClustersInfo();
-                    }
-                } );
-                contentRoot.getUI().addWindow( window.getWindow() );
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
+
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    ElasticsearchClusterConfiguration.PRODUCT_KEY );
+
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
             }
         } );
     }
@@ -469,6 +442,15 @@ public class Manager
     }
 
 
+    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
+
     /**
      * Fill out the table in which all nodes in the cluster are listed.
      *
@@ -482,115 +464,143 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-            checkButton.addStyleName( "default" );
-            checkButton.setVisible( true );
-
             final Button startButton = new Button( START_BUTTON_CAPTION );
-            startButton.addStyleName( "default" );
-            startButton.setVisible( true );
-
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-            stopButton.addStyleName( "default" );
-            stopButton.setVisible( true );
 
-            startButton.setEnabled( false );
-            stopButton.setEnabled( false );
+            addStyleNameToButtons( checkButton, startButton, stopButton );
+            enableButtons( startButton, stopButton );
             PROGRESS_ICON.setVisible( false );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
             availableOperations.addStyleName( "default" );
 
-            availableOperations.addComponent( checkButton );
-            availableOperations.addComponent( startButton );
-            availableOperations.addComponent( stopButton );
+            addGivenComponents( availableOperations, checkButton, startButton, stopButton );
 
             table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), checkIfMaster( agent ), resultHolder,
                     availableOperations
             }, null );
 
-            checkButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent event )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    disableButtons( startButton, stopButton, checkButton );
-                    executorService.execute(
-                            new CheckTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                resultHolder.setValue( parseServiceResult( result ) );
-                                                if ( resultHolder.getValue().contains( "not" ) )
-                                                {
-                                                    startButton.setEnabled( true );
-                                                    stopButton.setEnabled( false );
-                                                }
-                                                else
-                                                {
-                                                    startButton.setEnabled( false );
-                                                    stopButton.setEnabled( true );
-                                                }
-                                                PROGRESS_ICON.setVisible( false );
-                                                checkButton.setEnabled( true );
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
+            addCheckButtonClickListener( agent, resultHolder, checkButton, startButton, stopButton );
+            addStartButtonClickListener( agent, checkButton, startButton, stopButton );
+            addStopButtonClickListener( agent, checkButton, startButton, stopButton );
+        }
+    }
 
-            startButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    disableButtons( startButton, stopButton, checkButton );
-                    executorService.execute(
-                            new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                enableButtons( startButton, stopButton, checkButton );
-                                                checkButton.click();
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
 
-            stopButton.addClickListener( new Button.ClickListener()
+    public Button getButton( String caption, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            if ( b.getCaption().equals( caption ) )
             {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    disableButtons( startButton, stopButton, checkButton );
-                    executorService.execute(
-                            new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
+                return b;
+            }
+        }
+        return null;
+    }
+
+
+    public void addStopButtonClickListener( final Agent agent, final Button... buttons )
+    {
+        getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    @Override
+                                    public void onComplete( String result )
                                     {
-                                        @Override
-                                        public void onComplete( String result )
+                                        synchronized ( PROGRESS_ICON )
                                         {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                enableButtons( startButton, stopButton, checkButton );
-                                                checkButton.click();
-                                            }
+                                            enableButtons( buttons );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
                                         }
-                                    } ) );
-                }
-            } );
+                                    }
+                                } ) );
+            }
+        } );
+    }
+
+
+    public void addStartButtonClickListener( final Agent agent, final Button... buttons )
+    {
+        getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    @Override
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            enableButtons( buttons );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
+    }
+
+
+    public void addCheckButtonClickListener( final Agent agent, final Label resultHolder, final Button... buttons )
+    {
+        getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new CheckTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            resultHolder.setValue( parseServiceResult( result ) );
+                                            if ( resultHolder.getValue().contains( "not" ) )
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                            }
+                                            else
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            }
+                                            PROGRESS_ICON.setVisible( false );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
+    }
+
+
+    public void addStyleNameToButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.addStyleName( BUTTON_STYLE_NAME );
         }
     }
 

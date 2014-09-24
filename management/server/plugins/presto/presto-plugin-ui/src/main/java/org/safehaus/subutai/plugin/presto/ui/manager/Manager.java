@@ -68,7 +68,6 @@ public class Manager
     private final Table nodesTable;
     private final String COORDINATOR_PREFIX = "Coordinator: ";
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-    private final String MESSAGE = "No cluster is installed !";
     private final ExecutorService executorService;
     private final Presto presto;
     private final Hadoop hadoop;
@@ -123,73 +122,24 @@ public class Manager
         controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                refreshClustersInfo();
-            }
-        } );
+        addClickListener( refreshClustersBtn );
         controlsContent.addComponent( refreshClustersBtn );
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
 
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    checkAllNodes();
-                }
-            }
-        } );
+        addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
 
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    startAllNodes();
-                }
-            }
-        } );
+        addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
 
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    stopAllNodes();
-                }
-            }
-        } );
+        addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
@@ -210,6 +160,33 @@ public class Manager
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
+
+
+
+    public void addClickListener( Button button ){
+        if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) ){
+            refreshClustersInfo();
+        }
+
+        if ( config == null ){
+            final String MESSAGE = "No cluster is installed !";
+            show( MESSAGE );
+            return;
+        }
+        switch ( button.getCaption() )
+        {
+            case CHECK_ALL_BUTTON_CAPTION :
+                checkAllNodes();
+                break;
+            case START_ALL_BUTTON_CAPTION :
+                startAllNodes();
+                break;
+            case STOP_ALL_BUTTON_CAPTION :
+                stopAllNodes();
+                break;
+        }
+    }
+
 
     public void addClickListenerToAddNodeButton() {
         addNodeBtn.addClickListener( new Button.ClickListener()
