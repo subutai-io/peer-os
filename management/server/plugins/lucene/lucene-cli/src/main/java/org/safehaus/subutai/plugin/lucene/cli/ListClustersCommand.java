@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.lucene.cli;
 
 import java.util.List;
 
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 
 import org.apache.felix.gogo.commands.Command;
@@ -31,10 +31,10 @@ public class ListClustersCommand extends OsgiCommandSupport
 
     protected Object doExecute()
     {
-        List<Config> configList = luceneManager.getClusters();
+        List<LuceneConfig> configList = luceneManager.getClusters();
         if ( !configList.isEmpty() )
         {
-            for ( Config config : configList )
+            for ( LuceneConfig config : configList )
             {
                 System.out.println( config.getClusterName() );
             }

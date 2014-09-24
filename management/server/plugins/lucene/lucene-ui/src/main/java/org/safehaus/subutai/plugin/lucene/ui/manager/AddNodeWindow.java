@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 
 import com.google.common.base.Strings;
@@ -42,7 +42,7 @@ public class AddNodeWindow extends Window
 
 
     public AddNodeWindow( final Lucene lucene, final Tracker tracker, final ExecutorService executorService,
-                          final Config config, Set<Agent> nodes )
+                          final LuceneConfig config, Set<Agent> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -96,7 +96,7 @@ public class AddNodeWindow extends Window
                     {
                         while ( track )
                         {
-                            ProductOperationView po = tracker.getProductOperation( Config.PRODUCT_KEY, trackID );
+                            ProductOperationView po = tracker.getProductOperation( LuceneConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
                                 setOutput(

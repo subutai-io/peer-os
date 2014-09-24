@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.plugin.lucene.impl.handler.AddNodeOperationHandler;
@@ -121,7 +121,7 @@ public class LuceneImpl implements Lucene
 
 
     @Override
-    public UUID installCluster( final Config config )
+    public UUID installCluster( final LuceneConfig config )
     {
 
         Preconditions.checkNotNull( config, "Configuration is null" );
@@ -147,21 +147,21 @@ public class LuceneImpl implements Lucene
 
 
     @Override
-    public List<Config> getClusters()
+    public List<LuceneConfig> getClusters()
     {
-        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
+        return dbManager.getInfo( LuceneConfig.PRODUCT_KEY, LuceneConfig.class );
     }
 
 
     @Override
-    public Config getCluster( String clusterName )
+    public LuceneConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+        return dbManager.getInfo( LuceneConfig.PRODUCT_KEY, clusterName, LuceneConfig.class );
     }
 
 
     @Override
-    public UUID installCluster( Config config, HadoopClusterConfig hadoopConfig )
+    public UUID installCluster( LuceneConfig config, HadoopClusterConfig hadoopConfig )
     {
 
         InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
@@ -198,7 +198,7 @@ public class LuceneImpl implements Lucene
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, Config config, ProductOperation po )
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, LuceneConfig config, ProductOperation po )
     {
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )

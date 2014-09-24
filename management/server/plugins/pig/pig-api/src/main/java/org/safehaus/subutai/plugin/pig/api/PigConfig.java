@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
 
-public class Config implements ConfigBase
+public class PigConfig implements ConfigBase
 {
 
     public static final String TEMPLATE_NAME = "hadooppig";
@@ -29,7 +29,7 @@ public class Config implements ConfigBase
     }
 
 
-    public Config setClusterName( String clusterName )
+    public PigConfig setClusterName( String clusterName )
     {
         this.clusterName = clusterName;
         return this;

@@ -9,23 +9,23 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.pig.api.Config;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
 {
-    private final Config config;
+    private final PigConfig config;
     private HadoopClusterConfig hadoopConfig;
 
 
-    public InstallOperationHandler( PigImpl manager, Config config )
+    public InstallOperationHandler( PigImpl manager, PigConfig config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-                String.format( "Installing %s", Config.PRODUCT_KEY ) );
+        productOperation = manager.getTracker().createProductOperation( PigConfig.PRODUCT_KEY,
+                String.format( "Installing %s", PigConfig.PRODUCT_KEY ) );
     }
 
 
@@ -51,7 +51,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
             }
 
             po.addLog( "Preparing environment..." );
-            hadoopConfig.setTemplateName( Config.TEMPLATE_NAME );
+            hadoopConfig.setTemplateName( PigConfig.TEMPLATE_NAME );
             try
             {
                 EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );

@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.lucene.cli;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 
 import org.apache.felix.gogo.commands.Argument;
@@ -51,7 +51,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport
     {
         UUID uuid = luceneManager.uninstallCluster( clusterName );
 
-        tracker.printOperationLog( Config.PRODUCT_KEY, uuid, 10 * 60 * 1000 );
+        tracker.printOperationLog( LuceneConfig.PRODUCT_KEY, uuid, 10 * 60 * 1000 );
 
         return null;
     }

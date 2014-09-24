@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 
 import com.vaadin.ui.Component;
@@ -25,7 +25,7 @@ public class Wizard
     private final Tracker tracker;
     private final Lucene lucene;
     private int step = 1;
-    private Config config = new Config();
+    private LuceneConfig config = new LuceneConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
@@ -108,12 +108,12 @@ public class Wizard
     protected void init()
     {
         step = 1;
-        config = new Config();
+        config = new LuceneConfig();
         putForm();
     }
 
 
-    public Config getConfig()
+    public LuceneConfig getConfig()
     {
         return config;
     }

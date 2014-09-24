@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 
 
@@ -48,10 +48,10 @@ public class RestService
     public Response getClusters()
     {
 
-        List<Config> configs = luceneManager.getClusters();
+        List<LuceneConfig> configs = luceneManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
 
-        for ( Config config : configs )
+        for ( LuceneConfig config : configs )
         {
             clusterNames.add( config.getClusterName() );
         }
@@ -66,7 +66,7 @@ public class RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getCluster( @PathParam("clusterName") String clusterName )
     {
-        Config config = luceneManager.getCluster( clusterName );
+        LuceneConfig config = luceneManager.getCluster( clusterName );
 
         String cluster = JsonUtil.GSON.toJson( config );
         return Response.status( Response.Status.OK ).entity( cluster ).build();
@@ -81,7 +81,7 @@ public class RestService
                                     @QueryParam("nodes") String nodes )
     {
 
-        Config config = new Config();
+        LuceneConfig config = new LuceneConfig();
         config.setClusterName( clusterName );
         config.setHadoopClusterName( hadoopClusterName );
 
