@@ -11,7 +11,7 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class CommandRunnerUI implements PortalModule
+public class CommandRunnerPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "terminal.png";
@@ -35,21 +35,21 @@ public class CommandRunnerUI implements PortalModule
     @Override
     public String getId()
     {
-        return CommandRunnerUI.MODULE_NAME;
+        return CommandRunnerPortalModule.MODULE_NAME;
     }
 
 
     @Override
     public String getName()
     {
-        return CommandRunnerUI.MODULE_NAME;
+        return CommandRunnerPortalModule.MODULE_NAME;
     }
 
 
     @Override
     public File getImage()
     {
-        return FileUtil.getFile( CommandRunnerUI.MODULE_IMAGE, this );
+        return FileUtil.getFile( CommandRunnerPortalModule.MODULE_IMAGE, this );
     }
 
 

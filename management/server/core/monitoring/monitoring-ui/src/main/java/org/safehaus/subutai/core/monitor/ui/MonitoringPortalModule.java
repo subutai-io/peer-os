@@ -11,7 +11,7 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class MonitoringModule implements PortalModule
+public class MonitoringPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "monitoring.png";
@@ -37,7 +37,7 @@ public class MonitoringModule implements PortalModule
     @Override
     public File getImage()
     {
-        return FileUtil.getFile( MonitoringModule.MODULE_IMAGE, this );
+        return FileUtil.getFile( MonitoringPortalModule.MODULE_IMAGE, this );
     }
 
 

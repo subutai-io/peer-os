@@ -13,7 +13,7 @@ import com.vaadin.ui.Component;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public class PeerUI implements PortalModule
+public class PeerManagerPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "peer.png";

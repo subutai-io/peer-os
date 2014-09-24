@@ -4,37 +4,46 @@ package org.safehaus.subutai.core.container.ui;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 
 
-public class ContainerUI implements PortalModule
+public class LxcManagerPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "lxc.png";
-    public static final String MODULE_NAME = "Container";
-    protected static final Logger LOG = Logger.getLogger( ContainerUI.class.getName() );
-    private final ServiceLocator serviceLocator;
+    public static final String MODULE_NAME = "LXC";
     private ExecutorService executor;
+    private AgentManager agentManager;
+    private LxcManager lxcManager;
 
 
-    public ContainerUI()
+    public AgentManager getAgentManager()
     {
-        this.serviceLocator = new ServiceLocator();
+        return agentManager;
+    }
+
+
+    public void setAgentManager( AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
+
+
+    public void setLxcManager( LxcManager lxcManager )
+    {
+        this.lxcManager = lxcManager;
     }
 
 
     public void init()
     {
-        executor = Executors.newFixedThreadPool( 5 );
+        executor = Executors.newCachedThreadPool();
     }
 
 
@@ -61,23 +70,14 @@ public class ContainerUI implements PortalModule
     @Override
     public File getImage()
     {
-        return FileUtil.getFile( ContainerUI.MODULE_IMAGE, this );
+        return FileUtil.getFile( LxcManagerPortalModule.MODULE_IMAGE, this );
     }
 
 
     @Override
     public Component createComponent()
     {
-        try
-        {
-            return new ContainerForm( executor, serviceLocator );
-        }
-        catch ( NamingException e )
-        {
-            LOG.log( Level.SEVERE, e.getMessage() );
-        }
-
-        return null;
+        return new LxcForm( agentManager, lxcManager, executor );
     }
 
 

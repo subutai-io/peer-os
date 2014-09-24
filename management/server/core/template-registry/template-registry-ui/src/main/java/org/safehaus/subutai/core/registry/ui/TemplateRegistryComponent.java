@@ -36,16 +36,18 @@ import com.vaadin.ui.themes.Runo;
 /**
  *
  */
-public class TemplateRegistryForm extends CustomComponent
+public class TemplateRegistryComponent extends CustomComponent
 {
 
     private static final String VALUE_PROPERTY = "value";
+    private static final String PHYSICAL_IMG = "img/lxc/physical.png";
+    private static final String ICON = "icon";
     private final TemplateRegistryManager registryManager;
     private HierarchicalContainer container;
     private Tree templateTree;
 
 
-    public TemplateRegistryForm( TemplateRegistryManager registryManager )
+    public TemplateRegistryComponent( TemplateRegistryManager registryManager )
     {
         setHeight( 100, Unit.PERCENTAGE );
 
@@ -57,11 +59,11 @@ public class TemplateRegistryForm extends CustomComponent
 
         container = new HierarchicalContainer();
         container.addContainerProperty( VALUE_PROPERTY, Template.class, null );
-        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
+        container.addContainerProperty( ICON, Resource.class, new ThemeResource( PHYSICAL_IMG ) );
 
         templateTree = new Tree( "Templates" );
         templateTree.setContainerDataSource( container );
-        templateTree.setItemIconPropertyId( "icon" );
+        templateTree.setItemIconPropertyId( ICON );
         templateTree.setImmediate( true );
         templateTree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
         {

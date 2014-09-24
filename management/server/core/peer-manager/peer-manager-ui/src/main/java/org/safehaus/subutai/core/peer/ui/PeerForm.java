@@ -16,10 +16,10 @@ import com.vaadin.ui.themes.Runo;
 public class PeerForm extends CustomComponent implements Disposable
 {
 
-    private PeerUI peerUI;
+    private PeerManagerPortalModule peerManagerPortalModule;
 
 
-    public PeerForm( PeerUI peerUI )
+    public PeerForm( PeerManagerPortalModule peerManagerPortalModule )
     {
         setHeight( 100, UNITS_PERCENTAGE );
 
@@ -30,7 +30,7 @@ public class PeerForm extends CustomComponent implements Disposable
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        sheet.addTab( new PeerRegisterForm( peerUI ), "Registration" );
+        sheet.addTab( new PeerRegisterForm( peerManagerPortalModule ), "Registration" );
         verticalLayout.addComponent( sheet );
 
 
@@ -41,6 +41,6 @@ public class PeerForm extends CustomComponent implements Disposable
     @Override
     public void dispose()
     {
-        peerUI = null;
+        peerManagerPortalModule = null;
     }
 }

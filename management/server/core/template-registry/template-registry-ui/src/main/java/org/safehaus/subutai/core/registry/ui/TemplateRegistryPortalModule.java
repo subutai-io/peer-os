@@ -10,7 +10,7 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class TemplateRegistryUI implements PortalModule
+public class TemplateRegistryPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "tree.png";
@@ -48,7 +48,7 @@ public class TemplateRegistryUI implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new TemplateRegistryForm( registryManager );
+        return new TemplateRegistryComponent( registryManager );
     }
 
 

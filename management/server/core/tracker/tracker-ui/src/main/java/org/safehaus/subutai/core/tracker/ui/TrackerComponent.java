@@ -42,10 +42,10 @@ import com.vaadin.ui.TextArea;
 /**
  * Tracker Vaadin UI
  */
-public class TrackerForm extends CustomComponent
+public class TrackerComponent extends CustomComponent
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( TrackerForm.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TrackerComponent.class.getName() );
     private final Tracker tracker;
     private final ExecutorService executor;
     private Table operationsTable;
@@ -61,7 +61,7 @@ public class TrackerForm extends CustomComponent
     private static final String STATUS_PROPERTY = "Status";
 
 
-    public TrackerForm( Tracker tracker, ExecutorService executor )
+    public TrackerComponent( Tracker tracker, ExecutorService executor )
     {
         Preconditions.checkNotNull( tracker, "Tracker is null" );
         Preconditions.checkNotNull( executor, "Executor is null" );

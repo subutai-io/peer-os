@@ -5,7 +5,7 @@
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.monitor.ui.MonitoringModule">
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.monitor.ui.MonitoringPortalModule">
     <property name="monitor" ref="monitor" />
     <property name="agentManager" ref="agentManager" />
   </bean>

@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
 
 import com.vaadin.ui.Button;
@@ -20,10 +20,10 @@ public class BlueprintsForm
     private static final String NO_BLUEPRINTS = "No blueprints found";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManagerUI managerUI;
+    private EnvironmentManagerPortalModule managerUI;
 
 
-    public BlueprintsForm( EnvironmentManagerUI managerUI )
+    public BlueprintsForm( EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
 

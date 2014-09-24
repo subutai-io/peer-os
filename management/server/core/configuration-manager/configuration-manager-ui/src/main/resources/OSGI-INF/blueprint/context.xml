@@ -4,7 +4,7 @@
   <reference id="configManager" availability="mandatory"
              interface="org.safehaus.subutai.core.configuration.api.ConfigManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.configuration.ui.ConfigurationManagerUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.configuration.ui.ConfigurationManagerPortalModule"
         init-method="init" destroy-method="destroy">
     <property name="configManager" ref="configManager" />
   </bean>

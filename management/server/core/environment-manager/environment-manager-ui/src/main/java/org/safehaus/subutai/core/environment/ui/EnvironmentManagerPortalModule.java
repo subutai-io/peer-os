@@ -13,7 +13,7 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class EnvironmentManagerUI implements PortalModule
+public class EnvironmentManagerPortalModule implements PortalModule
 {
 
     private final static String MODULE_IMAGE = "env.png";

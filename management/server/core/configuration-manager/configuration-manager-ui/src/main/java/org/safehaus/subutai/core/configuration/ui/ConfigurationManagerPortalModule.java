@@ -12,7 +12,7 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class ConfigurationManagerUI implements PortalModule
+public class ConfigurationManagerPortalModule implements PortalModule
 {
 
     private static final String IMAGE = "config.png";

@@ -7,7 +7,7 @@ package org.safehaus.subutai.core.environment.ui;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.environment.ui.manage.BlueprintLoadForm;
+import org.safehaus.subutai.core.environment.ui.manage.BlueprintUploadForm;
 import org.safehaus.subutai.core.environment.ui.manage.BlueprintsForm;
 import org.safehaus.subutai.core.environment.ui.manage.EnvironmentsBuildProcessForm;
 import org.safehaus.subutai.core.environment.ui.manage.EnvironmentsForm;
@@ -25,13 +25,13 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
 {
 
 
-    private BlueprintLoadForm blueprintManager;
+    private BlueprintUploadForm blueprintManager;
     private BlueprintsForm blueprintsForm;
     private EnvironmentsForm environmentForm;
     private EnvironmentsBuildProcessForm environmentBuildForm;
 
 
-    public EnvironmentManagerForm( EnvironmentManagerUI managerUI )
+    public EnvironmentManagerForm( EnvironmentManagerPortalModule managerUI )
     {
         setHeight( 100, UNITS_PERCENTAGE );
 
@@ -42,7 +42,7 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        blueprintManager = new BlueprintLoadForm( managerUI );
+        blueprintManager = new BlueprintUploadForm( managerUI );
         blueprintsForm = new BlueprintsForm( managerUI );
         environmentBuildForm = new EnvironmentsBuildProcessForm( managerUI );
         environmentForm = new EnvironmentsForm( managerUI );

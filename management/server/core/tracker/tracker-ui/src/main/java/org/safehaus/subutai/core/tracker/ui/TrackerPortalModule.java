@@ -12,12 +12,12 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-public class TrackerUI implements PortalModule
+public class TrackerPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "tracker.png";
     public static final String MODULE_NAME = "Tracker";
-    private TrackerForm trackerForm;
+    private TrackerComponent trackerComponent;
     private Tracker tracker;
     private ExecutorService executor;
 
@@ -44,31 +44,31 @@ public class TrackerUI implements PortalModule
     @Override
     public String getId()
     {
-        return TrackerUI.MODULE_NAME;
+        return TrackerPortalModule.MODULE_NAME;
     }
 
 
     @Override
     public String getName()
     {
-        return TrackerUI.MODULE_NAME;
+        return TrackerPortalModule.MODULE_NAME;
     }
 
 
     @Override
     public File getImage()
     {
-        return FileUtil.getFile( TrackerUI.MODULE_IMAGE, this );
+        return FileUtil.getFile( TrackerPortalModule.MODULE_IMAGE, this );
     }
 
 
     @Override
     public Component createComponent()
     {
-        trackerForm = new TrackerForm( tracker, executor );
-        trackerForm.refreshSources();
-        trackerForm.startTracking();
-        return trackerForm;
+        trackerComponent = new TrackerComponent( tracker, executor );
+        trackerComponent.refreshSources();
+        trackerComponent.startTracking();
+        return trackerComponent;
     }
 
 
