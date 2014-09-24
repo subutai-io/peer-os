@@ -40,6 +40,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private static final String OK_ICON_SOURCE = "img/ok.png";
     private static final String ERROR_ICON_SOURCE = "img/cancel.png";
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
+    private static final String IMG = "img/spinner.gif";
     private AtomicInteger errorProcessed = null;
     private VerticalLayout contentRoot;
     private Table environmentsTable;
@@ -121,7 +122,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case NEW_PROCESS:
                     {
                         processButton = new Button( "Build" );
-                        progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
                         progressIcon.setVisible( false );
 
                         processButton.addClickListener( new Button.ClickListener()
@@ -149,7 +150,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case IN_PROGRESS:
                     {
                         processButton = new Button( "Terminate" );
-                        progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
                         progressIcon.setVisible( true );
                         processButton.addClickListener( new Button.ClickListener()
                         {
@@ -186,8 +187,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                // TODO create configure logic
-
                                 configureEnvironment( environmentBuildProcess );
                             }
                         } );
@@ -206,7 +205,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         }
         else
         {
-            Notification.show( EnvAnswer.NO_BUILD_PROCESS.getAnswer());
+            Notification.show( EnvAnswer.NO_BUILD_PROCESS.getAnswer() );
         }
         environmentsTable.refreshRowCache();
     }
