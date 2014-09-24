@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
-import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -11,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -88,10 +88,11 @@ public class RemotePeerRestClient
             WebClient client = WebClient.create( baseUrl );
 
             Form form = new Form();
-            form.param( "commandType", ccm.getType().toString() );
-            form.param( "command", ccm.toJson() );
+            form.set( "commandType", ccm.getType().toString() );
+            form.set( "command", ccm.toJson() );
+
             Response response =
-                    client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).accept( MediaType.APPLICATION_JSON ).post( form );
+                    client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).accept( MediaType.APPLICATION_JSON ).form( form );
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
