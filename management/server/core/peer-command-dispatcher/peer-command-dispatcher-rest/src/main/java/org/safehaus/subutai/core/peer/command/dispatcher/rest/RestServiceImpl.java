@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Agent;
@@ -141,8 +140,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response invoke( @FormParam( "commandType" ) final String commandType,
-                            @FormParam( "command" ) final String command )
+    public Response invoke( final String commandType, final String command )
     {
 
         PeerCommandType type = PeerCommandType.valueOf( commandType );
