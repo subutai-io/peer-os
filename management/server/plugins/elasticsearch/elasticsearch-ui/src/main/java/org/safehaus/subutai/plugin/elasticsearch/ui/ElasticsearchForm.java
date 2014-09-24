@@ -42,7 +42,7 @@ public class ElasticsearchForm extends CustomComponent
             {
                 TabSheet tabsheet = event.getTabSheet();
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if ( caption.equals( "Manage" ) )
+                if ( "Manage".equals( caption ) )
                 {
                     manager.refreshClustersInfo();
                 }

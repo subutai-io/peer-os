@@ -21,7 +21,7 @@ public class ElasticsearchUI implements PortalModule
 
     public static final String MODULE_IMAGE = "logo.jpeg";
     private final ServiceLocator serviceLocator;
-    protected Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
+    private static Logger LOG = Logger.getLogger( ElasticsearchUI.class.getName() );
     private ExecutorService executor;
 
 
@@ -72,7 +72,6 @@ public class ElasticsearchUI implements PortalModule
         catch ( NamingException e )
         {
             LOG.severe( e.getMessage() );
-            ;
         }
         return null;
     }

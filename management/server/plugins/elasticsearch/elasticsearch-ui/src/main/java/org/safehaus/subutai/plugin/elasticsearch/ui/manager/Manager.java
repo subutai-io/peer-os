@@ -52,12 +52,10 @@ public class Manager
     protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
     protected final static String STOP_BUTTON_CAPTION = "Stop";
     protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
     protected final static String HOST_COLUMN_CAPTION = "Host";
     protected final static String IP_COLUMN_CAPTION = "IP List";
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
-    protected final static String ADD_NODE_CAPTION = "Add Node";
     private static final String MESSAGE = "No cluster is installed !";
     private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final Pattern ELASTICSEARCH_PATTERN = Pattern.compile( ".*(elasticsearch.+?g).*" );
@@ -261,8 +259,7 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-
-                UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
+                UUID trackID = elasticsearch.uninstallCluster( config );
 
                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                         ElasticsearchClusterConfiguration.PRODUCT_KEY );
