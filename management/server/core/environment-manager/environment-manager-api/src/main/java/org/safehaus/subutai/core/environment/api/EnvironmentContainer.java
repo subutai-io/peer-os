@@ -8,7 +8,8 @@ import org.safehaus.subutai.common.protocol.Container;
 /**
  * Created by timur on 9/22/14.
  */
-public class EnvironmentContainer extends Container {
+public class EnvironmentContainer extends Container
+{
 
     private EnvironmentManager environmentManager;
 

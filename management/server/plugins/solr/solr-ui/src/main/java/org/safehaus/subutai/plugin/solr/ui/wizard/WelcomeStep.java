@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.solr.ui.wizard;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.plugin.solr.ui.SolrUI;
+import org.safehaus.subutai.plugin.solr.ui.SolrPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -39,7 +39,7 @@ public class WelcomeStep extends VerticalLayout
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( SolrUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( SolrPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 150, Unit.PIXELS );
         logoImg.setWidth( 150, Unit.PIXELS );

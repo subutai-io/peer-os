@@ -15,10 +15,10 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hadoop-plugin-api</module>
-    <module>hadoop-plugin-impl</module>
-    <module>hadoop-plugin-ui</module>
-    <module>hadoop-plugin-cli</module>
-    <module>hadoop-plugin-rest</module>
+    <module>hadoop-api</module>
+    <module>hadoop-impl</module>
+    <module>hadoop-ui</module>
+    <module>hadoop-cli</module>
+    <module>hadoop-rest</module>
   </modules>
 </project>

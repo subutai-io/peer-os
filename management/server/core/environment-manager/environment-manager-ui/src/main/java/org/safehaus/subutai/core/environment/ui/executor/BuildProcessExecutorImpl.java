@@ -40,7 +40,7 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
                 fireEvent( new BuildProcessExecutionEvent( "name", "desc", BuildProcessExecutionEventType.START ) );
                 try
                 {
-                    BuildProcessCommand command = commandFactory.newCommand( );
+                    BuildProcessCommand command = commandFactory.newCommand();
                     command.execute();
                     return ( new BuildProcessExecutionEvent( "", "", BuildProcessExecutionEventType.SUCCESS ) );
                 }

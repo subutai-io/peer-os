@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 import org.safehaus.subutai.core.configuration.impl.utils.ConfigBuilder;
 
 import com.google.gson.Gson;
@@ -24,7 +24,7 @@ public class ConfigBuilderTest
     public void test()
     {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        JsonObject jo = configBuilder.getConfigJsonObject( "test", ConfigTypeEnum.PROPERTIES );
+        JsonObject jo = configBuilder.getConfigJsonObject( "test", ConfiguraitonTypeEnum.PROPERTIES );
 
         JsonObject field1 =
                 configBuilder.buildFieldJsonObject( "field name", "Field Name", true, "textarea", true, "value" );

@@ -13,7 +13,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.pig.ui.PigUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.pig.ui.PigPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
 

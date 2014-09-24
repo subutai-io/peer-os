@@ -360,7 +360,8 @@ public class PeerManagerImpl implements PeerManager
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {}.getType() );
+                {
+                }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {

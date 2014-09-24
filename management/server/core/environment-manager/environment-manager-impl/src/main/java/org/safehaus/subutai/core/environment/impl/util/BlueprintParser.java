@@ -1,24 +1,17 @@
 package org.safehaus.subutai.core.environment.impl.util;
 
 
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-
-
 /**
  * Blueprint Parser Utility class
  */
 public class BlueprintParser
 {
 
-    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    /*Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
-    public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) throws JsonSyntaxException
+    public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) throws
+    EnvironmentManagerException
     {
         try
         {
@@ -27,7 +20,7 @@ public class BlueprintParser
         }
         catch ( JsonSyntaxException e )
         {
-            throw new JsonSyntaxException( "Error parsing blueprint" );
+            throw new EnvironmentManagerException( "Error parsing blueprint" );
         }
     }
 
@@ -41,5 +34,5 @@ public class BlueprintParser
     public Environment parseEnvironment( final String blueprintStr ) throws JsonSyntaxException
     {
         return gson.fromJson( blueprintStr, Environment.class );
-    }
+    }*/
 }

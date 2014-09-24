@@ -16,7 +16,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.accumulo.ui.AccumuloPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
 

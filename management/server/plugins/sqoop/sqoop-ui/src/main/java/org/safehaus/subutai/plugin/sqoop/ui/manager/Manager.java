@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
-import org.safehaus.subutai.plugin.sqoop.ui.SqoopForm;
+import org.safehaus.subutai.plugin.sqoop.ui.SqoopComponent;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -53,16 +53,16 @@ public class Manager
     private final Tracker tracker;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
-    private final SqoopForm sqoopForm;
+    private final SqoopComponent sqoopComponent;
     private SqoopConfig config;
 
 
-    public Manager( ExecutorService executorService, ServiceLocator serviceLocator, SqoopForm sqoopForm )
+    public Manager( ExecutorService executorService, ServiceLocator serviceLocator, SqoopComponent sqoopComponent )
             throws NamingException
     {
 
         this.executorService = executorService;
-        this.sqoopForm = sqoopForm;
+        this.sqoopComponent = sqoopComponent;
         this.sqoop = serviceLocator.getService( Sqoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
@@ -217,7 +217,7 @@ public class Manager
                 {
                     importPanel.setAgent( agent );
                     importPanel.setType( null );
-                    sqoopForm.addTab( importPanel );
+                    sqoopComponent.addTab( importPanel );
                 }
             } );
 
@@ -228,7 +228,7 @@ public class Manager
                 public void buttonClick( Button.ClickEvent event )
                 {
                     exportPanel.setAgent( agent );
-                    sqoopForm.addTab( exportPanel );
+                    sqoopComponent.addTab( exportPanel );
                 }
             } );
 

@@ -75,5 +75,4 @@ public class CloneContainersMessage extends PeerCommandMessage
     {
         this.criteria = criteria;
     }
-
 }

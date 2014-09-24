@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.plugin.shark.ui.SharkUI;
+import org.safehaus.subutai.plugin.shark.ui.SharkPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -39,7 +39,7 @@ public class WelcomeStep extends Panel
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( SharkUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( SharkPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 363, Unit.PIXELS );
         logoImg.setWidth( 88, Unit.PIXELS );

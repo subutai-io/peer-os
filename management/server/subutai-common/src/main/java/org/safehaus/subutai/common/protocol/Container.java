@@ -9,7 +9,8 @@ import org.safehaus.subutai.common.exception.ContainerException;
 /**
  * Created by timur on 9/20/14.
  */
-public abstract class Container {
+public abstract class Container
+{
     protected UUID agentId;
     protected UUID peerId;
     protected String hostname;
@@ -76,10 +77,10 @@ public abstract class Container {
         this.description = description;
     }
 
+
     public abstract boolean start() throws ContainerException;
 
     public abstract boolean stop() throws ContainerException;
 
     public abstract boolean isConnected() throws ContainerException;
-
 }

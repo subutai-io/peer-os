@@ -8,5 +8,4 @@ public interface BuildProcessExecutionListener
 {
 
     public void onExecutionEvent( BuildProcessExecutionEvent event );
-
 }

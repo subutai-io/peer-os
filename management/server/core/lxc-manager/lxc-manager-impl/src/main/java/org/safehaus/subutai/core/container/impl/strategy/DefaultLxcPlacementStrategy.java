@@ -31,8 +31,8 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy
     private static final double MIN_RAM_IN_RESERVE_MB = 1024;   // 1G
     private static final double MIN_CPU_LXC_PERCENT = 5;           // 5%
     private static final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
-    private final int numOfNodes;
     private static final Logger LOGGER = Logger.getLogger( DefaultLxcPlacementStrategy.class.getName() );
+    private final int numOfNodes;
 
 
     public DefaultLxcPlacementStrategy( int numOfNodes )

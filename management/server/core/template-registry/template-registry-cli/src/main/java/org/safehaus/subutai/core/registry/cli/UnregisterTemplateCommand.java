@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -18,12 +18,12 @@ public class UnregisterTemplateCommand extends OsgiCommandSupport
             description = "template name")
     String templateName;
 
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager )
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -31,7 +31,7 @@ public class UnregisterTemplateCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        templateRegistryManager.unregisterTemplate( templateName );
+        templateRegistry.unregisterTemplate( templateName );
 
         System.out.println( String.format( "Template %s unregistered successfully", templateName ) );
 

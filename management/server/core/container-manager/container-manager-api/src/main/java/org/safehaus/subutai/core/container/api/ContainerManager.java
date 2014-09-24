@@ -109,13 +109,11 @@ public interface ContainerManager
 
     /**
      * Adds container event listener
-     * @param listener
      */
     public void addListener( ContainerEventListener listener );
 
     /**
      * Removes container event listener
-     * @param listener
      */
     public void removeListener( ContainerEventListener listener );
 }

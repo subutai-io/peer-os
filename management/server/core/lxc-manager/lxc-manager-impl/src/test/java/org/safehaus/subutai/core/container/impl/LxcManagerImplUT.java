@@ -26,7 +26,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.lxcmanager.LxcManagerImpl;
 import org.safehaus.subutai.core.container.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -47,10 +47,10 @@ public class LxcManagerImplUT
     @Before
     public void setUpMethod()
     {
-        Monitor monitor = mock( Monitor.class );
-        when( monitor.getData( any( String.class ), any( Metric.class ), any( Date.class ), any( Date.class ) ) )
+        Monitoring monitoring = mock( Monitoring.class );
+        when( monitoring.getData( any( String.class ), any( Metric.class ), any( Date.class ), any( Date.class ) ) )
                 .thenReturn( Collections.EMPTY_MAP );
-        lxcManager = new LxcManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor );
+        lxcManager = new LxcManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitoring );
         ( ( LxcManagerImpl ) lxcManager ).init();
     }
 
@@ -119,7 +119,7 @@ public class LxcManagerImplUT
     public void testStopLxcOnHost()
     {
         LxcManager lxcManager = new LxcManagerImpl( new AgentManagerFake(),
-                MockUtils.getHardCodedCommandRunner( true, true, 0, "STOPPED", null ), mock( Monitor.class ) );
+                MockUtils.getHardCodedCommandRunner( true, true, 0, "STOPPED", null ), mock( Monitoring.class ) );
 
         boolean result =
                 lxcManager.stopLxcOnHost( MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname() );

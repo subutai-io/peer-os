@@ -265,26 +265,6 @@ public class CommunicationManagerImpl implements CommunicationManager
     }
 
 
-    /**
-     * Disposes communication manager
-     */
-    public void destroy()
-    {
-        try
-        {
-            cleanup();
-
-            exec.shutdown();
-
-            LOG.info( "Communication Manager stopped..." );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in destroy", ex );
-        }
-    }
-
-
     private void cleanup()
     {
         if ( pooledConnectionFactory != null )
@@ -308,6 +288,26 @@ public class CommunicationManagerImpl implements CommunicationManager
             {
                 LOG.warn( "ignore", e );
             }
+        }
+    }
+
+
+    /**
+     * Disposes communication manager
+     */
+    public void destroy()
+    {
+        try
+        {
+            cleanup();
+
+            exec.shutdown();
+
+            LOG.info( "Communication Manager stopped..." );
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in destroy", ex );
         }
     }
 }
