@@ -45,6 +45,21 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
+    protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected static final String CHECK_BUTTON_CAPTION = "Check";
+    protected static final String START_ALL_BUTTON_CAPTION = "Start All";
+    protected static final String START_BUTTON_CAPTION = "Start";
+    protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected static final String STOP_BUTTON_CAPTION = "Stop";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String HOST_COLUMN_CAPTION = "Host";
+    protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected static final String STATUS_COLUMN_CAPTION = "Status";
+    protected static final String ADD_NODE_CAPTION = "Add Node";
+    final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
@@ -57,23 +72,6 @@ public class Manager
     private final String message = "No cluster is installed !";
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private SparkClusterConfig config;
-
-    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
-    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
-    protected final static String CHECK_BUTTON_CAPTION = "Check";
-    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
-    protected final static String START_BUTTON_CAPTION = "Start";
-    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
-    protected final static String STOP_BUTTON_CAPTION = "Stop";
-    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
-    protected final static String HOST_COLUMN_CAPTION = "Host";
-    protected final static String IP_COLUMN_CAPTION = "IP List";
-    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
-    protected final static String STATUS_COLUMN_CAPTION = "Status";
-    protected final static String ADD_NODE_CAPTION = "Add Node";
-
-    final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
 
 
     public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException

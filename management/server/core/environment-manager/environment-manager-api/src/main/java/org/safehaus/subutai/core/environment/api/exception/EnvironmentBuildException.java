@@ -7,7 +7,7 @@ package org.safehaus.subutai.core.environment.api.exception;
 public class EnvironmentBuildException extends EnvironmentManagerException
 {
 
-    private String message;
+    private final String message;
 
 
     public EnvironmentBuildException( final String message )
