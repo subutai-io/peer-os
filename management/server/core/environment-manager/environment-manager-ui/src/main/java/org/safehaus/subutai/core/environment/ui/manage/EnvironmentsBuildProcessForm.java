@@ -15,6 +15,7 @@ import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionLi
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutor;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.executor.CloneCommandFactory;
+import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -282,11 +283,11 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
                 if ( errorProcessed.intValue() == 0 )
                 {
-                    Notification.show( "Cloning containers finished successfully." );
+                    Notification.show( EnvAnswer.SUCCESS.getAnswer() );
                 }
                 else
                 {
-                    Notification.show( "Not all containers successfully created." );
+                    Notification.show( EnvAnswer.FAIL.getAnswer() );
                 }
             }
         } );
