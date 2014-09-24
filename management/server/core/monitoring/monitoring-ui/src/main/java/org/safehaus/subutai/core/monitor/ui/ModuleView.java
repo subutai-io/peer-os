@@ -9,8 +9,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
-import org.safehaus.subutai.core.monitor.ui.component.AgentTree;
 import org.safehaus.subutai.core.monitor.ui.util.UIUtil;
+import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -31,7 +31,7 @@ public class ModuleView extends CustomComponent
     private static final int MAX_SIZE = 500;
     private final Monitor monitor;
     private final AgentManager agentManager;
-    private Chart chart;
+    private transient Chart chart;
     private AgentTree agentTree;
     private PopupDateField startDateField;
     private PopupDateField endDateField;

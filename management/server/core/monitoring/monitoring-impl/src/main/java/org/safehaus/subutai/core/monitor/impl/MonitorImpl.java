@@ -15,6 +15,9 @@ import java.util.TreeMap;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.safehaus.subutai.common.exception.HTTPException;
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.HttpUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
 import org.slf4j.Logger;
@@ -26,8 +29,8 @@ public class MonitorImpl implements Monitor
 
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json" );
-    private final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json", MonitorImpl.class );
+    private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 
     /**
@@ -39,7 +42,7 @@ public class MonitorImpl implements Monitor
     public Map<Metric, Map<Date, Double>> getDataForAllMetrics( String host, Date startDate, Date endDate )
     {
 
-        HashMap<Metric, Map<Date, Double>> data = new HashMap<>();
+        Map<Metric, Map<Date, Double>> data = new HashMap<>();
 
         for ( Metric metric : Metric.values() )
         {
@@ -62,7 +65,7 @@ public class MonitorImpl implements Monitor
         {
             data = execute( host, metric, startDate, endDate );
         }
-        catch ( Exception e )
+        catch ( IOException e )
         {
             LOG.error( "Error while executing query: ", e );
         }
@@ -71,7 +74,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    private Map<Date, Double> execute( String host, Metric metric, Date startDate, Date endDate ) throws Exception
+    private Map<Date, Double> execute( String host, Metric metric, Date startDate, Date endDate ) throws IOException
     {
 
         String query = QUERY.replace( "$host", host ).replace( "$metricName", metric.name().toLowerCase() )
@@ -80,7 +83,15 @@ public class MonitorImpl implements Monitor
 
         LOG.debug( "query: {}", query );
 
-        String response = HttpPost.execute( query );
+        String response = "";
+        try
+        {
+            response = HttpUtil.request( HttpUtil.RequestType.POST, query, null );
+        }
+        catch ( HTTPException e )
+        {
+            LOG.error( "Error in execute", e );
+        }
         List<JsonNode> nodes = toNodes( response );
 
         LOG.info( "nodes count: {}", nodes.size() );
@@ -98,7 +109,7 @@ public class MonitorImpl implements Monitor
         JsonNode json = OBJECT_MAPPER.readTree( response );
         JsonNode hits = json.get( "hits" ).get( "hits" );
 
-        ArrayList<JsonNode> nodes = new ArrayList<>();
+        List<JsonNode> nodes = new ArrayList<>();
 
         for ( int i = 0; i < hits.size(); i++ )
         {
@@ -136,7 +147,7 @@ public class MonitorImpl implements Monitor
 
         try
         {
-            date = DATE_FORMAT.parse( target );
+            date = dateFormat.parse( target );
         }
         catch ( ParseException e )
         {
@@ -149,6 +160,6 @@ public class MonitorImpl implements Monitor
 
     private String dateToStr( Date date )
     {
-        return DATE_FORMAT.format( date ).replace( " ", "T" );
+        return dateFormat.format( date ).replace( " ", "T" );
     }
 }

@@ -3,42 +3,21 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.safehaus.subutai</groupId>
-    <artifactId>monitoring-parent</artifactId>
+    <artifactId>template-manager-parent</artifactId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>monitoring-ui</artifactId>
-  <name>Subutai Monitoring UI</name>
+  <artifactId>template-manager-cli</artifactId>
+  <name>Subutai Template Manager CLI</name>
+  <description>Subutai Template Manager CLI</description>
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>vaadin-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>monitoring-api</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -46,33 +25,48 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
+      <artifactId>template-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.karaf.shell</groupId>
+      <artifactId>org.apache.karaf.shell.console</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-custom</artifactId>
-      <version>${project.version}</version>
+      <artifactId>lxc-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>agent-manager-api</artifactId>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.monitor.ui</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.template.cli</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>
+              org.apache.felix.service.command,
+              org.apache.felix.gogo.commands,
+              org.apache.karaf.shell.console,
+              *
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>

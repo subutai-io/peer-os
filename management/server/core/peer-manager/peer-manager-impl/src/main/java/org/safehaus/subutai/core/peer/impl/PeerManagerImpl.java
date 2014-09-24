@@ -360,8 +360,7 @@ public class PeerManagerImpl implements PeerManager
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {
-                }.getType() );
+                {}.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -519,16 +518,16 @@ public class PeerManagerImpl implements PeerManager
                 for (; a.hasMoreElements(); )
                 {
                     InetAddress addr = a.nextElement();
-                    if ( addr.getHostAddress().startsWith( "172" ) )
+                    if ( !addr.getHostAddress().startsWith( "10" ) && addr.isSiteLocalAddress() )
                     {
-                        return addr.getHostAddress();
+                        return ( addr.getHostName() );
                     }
                 }
             }
         }
         catch ( SocketException e )
         {
-            LOG.error( e.getMessage() );
+            System.out.println( e.getMessage() );
         }
 
 
