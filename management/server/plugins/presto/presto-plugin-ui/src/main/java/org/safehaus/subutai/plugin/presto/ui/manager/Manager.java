@@ -123,7 +123,6 @@ public class Manager
         controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.addStyleName( BUTTON_STYLE_NAME );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -136,7 +135,6 @@ public class Manager
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
 
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.addStyleName( BUTTON_STYLE_NAME );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -155,8 +153,8 @@ public class Manager
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
+
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.addStyleName( BUTTON_STYLE_NAME );
         startAllBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -175,8 +173,8 @@ public class Manager
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
+
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.addStyleName( BUTTON_STYLE_NAME );
         stopAllBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -196,32 +194,24 @@ public class Manager
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.addStyleName( BUTTON_STYLE_NAME );
-        destroyClusterBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
-                            "No" );
-                    addConfirmationWindowListenerToUninstall( alert );
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else
-                {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
-
+        addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
         addNodeBtn = new Button( ADD_NODE_CAPTION );
-        addNodeBtn.addStyleName( BUTTON_STYLE_NAME );
+        addClickListenerToAddNodeButton();
+        controlsContent.addComponent( addNodeBtn );
+        controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
+
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
+
+        PROGRESS_ICON.setVisible( false );
+        controlsContent.addComponent( PROGRESS_ICON );
+        contentRoot.addComponent( controlsContent, 0, 0 );
+        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+    }
+
+    public void addClickListenerToAddNodeButton() {
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -288,40 +278,51 @@ public class Manager
                 }
             }
         } );
-
-        controlsContent.addComponent( addNodeBtn );
-        controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
-        PROGRESS_ICON.setVisible( false );
-        controlsContent.addComponent( PROGRESS_ICON );
-        contentRoot.addComponent( controlsContent, 0, 0 );
-        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
 
 
-    public void addConfirmationWindowListenerToUninstall( ConfirmationDialog alert )
-    {
-        alert.getOk().addClickListener( new Button.ClickListener()
+    public void addClickListenerToDestroyClusterButton() {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = presto.uninstallCluster( config.getClusterName() );
-
-                ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID, PrestoClusterConfig.PRODUCT_KEY );
-
-                window.getWindow().addCloseListener( new Window.CloseListener()
+                if ( config != null )
                 {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent )
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
                     {
-                        refreshClustersInfo();
-                    }
-                } );
-                contentRoot.getUI().addWindow( window.getWindow() );
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID trackID = presto.uninstallCluster( config.getClusterName() );
+
+                            ProgressWindow window =
+                                    new ProgressWindow( executorService, tracker, trackID, PrestoClusterConfig.PRODUCT_KEY );
+
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
             }
         } );
     }
+
 
 
     private void populateTable( final Table table, Set<Agent> workers, final Agent coordinator )
@@ -376,9 +377,7 @@ public class Manager
         availableOperations.setSpacing( true );
         availableOperations.addStyleName( BUTTON_STYLE_NAME );
 
-        availableOperations.addComponent( checkBtn );
-        availableOperations.addComponent( startBtn );
-        availableOperations.addComponent( stopBtn );
+        addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn );
 
         table.addItem( new Object[] {
                 coordinator.getHostname(), coordinator.getListIP().get( 0 ), checkIfCoordinator( coordinator ),
