@@ -80,7 +80,7 @@ public class RemotePeerRestClient
 
     public boolean invoke( String ip, String port, PeerCommandMessage ccm )
     {
-        String path = "invoke";
+        String path = "peer/invoke";
         try
         {
             baseUrl = String.format( baseUrl, ip, port );

@@ -146,6 +146,7 @@ public class RestServiceImpl implements RestService
         PeerCommandType type = PeerCommandType.valueOf( commandType );
         Class clazz = getMessageClass( type );
         PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
+        LOG.info( String.format( "1=============[%s]", commandMessage, commandMessage!=null? commandMessage.toString():"NULL" ));
         try
         {
             peerManager.invoke( commandMessage );
@@ -156,6 +157,8 @@ public class RestServiceImpl implements RestService
             commandMessage.setSuccess( false );
             return Response.ok().entity( commandMessage ).build();
         }
+        LOG.info( String.format( "2=============[%s]", commandMessage, commandMessage!=null? commandMessage.toString():"NULL" ));
+
         return Response.ok().entity( commandMessage ).build();
     }
 

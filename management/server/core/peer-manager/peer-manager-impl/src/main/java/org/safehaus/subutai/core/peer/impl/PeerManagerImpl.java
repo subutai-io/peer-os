@@ -360,7 +360,8 @@ public class PeerManagerImpl implements PeerManager
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {}.getType() );
+                {
+                }.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -452,6 +453,7 @@ public class PeerManagerImpl implements PeerManager
     public void invoke( PeerCommandMessage peerCommandMessage ) throws PeerException
     {
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
+        LOG.info( String.format( "1=================[%s]", peerCommandMessage ) );
         switch ( peerCommandMessage.getType() )
         {
             case CLONE:
@@ -459,6 +461,8 @@ public class PeerManagerImpl implements PeerManager
                 Set<Agent> agents = createContainers( ccm );
                 ccm.setResult( agents );
                 ccm.setSuccess( true );
+                LOG.info( String.format( "2=================[%s]", peerCommandMessage ) );
+
                 break;
             case START:
                 peerCommandMessage.setSuccess( startContainer( peerContainer ) );
