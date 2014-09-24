@@ -15,7 +15,9 @@ import java.util.TreeMap;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.HttpUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
 import org.slf4j.Logger;
@@ -81,7 +83,15 @@ public class MonitorImpl implements Monitor
 
         LOG.debug( "query: {}", query );
 
-        String response = HttpPost.execute( query );
+        String response = "";
+        try
+        {
+            response = HttpUtil.request( HttpUtil.RequestType.POST, query, null );
+        }
+        catch ( HTTPException e )
+        {
+            LOG.error( "Error in execute", e );
+        }
         List<JsonNode> nodes = toNodes( response );
 
         LOG.info( "nodes count: {}", nodes.size() );
