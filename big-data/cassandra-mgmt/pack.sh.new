@@ -7,10 +7,10 @@ echo $BASE
 cd ../workspace
 SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/cassandra-mgmt/cassandra-mgmt"
 TARGET="/var/lib/jenkins/Automation/Bigdata/cassandra-mgmt"
-kskssql="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/keyspace"
+subutai_schema="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/cassandra-mgmt/"
 echo $SOURCE
 echo $TARGET
-echo $kskssql
+echo $subutai_schema
 cd $BASE
 
 LXCSOURCE="/var/lib/lxc"
@@ -42,7 +42,7 @@ cp $BASE/repo/sources.list $LXCSOURCE/$pattern/rootfs/etc/apt/
 
 #Copying logstash&jmxtrans deb files.
 cp $BASE/repo/ksks-cassandra-mgmt-1.0.8-amd64.deb $LXCSOURCE/$pattern/rootfs/root/
-cp $kskssql/kiskis.sql $LXCSOURCE/$pattern/rootfs/root/
+cp $subutai_schema/kiskis.sql $LXCSOURCE/$pattern/rootfs/root/
 
 #start base-container
 sudo lxc-start -n $pattern -d

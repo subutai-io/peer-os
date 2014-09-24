@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class ListHandler extends AbstractHandler<Collection<PackageInfo>>
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ListHandler.class.getName() );
 
     private Pattern lineStartPattern = Pattern.compile( "^[a-z]{2,3}\\s+" );
     private String namePattern;
@@ -73,45 +75,43 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>>
     public Collection<PackageInfo> performAction()
     {
         Agent agent = getAgent();
-        if ( agent == null )
+        if ( agent != null )
         {
-            return null;
-        }
-
-        AgentRequestBuilder rb = new AgentRequestBuilder( agent, makeCommand() );
-        Command cmd = packageManager.getCommandRunner().createCommand( new HashSet<>( Arrays.asList( rb ) ) );
-        packageManager.getCommandRunner().runCommand( cmd );
-        if ( cmd.hasSucceeded() )
-        {
-            Collection<PackageInfo> ls = new ArrayList<>();
-            AgentResult res = cmd.getResults().get( agent.getUuid() );
-            String s = res.getStdOut();
-            Pattern delim = Pattern.compile( "\\s+" );
-            try ( BufferedReader br = new BufferedReader( new StringReader( s ) ) )
+            AgentRequestBuilder rb = new AgentRequestBuilder( agent, makeCommand() );
+            Command cmd = packageManager.getCommandRunner().createCommand( new HashSet<>( Arrays.asList( rb ) ) );
+            packageManager.getCommandRunner().runCommand( cmd );
+            if ( cmd.hasSucceeded() )
             {
-                int cols = 0;
-                while ( ( s = br.readLine() ) != null )
+                Collection<PackageInfo> ls = new ArrayList<>();
+                AgentResult res = cmd.getResults().get( agent.getUuid() );
+                String s = res.getStdOut();
+                Pattern delim = Pattern.compile( "\\s+" );
+                try ( BufferedReader br = new BufferedReader( new StringReader( s ) ) )
                 {
-                    // count occurences of a seperator minus sign
-                    // http://stackoverflow.com/questions/275944
-                    if ( cols == 0 && s.startsWith( "+++" ) )
+                    int cols = 0;
+                    while ( ( s = br.readLine() ) != null )
                     {
-                        cols = 1 + s.length() - s.replace( "-", "" ).length();
-                    }
-                    PackageInfo pi = parseLine( s, cols, delim );
-                    if ( pi != null )
-                    {
-                        ls.add( pi );
+                        // count occurences of a seperator minus sign
+                        // http://stackoverflow.com/questions/275944
+                        if ( cols == 0 && s.startsWith( "+++" ) )
+                        {
+                            cols = 1 + s.length() - s.replace( "-", "" ).length();
+                        }
+                        PackageInfo pi = parseLine( s, cols, delim );
+                        if ( pi != null )
+                        {
+                            ls.add( pi );
+                        }
                     }
                 }
+                catch ( IOException ex )
+                {
+                    LOG.error( "Error in performAction", ex );
+                }
+                return ls;
             }
-            catch ( IOException ex )
-            {
-                // TODO:
-            }
-            return ls;
         }
-        return null;
+        return Collections.emptyList();
     }
 
 

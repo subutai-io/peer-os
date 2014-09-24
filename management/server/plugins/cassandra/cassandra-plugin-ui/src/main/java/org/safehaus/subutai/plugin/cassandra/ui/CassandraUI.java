@@ -83,7 +83,6 @@ public class CassandraUI implements PortalModule
         catch ( NamingException e )
         {
             LOG.severe( e.getMessage() );
-            ;
         }
         return null;
     }

@@ -15,9 +15,15 @@ import org.apache.commons.io.IOUtils;
 class HttpPost
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( HttpPost.class );
 
     private static final String URL = "http://127.0.0.1:9200/_all/logs/_search";
+    private static final Logger LOG = LoggerFactory.getLogger( HttpPost.class );
+
+
+    private HttpPost()
+    {
+
+    }
 
 
     static String execute( String params ) throws IOException

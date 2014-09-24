@@ -43,12 +43,12 @@ public class Cloner extends VerticalLayout
     private final Label indicator;
     private final TreeTable lxcTable;
     private final LxcManager lxcManager;
-    private static final String physicalHostLabel = "Physical Host";
-    private static final String statusLabel = "Status";
-    private static final String okIconSource = "img/ok.png";
-    private static final String errorIconSource = "img/cancel.png";
-    private static final String loadIconSource = "img/spinner.gif";
-    private static final String hostValidatorRegex =
+    private final String physicalHostLabel = "Physical Host";
+    private final String statusLabel = "Status";
+    private final String okIconSource = "img/ok.png";
+    private final String errorIconSource = "img/cancel.png";
+    private final String loadIconSource = "img/spinner.gif";
+    private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
     private final Executor executor;
