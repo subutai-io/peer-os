@@ -16,15 +16,15 @@ import com.vaadin.ui.TextArea;
 /**
  * Created by daralbaev on 7/9/14.
  */
-public class TerminalControl extends CssLayout
+public class TerminalControlCssLayout extends CssLayout
 {
-    private TerminalForm parent;
+    private TerminalComponent parent;
     private TextArea hiddenOutput;
     private String inputPrompt;
     private String username, currentPath, machineName;
 
 
-    public TerminalControl( TerminalForm parent )
+    public TerminalControlCssLayout( TerminalComponent parent )
     {
         username = ( String ) VaadinService.getCurrentRequest().getWrappedSession().getAttribute( "username" );
         currentPath = "/";

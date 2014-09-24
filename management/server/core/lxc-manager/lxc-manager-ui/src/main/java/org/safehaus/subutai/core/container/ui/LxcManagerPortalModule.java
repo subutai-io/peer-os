@@ -77,7 +77,7 @@ public class LxcManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new LxcForm( agentManager, lxcManager, executor );
+        return new LxcManagerComponent( agentManager, lxcManager, executor );
     }
 
 

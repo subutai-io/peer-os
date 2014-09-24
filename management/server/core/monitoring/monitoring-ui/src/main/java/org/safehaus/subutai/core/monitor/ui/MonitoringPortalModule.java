@@ -44,7 +44,7 @@ public class MonitoringPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new ModuleView( monitor, agentManager );
+        return new MonitoringComponent( monitor, agentManager );
     }
 
 

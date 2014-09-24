@@ -76,7 +76,7 @@ public class ConfigurationManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new ConfigurationManagerForm( configManager );
+        return new ConfigurationManagerComponent( configManager );
     }
 
 

@@ -43,9 +43,9 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Command Runner UI - Terminal
  */
-public class TerminalForm extends CustomComponent implements Disposable
+public class TerminalComponent extends CustomComponent implements Disposable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( TerminalForm.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( TerminalComponent.class.getName() );
 
 
     final CommandRunner commandRunner;
@@ -53,7 +53,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
     private AgentTree agentTree;
-    private TerminalControl commandOutputTxtArea;
+    private TerminalControlCssLayout commandOutputTxtArea;
     //
     private TextField programTxtFld, workDirTxtFld, timeoutTxtFld;
     private ComboBox requestTypeCombo;
@@ -61,7 +61,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private VerticalLayout controls;
 
 
-    public TerminalForm( final CommandRunner commandRunner, final AgentManager agentManager )
+    public TerminalComponent( final CommandRunner commandRunner, final AgentManager agentManager )
     {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
@@ -82,7 +82,7 @@ public class TerminalForm extends CustomComponent implements Disposable
         gridLayout.setSizeFull();
         gridLayout.setSplitPosition( 80, Unit.PERCENTAGE );
 
-        commandOutputTxtArea = new TerminalControl( this );
+        commandOutputTxtArea = new TerminalControlCssLayout( this );
 
         controls = new VerticalLayout();
         controls.setSpacing( true );
@@ -256,13 +256,13 @@ public class TerminalForm extends CustomComponent implements Disposable
         private final Command command;
         private final AtomicInteger taskCount;
         private final Label indicator;
-        private final TerminalForm form;
+        private final TerminalComponent form;
 
         private final StringBuilder output = new StringBuilder();
 
 
         private ExecuteCommandTask( final Command command, final AtomicInteger taskCount, final Label indicator,
-                                    final TerminalForm form )
+                                    final TerminalComponent form )
         {
             this.command = command;
             this.taskCount = taskCount;

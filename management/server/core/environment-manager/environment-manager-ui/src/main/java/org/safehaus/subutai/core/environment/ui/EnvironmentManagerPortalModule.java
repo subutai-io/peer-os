@@ -97,7 +97,7 @@ public class EnvironmentManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new EnvironmentManagerForm( this );
+        return new EnvironmentManagerComponent( this );
     }
 
 

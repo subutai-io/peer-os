@@ -70,7 +70,7 @@ public class ContainerManagerPortalModule implements PortalModule
     {
         try
         {
-            return new ContainerForm( executor, serviceLocator );
+            return new ContainerComponent( executor, serviceLocator );
         }
         catch ( NamingException e )
         {

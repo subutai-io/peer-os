@@ -67,7 +67,7 @@ public class PeerManagerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new PeerForm( this );
+        return new PeerComponent( this );
     }
 
 

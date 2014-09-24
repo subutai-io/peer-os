@@ -56,7 +56,7 @@ public class CommandRunnerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new TerminalForm( commandRunner, agentManager );
+        return new TerminalComponent( commandRunner, agentManager );
     }
 
 

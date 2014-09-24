@@ -19,11 +19,11 @@ import com.vaadin.ui.themes.Runo;
 /**
  *
  */
-public class ConfigurationManagerForm extends CustomComponent implements Disposable
+public class ConfigurationManagerComponent extends CustomComponent implements Disposable
 {
 
 
-    public ConfigurationManagerForm( ConfigManager configManager )
+    public ConfigurationManagerComponent( ConfigManager configManager )
     {
         setHeight( 100, UNITS_PERCENTAGE );
 

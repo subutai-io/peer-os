@@ -21,7 +21,7 @@ import com.vaadin.ui.themes.Runo;
 /**
  *
  */
-public class EnvironmentManagerForm extends CustomComponent implements Disposable
+public class EnvironmentManagerComponent extends CustomComponent implements Disposable
 {
 
 
@@ -31,7 +31,7 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
     private EnvironmentsBuildProcessForm environmentBuildForm;
 
 
-    public EnvironmentManagerForm( EnvironmentManagerPortalModule managerUI )
+    public EnvironmentManagerComponent( EnvironmentManagerPortalModule managerUI )
     {
         setHeight( 100, UNITS_PERCENTAGE );
 

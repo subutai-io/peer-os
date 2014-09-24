@@ -25,7 +25,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.PopupDateField;
 
 
-public class ModuleView extends CustomComponent
+public class MonitoringComponent extends CustomComponent
 {
 
     private static final int MAX_SIZE = 500;
@@ -38,7 +38,7 @@ public class ModuleView extends CustomComponent
     private ListSelect metricListSelect;
 
 
-    public ModuleView( Monitor monitor, AgentManager agentManager )
+    public MonitoringComponent( Monitor monitor, AgentManager agentManager )
     {
         this.monitor = monitor;
         this.agentManager = agentManager;

@@ -1,18 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.core.container.ui;
 
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.ui.clone.Cloner;
 import org.safehaus.subutai.core.container.ui.manage.Manager;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.vaadin.ui.CustomComponent;
@@ -22,18 +21,22 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 
-/**
- *
- */
-public class LxcForm extends CustomComponent implements Disposable
+public class ContainerComponent extends CustomComponent implements Disposable
 {
 
     private static final String MANAGER_TAB_CAPTION = "Manage";
     private final AgentTree agentTree;
+    private final ContainerManager containerManager;
+    private final StrategyManager strategyManager;
+    private final AgentManager agentManager;
 
 
-    public LxcForm( AgentManager agentManager, LxcManager lxcManager, Executor executor )
+    public ContainerComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
+
+        this.containerManager = serviceLocator.getService( ContainerManager.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.strategyManager = serviceLocator.getService( StrategyManager.class );
         setHeight( 100, Unit.PERCENTAGE );
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
@@ -48,8 +51,8 @@ public class LxcForm extends CustomComponent implements Disposable
         TabSheet commandsSheet = new TabSheet();
         commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
         commandsSheet.setSizeFull();
-        final Manager manager = new Manager( agentManager, lxcManager, executor );
-        commandsSheet.addTab( new Cloner( lxcManager, agentTree, executor ), "Clone" );
+        final Manager manager = new Manager( executorService, agentManager, containerManager );
+        commandsSheet.addTab( new Cloner( containerManager, strategyManager, agentTree ), "Clone" );
         commandsSheet.addTab( manager, MANAGER_TAB_CAPTION );
         commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {

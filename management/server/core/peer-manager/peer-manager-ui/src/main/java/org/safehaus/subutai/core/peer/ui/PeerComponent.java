@@ -13,13 +13,13 @@ import com.vaadin.ui.themes.Runo;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public class PeerForm extends CustomComponent implements Disposable
+public class PeerComponent extends CustomComponent implements Disposable
 {
 
     private PeerManagerPortalModule peerManagerPortalModule;
 
 
-    public PeerForm( PeerManagerPortalModule peerManagerPortalModule )
+    public PeerComponent( PeerManagerPortalModule peerManagerPortalModule )
     {
         setHeight( 100, UNITS_PERCENTAGE );
 
