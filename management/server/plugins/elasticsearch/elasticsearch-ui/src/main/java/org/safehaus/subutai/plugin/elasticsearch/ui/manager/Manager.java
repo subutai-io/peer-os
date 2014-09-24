@@ -259,7 +259,7 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = elasticsearch.uninstallCluster( config );
+                UUID trackID = elasticsearch.uninstallCluster( config.getClusterName() );
 
                 ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                         ElasticsearchClusterConfiguration.PRODUCT_KEY );

@@ -61,6 +61,7 @@ public class Manager
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String ADD_NODE_CAPTION = "Add Node";
+    protected final static String BUTTON_STYLE_NAME = "default";
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
@@ -96,7 +97,6 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -123,7 +123,7 @@ public class Manager
         controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.addStyleName( "default" );
+        refreshClustersBtn.addStyleName( BUTTON_STYLE_NAME );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -136,7 +136,7 @@ public class Manager
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
 
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.addStyleName( "default" );
+        checkAllBtn.addStyleName( BUTTON_STYLE_NAME );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -156,7 +156,7 @@ public class Manager
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.addStyleName( "default" );
+        startAllBtn.addStyleName( BUTTON_STYLE_NAME );
         startAllBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -176,7 +176,7 @@ public class Manager
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.addStyleName( "default" );
+        stopAllBtn.addStyleName( BUTTON_STYLE_NAME );
         stopAllBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -196,7 +196,7 @@ public class Manager
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.addStyleName( "default" );
+        destroyClusterBtn.addStyleName( BUTTON_STYLE_NAME );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -207,28 +207,7 @@ public class Manager
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
                             "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            /** before destroying cluster, stop it first to not leave background zombie processes **/
-                            stopAllBtn.click();
-                            UUID trackID = presto.uninstallCluster( config.getClusterName() );
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    PrestoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
+                    addConfirmationWindowListenerToUninstall( alert );
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
                 else
@@ -242,7 +221,7 @@ public class Manager
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
         addNodeBtn = new Button( ADD_NODE_CAPTION );
-        addNodeBtn.addStyleName( "default" );
+        addNodeBtn.addStyleName( BUTTON_STYLE_NAME );
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -319,221 +298,83 @@ public class Manager
     }
 
 
+    public void addConfirmationWindowListenerToUninstall( ConfirmationDialog alert )
+    {
+        alert.getOk().addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                UUID trackID = presto.uninstallCluster( config.getClusterName() );
+
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackID, PrestoClusterConfig.PRODUCT_KEY );
+
+                window.getWindow().addCloseListener( new Window.CloseListener()
+                {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent )
+                    {
+                        refreshClustersInfo();
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
+            }
+        } );
+    }
+
+
     private void populateTable( final Table table, Set<Agent> workers, final Agent coordinator )
     {
-
         table.removeAllItems();
 
         for ( final Agent agent : workers )
         {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.addStyleName( "default" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.addStyleName( "default" );
             final Button setCoordinatorBtn = new Button( SET_AS_COORDINATOR_BUTTON_CAPTION );
-            setCoordinatorBtn.addStyleName( "default" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.addStyleName( "default" );
-            stopBtn.setEnabled( false );
-            startBtn.setEnabled( false );
-            PROGRESS_ICON.setVisible( false );
 
+            addStyleNameToButtons( checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn );
+            disableButtons( startBtn, stopBtn );
+            PROGRESS_ICON.setVisible( false );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
-            availableOperations.addStyleName( "default" );
+            availableOperations.addStyleName( BUTTON_STYLE_NAME );
 
-            availableOperations.addComponent( checkBtn );
-            availableOperations.addComponent( startBtn );
-            availableOperations.addComponent( stopBtn );
-            availableOperations.addComponent( setCoordinatorBtn );
-            availableOperations.addComponent( destroyBtn );
-
+            addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn );
 
             table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), checkIfCoordinator( agent ), resultHolder,
                     availableOperations
             }, null );
 
-            checkBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    checkBtn.setEnabled( false );
-                    setCoordinatorBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
-                    executorService.execute(
-                            new CheckTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                resultHolder.setValue( result );
-                                                if ( result.contains( "Not" ) )
-                                                {
-                                                    startBtn.setEnabled( true );
-                                                    stopBtn.setEnabled( false );
-                                                }
-                                                else
-                                                {
-                                                    startBtn.setEnabled( false );
-                                                    stopBtn.setEnabled( true );
-                                                }
-                                                PROGRESS_ICON.setVisible( false );
-                                                destroyBtn.setEnabled( true );
-                                                setCoordinatorBtn.setEnabled( true );
-                                                checkBtn.setEnabled( true );
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
-
-            startBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    setCoordinatorBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
-                    executorService.execute(
-                            new StartTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                checkBtn.click();
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
-
-            stopBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    setCoordinatorBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
-                    executorService.execute(
-                            new StopTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                checkBtn.click();
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
-
-            setCoordinatorBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to set %s as coordinator node?", agent.getHostname() ), "Yes",
-                            "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = presto.changeCoordinatorNode( config.getClusterName(), agent.getHostname() );
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    PrestoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-            } );
-
-            destroyBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = presto.destroyWorkerNode( config.getClusterName(), agent.getHostname() );
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    PrestoClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-            } );
+            /** add click listeners to button */
+            addClickListenerToSlavesCheckButton( agent, resultHolder, checkBtn, startBtn, stopBtn, setCoordinatorBtn,
+                    destroyBtn );
+            addClickListenerToStartButtons( agent, startBtn, stopBtn, checkBtn, setCoordinatorBtn, destroyBtn );
+            addClickListenerToStopButtons( agent, startBtn, stopBtn, checkBtn );
+            addClickListenerToSetCoordinatorButton( agent, setCoordinatorBtn );
+            addClickListenerToDestroyButton( agent, destroyBtn );
         }
 
-        //add coordinator here
+        /** add Coordinator here */
         final Label resultHolder = new Label();
         final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-        checkBtn.addStyleName( "default" );
         final Button startBtn = new Button( START_BUTTON_CAPTION );
-        startBtn.addStyleName( "default" );
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-        stopBtn.addStyleName( "default" );
 
-        stopBtn.setEnabled( false );
-        startBtn.setEnabled( false );
+        addStyleNameToButtons( checkBtn, startBtn, stopBtn );
+
+        disableButtons( startBtn, stopBtn );
         PROGRESS_ICON.setVisible( false );
 
         HorizontalLayout availableOperations = new HorizontalLayout();
         availableOperations.setSpacing( true );
-        availableOperations.addStyleName( "default" );
+        availableOperations.addStyleName( BUTTON_STYLE_NAME );
 
         availableOperations.addComponent( checkBtn );
         availableOperations.addComponent( startBtn );
@@ -544,16 +385,165 @@ public class Manager
                 resultHolder, availableOperations
         }, null );
 
-        checkBtn.addClickListener( new Button.ClickListener()
+        addClickListenerToMasterCheckButton( coordinator, resultHolder, checkBtn, startBtn, stopBtn );
+        addClickListenerToStartButtons( coordinator, startBtn, stopBtn, checkBtn );
+        addClickListenerToStopButtons( coordinator, startBtn, stopBtn, checkBtn );
+    }
+
+
+    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
+
+    public void addStyleNameToButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.addStyleName( BUTTON_STYLE_NAME );
+        }
+    }
+
+
+    public void addClickListenerToSetCoordinatorButton( final Agent agent, Button setCoordinatorBtn )
+    {
+        setCoordinatorBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to set %s as coordinator node?", agent.getHostname() ), "Yes",
+                        "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+                        UUID trackID = presto.uninstallCluster( config.getClusterName() );
+
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                PrestoClusterConfig.PRODUCT_KEY );
+
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                refreshClustersInfo();
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
+
+    public void addClickListenerToDestroyButton( final Agent agent, Button destroyBtn )
+    {
+        destroyBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+                        UUID trackID = presto.destroyWorkerNode( config.getClusterName(), agent.getHostname() );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                PrestoClusterConfig.PRODUCT_KEY );
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                refreshClustersInfo();
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
+
+    public void addClickListenerToStartButtons( final Agent agent, final Button... buttons )
+    {
+        getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 PROGRESS_ICON.setVisible( true );
-                startBtn.setEnabled( false );
-                stopBtn.setEnabled( false );
-                checkBtn.setEnabled( false );
+                disableButtons( buttons );
+                executorService.execute( new StartTask( presto, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    @Override
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
+    }
 
+
+    public void addClickListenerToStopButtons( final Agent agent, final Button... buttons )
+    {
+        getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new StopTask( presto, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
+                                {
+                                    enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
+            }
+        } );
+    }
+
+
+    public void addClickListenerToMasterCheckButton( final Agent coordinator, final Label resultHolder,
+                                                     final Button... buttons )
+    {
+        getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
                 executorService.execute(
                         new CheckTask( presto, tracker, config.getClusterName(), coordinator.getHostname(),
                                 new CompleteEvent()
@@ -566,33 +556,35 @@ public class Manager
                                             resultHolder.setValue( result );
                                             if ( result.contains( "Not" ) )
                                             {
-                                                startBtn.setEnabled( true );
-                                                stopBtn.setEnabled( false );
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
                                             }
                                             else
                                             {
-                                                startBtn.setEnabled( false );
-                                                stopBtn.setEnabled( true );
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                             }
                                             PROGRESS_ICON.setVisible( false );
-                                            checkBtn.setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                                         }
                                     }
                                 } ) );
             }
         } );
+    }
 
-        startBtn.addClickListener( new Button.ClickListener()
+
+    public void addClickListenerToSlavesCheckButton( final Agent agent, final Label resultHolder,
+                                                     final Button... buttons )
+    {
+        getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 PROGRESS_ICON.setVisible( true );
-                startBtn.setEnabled( false );
-                stopBtn.setEnabled( false );
-
-                executorService.execute(
-                        new StartTask( presto, tracker, config.getClusterName(), coordinator.getHostname(),
+                disableButtons( buttons );
+                executorService.execute( new CheckTask( presto, tracker, config.getClusterName(), agent.getHostname(),
                                 new CompleteEvent()
                                 {
                                     @Override
@@ -600,37 +592,55 @@ public class Manager
                                     {
                                         synchronized ( PROGRESS_ICON )
                                         {
-                                            checkBtn.click();
+                                            resultHolder.setValue( result );
+                                            if ( result.contains( "Not" ) )
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                            }
+                                            else
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            }
+                                            PROGRESS_ICON.setVisible( false );
+                                            enableButtons( buttons );
                                         }
                                     }
                                 } ) );
             }
         } );
+    }
 
-        stopBtn.addClickListener( new Button.ClickListener()
+
+    public Button getButton( String caption, Button... buttons )
+    {
+        for ( Button b : buttons )
         {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
+            if ( b.getCaption().equals( caption ) )
             {
-                PROGRESS_ICON.setVisible( true );
-                startBtn.setEnabled( false );
-                stopBtn.setEnabled( false );
-
-                executorService.execute(
-                        new StopTask( presto, tracker, config.getClusterName(), coordinator.getHostname(),
-                                new CompleteEvent()
-                                {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            checkBtn.click();
-                                        }
-                                    }
-                                } ) );
+                return b;
             }
-        } );
+        }
+        return null;
+    }
+
+
+    public void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    public void enableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( true );
+        }
     }
 
 
