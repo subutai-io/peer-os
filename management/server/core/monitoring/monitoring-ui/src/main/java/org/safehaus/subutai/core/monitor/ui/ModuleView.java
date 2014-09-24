@@ -31,7 +31,7 @@ public class ModuleView extends CustomComponent
     private static final int MAX_SIZE = 500;
     private final Monitor monitor;
     private final AgentManager agentManager;
-    private Chart chart;
+    private transient Chart chart;
     private AgentTree agentTree;
     private PopupDateField startDateField;
     private PopupDateField endDateField;
