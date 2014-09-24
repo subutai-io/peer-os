@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class MonitorImpl implements Monitor
 
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json" );
+    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json", MonitorImpl.class );
     private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 

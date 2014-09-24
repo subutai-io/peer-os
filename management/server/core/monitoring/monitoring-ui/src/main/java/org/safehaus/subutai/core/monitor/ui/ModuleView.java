@@ -9,8 +9,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
-import org.safehaus.subutai.core.monitor.ui.component.AgentTree;
 import org.safehaus.subutai.core.monitor.ui.util.UIUtil;
+import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;

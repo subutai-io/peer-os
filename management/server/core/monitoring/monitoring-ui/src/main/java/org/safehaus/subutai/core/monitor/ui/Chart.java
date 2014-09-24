@@ -6,14 +6,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.ui.util.FileUtil;
 
 
 class Chart
 {
 
-    private static final String CHART_TEMPLATE = FileUtil.getContent( "js/chart.js" );
+    private static final String CHART_TEMPLATE = FileUtil.getContent( "js/chart.js", Chart.class );
     private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
     private final int maxSize;
 

@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.monitor.ui.util;
 
 
+import org.safehaus.subutai.common.util.FileUtil;
+
 import com.vaadin.ui.Window;
 
 
@@ -18,7 +20,7 @@ public class JavaScript
 
     public void loadFile( String filePath )
     {
-        execute( FileUtil.getContent( filePath ) );
+        execute( FileUtil.getContent( filePath, this ) );
     }
 
 
