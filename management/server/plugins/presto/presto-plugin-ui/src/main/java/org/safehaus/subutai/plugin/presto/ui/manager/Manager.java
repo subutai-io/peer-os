@@ -62,11 +62,11 @@ public class Manager
     protected final static String STATUS_COLUMN_CAPTION = "Status";
     protected final static String ADD_NODE_CAPTION = "Add Node";
     protected final static String BUTTON_STYLE_NAME = "default";
+    private static final String MESSAGE = "No cluster is installed !";
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private final String COORDINATOR_PREFIX = "Coordinator: ";
     private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Presto presto;
@@ -117,14 +117,15 @@ public class Manager
                 checkAllNodes();
             }
         } );
-
         controlsContent.addComponent( clusterCombo );
         controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
+
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         addClickListener( refreshClustersBtn );
         controlsContent.addComponent( refreshClustersBtn );
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
+
 
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
         addClickListener( checkAllBtn );
@@ -143,10 +144,12 @@ public class Manager
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
+
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
+
 
         addNodeBtn = new Button( ADD_NODE_CAPTION );
         addClickListenerToAddNodeButton();
@@ -163,26 +166,58 @@ public class Manager
 
 
 
-    public void addClickListener( Button button ){
-        if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) ){
-            refreshClustersInfo();
+    public void addClickListener( Button button )
+    {
+        if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) )
+        {
+            button.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    refreshClustersInfo();
+                }
+            } );
+            return;
         }
 
-        if ( config == null ){
-            final String MESSAGE = "No cluster is installed !";
+        if ( config == null )
+        {
             show( MESSAGE );
             return;
         }
         switch ( button.getCaption() )
         {
-            case CHECK_ALL_BUTTON_CAPTION :
-                checkAllNodes();
+            case CHECK_ALL_BUTTON_CAPTION:
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        checkAllNodes();
+                    }
+                } );
                 break;
-            case START_ALL_BUTTON_CAPTION :
-                startAllNodes();
+
+            case START_ALL_BUTTON_CAPTION:
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        startAllNodes();
+                    }
+                } );
                 break;
-            case STOP_ALL_BUTTON_CAPTION :
-                stopAllNodes();
+            case STOP_ALL_BUTTON_CAPTION:
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        stopAllNodes();
+                    }
+                } );
                 break;
         }
     }
@@ -644,7 +679,7 @@ public class Manager
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent =
-                            agentManager.getAgentByHostname( lxcHostname.replaceAll( COORDINATOR_PREFIX, "" ) );
+                            agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =

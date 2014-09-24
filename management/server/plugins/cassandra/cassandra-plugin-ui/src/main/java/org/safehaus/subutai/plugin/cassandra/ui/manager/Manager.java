@@ -54,12 +54,11 @@ public class Manager
     protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
     protected final static String STOP_BUTTON_CAPTION = "Stop";
     protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
     protected final static String HOST_COLUMN_CAPTION = "Host";
     protected final static String IP_COLUMN_CAPTION = "IP List";
     protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected final static String STATUS_COLUMN_CAPTION = "Status";
-    protected final static String ADD_NODE_CAPTION = "Add Node";
+    protected final static String BUTTON_STYLE_NAME = "default";
 
     private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String MESSAGE = "No cluster is installed !";
@@ -125,85 +124,48 @@ public class Manager
 
         /** Refresh button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                refreshClustersInfo();
-            }
-        } );
+        addClickListener( refreshClustersBtn );
         controlsContent.addComponent( refreshClustersBtn );
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
 
+
         /** Check all button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    checkAllNodes();
-                }
-            }
-        } );
+        addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
+
         /** Start all button */
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    startAllNodes();
-                }
-            }
-        } );
+        addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
+
         /** Stop all button */
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config == null )
-                {
-                    show( MESSAGE );
-                }
-                else
-                {
-                    stopAllNodes();
-                }
-            }
-        } );
+        addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.addStyleName( "default" );
+        addClickListenerToDestroyClusterButton();
+        controlsContent.addComponent( destroyClusterBtn );
+        controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
+
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
+
+        PROGRESS_ICON.setVisible( false );
+        controlsContent.addComponent( PROGRESS_ICON );
+        contentRoot.addComponent( controlsContent, 0, 0 );
+        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+    }
+
+
+    public void addClickListenerToDestroyClusterButton(){
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -245,14 +207,74 @@ public class Manager
                 }
             }
         } );
-        controlsContent.addComponent( destroyClusterBtn );
-        controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
-        PROGRESS_ICON.setVisible( false );
-        controlsContent.addComponent( PROGRESS_ICON );
-        contentRoot.addComponent( controlsContent, 0, 0 );
-        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
 
+
+
+    public void addClickListener( Button button )
+    {
+        if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) )
+        {
+            button.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    refreshClustersInfo();
+                }
+            } );
+            return;
+        }
+
+        if ( config == null )
+        {
+            show( MESSAGE );
+            return;
+        }
+        switch ( button.getCaption() )
+        {
+            case CHECK_ALL_BUTTON_CAPTION:
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        checkAllNodes();
+                    }
+                } );
+                break;
+
+            case START_ALL_BUTTON_CAPTION:
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        startAllNodes();
+                    }
+                } );
+                break;
+            case STOP_ALL_BUTTON_CAPTION:
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        stopAllNodes();
+                    }
+                } );
+                break;
+        }
+    }
+
+
+    public void addStyleNameToButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.addStyleName( BUTTON_STYLE_NAME );
+        }
+    }
 
     public void disableOREnableAllButtonsOnTable( Table table, boolean value )
     {
@@ -350,27 +372,19 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-            checkButton.addStyleName( "default" );
-
             final Button startButton = new Button( START_BUTTON_CAPTION );
-            startButton.addStyleName( "default" );
-            startButton.setVisible( true );
-
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-            stopButton.addStyleName( "default" );
-            stopButton.setVisible( true );
 
-            startButton.setEnabled( false );
-            stopButton.setEnabled( false );
+            addStyleNameToButtons( checkButton, startButton, stopButton );
+
+            disableButtons( startButton, stopButton );
             PROGRESS_ICON.setVisible( false );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.addStyleName( "default" );
             availableOperations.setSpacing( true );
 
-            availableOperations.addComponent( checkButton );
-            availableOperations.addComponent( startButton );
-            availableOperations.addComponent( stopButton );
+            addGivenComponents( availableOperations, checkButton, startButton, stopButton );
 
             String isSeed = checkIfSeed( agent );
 
@@ -378,96 +392,140 @@ public class Manager
                     agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
             }, null );
 
-            checkButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent event )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    startButton.setEnabled( false );
-                    stopButton.setEnabled( false );
-                    checkButton.setEnabled( false );
-                    executorService.execute(
-                            new CheckTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                resultHolder.setValue( result );
-                                                if ( result.contains( "not" ) )
-                                                {
-                                                    startButton.setEnabled( true );
-                                                    stopButton.setEnabled( false );
-                                                }
-                                                else
-                                                {
-                                                    startButton.setEnabled( false );
-                                                    stopButton.setEnabled( true );
-                                                }
-                                                PROGRESS_ICON.setVisible( false );
-                                                checkButton.setEnabled( true );
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
-
-            startButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    startButton.setEnabled( false );
-                    stopButton.setEnabled( false );
-                    checkButton.setEnabled( false );
-                    executorService.execute(
-                            new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                checkButton.setEnabled( true );
-                                                checkButton.click();
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
-
-            stopButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    PROGRESS_ICON.setVisible( true );
-                    startButton.setEnabled( false );
-                    stopButton.setEnabled( false );
-                    checkButton.setEnabled( false );
-                    executorService.execute(
-                            new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
-                                    {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                checkButton.setEnabled( true );
-                                                checkButton.click();
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
+            addClickListenerToCheckButton( agent, resultHolder, checkButton, startButton, stopButton );
+            addClickListenerToStartButton( agent, checkButton, startButton, stopButton );
+            addClickListenerToStopButton( agent, checkButton, startButton, stopButton );
         }
     }
 
+    public Button getButton( String caption, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            if ( b.getCaption().equals( caption ) )
+            {
+                return b;
+            }
+        }
+        return null;
+    }
+
+
+    public void addClickListenerToStopButton( final Agent agent, final Button ... buttons ){
+        getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    @Override
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
+    }
+
+    public void addClickListenerToStartButton( final Agent agent, final Button ... buttons ){
+        getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    @Override
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
+    }
+
+
+    public void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button ... buttons ){
+        getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new CheckTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            resultHolder.setValue( result );
+                                            if ( result.contains( "not" ) )
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                            }
+                                            else
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            }
+                                            PROGRESS_ICON.setVisible( false );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
+    }
+
+    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
+
+
+    public void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    public void enableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( true );
+        }
+    }
 
     public void stopAllNodes()
     {

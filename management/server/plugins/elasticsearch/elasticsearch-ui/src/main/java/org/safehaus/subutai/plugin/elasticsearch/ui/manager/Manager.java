@@ -184,7 +184,15 @@ public class Manager
     {
         if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) )
         {
-            refreshClustersInfo();
+            button.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    refreshClustersInfo();
+                }
+            } );
+            return;
         }
 
         if ( config == null )
@@ -195,13 +203,35 @@ public class Manager
         switch ( button.getCaption() )
         {
             case CHECK_ALL_BUTTON_CAPTION:
-                checkAllNodes();
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        checkAllNodes();
+                    }
+                } );
                 break;
+
             case START_ALL_BUTTON_CAPTION:
-                startAllNodes();
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        startAllNodes();
+                    }
+                } );
                 break;
             case STOP_ALL_BUTTON_CAPTION:
-                stopAllNodes();
+                button.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        stopAllNodes();
+                    }
+                } );
                 break;
         }
     }
