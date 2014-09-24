@@ -41,13 +41,13 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
         final SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
         if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null )
         {
-            po.addLogFailed( String.format( "Master node %s is not connected\nOperation aborted",
+            po.addLogFailed( String.format( "Master node %s is not connected. Operation aborted",
                     config.getMasterNode().getHostname() ) );
             return;
         }
@@ -56,14 +56,14 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
         if ( newMaster == null )
         {
             po.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", newMasterHostname ) );
+                    String.format( "Agent with hostname %s is not connected. Operation aborted", newMasterHostname ) );
             return;
         }
 
         if ( newMaster.equals( config.getMasterNode() ) )
         {
             po.addLogFailed(
-                    String.format( "Node %s is already a master node\nOperation aborted", newMasterHostname ) );
+                    String.format( "Node %s is already a master node. Operation aborted", newMasterHostname ) );
             return;
         }
 
@@ -71,7 +71,7 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
         if ( !config.getAllNodes().contains( newMaster ) )
         {
             po.addLogFailed(
-                    String.format( "Node %s does not belong to this cluster\nOperation aborted", newMasterHostname ) );
+                    String.format( "Node %s does not belong to this cluster. Operation aborted", newMasterHostname ) );
             return;
         }
 
@@ -154,13 +154,13 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
                 }
                 else
                 {
-                    po.addLogFailed( String.format( "Failed to set master IP on all nodes, %s\nOperation aborted",
+                    po.addLogFailed( String.format( "Failed to set master IP on all nodes, %s. Operation aborted",
                             setMasterIPCommand.getAllErrors() ) );
                 }
             }
             else
             {
-                po.addLogFailed( String.format( "Failed to add slaves to new master, %s\nOperation aborted",
+                po.addLogFailed( String.format( "Failed to add slaves to new master, %s. Operation aborted",
                         addSlavesCommand.getAllErrors() ) );
             }
         }

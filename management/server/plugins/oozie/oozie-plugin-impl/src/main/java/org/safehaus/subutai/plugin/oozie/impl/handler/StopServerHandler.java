@@ -40,7 +40,7 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                 if ( config == null )
                 {
                     productOperation.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
                 Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );

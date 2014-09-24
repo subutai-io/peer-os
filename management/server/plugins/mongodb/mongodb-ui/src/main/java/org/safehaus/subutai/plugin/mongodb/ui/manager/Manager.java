@@ -568,7 +568,7 @@ public class Manager
         List<MongoClusterConfig> mongoClusterInfos = mongo.getClusters();
         MongoClusterConfig clusterInfo = ( MongoClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 )
+        if ( mongoClusterInfos != null && !mongoClusterInfos.isEmpty() )
         {
             for ( MongoClusterConfig mongoClusterInfo : mongoClusterInfos )
             {

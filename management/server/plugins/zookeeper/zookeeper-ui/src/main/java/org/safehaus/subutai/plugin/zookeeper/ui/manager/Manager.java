@@ -631,7 +631,7 @@ public class Manager
         List<ZookeeperClusterConfig> mongoClusterInfos = zookeeper.getClusters();
         ZookeeperClusterConfig clusterInfo = ( ZookeeperClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 )
+        if ( mongoClusterInfos != null && !mongoClusterInfos.isEmpty() )
         {
             for ( ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos )
             {

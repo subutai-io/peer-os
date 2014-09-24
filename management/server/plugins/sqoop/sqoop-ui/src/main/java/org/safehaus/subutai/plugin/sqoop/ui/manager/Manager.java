@@ -273,7 +273,7 @@ public class Manager
         SqoopConfig current = ( SqoopConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         List<SqoopConfig> clustersInfo = sqoop.getClusters();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( SqoopConfig ci : clustersInfo )
             {

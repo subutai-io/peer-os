@@ -297,7 +297,7 @@ public class Manager
                 continue;
             }
 
-            final Object rowId = table.addItem( new Object[] {
+            table.addItem( new Object[] {
                     a.getHostname(), type, progressIcon
             }, null );
         }
@@ -332,7 +332,7 @@ public class Manager
         List<HBaseClusterConfig> clusters = hBaseUI.getHbaseManager().getClusters();
         HBaseClusterConfig clusterInfo = ( HBaseClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clusters != null && clusters.size() > 0 )
+        if ( clusters != null && !clusters.isEmpty() )
         {
             for ( HBaseClusterConfig info : clusters )
             {

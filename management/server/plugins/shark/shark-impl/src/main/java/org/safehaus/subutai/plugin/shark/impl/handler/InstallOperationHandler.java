@@ -42,13 +42,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
 
         if ( Strings.isNullOrEmpty( config.getClusterName() ) )
         {
-            productOperation.addLogFailed( "Malformed configuration\nInstallation aborted" );
+            productOperation.addLogFailed( "Malformed configuration. Installation aborted" );
             return;
         }
 
         if ( manager.getCluster( config.getClusterName() ) != null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+            productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists. Installation aborted",
                     config.getClusterName() ) );
             return;
         }
@@ -57,7 +57,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( sparkConfig == null )
         {
             productOperation.addLogFailed(
-                    String.format( "Spark cluster '%s' not found\nInstallation aborted", config.getClusterName() ) );
+                    String.format( "Spark cluster '%s' not found. Installation aborted", config.getClusterName() ) );
             return;
         }
 
@@ -70,7 +70,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
                 productOperation.addLogFailed(
-                        String.format( "Node %s is not connected\nInstallation aborted", node.getHostname() ) );
+                        String.format( "Node %s is not connected. Installation aborted", node.getHostname() ) );
                 return;
             }
         }
@@ -84,7 +84,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( !checkInstalledCommand.hasCompleted() )
         {
             productOperation
-                    .addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+                    .addLogFailed( "Failed to check presence of installed ksks packages. Installation aborted" );
             return;
         }
 
@@ -95,13 +95,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
             if ( result.getStdOut().contains( "ksks-shark" ) )
             {
                 productOperation.addLogFailed(
-                        String.format( "Node %s already has Shark installed\nInstallation aborted",
+                        String.format( "Node %s already has Shark installed. Installation aborted",
                                 node.getHostname() ) );
                 return;
             }
             else if ( !result.getStdOut().contains( "ksks-spark" ) )
             {
-                productOperation.addLogFailed( String.format( "Node %s has no Spark installation\nInstallation aborted",
+                productOperation.addLogFailed( String.format( "Node %s has no Spark installation. Installation aborted",
                         node.getHostname() ) );
                 return;
             }
@@ -113,14 +113,14 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
 
         if ( dbSaveSuccess )
         {
-            productOperation.addLog( "Cluster info saved to DB\nInstalling Shark..." );
+            productOperation.addLog( "Cluster info saved to DB. Installing Shark..." );
 
             Command installCommand = Commands.getInstallCommand( config.getNodes() );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )
             {
-                productOperation.addLog( "Installation succeeded\nSetting Master IP..." );
+                productOperation.addLog( "Installation succeeded. Setting Master IP..." );
 
                 Command setMasterIPCommand =
                         Commands.getSetMasterIPCommand( config.getNodes(), sparkConfig.getMasterNode() );
@@ -128,7 +128,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
 
                 if ( setMasterIPCommand.hasSucceeded() )
                 {
-                    productOperation.addLogDone( "Master IP successfully set\nDone" );
+                    productOperation.addLogDone( "Master IP successfully set. Done" );
                 }
                 else
                 {
@@ -144,7 +144,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         }
         else
         {
-            productOperation.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+            productOperation.addLogFailed( "Could not save cluster info to DB! Please see logs. Installation aborted" );
         }
     }
 }

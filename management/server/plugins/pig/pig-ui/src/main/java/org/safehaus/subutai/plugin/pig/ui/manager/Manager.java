@@ -217,7 +217,7 @@ public class Manager
         List<Config> clustersInfo = pig.getClusters();
         Config clusterInfo = ( Config ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( Config mongoClusterInfo : clustersInfo )
             {

@@ -39,7 +39,7 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy
                 if ( manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(),
                         HBaseClusterConfig.class ) != null )
                 {
-                    po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                    po.addLogFailed( String.format( "Cluster with name '%s' already exists. Installation aborted",
                             config.getClusterName() ) );
                     return;
                 }
@@ -102,7 +102,7 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy
                         return;
                     }
 
-                    po.addLog( "Installation succeeded\nConfiguring master..." );
+                    po.addLog( "Installation succeeded. Configuring master..." );
 
                     // Configuring master
                     Command configureMasterCommand = Commands.getConfigMasterTask( allNodes,
@@ -119,7 +119,7 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy
                         po.addLogFailed( String.format( "Configuration failed, %s", configureMasterCommand ) );
                         return;
                     }
-                    po.addLog( "Configuring master succeeded\nConfiguring region..." );
+                    po.addLog( "Configuring master succeeded. Configuring region..." );
 
                     // Configuring region
                     StringBuilder sbRegion = new StringBuilder();
@@ -143,7 +143,7 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy
                                 String.format( "Configuring failed, %s", configureRegionCommand.getAllErrors() ) );
                         return;
                     }
-                    po.addLog( "Configuring region succeeded\nSetting quorum..." );
+                    po.addLog( "Configuring region succeeded. Setting quorum..." );
 
                     // Configuring quorum
                     StringBuilder sbQuorum = new StringBuilder();
@@ -167,7 +167,7 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy
                                 String.format( "Installation failed, %s", configureQuorumCommand.getAllErrors() ) );
                         return;
                     }
-                    po.addLog( "Setting quorum succeeded\nSetting backup masters..." );
+                    po.addLog( "Setting quorum succeeded. Setting backup masters..." );
 
                     // Configuring backup master
                     Command configureBackupMasterCommand = Commands.getConfigBackupMastersCommand( allNodes,
@@ -184,11 +184,11 @@ public class OverHadoopSetupStrategy extends HBaseSetupStrategy
                                 configureBackupMasterCommand.getAllErrors() ) );
                         return;
                     }
-                    po.addLogDone( "Cluster installation succeeded\n" );
+                    po.addLogDone( "Cluster installation succeeded" );
                 }
                 else
                 {
-                    po.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+                    po.addLogFailed( "Could not save cluster info to DB! Please see logs. Installation aborted" );
                 }
             }
         } );

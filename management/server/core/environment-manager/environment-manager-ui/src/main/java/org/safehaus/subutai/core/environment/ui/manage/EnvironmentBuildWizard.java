@@ -145,7 +145,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                if ( selectedPeers().size() > 0 )
+                if ( !selectedPeers().isEmpty() )
                 {
                     next();
                 }

@@ -60,14 +60,11 @@ import com.google.common.base.Strings;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {
+
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
-    /**
-     * list of container event listeners
-     */
     private final Queue<ContainerEventListener> listeners = new ConcurrentLinkedQueue<>();
-    // number sequences for template names used for new clone name generation
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
 
