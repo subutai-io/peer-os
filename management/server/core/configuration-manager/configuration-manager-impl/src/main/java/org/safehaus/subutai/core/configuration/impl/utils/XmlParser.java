@@ -96,9 +96,7 @@ public class XmlParser implements ConfigParser
             fields.add( field );
         }
 
-        JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
-
-        return njo;
+        return configBuilder.addJsonArrayToConfig( jo, fields );
     }
 
 

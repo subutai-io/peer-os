@@ -65,7 +65,7 @@ public interface EnvironmentManager
 
     void saveEnvironment( Environment environment );
 
-    void buildEnvironment( EnvironmentBuildProcess environmentBuildProcess );
+    void buildEnvironment( EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException;
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 

@@ -37,8 +37,6 @@ public class PlainParser implements ConfigParser
                 configBuilder.buildFieldJsonObject( key.trim(), key.trim(), true, "textfield", true, value.trim() );
         fields.add( field );
 
-        JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
-
-        return njo;
+        return configBuilder.addJsonArrayToConfig( jo, fields );
     }
 }

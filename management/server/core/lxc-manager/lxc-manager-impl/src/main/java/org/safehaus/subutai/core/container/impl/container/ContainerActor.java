@@ -6,6 +6,8 @@ import java.util.concurrent.Callable;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -13,6 +15,8 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
  */
 public class ContainerActor implements Callable<ContainerInfo>
 {
+
+    private static final Logger LOG = LoggerFactory.getLogger( ContainerActor.class );
     private final ContainerInfo containerInfo;
     private final ContainerManager containerManager;
     private final ContainerAction containerAction;
@@ -52,6 +56,7 @@ public class ContainerActor implements Callable<ContainerInfo>
             }
             catch ( LxcCreateException ignore )
             {
+                LOG.trace( "ContainerActor@call: " + ignore.getMessage(), ignore );
             }
         }
         else
@@ -64,7 +69,7 @@ public class ContainerActor implements Callable<ContainerInfo>
             }
             catch ( LxcDestroyException ignore )
             {
-
+                LOG.trace( "ContainerActor@call: " + ignore.getMessage(), ignore );
             }
         }
         return containerInfo;

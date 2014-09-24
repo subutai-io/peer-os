@@ -325,7 +325,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException
     {
 
 
@@ -339,7 +339,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 boolean result = peerCommandDispatcher.invoke( peerCommand );
                 if ( result )
                 {
-                    LOG.info( "Clone commad executed successfully" );
+
+                    //TODO: Assign data from set of agents received
 
                     EnvironmentContainer container = new EnvironmentContainer();
                     container.setPeerId( ccm.getPeerId() );
@@ -353,6 +354,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             catch ( PeerCommandException e )
             {
                 LOG.error( e.getMessage(), e );
+                throw new EnvironmentBuildException(e.getMessage());
             }
             saveEnvironment( environment );
         }
