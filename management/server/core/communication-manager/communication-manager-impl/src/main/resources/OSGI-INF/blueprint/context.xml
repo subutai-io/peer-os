@@ -14,6 +14,7 @@
       <cm:property name="amqMaxPooledConnections" value="21" />
       <cm:property name="amqMaxSenderPoolSize" value="20" />
       <cm:property name="persistentMessages" value="false" />
+      <cm:property name="subutaiServicePort" value="8181" />
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -32,6 +33,7 @@
     <property name="amqMaxPooledConnections" value="${amqMaxPooledConnections}" />
     <property name="amqMaxSenderPoolSize" value="${amqMaxSenderPoolSize}" />
     <property name="persistentMessages" value="${persistentMessages}" />
+    <property name="subutaiServicePort" value="${subutaiServicePort}" />
   </bean>
 
   <service ref="communicationService"
