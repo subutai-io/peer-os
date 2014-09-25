@@ -1,21 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.manager;
 
-
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
@@ -28,11 +12,17 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.shark.api.Shark;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public class AddNodeWindow extends Window
 {
 
@@ -91,12 +81,13 @@ public class AddNodeWindow extends Window
                 executorService.execute( new Runnable()
                 {
 
+                    @Override
                     public void run()
                     {
                         while ( track )
                         {
-                            ProductOperationView po =
-                                    tracker.getProductOperation( SharkClusterConfig.PRODUCT_KEY, trackID );
+                            ProductOperationView po
+                                    = tracker.getProductOperation( SharkClusterConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
                                 setOutput(
@@ -122,8 +113,12 @@ public class AddNodeWindow extends Window
                             }
                         }
                     }
+
+
                 } );
             }
+
+
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
@@ -152,6 +147,8 @@ public class AddNodeWindow extends Window
                 track = false;
                 close();
             }
+
+
         } );
 
         HorizontalLayout bottomContent = new HorizontalLayout();
@@ -194,4 +191,7 @@ public class AddNodeWindow extends Window
         super.close();
         track = false;
     }
+
+
 }
+

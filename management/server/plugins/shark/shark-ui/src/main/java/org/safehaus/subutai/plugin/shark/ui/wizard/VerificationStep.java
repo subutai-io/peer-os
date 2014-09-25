@@ -1,19 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
-
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -22,11 +8,15 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.shark.api.Shark;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel
 {
 
@@ -60,8 +50,8 @@ public class VerificationStep extends Panel
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 UUID trackID = shark.installCluster( wizard.getConfig() );
-                ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID, SharkClusterConfig.PRODUCT_KEY );
+                ProgressWindow window
+                        = new ProgressWindow( executorService, tracker, trackID, SharkClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -69,9 +59,13 @@ public class VerificationStep extends Panel
                     {
                         wizard.init();
                     }
+
+
                 } );
                 getUI().addWindow( window.getWindow() );
             }
+
+
         } );
 
         Button back = new Button( "Back" );
@@ -83,6 +77,8 @@ public class VerificationStep extends Panel
             {
                 wizard.back();
             }
+
+
         } );
 
         HorizontalLayout buttons = new HorizontalLayout();
@@ -97,4 +93,7 @@ public class VerificationStep extends Panel
 
         setContent( grid );
     }
+
+
 }
+

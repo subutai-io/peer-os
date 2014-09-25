@@ -1,31 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.manager;
 
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import javax.naming.NamingException;
-
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.Spark;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
@@ -40,11 +14,26 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import javax.naming.NamingException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.shark.api.Shark;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.Spark;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
 
-/**
- * @author dilshat
- */
 public class Manager
 {
 
@@ -100,6 +89,8 @@ public class Manager
                 config = ( SharkClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
+
+
         } );
 
         controlsContent.addComponent( clusterCombo );
@@ -113,6 +104,8 @@ public class Manager
             {
                 refreshClustersInfo();
             }
+
+
         } );
 
         controlsContent.addComponent( refreshClustersBtn );
@@ -136,7 +129,7 @@ public class Manager
                         {
                             UUID trackID = shark.uninstallCluster( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    SharkClusterConfig.PRODUCT_KEY );
+                                                                        SharkClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -144,9 +137,13 @@ public class Manager
                                 {
                                     refreshClustersInfo();
                                 }
+
+
                             } );
                             contentRoot.getUI().addWindow( window.getWindow() );
                         }
+
+
                     } );
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
@@ -156,6 +153,8 @@ public class Manager
                     show( "Please, select cluster" );
                 }
             }
+
+
         } );
 
         controlsContent.addComponent( destroyClusterBtn );
@@ -170,15 +169,15 @@ public class Manager
                 if ( config != null )
                 {
                     SparkClusterConfig info = spark.
-                                                           getCluster( config.getClusterName() );
+                            getCluster( config.getClusterName() );
                     if ( info != null )
                     {
                         Set<Agent> nodes = new HashSet<>( info.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {
-                            AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( shark, executorService, tracker, config, nodes );
+                            AddNodeWindow addNodeWindow
+                                    = new AddNodeWindow( shark, executorService, tracker, config, nodes );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener()
                             {
@@ -187,6 +186,8 @@ public class Manager
                                 {
                                     refreshClustersInfo();
                                 }
+
+
                             } );
                         }
                         else
@@ -204,6 +205,8 @@ public class Manager
                     show( "Please, select cluster" );
                 }
             }
+
+
         } );
 
         controlsContent.addComponent( addNodeBtn );
@@ -219,7 +222,7 @@ public class Manager
                 {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format( "Do you want to Actualize master IP in %s cluster?",
-                                    config.getClusterName() ), "Yes", "No" );
+                                           config.getClusterName() ), "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
@@ -227,7 +230,7 @@ public class Manager
                         {
                             UUID trackID = shark.actualizeMasterIP( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    SharkClusterConfig.PRODUCT_KEY );
+                                                                        SharkClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -235,9 +238,13 @@ public class Manager
                                 {
                                     refreshClustersInfo();
                                 }
+
+
                             } );
                             contentRoot.getUI().addWindow( window.getWindow() );
                         }
+
+
                     } );
                 }
                 else
@@ -245,6 +252,8 @@ public class Manager
                     show( "Please, select cluster" );
                 }
             }
+
+
         } );
 
         controlsContent.addComponent( actualizeBtn );
@@ -271,14 +280,14 @@ public class Manager
             {
                 if ( event.isDoubleClick() )
                 {
-                    String lxcHostname =
-                            ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
+                    String lxcHostname
+                            = ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
-                                        agentManager );
+                        TerminalWindow terminal
+                                = new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                                      agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -287,6 +296,8 @@ public class Manager
                     }
                 }
             }
+
+
         } );
         return table;
     }
@@ -321,8 +332,9 @@ public class Manager
             final Button destroyBtn = new Button( "Destroy" );
             destroyBtn.addStyleName( "default" );
 
-            table.addItem( new Object[] {
-                    agent.getHostname() + String.format( " [%s]", agent.getListIP().get( 0 ) ), destroyBtn
+            table.addItem( new Object[]
+            {
+                agent.getHostname() + String.format( " [%s]", agent.getListIP().get( 0 ) ), destroyBtn
             }, null );
 
             destroyBtn.addClickListener( new Button.ClickListener()
@@ -339,7 +351,7 @@ public class Manager
                         {
                             UUID trackID = shark.destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    SharkClusterConfig.PRODUCT_KEY );
+                                                                        SharkClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -347,13 +359,19 @@ public class Manager
                                 {
                                     refreshClustersInfo();
                                 }
+
+
                             } );
                             contentRoot.getUI().addWindow( window.getWindow() );
                         }
+
+
                     } );
 
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
+
+
             } );
         }
     }
@@ -395,4 +413,7 @@ public class Manager
     {
         return contentRoot;
     }
+
+
 }
+

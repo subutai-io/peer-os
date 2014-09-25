@@ -1,28 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 
+import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
 import java.util.concurrent.ExecutorService;
-
 import javax.naming.NamingException;
-
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.GridLayout;
 
-
-/**
- * @author dilshat
- */
 public class Wizard
 {
 
@@ -117,4 +106,7 @@ public class Wizard
     {
         return config;
     }
+
+
 }
+

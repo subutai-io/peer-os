@@ -1,15 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
-
-import java.util.List;
-
-import org.safehaus.subutai.plugin.spark.api.Spark;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -21,11 +11,11 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import java.util.List;
+import org.safehaus.subutai.plugin.spark.api.Spark;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public class ConfigurationStep extends Panel
 {
 
@@ -68,6 +58,8 @@ public class ConfigurationStep extends Panel
                     wizard.getConfig().setNodes( config.getAllNodes() );
                 }
             }
+
+
         } );
 
 
@@ -109,6 +101,8 @@ public class ConfigurationStep extends Panel
                     wizard.next();
                 }
             }
+
+
         } );
 
         Button back = new Button( "Back" );
@@ -120,6 +114,8 @@ public class ConfigurationStep extends Panel
             {
                 wizard.back();
             }
+
+
         } );
 
         VerticalLayout layout = new VerticalLayout();
@@ -142,4 +138,7 @@ public class ConfigurationStep extends Panel
     {
         Notification.show( notification );
     }
+
+
 }
+

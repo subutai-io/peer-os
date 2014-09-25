@@ -1,13 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
-
-import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.plugin.shark.ui.SharkPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -16,11 +8,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.plugin.shark.ui.SharkPortalModule;
 
 
-/**
- * @author dilshat
- */
 public class WelcomeStep extends Panel
 {
 
@@ -59,8 +50,13 @@ public class WelcomeStep extends Panel
                 wizard.init();
                 wizard.next();
             }
+
+
         } );
 
         setContent( grid );
     }
+
+
 }
+
