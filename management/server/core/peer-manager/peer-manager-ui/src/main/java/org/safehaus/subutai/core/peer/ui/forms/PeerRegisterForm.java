@@ -292,7 +292,7 @@ public class PeerRegisterForm extends CustomComponent
 
 
                             WebClient local = WebClient.create( String.format( "http://%s:%s/cxf", "127.0.0.1",
-                                    peerManagerPortalModule.localServicePort ) );
+                                    "8181" ) );
                             String localhostPeer =
                                     local.path( "peer/json" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
 
