@@ -74,23 +74,6 @@ public class CommunicationManagerImpl implements CommunicationManager
      */
     private boolean persistentMessages;
 
-    /**
-     * subutai server working service port
-     */
-    private String subutaiServicePort;
-
-
-    public String getSubutaiServicePort()
-    {
-        return subutaiServicePort;
-    }
-
-
-    public void setSubutaiServicePort( final String subutaiServicePort )
-    {
-        this.subutaiServicePort = subutaiServicePort;
-    }
-
 
     public Connection createConnection() throws JMSException
     {
