@@ -307,16 +307,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 if ( result )
                 {
                     Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
-                    for ( Agent agent : agents )
+                    if ( !agents.isEmpty() )
                     {
-                        LOG.info( String.format( "------------> Adding container: %s", agent.toString() ) );
-                        EnvironmentContainer container = new EnvironmentContainer();
-                        container.setPeerId( agent.getSiteId() );
-                        container.setAgentId( agent.getUuid() );
-                        container.setHostname( agent.getHostname() );
-                        container.setDescription( ccm.getTemplate() );
-                        container.setName( agent.getHostname() );
-                        environment.addContainer( container );
+                        for ( Agent agent : agents )
+                        {
+                            LOG.info( String.format( "------------> Adding container: %s", agent.toString() ) );
+                            EnvironmentContainer container = new EnvironmentContainer();
+                            container.setPeerId( agent.getSiteId() );
+                            container.setAgentId( agent.getUuid() );
+                            container.setHostname( agent.getHostname() );
+                            container.setDescription( ccm.getTemplate() );
+                            container.setName( agent.getHostname() );
+                            environment.addContainer( container );
+                        }
                     }
                 }
             }

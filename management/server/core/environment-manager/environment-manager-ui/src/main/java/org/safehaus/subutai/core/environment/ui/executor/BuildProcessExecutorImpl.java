@@ -62,7 +62,8 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
         } );
 
 
-        ExecutorService waiter = Executors.newFixedThreadPool( 1 );
+//        ExecutorService waiter = Executors.newFixedThreadPool( 1 );
+        ExecutorService waiter = Executors.newCachedThreadPool();
         waiter.execute( new Runnable()
         {
             @Override

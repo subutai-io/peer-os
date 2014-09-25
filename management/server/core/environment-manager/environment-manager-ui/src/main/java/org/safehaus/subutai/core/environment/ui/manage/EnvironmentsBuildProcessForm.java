@@ -228,7 +228,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
         buildProcessExecutor.addListener( this );
-        ExecutorService executor = Executors.newFixedThreadPool( 1 );//.newSingleThreadExecutor();
+//        ExecutorService executor = Executors.newFixedThreadPool( 10 );
+        ExecutorService executor = Executors.newCachedThreadPool();
         buildProcessExecutor.execute( executor,
                 new BuildCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
         executor.shutdown();
