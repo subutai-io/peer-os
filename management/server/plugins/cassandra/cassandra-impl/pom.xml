@@ -18,6 +18,7 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+      <version>${org.osgi.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
@@ -26,13 +27,9 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>configuration-manager-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>

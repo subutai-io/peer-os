@@ -18,6 +18,7 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+      <version>${org.osgi.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -65,12 +66,13 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
+      <version>${org.mockito.version}</version>
     </dependency>
   </dependencies>
   <build>
