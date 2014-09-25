@@ -1034,6 +1034,13 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Environment Terminal  -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>environment-terminal-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Container Manager  -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
