@@ -77,7 +77,7 @@ public class MockUtils
                         {
                             return MockUtils.getCommand( true, true, 0, "RUNNING", null );
                         }
-                        else if ( request.getProgram().contains( "lxc-list" ) )
+                        else if ( request.getProgram().contains( "lxc-ls" ) )
                         {
                             return MockUtils.getCommand( true, true, 0, getLxcListOutput(), null );
                         }

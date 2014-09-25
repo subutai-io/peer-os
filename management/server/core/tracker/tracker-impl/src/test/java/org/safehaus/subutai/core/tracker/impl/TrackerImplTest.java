@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Test for TrackerImpl class
  */
-public class TrackerImplIT
+public class TrackerImplTest
 {
 
     private final DbManager dbManager = new DbManagerImpl();
@@ -103,6 +103,6 @@ public class TrackerImplIT
 
         tracker.printOperationLog( source, po.getId(), 5 * 1000 );
 
-        assertEquals( testLog, myOut.toString() );
+        assertEquals( testLog, myOut.toString().trim() );
     }
 }

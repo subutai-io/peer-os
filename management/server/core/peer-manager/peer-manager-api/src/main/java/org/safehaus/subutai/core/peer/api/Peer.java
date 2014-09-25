@@ -13,7 +13,20 @@ public class Peer
 
     private String name;
     private String ip;
+    private PeerStatus status;
     private UUID id;
+
+
+    public PeerStatus getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( final PeerStatus status )
+    {
+        this.status = status;
+    }
 
 
     public String getName()

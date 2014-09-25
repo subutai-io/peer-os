@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -12,6 +16,7 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.slf4j.Logger;
@@ -192,12 +197,52 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response processRegisterRequest( String peer )
+    {
+        Peer p = GSON.fromJson( peer, Peer.class );
+        return Response.ok( GSON.toJson( p ) ).build();
+    }
+
+
     private Peer getSamplePeer()
     {
         Peer peer = new Peer();
-        peer.setName( "Peer name" );
-        peer.setIp( "10.10.10.10" );
-        peer.setId( UUID.randomUUID() );
+        peer.setName( "Peer name 1" );
+        peer.setIp( getLocalIp() );
+        peer.setId( peerManager.getSiteId() );
+        peer.setStatus( PeerStatus.REQUESTED );
         return peer;
+    }
+
+
+    private static String getLocalIp()
+    {
+        Enumeration<NetworkInterface> n;
+        try
+        {
+            n = NetworkInterface.getNetworkInterfaces();
+            for (; n.hasMoreElements(); )
+            {
+                NetworkInterface e = n.nextElement();
+
+                Enumeration<InetAddress> a = e.getInetAddresses();
+                for (; a.hasMoreElements(); )
+                {
+                    InetAddress addr = a.nextElement();
+                    if ( !addr.getHostAddress().startsWith( "10" ) && addr.isSiteLocalAddress() )
+                    {
+                        return ( addr.getHostName() );
+                    }
+                }
+            }
+        }
+        catch ( SocketException e )
+        {
+            System.out.println( e.getMessage() );
+        }
+
+
+        return "127.0.0.1";
     }
 }

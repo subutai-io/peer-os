@@ -24,12 +24,18 @@ public class ReportsView extends HorizontalLayout implements View
     private TabSheet editors;
 
 
-    @Override
-    public void enter( ViewChangeEvent event )
+    public ReportsView()
     {
         setSizeFull();
         addStyleName( "reports" );
 
         addComponent( new Label( "Reports" ) );
+    }
+
+
+    @Override
+    public void enter( ViewChangeEvent event )
+    {
+
     }
 }

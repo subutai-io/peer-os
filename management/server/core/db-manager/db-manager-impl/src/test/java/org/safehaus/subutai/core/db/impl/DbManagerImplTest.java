@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for DbManagerImpl class
  */
-public class DbManagerImplIT
+public class DbManagerImplTest
 {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
