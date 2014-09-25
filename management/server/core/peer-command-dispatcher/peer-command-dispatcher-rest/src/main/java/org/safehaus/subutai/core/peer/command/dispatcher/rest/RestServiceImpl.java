@@ -163,11 +163,9 @@ public class RestServiceImpl implements RestService
                            .build();
         }
 
-        LOG.debug(
-                String.format( "Command before invoking PCD [%s]", commandMessage, commandMessage != null ? commandMessage.toString() : "NULL" ) );
+        LOG.debug( String.format( "Command before invoking PCD [%s]", commandMessage ) );
         peerCommandDispatcher.invoke( commandMessage );
-        LOG.debug(
-                String.format( "Command after invoking PCD [%s]", commandMessage, commandMessage != null ? commandMessage.toString() : "NULL" ) );
+        LOG.debug( String.format( "Command after invoking PCD [%s]", commandMessage ) );
 
         if ( commandMessage.isSuccess() )
         {
