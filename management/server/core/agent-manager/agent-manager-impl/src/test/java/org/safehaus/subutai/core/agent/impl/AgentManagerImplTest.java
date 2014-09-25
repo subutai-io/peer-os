@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for Agent Manager class
  */
-public class AgentManagerImplUT
+public class AgentManagerImplTest
 {
 
     private final String LXC_HOSTNAME = "parent-lxc-hostname";
@@ -119,6 +119,19 @@ public class AgentManagerImplUT
         agentManager.onResponse( response );
 
         assertNotNull( agentManager.getAgentByHostname( LXC_HOSTNAME ) );
+    }
+
+
+    @Test
+    public void shouldReturnAgentByEnvId()
+    {
+        UUID id = UUID.randomUUID();
+        Response response = MockUtils.getRegistrationRequestFromLxcAgentWithEnvironmentId( id );
+
+        agentManager.onResponse( response );
+
+        assertTrue( !agentManager.getAgentsByEnvironmentId( id ).isEmpty() );
+        assertTrue( id.equals( agentManager.getAgentsByEnvironmentId( id ).iterator().next().getEnvironmentId() ) );
     }
 
 

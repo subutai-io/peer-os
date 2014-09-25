@@ -7,8 +7,8 @@ package org.safehaus.subutai.core.command.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandExecutor;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.CommandExecutor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Test for CommandExecutor class
  */
-public class CommandExecutorUT
+public class CommandExecutorTest
 {
 
     @Test(expected = NullPointerException.class)
