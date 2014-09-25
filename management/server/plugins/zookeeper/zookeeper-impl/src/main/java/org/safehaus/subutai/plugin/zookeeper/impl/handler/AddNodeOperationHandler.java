@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;

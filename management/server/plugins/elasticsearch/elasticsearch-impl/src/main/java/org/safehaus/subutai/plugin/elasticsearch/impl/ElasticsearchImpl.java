@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;

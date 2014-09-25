@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;

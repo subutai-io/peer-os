@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
