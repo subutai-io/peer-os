@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-public class Config implements ConfigBase
+public class LuceneConfig implements ConfigBase
 {
 
     public static final String PRODUCT_KEY = "Lucene2";

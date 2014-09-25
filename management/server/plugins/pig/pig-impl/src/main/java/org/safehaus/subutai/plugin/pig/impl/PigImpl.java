@@ -19,8 +19,8 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.plugin.pig.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.pig.impl.handler.InstallOperationHandler;
@@ -139,7 +139,7 @@ public class PigImpl implements Pig
 
 
     @Override
-    public UUID installCluster( Config config )
+    public UUID installCluster( PigConfig config )
     {
 
         Preconditions.checkNotNull( config, "Configuration is null" );
@@ -159,21 +159,21 @@ public class PigImpl implements Pig
 
 
     @Override
-    public List<Config> getClusters()
+    public List<PigConfig> getClusters()
     {
-        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
+        return dbManager.getInfo( PigConfig.PRODUCT_KEY, PigConfig.class );
     }
 
 
     @Override
-    public Config getCluster( String clusterName )
+    public PigConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+        return dbManager.getInfo( PigConfig.PRODUCT_KEY, clusterName, PigConfig.class );
     }
 
 
     @Override
-    public UUID installCluster( Config config, HadoopClusterConfig hadoopConfig )
+    public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig )
     {
         InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
         operationHandler.setHadoopConfig( hadoopConfig );
@@ -195,7 +195,7 @@ public class PigImpl implements Pig
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, Config config, ProductOperation po )
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, ProductOperation po )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {

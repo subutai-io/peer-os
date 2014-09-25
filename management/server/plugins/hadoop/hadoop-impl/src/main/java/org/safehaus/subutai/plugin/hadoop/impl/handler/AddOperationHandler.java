@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;

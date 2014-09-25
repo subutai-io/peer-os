@@ -21,8 +21,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 
 public class RestService
@@ -53,7 +53,7 @@ public class RestService
     public Response installCluster( @QueryParam("config") String config )
     {
         TrimmedConfig trimmedConfig = JsonUtil.fromJson( config, TrimmedConfig.class );
-        Config pigConfig = new Config();
+        PigConfig pigConfig = new PigConfig();
         pigConfig.setClusterName( trimmedConfig.getClusterName() );
 
         if ( !CollectionUtil.isCollectionEmpty( trimmedConfig.getNodes() ) )
@@ -92,10 +92,10 @@ public class RestService
     public Response getClusters()
     {
 
-        List<Config> configs = pigManager.getClusters();
+        List<PigConfig> configs = pigManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
 
-        for ( Config config : configs )
+        for ( PigConfig config : configs )
         {
             clusterNames.add( config.getClusterName() );
         }
@@ -110,7 +110,7 @@ public class RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getCluster( @PathParam("clusterName") String clusterName )
     {
-        Config config = pigManager.getCluster( clusterName );
+        PigConfig config = pigManager.getCluster( clusterName );
 
         String cluster = JsonUtil.GSON.toJson( config );
         return Response.status( Response.Status.OK ).entity( cluster ).build();

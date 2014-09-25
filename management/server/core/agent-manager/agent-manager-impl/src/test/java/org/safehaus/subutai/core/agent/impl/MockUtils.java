@@ -49,4 +49,12 @@ public class MockUtils
 
         return response;
     }
+
+
+    public static Response getRegistrationRequestFromLxcAgentWithEnvironmentId( UUID envId )
+    {
+        Response response = getRegistrationRequestFromLxcAgent();
+        when( response.getEnvironmentId() ).thenReturn( envId );
+        return response;
+    }
 }

@@ -59,7 +59,12 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnectedAgents( @QueryParam("envId") String environmentId );
 
+    @POST
+    @Path( "invoke" )
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response invoke(@FormParam("commandType") String commandType, @FormParam( "command" ) String command);
+
     @GET
-    @Path("ping")
+    @Path( "ping" )
     public Response ping();
 }

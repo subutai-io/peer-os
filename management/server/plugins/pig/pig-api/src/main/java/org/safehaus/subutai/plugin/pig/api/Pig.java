@@ -10,12 +10,12 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
-public interface Pig extends ApiBase<Config>
+public interface Pig extends ApiBase<PigConfig>
 {
 
-    public UUID installCluster( Config config, HadoopClusterConfig hadoopConfig );
+    public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig );
 
     public UUID destroyNode( String clusterName, String lxcHostname );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, Config config, ProductOperation po );
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, ProductOperation po );
 }

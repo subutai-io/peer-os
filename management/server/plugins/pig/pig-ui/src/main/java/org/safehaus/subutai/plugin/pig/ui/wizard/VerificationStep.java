@@ -7,8 +7,8 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
@@ -41,7 +41,7 @@ public class VerificationStep extends Panel
 
         // Display config values
 
-        final Config config = wizard.getConfig();
+        final PigConfig config = wizard.getConfig();
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Hadoop cluster name", config.getHadoopClusterName() );
 
@@ -82,7 +82,7 @@ public class VerificationStep extends Panel
                     trackId = pig.installCluster( config, wizard.getHadoopConfig() );
                 }
 
-                ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, Config.PRODUCT_KEY );
+                ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, PigConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

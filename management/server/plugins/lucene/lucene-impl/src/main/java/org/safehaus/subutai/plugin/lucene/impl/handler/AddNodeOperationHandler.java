@@ -1,12 +1,12 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
@@ -22,7 +22,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( LuceneConfig.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
     }
 
@@ -30,7 +30,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
     @Override
     public void run()
     {
-        Config config = manager.getCluster( clusterName );
+        LuceneConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             productOperation.addLogFailed(
@@ -93,7 +93,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
 
             try
             {
-                manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, clusterName, config );
+                manager.getDbManager().saveInfo2( LuceneConfig.PRODUCT_KEY, clusterName, config );
 
                 productOperation.addLogDone( "Information updated in db" );
             }

@@ -23,7 +23,7 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
     @Override
     public void addListener( final BuildProcessExecutionListener listener )
     {
-
+        this.listeners.add( listener );
     }
 
 

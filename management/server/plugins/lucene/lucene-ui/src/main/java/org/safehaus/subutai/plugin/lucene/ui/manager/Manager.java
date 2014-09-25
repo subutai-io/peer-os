@@ -21,8 +21,8 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.Config;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -57,7 +57,7 @@ public class Manager
     private final Hadoop hadoop;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
-    private Config config;
+    private LuceneConfig config;
 
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -96,7 +96,7 @@ public class Manager
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                config = ( Config ) event.getProperty().getValue();
+                config = ( LuceneConfig ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -135,7 +135,7 @@ public class Manager
                         {
                             UUID trackID = lucene.uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID, Config.PRODUCT_KEY );
+                                    new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -296,7 +296,7 @@ public class Manager
                         {
                             UUID trackID = lucene.destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID, Config.PRODUCT_KEY );
+                                    new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -318,12 +318,12 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<Config> clustersInfo = lucene.getClusters();
-        Config clusterInfo = ( Config ) clusterCombo.getValue();
+        List<LuceneConfig> clustersInfo = lucene.getClusters();
+        LuceneConfig clusterInfo = ( LuceneConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
-            for ( Config luceneClusterInfo : clustersInfo )
+            for ( LuceneConfig luceneClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( luceneClusterInfo );
                 clusterCombo.setItemCaption( luceneClusterInfo,
@@ -332,7 +332,7 @@ public class Manager
             }
             if ( clusterInfo != null )
             {
-                for ( Config luceneClusterInfo : clustersInfo )
+                for ( LuceneConfig luceneClusterInfo : clustersInfo )
                 {
                     if ( luceneClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {
