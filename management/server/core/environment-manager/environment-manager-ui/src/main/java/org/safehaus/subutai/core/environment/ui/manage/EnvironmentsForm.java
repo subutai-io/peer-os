@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +27,10 @@ public class EnvironmentsForm
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManagerUI managerUI;
+    private EnvironmentManagerPortalModule managerUI;
 
 
-    public EnvironmentsForm( final EnvironmentManagerUI managerUI )
+    public EnvironmentsForm( final EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
 

@@ -6,7 +6,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
 
@@ -17,7 +17,7 @@ public abstract class ContainerManagerBase implements ContainerManager
     AgentManager agentManager;
     CommandRunner commandRunner;
     TemplateManager templateManager;
-    TemplateRegistryManager templateRegistry;
+    TemplateRegistry templateRegistry;
     DbManager dbManager;
 
 
@@ -69,13 +69,13 @@ public abstract class ContainerManagerBase implements ContainerManager
     }
 
 
-    public TemplateRegistryManager getTemplateRegistry()
+    public TemplateRegistry getTemplateRegistry()
     {
         return templateRegistry;
     }
 
 
-    public void setTemplateRegistry( TemplateRegistryManager templateRegistry )
+    public void setTemplateRegistry( TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
     }

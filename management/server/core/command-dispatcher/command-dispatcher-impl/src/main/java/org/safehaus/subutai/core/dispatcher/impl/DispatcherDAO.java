@@ -26,8 +26,8 @@ public class DispatcherDAO
     private static final Logger LOG = LoggerFactory.getLogger( DispatcherDAO.class.getName() );
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private final DbManager dbManager;
     private static final String COMMAND_ID_IS_NULL_MSG = "Command id is null";
+    private final DbManager dbManager;
 
 
     public DispatcherDAO( final DbManager dbManager )

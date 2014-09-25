@@ -353,7 +353,7 @@ public class Manager
         List<FlumeConfig> clustersInfo = flume.getClusters();
         FlumeConfig clusterInfo = ( FlumeConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && !clustersInfo.isEmpty())
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( FlumeConfig ci : clustersInfo )
             {

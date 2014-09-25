@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.registry.cli;
 import java.nio.charset.Charset;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -27,12 +27,12 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
             description = "md5sum of packages file")
     String md5sum;
 
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager )
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -40,7 +40,7 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        templateRegistryManager.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
+        templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
                 FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
 
         System.out.println( "Template registered successfully" );

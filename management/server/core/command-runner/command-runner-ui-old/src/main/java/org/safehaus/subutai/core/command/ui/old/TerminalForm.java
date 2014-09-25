@@ -41,12 +41,12 @@ public class TerminalForm extends CustomComponent implements Disposable
 {
 
     protected final AgentTree agentTree;
-    private final TextArea commandOutputTxtArea;
     protected final TextField programTxtFld;
     protected final TextField timeoutTxtFld;
     protected final TextField workDirTxtFld;
     protected final ComboBox requestTypeCombo;
     protected final Label indicator;
+    private final TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 

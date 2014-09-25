@@ -14,7 +14,7 @@
   <reference id="templateManager" availability="mandatory"
              interface="org.safehaus.subutai.core.template.api.TemplateManager" />
   <reference id="templateRegistry" availability="mandatory"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager" />
+             interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="repoManager" availability="mandatory"

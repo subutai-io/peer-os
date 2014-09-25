@@ -30,8 +30,7 @@ public class MobileCheckUI extends UI
                                 + request.getPathInfo()
                                 + "?mobile=false\">load it anyway</a>.</p><p>You can also <a href=\"https://vaadin" +
                                 ".com/blog/-/blogs/it-s-demo-time\">read more about the demo application</a> and it's" +
-                                " design from the Vaadin blog.</p>",
-                        ContentMode.HTML ) );
+                                " design from the Vaadin blog.</p>", ContentMode.HTML ) );
             }
         } );
     }

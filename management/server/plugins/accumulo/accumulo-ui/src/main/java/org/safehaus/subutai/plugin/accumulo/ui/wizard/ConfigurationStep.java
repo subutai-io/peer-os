@@ -83,7 +83,7 @@ public class ConfigurationStep extends Panel
 
 
             //fill zkClustersCombo with zk cluster infos
-            if ( !zkClusters.isEmpty()  )
+            if ( !zkClusters.isEmpty() )
             {
                 for ( ZookeeperClusterConfig zookeeperClusterConfig : zkClusters )
                 {

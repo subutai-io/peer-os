@@ -13,8 +13,8 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -45,7 +45,7 @@ public class Manager
     private final Tracker tracker;
     private final ExecutorService executorService;
     private final Pig pig;
-    private Config config;
+    private PigConfig config;
 
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -82,7 +82,7 @@ public class Manager
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                config = ( Config ) event.getProperty().getValue();
+                config = ( PigConfig ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -192,7 +192,7 @@ public class Manager
                         {
                             UUID trackID = pig.destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID, Config.PRODUCT_KEY );
+                                    new ProgressWindow( executorService, tracker, trackID, PigConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -214,19 +214,19 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<Config> clustersInfo = pig.getClusters();
-        Config clusterInfo = ( Config ) clusterCombo.getValue();
+        List<PigConfig> clustersInfo = pig.getClusters();
+        PigConfig clusterInfo = ( PigConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
-            for ( Config mongoClusterInfo : clustersInfo )
+            for ( PigConfig mongoClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
             }
             if ( clusterInfo != null )
             {
-                for ( Config mongoClusterInfo : clustersInfo )
+                for ( PigConfig mongoClusterInfo : clustersInfo )
                 {
                     if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {

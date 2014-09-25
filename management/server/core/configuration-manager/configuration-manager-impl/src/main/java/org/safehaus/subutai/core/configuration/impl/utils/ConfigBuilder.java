@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.configuration.impl.utils;
 
 import java.util.List;
 
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -25,10 +25,10 @@ public class ConfigBuilder
     }
 
 
-    public JsonObject getConfigJsonObject( String pathToFile, ConfigTypeEnum configTypeEnum )
+    public JsonObject getConfigJsonObject( String pathToFile, ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         jo.addProperty( "path", pathToFile );
-        jo.addProperty( "type", configTypeEnum.toString() );
+        jo.addProperty( "type", configuraitonTypeEnum.toString() );
         return jo;
     }
 

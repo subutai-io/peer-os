@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.configuration.impl.utils;
 
 
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 
 import com.google.gson.JsonObject;
 
@@ -11,5 +11,5 @@ import com.google.gson.JsonObject;
  */
 public interface ConfigParser
 {
-    JsonObject parserConfig( String pathToConfig, ConfigTypeEnum configTypeEnum );
+    JsonObject parserConfig( String pathToConfig, ConfiguraitonTypeEnum configuraitonTypeEnum );
 }

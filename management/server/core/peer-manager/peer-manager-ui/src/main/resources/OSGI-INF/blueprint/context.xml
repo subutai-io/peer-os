@@ -4,7 +4,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.peer.ui.PeerUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule"
         init-method="init" destroy-method="destroy">
     <property name="peerManager" ref="peerManager" />
   </bean>

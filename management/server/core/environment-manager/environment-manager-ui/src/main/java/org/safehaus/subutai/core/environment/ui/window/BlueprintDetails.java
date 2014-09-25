@@ -2,8 +2,9 @@ package org.safehaus.subutai.core.environment.ui.window;
 
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vaadin.ui.TextArea;
 
 
@@ -13,19 +14,18 @@ import com.vaadin.ui.TextArea;
 public class BlueprintDetails extends DetailsWindow
 {
 
-    private EnvironmentManager environmentManager;
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
-    public BlueprintDetails( String caption, EnvironmentManager environmentManager )
+    public BlueprintDetails( String caption )
     {
         super( caption );
-        this.environmentManager = environmentManager;
     }
 
 
     public void setContent( EnvironmentBlueprint blueprint )
     {
-        String value = environmentManager.parseBlueprint( blueprint );
+        String value = GSON.toJson( blueprint );
         TextArea area = getTextArea();
         area.setValue( value );
         verticalLayout.addComponent( area );

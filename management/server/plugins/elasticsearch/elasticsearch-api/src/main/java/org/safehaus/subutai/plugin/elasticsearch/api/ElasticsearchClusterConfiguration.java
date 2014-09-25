@@ -34,6 +34,12 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     }
 
 
+    public static String getTemplateName()
+    {
+        return templateName;
+    }
+
+
     @Override
     public String getClusterName()
     {
@@ -147,11 +153,5 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     public void setDataNodes( Set<Agent> nodes )
     {
         this.dataNodes = nodes;
-    }
-
-
-    public static String getTemplateName()
-    {
-        return templateName;
     }
 }
