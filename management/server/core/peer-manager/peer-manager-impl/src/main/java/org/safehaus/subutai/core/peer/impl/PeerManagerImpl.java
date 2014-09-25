@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
@@ -458,8 +459,16 @@ public class PeerManagerImpl implements PeerManager
         switch ( peerCommandMessage.getType() )
         {
             case CLONE:
-                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
-                createContainers( ccm );
+                if ( peerCommandMessage instanceof CloneContainersMessage )
+                {
+                    CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
+                    createContainers( ccm );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( false );
+                    peerCommandMessage.setResult( "Invalid CLONE command." );
+                }
                 break;
             case START:
                 peerCommandMessage.setSuccess( startContainer( peerContainer ) );
@@ -470,12 +479,33 @@ public class PeerManagerImpl implements PeerManager
             case ISCONNECTED:
                 peerCommandMessage.setSuccess( isContainerConnected( peerContainer ) );
                 break;
+            case EXECUTE:
+                if ( peerCommandMessage instanceof ExecuteCommandMessage )
+                {
+                    ExecuteCommandMessage ecm = ( ExecuteCommandMessage ) peerCommandMessage;
+                    executeCommand( peerContainer, ecm );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( false );
+                    peerCommandMessage.setResult( "Invalid EXECUTE command." );
+                }
+                break;
             default:
                 peerCommandMessage.setResult( "Unknown command." );
+                peerCommandMessage.setSuccess( false );
                 break;
         }
 
         LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
+    }
+
+
+    private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
+    {
+        ecm.setResult( "Command executor stub!!!" );
+        ecm.setSuccess( true );
+        // TODO: Implement me
     }
 
 
