@@ -30,7 +30,7 @@ public class EnvironmentTerminalPortalModule implements PortalModule
     }
 
 
-    public void destory()
+    public void destroy()
     {
         // while empty
     }
