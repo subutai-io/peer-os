@@ -158,7 +158,8 @@ public class Manager
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
 
-        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllNodesBtn, stopAllNodesBtn, destroyClusterBtn, addNodeBtn );
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllNodesBtn, stopAllNodesBtn, destroyClusterBtn,
+                addNodeBtn );
 
         progressIcon.setVisible( false );
         controlsContent.addComponent( progressIcon );
@@ -168,7 +169,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToAddNodeButton(){
+    public void addClickListenerToAddNodeButton()
+    {
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -225,7 +227,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyClusterButton(){
+    public void addClickListenerToDestroyClusterButton()
+    {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -265,6 +268,7 @@ public class Manager
             }
         } );
     }
+
 
     public void addClickListener( Button button )
     {
@@ -349,6 +353,7 @@ public class Manager
                 break;
         }
     }
+
 
     public void addGivenComponents( HorizontalLayout layout, Button... buttons )
     {
@@ -535,6 +540,7 @@ public class Manager
         }
     }
 
+
     public void disableButtons( Button... buttons )
     {
         for ( Button b : buttons )
@@ -551,7 +557,6 @@ public class Manager
             b.setEnabled( true );
         }
     }
-
 
 
     private void show( String notification )
@@ -593,8 +598,6 @@ public class Manager
             addClickListenerToStartButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToStopButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToDestroyButton( agent, destroyBtn );
-
-
         }
 
         //add master here
@@ -622,11 +625,11 @@ public class Manager
         addClickListenerToCheckButton( master, resultHolder, checkBtn, startBtn, stopBtn );
         addClickListenerToStartButton( master, checkBtn, startBtn, stopBtn );
         addClickListenerToStopButton( master, checkBtn, startBtn, startBtn );
-
     }
 
 
-    public void addClickListenerToCheckButton(final Agent agent, final Label resultHolder, final Button ... buttons ){
+    public void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button... buttons )
+    {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -651,12 +654,15 @@ public class Manager
                                     }
                                     else
                                     {
-                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled(false );
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
                                     progressIcon.setVisible( false );
-                                    for ( Button b : buttons ){
-                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption().equals( DESTROY_BUTTON_CAPTION ) ){
+                                    for ( Button b : buttons )
+                                    {
+                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption().equals(
+                                                DESTROY_BUTTON_CAPTION ) )
+                                        {
                                             enableButtons( b );
                                         }
                                     }
@@ -667,7 +673,9 @@ public class Manager
         } );
     }
 
-    public void addClickListenerToStartButton(final Agent agent, final Button ... buttons ){
+
+    public void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -691,7 +699,9 @@ public class Manager
         } );
     }
 
-    public void addClickListenerToDestroyButton(final Agent agent, final Button ... buttons ){
+
+    public void addClickListenerToDestroyButton( final Agent agent, final Button... buttons )
+    {
         getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -724,7 +734,9 @@ public class Manager
         } );
     }
 
-    public void addClickListenerToStopButton(final Agent agent, final Button ... buttons ){
+
+    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -760,6 +772,7 @@ public class Manager
         }
         return null;
     }
+
 
     public Component getContent()
     {
