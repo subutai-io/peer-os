@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
 import com.google.common.base.Strings;
-import java.util.UUID;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -22,15 +21,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
-                String.format( "Installing %s", SharkClusterConfig.PRODUCT_KEY ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId()
-    {
-        return productOperation.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                SharkClusterConfig.PRODUCT_KEY, String.format( "Installing %s", SharkClusterConfig.PRODUCT_KEY ) );
     }
 
 
@@ -47,7 +39,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( manager.getCluster( config.getClusterName() ) != null )
         {
             productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists. Installation aborted",
-                    config.getClusterName() ) );
+                                                          config.getClusterName() ) );
             return;
         }
 
@@ -94,55 +86,58 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
             {
                 productOperation.addLogFailed(
                         String.format( "Node %s already has Shark installed. Installation aborted",
-                                node.getHostname() ) );
+                                       node.getHostname() ) );
                 return;
             }
             else if ( !result.getStdOut().contains( "ksks-spark" ) )
             {
                 productOperation.addLogFailed( String.format( "Node %s has no Spark installation. Installation aborted",
-                        node.getHostname() ) );
+                                                              node.getHostname() ) );
                 return;
             }
         }
 
         productOperation.addLog( "Updating db..." );
-        boolean dbSaveSuccess =
-                manager.getDbManager().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-
-        if ( dbSaveSuccess )
+        try
         {
-            productOperation.addLog( "Cluster info saved to DB. Installing Shark..." );
+            manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        }
+        catch ( Exception ex )
+        {
+            productOperation.addLogFailed( "Could not save cluster info to DB! Please see logs. Installation aborted" );
+            return;
+        }
 
-            Command installCommand = Commands.getInstallCommand( config.getNodes() );
-            manager.getCommandRunner().runCommand( installCommand );
+        productOperation.addLog( "Cluster info saved to DB. Installing Shark..." );
 
-            if ( installCommand.hasSucceeded() )
+        Command installCommand = Commands.getInstallCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( installCommand );
+
+        if ( installCommand.hasSucceeded() )
+        {
+            productOperation.addLog( "Installation succeeded. Setting Master IP..." );
+
+            Command setMasterIPCommand
+                    = Commands.getSetMasterIPCommand( config.getNodes(), sparkConfig.getMasterNode() );
+            manager.getCommandRunner().runCommand( setMasterIPCommand );
+
+            if ( setMasterIPCommand.hasSucceeded() )
             {
-                productOperation.addLog( "Installation succeeded. Setting Master IP..." );
-
-                Command setMasterIPCommand =
-                        Commands.getSetMasterIPCommand( config.getNodes(), sparkConfig.getMasterNode() );
-                manager.getCommandRunner().runCommand( setMasterIPCommand );
-
-                if ( setMasterIPCommand.hasSucceeded() )
-                {
-                    productOperation.addLogDone( "Master IP successfully set. Done" );
-                }
-                else
-                {
-                    productOperation.addLogFailed(
-                            String.format( "Failed to set Master IP, %s", setMasterIPCommand.getAllErrors() ) );
-                }
+                productOperation.addLogDone( "Master IP successfully set. Done" );
             }
             else
             {
-                productOperation
-                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                productOperation.addLogFailed(
+                        String.format( "Failed to set Master IP, %s", setMasterIPCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation.addLogFailed( "Could not save cluster info to DB! Please see logs. Installation aborted" );
+            productOperation
+                    .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
     }
+
+
 }
+

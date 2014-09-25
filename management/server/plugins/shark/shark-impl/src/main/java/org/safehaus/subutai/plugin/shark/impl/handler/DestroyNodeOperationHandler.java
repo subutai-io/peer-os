@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
 import com.google.common.collect.Sets;
-import java.util.UUID;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -21,15 +20,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId()
-    {
-        return productOperation.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                SharkClusterConfig.PRODUCT_KEY, String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
 
@@ -93,11 +85,12 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             config.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
-            if ( manager.getDbManager().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+            try
             {
+                manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
             }
-            else
+            catch ( Exception ex )
             {
                 productOperation.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
             }
@@ -107,4 +100,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             productOperation.addLogFailed( "Uninstallation failed, command timed out" );
         }
     }
+
+
 }
+

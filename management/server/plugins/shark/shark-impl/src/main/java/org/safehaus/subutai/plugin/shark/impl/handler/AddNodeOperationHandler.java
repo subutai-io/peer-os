@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
 import com.google.common.collect.Sets;
-import java.util.UUID;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -22,15 +21,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
-                String.format( "Adding node to %s", clusterName ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId()
-    {
-        return productOperation.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                SharkClusterConfig.PRODUCT_KEY, String.format( "Adding node to %s", clusterName ) );
     }
 
 
@@ -73,7 +65,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         {
             productOperation.addLogFailed(
                     String.format( "Node %s does not belong to %s spark cluster. Operation aborted", lxcHostname,
-                            clusterName ) );
+                                   clusterName ) );
             return;
         }
 
@@ -106,44 +98,50 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         }
 
         config.getNodes().add( agent );
+
         productOperation.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        try
         {
-            productOperation.addLog( "Cluster info updated in DB. Installing Shark..." );
+            manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLog( "Cluster info updated in DB" );
+        }
+        catch ( Exception ex )
+        {
+            productOperation.addLogFailed( "Could not update cluster info in DB! Installation aborted" );
+            return;
+        }
 
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
-            manager.getCommandRunner().runCommand( installCommand );
+        productOperation.addLog( "Installing Shark..." );
 
-            if ( installCommand.hasSucceeded() )
+        Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+        manager.getCommandRunner().runCommand( installCommand );
+
+        if ( installCommand.hasSucceeded() )
+        {
+            productOperation.addLog( "Installation succeeded. Setting Master IP..." );
+
+            Command setMasterIPCommand
+                    = Commands.getSetMasterIPCommand( Sets.newHashSet( agent ), sparkConfig.getMasterNode() );
+            manager.getCommandRunner().runCommand( setMasterIPCommand );
+
+            if ( setMasterIPCommand.hasSucceeded() )
             {
-                productOperation.addLog( "Installation succeeded. Setting Master IP..." );
-
-                Command setMasterIPCommand =
-                        Commands.getSetMasterIPCommand( Sets.newHashSet( agent ), sparkConfig.getMasterNode() );
-                manager.getCommandRunner().runCommand( setMasterIPCommand );
-
-                if ( setMasterIPCommand.hasSucceeded() )
-                {
-                    productOperation.addLogDone( "Master IP set successfully. Done" );
-                }
-                else
-                {
-                    productOperation.addLogFailed(
-                            String.format( "Failed to set Master IP, %s", setMasterIPCommand.getAllErrors() ) );
-                }
+                productOperation.addLogDone( "Master IP set successfully. Done" );
             }
             else
             {
-
-                productOperation
-                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                productOperation.addLogFailed( String.format( "Failed to set Master IP, %s",
+                                                              setMasterIPCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation
-                    .addLogFailed( "Could not update cluster info in DB! Please see logs. Installation aborted" );
+            productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
+
     }
+
+
 }
+

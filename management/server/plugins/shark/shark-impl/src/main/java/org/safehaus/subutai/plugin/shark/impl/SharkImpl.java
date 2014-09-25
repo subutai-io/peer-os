@@ -14,6 +14,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
@@ -32,6 +33,7 @@ public class SharkImpl implements Shark
     private AgentManager agentManager;
     private Spark sparkManager;
     private DbManager dbManager;
+    private PluginDAO pluginDao;
     private Tracker tracker;
     private ExecutorService executor;
 
@@ -67,9 +69,9 @@ public class SharkImpl implements Shark
     }
 
 
-    public DbManager getDbManager()
+    public PluginDAO getPluginDao()
     {
-        return dbManager;
+        return pluginDao;
     }
 
 
@@ -82,6 +84,7 @@ public class SharkImpl implements Shark
     public void init()
     {
         executor = Executors.newCachedThreadPool();
+        pluginDao = new PluginDAO( dbManager );
     }
 
 
@@ -114,14 +117,14 @@ public class SharkImpl implements Shark
     @Override
     public List<SharkClusterConfig> getClusters()
     {
-        return dbManager.getInfo( SharkClusterConfig.PRODUCT_KEY, SharkClusterConfig.class );
+        return pluginDao.getInfo( SharkClusterConfig.PRODUCT_KEY, SharkClusterConfig.class );
     }
 
 
     @Override
     public SharkClusterConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class );
+        return pluginDao.getInfo( SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class );
     }
 
 

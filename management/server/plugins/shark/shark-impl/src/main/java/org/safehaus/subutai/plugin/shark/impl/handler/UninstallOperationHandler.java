@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import java.util.UUID;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -17,15 +16,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
     public UninstallOperationHandler( SharkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId()
-    {
-        return productOperation.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                SharkClusterConfig.PRODUCT_KEY, String.format( "Destroying cluster %s", clusterName ) );
     }
 
 
@@ -65,26 +57,27 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
                     if ( result.getStdOut().contains( "not installed" ) )
                     {
                         productOperation.addLog( String.format( "Shark is not installed, so not removed on node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
+                                                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
                     }
                     else
                     {
                         productOperation.addLog( String.format( "Shark is removed from node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
+                                                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
                     }
                 }
                 else
                 {
                     productOperation.addLog( String.format( "Error %s on node %s", result.getStdErr(),
-                            agent == null ? result.getAgentUUID() : agent.getHostname() ) );
+                                                            agent == null ? result.getAgentUUID() : agent.getHostname() ) );
                 }
             }
             productOperation.addLog( "Updating db..." );
-            if ( manager.getDbManager().deleteInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName() ) )
+            try
             {
+                manager.getPluginDao().deleteInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName() );
                 productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
             }
-            else
+            catch ( Exception ex )
             {
                 productOperation.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
             }
@@ -94,4 +87,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
             productOperation.addLogFailed( "Uninstallation failed, command timed out" );
         }
     }
+
+
 }
+
