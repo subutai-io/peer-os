@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.command.impl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.command.ExpiringCache;
+import org.safehaus.subutai.core.command.api.command.ExpiringCache;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNull;
 /**
  * Test for ExpiringCache class
  */
-public class ExpiringCacheUT
+public class ExpiringCacheTest
 {
 
     private final Object KEY = new Object();

@@ -12,10 +12,11 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.command.AbstractCommandRunner;
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.CommandStatus;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for CommandImpl class
  */
-public class CommandImplUT
+public class CommandImplTest
 {
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";
@@ -46,10 +47,24 @@ public class CommandImplUT
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullBuilder()
     {
         new CommandImpl( null, mock( Set.class ), mock( AbstractCommandRunner.class ) );
+    }
+
+
+    @Test( expected = NullPointerException.class )
+    public void constructorShouldFailNullBuilderBroadcast()
+    {
+        new CommandImpl( null, 1, mock( AbstractCommandRunner.class ) );
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorShouldFailZeroRequestsCountBroadcast()
+    {
+        new CommandImpl( mock( RequestBuilder.class ), 0, mock( AbstractCommandRunner.class ) );
     }
 
 
@@ -90,6 +105,16 @@ public class CommandImplUT
         command.appendResult( MockUtils.getTimedOutResponse( agentUUID, command.getCommandUUID() ) );
 
         assertTrue( command.hasCompleted() );
+    }
+
+
+    @Test( expected = CommandException.class )
+    public void shouldThrowCommandException() throws CommandException
+    {
+
+        command.setCommandStatus( CommandStatus.RUNNING );
+
+        command.execute();
     }
 
 

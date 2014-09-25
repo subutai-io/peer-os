@@ -75,4 +75,19 @@ public class CloneContainersMessage extends PeerCommandMessage
     {
         this.criteria = criteria;
     }
+
+
+    @Override
+    public String toString()
+    {
+        return "CloneContainersMessage{" +
+                "envId=" + envId +
+                ", template='" + template + '\'' +
+                ", numberOfNodes=" + numberOfNodes +
+                ", Strategy='" + Strategy + '\'' +
+                ", criteria=" + criteria +
+                ", result=" + result +
+                ", success=" + success +
+                '}';
+    }
 }

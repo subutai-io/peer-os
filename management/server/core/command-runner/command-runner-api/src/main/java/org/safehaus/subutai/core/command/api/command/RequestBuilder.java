@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.common.command;
+package org.safehaus.subutai.core.command.api.command;
 
 
 import java.util.List;
@@ -160,7 +160,7 @@ public class RequestBuilder
     public RequestBuilder withTimeout( int timeout )
     {
         Preconditions.checkArgument(
-                NumUtil.isNumBetween( timeout, Common.MIN_COMMAND_TIMEOUT_SEC, Common.MAX_COMMAND_TIMEOUT_SEC ),
+                NumUtil.isIntBetween( timeout, Common.MIN_COMMAND_TIMEOUT_SEC, Common.MAX_COMMAND_TIMEOUT_SEC ),
                 String.format( "Timeout is not in range %d to %d", Common.MIN_COMMAND_TIMEOUT_SEC,
                         Common.MAX_COMMAND_TIMEOUT_SEC ) );
 

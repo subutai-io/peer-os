@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.api;
 
 
-import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 
 
 /**
@@ -10,5 +10,5 @@ import org.safehaus.subutai.common.protocol.PeerCommand;
 public interface PeerCommandDispatcher
 {
 
-    public boolean invoke( PeerCommand peerCommand ) throws PeerCommandException;
+    public void invoke( PeerCommandMessage peerCommand );
 }

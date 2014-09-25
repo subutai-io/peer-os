@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.command.impl;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.command.AgentResultImpl;
+import org.safehaus.subutai.core.command.api.command.AgentResultImpl;
 import org.safehaus.subutai.common.protocol.Response;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test of AgentResult class
  */
-public class AgentResultUT
+public class AgentResultTest
 {
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";

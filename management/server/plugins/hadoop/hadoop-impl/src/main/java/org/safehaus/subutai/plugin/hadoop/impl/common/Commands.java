@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;

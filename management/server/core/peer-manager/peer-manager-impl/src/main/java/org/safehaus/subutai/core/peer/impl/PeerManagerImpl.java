@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -379,7 +379,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( CloneContainersMessage ccm )
+    public void createContainers( CloneContainersMessage ccm )
     {
         UUID envId = ccm.getEnvId();
         String template = ccm.getTemplate();
@@ -387,14 +387,15 @@ public class PeerManagerImpl implements PeerManager
         String strategy = ccm.getStrategy();
         try
         {
-            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
+            Set<Agent> result = containerManager.clone( envId, template, numberOfNodes, strategy, null );
+            ccm.setSuccess( true );
+            ccm.setResult( result );
         }
         catch ( ContainerCreateException e )
         {
-            LOG.error( e.getMessage() );
+            ccm.setSuccess( false );
+            ccm.setResult( e.toString() );
         }
-        //TODO: replace with empty set;
-        return null;
     }
 
 
@@ -449,44 +450,43 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public boolean invoke( PeerCommand peerCommand ) throws PeerException
+    @Override
+    public void invoke( PeerCommandMessage peerCommandMessage )
     {
-        boolean result = false;
-        switch ( peerCommand.getType() )
+        PeerContainer peerContainer = containerLookup( peerCommandMessage );
+        LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
+        switch ( peerCommandMessage.getType() )
         {
             case CLONE:
-                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
                 createContainers( ccm );
                 break;
             case START:
-                PeerContainer peerContainer = containerLookup( peerCommand );
-                result = startContainer( peerContainer );
+                peerCommandMessage.setSuccess( startContainer( peerContainer ) );
                 break;
             case STOP:
-                PeerContainer peerContainer1 = containerLookup( peerCommand );
-                result = stopContainer( peerContainer1 );
+                peerCommandMessage.setSuccess( stopContainer( peerContainer ) );
                 break;
             case ISCONNECTED:
-                PeerContainer peerContainer2 = containerLookup( peerCommand );
-                result = isContainerConnected( peerContainer2 );
+                peerCommandMessage.setSuccess( isContainerConnected( peerContainer ) );
                 break;
             default:
-                //TODO: log or exception?
+                peerCommandMessage.setResult( "Unknown command." );
                 break;
         }
-        return result;
+
+        LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
     }
 
 
-    private PeerContainer containerLookup( PeerCommand peerCommand ) throws PeerException
+    private PeerContainer containerLookup( PeerCommandMessage peerCommand )
     {
-
-        UUID agentId = peerCommand.getMessage().getAgentId();
-        PeerContainer container = findPeerContainer( agentId );
-        if ( container == null )
+        if ( peerCommand.getAgentId() == null )
         {
-            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
+            return null;
         }
+        UUID agentId = peerCommand.getAgentId();
+        PeerContainer container = findPeerContainer( agentId );
         return container;
     }
 
