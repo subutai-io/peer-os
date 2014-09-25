@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test of AgentResult class
  */
-public class AgentResultUT
+public class AgentResultTest
 {
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";

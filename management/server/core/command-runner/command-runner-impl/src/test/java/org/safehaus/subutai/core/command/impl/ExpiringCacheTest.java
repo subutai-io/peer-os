@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNull;
 /**
  * Test for ExpiringCache class
  */
-public class ExpiringCacheUT
+public class ExpiringCacheTest
 {
 
     private final Object KEY = new Object();

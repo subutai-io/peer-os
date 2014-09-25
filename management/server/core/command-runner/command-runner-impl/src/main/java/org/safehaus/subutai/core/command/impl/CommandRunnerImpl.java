@@ -37,6 +37,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
 
     private final CommunicationManager communicationManager;
     private final AgentManager agentManager;
+    private int inactiveCommandDropTimeout = Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
 
 
     public CommandRunnerImpl( CommunicationManager communicationManager, AgentManager agentManager )
@@ -48,6 +49,12 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
 
         this.communicationManager = communicationManager;
         this.agentManager = agentManager;
+    }
+
+
+    protected void setInactiveCommandDropTimeout( final int inactiveCommandDropTimeout )
+    {
+        this.inactiveCommandDropTimeout = inactiveCommandDropTimeout;
     }
 
 
@@ -107,8 +114,9 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
         CommandExecutor commandExecutor = new CommandExecutor( commandImpl, commandCallback );
 
         //put command to cache
-        boolean queued = commandExecutors.put( commandImpl.getCommandUUID(), commandExecutor,
-                Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 2000, new CommandExecutorExpiryCallback() );
+        boolean queued = commandExecutors
+                .put( commandImpl.getCommandUUID(), commandExecutor, inactiveCommandDropTimeout * 1000 + 2000,
+                        new CommandExecutorExpiryCallback() );
 
         if ( queued )
         {

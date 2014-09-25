@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for CacheEntry class
  */
-public class CacheEntryUT
+public class CacheEntryTest
 {
 
     private final Object SOME_VALUE = new Object();

@@ -18,7 +18,6 @@ import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
@@ -45,7 +44,7 @@ import static org.mockito.Mockito.verify;
 /**
  * Test for CommandRunner class
  */
-public class CommandRunnerImplUT
+public class CommandRunnerImplTest
 {
 
     private static ExecutorService exec;
@@ -134,12 +133,12 @@ public class CommandRunnerImplUT
 
 
     @Test
-    @Ignore
     public void commandShouldTimeout()
     {
         Assume.assumeTrue( allTests );
 
         Command command = MockUtils.getCommand( "ls", commandRunner, UUID.randomUUID(), 1 );
+        ( ( CommandRunnerImpl ) commandRunner ).setInactiveCommandDropTimeout( 1 );
 
         commandRunner.runCommand( command );
 
@@ -148,12 +147,13 @@ public class CommandRunnerImplUT
 
 
     @Test
-    @Ignore
     public void commandShouldTimeoutAsync()
     {
         Assume.assumeTrue( allTests );
 
         Command command = MockUtils.getCommand( "ls", commandRunner, UUID.randomUUID(), 1 );
+
+        ( ( CommandRunnerImpl ) commandRunner ).setInactiveCommandDropTimeout( 1 );
 
         commandRunner.runCommandAsync( command );
 

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for CommandImpl class
  */
-public class CommandImplUT
+public class CommandImplTest
 {
 
     private final String SOME_DUMMY_OUTPUT = "some dummy output";

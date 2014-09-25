@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Test for CommandExecutor class
  */
-public class CommandExecutorUT
+public class CommandExecutorTest
 {
 
     @Test(expected = NullPointerException.class)
