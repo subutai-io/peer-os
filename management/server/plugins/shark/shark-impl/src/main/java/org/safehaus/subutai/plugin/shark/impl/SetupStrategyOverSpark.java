@@ -1,11 +1,15 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
 public class SetupStrategyOverSpark extends SetupStartegyBase implements ClusterSetupStrategy
@@ -20,7 +24,68 @@ public class SetupStrategyOverSpark extends SetupStartegyBase implements Cluster
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
+        checkConfig();
+
+        if ( config.getSparkConfig() == null || config.getSparkConfig().getClusterName() == null )
+        {
+            throw new ClusterSetupException( "Spark cluster not defined" );
+        }
+        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkConfig().getClusterName() );
+        if ( sparkConfig == null )
+        {
+            throw new ClusterSetupException( String.format( "Spark cluster '%s' not found. Installation aborted",
+                                                            config.getClusterName() ) );
+        }
+
+        config.setNodes( sparkConfig.getAllNodes() );
+        checkConnected();
+
+        po.addLog( "Checking installed packages..." );
+
+        Command checkCmd = Commands.getCheckInstalledCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( checkCmd );
+        if ( !checkCmd.hasCompleted() )
+        {
+            throw new ClusterSetupException( "Failed to check installed packages. Installation aborted" );
+        }
+
+        for ( Agent node : config.getNodes() )
+        {
+            AgentResult result = checkCmd.getResults().get( node.getUuid() );
+            if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+            {
+                throw new ClusterSetupException( String.format(
+                        "Node %s already has Shark installed. Installation aborted",
+                        node.getHostname() ) );
+            }
+        }
+
+        po.addLog( "Updating db..." );
+        try
+        {
+            manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLog( "Cluster info saved to DB." );
+        }
+        catch ( Exception ex )
+        {
+            throw new ClusterSetupException( "Could not save cluster info to DB! Please see logs. Installation aborted" );
+        }
+
+        po.addLog( "Installing Shark..." );
+        Command installCommand = Commands.getInstallCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( installCommand );
+
+        if ( installCommand.hasSucceeded() )
+        {
+            po.addLog( "Installation succeeded." );
+            setupMasterIp( sparkConfig.getMasterNode() );
+        }
+        else
+        {
+            throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
+        }
+
+        return config;
     }
 
 

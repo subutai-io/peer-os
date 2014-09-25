@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
+import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.shark.impl.mock.SharkImplMock;
@@ -40,6 +41,7 @@ public class InstallOperationHandlerTest
     public void testWithExistingCluster()
     {
         SharkClusterConfig config = new SharkClusterConfig();
+        config.setSetupType( SetupType.OVER_SPARK );
         config.setClusterName( "test-cluster" );
         config.setNodes( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
 

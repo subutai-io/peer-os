@@ -12,9 +12,11 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
@@ -32,20 +34,24 @@ public class SharkImpl implements Shark
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private Spark sparkManager;
+    private Hadoop hadoopManager;
     private DbManager dbManager;
     private PluginDAO pluginDao;
     private Tracker tracker;
+    private EnvironmentManager environmentManager;
     private ExecutorService executor;
 
 
     public SharkImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                      Spark sparkManager )
+                      Spark sparkManager, Hadoop hadoopManager, EnvironmentManager environmentManager )
     {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.sparkManager = sparkManager;
+        this.hadoopManager = hadoopManager;
+        this.environmentManager = environmentManager;
 
         Commands.init( commandRunner );
     }
@@ -66,6 +72,18 @@ public class SharkImpl implements Shark
     public Spark getSparkManager()
     {
         return sparkManager;
+    }
+
+
+    public Hadoop getHadoopManager()
+    {
+        return hadoopManager;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
     }
 
 
