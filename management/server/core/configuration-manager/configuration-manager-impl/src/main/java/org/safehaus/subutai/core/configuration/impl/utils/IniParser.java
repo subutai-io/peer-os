@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -71,10 +71,10 @@ public class IniParser implements ConfigParser
 
 
     @Override
-    public JsonObject parserConfig( String pathToConfig, ConfigTypeEnum configTypeEnum )
+    public JsonObject parserConfig( String pathToConfig, ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configTypeEnum );
+        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configuraitonTypeEnum );
 
         Iterator<String> iterator = config.getKeys();
         List<JsonObject> fields = new ArrayList<>();

@@ -152,7 +152,7 @@ public class ConfigurationStep extends VerticalLayout
                 hadoopClusters.setValue( info );
             }
         }
-        else if ( clusters != null && !clusters.isEmpty())
+        else if ( clusters != null && !clusters.isEmpty() )
         {
             hadoopClusters.setValue( clusters.iterator().next() );
         }

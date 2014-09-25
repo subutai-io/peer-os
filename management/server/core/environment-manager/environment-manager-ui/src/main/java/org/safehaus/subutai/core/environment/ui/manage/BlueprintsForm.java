@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
 
 import com.vaadin.ui.Button;
@@ -17,12 +17,13 @@ import com.vaadin.ui.VerticalLayout;
 public class BlueprintsForm
 {
 
+    private static final String NO_BLUEPRINTS = "No blueprints found";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManagerUI managerUI;
+    private EnvironmentManagerPortalModule managerUI;
 
 
-    public BlueprintsForm( EnvironmentManagerUI managerUI )
+    public BlueprintsForm( EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
 
@@ -54,7 +55,7 @@ public class BlueprintsForm
         Table table = new Table( caption );
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "View", Button.class, null );
-        table.addContainerProperty( "Build environment", Button.class, null );
+        table.addContainerProperty( "Build", Button.class, null );
         table.addContainerProperty( "Delete", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -80,15 +81,14 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        BlueprintDetails details =
-                                new BlueprintDetails( "Blueprint details", managerUI.getEnvironmentManager() );
+                        BlueprintDetails details = new BlueprintDetails( "Blueprint details" );
                         details.setContent( environmentBuildTask.getEnvironmentBlueprint() );
                         contentRoot.getUI().addWindow( details );
                         details.setVisible( true );
                     }
                 } );
 
-                final Button buildEnvironmentButton = new Button( "Build Environment" );
+                final Button buildEnvironmentButton = new Button( "Build" );
                 buildEnvironmentButton.addClickListener( new Button.ClickListener()
                 {
                     @Override
@@ -111,7 +111,7 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Object rowId = environmentsTable.addItem( new Object[] {
+                environmentsTable.addItem( new Object[] {
                         environmentBuildTask.getEnvironmentBlueprint().getName(), viewButton, buildEnvironmentButton,
                         deleteBlueprintButton
                 }, null );
@@ -119,7 +119,7 @@ public class BlueprintsForm
         }
         else
         {
-            Notification.show( "There is no blueprints", "No blueprints found", Notification.Type.WARNING_MESSAGE );
+            Notification.show( NO_BLUEPRINTS );
         }
         environmentsTable.refreshRowCache();
     }

@@ -6,7 +6,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule"
         init-method="init" destroy-method="destroy">
     <property name="environmentManager" ref="environmentManager" />
     <property name="peerManager" ref="peerManager" />

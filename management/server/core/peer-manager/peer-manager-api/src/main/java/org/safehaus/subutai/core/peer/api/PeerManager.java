@@ -15,7 +15,8 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public interface PeerManager {
+public interface PeerManager
+{
 
     boolean register( Peer peer );
 
@@ -45,15 +46,15 @@ public interface PeerManager {
 
     public Set<Agent> createContainers( CloneContainersMessage ccm );
 
-    public boolean startContainer(PeerContainer container);
+    public boolean startContainer( PeerContainer container );
 
-    public boolean stopContainer(PeerContainer container);
+    public boolean stopContainer( PeerContainer container );
 
-    public boolean isContainerConnected(PeerContainer container);
+    public boolean isContainerConnected( PeerContainer container );
 
     public Set<PeerContainer> getContainers();
 
-    public void addContainer(PeerContainer peerContainer);
+    public void addContainer( PeerContainer peerContainer );
 
     public boolean invoke( PeerCommand peerCommand ) throws PeerException;
 }

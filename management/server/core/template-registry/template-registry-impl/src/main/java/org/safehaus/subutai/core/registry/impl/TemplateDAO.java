@@ -60,35 +60,6 @@ public class TemplateDAO
     }
 
 
-    /**
-     * Returns child templates of supplied parent
-     *
-     * @param parentTemplateName - name of parent template
-     * @param lxcArch - lxc arch of template
-     *
-     * @return {@code List<Template>}
-     */
-    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) throws DBException
-    {
-        if ( parentTemplateName != null && lxcArch != null )
-        {
-            try
-            {
-                ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where parent = ?",
-                        String.format( TEMPLATE_ARCH_FORMAT, parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
-
-                return getTemplatesFromResultSet( rs );
-            }
-            catch ( JsonSyntaxException ex )
-            {
-                LOG.error( "Error in geChildTemplates", ex );
-                throw new DBException( String.format( "Error in geChildTemplates %s", ex ) );
-            }
-        }
-        return Collections.emptyList();
-    }
-
-
     private List<Template> getTemplatesFromResultSet( ResultSet rs )
     {
         List<Template> list = new ArrayList<>();
@@ -106,6 +77,36 @@ public class TemplateDAO
             }
         }
         return list;
+    }
+
+
+    /**
+     * Returns child templates of supplied parent
+     *
+     * @param parentTemplateName - name of parent template
+     * @param lxcArch - lxc arch of template
+     *
+     * @return {@code List<Template>}
+     */
+    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) throws DBException
+    {
+        if ( parentTemplateName != null && lxcArch != null )
+        {
+            try
+            {
+                ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where parent = ?",
+                        String.format( TEMPLATE_ARCH_FORMAT, parentTemplateName.toLowerCase(),
+                                lxcArch.toLowerCase() ) );
+
+                return getTemplatesFromResultSet( rs );
+            }
+            catch ( JsonSyntaxException ex )
+            {
+                LOG.error( "Error in geChildTemplates", ex );
+                throw new DBException( String.format( "Error in geChildTemplates %s", ex ) );
+            }
+        }
+        return Collections.emptyList();
     }
 
 

@@ -242,7 +242,8 @@ public class TrackerImpl implements Tracker
                 }
                 //return if operation is completed
                 //or if time limit is reached
-                if ( po.getState() != ProductOperationState.RUNNING  || System.currentTimeMillis() - startedTs > maxOperationDurationMs)
+                if ( po.getState() != ProductOperationState.RUNNING
+                        || System.currentTimeMillis() - startedTs > maxOperationDurationMs )
                 {
                     return;
                 }

@@ -15,10 +15,10 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>mahout-plugin-api</module>
-    <module>mahout-plugin-impl</module>
-    <module>mahout-plugin-ui</module>
-    <module>mahout-plugin-cli</module>
-    <module>mahout-plugin-rest</module>
+    <module>mahout-api</module>
+    <module>mahout-impl</module>
+    <module>mahout-ui</module>
+    <module>mahout-cli</module>
+    <module>mahout-rest</module>
   </modules>
 </project>

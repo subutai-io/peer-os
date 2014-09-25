@@ -4,7 +4,8 @@ package org.safehaus.subutai.core.strategy.api;
 /**
  * Class for holding container placement strategy criteria.
  */
-public class Criteria {
+public class Criteria
+{
     private String id;
     // title for displaying in UI
     private String title;

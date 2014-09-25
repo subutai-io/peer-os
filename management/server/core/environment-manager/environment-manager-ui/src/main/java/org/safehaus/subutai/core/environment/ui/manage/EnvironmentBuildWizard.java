@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
 
@@ -33,10 +33,10 @@ public class EnvironmentBuildWizard extends DetailsWindow
     private EnvironmentBuildTask environmentBuildTask;
     private Table peersTable;
     private Table containerToPeerTable;
-    private EnvironmentManagerUI managerUI;
+    private EnvironmentManagerPortalModule managerUI;
 
 
-    public EnvironmentBuildWizard( final String caption, EnvironmentManagerUI managerUI,
+    public EnvironmentBuildWizard( final String caption, EnvironmentManagerPortalModule managerUI,
                                    EnvironmentBuildTask environmentBuildTask )
     {
         super( caption );
@@ -73,7 +73,8 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 close();
                 break;
             }
-            default:  {
+            default:
+            {
                 setContent( genPeersTable() );
                 break;
             }
@@ -81,13 +82,13 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    public EnvironmentManagerUI getManagerUI()
+    public EnvironmentManagerPortalModule getManagerUI()
     {
         return managerUI;
     }
 
 
-    public void setManagerUI( final EnvironmentManagerUI managerUI )
+    public void setManagerUI( final EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
     }

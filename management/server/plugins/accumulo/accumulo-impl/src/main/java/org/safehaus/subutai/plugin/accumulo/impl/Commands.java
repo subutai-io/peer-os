@@ -137,8 +137,8 @@ public class Commands extends CommandsSingleton
     public static Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
     {
         return createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s",
-                                slaveNode.getHostname() ) ), nodes );
+                String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s", slaveNode.getHostname() ) ),
+                nodes );
     }
 
 
@@ -161,8 +161,8 @@ public class Commands extends CommandsSingleton
     public static Command getAddPropertyCommand( String propertyName, String propertyValue, Set<Agent> agents )
     {
         return createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName,
-                                propertyValue ) ), agents );
+                String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName, propertyValue ) ),
+                agents );
     }
 
 
