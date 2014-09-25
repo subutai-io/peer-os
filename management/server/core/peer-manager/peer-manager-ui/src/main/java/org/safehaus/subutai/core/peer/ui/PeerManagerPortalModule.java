@@ -19,6 +19,7 @@ public class PeerManagerPortalModule implements PortalModule
     public static final String MODULE_IMAGE = "peer.png";
     public static final String MODULE_NAME = "Peer";
     private PeerManager peerManager;
+    public String localServicePort;
 
 
     public PeerManager getPeerManager()

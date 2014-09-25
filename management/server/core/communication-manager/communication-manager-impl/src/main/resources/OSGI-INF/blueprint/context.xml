@@ -17,12 +17,6 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <cm:property-placeholder persistent-id="Subutai" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="subutaiServicePort" value="8181" />
-    </cm:default-properties>
-  </cm:property-placeholder>
-
   <bean id="communicationService"
         class="org.safehaus.subutai.core.communication.impl.CommunicationManagerImpl"
         init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
@@ -32,7 +26,6 @@
     <property name="amqMaxPooledConnections" value="${amqMaxPooledConnections}" />
     <property name="amqMaxSenderPoolSize" value="${amqMaxSenderPoolSize}" />
     <property name="persistentMessages" value="${persistentMessages}" />
-    <property name="subutaiServicePort" value="${subutaiServicePort}" />
   </bean>
 
   <service ref="communicationService"

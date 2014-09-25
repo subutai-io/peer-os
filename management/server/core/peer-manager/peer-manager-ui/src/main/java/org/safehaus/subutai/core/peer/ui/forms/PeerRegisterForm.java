@@ -7,7 +7,6 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.core.communication.impl.CommunicationManagerImpl;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.ui.PeerManagerPortalModule;
@@ -63,8 +62,6 @@ public class PeerRegisterForm extends CustomComponent
     private TextField servicePortTextField;
 
     private PeerManagerPortalModule peerManagerPortalModule;
-
-    CommunicationManagerImpl communicationManager = new CommunicationManagerImpl();
 
 
     /**
@@ -295,7 +292,7 @@ public class PeerRegisterForm extends CustomComponent
 
 
                             WebClient local = WebClient.create( String.format( "http://%s:%s/cxf", "127.0.0.1",
-                                    communicationManager.getSubutaiServicePort() ) );
+                                    peerManagerPortalModule.localServicePort ) );
                             String localhostPeer =
                                     local.path( "peer/json" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
 
