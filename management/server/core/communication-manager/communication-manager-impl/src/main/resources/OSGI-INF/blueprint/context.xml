@@ -14,6 +14,11 @@
       <cm:property name="amqMaxPooledConnections" value="21" />
       <cm:property name="amqMaxSenderPoolSize" value="20" />
       <cm:property name="persistentMessages" value="false" />
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <cm:property-placeholder persistent-id="Subutai" update-strategy="none">
+    <cm:default-properties>
       <cm:property name="subutaiServicePort" value="8181" />
     </cm:default-properties>
   </cm:property-placeholder>
