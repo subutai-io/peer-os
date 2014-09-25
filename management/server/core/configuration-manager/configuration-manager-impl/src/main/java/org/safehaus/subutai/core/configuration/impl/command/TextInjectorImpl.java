@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.configuration.impl.command;
 
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;

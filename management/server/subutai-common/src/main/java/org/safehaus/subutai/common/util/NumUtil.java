@@ -12,7 +12,7 @@ public class NumUtil
     }
 
 
-    public static boolean isNumBetween( int num, int from, int to )
+    public static boolean isIntBetween( int num, int from, int to )
     {
         return num >= from && num <= to;
     }

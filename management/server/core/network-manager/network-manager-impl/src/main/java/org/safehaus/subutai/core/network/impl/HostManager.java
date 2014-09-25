@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.network.impl;
 
 import java.util.List;
 
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
