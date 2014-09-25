@@ -103,6 +103,6 @@ public class TrackerImplIT
 
         tracker.printOperationLog( source, po.getId(), 5 * 1000 );
 
-        assertEquals( testLog, myOut.toString() );
+        assertEquals( testLog, myOut.toString().trim() );
     }
 }
