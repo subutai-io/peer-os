@@ -269,8 +269,7 @@ public class Manager
         } );
     }
 
-
-    public void addClickListener( Button button )
+    public void addClickListener( final Button button )
     {
         if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) )
         {
@@ -284,12 +283,6 @@ public class Manager
             } );
             return;
         }
-
-        if ( config == null )
-        {
-            show( MESSAGE );
-            return;
-        }
         switch ( button.getCaption() )
         {
             case CHECK_ALL_BUTTON_CAPTION:
@@ -298,7 +291,14 @@ public class Manager
                     @Override
                     public void buttonClick( final Button.ClickEvent event )
                     {
-                        checkAllNodesStatus();
+                        if ( config == null )
+                        {
+                            show( MESSAGE );
+                        }
+                        else
+                        {
+                            checkAllNodesStatus();
+                        }
                     }
                 } );
                 break;
@@ -309,21 +309,36 @@ public class Manager
                     @Override
                     public void buttonClick( final Button.ClickEvent event )
                     {
-                        progressIcon.setVisible( true );
-                        disableOREnableAllButtonsOnTable( nodesTable, false );
-                        executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
-                                config.getMasterNode().getHostname(), new CompleteEvent()
+                        if ( config == null )
                         {
-                            @Override
-                            public void onComplete( String result )
+                            show( MESSAGE );
+                        }
+                        else
+                        {
+                            button.addClickListener( new Button.ClickListener()
                             {
-                                synchronized ( progressIcon )
+                                @Override
+                                public void buttonClick( final Button.ClickEvent event )
                                 {
-                                    disableOREnableAllButtonsOnTable( nodesTable, true );
-                                    checkAllNodesStatus();
+                                    progressIcon.setVisible( true );
+                                    disableOREnableAllButtonsOnTable( nodesTable, false );
+                                    executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
+                                            config.getMasterNode().getHostname(), new CompleteEvent()
+                                    {
+                                        @Override
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                                checkAllNodesStatus();
+                                            }
+                                        }
+                                    } ) );
                                 }
-                            }
-                        } ) );
+                            } );
+                        }
+
                     }
                 } );
                 break;
@@ -333,21 +348,35 @@ public class Manager
                     @Override
                     public void buttonClick( final Button.ClickEvent event )
                     {
-                        progressIcon.setVisible( true );
-                        disableOREnableAllButtonsOnTable( nodesTable, false );
-                        executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
-                                config.getMasterNode().getHostname(), new CompleteEvent()
+                        if ( config == null )
                         {
-                            @Override
-                            public void onComplete( String result )
+                            show( MESSAGE );
+                        }
+                        else
+                        {
+                            button.addClickListener( new Button.ClickListener()
                             {
-                                synchronized ( progressIcon )
+                                @Override
+                                public void buttonClick( final Button.ClickEvent event )
                                 {
-                                    disableOREnableAllButtonsOnTable( nodesTable, true );
-                                    checkAllNodesStatus();
+                                    progressIcon.setVisible( true );
+                                    disableOREnableAllButtonsOnTable( nodesTable, false );
+                                    executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
+                                            config.getMasterNode().getHostname(), new CompleteEvent()
+                                    {
+                                        @Override
+                                        public void onComplete( String result )
+                                        {
+                                            synchronized ( progressIcon )
+                                            {
+                                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                                checkAllNodesStatus();
+                                            }
+                                        }
+                                    } ) );
                                 }
-                            }
-                        } ) );
+                            } );
+                        }
                     }
                 } );
                 break;
