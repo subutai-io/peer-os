@@ -32,11 +32,10 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
             return;
         }
 
-        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( clusterName );
+        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkConfig().getClusterName() );
         if ( sparkConfig == null )
         {
-            productOperation
-                    .addLogFailed( String.format( "Spark cluster '%s' not found\nInstallation aborted", clusterName ) );
+            productOperation.addLogFailed( "Underlying Spark cluster not found: " + clusterName );
             return;
         }
 

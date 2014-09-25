@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -13,15 +12,15 @@ import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
 {
-    private final String lxcHostname;
+    private final String hostname;
 
 
-    public DestroyNodeOperationHandler( SharkImpl manager, String clusterName, String lxcHostname )
+    public DestroyNodeOperationHandler( SharkImpl manager, String clusterName, String hostname )
     {
         super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
+        this.hostname = hostname;
         this.productOperation = manager.getTracker().createProductOperation(
-                SharkClusterConfig.PRODUCT_KEY, String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
+                SharkClusterConfig.PRODUCT_KEY, String.format( "Destroying %s in %s", hostname, clusterName ) );
     }
 
 
@@ -36,18 +35,18 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             return;
         }
 
-        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )
         {
             productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+                    String.format( "Agent with hostname %s is not connected\nOperation aborted", hostname ) );
             return;
         }
 
         if ( !config.getNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s does not belong to cluster %s", hostname, clusterName ) );
             return;
         }
 
@@ -63,28 +62,18 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
 
         if ( uninstallCommand.hasCompleted() )
         {
-            AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
-            if ( result.getExitCode() != null && result.getExitCode() == 0 )
+            if ( uninstallCommand.hasSucceeded() )
             {
-                if ( result.getStdOut().contains( "not installed" ) )
-                {
-                    productOperation.addLog(
-                            String.format( "Shark is not installed, so not removed on node %s", agent.getHostname() ) );
-                }
-                else
-                {
-                    productOperation.addLog( String.format( "Shark is removed from node %s", agent.getHostname() ) );
-                }
+                productOperation.addLog( String.format( "Shark is removed from node %s", agent.getHostname() ) );
             }
             else
             {
-                productOperation
-                        .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
+                productOperation.addLog( "Failed to remove Shark: " + uninstallCommand.getAllErrors() );
             }
 
             config.getNodes().remove( agent );
-            productOperation.addLog( "Updating db..." );
 
+            productOperation.addLog( "Updating db..." );
             try
             {
                 manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
@@ -92,7 +81,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             }
             catch ( Exception ex )
             {
-                productOperation.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
+                productOperation.addLogFailed( "Failed to update cluster info: " + ex.getMessage() );
             }
         }
         else

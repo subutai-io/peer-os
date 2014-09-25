@@ -49,26 +49,17 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
 
         if ( uninstallCommand.hasCompleted() )
         {
-            for ( AgentResult result : uninstallCommand.getResults().values() )
+            for ( Agent a : config.getNodes() )
             {
-                Agent agent = manager.getAgentManager().getAgentByUUID( result.getAgentUUID() );
+                AgentResult result = uninstallCommand.getResults().get( a.getUuid() );
                 if ( result.getExitCode() != null && result.getExitCode() == 0 )
                 {
-                    if ( result.getStdOut().contains( "not installed" ) )
-                    {
-                        productOperation.addLog( String.format( "Shark is not installed, so not removed on node %s",
-                                                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                    }
-                    else
-                    {
-                        productOperation.addLog( String.format( "Shark is removed from node %s",
-                                                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                    }
+                    productOperation.addLog( String.format( "Shark removed from %s", a.getHostname() ) );
                 }
                 else
                 {
-                    productOperation.addLog( String.format( "Error %s on node %s", result.getStdErr(),
-                                                            agent == null ? result.getAgentUUID() : agent.getHostname() ) );
+                    productOperation.addLog(
+                            String.format( "Error on node %s: %s", a.getHostname(), result.getStdErr() ) );
                 }
             }
             productOperation.addLog( "Updating db..." );
@@ -79,7 +70,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
             }
             catch ( Exception ex )
             {
-                productOperation.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+                productOperation.addLogFailed( "Failed to update cluster info: " + ex.getMessage() );
             }
         }
         else
