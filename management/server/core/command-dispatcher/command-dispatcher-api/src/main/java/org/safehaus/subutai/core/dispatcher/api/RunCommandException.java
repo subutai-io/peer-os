@@ -1,4 +1,4 @@
-package org.safehaus.subutai.common.exception;
+package org.safehaus.subutai.core.dispatcher.api;
 
 
 /**
