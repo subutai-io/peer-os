@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.command.impl;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.command.AgentResultImpl;
+import org.safehaus.subutai.core.command.api.command.AgentResultImpl;
 import org.safehaus.subutai.common.protocol.Response;
 
 import static org.junit.Assert.assertEquals;

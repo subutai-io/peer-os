@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.packge.api.PackageInfo;
 import org.safehaus.subutai.core.packge.impl.DebPackageManager;

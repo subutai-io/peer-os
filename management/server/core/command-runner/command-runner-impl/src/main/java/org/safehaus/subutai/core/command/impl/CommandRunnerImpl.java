@@ -8,15 +8,15 @@ package org.safehaus.subutai.core.command.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.AbstractCommand;
-import org.safehaus.subutai.common.command.AbstractCommandRunner;
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandExecutor;
-import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AbstractCommand;
+import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.CommandExecutor;
+import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
+import org.safehaus.subutai.core.command.api.command.CommandStatus;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.RunCommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;

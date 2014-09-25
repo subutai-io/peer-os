@@ -1,4 +1,4 @@
-package org.safehaus.subutai.common.command;
+package org.safehaus.subutai.core.command.api.command;
 
 
 import java.util.Map;

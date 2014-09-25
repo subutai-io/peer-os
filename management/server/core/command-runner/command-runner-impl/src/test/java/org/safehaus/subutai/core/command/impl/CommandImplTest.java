@@ -12,11 +12,11 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.command.AbstractCommandRunner;
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.CommandStatus;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 
