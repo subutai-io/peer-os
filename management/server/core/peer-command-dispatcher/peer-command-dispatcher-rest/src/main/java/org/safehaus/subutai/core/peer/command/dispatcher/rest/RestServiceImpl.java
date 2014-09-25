@@ -152,11 +152,17 @@ public class RestServiceImpl implements RestService
         PeerCommandType type = PeerCommandType.valueOf( commandType );
         Class clazz = getMessageClass( type );
         PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
-        LOG.debug( String.format( "Before =============[%s]", commandMessage,
-                commandMessage != null ? commandMessage.toString() : "NULL" ) );
+        if ( commandMessage == null )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( "Could not restore command from JSON." )
+                           .build();
+        }
+
+        LOG.debug(
+                String.format( "Command before invoking PCD [%s]", commandMessage, commandMessage != null ? commandMessage.toString() : "NULL" ) );
         peerCommandDispatcher.invoke( commandMessage );
-        LOG.debug( String.format( "After =============[%s]", commandMessage,
-                commandMessage != null ? commandMessage.toString() : "NULL" ) );
+        LOG.debug(
+                String.format( "Command after invoking PCD [%s]", commandMessage, commandMessage != null ? commandMessage.toString() : "NULL" ) );
 
         if ( commandMessage.isSuccess() )
         {
