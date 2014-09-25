@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for LxcManagerImpl class
  */
-public class LxcManagerImplUT
+public class LxcManagerImplTest
 {
 
     private LxcManager lxcManager;
