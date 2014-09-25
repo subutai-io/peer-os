@@ -20,7 +20,7 @@ public class SharkImplMock extends SharkImpl
     public SharkImplMock()
     {
         super( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), new TrackerMock(),
-                mock( Spark.class ) );
+               mock( Spark.class ) );
     }
 
 
@@ -36,4 +36,7 @@ public class SharkImplMock extends SharkImpl
     {
         return clusterConfig;
     }
+
+
 }
+

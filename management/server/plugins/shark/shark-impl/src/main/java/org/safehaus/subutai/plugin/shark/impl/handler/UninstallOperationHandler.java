@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
 import java.util.UUID;
-
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -63,7 +62,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
                 Agent agent = manager.getAgentManager().getAgentByUUID( result.getAgentUUID() );
                 if ( result.getExitCode() != null && result.getExitCode() == 0 )
                 {
-                    if ( result.getStdOut().contains( "Package ksks-shark is not installed, so not removed" ) )
+                    if ( result.getStdOut().contains( "not installed" ) )
                     {
                         productOperation.addLog( String.format( "Shark is not installed, so not removed on node %s",
                                 agent == null ? result.getAgentUUID() : agent.getHostname() ) );

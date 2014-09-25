@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.impl;
 
 
+import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -25,12 +20,7 @@ import org.safehaus.subutai.plugin.shark.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.shark.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 
-import com.google.common.base.Preconditions;
 
-
-/**
- * @author dilshat
- */
 public class SharkImpl implements Shark
 {
 
@@ -97,6 +87,7 @@ public class SharkImpl implements Shark
     }
 
 
+    @Override
     public UUID installCluster( final SharkClusterConfig config )
     {
 
@@ -110,6 +101,7 @@ public class SharkImpl implements Shark
     }
 
 
+    @Override
     public UUID uninstallCluster( final String clusterName )
     {
 
@@ -121,6 +113,7 @@ public class SharkImpl implements Shark
     }
 
 
+    @Override
     public List<SharkClusterConfig> getClusters()
     {
         return dbManager.getInfo( SharkClusterConfig.PRODUCT_KEY, SharkClusterConfig.class );
@@ -134,6 +127,7 @@ public class SharkImpl implements Shark
     }
 
 
+    @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
 
@@ -145,6 +139,7 @@ public class SharkImpl implements Shark
     }
 
 
+    @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
 
@@ -156,6 +151,7 @@ public class SharkImpl implements Shark
     }
 
 
+    @Override
     public UUID actualizeMasterIP( final String clusterName )
     {
 
@@ -165,4 +161,7 @@ public class SharkImpl implements Shark
 
         return operationHandler.getTrackerId();
     }
+
+
 }
+

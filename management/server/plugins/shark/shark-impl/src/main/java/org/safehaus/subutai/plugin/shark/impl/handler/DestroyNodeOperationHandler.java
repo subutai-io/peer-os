@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
+import com.google.common.collect.Sets;
 import java.util.UUID;
-
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -10,8 +10,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
-
-import com.google.common.collect.Sets;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
@@ -76,7 +74,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
             if ( result.getExitCode() != null && result.getExitCode() == 0 )
             {
-                if ( result.getStdOut().contains( "Package ksks-shark is not installed, so not removed" ) )
+                if ( result.getStdOut().contains( "not installed" ) )
                 {
                     productOperation.addLog(
                             String.format( "Shark is not installed, so not removed on node %s", agent.getHostname() ) );

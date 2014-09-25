@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
+import com.google.common.base.Strings;
 import java.util.UUID;
-
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -11,8 +11,6 @@ import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-
-import com.google.common.base.Strings;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
@@ -92,7 +90,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         {
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( "ksks-shark" ) )
+            if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
             {
                 productOperation.addLogFailed(
                         String.format( "Node %s already has Shark installed. Installation aborted",

@@ -3,12 +3,10 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
@@ -30,7 +28,7 @@ public class InstallOperationHandlerTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testWithNullConfig()
     {
         handler = new InstallOperationHandler( mock, null );
@@ -43,7 +41,7 @@ public class InstallOperationHandlerTest
     {
         SharkClusterConfig config = new SharkClusterConfig();
         config.setClusterName( "test-cluster" );
-        config.setNodes( new HashSet<Agent>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
+        config.setNodes( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
 
         mock.setClusterConfig( config );
         handler = new InstallOperationHandler( mock, config );
@@ -54,4 +52,7 @@ public class InstallOperationHandlerTest
         Assert.assertTrue( po.getLog().toLowerCase().contains( config.getClusterName() ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
+
+
 }
+
