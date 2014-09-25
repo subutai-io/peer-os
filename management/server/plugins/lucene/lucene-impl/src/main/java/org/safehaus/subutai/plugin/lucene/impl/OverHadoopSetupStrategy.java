@@ -10,13 +10,13 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 
 
 class OverHadoopSetupStrategy extends LuceneSetupStrategy
 {
 
-    public OverHadoopSetupStrategy( LuceneImpl manager, Config config, ProductOperation po )
+    public OverHadoopSetupStrategy( LuceneImpl manager, LuceneConfig config, ProductOperation po )
     {
         super( manager, config, po );
     }
@@ -99,7 +99,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
 
             try
             {
-                manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getDbManager().saveInfo2( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
 
                 po.addLogDone( "Information updated in db" );
             }

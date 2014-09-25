@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.pig.api.Config;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
 
 import com.google.common.collect.Sets;
@@ -20,7 +20,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( PigConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -28,7 +28,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
     @Override
     public void run()
     {
-        Config config = manager.getCluster( clusterName );
+        PigConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             productOperation.addLogFailed(
@@ -61,7 +61,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             if ( result.getExitCode() != null && result.getExitCode() == 0 )
             {
                 if ( result.getStdOut().contains(
-                        String.format( "Package %s is not installed, so not removed", Config.PRODUCT_PACKAGE ) ) )
+                        String.format( "Package %s is not installed, so not removed", PigConfig.PRODUCT_PACKAGE ) ) )
                 {
                     productOperation.addLog(
                             String.format( "Pig is not installed, so not removed on node %s", agent.getHostname() ) );
@@ -81,8 +81,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             productOperation.addLog( "Updating db..." );
 
             if ( config.getNodes().isEmpty() ?
-                 manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) :
-                 manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
+                 manager.getDbManager().deleteInfo( PigConfig.PRODUCT_KEY, config.getClusterName() ) :
+                 manager.getDbManager().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config ) )
             {
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
             }

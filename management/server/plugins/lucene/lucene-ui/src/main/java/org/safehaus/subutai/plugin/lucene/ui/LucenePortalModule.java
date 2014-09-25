@@ -15,7 +15,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -53,13 +53,13 @@ public class LucenePortalModule implements PortalModule
     @Override
     public String getId()
     {
-        return Config.PRODUCT_KEY;
+        return LuceneConfig.PRODUCT_KEY;
     }
 
 
     public String getName()
     {
-        return Config.PRODUCT_KEY;
+        return LuceneConfig.PRODUCT_KEY;
     }
 
 

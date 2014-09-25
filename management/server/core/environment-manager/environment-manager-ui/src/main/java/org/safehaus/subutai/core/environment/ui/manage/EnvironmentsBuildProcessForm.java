@@ -15,6 +15,7 @@ import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionLi
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutor;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.executor.CloneCommandFactory;
+import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private static final String OK_ICON_SOURCE = "img/ok.png";
     private static final String ERROR_ICON_SOURCE = "img/cancel.png";
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
+    private static final String IMG = "img/spinner.gif";
     private AtomicInteger errorProcessed = null;
     private VerticalLayout contentRoot;
     private Table environmentsTable;
@@ -120,7 +122,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case NEW_PROCESS:
                     {
                         processButton = new Button( "Build" );
-                        progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
                         progressIcon.setVisible( false );
 
                         processButton.addClickListener( new Button.ClickListener()
@@ -148,7 +150,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case IN_PROGRESS:
                     {
                         processButton = new Button( "Terminate" );
-                        progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
                         progressIcon.setVisible( true );
                         processButton.addClickListener( new Button.ClickListener()
                         {
@@ -185,8 +187,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                // TODO create configure logic
-
                                 configureEnvironment( environmentBuildProcess );
                             }
                         } );
@@ -205,7 +205,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         }
         else
         {
-            Notification.show( "No build process tasks", Notification.Type.HUMANIZED_MESSAGE );
+            Notification.show( EnvAnswer.NO_BUILD_PROCESS.getAnswer() );
         }
         environmentsTable.refreshRowCache();
     }
@@ -237,7 +237,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl();
         buildProcessExecutor.addListener( this );
-        ExecutorService executor = Executors.newFixedThreadPool( 1 );
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         buildProcessExecutor.execute( executor,
                 new CloneCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
         executor.shutdown();
@@ -282,11 +282,11 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
                 if ( errorProcessed.intValue() == 0 )
                 {
-                    Notification.show( "Cloning containers finished successfully." );
+                    Notification.show( EnvAnswer.SUCCESS.getAnswer() );
                 }
                 else
                 {
-                    Notification.show( "Not all containers successfully created." );
+                    Notification.show( EnvAnswer.FAIL.getAnswer() );
                 }
             }
         } );
