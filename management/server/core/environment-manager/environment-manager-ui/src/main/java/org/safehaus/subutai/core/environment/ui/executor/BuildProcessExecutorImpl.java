@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+
 
 /**
  * Created by bahadyr on 9/23/14.
@@ -18,6 +20,14 @@ import java.util.concurrent.Future;
 public class BuildProcessExecutorImpl implements BuildProcessExecutor
 {
     private Set<BuildProcessExecutionListener> listeners = new HashSet<>();
+
+    private EnvironmentBuildProcess buildProcess;
+
+
+    public BuildProcessExecutorImpl( final EnvironmentBuildProcess buildProcess )
+    {
+        this.buildProcess = buildProcess;
+    }
 
 
     @Override
@@ -37,22 +47,22 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
         {
             public BuildProcessExecutionEvent call()
             {
-                fireEvent( new BuildProcessExecutionEvent( "name", "desc", BuildProcessExecutionEventType.START ) );
+                fireEvent( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.START ) );
                 try
                 {
                     BuildProcessCommand command = commandFactory.newCommand();
                     command.execute();
-                    return ( new BuildProcessExecutionEvent( "", "", BuildProcessExecutionEventType.SUCCESS ) );
+                    return ( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.SUCCESS ) );
                 }
                 catch ( BuildProcessExecutionException ce )
                 {
-                    return ( new BuildProcessExecutionEvent( "name", "desc", BuildProcessExecutionEventType.FAIL ) );
+                    return ( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.FAIL ) );
                 }
             }
         } );
 
 
-        ExecutorService waiter = Executors.newFixedThreadPool( 1 );
+        ExecutorService waiter = Executors.newSingleThreadExecutor();
         waiter.execute( new Runnable()
         {
             @Override
@@ -66,7 +76,7 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
                 }
                 catch ( InterruptedException | ExecutionException e )
                 {
-                    fireEvent( new BuildProcessExecutionEvent( "", "", BuildProcessExecutionEventType.FAIL ) );
+                    fireEvent( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.FAIL ) );
                 }
             }
         } );

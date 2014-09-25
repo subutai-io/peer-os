@@ -40,7 +40,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private static final String OK_ICON_SOURCE = "img/ok.png";
     private static final String ERROR_ICON_SOURCE = "img/cancel.png";
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
-    private static final String IMG = "img/spinner.gif";
+//    private static final String IMG = "img/spinner.gif";
     private AtomicInteger errorProcessed = null;
     private VerticalLayout contentRoot;
     private Table environmentsTable;
@@ -114,7 +114,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 } );
 
                 Button processButton = null;
-                Embedded progressIcon = null;
+//                Embedded progressIcon = null;
                 Button destroyButton = null;
 
                 switch ( environmentBuildProcess.getProcessStatusEnum() )
@@ -122,8 +122,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case NEW_PROCESS:
                     {
                         processButton = new Button( "Build" );
-                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
-                        progressIcon.setVisible( false );
+//                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
+//                        progressIcon.setVisible( false );
 
                         processButton.addClickListener( new Button.ClickListener()
                         {
@@ -150,8 +150,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case IN_PROGRESS:
                     {
                         processButton = new Button( "Terminate" );
-                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
-                        progressIcon.setVisible( true );
+//                        progressIcon = new Embedded( "", new ThemeResource( IMG ) );
+//                        progressIcon.setVisible( true );
                         processButton.addClickListener( new Button.ClickListener()
                         {
                             @Override
@@ -165,8 +165,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case FAILED:
                     {
                         processButton = new Button( "Destroy" );
-                        progressIcon = new Embedded( "", new ThemeResource( "img/cancel.png" ) );
-                        progressIcon.setVisible( true );
+//                        progressIcon = new Embedded( "", new ThemeResource( "img/cancel.png" ) );
+//                        progressIcon.setVisible( true );
                         processButton.addClickListener( new Button.ClickListener()
                         {
                             @Override
@@ -180,8 +180,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     case SUCCESSFUL:
                     {
                         processButton = new Button( "Configure" );
-                        progressIcon = new Embedded( "", new ThemeResource( "img/ok.png" ) );
-                        progressIcon.setVisible( true );
+//                        progressIcon = new Embedded( "", new ThemeResource( "img/ok.png" ) );
+//                        progressIcon.setVisible( true );
                         processButton.addClickListener( new Button.ClickListener()
                         {
                             @Override
@@ -198,9 +198,9 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     }
                 }
                 environmentsTable.addItem( new Object[] {
-                        environmentBuildProcess.getUuid(), progressIcon, viewEnvironmentInfoButton, processButton,
+                        environmentBuildProcess.getUuid(), null, viewEnvironmentInfoButton, processButton,
                         destroyButton
-                }, null );
+                }, environmentBuildProcess.getUuid().toString() );
             }
         }
         else
@@ -235,7 +235,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
         errorProcessed = new AtomicInteger( 0 );
 
-        BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl();
+        BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl(environmentBuildProcess);
         buildProcessExecutor.addListener( this );
         ExecutorService executor = Executors.newSingleThreadExecutor();
         buildProcessExecutor.execute( executor,
