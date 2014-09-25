@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.communication.api.CommandJson;
 import org.slf4j.LoggerFactory;
 
@@ -143,6 +144,26 @@ public class CommunicationManagerImplIT
                 return true;
             }
         } );
+    }
+
+
+    @Test
+    public void testBroadcastMessage() throws JMSException
+    {
+        UUID uuid = UUID.randomUUID();
+        Request request = TestUtils.getRequestTemplate( uuid );
+        //setup listener
+
+        MessageConsumer consumer = createConsumer( Common.BROADCAST_TOPIC );
+
+        communicationManagerImpl.sendBroadcastRequest( request );
+
+
+        TextMessage txtMsg = ( TextMessage ) consumer.receive();
+        String jsonCmd = txtMsg.getText();
+        Request request2 = CommandJson.getRequest( jsonCmd );
+
+        assertEquals( request.getUuid(), request2.getUuid() );
     }
 
 
