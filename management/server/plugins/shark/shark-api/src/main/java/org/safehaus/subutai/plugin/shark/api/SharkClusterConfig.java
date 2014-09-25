@@ -1,29 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.api;
 
 
 import java.util.Set;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-/**
- * @author dilshat
- */
 public class SharkClusterConfig implements ConfigBase
 {
 
     public static final String PRODUCT_KEY = "Shark";
+    public static final String TEMPLATE_NAME = "shark";
     private String clusterName = "";
 
     private Set<Agent> nodes;
 
 
+    @Override
     public String getClusterName()
     {
         return clusterName;
@@ -60,4 +53,7 @@ public class SharkClusterConfig implements ConfigBase
     {
         return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
     }
+
+
 }
+
