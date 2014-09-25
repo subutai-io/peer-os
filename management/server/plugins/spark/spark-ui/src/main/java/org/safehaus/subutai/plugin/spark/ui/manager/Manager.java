@@ -72,7 +72,6 @@ public class Manager
     private final Hadoop hadoop;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
-    private final String message = "No cluster is installed !";
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private SparkClusterConfig config;
 
@@ -653,7 +652,7 @@ public class Manager
 
         addClickListenerToCheckButton( master, resultHolder, checkBtn, startBtn, stopBtn );
         addClickListenerToStartButton( master, checkBtn, startBtn, stopBtn );
-        addClickListenerToStopButton( master, checkBtn, startBtn, startBtn );
+        addClickListenerToStopButton( master, checkBtn, startBtn, stopBtn );
     }
 
 
@@ -720,6 +719,7 @@ public class Manager
                             {
                                 synchronized ( progressIcon )
                                 {
+                                    enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).click();
                                 }
                             }
@@ -781,6 +781,7 @@ public class Manager
                             {
                                 synchronized ( progressIcon )
                                 {
+                                    enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).click();
                                 }
                             }
