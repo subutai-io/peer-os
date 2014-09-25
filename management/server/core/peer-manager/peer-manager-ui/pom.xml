@@ -55,6 +55,10 @@
       <artifactId>slf4j-simple</artifactId>
       <version>${org.slf4j.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>communication-manager-impl</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
