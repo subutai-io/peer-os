@@ -237,7 +237,7 @@ public class TrackerImpl implements Tracker
                 //print log if anything new is appended to it
                 if ( logSize != po.getLog().length() )
                 {
-                    LOG.info( po.getLog().substring( logSize, po.getLog().length() ) );
+                    System.out.println( po.getLog().substring( logSize, po.getLog().length() ) );
                     logSize = po.getLog().length();
                 }
                 //return if operation is completed

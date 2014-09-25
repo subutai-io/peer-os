@@ -124,8 +124,7 @@ public class MonitorView extends VerticalLayout implements View
             "}";
 
 
-    @Override
-    public void enter( ViewChangeEvent event )
+    public MonitorView()
     {
         setSizeFull();
         addStyleName( "reports" );
@@ -209,5 +208,12 @@ public class MonitorView extends VerticalLayout implements View
         {
             LOG.info( ex.getMessage() );
         }
+    }
+
+
+    @Override
+    public void enter( ViewChangeEvent event )
+    {
+
     }
 }
