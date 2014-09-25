@@ -49,6 +49,7 @@
     <dependency>
       <groupId>com.esotericsoftware.yamlbeans</groupId>
       <artifactId>yamlbeans</artifactId>
+      <version>${yamlbeans.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-configuration</groupId>
@@ -57,6 +58,7 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+      <version>${com.google.code.gson.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
