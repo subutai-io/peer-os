@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Test for CommunicationManager class <p/> TODO Add embedded broker for unit tests
+ * Test for CommunicationManager class
  */
 public class CommunicationManagerImplIT
 {
