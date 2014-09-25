@@ -7,9 +7,11 @@ package org.safehaus.subutai.core.communication.impl;
 
 
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
+import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -18,14 +20,16 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.communication.api.CommandJson;
+import org.slf4j.LoggerFactory;
+
+import com.jayway.awaitility.Awaitility;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,28 +39,32 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for CommunicationManager class <p/> TODO Add embedded broker for unit tests
  */
-@Ignore
 public class CommunicationManagerImplIT
 {
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
 
-    private static CommunicationManagerImpl communicationManagerImpl = null;
+    private CommunicationManagerImpl communicationManagerImpl = null;
+    private static final String SERVICE_QUEUE_NAME = "SERVICE_QUEUE";
 
 
-    @BeforeClass
-    public static void setUpClass()
+    @Before
+    public void setUpClass() throws Exception
     {
+
+        //init target object
         communicationManagerImpl = new CommunicationManagerImpl();
-        communicationManagerImpl.setAmqMaxMessageToAgentTtlSec( 5 );
-        communicationManagerImpl.setAmqUrl( "some-url" );
-        communicationManagerImpl.setAmqMaxSenderPoolSize( 1 );
-        communicationManagerImpl.setAmqMaxPooledConnections( 1 );
-        communicationManagerImpl.setAmqServiceTopic( "SERVICE_QUEUE" );
+        communicationManagerImpl.setAmqMaxMessageToAgentTtlSec( 30 );
+        communicationManagerImpl.setAmqUrl( "vm://localhost?broker.persistent=false" );
+        communicationManagerImpl.setPersistentMessages( false );
+        communicationManagerImpl.setAmqMaxSenderPoolSize( 5 );
+        communicationManagerImpl.setAmqMaxPooledConnections( 5 );
+        communicationManagerImpl.setAmqServiceTopic( SERVICE_QUEUE_NAME );
         communicationManagerImpl.init();
     }
 
 
-    @AfterClass
-    public static void tearDownClass()
+    @After
+    public void tearDownClass() throws Exception
     {
         communicationManagerImpl.destroy();
     }
@@ -89,18 +97,14 @@ public class CommunicationManagerImplIT
     @Test
     public void testSendRequest() throws JMSException
     {
-        Connection connection;
         UUID uuid = UUID.randomUUID();
-        //setup listener
-        connection = communicationManagerImpl.createConnection();
-        connection.start();
-        Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-        Destination testQueue = session.createQueue( uuid.toString() );
-        MessageConsumer consumer = session.createConsumer( testQueue );
-
         Request request = TestUtils.getRequestTemplate( uuid );
+        //setup listener
+
+        MessageConsumer consumer = createConsumer( uuid.toString() );
 
         communicationManagerImpl.sendRequest( request );
+
 
         TextMessage txtMsg = ( TextMessage ) consumer.receive();
         String jsonCmd = txtMsg.getText();
@@ -111,52 +115,51 @@ public class CommunicationManagerImplIT
 
 
     @Test
-    public void testMessageReception() throws JMSException, InterruptedException
+    public void testMessageReception() throws JMSException
     {
-        Connection connection;
-
-        TestResponseListener responseListener = new TestResponseListener();
+        //setup listener
+        final TestResponseListener responseListener = new TestResponseListener();
         communicationManagerImpl.addListener( responseListener );
 
-        //setup listener
-
-        connection = communicationManagerImpl.createConnection();
-        connection.start();
-        final Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-        Destination testQueue = session.createQueue( "SERVICE_QUEUE" );
-        final MessageProducer producer = session.createProducer( testQueue );
 
         final Response response = new Response();
+        Connection connection = communicationManagerImpl.createConnection();
+        connection.start();
+        final Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+        Destination topic = session.createTopic( SERVICE_QUEUE_NAME );
+        final MessageProducer producer = session.createProducer( topic );
 
-        Thread t = new Thread( new Runnable()
+        BytesMessage message = session.createBytesMessage();
+        message.writeBytes( CommandJson.getResponse( response ).getBytes() );
+        producer.send( message );
+
+        Awaitility.await().atMost( 1, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+                  .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
         {
 
-            public void run()
+            public Boolean call() throws Exception
             {
-                try
-                {
-                    producer.send( session.createTextMessage( CommandJson.getResponse( response ) ) );
-                }
-                catch ( JMSException ex )
-                {
-                    Logger.getLogger( CommunicationManagerImplIT.class.getName() ).log( Level.SEVERE, null, ex );
-                }
+                responseListener.signal.acquire();
+                return true;
             }
         } );
-        t.start();
-        synchronized ( responseListener.signal )
-        {
-            responseListener.signal.wait();
-        }
+    }
 
-        assertEquals( response.getUuid(), responseListener.response.getUuid() );
+
+    private MessageConsumer createConsumer( String topicName ) throws JMSException
+    {
+        Connection connection = communicationManagerImpl.createConnection();
+        connection.start();
+        Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+        Destination topic = session.createTopic( topicName );
+        return session.createConsumer( topic );
     }
 
 
     private static class TestResponseListener implements ResponseListener
     {
 
-        private final Object signal = new Object();
+        private final Semaphore signal = new Semaphore( 0 );
         private Response response;
 
 
@@ -165,10 +168,7 @@ public class CommunicationManagerImplIT
 
             this.response = response;
 
-            synchronized ( signal )
-            {
-                signal.notify();
-            }
+            signal.release();
         }
     }
 }
