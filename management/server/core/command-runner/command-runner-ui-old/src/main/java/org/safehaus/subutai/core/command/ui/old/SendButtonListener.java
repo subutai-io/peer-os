@@ -114,7 +114,7 @@ public class SendButtonListener implements Button.ClickListener
         }
 
         if ( !( StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) && NumUtil
-                .isNumBetween( Integer.valueOf( form.timeoutTxtFld.getValue() ), Common.MIN_COMMAND_TIMEOUT_SEC,
+                .isIntBetween( Integer.valueOf( form.timeoutTxtFld.getValue() ), Common.MIN_COMMAND_TIMEOUT_SEC,
                         Common.MAX_COMMAND_TIMEOUT_SEC ) ) )
         {
 

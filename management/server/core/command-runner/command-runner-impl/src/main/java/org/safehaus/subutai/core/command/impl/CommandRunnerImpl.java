@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.command.CommandExecutor;
 import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.RunCommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.settings.Common;
@@ -125,6 +126,10 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
                     communicationManager.sendRequest( request );
                 }
             }
+        }
+        else
+        {
+            throw new RunCommandException( "Could not queue command for processing" );
         }
     }
 
