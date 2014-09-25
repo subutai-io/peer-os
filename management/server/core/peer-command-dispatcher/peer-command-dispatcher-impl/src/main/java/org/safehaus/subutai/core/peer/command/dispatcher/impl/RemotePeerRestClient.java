@@ -6,6 +6,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,21 +86,34 @@ public class RemotePeerRestClient
         {
             baseUrl = String.format( baseUrl, ip, port );
             LOG.info( baseUrl );
+
             WebClient client = WebClient.create( baseUrl );
 
             Form form = new Form();
             form.set( "commandType", ccm.getType().toString() );
             form.set( "command", ccm.toJson() );
 
-            Response response =
-                    client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE ).accept( MediaType.APPLICATION_JSON ).form( form );
+            Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                      .accept( MediaType.APPLICATION_JSON ).form( form );
+
+            String jsonObject = response.readEntity( String.class );
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                LOG.info( response.toString() );
+                //                LOG.info( response.toString() );
+                LOG.info( response.getEntity().toString() );
+                LOG.info( jsonObject );
+                PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
+                ccm.setResult( result.getResult() );
+                LOG.info( String.format( "RESULT: %s", result.toString() ) );
+
                 return true;
             }
-            return false;
+            else {
+                ccm.setResult( jsonObject );
+                ccm.setSuccess( false );
+                return false;
+            }
         }
         catch ( Exception e )
         {

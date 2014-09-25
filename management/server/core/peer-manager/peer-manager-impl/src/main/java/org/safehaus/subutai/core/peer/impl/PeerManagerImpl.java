@@ -379,7 +379,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( CloneContainersMessage ccm )
+    public void createContainers( CloneContainersMessage ccm )
     {
         UUID envId = ccm.getEnvId();
         String template = ccm.getTemplate();
@@ -387,14 +387,15 @@ public class PeerManagerImpl implements PeerManager
         String strategy = ccm.getStrategy();
         try
         {
-            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
+            Set<Agent> result = containerManager.clone( envId, template, numberOfNodes, strategy, null );
+            ccm.setSuccess( true );
+            ccm.setResult( result );
         }
         catch ( ContainerCreateException e )
         {
-            LOG.error( e.getMessage() );
+            ccm.setSuccess( false );
+            ccm.setResult( e.toString() );
         }
-        //TODO: replace with empty set;
-        return null;
     }
 
 
@@ -450,19 +451,15 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public void invoke( PeerCommandMessage peerCommandMessage ) throws PeerException
+    public void invoke( PeerCommandMessage peerCommandMessage )
     {
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
-        LOG.debug( String.format( "1=================[%s]", peerCommandMessage ) );
+        LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
         switch ( peerCommandMessage.getType() )
         {
             case CLONE:
                 CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
-                Set<Agent> agents = createContainers( ccm );
-                ccm.setResult( agents );
-                ccm.setSuccess( true );
-                LOG.info( String.format( "2=================[%s]", peerCommandMessage ) );
-
+                createContainers( ccm );
                 break;
             case START:
                 peerCommandMessage.setSuccess( startContainer( peerContainer ) );
@@ -474,9 +471,11 @@ public class PeerManagerImpl implements PeerManager
                 peerCommandMessage.setSuccess( isContainerConnected( peerContainer ) );
                 break;
             default:
-                //TODO: log or exception?
+                peerCommandMessage.setResult( "Unknown command." );
                 break;
         }
+
+        LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
     }
 
 
