@@ -35,6 +35,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <version>${com.google.guava.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
