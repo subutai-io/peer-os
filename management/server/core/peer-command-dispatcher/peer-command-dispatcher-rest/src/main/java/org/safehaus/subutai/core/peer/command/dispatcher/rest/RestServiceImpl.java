@@ -1,18 +1,19 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 
 
-import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,10 +32,17 @@ public class RestServiceImpl implements RestService
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
+    private PeerCommandDispatcher peerCommandDispatcher;
 
 
     public RestServiceImpl()
     {
+    }
+
+
+    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
+    {
+        this.peerCommandDispatcher = peerCommandDispatcher;
     }
 
 
@@ -71,8 +79,8 @@ public class RestServiceImpl implements RestService
     {
         CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
         LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
-        Set<Agent> list = ( Set<Agent> ) peerManager.createContainers( ccm );
-        return JsonUtil.toJson( list );
+        peerManager.createContainers( ccm );
+        return JsonUtil.toJson( ccm.getResult() );
     }
 
 
@@ -133,6 +141,42 @@ public class RestServiceImpl implements RestService
         catch ( JsonSyntaxException | PeerException e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response invoke( final String commandType, final String command )
+    {
+
+        PeerCommandType type = PeerCommandType.valueOf( commandType );
+        Class clazz = getMessageClass( type );
+        PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
+        LOG.debug( String.format( "Before =============[%s]", commandMessage,
+                commandMessage != null ? commandMessage.toString() : "NULL" ) );
+        peerCommandDispatcher.invoke( commandMessage );
+        LOG.debug( String.format( "After =============[%s]", commandMessage,
+                commandMessage != null ? commandMessage.toString() : "NULL" ) );
+
+        if ( commandMessage.isSuccess() )
+        {
+            return Response.ok().entity( commandMessage.toJson() ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( commandMessage.toJson() ).build();
+        }
+    }
+
+
+    private Class getMessageClass( final PeerCommandType type )
+    {
+        switch ( type )
+        {
+            case CLONE:
+                return CloneContainersMessage.class;
+            default:
+                return PeerCommandMessage.class;
         }
     }
 
