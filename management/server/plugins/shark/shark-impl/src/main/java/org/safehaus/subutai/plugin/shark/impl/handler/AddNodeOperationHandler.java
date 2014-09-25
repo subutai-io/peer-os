@@ -51,7 +51,12 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
             return;
         }
 
-        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkConfig().getClusterName() );
+        if ( config.getSparkClusterName() == null )
+        {
+            productOperation.addLogFailed( "Spark cluster name not specified" );
+            return;
+        }
+        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
             productOperation.addLogFailed( String.format( "Underlying Spark cluster '%s' not found.", clusterName ) );

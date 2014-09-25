@@ -17,6 +17,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
@@ -118,6 +119,15 @@ public class SharkImpl implements Shark
         Preconditions.checkNotNull( config, "Configuration is null" );
 
         AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID installCluster( SharkClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config, hadoopConfig );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

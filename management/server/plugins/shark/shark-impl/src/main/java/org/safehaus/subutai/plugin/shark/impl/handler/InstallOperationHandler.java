@@ -19,14 +19,22 @@ import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
 {
     private final SharkClusterConfig config;
+    private HadoopClusterConfig hadoopConfig;
+
+
+    public InstallOperationHandler( SharkImpl manager, SharkClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        super( manager, config.getClusterName() );
+        this.config = config;
+        this.hadoopConfig = hadoopConfig;
+        this.productOperation = manager.getTracker().createProductOperation(
+                SharkClusterConfig.PRODUCT_KEY, String.format( "Installing %s", SharkClusterConfig.PRODUCT_KEY ) );
+    }
 
 
     public InstallOperationHandler( SharkImpl manager, SharkClusterConfig config )
     {
-        super( manager, config.getClusterName() );
-        this.config = config;
-        this.productOperation = manager.getTracker().createProductOperation(
-                SharkClusterConfig.PRODUCT_KEY, String.format( "Installing %s", SharkClusterConfig.PRODUCT_KEY ) );
+        this( manager, config, null );
     }
 
 
@@ -38,8 +46,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         ClusterSetupStrategy css;
         if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
         {
-            HadoopClusterConfig hadoopConfig = config.getHadoopConfig();
-            SparkClusterConfig sparkConfig = config.getSparkConfig();
+            SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
             if ( hadoopConfig == null )
             {
                 po.addLogFailed( "No Hadoop configuration specified" );

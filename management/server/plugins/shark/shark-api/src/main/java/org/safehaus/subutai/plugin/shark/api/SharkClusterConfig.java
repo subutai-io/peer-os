@@ -4,8 +4,6 @@ package org.safehaus.subutai.plugin.shark.api;
 import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
 public class SharkClusterConfig implements ConfigBase
@@ -16,8 +14,8 @@ public class SharkClusterConfig implements ConfigBase
 
     private SetupType setupType;
     private String clusterName = "";
-    private SparkClusterConfig sparkConfig;
-    private HadoopClusterConfig hadoopConfig;
+    private String sparkClusterName = "";
+    private String hadoopClusterName = "";
     private Set<Agent> nodes;
 
 
@@ -65,27 +63,27 @@ public class SharkClusterConfig implements ConfigBase
     }
 
 
-    public SparkClusterConfig getSparkConfig()
+    public String getSparkClusterName()
     {
-        return sparkConfig;
+        return sparkClusterName;
     }
 
 
-    public void setSparkConfig( SparkClusterConfig sparkConfig )
+    public void setSparkClusterName( String sparkClusterName )
     {
-        this.sparkConfig = sparkConfig;
+        this.sparkClusterName = sparkClusterName;
     }
 
 
-    public HadoopClusterConfig getHadoopConfig()
+    public String getHadoopClusterName()
     {
-        return hadoopConfig;
+        return hadoopClusterName;
     }
 
 
-    public void setHadoopConfig( HadoopClusterConfig hadoopConfig )
+    public void setHadoopClusterName( String hadoopClusterName )
     {
-        this.hadoopConfig = hadoopConfig;
+        this.hadoopClusterName = hadoopClusterName;
     }
 
 
