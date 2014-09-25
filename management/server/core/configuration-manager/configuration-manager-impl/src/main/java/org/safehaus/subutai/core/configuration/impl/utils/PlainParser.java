@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.configuration.impl.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 
 import com.google.gson.JsonObject;
 
@@ -25,10 +25,10 @@ public class PlainParser implements ConfigParser
 
 
     @Override
-    public JsonObject parserConfig( final String pathToConfig, final ConfigTypeEnum configTypeEnum )
+    public JsonObject parserConfig( final String pathToConfig, final ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configTypeEnum );
+        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configuraitonTypeEnum );
 
         List<JsonObject> fields = new ArrayList<>();
         String key = "plain";

@@ -81,6 +81,10 @@
   <properties>
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Sonar -->
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <!-- Runtime -->
     <karaf.version>2.3.7</karaf.version>
     <karaf.features.version>2.3.7</karaf.features.version>
@@ -1410,6 +1414,32 @@
   </dependencyManagement>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.2.201409121644</version>
+        <configuration>
+          <destFile>${sonar.jacoco.reportPath}</destFile>
+          <append>true</append>
+        </configuration>
+        <executions>
+          <execution>
+            <id>jacoco-initialize</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-site</id>
+            <phase>install</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>

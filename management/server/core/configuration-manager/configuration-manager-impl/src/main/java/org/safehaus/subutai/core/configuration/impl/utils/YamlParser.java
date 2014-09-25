@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 import org.yaml.snakeyaml.Yaml;
 
 import com.esotericsoftware.yamlbeans.YamlException;
@@ -89,10 +89,10 @@ public class YamlParser implements ConfigParser
 
 
     @Override
-    public JsonObject parserConfig( final String pathToConfig, final ConfigTypeEnum configTypeEnum )
+    public JsonObject parserConfig( final String pathToConfig, final ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configTypeEnum );
+        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configuraitonTypeEnum );
 
         String content = FileUtil.getContent( pathToConfig, this );
 

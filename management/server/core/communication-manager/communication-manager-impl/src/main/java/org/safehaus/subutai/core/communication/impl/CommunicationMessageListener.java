@@ -117,7 +117,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception ex )
         {
-            LOG.error(  "Error in notifyListeners", ex );
+            LOG.error( "Error in notifyListeners", ex );
         }
     }
 
@@ -131,7 +131,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception e )
         {
-            LOG.error(  "Error notifying message listeners", e );
+            LOG.error( "Error notifying message listeners", e );
         }
         return false;
     }
@@ -153,7 +153,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception ex )
         {
-            LOG.error(  "Error to add a listener:", ex );
+            LOG.error( "Error to add a listener:", ex );
         }
     }
 
@@ -171,7 +171,7 @@ class CommunicationMessageListener implements MessageListener
         }
         catch ( Exception ex )
         {
-            LOG.error(  "Error in removeListener", ex );
+            LOG.error( "Error in removeListener", ex );
         }
     }
 

@@ -61,9 +61,9 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 
-@Theme( "dashboard" )
-@SuppressWarnings( "serial" )
-@Title( "Subutai" )
+@Theme("dashboard")
+@SuppressWarnings("serial")
+@Title("Subutai")
 
 public class MainUI extends UI
 {

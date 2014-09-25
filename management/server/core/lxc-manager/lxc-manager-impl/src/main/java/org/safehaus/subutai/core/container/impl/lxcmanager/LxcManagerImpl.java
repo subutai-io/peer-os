@@ -37,7 +37,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.core.container.impl.strategy.RoundRobinStrategy;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,20 +48,19 @@ import com.google.common.base.Strings;
 public class LxcManagerImpl implements LxcManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( LxcManagerImpl.class );
-
-    private final Pattern loadAvgPattern = Pattern.compile( "load average: (.*)" );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    private final Pattern loadAvgPattern = Pattern.compile( "load average: (.*)" );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
-    private Monitor monitor;
+    private Monitoring monitoring;
 
 
-    public LxcManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitor monitor )
+    public LxcManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring )
     {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
-        this.monitor = monitor;
+        this.monitoring = monitoring;
 
         Commands.init( commandRunner );
     }
@@ -71,7 +70,7 @@ public class LxcManagerImpl implements LxcManager
     {
         Preconditions.checkNotNull( agentManager, "Agent manager is null" );
         Preconditions.checkNotNull( commandRunner, "Command runner is null" );
-        Preconditions.checkNotNull( monitor, "Monitor is null" );
+        Preconditions.checkNotNull( monitoring, "Monitor is null" );
 
         executor = Executors.newCachedThreadPool();
     }
@@ -263,7 +262,7 @@ public class LxcManagerImpl implements LxcManager
                             for ( Metric metricKey : Metric.values() )
                             {
                                 Map<Date, Double> metricMap =
-                                        monitor.getData( agent.getHostname(), metricKey, startDate, endDate );
+                                        monitoring.getData( agent.getHostname(), metricKey, startDate, endDate );
                                 if ( !metricMap.isEmpty() )
                                 {
                                     double avg = 0;

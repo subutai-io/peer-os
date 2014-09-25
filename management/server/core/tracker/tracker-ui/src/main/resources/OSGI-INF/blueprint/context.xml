@@ -6,7 +6,7 @@
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.tracker.ui.TrackerUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.tracker.ui.TrackerPortalModule"
         init-method="init" destroy-method="destroy">
     <property name="tracker" ref="tracker" />
   </bean>
