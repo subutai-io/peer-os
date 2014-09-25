@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.command.AbstractCommandRunner;
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.CommandException;
 import org.safehaus.subutai.common.command.CommandStatus;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -46,10 +47,24 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullBuilder()
     {
         new CommandImpl( null, mock( Set.class ), mock( AbstractCommandRunner.class ) );
+    }
+
+
+    @Test( expected = NullPointerException.class )
+    public void constructorShouldFailNullBuilderBroadcast()
+    {
+        new CommandImpl( null, 1, mock( AbstractCommandRunner.class ) );
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructorShouldFailZeroRequestsCountBroadcast()
+    {
+        new CommandImpl( mock( RequestBuilder.class ), 0, mock( AbstractCommandRunner.class ) );
     }
 
 
@@ -90,6 +105,16 @@ public class CommandImplTest
         command.appendResult( MockUtils.getTimedOutResponse( agentUUID, command.getCommandUUID() ) );
 
         assertTrue( command.hasCompleted() );
+    }
+
+
+    @Test( expected = CommandException.class )
+    public void shouldThrowCommandException() throws CommandException
+    {
+
+        command.setCommandStatus( CommandStatus.RUNNING );
+
+        command.execute();
     }
 
 
