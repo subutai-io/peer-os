@@ -18,7 +18,7 @@ public class Environment
     private Set<Node> nodes;
     private String name;
     private Set<EnvironmentContainer> containers;
-    //    private String peerUuid;
+        private String peerUuid;
 
 
     public Environment( String name, UUID envId )
@@ -33,7 +33,10 @@ public class Environment
 
     public Environment( final String name, final String peerUuid )
     {
-
+        this.nodes = new HashSet<>();
+        this.name = name;
+//        this.uuid = envId;
+        this.containers = new HashSet<>();
     }
 
 

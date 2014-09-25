@@ -56,7 +56,7 @@ public class EnvironmentBuilder
         Set<String> physicalNodes = environmentBuildTask.getPhysicalNodes();
 
 
-        Environment environment = new Environment( blueprint.getName(), environmentBuildTask.getPeerUuid() );
+        Environment environment = new Environment( blueprint.getName(), environmentBuildTask.getUuid() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
         {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();

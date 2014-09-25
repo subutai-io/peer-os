@@ -7,8 +7,8 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.Config;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
@@ -39,7 +39,7 @@ public class VerificationStep extends Panel
                 + "(you may change them by clicking on Back button)</strong><br/>" );
         confirmationLbl.setContentMode( ContentMode.HTML );
 
-        final Config config = wizard.getConfig();
+        final LuceneConfig config = wizard.getConfig();
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Installation Name", wizard.getConfig().getClusterName() );
@@ -79,7 +79,7 @@ public class VerificationStep extends Panel
                     trackId = lucene.installCluster( config, wizard.getHadoopConfig() );
                 }
 
-                ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, Config.PRODUCT_KEY );
+                ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, LuceneConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

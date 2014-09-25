@@ -9,7 +9,7 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.pig.api.Config;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 
 import com.google.common.base.Strings;
@@ -103,7 +103,7 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void addOverHadoopControls( ComponentContainer parent, final Config config )
+    private void addOverHadoopControls( ComponentContainer parent, final PigConfig config )
     {
 
         final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
@@ -185,7 +185,7 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void addWithHadoopControls( ComponentContainer content, final Config config,
+    private void addWithHadoopControls( ComponentContainer content, final PigConfig config,
                                         final HadoopClusterConfig hadoopConfig )
     {
 

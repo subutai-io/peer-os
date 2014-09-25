@@ -21,7 +21,7 @@ public class RemotePeerRestClient
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
-    public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
 
 
