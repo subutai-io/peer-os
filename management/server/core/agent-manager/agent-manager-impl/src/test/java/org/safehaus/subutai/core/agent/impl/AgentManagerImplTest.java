@@ -123,6 +123,19 @@ public class AgentManagerImplTest
 
 
     @Test
+    public void shouldReturnAgentByEnvId()
+    {
+        UUID id = UUID.randomUUID();
+        Response response = MockUtils.getRegistrationRequestFromLxcAgentWithEnvironmentId( id );
+
+        agentManager.onResponse( response );
+
+        assertTrue( !agentManager.getAgentsByEnvironmentId( id ).isEmpty() );
+        assertTrue( id.equals( agentManager.getAgentsByEnvironmentId( id ).iterator().next().getEnvironmentId() ) );
+    }
+
+
+    @Test
     public void shouldNotReturnAgentsWithMissingUUID()
     {
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
