@@ -23,6 +23,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
@@ -40,7 +41,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
-public class CassandraImpl extends CassandraBase
+public class CassandraImpl implements Cassandra
 {
 
     private Commands commands;

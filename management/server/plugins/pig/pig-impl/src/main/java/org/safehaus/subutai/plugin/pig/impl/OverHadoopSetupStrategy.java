@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.plugin.pig.api.Config;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 import com.google.common.base.Strings;
 
@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
 class OverHadoopSetupStrategy extends PigSetupStrategy
 {
 
-    public OverHadoopSetupStrategy( PigImpl manager, Config config, ProductOperation po )
+    public OverHadoopSetupStrategy( PigImpl manager, PigConfig config, ProductOperation po )
     {
         super( manager, config, po );
     }
@@ -76,7 +76,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
             Agent node = it.next();
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( Config.PRODUCT_PACKAGE ) )
+            if ( result.getStdOut().contains( PigConfig.PRODUCT_PACKAGE ) )
             {
                 productOperation.addLog(
                         String.format( "Node %s already has Pig installed. Omitting this node from installation",
@@ -94,7 +94,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
 
         // Save to db
 
-        if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
+        if ( manager.getDbManager().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
             productOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
             Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );

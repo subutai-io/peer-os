@@ -9,8 +9,8 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -25,7 +25,7 @@ public class Wizard
     private final Pig pig;
     private final Tracker tracker;
     private int step = 1;
-    private Config config = new Config();
+    private PigConfig config = new PigConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
@@ -102,12 +102,12 @@ public class Wizard
     protected void init()
     {
         step = 1;
-        config = new Config();
+        config = new PigConfig();
         putForm();
     }
 
 
-    public Config getConfig()
+    public PigConfig getConfig()
     {
         return config;
     }

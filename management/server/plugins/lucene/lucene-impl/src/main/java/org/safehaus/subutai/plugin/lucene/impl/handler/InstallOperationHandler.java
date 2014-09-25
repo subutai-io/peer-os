@@ -9,23 +9,23 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl>
 {
-    private final Config config;
+    private final LuceneConfig config;
     private HadoopClusterConfig hadoopConfig;
 
 
-    public InstallOperationHandler( LuceneImpl manager, Config config )
+    public InstallOperationHandler( LuceneImpl manager, LuceneConfig config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-                String.format( "Installing %s", Config.PRODUCT_KEY ) );
+        productOperation = manager.getTracker().createProductOperation( LuceneConfig.PRODUCT_KEY,
+                String.format( "Installing %s", LuceneConfig.PRODUCT_KEY ) );
     }
 
 
@@ -57,7 +57,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
             }
 
             po.addLog( "Preparing environment..." );
-            hadoopConfig.setTemplateName( Config.TEMPLATE_NAME );
+            hadoopConfig.setTemplateName( LuceneConfig.TEMPLATE_NAME );
             try
             {
                 EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
