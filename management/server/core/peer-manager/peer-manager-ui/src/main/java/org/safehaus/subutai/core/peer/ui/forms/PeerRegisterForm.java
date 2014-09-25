@@ -122,7 +122,7 @@ public class PeerRegisterForm extends CustomComponent
         servicePort.setImmediate( false );
         servicePort.setWidth( "-1px" );
         servicePort.setHeight( "-1px" );
-        servicePort.setValue( "Tags:" );
+        servicePort.setValue( "Service Port:" );
         absoluteLayout.addComponent( servicePort, "top:36.0px;left:20.0px;" );
 
         // servicePortTextField
@@ -292,7 +292,7 @@ public class PeerRegisterForm extends CustomComponent
 
 
                             WebClient local =
-                                    WebClient.create( String.format( "http://%s:%s/cxf", "127.0.0.1", "8181" ) );
+                                    WebClient.create( String.format( "http://%s:%s/cxf", "127.0.0.1", servicePort ) );
                             String localhostPeer =
                                     local.path( "peer/json" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
 
