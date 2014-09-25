@@ -15,7 +15,7 @@ public class DestroyEnvironmentCommandTest
     DestroyEnvironmentCommand destroyEnvironmentCommand;
 
 
-    @Before
+//    @Before
     public void init()
     {
         destroyEnvironmentCommand = mock( DestroyEnvironmentCommand.class );

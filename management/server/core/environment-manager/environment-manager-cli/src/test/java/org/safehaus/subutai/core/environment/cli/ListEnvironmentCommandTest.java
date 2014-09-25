@@ -15,7 +15,7 @@ public class ListEnvironmentCommandTest
     ListEnvironmentsCommand listEnvironmentsCommand;
 
 
-    @Before
+//    @Before
     public void init()
     {
         listEnvironmentsCommand = mock( ListEnvironmentsCommand.class );

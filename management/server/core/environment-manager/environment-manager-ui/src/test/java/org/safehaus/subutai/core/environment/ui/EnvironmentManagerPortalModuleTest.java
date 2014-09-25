@@ -15,7 +15,7 @@ public class EnvironmentManagerPortalModuleTest
     EnvironmentManagerPortalModule environmentManagerPortalModule;
 
 
-    @Before
+//    @Before
     public void init()
     {
         environmentManagerPortalModule = mock( EnvironmentManagerPortalModule.class );

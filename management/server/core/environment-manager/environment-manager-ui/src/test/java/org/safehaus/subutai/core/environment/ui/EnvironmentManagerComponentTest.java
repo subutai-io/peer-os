@@ -15,7 +15,7 @@ public class EnvironmentManagerComponentTest
     EnvironmentManagerComponent environmentManagerComponent;
 
 
-    @Before
+//    @Before
     public void init()
     {
         environmentManagerComponent = mock( EnvironmentManagerComponent.class );

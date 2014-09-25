@@ -15,7 +15,7 @@ public class DescribeEnvironmentCommandTest
     DescribeEnvironmentCommand describeEnvironmentCommand;
 
 
-    @Before
+//    @Before
     public void init()
     {
         describeEnvironmentCommand = mock( DescribeEnvironmentCommand.class );

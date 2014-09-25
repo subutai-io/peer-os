@@ -15,7 +15,7 @@ public class BuildEnvironmentCommandTest
     BuildEnvironmentCommand buildEnvironmentCommand;
 
 
-    @Before
+//    @Before
     public void init()
     {
         buildEnvironmentCommand = mock( BuildEnvironmentCommand.class );
