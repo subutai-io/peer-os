@@ -97,7 +97,6 @@ public class ConfigurationStep extends VerticalLayout
         final ComboBox nodesCountCombo =
                 new ComboBox( "Choose number of nodes in cluster", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         nodesCountCombo.setImmediate( true );
-        nodesCountCombo.setTextInputAllowed( true );
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setNullSelectionAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
@@ -114,7 +113,6 @@ public class ConfigurationStep extends VerticalLayout
         final ComboBox seedsCountCombo =
                 new ComboBox( "Choose number of seeds", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         seedsCountCombo.setImmediate( true );
-        seedsCountCombo.setTextInputAllowed( true );
         seedsCountCombo.setImmediate( true );
         seedsCountCombo.setNullSelectionAllowed( false );
         seedsCountCombo.setValue( wizard.getConfig() );

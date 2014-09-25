@@ -195,12 +195,6 @@ public class Manager
             } );
             return;
         }
-
-        if ( config == null )
-        {
-            show( MESSAGE );
-            return;
-        }
         switch ( button.getCaption() )
         {
             case CHECK_ALL_BUTTON_CAPTION:
@@ -209,7 +203,14 @@ public class Manager
                     @Override
                     public void buttonClick( final Button.ClickEvent event )
                     {
-                        checkAllNodes();
+                        if ( config == null )
+                        {
+                            show( MESSAGE );
+                        }
+                        else
+                        {
+                            checkAllNodes();
+                        }
                     }
                 } );
                 break;
@@ -220,7 +221,15 @@ public class Manager
                     @Override
                     public void buttonClick( final Button.ClickEvent event )
                     {
-                        startAllNodes();
+                        if ( config == null )
+                        {
+                            show( MESSAGE );
+                        }
+                        else
+                        {
+                            startAllNodes();
+                        }
+
                     }
                 } );
                 break;
@@ -230,7 +239,14 @@ public class Manager
                     @Override
                     public void buttonClick( final Button.ClickEvent event )
                     {
-                        stopAllNodes();
+                        if ( config == null )
+                        {
+                            show( MESSAGE );
+                        }
+                        else
+                        {
+                            stopAllNodes();
+                        }
                     }
                 } );
                 break;
