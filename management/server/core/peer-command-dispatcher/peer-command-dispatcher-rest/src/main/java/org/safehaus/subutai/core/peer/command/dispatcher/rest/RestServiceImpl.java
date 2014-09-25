@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -17,6 +16,7 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.slf4j.Logger;
@@ -207,7 +207,7 @@ public class RestServiceImpl implements RestService
         peer.setName( "Peer name 1" );
         peer.setIp( getLocalIp() );
         peer.setId( peerManager.getSiteId() );
-        //        peer.setStatus( PeerStatus.NO_PEERS );
+        peer.setStatus( PeerStatus.REQUESTED );
         return peer;
     }
 

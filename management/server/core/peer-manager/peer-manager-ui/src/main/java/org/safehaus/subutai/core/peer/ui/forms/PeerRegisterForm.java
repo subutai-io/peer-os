@@ -205,6 +205,10 @@ public class PeerRegisterForm extends CustomComponent
         for ( final Peer peer : peers )
         {
             Button unregisterButton = new Button( "Unregister" );
+            if ( peer == null )
+            {
+                continue;
+            }
             switch ( peer.getStatus() )
             {
                 case REQUESTED:

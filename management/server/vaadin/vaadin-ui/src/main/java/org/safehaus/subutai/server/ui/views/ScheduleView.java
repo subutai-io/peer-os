@@ -29,8 +29,7 @@ public class ScheduleView extends CssLayout implements View
     // private CSSInject css;
 
 
-    @Override
-    public void enter( ViewChangeEvent event )
+    public ScheduleView()
     {
         setSizeFull();
         addStyleName( "schedule" );
@@ -47,5 +46,12 @@ public class ScheduleView extends CssLayout implements View
         catalog.setCaption( "Catalog" );
         catalog.addStyleName( "catalog" );
         tabs.addComponent( catalog );
+    }
+
+
+    @Override
+    public void enter( ViewChangeEvent event )
+    {
+
     }
 }

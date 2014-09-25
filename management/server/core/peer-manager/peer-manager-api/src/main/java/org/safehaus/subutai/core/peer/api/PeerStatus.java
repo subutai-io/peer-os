@@ -6,5 +6,5 @@ package org.safehaus.subutai.core.peer.api;
  */
 public enum PeerStatus
 {
-    APPROVED, REJECTED, REQUESTED, NO_PEERS, HAS_PEERS;
+    APPROVED, REJECTED, REQUESTED;
 }
