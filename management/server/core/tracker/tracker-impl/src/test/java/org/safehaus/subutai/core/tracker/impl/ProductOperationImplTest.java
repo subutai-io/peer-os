@@ -6,6 +6,7 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for ProductOperation class
  */
-public class ProductOperationImplUT
+public class ProductOperationImplTest
 {
 
     private final UUID ID = UUID.randomUUID();
@@ -127,6 +128,7 @@ public class ProductOperationImplUT
         when( poi.getDescription() ).thenReturn( DESCRIPTION );
         when( poi.getState() ).thenReturn( ProductOperationState.RUNNING );
         when( poi.getLog() ).thenReturn( DUMMY_LOG );
+        when( poi.createDate() ).thenReturn(new Date(  ));
 
         ProductOperationViewImpl povi = new ProductOperationViewImpl( poi );
 

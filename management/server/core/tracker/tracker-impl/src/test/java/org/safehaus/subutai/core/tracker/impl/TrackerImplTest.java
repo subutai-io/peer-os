@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Test for TrackerImpl class
  */
-public class TrackerImplIT
+public class TrackerImplTest
 {
 
     private final DbManager dbManager = new DbManagerImpl();
