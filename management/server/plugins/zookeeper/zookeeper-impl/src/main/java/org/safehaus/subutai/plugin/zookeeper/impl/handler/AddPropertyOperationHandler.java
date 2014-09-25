@@ -4,9 +4,9 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;

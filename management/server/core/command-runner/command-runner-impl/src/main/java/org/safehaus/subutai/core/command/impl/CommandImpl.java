@@ -8,10 +8,10 @@ package org.safehaus.subutai.core.command.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.AbstractCommand;
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.CommandRunnerBase;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AbstractCommand;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;

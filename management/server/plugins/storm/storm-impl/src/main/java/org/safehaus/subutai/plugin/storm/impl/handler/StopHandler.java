@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;

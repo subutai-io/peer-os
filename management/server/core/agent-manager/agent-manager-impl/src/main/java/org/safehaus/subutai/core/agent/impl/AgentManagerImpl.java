@@ -265,7 +265,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         Set<Agent> agentSet = new HashSet<>();
         if ( environmentId != null )
         {
-            for ( Agent agent : agents.asMap().values() )
+            for ( Agent agent : getLxcAgents() )
             {
                 if ( agent.getEnvironmentId() != null && environmentId.compareTo( agent.getEnvironmentId() ) == 0 )
                 {
@@ -397,7 +397,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
                         //TODO pass proper environmentId
-                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(), UUIDUtil.generateMACBasedUUID() );
+                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(),
+                        response.getEnvironmentId() == null ? UUIDUtil.generateMACBasedUUID() :
+                        response.getEnvironmentId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );

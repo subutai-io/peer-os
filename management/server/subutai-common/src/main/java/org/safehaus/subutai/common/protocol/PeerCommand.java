@@ -1,6 +1,9 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import org.safehaus.subutai.common.util.JsonUtil;
+
+
 /**
  * Created by timur on 9/20/14.
  */
@@ -38,5 +41,9 @@ public class PeerCommand
     public void setType( final PeerCommandType type )
     {
         this.type = type;
+    }
+
+    public String toJson() {
+        return JsonUtil.toJson( PeerCommand.class, this );
     }
 }
