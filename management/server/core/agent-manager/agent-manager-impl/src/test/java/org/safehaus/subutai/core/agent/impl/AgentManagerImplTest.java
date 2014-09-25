@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for Agent Manager class
  */
-public class AgentManagerImplUT
+public class AgentManagerImplTest
 {
 
     private final String LXC_HOSTNAME = "parent-lxc-hostname";
