@@ -156,7 +156,7 @@ public class Manager
         controlsContent.addComponent( addNodeBtn );
         controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
 
-        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn, addNodeBtn );
 
         PROGRESS_ICON.setVisible( false );
         controlsContent.addComponent( PROGRESS_ICON );
@@ -249,60 +249,61 @@ public class Manager
                 {
                     show( "Please, select cluster" );
                 }
-
-                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                else
                 {
-                    String hn = config.getHadoopClusterName();
-                    if ( hn == null || hn.isEmpty() )
+                    if ( config.getSetupType() == SetupType.OVER_HADOOP )
                     {
-                        show( "Undefined Hadoop cluster name" );
-                        return;
-                    }
-                    HadoopClusterConfig info = hadoop.getCluster( hn );
-                    if ( info != null )
-                    {
-                        HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
-                        nodes.removeAll( config.getAllNodes() );
-                        if ( !nodes.isEmpty() )
+                        String hn = config.getHadoopClusterName();
+                        if ( hn == null || hn.isEmpty() )
                         {
-                            AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( presto, executorService, tracker, config, nodes );
-                            contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener()
+                            show( "Undefined Hadoop cluster name" );
+                            return;
+                        }
+                        HadoopClusterConfig info = hadoop.getCluster( hn );
+                        if ( info != null )
+                        {
+                            HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            nodes.removeAll( config.getAllNodes() );
+                            if ( !nodes.isEmpty() )
                             {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
+                                AddNodeWindow addNodeWindow = new AddNodeWindow( presto, executorService, tracker, config, nodes );
+                                contentRoot.getUI().addWindow( addNodeWindow );
+                                addNodeWindow.addCloseListener( new Window.CloseListener()
                                 {
-                                    refreshClustersInfo();
-                                }
-                            } );
+                                    @Override
+                                    public void windowClose( Window.CloseEvent closeEvent )
+                                    {
+                                        refreshClustersInfo();
+                                    }
+                                } );
+                            }
+                            else
+                            {
+                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
+                            }
                         }
                         else
                         {
-                            show( "All nodes in corresponding Hadoop cluster have Presto installed" );
+                            show( "Hadoop cluster info not found" );
                         }
                     }
-                    else
+                    else if ( config.getSetupType() == SetupType.WITH_HADOOP )
                     {
-                        show( "Hadoop cluster info not found" );
-                    }
-                }
-                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
-                {
-                    ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
-                    d.getOk().addClickListener( new Button.ClickListener()
-                    {
-
-                        @Override
-                        public void buttonClick( Button.ClickEvent event )
+                        ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
+                        d.getOk().addClickListener( new Button.ClickListener()
                         {
-                            UUID trackId = presto.addWorkerNode( config.getClusterName(), null );
-                            ProgressWindow w = new ProgressWindow( executorService, tracker, trackId,
-                                    PrestoClusterConfig.PRODUCT_KEY );
-                            contentRoot.getUI().addWindow( w.getWindow() );
-                        }
-                    } );
-                    contentRoot.getUI().addWindow( d.getAlert() );
+
+                            @Override
+                            public void buttonClick( Button.ClickEvent event )
+                            {
+                                UUID trackId = presto.addWorkerNode( config.getClusterName(), null );
+                                ProgressWindow w = new ProgressWindow( executorService, tracker, trackId,
+                                        PrestoClusterConfig.PRODUCT_KEY );
+                                contentRoot.getUI().addWindow( w.getWindow() );
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( d.getAlert() );
+                    }
                 }
             }
         } );
@@ -517,26 +518,26 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new StartTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    enableButtons( getButton( CHECK_BUTTON_CAPTION, buttons ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
 
 
-    public void addClickListenerToStopButtons( final Agent agent, final Button... buttons )
+    public void addClickListenerToStopButtons( final Agent agent, final Button ... buttons )
     {
-        getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
@@ -612,29 +613,34 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new CheckTask( presto, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
+                                    resultHolder.setValue( result );
+                                    if ( result.contains( "Not" ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( result.contains( "Not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            enableButtons( buttons );
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    PROGRESS_ICON.setVisible( false );
+                                    for ( Button b : buttons ){
+                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION) || b.getCaption().equals( SET_AS_COORDINATOR_BUTTON_CAPTION )
+                                                || b.getCaption().equals( DESTROY_BUTTON_CAPTION )){
+                                            enableButtons( b );
                                         }
                                     }
-                                } ) );
+                                }
+                            }
+                        } ) );
             }
         } );
     }

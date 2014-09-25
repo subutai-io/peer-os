@@ -304,6 +304,7 @@ public class Manager
         for ( Agent agent : config.getNodes() )
         {
             PROGRESS_ICON.setVisible( true );
+            disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
                     new StartTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                             new CompleteEvent()
@@ -313,6 +314,7 @@ public class Manager
                                 {
                                     synchronized ( PROGRESS_ICON )
                                     {
+                                        disableOREnableAllButtonsOnTable( nodesTable, true );
                                         checkAllNodes();
                                     }
                                 }
@@ -326,6 +328,7 @@ public class Manager
         for ( Agent agent : config.getNodes() )
         {
             PROGRESS_ICON.setVisible( true );
+            disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute( new StopTask( elasticsearch, tracker, config.getClusterName(), agent.getHostname(),
                     new CompleteEvent()
                     {
@@ -334,6 +337,7 @@ public class Manager
                         {
                             synchronized ( PROGRESS_ICON )
                             {
+                                disableOREnableAllButtonsOnTable( nodesTable, true );
                                 checkAllNodes();
                             }
                         }
@@ -486,6 +490,28 @@ public class Manager
         else
         {
             clusterCombo.setValue( clusters.iterator().next() );
+        }
+    }
+
+
+    public void disableOREnableAllButtonsOnTable( Table table, boolean value )
+    {
+        if ( table != null )
+        {
+            for ( Object o : table.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = table.getItem( rowId );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    for ( Component component : availableOperationsLayout )
+                    {
+                        component.setEnabled( value );
+                    }
+                }
+            }
         }
     }
 
