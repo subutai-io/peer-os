@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for CommunicationManager class
  */
-public class CommunicationManagerImplIT
+public class CommunicationManagerImplTest
 {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
 
