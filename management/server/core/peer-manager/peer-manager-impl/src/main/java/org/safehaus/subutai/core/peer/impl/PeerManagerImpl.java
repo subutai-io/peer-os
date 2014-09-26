@@ -395,7 +395,7 @@ public class PeerManagerImpl implements PeerManager
         catch ( ContainerCreateException e )
         {
             ccm.setSuccess( false );
-            ccm.setResult( e.toString() );
+            ccm.setExceptionMessage( e.toString() );
         }
     }
 
@@ -456,6 +456,7 @@ public class PeerManagerImpl implements PeerManager
     {
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
         LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
+        boolean result;
         switch ( peerCommandMessage.getType() )
         {
             case CLONE:
@@ -471,13 +472,47 @@ public class PeerManagerImpl implements PeerManager
                 }
                 break;
             case START:
-                peerCommandMessage.setSuccess( startContainer( peerContainer ) );
+                result = startContainer( peerContainer );
+                if ( result )
+                {
+                    peerCommandMessage.setSuccess( result );
+                    peerCommandMessage.setResult( result );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( result );
+                    peerCommandMessage.setResult( result );
+                    peerCommandMessage.setExceptionMessage( "Could not start container." );
+                }
                 break;
             case STOP:
-                peerCommandMessage.setSuccess( stopContainer( peerContainer ) );
+                result = stopContainer( peerContainer );
+                if ( result )
+                {
+                    peerCommandMessage.setSuccess( result );
+                    peerCommandMessage.setResult( result );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( result );
+                    peerCommandMessage.setResult( result );
+                    peerCommandMessage.setExceptionMessage( "Could not stop container." );
+                }
                 break;
             case ISCONNECTED:
-                peerCommandMessage.setSuccess( isContainerConnected( peerContainer ) );
+
+                result = isContainerConnected( peerContainer );
+                if ( result )
+                {
+                    peerCommandMessage.setSuccess( result );
+                    peerCommandMessage.setResult( result );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( result );
+                    peerCommandMessage.setResult( result );
+                    peerCommandMessage.setExceptionMessage( "Container is not connected." );
+                }
                 break;
             case EXECUTE:
                 if ( peerCommandMessage instanceof ExecuteCommandMessage )
@@ -492,7 +527,7 @@ public class PeerManagerImpl implements PeerManager
                 }
                 break;
             default:
-                peerCommandMessage.setResult( "Unknown command." );
+                peerCommandMessage.setExceptionMessage( "Unknown command." );
                 peerCommandMessage.setSuccess( false );
                 break;
         }

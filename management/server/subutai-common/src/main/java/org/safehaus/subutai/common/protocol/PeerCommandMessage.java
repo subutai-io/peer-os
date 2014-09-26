@@ -9,12 +9,12 @@ import org.safehaus.subutai.common.util.JsonUtil;
 /**
  * Created by timur on 9/20/14.
  */
-public class PeerCommandMessage
+public abstract class PeerCommandMessage
 {
     protected UUID agentId;
     protected UUID peerId;
     protected PeerCommandType type;
-    protected Object result;
+    protected String exceptionMessage;
     protected boolean success = false;
 
 
@@ -68,15 +68,15 @@ public class PeerCommandMessage
     }
 
 
-    public Object getResult()
+    public String getExceptionMessage()
     {
-        return result;
+        return exceptionMessage;
     }
 
 
-    public void setResult( final Object result )
+    public void setExceptionMessage( final String exceptionMessage )
     {
-        this.result = result;
+        this.exceptionMessage = exceptionMessage;
     }
 
 
@@ -98,6 +98,10 @@ public class PeerCommandMessage
     }
 
 
+    abstract public void setResult(Object result);
+
+    abstract public Object getResult();
+
     @Override
     public String toString()
     {
@@ -105,7 +109,7 @@ public class PeerCommandMessage
                 "agentId=" + agentId +
                 ", peerId=" + peerId +
                 ", type=" + type +
-                ", result=" + result +
+                ", exceptionMessage=" + exceptionMessage +
                 ", success=" + success +
                 '}';
     }

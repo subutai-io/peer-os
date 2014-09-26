@@ -47,22 +47,22 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
         {
             public BuildProcessExecutionEvent call()
             {
-                fireEvent( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.START ) );
+                fireEvent( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.START ) );
                 try
                 {
                     BuildProcessCommand command = commandFactory.newCommand();
                     command.execute();
-                    return ( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.SUCCESS ) );
+                    return ( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.SUCCESS ) );
                 }
                 catch ( BuildProcessExecutionException ce )
                 {
-                    return ( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.FAIL ) );
+                    return ( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.FAIL ) );
                 }
             }
         } );
 
 
-//        ExecutorService waiter = Executors.newFixedThreadPool( 1 );
+        //        ExecutorService waiter = Executors.newFixedThreadPool( 1 );
         ExecutorService waiter = Executors.newCachedThreadPool();
         waiter.execute( new Runnable()
         {
@@ -77,7 +77,7 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
                 }
                 catch ( InterruptedException | ExecutionException e )
                 {
-                    fireEvent( new BuildProcessExecutionEvent( buildProcess.getUuid().toString(), "desc", BuildProcessExecutionEventType.FAIL ) );
+                    fireEvent( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.FAIL ) );
                 }
             }
         } );

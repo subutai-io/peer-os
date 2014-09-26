@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEvent;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEventType;
@@ -189,7 +190,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 }
                 environmentsTable.addItem( new Object[] {
                         environmentBuildProcess.getUuid(), null, viewEnvironmentInfoButton, processButton, destroyButton
-                }, environmentBuildProcess.getUuid().toString() );
+                }, environmentBuildProcess.getUuid());
             }
         }
         else
@@ -224,7 +225,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
         buildProcessExecutor.addListener( this );
-//        ExecutorService executor = Executors.newFixedThreadPool( 10 );
+        //        ExecutorService executor = Executors.newFixedThreadPool( 10 );
         ExecutorService executor = Executors.newCachedThreadPool();
         buildProcessExecutor.execute( executor,
                 new BuildCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
@@ -246,12 +247,14 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             @Override
             public void run()
             {
-                Item row = environmentsTable.getItem( event.getName() );
+                Item row = environmentsTable.getItem( event.getEnvironmentBuildProcess().getUuid() );
                 if ( row != null )
                 {
                     Property p = row.getItemProperty( STATUS );
+                    Button actionBtn = ( Button ) row.getItemProperty( ACTION ).getValue();
                     if ( BuildProcessExecutionEventType.START.equals( event.getEventType() ) )
                     {
+                        actionBtn.setEnabled( false );
                         p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
                         Notification.show( EnvAnswer.START.getAnswer() );
                     }
@@ -259,6 +262,13 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     {
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
                         Notification.show( EnvAnswer.SUCCESS.getAnswer() );
+
+                        //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
+                        managerUI.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
+                        EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
+                        ebp.setCompleteStatus( true );
+                        ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
+                        managerUI.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
