@@ -2,6 +2,7 @@ package org.safehaus.subutai.common.protocol;
 
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -185,5 +186,118 @@ public class Request implements Serializable
                 + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath
                 + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment
                 + ", pid=" + pid + ", timeout=" + timeout + '}';
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof Request ) )
+        {
+            return false;
+        }
+
+        final Request request = ( Request ) o;
+
+        if ( args != null ? !args.equals( request.args ) : request.args != null )
+        {
+            return false;
+        }
+        if ( !Arrays.equals( confPoints, request.confPoints ) )
+        {
+            return false;
+        }
+        if ( environment != null ? !environment.equals( request.environment ) : request.environment != null )
+        {
+            return false;
+        }
+        if ( pid != null ? !pid.equals( request.pid ) : request.pid != null )
+        {
+            return false;
+        }
+        if ( program != null ? !program.equals( request.program ) : request.program != null )
+        {
+            return false;
+        }
+        if ( requestSequenceNumber != null ? !requestSequenceNumber.equals( request.requestSequenceNumber ) :
+             request.requestSequenceNumber != null )
+        {
+            return false;
+        }
+        if ( runAs != null ? !runAs.equals( request.runAs ) : request.runAs != null )
+        {
+            return false;
+        }
+        if ( source != null ? !source.equals( request.source ) : request.source != null )
+        {
+            return false;
+        }
+        if ( stdErr != request.stdErr )
+        {
+            return false;
+        }
+        if ( stdErrPath != null ? !stdErrPath.equals( request.stdErrPath ) : request.stdErrPath != null )
+        {
+            return false;
+        }
+        if ( stdOut != request.stdOut )
+        {
+            return false;
+        }
+        if ( stdOutPath != null ? !stdOutPath.equals( request.stdOutPath ) : request.stdOutPath != null )
+        {
+            return false;
+        }
+        if ( taskUuid != null ? !taskUuid.equals( request.taskUuid ) : request.taskUuid != null )
+        {
+            return false;
+        }
+        if ( timeout != null ? !timeout.equals( request.timeout ) : request.timeout != null )
+        {
+            return false;
+        }
+        if ( type != request.type )
+        {
+            return false;
+        }
+        if ( uuid != null ? !uuid.equals( request.uuid ) : request.uuid != null )
+        {
+            return false;
+        }
+        if ( workingDirectory != null ? !workingDirectory.equals( request.workingDirectory ) :
+             request.workingDirectory != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = source != null ? source.hashCode() : 0;
+        result = 31 * result + ( type != null ? type.hashCode() : 0 );
+        result = 31 * result + ( uuid != null ? uuid.hashCode() : 0 );
+        result = 31 * result + ( taskUuid != null ? taskUuid.hashCode() : 0 );
+        result = 31 * result + ( requestSequenceNumber != null ? requestSequenceNumber.hashCode() : 0 );
+        result = 31 * result + ( workingDirectory != null ? workingDirectory.hashCode() : 0 );
+        result = 31 * result + ( program != null ? program.hashCode() : 0 );
+        result = 31 * result + ( stdOut != null ? stdOut.hashCode() : 0 );
+        result = 31 * result + ( stdErr != null ? stdErr.hashCode() : 0 );
+        result = 31 * result + ( stdOutPath != null ? stdOutPath.hashCode() : 0 );
+        result = 31 * result + ( stdErrPath != null ? stdErrPath.hashCode() : 0 );
+        result = 31 * result + ( runAs != null ? runAs.hashCode() : 0 );
+        result = 31 * result + ( args != null ? args.hashCode() : 0 );
+        result = 31 * result + ( environment != null ? environment.hashCode() : 0 );
+        result = 31 * result + ( pid != null ? pid.hashCode() : 0 );
+        result = 31 * result + ( timeout != null ? timeout.hashCode() : 0 );
+        result = 31 * result + ( confPoints != null ? Arrays.hashCode( confPoints ) : 0 );
+        return result;
     }
 }

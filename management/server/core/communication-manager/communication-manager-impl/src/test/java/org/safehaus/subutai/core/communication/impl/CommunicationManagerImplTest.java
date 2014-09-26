@@ -109,7 +109,7 @@ public class CommunicationManagerImplTest
 
         TextMessage txtMsg = ( TextMessage ) consumer.receive();
         String jsonCmd = txtMsg.getText();
-        Request request2 = CommandJson.getRequest( jsonCmd );
+        Request request2 = CommandJson.getRequestFromCommandJson( jsonCmd );
 
         assertEquals( request.getUuid(), request2.getUuid() );
     }
@@ -131,7 +131,7 @@ public class CommunicationManagerImplTest
         final MessageProducer producer = session.createProducer( topic );
 
         BytesMessage message = session.createBytesMessage();
-        message.writeBytes( CommandJson.getResponse( response ).getBytes() );
+        message.writeBytes( CommandJson.getResponseCommandJson( response ).getBytes() );
         producer.send( message );
 
         Awaitility.await().atMost( 1, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
@@ -161,7 +161,7 @@ public class CommunicationManagerImplTest
 
         TextMessage txtMsg = ( TextMessage ) consumer.receive();
         String jsonCmd = txtMsg.getText();
-        Request request2 = CommandJson.getRequest( jsonCmd );
+        Request request2 = CommandJson.getRequestFromCommandJson( jsonCmd );
 
         assertEquals( request.getUuid(), request2.getUuid() );
     }

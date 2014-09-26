@@ -5,7 +5,6 @@
 package org.safehaus.subutai.core.communication.api;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.slf4j.Logger;
@@ -39,11 +38,11 @@ public class CommandJson
      *
      * @return request
      */
-    public static Request getRequest( String json )
+    public static Request getRequestFromCommandJson( String json )
     {
         try
         {
-            Command cmd = getCommand( json );
+            Command cmd = getCommandFromJson( json );
             if ( cmd.getRequest() != null )
             {
                 return cmd.getRequest();
@@ -51,7 +50,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error in getRequest", ex );
+            LOG.error( "Error in getRequestFromCommandJson", ex );
         }
 
         return null;
@@ -59,13 +58,13 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized command from json string
+     * Returns deserialized request from json string
      *
-     * @param json - command in json format
+     * @param json - request in json format
      *
-     * @return command
+     * @return request
      */
-    public static Command getCommand( String json )
+    public static Command getCommandFromJson( String json )
     {
         try
         {
@@ -73,7 +72,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error in getCommand", ex );
+            LOG.error( "Error in getCommandFromJson", ex );
         }
 
         return null;
@@ -156,11 +155,11 @@ public class CommandJson
      *
      * @return response
      */
-    public static Response getResponse( String json )
+    public static Response getResponseFromCommandJson( String json )
     {
         try
         {
-            Command cmd = getCommand( json );
+            Command cmd = getCommandFromJson( json );
             if ( cmd.getResponse() != null )
             {
                 return cmd.getResponse();
@@ -168,7 +167,7 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error in getResponse", ex );
+            LOG.error( "Error in getResponseCommandJson", ex );
         }
 
         return null;
@@ -178,19 +177,19 @@ public class CommandJson
     /**
      * Returns serialized request from Request POJO
      *
-     * @param cmd - request in pojo format
+     * @param request - request in pojo format
      *
      * @return request in json format
      */
-    public static String getJson( Request cmd )
+    public static String getRequestCommandJson( Request request )
     {
         try
         {
-            return GSON.toJson( new CommandImpl( cmd ) );
+            return GSON.toJson( new CommandImpl( request ) );
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error in getJson", ex );
+            LOG.error( "Error in getCommandJson", ex );
         }
         return null;
     }
@@ -199,32 +198,32 @@ public class CommandJson
     /**
      * Returns serialized response from Response POJO
      *
-     * @param cmd - response in pojo format
+     * @param response - response in pojo format
      *
      * @return response in json format
      */
-    public static String getResponse( Response cmd )
+    public static String getResponseCommandJson( Response response )
     {
         try
         {
-            return GSON.toJson( new CommandImpl( cmd ) );
+            return GSON.toJson( new CommandImpl( response ) );
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error in getResponse", ex );
+            LOG.error( "Error in getResponseCommandJson", ex );
         }
         return null;
     }
 
 
     /**
-     * Returns serialized command from Command POJO
+     * Returns serialized request from Command POJO
      *
-     * @param cmd - command in pojo format
+     * @param cmd - request in pojo format
      *
-     * @return request in command format
+     * @return request in request format
      */
-    public static String getJson( Command cmd )
+    public static String getCommandJson( Command cmd )
     {
         try
         {
@@ -232,63 +231,16 @@ public class CommandJson
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error in getJson", ex );
+            LOG.error( "Error in getCommandJson", ex );
         }
         return null;
     }
 
 
-    /**
-     * Returns serialized agent from Agent POJO
-     *
-     * @param agent - agent in pojo format
-     *
-     * @return agent in json format
-     */
-    public static String getAgentJson( Object agent )
-    {
-        try
-        {
-            return GSON.toJson( agent );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in getAgentJson", ex );
-        }
-        return null;
-    }
-
-
-    /**
-     * Returns deserialized agent from Agent json
-     *
-     * @param json - agent in json format
-     *
-     * @return agent in pojo format
-     */
-    public static Agent getAgent( String json )
-    {
-        try
-        {
-            Agent agent = GSON.fromJson( escape( json ), Agent.class );
-            if ( agent != null )
-            {
-                return agent;
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in getAgent", ex );
-        }
-
-        return null;
-    }
-
-
-    private static class CommandImpl implements Command
+    public static class CommandImpl implements Command
     {
 
-        Request command;
+        Request request;
         Response response;
 
 
@@ -296,7 +248,7 @@ public class CommandJson
         {
             if ( message instanceof Request )
             {
-                this.command = ( Request ) message;
+                this.request = ( Request ) message;
             }
             else if ( message instanceof Response )
             {
@@ -308,7 +260,7 @@ public class CommandJson
         @Override
         public Request getRequest()
         {
-            return command;
+            return request;
         }
 
 
@@ -316,6 +268,42 @@ public class CommandJson
         public Response getResponse()
         {
             return response;
+        }
+
+
+        @Override
+        public boolean equals( final Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( !( o instanceof CommandImpl ) )
+            {
+                return false;
+            }
+
+            final CommandImpl command = ( CommandImpl ) o;
+
+            if ( request != null ? !request.equals( command.request ) : command.request != null )
+            {
+                return false;
+            }
+            if ( response != null ? !response.equals( command.response ) : command.response != null )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+        @Override
+        public int hashCode()
+        {
+            int result = request != null ? request.hashCode() : 0;
+            result = 31 * result + ( response != null ? response.hashCode() : 0 );
+            return result;
         }
     }
 }
