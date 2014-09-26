@@ -53,7 +53,7 @@ public class AgentNotifier implements Runnable
 
     private void notifyListeners( Set<Agent> agents )
     {
-        for ( Iterator<AgentListener> it = agentManager.listeners.iterator(); it.hasNext(); )
+        for ( Iterator<AgentListener> it = agentManager.getListenersQueue().iterator(); it.hasNext(); )
         {
             AgentListener listener = it.next();
             try
