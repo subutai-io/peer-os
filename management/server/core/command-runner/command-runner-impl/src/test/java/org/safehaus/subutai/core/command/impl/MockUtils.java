@@ -12,13 +12,14 @@ import java.util.UUID;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -31,9 +32,10 @@ import static org.mockito.Mockito.when;
 public class MockUtils
 {
 
-    public static Response getFailedResponse( UUID agentUUID, UUID commandUUID )
+    public static Response getFailedResponse( UUID agentUUID, UUID commandUUID, String error )
     {
         Response response = getIntermediateResponse( agentUUID, commandUUID );
+        when( response.getStdErr() ).thenReturn( error );
         when( response.getExitCode() ).thenReturn( 123 );
         when( response.getType() ).thenReturn( ResponseType.EXECUTE_RESPONSE_DONE );
         when( response.isFinal() ).thenReturn( true );
@@ -137,6 +139,12 @@ public class MockUtils
         when( requestBuilder.getTimeout() ).thenReturn( timeout );
 
         return requestBuilder;
+    }
+
+
+    public static AgentRequestBuilder getAgentRequestBuilder( Agent agent, String cmd )
+    {
+        return new AgentRequestBuilder( agent, cmd );
     }
 
 

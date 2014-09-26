@@ -63,7 +63,7 @@ class CommandProducer implements Runnable
             producer.setDeliveryMode( communicationManagerImpl.isPersistentMessages() ? DeliveryMode.PERSISTENT :
                                       DeliveryMode.NON_PERSISTENT );
             producer.setTimeToLive( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec() * 1000 );
-            String json = CommandJson.getJson( command );
+            String json = CommandJson.getRequestCommandJson( command );
 
             if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) )
             {
