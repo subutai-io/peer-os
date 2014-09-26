@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
@@ -43,7 +43,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( config == null )
         {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
@@ -52,14 +52,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( agent == null )
         {
             productOperation
-                    .addLogFailed( String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
+                    .addLogFailed( String.format( "Node %s is not connected. Operation aborted", lxcHostname ) );
             return;
         }
 
         if ( config.getNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
-                    String.format( "Node %s already belongs to this cluster\nOperation aborted", lxcHostname ) );
+                    String.format( "Node %s already belongs to this cluster. Operation aborted", lxcHostname ) );
             return;
         }
 
@@ -67,14 +67,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( sparkConfig == null )
         {
             productOperation
-                    .addLogFailed( String.format( "Spark cluster '%s' not found\nInstallation aborted", clusterName ) );
+                    .addLogFailed( String.format( "Spark cluster '%s' not found. Installation aborted", clusterName ) );
             return;
         }
 
         if ( !sparkConfig.getAllNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
-                    String.format( "Node %s does not belong to %s spark cluster\nOperation aborted", lxcHostname,
+                    String.format( "Node %s does not belong to %s spark cluster. Operation aborted", lxcHostname,
                             clusterName ) );
             return;
         }
@@ -88,7 +88,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( !checkInstalledCommand.hasCompleted() )
         {
             productOperation
-                    .addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+                    .addLogFailed( "Failed to check presence of installed ksks packages. Installation aborted" );
             return;
         }
 
@@ -97,13 +97,13 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         if ( result.getStdOut().contains( "ksks-shark" ) )
         {
             productOperation.addLogFailed(
-                    String.format( "Node %s already has Shark installed\nInstallation aborted", lxcHostname ) );
+                    String.format( "Node %s already has Shark installed. Installation aborted", lxcHostname ) );
             return;
         }
         else if ( !result.getStdOut().contains( "ksks-spark" ) )
         {
             productOperation.addLogFailed(
-                    String.format( "Node %s has no Spark installation\nInstallation aborted", lxcHostname ) );
+                    String.format( "Node %s has no Spark installation. Installation aborted", lxcHostname ) );
             return;
         }
 
@@ -112,14 +112,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         //save to db
         if ( manager.getDbManager().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
-            productOperation.addLog( "Cluster info updated in DB\nInstalling Shark..." );
+            productOperation.addLog( "Cluster info updated in DB. Installing Shark..." );
 
             Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )
             {
-                productOperation.addLog( "Installation succeeded\nSetting Master IP..." );
+                productOperation.addLog( "Installation succeeded. Setting Master IP..." );
 
                 Command setMasterIPCommand =
                         Commands.getSetMasterIPCommand( Sets.newHashSet( agent ), sparkConfig.getMasterNode() );
@@ -127,7 +127,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
 
                 if ( setMasterIPCommand.hasSucceeded() )
                 {
-                    productOperation.addLogDone( "Master IP set successfully\nDone" );
+                    productOperation.addLogDone( "Master IP set successfully. Done" );
                 }
                 else
                 {
@@ -145,7 +145,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         else
         {
             productOperation
-                    .addLogFailed( "Could not update cluster info in DB! Please see logs\nInstallation aborted" );
+                    .addLogFailed( "Could not update cluster info in DB! Please see logs. Installation aborted" );
         }
     }
 }

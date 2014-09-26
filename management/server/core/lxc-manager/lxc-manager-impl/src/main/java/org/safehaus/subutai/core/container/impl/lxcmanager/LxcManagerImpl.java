@@ -20,8 +20,8 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
@@ -37,7 +37,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.core.container.impl.strategy.RoundRobinStrategy;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,18 +49,18 @@ public class LxcManagerImpl implements LxcManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( LxcManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
-    private final Pattern p = Pattern.compile( "load average: (.*)" );
+    private final Pattern loadAvgPattern = Pattern.compile( "load average: (.*)" );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
-    private Monitor monitor;
+    private Monitoring monitoring;
 
 
-    public LxcManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitor monitor )
+    public LxcManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring )
     {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
-        this.monitor = monitor;
+        this.monitoring = monitoring;
 
         Commands.init( commandRunner );
     }
@@ -70,7 +70,7 @@ public class LxcManagerImpl implements LxcManager
     {
         Preconditions.checkNotNull( agentManager, "Agent manager is null" );
         Preconditions.checkNotNull( commandRunner, "Command runner is null" );
-        Preconditions.checkNotNull( monitor, "Monitor is null" );
+        Preconditions.checkNotNull( monitoring, "Monitor is null" );
 
         executor = Executors.newCachedThreadPool();
     }
@@ -199,7 +199,7 @@ public class LxcManagerImpl implements LxcManager
                             {
                                 // 09:17:38 up 4 days, 23:06,  0 users,  load average: 2.18, 3.06, 2.12
 
-                                Matcher m = p.matcher( metric );
+                                Matcher m = loadAvgPattern.matcher( metric );
                                 if ( m.find() )
                                 {
                                     String[] loads = m.group( 1 ).split( "," );
@@ -262,7 +262,7 @@ public class LxcManagerImpl implements LxcManager
                             for ( Metric metricKey : Metric.values() )
                             {
                                 Map<Date, Double> metricMap =
-                                        monitor.getData( agent.getHostname(), metricKey, startDate, endDate );
+                                        monitoring.getData( agent.getHostname(), metricKey, startDate, endDate );
                                 if ( !metricMap.isEmpty() )
                                 {
                                     double avg = 0;

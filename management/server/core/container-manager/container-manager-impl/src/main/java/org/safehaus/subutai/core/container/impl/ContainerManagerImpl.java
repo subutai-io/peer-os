@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -45,8 +45,8 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
@@ -61,25 +61,22 @@ import com.google.common.base.Strings;
 
 public class ContainerManagerImpl extends ContainerManagerBase
 {
+
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
-    /**
-     * list of container event listeners
-     */
     private final Queue<ContainerEventListener> listeners = new ConcurrentLinkedQueue<>();
-    // number sequences for template names used for new clone name generation
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
 
 
-    public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitor monitor,
-                                 TemplateManager templateManager, TemplateRegistryManager templateRegistry,
+    public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring,
+                                 TemplateManager templateManager, TemplateRegistry templateRegistry,
                                  DbManager dbManager, StrategyManager strategyManager )
     {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
-        this.monitor = monitor;
+        this.monitoring = monitoring;
         this.templateManager = templateManager;
         this.templateRegistry = templateRegistry;
         this.dbManager = dbManager;
@@ -91,7 +88,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     {
         Preconditions.checkNotNull( agentManager, "Agent manager is null" );
         Preconditions.checkNotNull( commandRunner, "Command runner is null" );
-        Preconditions.checkNotNull( monitor, "Monitor is null" );
+        Preconditions.checkNotNull( monitoring, "Monitor is null" );
 
         sequences = new ConcurrentHashMap<>();
         executor = Executors.newCachedThreadPool();
@@ -376,6 +373,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
      *
      * @return map of metrics where key is a physical agent and value is a metric
      */
+    @Override
     public Map<Agent, ServerMetric> getPhysicalServerMetrics()
     {
         final Map<Agent, ServerMetric> serverMetrics = new HashMap<>();
@@ -585,7 +583,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         Map<Metric, Double> averageMetrics = new EnumMap<>( Metric.class );
         for ( Metric metricKey : Metric.values() )
         {
-            Map<Date, Double> metricMap = monitor.getData( agent.getHostname(), metricKey, startDate, endDate );
+            Map<Date, Double> metricMap = monitoring.getData( agent.getHostname(), metricKey, startDate, endDate );
             if ( !metricMap.isEmpty() )
             {
                 double avg = 0;
@@ -699,7 +697,9 @@ public class ContainerManagerImpl extends ContainerManagerBase
         }
         if ( parseOk )
         {
-            return new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
+            ServerMetric serverMetric =
+                    new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc, null );
+            return serverMetric;
         }
         else
         {

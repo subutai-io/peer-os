@@ -5,10 +5,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,12 +63,57 @@ public class RemotePeerRestClient
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                //                JsonObject jsonObject = ( JsonObject ) response.;
+                //                JsonObject jsonObject = ( JsonObject ) response.get;
 
                 LOG.info( response.toString() );
                 return true;
             }
             return false;
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+        }
+
+        return false;
+    }
+
+
+    public boolean invoke( String ip, String port, PeerCommandMessage ccm )
+    {
+        String path = "peer/invoke";
+        try
+        {
+            baseUrl = String.format( baseUrl, ip, port );
+            LOG.info( baseUrl );
+
+            WebClient client = WebClient.create( baseUrl );
+
+            Form form = new Form();
+            form.set( "commandType", ccm.getType().toString() );
+            form.set( "command", ccm.toJson() );
+
+            Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
+                                      .accept( MediaType.APPLICATION_JSON ).form( form );
+
+            String jsonObject = response.readEntity( String.class );
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                //                LOG.info( response.toString() );
+                LOG.info( response.getEntity().toString() );
+                LOG.info( jsonObject );
+                PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
+                ccm.setResult( result.getResult() );
+                LOG.info( String.format( "RESULT: %s", result.toString() ) );
+
+                return true;
+            }
+            else {
+                ccm.setResult( jsonObject );
+                ccm.setSuccess( false );
+                return false;
+            }
         }
         catch ( Exception e )
         {

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
-import org.safehaus.subutai.plugin.spark.ui.SparkUI;
+import org.safehaus.subutai.plugin.spark.ui.SparkPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -32,7 +32,7 @@ public class WelcomeStep extends Panel
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( SparkUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( SparkPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 100, Unit.PIXELS );
         logoImg.setWidth( 192, Unit.PIXELS );

@@ -160,7 +160,7 @@ public class ConfigurationStep extends Panel
             hadoopClustersCombo.setNullSelectionAllowed( false );
 
             List<HadoopClusterConfig> hadoopClusterConfigs = hadoop.getClusters();
-            if ( hadoopClusterConfigs.size() > 0 )
+            if ( !hadoopClusterConfigs.isEmpty() )
             {
                 for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusterConfigs )
                 {
@@ -175,7 +175,7 @@ public class ConfigurationStep extends Panel
             {
                 hadoopClustersCombo.setValue( info );
             }
-            else if ( hadoopClusterConfigs.size() > 0 )
+            else if ( !hadoopClusterConfigs.isEmpty() )
             {
                 hadoopClustersCombo.setValue( hadoopClusterConfigs.iterator().next() );
             }

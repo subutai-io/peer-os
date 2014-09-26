@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ public class EnvironmentBuildTask
     public EnvironmentBuildTask()
     {
         this.uuid = UUID.randomUUID();
+        this.physicalNodes = new HashSet<>();
     }
 
 

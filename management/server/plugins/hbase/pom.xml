@@ -15,10 +15,10 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hbase-plugin-api</module>
-    <module>hbase-plugin-impl</module>
-    <module>hbase-plugin-ui</module>
-    <module>hbase-plugin-cli</module>
-    <module>hbase-plugin-rest</module>
+    <module>hbase-api</module>
+    <module>hbase-impl</module>
+    <module>hbase-ui</module>
+    <module>hbase-cli</module>
+    <module>hbase-rest</module>
   </modules>
 </project>

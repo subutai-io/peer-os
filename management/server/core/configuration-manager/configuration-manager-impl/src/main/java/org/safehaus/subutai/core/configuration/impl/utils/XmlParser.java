@@ -6,7 +6,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -78,10 +78,10 @@ public class XmlParser implements ConfigParser
 
 
     @Override
-    public JsonObject parserConfig( final String pathToConfig, final ConfigTypeEnum configTypeEnum )
+    public JsonObject parserConfig( final String pathToConfig, final ConfiguraitonTypeEnum configuraitonTypeEnum )
     {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configTypeEnum );
+        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configuraitonTypeEnum );
 
         List<HierarchicalConfiguration> properties = config.configurationsAt( "property" );
         config.setDelimiterParsingDisabled( false );

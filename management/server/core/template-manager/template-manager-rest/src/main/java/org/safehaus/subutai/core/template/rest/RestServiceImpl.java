@@ -27,7 +27,7 @@ import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
 import com.google.common.hash.HashCode;
@@ -39,7 +39,7 @@ public class RestServiceImpl implements RestService
 
     private static final Logger logger = Logger.getLogger( RestServiceImpl.class.getName() );
     TemplateManager templateManager;
-    TemplateRegistryManager templateRegistry;
+    TemplateRegistry templateRegistry;
     AptRepositoryManager aptRepoManager;
     AgentManager agentManager;
     CommandRunner commandRunner;
@@ -52,7 +52,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    public void setTemplateRegistry( TemplateRegistryManager templateRegistry )
+    public void setTemplateRegistry( TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
     }

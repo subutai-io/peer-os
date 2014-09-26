@@ -2,14 +2,11 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -20,7 +17,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
@@ -31,11 +27,15 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.AddNodeOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.CheckClusterOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.CheckNodeOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StartNodeOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StopNodeOperationHandler;
+import org.safehaus.subutai.plugin.elasticsearch.impl.handler.UninstallOperationHandler;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -171,44 +171,11 @@ public class ElasticsearchImpl implements Elasticsearch
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName )
+    public UUID uninstallCluster( String clusterName )
     {
-        final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
-
-        executor.execute( new Runnable()
-        {
-
-            public void run()
-            {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
-                if ( elasticsearchClusterConfiguration == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
-
-                po.addLog( "Destroying lxc containers..." );
-
-                try
-                {
-                    lxcManager.destroyLxcs( elasticsearchClusterConfiguration.getNodes() );
-                    po.addLog( "Lxc containers successfully destroyed" );
-                }
-                catch ( LxcDestroyException ex )
-                {
-                    po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
-                }
-                po.addLog( "Updating db..." );
-
-                pluginDAO.deleteInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                        elasticsearchClusterConfiguration.getClusterName() );
-                po.addLogDone( "Cluster info deleted from DB\nDone" );
-            }
-        } );
-
-        return po.getId();
+        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -230,111 +197,29 @@ public class ElasticsearchImpl implements Elasticsearch
 
 
     @Override
-    public UUID startAllNodes( final String clusterName )
+    public UUID startAllNodes( String clusterName )
     {
-        final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                String.format( "Starting cluster %s", clusterName ) );
-
-        executor.execute( new Runnable()
-        {
-            public void run()
-            {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
-                if ( elasticsearchClusterConfiguration == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
-                Command startServiceCommand = Commands.getStartCommand( elasticsearchClusterConfiguration.getNodes() );
-                commandRunner.runCommand( startServiceCommand );
-
-                if ( startServiceCommand.hasSucceeded() )
-                {
-                    po.addLogDone( "Start succeeded" );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
-                }
-            }
-        } );
-
-        return po.getId();
+        AbstractOperationHandler operationHandler = new StartClusterOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
     @Override
     public UUID checkAllNodes( final String clusterName )
     {
-        final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                String.format( "Checking cluster %s", clusterName ) );
-
-        executor.execute( new Runnable()
-        {
-
-            public void run()
-            {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
-                if ( elasticsearchClusterConfiguration == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
-
-                Command checkStatusCommand = Commands.getStatusCommand( elasticsearchClusterConfiguration.getNodes() );
-                commandRunner.runCommand( checkStatusCommand );
-
-                if ( checkStatusCommand.hasSucceeded() )
-                {
-                    po.addLogDone( "All nodes are running." );
-                }
-                else
-                {
-                    logStatusResults( po, checkStatusCommand );
-                }
-            }
-        } );
-
-        return po.getId();
+        AbstractOperationHandler operationHandler = new CheckClusterOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
     @Override
     public UUID stopAllNodes( final String clusterName )
     {
-        final ProductOperation po = tracker.createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
-                String.format( "Stopping cluster %s", clusterName ) );
-
-        executor.execute( new Runnable()
-        {
-
-            public void run()
-            {
-                ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = getCluster( clusterName );
-                if ( elasticsearchClusterConfiguration == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
-
-                Command stopServiceCommand = Commands.getStopCommand( elasticsearchClusterConfiguration.getNodes() );
-                commandRunner.runCommand( stopServiceCommand );
-
-                if ( stopServiceCommand.hasSucceeded() )
-                {
-                    po.addLogDone( "Stop succeeded" );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
-                }
-            }
-        } );
-
-        return po.getId();
+        AbstractOperationHandler operationHandler = new StopClusterOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -395,31 +280,6 @@ public class ElasticsearchImpl implements Elasticsearch
         Preconditions.checkNotNull( po, "Product operation is null" );
 
         return new StandaloneSetupStrategy( environment, elasticsearchClusterConfiguration, po, this );
-    }
-
-
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
-    {
-
-        StringBuilder log = new StringBuilder();
-
-        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
-        {
-
-            String status = "UNKNOWN";
-            if ( e.getValue().getExitCode() == 0 )
-            {
-                status = "RUNNING";
-            }
-            else if ( e.getValue().getExitCode() == 768 )
-            {
-                status = "NOT RUNNING";
-            }
-
-            log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );
-        }
-
-        po.addLogDone( log.toString() );
     }
 
 

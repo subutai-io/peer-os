@@ -9,7 +9,7 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 
 import com.vaadin.data.Property;
@@ -108,7 +108,7 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void addOverHadoopControls( ComponentContainer parent, final Config config )
+    private void addOverHadoopControls( ComponentContainer parent, final LuceneConfig config )
     {
         final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
 
@@ -153,7 +153,7 @@ public class ConfigurationStep extends Panel
                 hadoopClusters.setValue( info );
             }
         }
-        else if ( clusters != null && clusters.size() > 0 )
+        else if ( clusters != null && !clusters.isEmpty() )
         {
             hadoopClusters.setValue( clusters.iterator().next() );
         }
@@ -189,7 +189,7 @@ public class ConfigurationStep extends Panel
     }
 
 
-    private void addWithHadoopControls( ComponentContainer content, final Config config,
+    private void addWithHadoopControls( ComponentContainer content, final LuceneConfig config,
                                         final HadoopClusterConfig hadoopConfig )
     {
 
@@ -268,7 +268,7 @@ public class ConfigurationStep extends Panel
 
     private void nextButtonClickHandler( Wizard wizard )
     {
-        Config config = wizard.getConfig();
+        LuceneConfig config = wizard.getConfig();
         if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
         {
             show( "Enter installation name" );

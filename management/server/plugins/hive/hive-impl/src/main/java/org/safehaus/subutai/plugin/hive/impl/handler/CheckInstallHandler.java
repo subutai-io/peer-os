@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hive.impl.CommandType;
 import org.safehaus.subutai.plugin.hive.impl.Commands;

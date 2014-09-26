@@ -19,11 +19,16 @@ import com.vaadin.ui.VerticalLayout;
 public class TransactionsView extends VerticalLayout implements View
 {
 
+    public TransactionsView()
+    {
+        setSizeFull();
+        addStyleName( "transactions" );
+    }
+
     @Override
     public void enter( ViewChangeEvent event )
     {
 
-        setSizeFull();
-        addStyleName( "transactions" );
+
     }
 }

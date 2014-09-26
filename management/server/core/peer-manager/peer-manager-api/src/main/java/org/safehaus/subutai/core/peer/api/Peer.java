@@ -8,11 +8,25 @@ import java.util.UUID;
  * Created by bahadyr on 9/6/14.
  */
 //@XmlRootElement(name = "Peer")
-public class Peer {
+public class Peer
+{
 
     private String name;
     private String ip;
+    private PeerStatus status;
     private UUID id;
+
+
+    public PeerStatus getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( final PeerStatus status )
+    {
+        this.status = status;
+    }
 
 
     public String getName()

@@ -29,9 +29,7 @@ public class PortalModuleServiceImpl implements PortalModuleService
             LOG.info( "Registering module " + module.getId() );
             modules.add( module );
             for ( PortalModuleListener listener : listeners )
-            {
                 listener.moduleRegistered( module );
-            }
         }
         else
         {

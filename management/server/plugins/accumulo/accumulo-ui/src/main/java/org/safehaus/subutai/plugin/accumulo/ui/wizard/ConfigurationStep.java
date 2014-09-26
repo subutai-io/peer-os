@@ -83,7 +83,7 @@ public class ConfigurationStep extends Panel
 
 
             //fill zkClustersCombo with zk cluster infos
-            if ( zkClusters.size() > 0 )
+            if ( !zkClusters.isEmpty() )
             {
                 for ( ZookeeperClusterConfig zookeeperClusterConfig : zkClusters )
                 {
@@ -101,7 +101,7 @@ public class ConfigurationStep extends Panel
                 zkClustersCombo.setValue( zookeeperClusterConfig );
                 zkClustersCombo.setItemCaption( zookeeperClusterConfig, zookeeperClusterConfig.getClusterName() );
             }
-            else if ( zkClusters.size() > 0 )
+            else if ( !zkClusters.isEmpty() )
             {
                 //select first one if saved not found
                 zkClustersCombo.setValue( zkClusters.iterator().next() );
@@ -127,7 +127,7 @@ public class ConfigurationStep extends Panel
             } );
 
             //fill hadoopClustersCombo with hadoop cluster infos
-            if ( hadoopClusters.size() > 0 )
+            if ( !hadoopClusters.isEmpty() )
             {
                 for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusters )
                 {
@@ -145,7 +145,7 @@ public class ConfigurationStep extends Panel
                 hadoopClustersCombo.setValue( hadoopClusterConfig );
                 hadoopClustersCombo.setItemCaption( hadoopClusterConfig, hadoopClusterConfig.getClusterName() );
             }
-            else if ( hadoopClusters.size() > 0 )
+            else if ( !hadoopClusters.isEmpty() )
             {
                 //select first one if saved not found
                 hadoopClustersCombo.setValue( hadoopClusters.iterator().next() );

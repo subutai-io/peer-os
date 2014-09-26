@@ -32,7 +32,7 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class Cloner extends VerticalLayout
 {
 
@@ -43,12 +43,12 @@ public class Cloner extends VerticalLayout
     private final Label indicator;
     private final TreeTable lxcTable;
     private final LxcManager lxcManager;
-    private static final String physicalHostLabel = "Physical Host";
-    private static final String statusLabel = "Status";
-    private static final String okIconSource = "img/ok.png";
-    private static final String errorIconSource = "img/cancel.png";
-    private static final String loadIconSource = "img/spinner.gif";
-    private static final String hostValidatorRegex =
+    private final String physicalHostLabel = "Physical Host";
+    private final String statusLabel = "Status";
+    private final String okIconSource = "img/ok.png";
+    private final String errorIconSource = "img/cancel.png";
+    private final String loadIconSource = "img/spinner.gif";
+    private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
     private final Executor executor;
@@ -86,120 +86,6 @@ public class Cloner extends VerticalLayout
             }
         }
     };
-
-
-    private class LxcCloneRunnable implements Runnable
-    {
-        private Agent agent;
-        private String lxcHostname;
-        private AtomicInteger countProcessed;
-
-
-        public LxcCloneRunnable( Agent agent, String lxcHostname, final AtomicInteger countProcessed )
-        {
-            this.agent = agent;
-            this.lxcHostname = lxcHostname;
-            this.countProcessed = countProcessed;
-        }
-
-
-        @Override
-        public void run()
-        {
-            boolean result = lxcManager.cloneLxcOnHost( agent, lxcHostname );
-            Item row = lxcTable.getItem( lxcHostname );
-            if ( row != null )
-            {
-                if ( result )
-                {
-                    row.getItemProperty( "Status" ).setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
-                }
-                else
-                {
-                    row.getItemProperty( "Status" )
-                       .setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
-                }
-            }
-            if ( countProcessed.decrementAndGet() == 0 )
-            {
-                indicator.setVisible( false );
-            }
-        }
-    }
-
-
-    private class CloneRunnable implements Runnable
-    {
-        private double count;
-        private String productName;
-
-
-        public CloneRunnable( String productName, double count )
-        {
-            this.count = count;
-            this.productName = productName;
-        }
-
-
-        @Override
-        public void run()
-        {
-            Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
-            if ( bestServers.isEmpty() )
-            {
-                show( "No servers available to accommodate new lxc containers" );
-                indicator.setVisible( false );
-            }
-            else
-            {
-                int numOfLxcSlots = 0;
-                for ( Map.Entry<Agent, Integer> srv : bestServers.entrySet() )
-                {
-                    numOfLxcSlots += srv.getValue();
-                }
-
-                if ( numOfLxcSlots < count )
-                {
-                    show( String.format( "Only %s lxc containers can be created", numOfLxcSlots ) );
-                    indicator.setVisible( false );
-                }
-                else
-                {
-
-                    Map<Agent, List<String>> agentFamilies = new HashMap<>();
-                    int numOfLxcsToClone = ( int ) count;
-                    final AtomicInteger countProcessed = new AtomicInteger( numOfLxcsToClone );
-
-                    for ( int i = 1; i <= numOfLxcsToClone; i++ )
-                    {
-                        Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
-                        final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                        bestServers.put( entry.getKey(), entry.getValue() - 1 );
-                        List<String> lxcHostNames = agentFamilies.get( entry.getKey() );
-                        if ( lxcHostNames == null )
-                        {
-                            lxcHostNames = new ArrayList<>();
-                            agentFamilies.put( entry.getKey(), lxcHostNames );
-                        }
-                        final StringBuilder lxcHost = new StringBuilder();
-                        if ( !Strings.isNullOrEmpty( productName ) )
-                        {
-                            lxcHost.append( productName );
-                            lxcHost.append( lxcHostNames.size() + 1 );
-                            lxcHost.append( "-" );
-                        }
-                        lxcHost.append( UUIDUtil.generateTimeBasedUUID().toString() );
-                        lxcHostNames.add( lxcHost.toString() );
-
-                        //start clone task
-                        executor.execute( new LxcCloneRunnable( entry.getKey(), lxcHost.toString(), countProcessed ) );
-                    }
-
-                    populateLxcTable( agentFamilies );
-                }
-            }
-        }
-    }
 
 
     public Cloner( final LxcManager lxcManager, AgentTree agentTree, Executor executor )
@@ -351,5 +237,119 @@ public class Cloner extends VerticalLayout
         table.setSelectable( false );
         table.setImmediate( true );
         return table;
+    }
+
+
+    private class LxcCloneRunnable implements Runnable
+    {
+        private Agent agent;
+        private String lxcHostname;
+        private AtomicInteger countProcessed;
+
+
+        public LxcCloneRunnable( Agent agent, String lxcHostname, final AtomicInteger countProcessed )
+        {
+            this.agent = agent;
+            this.lxcHostname = lxcHostname;
+            this.countProcessed = countProcessed;
+        }
+
+
+        @Override
+        public void run()
+        {
+            boolean result = lxcManager.cloneLxcOnHost( agent, lxcHostname );
+            Item row = lxcTable.getItem( lxcHostname );
+            if ( row != null )
+            {
+                if ( result )
+                {
+                    row.getItemProperty( "Status" ).setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
+                }
+                else
+                {
+                    row.getItemProperty( "Status" )
+                       .setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
+                }
+            }
+            if ( countProcessed.decrementAndGet() == 0 )
+            {
+                indicator.setVisible( false );
+            }
+        }
+    }
+
+
+    private class CloneRunnable implements Runnable
+    {
+        private double count;
+        private String productName;
+
+
+        public CloneRunnable( String productName, double count )
+        {
+            this.count = count;
+            this.productName = productName;
+        }
+
+
+        @Override
+        public void run()
+        {
+            Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
+            if ( bestServers.isEmpty() )
+            {
+                show( "No servers available to accommodate new lxc containers" );
+                indicator.setVisible( false );
+            }
+            else
+            {
+                int numOfLxcSlots = 0;
+                for ( Map.Entry<Agent, Integer> srv : bestServers.entrySet() )
+                {
+                    numOfLxcSlots += srv.getValue();
+                }
+
+                if ( numOfLxcSlots < count )
+                {
+                    show( String.format( "Only %s lxc containers can be created", numOfLxcSlots ) );
+                    indicator.setVisible( false );
+                }
+                else
+                {
+
+                    Map<Agent, List<String>> agentFamilies = new HashMap<>();
+                    int numOfLxcsToClone = ( int ) count;
+                    final AtomicInteger countProcessed = new AtomicInteger( numOfLxcsToClone );
+
+                    for ( int i = 1; i <= numOfLxcsToClone; i++ )
+                    {
+                        Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( bestServers );
+                        final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                        bestServers.put( entry.getKey(), entry.getValue() - 1 );
+                        List<String> lxcHostNames = agentFamilies.get( entry.getKey() );
+                        if ( lxcHostNames == null )
+                        {
+                            lxcHostNames = new ArrayList<>();
+                            agentFamilies.put( entry.getKey(), lxcHostNames );
+                        }
+                        final StringBuilder lxcHost = new StringBuilder();
+                        if ( !Strings.isNullOrEmpty( productName ) )
+                        {
+                            lxcHost.append( productName );
+                            lxcHost.append( lxcHostNames.size() + 1 );
+                            lxcHost.append( "-" );
+                        }
+                        lxcHost.append( UUIDUtil.generateTimeBasedUUID().toString() );
+                        lxcHostNames.add( lxcHost.toString() );
+
+                        //start clone task
+                        executor.execute( new LxcCloneRunnable( entry.getKey(), lxcHost.toString(), countProcessed ) );
+                    }
+
+                    populateLxcTable( agentFamilies );
+                }
+            }
+        }
     }
 }

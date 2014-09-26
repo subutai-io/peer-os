@@ -31,6 +31,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
+      <version>${org.slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -47,6 +48,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-custom</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

@@ -3,9 +3,9 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
@@ -39,13 +39,13 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
         if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null )
         {
-            po.addLogFailed( String.format( "Master node %s is not connected\nOperation aborted",
+            po.addLogFailed( String.format( "Master node %s is not connected. Operation aborted",
                     config.getMasterNode().getHostname() ) );
             return;
         }
@@ -53,14 +53,14 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )
         {
-            po.addLogFailed( String.format( "New node %s is not connected\nOperation aborted", hostname ) );
+            po.addLogFailed( String.format( "New node %s is not connected. Operation aborted", hostname ) );
             return;
         }
 
         //check if node is in the cluster
         if ( config.getSlaveNodes().contains( agent ) )
         {
-            po.addLogFailed( String.format( "Node %s already belongs to this cluster\nOperation aborted",
+            po.addLogFailed( String.format( "Node %s already belongs to this cluster. Operation aborted",
                     agent.getHostname() ) );
             return;
         }
@@ -82,7 +82,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            po.addLogFailed( "Failed to check presence of installed ksks packages\nOperation aborted" );
+            po.addLogFailed( "Failed to check presence of installed ksks packages. Operation aborted" );
             return;
         }
 
@@ -90,12 +90,12 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         if ( result.getStdOut().contains( "ksks-spark" ) && install )
         {
-            po.addLogFailed( String.format( "Node %s already has Spark installed\nOperation aborted", hostname ) );
+            po.addLogFailed( String.format( "Node %s already has Spark installed. Operation aborted", hostname ) );
             return;
         }
         else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
         {
-            po.addLogFailed( String.format( "Node %s has no Hadoop installation\nOperation aborted", hostname ) );
+            po.addLogFailed( String.format( "Node %s has no Hadoop installation. Operation aborted", hostname ) );
             return;
         }
 
@@ -131,14 +131,14 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         if ( setMasterIPCommand.hasSucceeded() )
         {
-            po.addLog( "Master IP successfully set\nRegistering slave with master..." );
+            po.addLog( "Master IP successfully set. Registering slave with master..." );
 
             Command addSlaveCommand = Commands.getAddSlaveCommand( agent, config.getMasterNode() );
             manager.getCommandRunner().runCommand( addSlaveCommand );
 
             if ( addSlaveCommand.hasSucceeded() )
             {
-                po.addLog( "Registration succeeded\nRestarting master..." );
+                po.addLog( "Registration succeeded. Restarting master..." );
 
                 Command restartMasterCommand = Commands.getRestartMasterCommand( config.getMasterNode() );
                 final AtomicBoolean ok = new AtomicBoolean();
@@ -158,7 +158,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
                 if ( ok.get() )
                 {
-                    po.addLog( "Master restarted successfully\nStarting Spark on new node..." );
+                    po.addLog( "Master restarted successfully. Starting Spark on new node..." );
 
                     Command startSlaveCommand = Commands.getStartSlaveCommand( agent );
                     ok.set( false );
@@ -178,7 +178,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
                     if ( ok.get() )
                     {
-                        po.addLogDone( "Spark started successfully\nDone" );
+                        po.addLogDone( "Spark started successfully. Done" );
                     }
                     else
                     {

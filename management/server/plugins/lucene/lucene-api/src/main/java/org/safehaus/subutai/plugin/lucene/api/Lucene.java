@@ -10,14 +10,14 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
-public interface Lucene extends ApiBase<Config>
+public interface Lucene extends ApiBase<LuceneConfig>
 {
 
-    public UUID installCluster( Config config, HadoopClusterConfig hadoopConfig );
+    public UUID installCluster( LuceneConfig config, HadoopClusterConfig hadoopConfig );
 
     public UUID addNode( String clusterName, String lxcHostname );
 
     public UUID destroyNode( String clusterName, String lxcHostname );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, Config config, ProductOperation po );
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, LuceneConfig config, ProductOperation po );
 }

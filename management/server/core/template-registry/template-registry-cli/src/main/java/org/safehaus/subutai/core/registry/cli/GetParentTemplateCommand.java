@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.registry.cli;
 
 
 import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -24,21 +24,20 @@ public class GetParentTemplateCommand extends OsgiCommandSupport
             description = "lxc arch, default = amd64" )
     String lxcArch;
 
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager )
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
     }
 
 
     @Override
     protected Object doExecute() throws Exception
     {
-        Template template =
-                Strings.isNullOrEmpty( lxcArch ) ? templateRegistryManager.getParentTemplate( childTemplateName ) :
-                templateRegistryManager.getParentTemplate( childTemplateName, lxcArch );
+        Template template = Strings.isNullOrEmpty( lxcArch ) ? templateRegistry.getParentTemplate( childTemplateName ) :
+                            templateRegistry.getParentTemplate( childTemplateName, lxcArch );
 
         if ( template != null )
         {

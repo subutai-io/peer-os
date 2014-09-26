@@ -22,7 +22,7 @@ public interface RestService
     @Path("peer")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.TEXT_PLAIN)
-    public Peer registerPeer( String peer );
+    public Peer registerPeer( @QueryParam( "peer" ) String peer );
 
     @POST
     @Path("containers")
@@ -59,7 +59,17 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConnectedAgents( @QueryParam("envId") String environmentId );
 
+    @POST
+    @Path( "invoke" )
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response invoke(@FormParam("commandType") String commandType, @FormParam( "command" ) String command);
+
     @GET
-    @Path("ping")
+    @Path( "ping" )
     public Response ping();
+
+    @POST
+    @Path("register")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response processRegisterRequest( @QueryParam("peer") String peer );
 }

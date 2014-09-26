@@ -12,7 +12,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.sqoop.ui.SqoopUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.sqoop.ui.SqoopPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
 

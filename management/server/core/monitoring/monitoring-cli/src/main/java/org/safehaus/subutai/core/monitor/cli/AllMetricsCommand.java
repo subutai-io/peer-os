@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.api.Monitor;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.karaf.shell.commands.Argument;
@@ -20,12 +20,12 @@ public class AllMetricsCommand extends OsgiCommandSupport
     @Argument(index = 0, name = "hostname", required = true, multiValued = false)
     protected String hostname = null;
 
-    private Monitor monitor;
+    private Monitoring monitoring;
 
 
-    public void setMonitor( Monitor monitor )
+    public void setMonitoring( Monitoring monitoring )
     {
-        this.monitor = monitor;
+        this.monitoring = monitoring;
     }
 
 
@@ -35,7 +35,7 @@ public class AllMetricsCommand extends OsgiCommandSupport
         Date endDate = new Date();
         Date startDate = DateUtils.addDays( endDate, -1 );
 
-        Map<Metric, Map<Date, Double>> data = monitor.getDataForAllMetrics( hostname, startDate, endDate );
+        Map<Metric, Map<Date, Double>> data = monitoring.getDataForAllMetrics( hostname, startDate, endDate );
 
         System.out.println( "Data: " + data );
 

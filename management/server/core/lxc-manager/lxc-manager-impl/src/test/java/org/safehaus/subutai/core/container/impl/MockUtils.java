@@ -13,9 +13,9 @@ import java.util.UUID;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -77,7 +77,7 @@ public class MockUtils
                         {
                             return MockUtils.getCommand( true, true, 0, "RUNNING", null );
                         }
-                        else if ( request.getProgram().contains( "lxc-list" ) )
+                        else if ( request.getProgram().contains( "lxc-ls" ) )
                         {
                             return MockUtils.getCommand( true, true, 0, getLxcListOutput(), null );
                         }

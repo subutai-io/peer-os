@@ -20,7 +20,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -379,7 +380,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( CloneContainersMessage ccm )
+    public void createContainers( CloneContainersMessage ccm )
     {
         UUID envId = ccm.getEnvId();
         String template = ccm.getTemplate();
@@ -387,14 +388,15 @@ public class PeerManagerImpl implements PeerManager
         String strategy = ccm.getStrategy();
         try
         {
-            return containerManager.clone( envId, template, numberOfNodes, strategy, null );
+            Set<Agent> result = containerManager.clone( envId, template, numberOfNodes, strategy, null );
+            ccm.setSuccess( true );
+            ccm.setResult( result );
         }
         catch ( ContainerCreateException e )
         {
-            LOG.error( e.getMessage() );
+            ccm.setSuccess( false );
+            ccm.setResult( e.toString() );
         }
-        //TODO: replace with empty set;
-        return null;
     }
 
 
@@ -449,44 +451,72 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public boolean invoke( PeerCommand peerCommand ) throws PeerException
+    @Override
+    public void invoke( PeerCommandMessage peerCommandMessage )
     {
-        boolean result = false;
-        switch ( peerCommand.getType() )
+        PeerContainer peerContainer = containerLookup( peerCommandMessage );
+        LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
+        switch ( peerCommandMessage.getType() )
         {
             case CLONE:
-                CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
-                createContainers( ccm );
+                if ( peerCommandMessage instanceof CloneContainersMessage )
+                {
+                    CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
+                    createContainers( ccm );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( false );
+                    peerCommandMessage.setResult( "Invalid CLONE command." );
+                }
                 break;
             case START:
-                PeerContainer peerContainer = containerLookup( peerCommand );
-                result = startContainer( peerContainer );
+                peerCommandMessage.setSuccess( startContainer( peerContainer ) );
                 break;
             case STOP:
-                PeerContainer peerContainer1 = containerLookup( peerCommand );
-                result = stopContainer( peerContainer1 );
+                peerCommandMessage.setSuccess( stopContainer( peerContainer ) );
                 break;
             case ISCONNECTED:
-                PeerContainer peerContainer2 = containerLookup( peerCommand );
-                result = isContainerConnected( peerContainer2 );
+                peerCommandMessage.setSuccess( isContainerConnected( peerContainer ) );
+                break;
+            case EXECUTE:
+                if ( peerCommandMessage instanceof ExecuteCommandMessage )
+                {
+                    ExecuteCommandMessage ecm = ( ExecuteCommandMessage ) peerCommandMessage;
+                    executeCommand( peerContainer, ecm );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( false );
+                    peerCommandMessage.setResult( "Invalid EXECUTE command." );
+                }
                 break;
             default:
-                //TODO: log or exception?
+                peerCommandMessage.setResult( "Unknown command." );
+                peerCommandMessage.setSuccess( false );
                 break;
         }
-        return result;
+
+        LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
     }
 
 
-    private PeerContainer containerLookup( PeerCommand peerCommand ) throws PeerException
+    private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
     {
+        ecm.setResult( "Command executor stub!!!" );
+        ecm.setSuccess( true );
+        // TODO: Implement me
+    }
 
-        UUID agentId = peerCommand.getMessage().getAgentId();
-        PeerContainer container = findPeerContainer( agentId );
-        if ( container == null )
+
+    private PeerContainer containerLookup( PeerCommandMessage peerCommand )
+    {
+        if ( peerCommand.getAgentId() == null )
         {
-            throw new PeerException( String.format( "Container does not exist [%s]", agentId ) );
+            return null;
         }
+        UUID agentId = peerCommand.getAgentId();
+        PeerContainer container = findPeerContainer( agentId );
         return container;
     }
 
@@ -521,16 +551,16 @@ public class PeerManagerImpl implements PeerManager
                 for (; a.hasMoreElements(); )
                 {
                     InetAddress addr = a.nextElement();
-                    if ( addr.getHostAddress().startsWith( "172" ) )
+                    if ( !addr.getHostAddress().startsWith( "10" ) && addr.isSiteLocalAddress() )
                     {
-                        return addr.getHostAddress();
+                        return ( addr.getHostName() );
                     }
                 }
             }
         }
         catch ( SocketException e )
         {
-            LOG.error( e.getMessage() );
+            System.out.println( e.getMessage() );
         }
 
 

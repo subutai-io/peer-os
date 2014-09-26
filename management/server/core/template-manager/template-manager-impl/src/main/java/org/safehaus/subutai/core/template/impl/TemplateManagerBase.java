@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.template.impl;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
 
@@ -13,7 +13,7 @@ public abstract class TemplateManagerBase implements TemplateManager
 
     CommandRunner commandRunner;
     AgentManager agentManager;
-    TemplateRegistryManager templateRegistry;
+    TemplateRegistry templateRegistry;
     AptRepositoryManager repoManager;
 
     ScriptExecutor scriptExecutor;
@@ -43,13 +43,13 @@ public abstract class TemplateManagerBase implements TemplateManager
     }
 
 
-    public TemplateRegistryManager getTemplateRegistry()
+    public TemplateRegistry getTemplateRegistry()
     {
         return templateRegistry;
     }
 
 
-    public void setTemplateRegistry( TemplateRegistryManager templateRegistry )
+    public void setTemplateRegistry( TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
     }

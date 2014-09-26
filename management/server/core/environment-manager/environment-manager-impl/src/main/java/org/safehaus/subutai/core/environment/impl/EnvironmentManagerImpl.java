@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.protocol.PeerCommand;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -27,16 +27,16 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
-import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 
 /**
@@ -49,15 +49,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String ENVIRONMENT = "ENVIRONMENT";
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
-    private BlueprintParser blueprintParser;
     private ContainerManager containerManager;
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private DbManager dbManager;
-    //    private PeerManager peerManager;
     private PeerCommandDispatcher peerCommandDispatcher;
     private Set<EnvironmentContainer> containers = new HashSet<>();
 
@@ -79,23 +78,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    /*public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }*/
-
-
     public void init()
     {
-        this.blueprintParser = new BlueprintParser();
+
         this.environmentDAO = new EnvironmentDAO( dbManager );
-        environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
+        environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager );
     }
 
 
@@ -103,13 +90,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.environmentDAO = null;
         this.environmentBuilder = null;
-        this.blueprintParser = null;
         this.containerManager = null;
-        this.templateRegistryManager = null;
+        this.templateRegistry = null;
         this.agentManager = null;
         this.networkManager = null;
         this.dbManager = null;
-        //        this.peerManager = null;
     }
 
 
@@ -137,18 +122,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public BlueprintParser getBlueprintParser()
-    {
-        return blueprintParser;
-    }
-
-
-    public void setBlueprintParser( final BlueprintParser blueprintParser )
-    {
-        this.blueprintParser = blueprintParser;
-    }
-
-
     public ContainerManager getContainerManager()
     {
         return containerManager;
@@ -161,15 +134,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public TemplateRegistryManager getTemplateRegistryManager()
+    public TemplateRegistry getTemplateRegistry()
     {
-        return templateRegistryManager;
+        return templateRegistry;
     }
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager )
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -265,17 +238,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-
+            EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprintStr, EnvironmentBlueprint.class );
             EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-            environmentBuildTask.setEnvironmentBlueprint( blueprint );
+            environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
             return environmentDAO
                     .saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
         }
-        catch ( JsonSyntaxException e )
+        catch ( JsonParseException e )
         {
-            LOG.error( e.getMessage(), e );
+            LOG.info( e.getMessage() );
         }
         return false;
     }
@@ -292,13 +264,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean deleteBlueprint( String uuid )
     {
         return environmentDAO.deleteInfo( BLUEPRINT, uuid );
-    }
-
-
-    @Override
-    public String parseBlueprint( final EnvironmentBlueprint blueprint )
-    {
-        return blueprintParser.parseEnvironmentBlueprint( blueprint );
     }
 
 
@@ -333,22 +298,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 
-            PeerCommand peerCommand = new PeerCommand( PeerCommandType.CLONE, ccm );
+            ccm.setType( PeerCommandType.CLONE );
             try
             {
-                boolean result = peerCommandDispatcher.invoke( peerCommand );
+                peerCommandDispatcher.invoke( ccm );
+                boolean result = ccm.isSuccess();
                 if ( result )
                 {
-
-                    //TODO: Assign data from set of agents received
-
-                    EnvironmentContainer container = new EnvironmentContainer();
-                    container.setPeerId( ccm.getPeerId() );
-                    //                    container.setAgentId(  );
-                    //                    container.setHostname(  );
-                    container.setDescription( ccm.getTemplate() );
-                    container.setName( ccm.getTemplate() );
-                    environment.addContainer( container );
+                    Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
+                    for ( Agent agent : agents )
+                    {
+                        LOG.info( String.format( "------------> Adding container: %s", agent.toString() ) );
+                        EnvironmentContainer container = new EnvironmentContainer();
+                        container.setPeerId( agent.getSiteId() );
+                        container.setAgentId( agent.getUuid() );
+                        container.setHostname( agent.getHostname() );
+                        container.setDescription( ccm.getTemplate() );
+                        container.setName( agent.getHostname() );
+                        environment.addContainer( container );
+                    }
                 }
             }
             catch ( PeerCommandException e )
@@ -391,46 +359,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public boolean startContainer( final EnvironmentContainer container )
     {
-        PeerCommand peerCommand = new PeerCommand( PeerCommandType.START,
-                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
-        return peerCommandDispatcher.invoke( peerCommand );
+        PeerCommandMessage cm =
+                new PeerCommandMessage( PeerCommandType.START, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
     }
 
 
     @Override
     public boolean stopContainer( final EnvironmentContainer container )
     {
-        PeerCommand peerCommand = new PeerCommand( PeerCommandType.STOP,
-                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
-        return peerCommandDispatcher.invoke( peerCommand );
+        PeerCommandMessage cm =
+                new PeerCommandMessage( PeerCommandType.STOP, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
     }
 
 
     @Override
     public boolean isContainerConnected( final EnvironmentContainer container )
     {
-        PeerCommand peerCommand = new PeerCommand( PeerCommandType.ISCONNECTED,
-                new PeerCommandMessage( container.getPeerId(), container.getAgentId() ) );
-        return peerCommandDispatcher.invoke( peerCommand );
-    }
-
-
-    private boolean build( EnvironmentBuildTask environmentBuildTask )
-    {
-
-        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
-                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) )
-        {
-            try
-            {
-                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
-                return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-            }
-            catch ( EnvironmentBuildException e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
-        }
-        return false;
+        PeerCommandMessage cm =
+                new PeerCommandMessage( PeerCommandType.ISCONNECTED, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
     }
 }

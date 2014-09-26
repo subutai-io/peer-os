@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.pig.cli;
 
 import java.util.List;
 
-import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -31,10 +31,10 @@ public class ListClustersCommand extends OsgiCommandSupport
 
     protected Object doExecute()
     {
-        List<Config> configList = pigManager.getClusters();
+        List<PigConfig> configList = pigManager.getClusters();
         if ( !configList.isEmpty() )
         {
-            for ( Config config : configList )
+            for ( PigConfig config : configList )
             {
                 System.out.println( config.getClusterName() );
             }

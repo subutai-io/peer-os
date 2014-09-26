@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.lucene.ui.wizard;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
-import org.safehaus.subutai.plugin.lucene.ui.LuceneUI;
+import org.safehaus.subutai.plugin.lucene.ui.LucenePortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -32,7 +32,7 @@ public class WelcomeStep extends Panel
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( LuceneUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( LucenePortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 206, Unit.PIXELS );
         logoImg.setWidth( 100, Unit.PIXELS );

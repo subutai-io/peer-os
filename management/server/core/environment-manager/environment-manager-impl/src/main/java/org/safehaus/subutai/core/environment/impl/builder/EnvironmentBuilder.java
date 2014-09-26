@@ -21,7 +21,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.collect.Lists;
 
@@ -32,15 +32,15 @@ import com.google.common.collect.Lists;
 public class EnvironmentBuilder
 {
 
-    private final TemplateRegistryManager templateRegistryManager;
+    private final TemplateRegistry templateRegistry;
     private final AgentManager agentManager;
     private final NetworkManager networkManager;
 
 
-    public EnvironmentBuilder( final TemplateRegistryManager templateRegistryManager, final AgentManager agentManager,
+    public EnvironmentBuilder( final TemplateRegistry templateRegistry, final AgentManager agentManager,
                                NetworkManager networkManager )
     {
-        this.templateRegistryManager = templateRegistryManager;
+        this.templateRegistry = templateRegistry;
         this.agentManager = agentManager;
         this.networkManager = networkManager;
     }
@@ -56,7 +56,7 @@ public class EnvironmentBuilder
         Set<String> physicalNodes = environmentBuildTask.getPhysicalNodes();
 
 
-        Environment environment = new Environment( blueprint.getName(), environmentBuildTask.getPeerUuid() );
+        Environment environment = new Environment( blueprint.getName(), environmentBuildTask.getUuid() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
         {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
@@ -67,10 +67,9 @@ public class EnvironmentBuilder
                                 nodeGroup.getNumberOfNodes() ) );
             }
 
-            Set<Agent> physicalAgents = null;
-            if ( physicalNodes != null && !physicalNodes.isEmpty() )
+            Set<Agent> physicalAgents = new HashSet<>();
+            if ( !physicalNodes.isEmpty() )
             {
-                physicalAgents = new HashSet<>();
                 for ( String host : physicalNodes )
                 {
                     Agent pAgent = agentManager.getAgentByHostname( host );
@@ -82,7 +81,7 @@ public class EnvironmentBuilder
                     physicalAgents.add( pAgent );
                 }
             }
-            Template template = templateRegistryManager.getTemplate( nodeGroup.getTemplateName() );
+            Template template = templateRegistry.getTemplate( nodeGroup.getTemplateName() );
             if ( template == null )
             {
                 throw new EnvironmentBuildException(

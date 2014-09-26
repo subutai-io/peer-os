@@ -9,14 +9,10 @@ import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -33,17 +29,14 @@ import com.vaadin.ui.themes.Runo;
 public class EnvironmentBuildWizard extends DetailsWindow
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentBuildWizard.class.getName() );
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    int step = 0;
-    EnvironmentBuildTask environmentBuildTask;
-    Table peersTable;
-    Table containerToPeerTable;
-    private EnvironmentManagerUI managerUI;
+    private int step = 0;
+    private EnvironmentBuildTask environmentBuildTask;
+    private Table peersTable;
+    private Table containerToPeerTable;
+    private EnvironmentManagerPortalModule managerUI;
 
 
-    public EnvironmentBuildWizard( final String caption, EnvironmentManagerUI managerUI,
+    public EnvironmentBuildWizard( final String caption, EnvironmentManagerPortalModule managerUI,
                                    EnvironmentBuildTask environmentBuildTask )
     {
         super( caption );
@@ -80,17 +73,22 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 close();
                 break;
             }
+            default:
+            {
+                setContent( genPeersTable() );
+                break;
+            }
         }
     }
 
 
-    public EnvironmentManagerUI getManagerUI()
+    public EnvironmentManagerPortalModule getManagerUI()
     {
         return managerUI;
     }
 
 
-    public void setManagerUI( final EnvironmentManagerUI managerUI )
+    public void setManagerUI( final EnvironmentManagerPortalModule managerUI )
     {
         this.managerUI = managerUI;
     }
@@ -145,7 +143,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                if ( selectedPeers().size() > 0 )
+                if ( !selectedPeers().isEmpty() )
                 {
                     next();
                 }

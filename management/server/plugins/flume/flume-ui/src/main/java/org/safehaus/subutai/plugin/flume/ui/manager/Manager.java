@@ -241,7 +241,7 @@ public class Manager
             stopBtn.setEnabled( true );
             startBtn.setEnabled( true );
 
-            String ip = agent.getListIP() != null && agent.getListIP().size() > 0 ? agent.getListIP().get( 0 ) : "";
+            String ip = agent.getListIP() != null && !agent.getListIP().isEmpty() ? agent.getListIP().get( 0 ) : "";
             table.addItem( new Object[] {
                     agent.getHostname(), ip, startBtn, stopBtn, destroyBtn
             }, null );
@@ -353,7 +353,7 @@ public class Manager
         List<FlumeConfig> clustersInfo = flume.getClusters();
         FlumeConfig clusterInfo = ( FlumeConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( clustersInfo != null && clustersInfo.size() > 0 )
+        if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
             for ( FlumeConfig ci : clustersInfo )
             {
