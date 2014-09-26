@@ -4,13 +4,13 @@ package org.safehaus.subutai.plugin.presto.impl;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
 import com.google.common.base.Preconditions;

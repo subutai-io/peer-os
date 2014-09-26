@@ -51,24 +51,24 @@ import static org.safehaus.subutai.plugin.hbase.api.HBaseType.HMaster;
 
 public class Manager
 {
-    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
-    protected final static String REFRESH_CLUSTER_CAPTION = "Refresh Clusters";
-    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
-    protected final static String CHECK_BUTTON_CAPTION = "Check";
-    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
-    protected final static String START_BUTTON_CAPTION = "Start";
-    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
-    protected final static String STOP_BUTTON_CAPTION = "Stop";
-    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
-    protected final static String HOST_COLUMN_CAPTION = "Host";
-    protected final static String IP_COLUMN_CAPTION = "IP List";
-    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
-    protected final static String STATUS_COLUMN_CAPTION = "Status";
-    protected final static String ADD_NODE_CAPTION = "Add Node";
-    protected final static String TABLE_CAPTION = "All Nodes";
-    protected final static String BUTTON_STYLE_NAME = "default";
-    private static Table nodesTable = null;
+
+    protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String REFRESH_CLUSTER_CAPTION = "Refresh Clusters";
+    protected static final String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected static final String CHECK_BUTTON_CAPTION = "Check";
+    protected static final String START_ALL_BUTTON_CAPTION = "Start All";
+    protected static final String START_BUTTON_CAPTION = "Start";
+    protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected static final String STOP_BUTTON_CAPTION = "Stop";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String HOST_COLUMN_CAPTION = "Host";
+    protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected static final String STATUS_COLUMN_CAPTION = "Status";
+    protected static final String ADD_NODE_CAPTION = "Add Node";
+    protected static final String TABLE_CAPTION = "All Nodes";
+    protected static final String BUTTON_STYLE_NAME = "default";
     protected final Button refreshClustersBtn, startAllNodesBtn, stopAllNodesBtn, checkAllBtn, destroyClusterBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
@@ -83,6 +83,7 @@ public class Manager
     private final Pattern REGION_PATTERN = Pattern.compile( ".*(HRegionServer.+?g).*" );
     private final Pattern QUORUM_PATTERN = Pattern.compile( ".*(HQuorumPeer.+?g).*" );
     private HBaseClusterConfig config;
+    private Table nodesTable = null;
 
 
     public Manager( final ExecutorService executor, final ServiceLocator serviceLocator ) throws NamingException
@@ -295,17 +296,17 @@ public class Manager
         PROGRESS_ICON.setVisible( true );
         disableOREnableAllButtonsOnTable( nodesTable, false );
         executor.execute( new StopTask( hbase, tracker, config.getClusterName(), new CompleteEvent()
+        {
+            @Override
+            public void onComplete( String result )
+            {
+                synchronized ( PROGRESS_ICON )
                 {
-                    @Override
-                    public void onComplete( String result )
-                    {
-                        synchronized ( PROGRESS_ICON )
-                        {
-                            disableOREnableAllButtonsOnTable( nodesTable, true );
-                            checkAllNodes();
-                        }
-                    }
-                } ) );
+                    disableOREnableAllButtonsOnTable( nodesTable, true );
+                    checkAllNodes();
+                }
+            }
+        } ) );
     }
 
 
@@ -314,17 +315,17 @@ public class Manager
         PROGRESS_ICON.setVisible( true );
         disableOREnableAllButtonsOnTable( nodesTable, false );
         executor.execute( new StartTask( hbase, tracker, config.getClusterName(), new CompleteEvent()
+        {
+            @Override
+            public void onComplete( String result )
+            {
+                synchronized ( PROGRESS_ICON )
                 {
-                    @Override
-                    public void onComplete( String result )
-                    {
-                        synchronized ( PROGRESS_ICON )
-                        {
-                            disableOREnableAllButtonsOnTable( nodesTable, true );
-                            checkAllNodes();
-                        }
-                    }
-                } ) );
+                    disableOREnableAllButtonsOnTable( nodesTable, true );
+                    checkAllNodes();
+                }
+            }
+        } ) );
     }
 
 
@@ -348,7 +349,6 @@ public class Manager
             }
         }
     }
-
 
 
     private void populateTable( final Table table, Set<Agent> agents )
@@ -391,18 +391,18 @@ public class Manager
                     stopBtn.setEnabled( false );
                     checkBtn.setEnabled( false );
                     executor.execute( new CheckTask( hbase, tracker, config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent()
+                            new CompleteEvent()
+                            {
+                                public void onComplete( String result )
+                                {
+                                    synchronized ( PROGRESS_ICON )
                                     {
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( PROGRESS_ICON )
-                                            {
-                                                resultHolder.setValue( parseStatus( result, findNodeRoles( agent ) ) );
-                                                PROGRESS_ICON.setVisible( false );
-                                                checkBtn.setEnabled( true );
-                                            }
-                                        }
-                                    } ) );
+                                        resultHolder.setValue( parseStatus( result, findNodeRoles( agent ) ) );
+                                        PROGRESS_ICON.setVisible( false );
+                                        checkBtn.setEnabled( true );
+                                    }
+                                }
+                            } ) );
                 }
             } );
         }
@@ -461,7 +461,8 @@ public class Manager
         {
             sb.append( HBaseType.BackupMaster.name() ).append( ", " );
         }
-        if ( sb.length() > 0 ){
+        if ( sb.length() > 0 )
+        {
             return sb.toString().substring( 0, ( sb.length() - 2 ) );
         }
         return null;

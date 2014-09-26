@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 
