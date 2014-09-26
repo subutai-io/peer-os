@@ -25,6 +25,7 @@ downloadFileAndMakeChanges() {
 
 	# move configuration files 
 	mv hbase-$hbaseVersion*/conf/* $BASE/$fileName/etc/hbase/
+	rm -rf hbase-$hbaseVersion*/docs
 	touch $BASE/$fileName/etc/hbase/backup-masters
 
 
