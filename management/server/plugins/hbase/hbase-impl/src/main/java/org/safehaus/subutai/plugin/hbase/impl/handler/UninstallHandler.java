@@ -7,19 +7,13 @@ import java.util.Set;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
-
-    private ProductOperation po;
     private String clusterName;
 
 
@@ -27,7 +21,7 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 
@@ -35,60 +29,44 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        final ProductOperation po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
-
-        manager.getExecutor().execute( new Runnable()
+        HBaseClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
         {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            return;
+        }
 
-            public void run()
-            {
-                HBaseClusterConfig config = manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName,
-                        HBaseClusterConfig.class );
-                if ( config == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
-                    return;
-                }
+        Set<Agent> allNodes;
+        try
+        {
+            allNodes = getAllNodes( config );
+        }
+        catch ( Exception e )
+        {
+            productOperation.addLogFailed( e.getMessage() );
+            return;
+        }
 
-                Set<Agent> allNodes;
-                try
-                {
-                    allNodes = getAllNodes( config );
-                }
-                catch ( Exception e )
-                {
-                    po.addLogFailed( e.getMessage() );
-                    return;
-                }
+        productOperation.addLog( "Uninstalling..." );
 
-                po.addLog( "Uninstalling..." );
+        Command installCommand = Commands.getUninstallCommand( allNodes );
+        manager.getCommandRunner().runCommand( installCommand );
 
-                Command installCommand = Commands.getUninstallCommand( allNodes );
-                manager.getCommandRunner().runCommand( installCommand );
+        if ( installCommand.hasSucceeded() )
+        {
+            productOperation.addLog( "Uninstallation success.." );
+        }
+        else
+        {
+            productOperation
+                    .addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
+            return;
+        }
 
-                if ( installCommand.hasSucceeded() )
-                {
-                    po.addLog( "Uninstallation success.." );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
-                    return;
-                }
-
-                po.addLog( "Updating db..." );
-                if ( manager.getDbManager().deleteInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName() ) )
-                {
-                    po.addLogDone( "Cluster info deleted from DB\nDone" );
-                }
-                else
-                {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs. Failed" );
-                }
-            }
-        } );
+        productOperation.addLog( "Updating db..." );
+        manager.getPluginDAO().deleteInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName() );
+        productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
     }
 
 
@@ -96,33 +74,37 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
     {
         final Set<Agent> allNodes = new HashSet<>();
 
-        if ( manager.getAgentManager().getAgentByHostname( config.getMaster() ) == null )
+        if ( config.getHbaseMaster() == null )
         {
-            throw new Exception( String.format( "Master node %s not connected", config.getMaster() ) );
+            throw new Exception( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
         }
-        allNodes.add( manager.getAgentManager().getAgentByHostname( config.getMaster() ) );
-        if ( manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ) == null )
-        {
-            throw new Exception( String.format( "Backup master node %s not connected", config.getBackupMasters() ) );
-        }
-        allNodes.add( manager.getAgentManager().getAgentByHostname( config.getBackupMasters() ) );
+        allNodes.add( config.getHbaseMaster() );
 
-        for ( String hostname : config.getRegion() )
+        for ( Agent agent : config.getRegionServers() )
         {
-            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null )
+            if ( agent == null )
             {
-                throw new Exception( String.format( "Region server node %s not connected", hostname ) );
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
             }
-            allNodes.add( manager.getAgentManager().getAgentByHostname( hostname ) );
+            allNodes.add( agent );
         }
 
-        for ( String hostname : config.getQuorum() )
+        for ( Agent agent : config.getQuorumPeers() )
         {
-            if ( manager.getAgentManager().getAgentByHostname( hostname ) == null )
+            if ( agent == null )
             {
-                throw new Exception( String.format( "Quorum node %s not connected", hostname ) );
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
             }
-            allNodes.add( manager.getAgentManager().getAgentByHostname( hostname ) );
+            allNodes.add( agent );
+        }
+
+        for ( Agent agent : config.getBackupMasters() )
+        {
+            if ( agent == null )
+            {
+                throw new Exception( String.format( "Region server node %s not connected", agent ) );
+            }
+            allNodes.add( agent );
         }
 
         return allNodes;

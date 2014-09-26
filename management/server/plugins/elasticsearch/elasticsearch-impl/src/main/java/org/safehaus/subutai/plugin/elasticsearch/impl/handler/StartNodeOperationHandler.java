@@ -81,20 +81,5 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Elastics
             productOperation.addLogFailed( String.format( "Starting node %s failed, %s", node.getHostname(),
                     startNodeCommand.getAllErrors() ) );
         }
-
-        //        Command startServiceCommand = Commands.getStartCommand( Sets.newHashSet( node ) );
-        //        manager.getCommandRunner().runCommand( startServiceCommand );
-        //        if ( startServiceCommand.hasSucceeded() ) {
-        //            AgentResult ar = startServiceCommand.getResults().get( node.getUuid() );
-        //            if ( ar.getStdOut().contains( "Starting Elasticsearch Server" ) ) {
-        //                productOperation.addLogDone( "elasticsearch is running" );
-        //            }
-        //            else {
-        //                productOperation.addLogFailed( "Could not start Elasticsearch !!!" );
-        //            }
-        //        }
-        //        else {
-        //            productOperation.addLogFailed( "Elasticsearch start command is not succeeded !!!" );
-        //        }
     }
 }

@@ -20,8 +20,9 @@ public class ElasticsearchPortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "logo.jpeg";
+    private static Logger LOG = Logger.getLogger( ElasticsearchPortalModule.class.getName() );
     private final ServiceLocator serviceLocator;
-    protected Logger LOG = Logger.getLogger( ElasticsearchPortalModule.class.getName() );
+
     private ExecutorService executor;
 
 

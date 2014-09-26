@@ -1,15 +1,12 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -26,6 +23,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.InstallHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterHandler;
@@ -190,7 +188,7 @@ public class HBaseImpl implements HBase
 
     public List<HBaseClusterConfig> getClusters()
     {
-        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
+        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
     }
 
 
@@ -246,7 +244,9 @@ public class HBaseImpl implements HBase
     @Override
     public UUID checkNode( final String clustername, final String lxchostname )
     {
-        return null;
+        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -273,7 +273,6 @@ public class HBaseImpl implements HBase
 
     public UUID uninstallCluster( final String clusterName )
     {
-        //        Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new UninstallHandler( this, clusterName );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -283,43 +282,6 @@ public class HBaseImpl implements HBase
     @Override
     public HBaseClusterConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
-    }
-
-
-    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception
-    {
-        final Set<Agent> allNodes = new HashSet<>();
-
-        if ( agentManager.getAgentByHostname( config.getMaster() ) == null )
-        {
-            throw new Exception( String.format( "Master node %s not connected", config.getMaster() ) );
-        }
-        allNodes.add( agentManager.getAgentByHostname( config.getMaster() ) );
-        if ( agentManager.getAgentByHostname( config.getBackupMasters() ) == null )
-        {
-            throw new Exception( String.format( "Backup master node %s not connected", config.getBackupMasters() ) );
-        }
-        allNodes.add( agentManager.getAgentByHostname( config.getBackupMasters() ) );
-
-        for ( String hostname : config.getRegion() )
-        {
-            if ( agentManager.getAgentByHostname( hostname ) == null )
-            {
-                throw new Exception( String.format( "Region server node %s not connected", hostname ) );
-            }
-            allNodes.add( agentManager.getAgentByHostname( hostname ) );
-        }
-
-        for ( String hostname : config.getQuorum() )
-        {
-            if ( agentManager.getAgentByHostname( hostname ) == null )
-            {
-                throw new Exception( String.format( "Quorum node %s not connected", hostname ) );
-            }
-            allNodes.add( agentManager.getAgentByHostname( hostname ) );
-        }
-
-        return allNodes;
+        return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
     }
 }

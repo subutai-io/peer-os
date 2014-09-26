@@ -38,10 +38,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>configuration-manager-api</artifactId>
-    </dependency>-->
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
