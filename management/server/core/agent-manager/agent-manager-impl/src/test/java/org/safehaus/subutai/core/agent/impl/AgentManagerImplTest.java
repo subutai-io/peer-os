@@ -7,6 +7,8 @@ package org.safehaus.subutai.core.agent.impl;
 
 
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +19,8 @@ import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+
+import com.jayway.awaitility.Awaitility;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -91,6 +95,42 @@ public class AgentManagerImplTest
 
         assertFalse( agentManager.getPhysicalAgents().isEmpty() );
         assertTrue( agentManager.getLxcAgents().isEmpty() );
+    }
+
+
+    @Test
+    public void shouldWaitForAgentRegistration()
+    {
+
+        final Response registrationRequest = MockUtils.getRegistrationRequestFromPhysicalAgent();
+
+        Thread t = new Thread( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep( 500 );
+                    agentManager.onResponse( registrationRequest );
+                }
+                catch ( InterruptedException e )
+                {
+                }
+            }
+        } );
+        t.start();
+
+
+        Awaitility.await().atMost( 3, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+                  .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
+        {
+
+            public Boolean call() throws Exception
+            {
+                return agentManager.waitForRegistration( registrationRequest.getHostname(), 1500 ) != null;
+            }
+        } );
     }
 
 
