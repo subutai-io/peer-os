@@ -8,13 +8,13 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 /**
  * Created by timur on 9/8/14.
  */
-public class CloneCommandFactory implements BuildProcessCommandFactory
+public class BuildCommandFactory implements BuildProcessCommandFactory
 {
     private EnvironmentManager environmentManager;
     private EnvironmentBuildProcess environmentBuildProcess;
 
 
-    public CloneCommandFactory( final EnvironmentManager environmentManager,
+    public BuildCommandFactory( final EnvironmentManager environmentManager,
                                 final EnvironmentBuildProcess environmentBuildProcess )
     {
         this.environmentManager = environmentManager;
@@ -25,6 +25,6 @@ public class CloneCommandFactory implements BuildProcessCommandFactory
     @Override
     public BuildProcessCommand newCommand()
     {
-        return new CloneCommand( environmentManager, environmentBuildProcess );
+        return new BuildCommand( environmentManager, environmentBuildProcess );
     }
 }

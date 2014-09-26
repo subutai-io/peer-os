@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerCommandDispatcherImpl.class.getName() );
+    private static final String port = "8181";
     private PeerManager peerManager;
     private RemotePeerRestClient remotePeerRestClient;
 
@@ -56,7 +57,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 
 
     @Override
-    public void invoke( final PeerCommandMessage peerCommand )
+    public synchronized void invoke( PeerCommandMessage peerCommand )
     {
         if ( peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
         {
@@ -66,7 +67,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
         {
             Peer peer = peerManager.getPeerByUUID( peerCommand.getPeerId() );
             remotePeerRestClient = new RemotePeerRestClient();
-            remotePeerRestClient.invoke( peer.getIp(), "8181", peerCommand );
+            remotePeerRestClient.invoke( peer.getIp(), port, peerCommand );
         }
     }
 }

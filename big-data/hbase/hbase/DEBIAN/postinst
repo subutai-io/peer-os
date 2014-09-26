@@ -15,13 +15,13 @@ escape_characters()
 }
 
 # Replace the comment with the real export in the file
-if [ "x$JAVA_HOME" = "x" ];
+if [[ "x$JAVA_HOME" == "x" ]];
 then
-    sed -i 's/export JAVA_HOME=.*/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hbaseConf/hbase-env.sh
+    sed -i 's/# export JAVA_HOME=.*/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hbaseConf/hbase-env.sh
 else
     escape_characters $JAVA_HOME
     echo "Using JAVA_HOME:" $JAVA_HOME
-    sed -i 's/export JAVA_HOME=.*/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
+    sed -i 's/# export JAVA_HOME=.*/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
 fi
 
 . $FilePath
@@ -37,16 +37,6 @@ ln -sf $hbaseConf/* $hbaseHome/conf/
 /opt/hbase-$hbaseVersion/bin/hbase-property.sh add hbase-site.xml hbase.zookeeper.property.clientPort 2181
 /opt/hbase-$hbaseVersion/bin/hbase-property.sh add hbase-site.xml hbase.zookeeper.quorum localhost
 /opt/hbase-$hbaseVersion/bin/hbase-property.sh add hbase-site.xml hbase.cluster.distributed true
-
-# Replace the comment with the real export in the file
-if [[ "x$JAVA_HOME" == "x" ]];
-then
-    sed -i 's/# export JAVA_HOME=.*/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hbaseConf/hbase-env.sh
-else
-    escape_characters $JAVA_HOME
-    echo "Using JAVA_HOME:" $JAVA_HOME
-    sed -i 's/# export JAVA_HOME=.*/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
-fi
 
 # set hbase_manages_zk environment variable inside hbase-env.sh
 sed -i 's/# export HBASE_MANAGES_ZK=.*/export HBASE_MANAGES_ZK=true/g' $hbaseConf/hbase-env.sh
