@@ -123,13 +123,9 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID installCluster( final LuceneConfig config )
     {
-
         Preconditions.checkNotNull( config, "Configuration is null" );
-
         AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -137,11 +133,8 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID uninstallCluster( final String clusterName )
     {
-
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -149,26 +142,23 @@ public class LuceneImpl implements Lucene
     @Override
     public List<LuceneConfig> getClusters()
     {
-        return dbManager.getInfo( LuceneConfig.PRODUCT_KEY, LuceneConfig.class );
+        return pluginDao.getInfo( LuceneConfig.PRODUCT_KEY, LuceneConfig.class );
     }
 
 
     @Override
     public LuceneConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( LuceneConfig.PRODUCT_KEY, clusterName, LuceneConfig.class );
+        return pluginDao.getInfo( LuceneConfig.PRODUCT_KEY, clusterName, LuceneConfig.class );
     }
 
 
     @Override
     public UUID installCluster( LuceneConfig config, HadoopClusterConfig hadoopConfig )
     {
-
         InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
         operationHandler.setHadoopConfig( hadoopConfig );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -176,11 +166,8 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID addNode( final String clusterName, final String lxcHostname )
     {
-
         AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -188,11 +175,8 @@ public class LuceneImpl implements Lucene
     @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -200,7 +184,6 @@ public class LuceneImpl implements Lucene
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, LuceneConfig config, ProductOperation po )
     {
-
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
             return new OverHadoopSetupStrategy( this, config, po );
@@ -211,7 +194,6 @@ public class LuceneImpl implements Lucene
             s.setEnvironment( env );
             return s;
         }
-
         return null;
     }
 }

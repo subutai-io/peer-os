@@ -42,12 +42,18 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class Manager
 {
+    protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
+    protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
+    protected static final String HOST_COLUMN_CAPTION = "Host";
+    protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String BUTTON_STYLE_NAME = "default";
 
+    final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
@@ -62,7 +68,6 @@ public class Manager
 
     public Manager( final ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
-
         this.executorService = executorService;
         this.lucene = serviceLocator.getService( Lucene.class );
         this.tracker = serviceLocator.getService( Tracker.class );
@@ -79,7 +84,6 @@ public class Manager
         contentRoot.setColumns( 1 );
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -100,10 +104,11 @@ public class Manager
                 refreshUI();
             }
         } );
-
         controlsContent.addComponent( clusterCombo );
 
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+
+        /** Refresh Cluster button */
+        refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -113,54 +118,28 @@ public class Manager
                 refreshClustersInfo();
             }
         } );
-
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        /** Destroy Cluster button */
+        destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( config != null )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
-                            "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = lucene.uninstallCluster( config.getClusterName() );
-                            ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else
-                {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
-
+        addClickListenerToDestorClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
 
-        Button addNodeBtn = new Button( "Add Node" );
+
+        /** Add Node button */
+        addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
         addNodeBtn.addStyleName( "default" );
+        addClickListenerToAddNodeButton();
+        controlsContent.addComponent( addNodeBtn );
+
+        contentRoot.addComponent( controlsContent, 0, 0 );
+        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+    }
+
+
+    public void addClickListenerToAddNodeButton()
+    {
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -203,25 +182,69 @@ public class Manager
                 }
             }
         } );
+    }
 
-        controlsContent.addComponent( addNodeBtn );
 
-        contentRoot.addComponent( controlsContent, 0, 0 );
-        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+    public void addClickListenerToDestorClusterButton()
+    {
+        destroyClusterBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config != null )
+                {
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener()
+                    {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent )
+                        {
+                            UUID trackID = lucene.uninstallCluster( config.getClusterName() );
+                            ProgressWindow window =
+                                    new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener()
+                            {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else
+                {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
     }
 
 
     private Table createTableTemplate( String caption )
     {
         final Table table = new Table( caption );
-        table.addContainerProperty( "Host", String.class, null );
-        table.addContainerProperty( "IPs", String.class, null );
-        table.addContainerProperty( "Destroy", Button.class, null );
+        table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
+        addClickListenerToNodesTable( table );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
+        return table;
+    }
 
+
+    public void addClickListenerToNodesTable( final Table table )
+    {
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
             @Override
@@ -246,7 +269,6 @@ public class Manager
                 }
             }
         } );
-        return table;
     }
 
 
@@ -276,43 +298,77 @@ public class Manager
 
         for ( final Agent agent : agents )
         {
-            final Button destroyBtn = new Button( "Destroy" );
+            final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            destroyBtn.addStyleName( "default" );
+
+            final HorizontalLayout availableOperations = new HorizontalLayout();
+            availableOperations.addStyleName( "default" );
+            availableOperations.setSpacing( true );
+
+            addGivenComponents( availableOperations, destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().toString(), destroyBtn
+                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
             }, null );
-
-            destroyBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = lucene.destroyNode( config.getClusterName(), agent.getHostname() );
-                            ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-            } );
+            addClickListenerToDestroyButton( agent, destroyBtn );
         }
+    }
+
+
+    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
+
+    public void addClickListenerToDestroyButton( final Agent agent, Button... buttons )
+    {
+        getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+                        UUID trackID = lucene.destroyNode( config.getClusterName(), agent.getHostname() );
+                        ProgressWindow window =
+                                new ProgressWindow( executorService, tracker, trackID, LuceneConfig.PRODUCT_KEY );
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                refreshClustersInfo();
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
+
+    public Button getButton( String caption, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            if ( b.getCaption().equals( caption ) )
+            {
+                return b;
+            }
+        }
+        return null;
     }
 
 
