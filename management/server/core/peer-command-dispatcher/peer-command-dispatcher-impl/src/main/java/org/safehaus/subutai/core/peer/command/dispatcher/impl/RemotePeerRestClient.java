@@ -26,8 +26,8 @@ public class RemotePeerRestClient
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
-    private static final long RECEIVE_TIMEOUT = 3000000;
-    private static final long CONNECTION_TIMEOUT = 3000000;
+    private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
+    private static final long CONNECTION_TIMEOUT = 1000 * 60 * 5;
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
 
@@ -110,22 +110,23 @@ public class RemotePeerRestClient
                                       .accept( MediaType.APPLICATION_JSON ).form( form );
 
             String jsonObject = response.readEntity( String.class );
+            PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-//                LOG.info( response.getEntity().toString() );
-//                LOG.info( jsonObject );
-                PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
+                //                LOG.info( response.getEntity().toString() );
+                //                LOG.info( jsonObject );
+
                 ccm.setResult( result.getResult() );
                 ccm.setSuccess( result.isSuccess() );
-//                LOG.info( String.format( "RESULT: %s", result.toString() ) );
+                //                LOG.info( String.format( "RESULT: %s", result.toString() ) );
 
                 return ccm;
             }
             else
             {
-                ccm.setResult( jsonObject );
                 ccm.setSuccess( false );
+                ccm.setExceptionMessage( result.getExceptionMessage() );
                 return ccm;
             }
         }

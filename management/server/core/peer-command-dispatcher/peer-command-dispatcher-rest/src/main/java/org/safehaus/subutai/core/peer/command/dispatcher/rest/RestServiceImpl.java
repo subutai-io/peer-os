@@ -10,6 +10,7 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -154,6 +155,7 @@ public class RestServiceImpl implements RestService
     public Response invoke( final String commandType, final String command )
     {
 
+        LOG.info(String.format( "Remote peer sent a command: " ) + commandType);
         PeerCommandType type = PeerCommandType.valueOf( commandType );
         Class clazz = getMessageClass( type );
         PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
@@ -185,7 +187,7 @@ public class RestServiceImpl implements RestService
             case CLONE:
                 return CloneContainersMessage.class;
             default:
-                return PeerCommandMessage.class;
+                return DefaultCommandMessage.class;
         }
     }
 
