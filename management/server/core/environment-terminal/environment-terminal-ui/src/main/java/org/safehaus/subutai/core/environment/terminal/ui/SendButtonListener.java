@@ -50,7 +50,7 @@ public class SendButtonListener implements Button.ClickListener
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        Set<Agent> agents = new HashSet<>();// = form.agentTree.getSelectedAgents();
+        Set<Agent> agents = new HashSet<>();// = form.agentTree.getSelectedContainers();
         if ( agents.isEmpty() )
         {
             form.show( "Please, select nodes" );
