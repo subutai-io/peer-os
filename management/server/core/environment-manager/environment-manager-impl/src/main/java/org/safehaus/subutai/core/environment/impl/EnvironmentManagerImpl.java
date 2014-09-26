@@ -328,6 +328,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 throw new EnvironmentBuildException( e.getMessage() );
             }
         }
+
         saveEnvironment( environment );
     }
 
