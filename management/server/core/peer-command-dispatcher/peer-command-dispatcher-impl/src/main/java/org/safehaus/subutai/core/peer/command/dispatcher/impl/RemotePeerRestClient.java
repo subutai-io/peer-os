@@ -111,13 +111,12 @@ public class RemotePeerRestClient
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                //                LOG.info( response.toString() );
-                LOG.info( response.getEntity().toString() );
-                LOG.info( jsonObject );
+//                LOG.info( response.getEntity().toString() );
+//                LOG.info( jsonObject );
                 PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
                 ccm.setResult( result.getResult() );
                 ccm.setSuccess( result.isSuccess() );
-                LOG.info( String.format( "RESULT: %s", result.toString() ) );
+//                LOG.info( String.format( "RESULT: %s", result.toString() ) );
 
                 return ccm;
             }
