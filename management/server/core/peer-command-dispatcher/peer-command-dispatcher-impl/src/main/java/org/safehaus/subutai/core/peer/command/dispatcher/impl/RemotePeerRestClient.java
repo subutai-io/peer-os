@@ -26,6 +26,8 @@ public class RemotePeerRestClient
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
+    private static final long RECEIVE_TIMEOUT = 3000000;
+    private static final long CONNECTION_TIMEOUT = 3000000;
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
 
@@ -99,8 +101,8 @@ public class RemotePeerRestClient
             HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
             HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-            httpClientPolicy.setConnectionTimeout( 3000000 );
-            httpClientPolicy.setReceiveTimeout( 3000000 );
+            httpClientPolicy.setConnectionTimeout( CONNECTION_TIMEOUT );
+            httpClientPolicy.setReceiveTimeout( RECEIVE_TIMEOUT );
 
             httpConduit.setClient( httpClientPolicy );
 
