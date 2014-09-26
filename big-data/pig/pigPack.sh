@@ -24,6 +24,7 @@ downloadHadoopAndMakeChanges() {
 	pushd $tempDirectory
 	tar -xpf $pigTarFile -C .
 	rm $pigTarFile
+	rm -rf pig*/docs
 
 	# move conf directory
 	mv pig*/conf/* $confDirectory
