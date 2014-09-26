@@ -6,6 +6,7 @@
 package org.safehaus.subutai.core.command.impl;
 
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +20,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -29,6 +31,7 @@ import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
+import com.google.common.collect.Sets;
 import com.jayway.awaitility.Awaitility;
 
 import static com.jayway.awaitility.Awaitility.to;
@@ -39,6 +42,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -53,7 +57,7 @@ public class CommandRunnerImplTest
     private CommunicationManager communicationManager;
     private CommandRunnerImpl commandRunner;
     private final static String ERR_MSG = "some error message";
-
+    private static final Set<Agent> TWO_AGENTS = MockUtils.getAgents( UUID.randomUUID(), UUID.randomUUID() );
 
 
     @BeforeClass
@@ -75,6 +79,7 @@ public class CommandRunnerImplTest
     {
         communicationManager = mock( CommunicationManager.class );
         agentManager = mock( AgentManager.class );
+        when( agentManager.getAgents() ).thenReturn( TWO_AGENTS );
         commandRunner = new CommandRunnerImpl( communicationManager, agentManager );
         commandRunner.init();
     }
@@ -118,6 +123,42 @@ public class CommandRunnerImplTest
         commandRunner.destroy();
 
         verify( communicationManager ).removeListener( commandRunner );
+    }
+
+
+    @Test
+    public void shouldCreateBroadcastCommand()
+    {
+        Assume.assumeTrue( allTests );
+
+        CommandImpl command =
+                ( CommandImpl ) commandRunner.createBroadcastCommand( MockUtils.getRequestBuilder( "cmd", 10 ) );
+
+        assertEquals( 2, command.getRequestsCount() );
+    }
+
+
+    @Test
+    public void shouldCreateCommand()
+    {
+        Assume.assumeTrue( allTests );
+
+        CommandImpl command =
+                ( CommandImpl ) commandRunner.createCommand( MockUtils.getRequestBuilder( "cmd", 10 ), TWO_AGENTS );
+
+        assertEquals( 2, command.getRequestsCount() );
+    }
+
+
+    @Test
+    public void shouldCreateCommand2()
+    {
+        Assume.assumeTrue( allTests );
+
+        CommandImpl command = ( CommandImpl ) commandRunner
+                .createCommand( Sets.newHashSet( MockUtils.getAgentRequestBuilder( TWO_AGENTS.iterator().next(), "cmd'" ) ) );
+
+        assertEquals( TWO_AGENTS.iterator().next().getUuid() , command.getRequests().iterator().next().getUuid() );
     }
 
 

@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
@@ -138,6 +139,12 @@ public class MockUtils
         when( requestBuilder.getTimeout() ).thenReturn( timeout );
 
         return requestBuilder;
+    }
+
+
+    public static AgentRequestBuilder getAgentRequestBuilder( Agent agent, String cmd )
+    {
+        return new AgentRequestBuilder( agent, cmd );
     }
 
 
