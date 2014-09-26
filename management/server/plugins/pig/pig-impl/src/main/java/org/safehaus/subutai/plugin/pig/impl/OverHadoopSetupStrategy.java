@@ -63,7 +63,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
 
         // Check installed packages
 
-        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -93,26 +93,18 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         productOperation.addLog( "Updating db..." );
 
         // Save to db
+        manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
 
-        if ( manager.getDbManager().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        Command installCommand = Commands.getInstallCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( installCommand );
+        if ( installCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );
-            Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
-            manager.getCommandRunner().runCommand( installCommand );
-
-            if ( installCommand.hasSucceeded() )
-            {
-                productOperation.addLogDone( "Installation succeeded\nDone" );
-            }
-            else
-            {
-                productOperation
-                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
-            }
+            productOperation.addLogDone( "Installation succeeded\nDone" );
         }
         else
         {
-            productOperation.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+            productOperation
+                    .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
 
         return config;

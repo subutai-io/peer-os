@@ -84,7 +84,6 @@ public class AddNodeWindow extends Window
 
                 executorService.execute( new Runnable()
                 {
-
                     @Override
                     public void run()
                     {
@@ -143,7 +142,6 @@ public class AddNodeWindow extends Window
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                //close window
                 track = false;
                 close();
             }

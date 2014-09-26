@@ -1,13 +1,24 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
+import org.safehaus.subutai.plugin.pig.impl.Commands;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
+
+import com.google.common.collect.Sets;
 
 
 public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
@@ -66,10 +77,63 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
         }
     }
 
-    public Agent setupHost( PigConfig config )
+    public Agent setupHost( PigConfig config ) throws ClusterSetupException
     {
+        ProductOperation po = productOperation;
 
-        return null;
+        Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
+        if ( agent == null )
+        {
+            throw new ClusterSetupException( "New node is not connected" );
+        }
+
+        //check if node is in the cluster
+        if ( config.getNodes().contains( agent ) )
+        {
+            throw new ClusterSetupException( "Node already belongs to cluster" + clusterName );
+        }
+
+        po.addLog( "Checking prerequisites..." );
+
+        //check installed ksks packages
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
+        manager.getCommandRunner().runCommand( checkInstalledCommand );
+
+        if ( !checkInstalledCommand.hasCompleted() )
+        {
+            throw new ClusterSetupException( "Failed to check installed packages" );
+        }
+
+        AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
+        boolean skipInstall = false;
+        String hadoopPack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME;
+        if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+        {
+            skipInstall = true;
+            po.addLog( "Node already has Pig installed" );
+        }
+        else if ( !result.getStdOut().contains( hadoopPack ) )
+        {
+            throw new ClusterSetupException( "Node has no Hadoop installation" );
+        }
+
+        //install pig
+        if ( !skipInstall )
+        {
+            po.addLog( "Installing Pig..." );
+            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+            manager.getCommandRunner().runCommand( installCommand );
+
+            if ( installCommand.hasSucceeded() )
+            {
+                po.addLog( "Installation succeeded" );
+            }
+            else
+            {
+                throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
+            }
+        }
+        return agent;
     }
 
     public Agent addHost( PigConfig config )

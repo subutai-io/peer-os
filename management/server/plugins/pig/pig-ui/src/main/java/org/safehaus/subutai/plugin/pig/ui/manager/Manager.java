@@ -280,7 +280,7 @@ public class Manager
     {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( IP_COLUMN_CAPTION, Button.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
 
         table.setSizeFull();
@@ -361,6 +361,7 @@ public class Manager
         }
     }
 
+
     public Button getButton( String caption, Button... buttons )
     {
         for ( Button b : buttons )
@@ -422,10 +423,10 @@ public class Manager
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && !clustersInfo.isEmpty() )
         {
-            for ( PigConfig mongoClusterInfo : clustersInfo )
+            for ( PigConfig pigClusterInfo : clustersInfo )
             {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+                clusterCombo.addItem( pigClusterInfo );
+                clusterCombo.setItemCaption( pigClusterInfo, pigClusterInfo.getClusterName() );
             }
             if ( clusterInfo != null )
             {
