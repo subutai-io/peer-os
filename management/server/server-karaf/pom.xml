@@ -114,6 +114,11 @@
                   <outputDirectory>target/assembly/deploy</outputDirectory>
                   <type>war</type>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>vaadin-ui</artifactId>
+                  <classifier>classes</classifier>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->

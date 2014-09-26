@@ -29,17 +29,6 @@ public class ServiceLocator
     }
 
 
-    public static <T> T getServiceNoCache( Class<T> clazz ) throws NamingException
-    {
-        Preconditions.checkNotNull( clazz, "Class is null" );
-
-        String serviceName = clazz.getName();
-        InitialContext ctx = new InitialContext();
-        String jndiName = "osgi:service/" + serviceName;
-        return clazz.cast( ctx.lookup( jndiName ) );
-    }
-
-
     /**
      * Returns service by Interface, bypasses cache
      *

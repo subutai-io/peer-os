@@ -47,6 +47,9 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- core -->
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- agent-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -242,6 +245,14 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- environment-terminal -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>environment-terminal-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- file-tracker -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -255,7 +266,7 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- file-tracker -->
+      <!-- git-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>git-manager-api</artifactId>
@@ -335,6 +346,24 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- peer-command-dispatcher -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>peer-command-dispatcher-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>peer-command-dispatcher-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>peer-command-dispatcher-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- peer-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -359,19 +388,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>peer-manager-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- peer-command-dispatcher -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>peer-command-dispatcher-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>peer-command-dispatcher-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -473,6 +489,12 @@
         <groupId>${project.groupId}</groupId>
         <artifactId>vaadin-ui</artifactId>
         <type>war</type>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>vaadin-ui</artifactId>
+        <classifier>classes</classifier>
         <version>${project.version}</version>
       </dependency>
 
@@ -594,7 +616,7 @@
       <dependency>
         <groupId>com.jayway.awaitility</groupId>
         <artifactId>awaitility</artifactId>
-        <version>1.5.0</version>
+        <version>1.6.1</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -762,6 +784,11 @@
     </plugins>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
