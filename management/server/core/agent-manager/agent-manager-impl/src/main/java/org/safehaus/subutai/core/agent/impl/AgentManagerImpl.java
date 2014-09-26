@@ -46,7 +46,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     /**
      * list of agent listeners
      */
-    protected final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<>();
+    private final Queue<AgentListener> listeners = new ConcurrentLinkedQueue<>();
     /**
      * reference to communication manager
      */
@@ -88,6 +88,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     {
         return Collections.unmodifiableCollection( listeners );
     }
+
+
+    protected Queue<AgentListener> getListenersQueue() {return listeners;}
 
 
     /**
