@@ -45,23 +45,23 @@ import com.vaadin.ui.Window;
 public class Manager
 {
 
-    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
-    protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
-    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
-    protected final static String CHECK_BUTTON_CAPTION = "Check";
-    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
-    protected final static String START_BUTTON_CAPTION = "Start";
-    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
-    protected final static String STOP_BUTTON_CAPTION = "Stop";
-    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
-    protected final static String SET_AS_COORDINATOR_BUTTON_CAPTION = "Set As Coordinator";
-    protected final static String HOST_COLUMN_CAPTION = "Host";
-    protected final static String IP_COLUMN_CAPTION = "IP List";
-    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
-    protected final static String STATUS_COLUMN_CAPTION = "Status";
-    protected final static String ADD_NODE_CAPTION = "Add Node";
-    protected final static String BUTTON_STYLE_NAME = "default";
+    protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
+    protected static final String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected static final String CHECK_BUTTON_CAPTION = "Check";
+    protected static final String START_ALL_BUTTON_CAPTION = "Start All";
+    protected static final String START_BUTTON_CAPTION = "Start";
+    protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected static final String STOP_BUTTON_CAPTION = "Stop";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String SET_AS_COORDINATOR_BUTTON_CAPTION = "Set As Coordinator";
+    protected static final String HOST_COLUMN_CAPTION = "Host";
+    protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected static final String STATUS_COLUMN_CAPTION = "Status";
+    protected static final String ADD_NODE_CAPTION = "Add Node";
+    protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn, addNodeBtn;
     private final GridLayout contentRoot;
@@ -156,7 +156,8 @@ public class Manager
         controlsContent.addComponent( addNodeBtn );
         controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
 
-        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn, addNodeBtn );
+        addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn,
+                addNodeBtn );
 
         PROGRESS_ICON.setVisible( false );
         controlsContent.addComponent( PROGRESS_ICON );
@@ -213,7 +214,6 @@ public class Manager
                         {
                             startAllNodes();
                         }
-
                     }
                 } );
                 break;
@@ -238,8 +238,8 @@ public class Manager
     }
 
 
-
-    public void addClickListenerToAddNodeButton() {
+    public void addClickListenerToAddNodeButton()
+    {
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -266,7 +266,8 @@ public class Manager
                             nodes.removeAll( config.getAllNodes() );
                             if ( !nodes.isEmpty() )
                             {
-                                AddNodeWindow addNodeWindow = new AddNodeWindow( presto, executorService, tracker, config, nodes );
+                                AddNodeWindow addNodeWindow =
+                                        new AddNodeWindow( presto, executorService, tracker, config, nodes );
                                 contentRoot.getUI().addWindow( addNodeWindow );
                                 addNodeWindow.addCloseListener( new Window.CloseListener()
                                 {
@@ -310,7 +311,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyClusterButton() {
+    public void addClickListenerToDestroyClusterButton()
+    {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -328,8 +330,8 @@ public class Manager
                         {
                             UUID trackID = presto.uninstallCluster( config.getClusterName() );
 
-                            ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker, trackID, PrestoClusterConfig.PRODUCT_KEY );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    PrestoClusterConfig.PRODUCT_KEY );
 
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
@@ -351,7 +353,6 @@ public class Manager
             }
         } );
     }
-
 
 
     private void populateTable( final Table table, Set<Agent> workers, final Agent coordinator )
@@ -535,7 +536,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStopButtons( final Agent agent, final Button ... buttons )
+    public void addClickListenerToStopButtons( final Agent agent, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -632,9 +633,12 @@ public class Manager
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
                                     PROGRESS_ICON.setVisible( false );
-                                    for ( Button b : buttons ){
-                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION) || b.getCaption().equals( SET_AS_COORDINATOR_BUTTON_CAPTION )
-                                                || b.getCaption().equals( DESTROY_BUTTON_CAPTION )){
+                                    for ( Button b : buttons )
+                                    {
+                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption().equals(
+                                                SET_AS_COORDINATOR_BUTTON_CAPTION ) || b.getCaption().equals(
+                                                DESTROY_BUTTON_CAPTION ) )
+                                        {
                                             enableButtons( b );
                                         }
                                     }
@@ -700,8 +704,7 @@ public class Manager
                 {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent =
-                            agentManager.getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =

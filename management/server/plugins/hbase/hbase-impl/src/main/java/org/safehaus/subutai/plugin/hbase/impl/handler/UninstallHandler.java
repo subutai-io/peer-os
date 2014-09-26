@@ -70,43 +70,22 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
     }
 
 
-    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception
+    private Set<Agent> getAllNodes( HBaseClusterConfig config )
     {
         final Set<Agent> allNodes = new HashSet<>();
-
-        if ( config.getHbaseMaster() == null )
-        {
-            throw new Exception( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
-        }
         allNodes.add( config.getHbaseMaster() );
-
         for ( Agent agent : config.getRegionServers() )
         {
-            if ( agent == null )
-            {
-                throw new Exception( String.format( "Region server node %s not connected", agent ) );
-            }
             allNodes.add( agent );
         }
-
         for ( Agent agent : config.getQuorumPeers() )
         {
-            if ( agent == null )
-            {
-                throw new Exception( String.format( "Region server node %s not connected", agent ) );
-            }
             allNodes.add( agent );
         }
-
         for ( Agent agent : config.getBackupMasters() )
         {
-            if ( agent == null )
-            {
-                throw new Exception( String.format( "Region server node %s not connected", agent ) );
-            }
             allNodes.add( agent );
         }
-
         return allNodes;
     }
 }

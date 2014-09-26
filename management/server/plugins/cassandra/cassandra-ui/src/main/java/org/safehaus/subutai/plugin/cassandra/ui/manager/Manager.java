@@ -45,21 +45,20 @@ import com.vaadin.ui.Window;
 
 public class Manager
 {
-    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
-    protected final static String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
-    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
-    protected final static String CHECK_BUTTON_CAPTION = "Check";
-    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
-    protected final static String START_BUTTON_CAPTION = "Start";
-    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
-    protected final static String STOP_BUTTON_CAPTION = "Stop";
-    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    protected final static String HOST_COLUMN_CAPTION = "Host";
-    protected final static String IP_COLUMN_CAPTION = "IP List";
-    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
-    protected final static String STATUS_COLUMN_CAPTION = "Status";
-    protected final static String BUTTON_STYLE_NAME = "default";
-
+    protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
+    protected static final String CHECK_ALL_BUTTON_CAPTION = "Check All";
+    protected static final String CHECK_BUTTON_CAPTION = "Check";
+    protected static final String START_ALL_BUTTON_CAPTION = "Start All";
+    protected static final String START_BUTTON_CAPTION = "Start";
+    protected static final String STOP_ALL_BUTTON_CAPTION = "Stop All";
+    protected static final String STOP_BUTTON_CAPTION = "Stop";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String HOST_COLUMN_CAPTION = "Host";
+    protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
+    protected static final String STATUS_COLUMN_CAPTION = "Status";
+    protected static final String BUTTON_STYLE_NAME = "default";
     private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String MESSAGE = "No cluster is installed !";
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
@@ -165,7 +164,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyClusterButton(){
+    public void addClickListenerToDestroyClusterButton()
+    {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -258,7 +258,6 @@ public class Manager
                         {
                             startAllNodes();
                         }
-
                     }
                 } );
                 break;
@@ -290,6 +289,7 @@ public class Manager
             b.addStyleName( BUTTON_STYLE_NAME );
         }
     }
+
 
     public void disableOREnableAllButtonsOnTable( Table table, boolean value )
     {
@@ -413,6 +413,7 @@ public class Manager
         }
     }
 
+
     public Button getButton( String caption, Button... buttons )
     {
         for ( Button b : buttons )
@@ -426,7 +427,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToStopButton( final Agent agent, final Button ... buttons ){
+    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -434,8 +436,7 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute(
-                        new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                executorService.execute( new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
                                 new CompleteEvent()
                                 {
                                     @Override
@@ -452,7 +453,9 @@ public class Manager
         } );
     }
 
-    public void addClickListenerToStartButton( final Agent agent, final Button ... buttons ){
+
+    public void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -479,7 +482,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button ... buttons ){
+    public void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button... buttons )
+    {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -515,6 +519,7 @@ public class Manager
         } );
     }
 
+
     public void addGivenComponents( HorizontalLayout layout, Button... buttons )
     {
         for ( Button b : buttons )
@@ -522,7 +527,6 @@ public class Manager
             layout.addComponent( b );
         }
     }
-
 
 
     public void disableButtons( Button... buttons )
@@ -541,6 +545,7 @@ public class Manager
             b.setEnabled( true );
         }
     }
+
 
     public void stopAllNodes()
     {
