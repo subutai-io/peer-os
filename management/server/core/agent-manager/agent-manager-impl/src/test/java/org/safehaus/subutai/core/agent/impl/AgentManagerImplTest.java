@@ -97,6 +97,15 @@ public class AgentManagerImplTest
         assertTrue( agentManager.getLxcAgents().isEmpty() );
     }
 
+    @Test
+    public void shouldSetNotifyListenersFlag()
+    {
+
+        agentManager.setNotifyAgentListeners( true );
+
+        assertTrue( agentManager.isNotifyAgentListeners() );
+    }
+
 
     @Test
     public void shouldWaitForAgentRegistration()
