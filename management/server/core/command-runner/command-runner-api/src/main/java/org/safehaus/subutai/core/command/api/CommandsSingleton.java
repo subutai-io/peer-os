@@ -3,28 +3,20 @@ package org.safehaus.subutai.core.command.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Preconditions;
 
 
 /**
- * This class is used to hold commands specific to client. One needs to call {@code init} method prior to using it.
- * Clients should extend this class and add custom commands creation methods e.g. <p/>
- * <blockquote><pre>
- * public class Commands extends CommandsSingleton{
- *   public static Command getStartCommand(Set<Agent> agents) {
- *     return createCommand(
- *       new RequestBuilder("service solr start").withTimeout(60),
- *       agents);
- *   }
- * }
- * </pre></blockquote>
- * <p/> Then somewhere in client code prior to using this class: <p/> {@code Commands.init(commandRunnner);}
+ * This class is used to hold commands specific to client.
+ *
+ * @deprecated Do not use this class. Use factories and run commands using Command.execute
  */
+@Deprecated
 public class CommandsSingleton
 {
     private static CommandsSingleton INSTANCE = new CommandsSingleton();
