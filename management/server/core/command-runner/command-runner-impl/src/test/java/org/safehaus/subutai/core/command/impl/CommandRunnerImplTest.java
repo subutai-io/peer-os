@@ -19,14 +19,14 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.command.api.command.CommandStatus;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.CommandStatus;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import com.jayway.awaitility.Awaitility;
@@ -52,6 +52,8 @@ public class CommandRunnerImplTest
     private AgentManager agentManager;
     private CommunicationManager communicationManager;
     private CommandRunnerImpl commandRunner;
+    private final static String ERR_MSG = "some error message";
+
 
 
     @BeforeClass
@@ -223,7 +225,7 @@ public class CommandRunnerImplTest
 
         UUID agentUUID = UUID.randomUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
-        final Response response = MockUtils.getFailedResponse( agentUUID, command.getCommandUUID() );
+        final Response response = MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG );
 
         commandRunner.runCommandAsync( command );
         exec.execute( new Runnable()
@@ -247,7 +249,7 @@ public class CommandRunnerImplTest
 
         UUID agentUUID = UUID.randomUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
-        final Response response = MockUtils.getFailedResponse( agentUUID, command.getCommandUUID() );
+        final Response response = MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG );
 
         exec.execute( new Runnable()
         {

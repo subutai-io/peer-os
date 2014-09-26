@@ -9,6 +9,8 @@ package org.safehaus.subutai.core.command.impl;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +22,11 @@ import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
+import com.jayway.awaitility.Awaitility;
+
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,7 +38,9 @@ import static org.mockito.Mockito.when;
 public class CommandImplTest
 {
 
-    private final String SOME_DUMMY_OUTPUT = "some dummy output";
+    private final static String SOME_DUMMY_OUTPUT = "some dummy output";
+    private final static String ERR_MSG = "some error message";
+    private final static String DESCRIPTION = "some description";
 
     private final UUID agentUUID = UUID.randomUUID();
     private CommandImpl command;
@@ -45,7 +53,7 @@ public class CommandImplTest
     {
         Set<Agent> agents = MockUtils.getAgents( agentUUID );
         RequestBuilder requestBuilder = MockUtils.getRequestBuilder( "pwd", 1, agents );
-        command = new CommandImpl( null, requestBuilder, agents, mock( AbstractCommandRunner.class ) );
+        command = new CommandImpl( DESCRIPTION, requestBuilder, agents, mock( AbstractCommandRunner.class ) );
     }
 
 
@@ -118,6 +126,16 @@ public class CommandImplTest
     }
 
 
+    @Test
+    public void shouldReturnCompletedRequestsCount()
+    {
+
+        command.appendResult( MockUtils.getTimedOutResponse( agentUUID, command.getCommandUUID() ) );
+
+        assertEquals( 1, command.getRequestsCompleted() );
+    }
+
+
     @Test(expected = CommandException.class)
     public void shouldThrowCommandException() throws CommandException
     {
@@ -135,6 +153,89 @@ public class CommandImplTest
         command.appendResult( MockUtils.getSucceededResponse( agentUUID, command.getCommandUUID() ) );
 
         assertEquals( CommandStatus.SUCCEEDED, command.getCommandStatus() );
+        assertTrue( command.hasSucceeded() );
+    }
+
+
+    @Test
+    public void shouldReturnAfterCompletion()
+    {
+
+        Thread t = new Thread( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep( 500 );
+                    command.notifyWaitingThreads();
+                }
+                catch ( InterruptedException e )
+                {
+                }
+            }
+        } );
+        t.start();
+
+        Awaitility.await().atMost( 1, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+                  .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
+        {
+
+            public Boolean call() throws Exception
+            {
+
+                command.waitCompletion();
+                return true;
+            }
+        } );
+    }
+
+
+    @Test
+    public void shouldReleaseUpdateLock() throws InterruptedException
+    {
+
+        Thread t = new Thread( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    command.getUpdateLock();
+                    Thread.sleep( 500 );
+                    command.releaseUpdateLock();
+                }
+                catch ( InterruptedException e )
+                {
+                }
+            }
+        } );
+        t.start();
+        Thread.sleep( 100 );
+
+        Awaitility.await().atMost( 1, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+                  .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
+        {
+
+            public Boolean call() throws Exception
+            {
+
+                command.getUpdateLock();
+                return true;
+            }
+        } );
+    }
+
+
+    @Test
+    public void shouldReturnSucceedRequestsCount()
+    {
+
+        command.appendResult( MockUtils.getSucceededResponse( agentUUID, command.getCommandUUID() ) );
+
+        assertEquals( 1, command.getRequestsSucceeded() );
     }
 
 
@@ -142,9 +243,29 @@ public class CommandImplTest
     public void shouldFailCommandStatus()
     {
 
-        command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID() ) );
+        command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG ) );
 
         assertEquals( CommandStatus.FAILED, command.getCommandStatus() );
+    }
+
+
+    @Test
+    public void shouldReturnErrMessage()
+    {
+
+        command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG ) );
+
+        assertThat( command.getAllErrors(), containsString( ERR_MSG ) );
+    }
+
+
+    @Test
+    public void shouldReturnDescription()
+    {
+
+        command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG ) );
+
+        assertEquals( DESCRIPTION, command.getDescription() );
     }
 
 
