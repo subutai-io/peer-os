@@ -23,7 +23,6 @@ import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -242,24 +241,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
 
 
     @Override
-    public Set<Agent> getAgentsByHostnames( final Set<String> hostnames )
-    {
-        Set<Agent> agentSet = new HashSet<>();
-        if ( !CollectionUtil.isCollectionEmpty( hostnames ) )
-        {
-            for ( Agent agent : agents.asMap().values() )
-            {
-                if ( hostnames.contains( agent.getHostname() ) )
-                {
-                    agentSet.add( agent );
-                }
-            }
-        }
-        return agentSet;
-    }
-
-
-    @Override
     public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId )
     {
         Set<Agent> agentSet = new HashSet<>();
@@ -286,7 +267,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
         {
             try
             {
-                Thread.sleep( 2000 );
+                Thread.sleep( 1000 );
             }
             catch ( InterruptedException ignore )
             {

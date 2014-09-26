@@ -105,13 +105,6 @@ public class AgentManagerFake implements AgentManager
 
 
     @Override
-    public Set<Agent> getAgentsByHostnames( final Set<String> hostnames )
-    {
-        return null;
-    }
-
-
-    @Override
     public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId )
     {
         return null;
