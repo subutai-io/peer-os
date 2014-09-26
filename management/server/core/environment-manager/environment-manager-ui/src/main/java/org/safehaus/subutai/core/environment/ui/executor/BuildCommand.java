@@ -9,14 +9,14 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 /**
  * Created by timur on 9/8/14.
  */
-public class CloneCommand implements BuildProcessCommand
+public class BuildCommand implements BuildProcessCommand
 {
 
     private EnvironmentManager environmentManager;
     private EnvironmentBuildProcess environmentBuildProcess;
 
 
-    public CloneCommand( EnvironmentManager environmentManager, EnvironmentBuildProcess environmentBuildProcess )
+    public BuildCommand( EnvironmentManager environmentManager, EnvironmentBuildProcess environmentBuildProcess )
     {
         this.environmentManager = environmentManager;
         this.environmentBuildProcess = environmentBuildProcess;
