@@ -3,13 +3,13 @@ package org.safehaus.subutai.plugin.pig.impl;
 
 import java.util.Iterator;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 import com.google.common.base.Strings;
@@ -103,8 +103,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         }
         else
         {
-            productOperation
-                    .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+            productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
 
         return config;

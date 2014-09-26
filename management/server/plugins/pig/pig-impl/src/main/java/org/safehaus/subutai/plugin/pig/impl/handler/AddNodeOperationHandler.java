@@ -1,10 +1,6 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -25,6 +21,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
 {
 
     private final String hostname;
+
 
     public AddNodeOperationHandler( PigImpl manager, String clusterName, String hostname )
     {
@@ -76,6 +73,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
             po.addLogFailed( "Add worker node failed" );
         }
     }
+
 
     public Agent setupHost( PigConfig config ) throws ClusterSetupException
     {
@@ -135,6 +133,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
         }
         return agent;
     }
+
 
     public Agent addHost( PigConfig config )
     {

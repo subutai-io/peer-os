@@ -92,8 +92,7 @@ public class AddNodeWindow extends Window
                     {
                         while ( track )
                         {
-                            ProductOperationView po =
-                                    tracker.getProductOperation( PigConfig.PRODUCT_KEY, trackID );
+                            ProductOperationView po = tracker.getProductOperation( PigConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
                                 setOutput(
@@ -104,7 +103,6 @@ public class AddNodeWindow extends Window
                                     hideProgress();
                                     ok.setEnabled( true );
                                     break;
-
                                 }
                             }
                             else

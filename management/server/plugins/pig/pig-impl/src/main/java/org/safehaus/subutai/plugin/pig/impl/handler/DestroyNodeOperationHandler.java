@@ -1,11 +1,10 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
@@ -43,7 +42,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed(
+                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
@@ -89,6 +89,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             po.addLogFailed( "Failed to destroy node" );
         }
     }
+
 
     private boolean uninstall( Agent agent )
     {

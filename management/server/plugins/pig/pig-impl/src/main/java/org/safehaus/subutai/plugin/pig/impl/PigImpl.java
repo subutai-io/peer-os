@@ -200,6 +200,7 @@ public class PigImpl implements Pig
         return operationHandler.getTrackerId();
     }
 
+
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, ProductOperation po )
     {

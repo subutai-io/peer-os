@@ -69,6 +69,7 @@ public class DestroyClusterOperationHandler extends AbstractOperationHandler<Pig
         }
     }
 
+
     private boolean uninstall( PigConfig config )
     {
         ProductOperation po = productOperation;

@@ -149,7 +149,6 @@ public class Manager
     }
 
 
-
     public void addStyleNameToButtons( Button... buttons )
     {
         for ( Button b : buttons )
@@ -219,8 +218,8 @@ public class Manager
                             public void buttonClick( Button.ClickEvent event )
                             {
                                 UUID trackId = pig.addNode( config.getClusterName(), null );
-                                ProgressWindow w = new ProgressWindow( executorService, tracker, trackId,
-                                        PigConfig.PRODUCT_KEY );
+                                ProgressWindow w =
+                                        new ProgressWindow( executorService, tracker, trackId, PigConfig.PRODUCT_KEY );
                                 contentRoot.getUI().addWindow( w.getWindow() );
                             }
                         } );
@@ -252,8 +251,8 @@ public class Manager
 
                             UUID trackID = pig.uninstallCluster( config.getClusterName() );
 
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    PigConfig.PRODUCT_KEY );
+                            ProgressWindow window =
+                                    new ProgressWindow( executorService, tracker, trackID, PigConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -276,6 +275,7 @@ public class Manager
         } );
     }
 
+
     private Table createTableTemplate( String caption )
     {
         final Table table = new Table( caption );
@@ -292,7 +292,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToNodesTable( final Table table ){
+    public void addClickListenerToNodesTable( final Table table )
+    {
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
             @Override
@@ -362,20 +363,8 @@ public class Manager
     }
 
 
-    public Button getButton( String caption, Button... buttons )
+    private void addClickListenerToDestroyButton( final Agent agent, Button... buttons )
     {
-        for ( Button b : buttons )
-        {
-            if ( b.getCaption().equals( caption ) )
-            {
-                return b;
-            }
-        }
-        return null;
-    }
-
-
-    private void addClickListenerToDestroyButton( final Agent agent, Button ... buttons ){
         getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
             @Override
@@ -408,13 +397,19 @@ public class Manager
         } );
     }
 
-    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+
+    public Button getButton( String caption, Button... buttons )
     {
         for ( Button b : buttons )
         {
-            layout.addComponent( b );
+            if ( b.getCaption().equals( caption ) )
+            {
+                return b;
+            }
         }
+        return null;
     }
+
 
     public void refreshClustersInfo()
     {
@@ -443,6 +438,15 @@ public class Manager
             {
                 clusterCombo.setValue( clustersInfo.iterator().next() );
             }
+        }
+    }
+
+
+    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
         }
     }
 
