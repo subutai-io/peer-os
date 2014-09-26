@@ -12,13 +12,13 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +36,8 @@ public class CommandImplTest
 
     private final UUID agentUUID = UUID.randomUUID();
     private CommandImpl command;
+    private static final int MAX_TIMEOUT = 100;
+    private static final int REQUESTS_COUNT = 3;
 
 
     @Before
@@ -47,24 +49,32 @@ public class CommandImplTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullBuilder()
     {
         new CommandImpl( null, mock( Set.class ), mock( AbstractCommandRunner.class ) );
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullBuilderBroadcast()
     {
         new CommandImpl( null, 1, mock( AbstractCommandRunner.class ) );
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailZeroRequestsCountBroadcast()
     {
         new CommandImpl( mock( RequestBuilder.class ), 0, mock( AbstractCommandRunner.class ) );
+    }
+
+
+    @Test
+    public void shoudlReturnRequestsCount()
+    {
+        command = new CommandImpl( mock( RequestBuilder.class ), REQUESTS_COUNT, mock( AbstractCommandRunner.class ) );
+        assertEquals( REQUESTS_COUNT, command.getRequestsCount() );
     }
 
 
@@ -108,7 +118,7 @@ public class CommandImplTest
     }
 
 
-    @Test( expected = CommandException.class )
+    @Test(expected = CommandException.class)
     public void shouldThrowCommandException() throws CommandException
     {
 
@@ -135,6 +145,21 @@ public class CommandImplTest
         command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID() ) );
 
         assertEquals( CommandStatus.FAILED, command.getCommandStatus() );
+    }
+
+
+    @Test
+    public void shouldReturnMaxTimeout()
+    {
+
+        Set<AgentRequestBuilder> ag = new HashSet<>();
+        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUID.randomUUID() ), "cmd" )
+                .withTimeout( MAX_TIMEOUT - 1 ) );
+        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUID.randomUUID() ), "cmd" )
+                .withTimeout( MAX_TIMEOUT ) );
+        command = new CommandImpl( null, ag, mock( AbstractCommandRunner.class ) );
+
+        assertEquals( MAX_TIMEOUT, command.getTimeout() );
     }
 
 
