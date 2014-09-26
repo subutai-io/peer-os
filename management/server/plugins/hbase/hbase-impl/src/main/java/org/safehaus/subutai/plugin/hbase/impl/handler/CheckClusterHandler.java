@@ -15,8 +15,6 @@ import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
 {
-
-    private ProductOperation po;
     private String clusterName;
 
 
@@ -24,7 +22,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Checking %s cluster...", clusterName ) );
     }
 
@@ -32,98 +30,69 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run()
     {
-        final ProductOperation po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
-                String.format( "Checking cluster %s", clusterName ) );
-        manager.getExecutor().execute( new Runnable()
+        HBaseClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
         {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
+            return;
+        }
 
-            public void run()
+        Set<Agent> allNodes;
+        try
+        {
+            allNodes = getAllNodes( config );
+        }
+        catch ( Exception e )
+        {
+            productOperation.addLogFailed( e.getMessage() );
+
+            return;
+        }
+        if ( allNodes == null || allNodes.isEmpty() )
+        {
+            productOperation.addLogFailed( "Nodes not connected" );
+            return;
+        }
+
+        Command checkCommand = Commands.getStatusCommand( allNodes );
+        manager.getCommandRunner().runCommand( checkCommand );
+
+        if ( checkCommand.hasSucceeded() )
+        {
+            StringBuilder status = new StringBuilder();
+            for ( Agent agent : allNodes )
             {
-                HBaseClusterConfig config = manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName,
-                        HBaseClusterConfig.class );
-                if ( config == null )
-                {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
-                    return;
-                }
-
-                Set<Agent> allNodes;
-                try
-                {
-                    allNodes = getAllNodes( config );
-                }
-                catch ( Exception e )
-                {
-                    po.addLogFailed( e.getMessage() );
-
-                    return;
-                }
-                if ( allNodes == null || allNodes.isEmpty() )
-                {
-                    po.addLogFailed( "Nodes not connected" );
-                    return;
-                }
-
-                Command checkCommand = Commands.getStatusCommand( allNodes );
-                manager.getCommandRunner().runCommand( checkCommand );
-
-                if ( checkCommand.hasSucceeded() )
-                {
-                    StringBuilder status = new StringBuilder();
-                    for ( Agent agent : allNodes )
-                    {
-                        status.append( agent.getHostname() ).append( ":\n" )
-                              .append( checkCommand.getResults().get( agent.getUuid() ).getStdOut() ).append( "\n\n" );
-                    }
-                    po.addLogDone( status.toString() );
-                }
-                else
-                {
-                    po.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
-                }
+                status.append( agent.getHostname() ).append( ":\n" )
+                      .append( checkCommand.getResults().get( agent.getUuid() ).getStdOut() ).append( "\n\n" );
             }
-        } );
+            productOperation.addLogDone( status.toString() );
+        }
+        else
+        {
+            productOperation.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
+        }
+
     }
 
 
-    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception
+    private Set<Agent> getAllNodes( HBaseClusterConfig config )
     {
         final Set<Agent> allNodes = new HashSet<>();
-
-        if ( config.getHbaseMaster() == null )
-        {
-            throw new Exception( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
-        }
         allNodes.add( config.getHbaseMaster() );
-
         for ( Agent agent : config.getRegionServers() )
         {
-            if ( agent == null )
-            {
-                throw new Exception( String.format( "Region server node %s not connected", agent ) );
-            }
             allNodes.add( agent );
         }
-
         for ( Agent agent : config.getQuorumPeers() )
         {
-            if ( agent == null )
-            {
-                throw new Exception( String.format( "Region server node %s not connected", agent ) );
-            }
             allNodes.add( agent );
         }
 
         for ( Agent agent : config.getBackupMasters() )
         {
-            if ( agent == null )
-            {
-                throw new Exception( String.format( "Region server node %s not connected", agent ) );
-            }
             allNodes.add( agent );
         }
-
         return allNodes;
     }
 }

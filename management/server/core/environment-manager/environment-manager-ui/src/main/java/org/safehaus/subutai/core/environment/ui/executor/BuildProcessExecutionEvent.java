@@ -12,7 +12,7 @@ public class BuildProcessExecutionEvent
     private BuildProcessExecutionEventType eventType;
 
 
-    public BuildProcessExecutionEvent( final String description, String name, BuildProcessExecutionEventType type )
+    public BuildProcessExecutionEvent( String name, String description, BuildProcessExecutionEventType type )
     {
         this.name = name;
         this.description = description;

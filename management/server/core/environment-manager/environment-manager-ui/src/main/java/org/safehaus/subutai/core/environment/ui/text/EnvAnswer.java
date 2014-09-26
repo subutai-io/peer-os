@@ -6,8 +6,10 @@ package org.safehaus.subutai.core.environment.ui.text;
  */
 public enum EnvAnswer
 {
-    SUCCESS( "Cloning containers finished successfully." ), FAIL( "Cloning containers failed." ),
-    NO_BUILD_PROCESS( "No build process tasks" );
+    START( "Environment build process started." ),
+    SUCCESS( "Environment created successfully." ),
+    FAIL( "Failed creating environment." ),
+    NO_BUILD_PROCESS( "No environment build process." );
 
 
     String answer;

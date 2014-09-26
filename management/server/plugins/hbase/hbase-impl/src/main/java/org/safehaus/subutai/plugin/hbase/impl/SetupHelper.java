@@ -29,9 +29,7 @@ public class SetupHelper
     public void configureHMaster() throws ClusterSetupException
     {
         po.addLog( "Setting master" );
-        StringBuilder sb = new StringBuilder();
         Agent hmaster = config.getHbaseMaster();
-
         Command cmd = Commands.getConfigMasterCommand( config.getAllNodes(), config.getHadoopNameNode(),
                 hmaster.getHostname() );
         manager.getCommandRunner().runCommand( cmd );
