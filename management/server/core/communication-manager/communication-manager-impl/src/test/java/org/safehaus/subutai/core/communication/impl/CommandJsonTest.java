@@ -34,11 +34,31 @@ public class CommandJsonTest
 
 
     @Test
+    public void shouldReturnResponseCommandJson()
+    {
+        Response response = new Response();
+        String expected = GSON.toJson( new CommandJson.CommandImpl( response ) );
+        String actual = CommandJson.getResponseCommandJson( response );
+        assertEquals( expected, actual );
+    }
+
+
+    @Test
     public void shouldReturnCommandJson()
     {
 
         String actual = CommandJson.getCommandJson( new CommandJson.CommandImpl( new Response() ) );
         String expected = GSON.toJson( GSON.fromJson( actual, CommandJson.CommandImpl.class ) );
+        assertEquals( expected, actual );
+    }
+
+
+    @Test
+    public void shouldReturnCommandFromJson()
+    {
+        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        Command expected = new CommandJson.CommandImpl( request );
+        Command actual = CommandJson.getCommandFromJson( GSON.toJson( expected ) );
         assertEquals( expected, actual );
     }
 
@@ -59,26 +79,6 @@ public class CommandJsonTest
         Response expected = new Response();
         String cmdJson = GSON.toJson( new CommandJson.CommandImpl( expected ) );
         Response actual = CommandJson.getResponseFromCommandJson( cmdJson );
-        assertEquals( expected, actual );
-    }
-
-
-    @Test
-    public void shouldReturnResponseCommandJson()
-    {
-        Response response = new Response();
-        String expected = GSON.toJson( new CommandJson.CommandImpl( response ) );
-        String actual = CommandJson.getResponseCommandJson( response );
-        assertEquals( expected, actual );
-    }
-
-
-    @Test
-    public void shouldReturnCommandFromJson()
-    {
-        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
-        Command expected = new CommandJson.CommandImpl( request );
-        Command actual = CommandJson.getCommandFromJson( GSON.toJson( expected ) );
         assertEquals( expected, actual );
     }
 }
