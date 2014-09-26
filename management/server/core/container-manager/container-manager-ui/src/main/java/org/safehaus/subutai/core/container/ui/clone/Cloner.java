@@ -30,6 +30,7 @@ import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -82,8 +83,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     + "61}[0-9A-Za-z])?)*\\.?$";
     AtomicInteger countProcessed = null;
     AtomicInteger errorProcessed = null;
-    Map<ContainerPlacementStrategy, BeanItemContainer<Criteria>> criteriaBeansMap =
-            new HashMap<ContainerPlacementStrategy, BeanItemContainer<Criteria>>();
+    Map<ContainerPlacementStrategy, BeanItemContainer<Criteria>> criteriaBeansMap = new HashMap<>();
     List<ContainerPlacementStrategy> placementStrategies;
 
 
@@ -101,13 +101,13 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         placementStrategies = strategyManager.getPlacementStrategies();
         for ( ContainerPlacementStrategy st : placementStrategies )
         {
-            BeanItemContainer<Criteria> beanItems = new BeanItemContainer<Criteria>( Criteria.class );
+            BeanItemContainer<Criteria> beanItems = new BeanItemContainer<>( Criteria.class );
             beanItems.addAll( st.getCriteria() );
             criteriaBeansMap.put( st, beanItems );
         }
 
         BeanItemContainer<ContainerPlacementStrategy> container =
-                new BeanItemContainer<ContainerPlacementStrategy>( ContainerPlacementStrategy.class );
+                new BeanItemContainer<>( ContainerPlacementStrategy.class );
         container.addAll( placementStrategies );
 
         textFieldLxcName = new TextField();
@@ -265,8 +265,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
 
         Set<Agent> physicalAgents = AgentUtil.filterPhysicalAgents( agentTree.getSelectedAgents() );
         final Map<Agent, List<String>> agentFamilies = new HashMap<>();
-        final double count = ( Double ) slider.getValue();
-        List<Criteria> criteria = new ArrayList<Criteria>();
+        final double count = slider.getValue();
+        List<Criteria> criteria = new ArrayList<>();
         if ( physicalAgents.isEmpty() )
         { // process cloning by selected strategy
 
@@ -282,13 +282,13 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
             if ( selectedStrategy.hasCriteria() )
             {
                 BeanItemContainer<Criteria> beans = criteriaBeansMap.get( selectedStrategy );
-                criteria = new ArrayList( beans.getItemIds() );
+                criteria = Lists.newArrayList( beans.getItemIds() );
                 for ( Criteria c : criteria )
                 {
                     LOG.info( String.format( "%s %s %s", c.getId(), c.getTitle(), c.getValue() ) );
                 }
             }
-            Map<Agent, Integer> bestServers = null;
+            Map<Agent, Integer> bestServers;
             try
             {
                 bestServers = strategyManager

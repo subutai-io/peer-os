@@ -16,12 +16,10 @@ import com.vaadin.ui.themes.Runo;
 public class PeerComponent extends CustomComponent implements Disposable
 {
 
-    private PeerManagerPortalModule peerManagerPortalModule;
-
 
     public PeerComponent( PeerManagerPortalModule peerManagerPortalModule )
     {
-        setHeight( 100, UNITS_PERCENTAGE );
+        setHeight( 100, Unit.PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
@@ -41,6 +39,6 @@ public class PeerComponent extends CustomComponent implements Disposable
     @Override
     public void dispose()
     {
-        peerManagerPortalModule = null;
+        final PeerManagerPortalModule peerManagerPortalModule = null;
     }
 }

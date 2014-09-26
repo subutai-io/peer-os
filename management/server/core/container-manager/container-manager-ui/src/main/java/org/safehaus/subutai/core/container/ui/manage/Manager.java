@@ -33,10 +33,6 @@ public class Manager extends VerticalLayout
 
     private static final String PHYSICAL_HOST_LABEL = "Physical Host";
     private final Label indicator;
-    private final Button infoBtn;
-    private final Button startAllBtn;
-    private final Button stopAllBtn;
-    private final Button destroyAllBtn;
     private final TreeTable lxcTable;
     private final ContainerManager containerManager;
     private final AgentManager agentManager;
@@ -57,7 +53,7 @@ public class Manager extends VerticalLayout
 
         lxcTable = createTableTemplate( "Lxc containers", 500 );
 
-        infoBtn = new Button( Buttons.INFO.getButtonLabel() );
+        final Button infoBtn = new Button( Buttons.INFO.getButtonLabel() );
         infoBtn.addStyleName( "default" );
         infoBtn.addClickListener( new Button.ClickListener()
         {
@@ -68,7 +64,7 @@ public class Manager extends VerticalLayout
             }
         } );
 
-        stopAllBtn = new Button( Buttons.STOP_ALL.getButtonLabel() );
+        final Button stopAllBtn = new Button( Buttons.STOP_ALL.getButtonLabel() );
         stopAllBtn.addStyleName( "default" );
         stopAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -86,7 +82,7 @@ public class Manager extends VerticalLayout
                 }
             }
         } );
-        startAllBtn = new Button( Buttons.START_ALL.getButtonLabel() );
+        final Button startAllBtn = new Button( Buttons.START_ALL.getButtonLabel() );
         startAllBtn.addStyleName( "default" );
         startAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -104,7 +100,7 @@ public class Manager extends VerticalLayout
                 }
             }
         } );
-        destroyAllBtn = new Button( Buttons.DESTROY_ALL.getButtonLabel() );
+        final Button destroyAllBtn = new Button( Buttons.DESTROY_ALL.getButtonLabel() );
         destroyAllBtn.addStyleName( "default" );
         destroyAllBtn.addClickListener( new Button.ClickListener()
         {

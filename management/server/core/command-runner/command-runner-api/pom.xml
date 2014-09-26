@@ -38,6 +38,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.command.api</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

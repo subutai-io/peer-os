@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.monitor.ui.util;
 
 import java.util.Date;
 
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
@@ -66,7 +67,7 @@ public class UIUtil
 
         PopupDateField dateField = new PopupDateField( label, value );
         dateField.setDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        dateField.setResolution( PopupDateField.RESOLUTION_SEC );
+        dateField.setResolution( Resolution.SECOND );
 
         parent.addComponent( dateField, position );
 

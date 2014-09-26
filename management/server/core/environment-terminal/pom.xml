@@ -15,6 +15,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <!--<module>environment-terminal-ui</module>-->
+    <module>environment-terminal-ui</module>
   </modules>
 </project>

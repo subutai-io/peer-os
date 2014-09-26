@@ -18,7 +18,7 @@
     <module>monitoring-api</module>
     <module>monitoring-impl</module>
     <module>monitoring-cli</module>
-    <!--<module>monitoring-ui</module>-->
+    <module>monitoring-ui</module>
   </modules>
 
 </project>
