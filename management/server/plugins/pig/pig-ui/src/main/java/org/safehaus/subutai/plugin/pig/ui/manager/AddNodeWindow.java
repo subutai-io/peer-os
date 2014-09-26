@@ -72,6 +72,8 @@ public class AddNodeWindow extends Window
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
+        final Button ok = new Button( "Ok" );
+
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -82,6 +84,7 @@ public class AddNodeWindow extends Window
                 Agent agent = ( Agent ) hadoopNodes.getValue();
                 final UUID trackID = pig.addNode( config.getClusterName(), agent.getHostname() );
 
+                ok.setEnabled( false );
                 executorService.execute( new Runnable()
                 {
                     @Override
@@ -97,8 +100,11 @@ public class AddNodeWindow extends Window
                                         po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
                                 if ( po.getState() != ProductOperationState.RUNNING )
                                 {
+
                                     hideProgress();
+                                    ok.setEnabled( true );
                                     break;
+
                                 }
                             }
                             else
@@ -135,7 +141,7 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
+
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {

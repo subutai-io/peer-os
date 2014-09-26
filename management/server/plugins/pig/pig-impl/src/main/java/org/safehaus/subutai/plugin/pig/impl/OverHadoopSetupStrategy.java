@@ -99,7 +99,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         manager.getCommandRunner().runCommand( installCommand );
         if ( installCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Installation succeeded\nDone" );
+            productOperation.addLog( "Installation succeeded" );
         }
         else
         {

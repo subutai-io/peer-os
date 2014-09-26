@@ -25,13 +25,26 @@ public class PigComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
-        Manager manager = new Manager( executorService, serviceLocator );
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
+        final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
-        verticalLayout.addComponent( mongoSheet );
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( sheet );
 
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
