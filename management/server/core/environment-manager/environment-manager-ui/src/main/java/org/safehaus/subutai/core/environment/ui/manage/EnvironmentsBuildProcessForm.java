@@ -42,8 +42,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
     private static final String STATUS = "Status";
     private static final String ACTION = "Action";
-    //    private static final String IMG = "img/spinner.gif";
-    private AtomicInteger errorProcessed = null;
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -223,8 +221,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
     private void startBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
-
-        errorProcessed = new AtomicInteger( 0 );
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
         buildProcessExecutor.addListener( this );

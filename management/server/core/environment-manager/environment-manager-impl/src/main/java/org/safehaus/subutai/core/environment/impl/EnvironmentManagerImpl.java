@@ -294,8 +294,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
 
 
-        Environment environment =
-                new Environment( environmentBuildProcess.getEnvironmentName(), environmentBuildProcess.getUuid() );
+        Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 

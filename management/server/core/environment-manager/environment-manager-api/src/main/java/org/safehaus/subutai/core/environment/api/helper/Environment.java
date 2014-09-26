@@ -18,24 +18,12 @@ public class Environment
     private Set<Node> nodes;
     private String name;
     private Set<EnvironmentContainer> containers;
-        private String peerUuid;
 
-
-    public Environment( String name, UUID envId )
-    {
-        this.uuid = envId;
-        this.nodes = new HashSet<>();
-        this.name = name;
-        this.containers = new HashSet<>();
-        //        this.peerUuid = peerUuid;
-    }
-
-
-    public Environment( final String name, final String peerUuid )
+    public Environment( final String name )
     {
         this.nodes = new HashSet<>();
         this.name = name;
-//        this.uuid = envId;
+        this.uuid = UUID.randomUUID();
         this.containers = new HashSet<>();
     }
 

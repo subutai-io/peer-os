@@ -57,7 +57,7 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 
 
     @Override
-    public synchronized void invoke( final PeerCommandMessage peerCommand )
+    public synchronized void invoke( PeerCommandMessage peerCommand )
     {
         if ( peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
         {

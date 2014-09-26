@@ -81,7 +81,7 @@ public class RemotePeerRestClient
     }
 
 
-    public boolean invoke( String ip, String port, PeerCommandMessage ccm )
+    public PeerCommandMessage invoke( String ip, String port, PeerCommandMessage ccm )
     {
         String path = "peer/invoke";
         try
@@ -116,15 +116,16 @@ public class RemotePeerRestClient
                 LOG.info( jsonObject );
                 PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
                 ccm.setResult( result.getResult() );
+                ccm.setSuccess( result.isSuccess() );
                 LOG.info( String.format( "RESULT: %s", result.toString() ) );
 
-                return true;
+                return ccm;
             }
             else
             {
                 ccm.setResult( jsonObject );
                 ccm.setSuccess( false );
-                return false;
+                return ccm;
             }
         }
         catch ( Exception e )
@@ -132,6 +133,6 @@ public class RemotePeerRestClient
             LOG.error( e.getMessage() );
         }
 
-        return false;
+        return null;
     }
 }
