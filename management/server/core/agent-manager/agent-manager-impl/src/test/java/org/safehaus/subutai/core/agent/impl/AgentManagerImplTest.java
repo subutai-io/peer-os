@@ -122,13 +122,13 @@ public class AgentManagerImplTest
         t.start();
 
 
-        Awaitility.await().atMost( 3, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+        Awaitility.await().atMost( 2, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
                   .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
         {
 
             public Boolean call() throws Exception
             {
-                return agentManager.waitForRegistration( registrationRequest.getHostname(), 1500 ) != null;
+                return agentManager.waitForRegistration( registrationRequest.getHostname(), 2000 ) != null;
             }
         } );
     }
