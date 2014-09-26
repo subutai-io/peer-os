@@ -15,13 +15,13 @@ escape_characters()
 }
 
 # Replace the comment with the real export in the file
-if [ "x$JAVA_HOME" = "x" ];
+if [[ "x$JAVA_HOME" == "x" ]];
 then
-    sed -i 's/export JAVA_HOME=.*/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hbaseConf/hbase-env.sh
+    sed -i 's/# export JAVA_HOME=.*/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hbaseConf/hbase-env.sh
 else
     escape_characters $JAVA_HOME
     echo "Using JAVA_HOME:" $JAVA_HOME
-    sed -i 's/export JAVA_HOME=.*/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
+    sed -i 's/# export JAVA_HOME=.*/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
 fi
 
 . $FilePath
