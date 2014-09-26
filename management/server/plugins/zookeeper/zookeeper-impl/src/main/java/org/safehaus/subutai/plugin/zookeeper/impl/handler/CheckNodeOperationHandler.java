@@ -3,11 +3,11 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
@@ -61,31 +61,17 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Zookeepe
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
-        productOperation.addLog( "Checking node..." );
+
         Command checkCommand = Commands.getStatusCommand( node );
         manager.getCommandRunner().runCommand( checkCommand );
-        NodeState state = NodeState.UNKNOWN;
+
         if ( checkCommand.hasCompleted() )
         {
-            AgentResult result = checkCommand.getResults().get( node.getUuid() );
-            if ( result.getStdOut().contains( "is Running" ) )
-            {
-                state = NodeState.RUNNING;
-            }
-            else if ( result.getStdOut().contains( "is NOT Running" ) )
-            {
-                state = NodeState.STOPPED;
-            }
-        }
-
-        if ( NodeState.UNKNOWN.equals( state ) )
-        {
-            productOperation.addLogFailed(
-                    String.format( "Failed to check status of %s, %s", lxcHostname, checkCommand.getAllErrors() ) );
+            productOperation.addLogDone( String.format( "%s", checkCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
         else
         {
-            productOperation.addLogDone( String.format( "Node %s is %s", lxcHostname, state ) );
+            productOperation.addLogFailed( String.format( "Faied to check status, %s", checkCommand.getAllErrors() ) );
         }
     }
 }
