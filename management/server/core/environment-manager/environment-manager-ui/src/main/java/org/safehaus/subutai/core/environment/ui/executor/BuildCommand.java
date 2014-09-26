@@ -4,6 +4,8 @@ package org.safehaus.subutai.core.environment.ui.executor;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -11,7 +13,7 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
  */
 public class BuildCommand implements BuildProcessCommand
 {
-
+    private static final Logger LOG = LoggerFactory.getLogger( BuildCommand.class.getName() );
     private EnvironmentManager environmentManager;
     private EnvironmentBuildProcess environmentBuildProcess;
 
@@ -32,6 +34,7 @@ public class BuildCommand implements BuildProcessCommand
         }
         catch ( EnvironmentBuildException e )
         {
+            LOG.error( e.getMessage(), e );
             throw new BuildProcessExecutionException( e.getMessage() );
         }
     }
