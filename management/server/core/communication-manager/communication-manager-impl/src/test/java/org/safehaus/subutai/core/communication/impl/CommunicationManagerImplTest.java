@@ -134,7 +134,7 @@ public class CommunicationManagerImplTest
         message.writeBytes( CommandJson.getResponseCommandJson( response ).getBytes() );
         producer.send( message );
 
-        Awaitility.await().atMost( 1, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+        Awaitility.await().atMost( 2, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
                   .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
         {
 

@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -80,5 +81,34 @@ public class CommandJsonTest
         String cmdJson = GSON.toJson( new CommandJson.CommandImpl( expected ) );
         Response actual = CommandJson.getResponseFromCommandJson( cmdJson );
         assertEquals( expected, actual );
+    }
+
+
+    @Test
+    public void shouldReturnNonNullResponse()
+    {
+        Response response = new Response();
+        CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( response );
+
+        assertNotNull( cmd.getResponse() );
+    }
+
+
+    @Test
+    public void shouldReturnNonNullRequest()
+    {
+        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
+
+        assertNotNull( cmd.getRequest() );
+    }
+
+
+    @Test
+    public void shouldEscapeString()
+    {
+        String str = "\"\\\b\f\n\r\t/" + '\u007F';
+
+        assertEquals( "\"\\\b\f\n\r\t\\/" + "\\u007F", CommandJson.escape( str ) );
     }
 }

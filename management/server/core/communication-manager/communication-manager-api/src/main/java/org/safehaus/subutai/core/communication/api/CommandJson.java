@@ -10,8 +10,10 @@ import org.safehaus.subutai.common.protocol.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -40,17 +42,11 @@ public class CommandJson
      */
     public static Request getRequestFromCommandJson( String json )
     {
-        try
+
+        Command cmd = getCommandFromJson( json );
+        if ( cmd != null && cmd.getRequest() != null )
         {
-            Command cmd = getCommandFromJson( json );
-            if ( cmd.getRequest() != null )
-            {
-                return cmd.getRequest();
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in getRequestFromCommandJson", ex );
+            return cmd.getRequest();
         }
 
         return null;
@@ -70,7 +66,7 @@ public class CommandJson
         {
             return GSON.fromJson( escape( json ), CommandImpl.class );
         }
-        catch ( Exception ex )
+        catch ( JsonSyntaxException ex )
         {
             LOG.error( "Error in getCommandFromJson", ex );
         }
@@ -86,7 +82,7 @@ public class CommandJson
      *
      * @return escaped json string
      */
-    private static String escape( String s )
+    public static String escape( String s )
     {
         StringBuilder sb = new StringBuilder();
         for ( int i = 0; i < s.length(); i++ )
@@ -157,17 +153,11 @@ public class CommandJson
      */
     public static Response getResponseFromCommandJson( String json )
     {
-        try
+
+        Command cmd = getCommandFromJson( json );
+        if ( cmd != null && cmd.getResponse() != null )
         {
-            Command cmd = getCommandFromJson( json );
-            if ( cmd.getResponse() != null )
-            {
-                return cmd.getResponse();
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in getResponseCommandJson", ex );
+            return cmd.getResponse();
         }
 
         return null;
@@ -187,9 +177,9 @@ public class CommandJson
         {
             return GSON.toJson( new CommandImpl( request ) );
         }
-        catch ( Exception ex )
+        catch ( RuntimeException ex )
         {
-            LOG.error( "Error in getCommandJson", ex );
+            LOG.error( "Error in getRequestCommandJson", ex );
         }
         return null;
     }
@@ -208,7 +198,7 @@ public class CommandJson
         {
             return GSON.toJson( new CommandImpl( response ) );
         }
-        catch ( Exception ex )
+        catch ( RuntimeException ex )
         {
             LOG.error( "Error in getResponseCommandJson", ex );
         }
@@ -229,7 +219,7 @@ public class CommandJson
         {
             return GSON.toJson( cmd );
         }
-        catch ( Exception ex )
+        catch ( RuntimeException ex )
         {
             LOG.error( "Error in getCommandJson", ex );
         }
@@ -246,6 +236,9 @@ public class CommandJson
 
         public CommandImpl( Object message )
         {
+            Preconditions.checkArgument( message instanceof Request || message instanceof Response,
+                    "Message is of wrong type" );
+
             if ( message instanceof Request )
             {
                 this.request = ( Request ) message;
