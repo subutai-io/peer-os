@@ -54,7 +54,7 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized request from json string
+     * Returns deserialized command from json string
      *
      * @param json - request in json format
      *
@@ -165,7 +165,7 @@ public class CommandJson
 
 
     /**
-     * Returns serialized request from Request POJO
+     * Returns serialized command from Request POJO
      *
      * @param request - request in pojo format
      *
@@ -186,7 +186,7 @@ public class CommandJson
 
 
     /**
-     * Returns serialized request from Response POJO
+     * Returns serialized command from Response POJO
      *
      * @param response - response in pojo format
      *
@@ -207,7 +207,7 @@ public class CommandJson
 
 
     /**
-     * Returns serialized request from Command POJO
+     * Returns serialized command from Command POJO
      *
      * @param cmd - request in pojo format
      *
