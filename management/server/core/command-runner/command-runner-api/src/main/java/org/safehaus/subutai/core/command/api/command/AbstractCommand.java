@@ -22,7 +22,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * Provides command Command functionality
+ * Provides common Command functionality
  */
 public abstract class AbstractCommand implements Command
 {

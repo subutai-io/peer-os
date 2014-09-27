@@ -186,7 +186,7 @@ public class CommandJson
 
 
     /**
-     * Returns serialized response from Response POJO
+     * Returns serialized request from Response POJO
      *
      * @param response - response in pojo format
      *
@@ -230,7 +230,7 @@ public class CommandJson
     public static class CommandImpl implements Command
     {
 
-        Request request;
+        Request command;
         Response response;
 
 
@@ -241,7 +241,7 @@ public class CommandJson
 
             if ( message instanceof Request )
             {
-                this.request = ( Request ) message;
+                this.command = ( Request ) message;
             }
             else if ( message instanceof Response )
             {
@@ -253,7 +253,7 @@ public class CommandJson
         @Override
         public Request getRequest()
         {
-            return request;
+            return command;
         }
 
 
@@ -278,7 +278,7 @@ public class CommandJson
 
             final CommandImpl command = ( CommandImpl ) o;
 
-            if ( request != null ? !request.equals( command.request ) : command.request != null )
+            if ( this.command != null ? !this.command.equals( command.command ) : command.command != null )
             {
                 return false;
             }
@@ -294,7 +294,7 @@ public class CommandJson
         @Override
         public int hashCode()
         {
-            int result = request != null ? request.hashCode() : 0;
+            int result = command != null ? command.hashCode() : 0;
             result = 31 * result + ( response != null ? response.hashCode() : 0 );
             return result;
         }
