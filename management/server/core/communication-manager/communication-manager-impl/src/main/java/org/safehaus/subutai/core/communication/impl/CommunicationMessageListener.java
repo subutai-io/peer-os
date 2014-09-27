@@ -52,6 +52,7 @@ class CommunicationMessageListener implements MessageListener
                 String jsonCmd = new String( msgBytes, "UTF-8" );
                 Response response = CommandJson.getResponseFromCommandJson( jsonCmd );
 
+
                 if ( response != null )
                 {
                     logResponse( response, jsonCmd );
@@ -75,6 +76,10 @@ class CommunicationMessageListener implements MessageListener
                             .setTransportId( ( ( RemoveInfo ) aMsg.getDataStructure() ).getObjectId().toString() );
                     notifyListeners( agentDisconnect );
                 }
+            }
+            else
+            {
+                LOG.warn( message.toString() );
             }
         }
         catch ( Exception ex )
