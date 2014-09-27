@@ -16,7 +16,7 @@ if ls *.deb ; then
 	rm  *.deb
 fi
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+fileName=`ls | grep subutai | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
