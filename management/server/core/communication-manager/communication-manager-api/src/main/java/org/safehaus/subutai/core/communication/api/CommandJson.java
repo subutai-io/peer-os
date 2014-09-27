@@ -36,17 +36,17 @@ public class CommandJson
     /**
      * Returns deserialized request from json string
      *
-     * @param json - request in json format
+     * @param json - command in json format
      *
-     * @return request
+     * @return command
      */
     public static Request getRequestFromCommandJson( String json )
     {
 
         Command cmd = getCommandFromJson( json );
-        if ( cmd != null && cmd.getRequest() != null )
+        if ( cmd != null && cmd.getCommand() != null )
         {
-            return cmd.getRequest();
+            return cmd.getCommand();
         }
 
         return null;
@@ -54,11 +54,11 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized request from json string
+     * Returns deserialized command from json string
      *
-     * @param json - request in json format
+     * @param json - command in json format
      *
-     * @return request
+     * @return command
      */
     public static Command getCommandFromJson( String json )
     {
@@ -165,11 +165,11 @@ public class CommandJson
 
 
     /**
-     * Returns serialized request from Request POJO
+     * Returns serialized command from Request POJO
      *
-     * @param request - request in pojo format
+     * @param request - command in pojo format
      *
-     * @return request in json format
+     * @return command in json format
      */
     public static String getRequestCommandJson( Request request )
     {
@@ -186,7 +186,7 @@ public class CommandJson
 
 
     /**
-     * Returns serialized response from Response POJO
+     * Returns serialized command from Response POJO
      *
      * @param response - response in pojo format
      *
@@ -207,11 +207,11 @@ public class CommandJson
 
 
     /**
-     * Returns serialized request from Command POJO
+     * Returns serialized command from Command POJO
      *
-     * @param cmd - request in pojo format
+     * @param cmd - command in pojo format
      *
-     * @return request in request format
+     * @return command in command format
      */
     public static String getCommandJson( Command cmd )
     {
@@ -230,7 +230,7 @@ public class CommandJson
     public static class CommandImpl implements Command
     {
 
-        Request request;
+        Request command;
         Response response;
 
 
@@ -241,7 +241,7 @@ public class CommandJson
 
             if ( message instanceof Request )
             {
-                this.request = ( Request ) message;
+                this.command = ( Request ) message;
             }
             else if ( message instanceof Response )
             {
@@ -251,9 +251,9 @@ public class CommandJson
 
 
         @Override
-        public Request getRequest()
+        public Request getCommand()
         {
-            return request;
+            return command;
         }
 
 
@@ -278,7 +278,7 @@ public class CommandJson
 
             final CommandImpl command = ( CommandImpl ) o;
 
-            if ( request != null ? !request.equals( command.request ) : command.request != null )
+            if ( this.command != null ? !this.command.equals( command.command ) : command.command != null )
             {
                 return false;
             }
@@ -294,7 +294,7 @@ public class CommandJson
         @Override
         public int hashCode()
         {
-            int result = request != null ? request.hashCode() : 0;
+            int result = command != null ? command.hashCode() : 0;
             result = 31 * result + ( response != null ? response.hashCode() : 0 );
             return result;
         }
