@@ -24,7 +24,7 @@ cp -a $SOURCE/etc/ $BASE/$fileName/
 cp -a $SOURCE/opt $BASE/$fileName/
 
 #http://apache.bilkent.edu.tr/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz
-wget http://mirrors.ibiblio.org/apache/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz -P $fileName/opt/
+wget http://www.bizdirusa.com/mirrors/apache/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz -P $fileName/opt/
 cd $fileName/opt
 tar xzvf apache-activemq-5.9.1-bin.tar.gz
 rm apache-activemq-5.9.1-bin.tar.gz
