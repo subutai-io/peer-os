@@ -10,7 +10,7 @@ BASE_SOURCE=$MANAGEMENT_BASE"/workspace/management"
 echo "BASE:"$BASE
 echo "MANAGEMENT_BASE:"$MANAGEMENT_BASE
 echo "SOURCE:"$SOURCE
-echo "BASE_SOURCE:"
+echo "BASE_SOURCE:"$BASE_SOURCE
 
 #removing debian file
 cd $BASE
@@ -89,8 +89,6 @@ else
    mv $fileName $packageName
    dpkg-deb -z8 -Zgzip --build $packageName/
 fi
-
-exit 1
 
 #copying subutai-management.deb file to our pool
 cp $packageName".deb" /var/lib/jenkins/Automation/Bigdata/management/
