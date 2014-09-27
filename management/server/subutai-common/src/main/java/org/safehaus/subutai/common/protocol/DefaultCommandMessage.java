@@ -10,28 +10,28 @@ import java.util.UUID;
 public class DefaultCommandMessage extends PeerCommandMessage
 
 {
-    protected Boolean result;
-
-
-    public DefaultCommandMessage( PeerCommandType type, UUID peerId, UUID agentId )
+    public DefaultCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
     {
-        super( type, peerId, agentId );
+        super( type, envId, peerId, agentId );
     }
 
 
     @Override
     public void setResult( final Object result )
     {
-        if ( result != null && result instanceof Boolean )
+
+        if ( !( result instanceof Boolean ) )
         {
-            this.result = ( Boolean ) result;
+            throw new IllegalArgumentException( "Argument must be boolean." );
         }
+
+        this.success = ( Boolean ) result;
     }
 
 
     @Override
-    public Object getResult()
+    public Boolean getResult()
     {
-        return result;
+        return success;
     }
 }

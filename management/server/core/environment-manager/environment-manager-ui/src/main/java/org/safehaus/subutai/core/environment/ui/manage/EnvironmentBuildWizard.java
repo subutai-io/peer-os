@@ -244,10 +244,10 @@ public class EnvironmentBuildWizard extends DetailsWindow
             UUID peerUuid = ( UUID ) selection.getValue();
 
 
-            CloneContainersMessage ccm = new CloneContainersMessage();
+            CloneContainersMessage ccm = new CloneContainersMessage( environmentBuildTask.getUuid(), peerUuid );
             ccm.setTemplate( templateName );
-            ccm.setPeerId( peerUuid );
-            ccm.setEnvId( environmentBuildTask.getUuid() );
+            //            ccm.setPeerId( peerUuid );
+            //            ccm.setEnvId( environmentBuildTask.getUuid() );
             ccm.setNumberOfNodes( 2 );
             ccm.setStrategy( "ROUND_ROBIN" );
             process.getCloneContainersMessages().add( ccm );

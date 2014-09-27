@@ -380,23 +380,11 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public void createContainers( CloneContainersMessage ccm )
+    public Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String strategy )
+            throws ContainerCreateException
     {
-        UUID envId = ccm.getEnvId();
-        String template = ccm.getTemplate();
-        int numberOfNodes = ccm.getNumberOfNodes();
-        String strategy = ccm.getStrategy();
-        try
-        {
-            Set<Agent> result = containerManager.clone( envId, template, numberOfNodes, strategy, null );
-            ccm.setSuccess( true );
-            ccm.setResult( result );
-        }
-        catch ( ContainerCreateException e )
-        {
-            ccm.setSuccess( false );
-            ccm.setExceptionMessage( e.toString() );
-        }
+
+        return containerManager.clone( envId, template, numberOfNodes, strategy, null );
     }
 
 
@@ -454,6 +442,11 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void invoke( PeerCommandMessage peerCommandMessage )
     {
+        if ( !getSiteId().equals( peerCommandMessage.getPeerId() ) )
+        {
+            LOG.warn( String.format( "Orphan command message: %s", peerCommandMessage ) );
+            return;
+        }
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
         LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
         boolean result;
@@ -463,12 +456,18 @@ public class PeerManagerImpl implements PeerManager
                 if ( peerCommandMessage instanceof CloneContainersMessage )
                 {
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
-                    createContainers( ccm );
-                }
-                else
-                {
-                    peerCommandMessage.setSuccess( false );
-                    peerCommandMessage.setResult( "Invalid CLONE command." );
+                    try
+                    {
+                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getTemplate(), ccm.getNumberOfNodes(),
+                                ccm.getStrategy() );
+                        ccm.setResult( agents );
+                        ccm.setSuccess( true );
+                    }
+                    catch ( ContainerCreateException e )
+                    {
+                        peerCommandMessage.setSuccess( false );
+                        peerCommandMessage.setExceptionMessage( e.toString() );
+                    }
                 }
                 break;
             case START:
@@ -476,12 +475,10 @@ public class PeerManagerImpl implements PeerManager
                 if ( result )
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                 }
                 else
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                     peerCommandMessage.setExceptionMessage( "Could not start container." );
                 }
                 break;
@@ -490,12 +487,10 @@ public class PeerManagerImpl implements PeerManager
                 if ( result )
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                 }
                 else
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                     peerCommandMessage.setExceptionMessage( "Could not stop container." );
                 }
                 break;
@@ -505,12 +500,10 @@ public class PeerManagerImpl implements PeerManager
                 if ( result )
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                 }
                 else
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                     peerCommandMessage.setExceptionMessage( "Container is not connected." );
                 }
                 break;
@@ -523,7 +516,6 @@ public class PeerManagerImpl implements PeerManager
                 else
                 {
                     peerCommandMessage.setSuccess( false );
-                    peerCommandMessage.setResult( "Invalid EXECUTE command." );
                 }
                 break;
             default:
@@ -531,6 +523,7 @@ public class PeerManagerImpl implements PeerManager
                 peerCommandMessage.setSuccess( false );
                 break;
         }
+        peerCommandMessage.setProccessed( true );
 
         LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
     }
