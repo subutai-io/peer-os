@@ -50,7 +50,7 @@ class CommunicationMessageListener implements MessageListener
                 byte[] msgBytes = new byte[( int ) msg.getBodyLength()];
                 msg.readBytes( msgBytes );
                 String jsonCmd = new String( msgBytes, "UTF-8" );
-                Response response = CommandJson.getResponse( jsonCmd );
+                Response response = CommandJson.getResponseFromCommandJson( jsonCmd );
 
                 if ( response != null )
                 {
@@ -88,7 +88,7 @@ class CommunicationMessageListener implements MessageListener
     {
         if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE )
         {
-            LOG.info( "\nReceived {0}", CommandJson.getJson( CommandJson.getCommand( json ) ) );
+            LOG.info( "\nReceived {0}", CommandJson.getCommandJson( CommandJson.getCommandFromJson( json ) ) );
         }
         else
         {

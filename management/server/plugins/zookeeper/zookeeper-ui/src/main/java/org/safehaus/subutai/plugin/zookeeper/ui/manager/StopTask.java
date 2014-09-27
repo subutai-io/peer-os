@@ -9,7 +9,6 @@ package org.safehaus.subutai.plugin.zookeeper.ui.manager;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -17,9 +16,6 @@ import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public class StopTask implements Runnable
 {
 
@@ -55,10 +51,7 @@ public class StopTask implements Runnable
             {
                 if ( po.getState() != ProductOperationState.RUNNING )
                 {
-                    if ( po.getState() == ProductOperationState.SUCCEEDED )
-                    {
-                        state = NodeState.STOPPED;
-                    }
+                    completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
@@ -75,7 +68,5 @@ public class StopTask implements Runnable
                 break;
             }
         }
-
-        completeEvent.onComplete( state );
     }
 }
