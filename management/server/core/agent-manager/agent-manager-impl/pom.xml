@@ -49,7 +49,6 @@
     <dependency>
       <groupId>com.jayway.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>${com.jayway.awaitility.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

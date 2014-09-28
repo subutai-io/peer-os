@@ -15,10 +15,10 @@ import org.safehaus.subutai.core.command.api.command.Command;
 
 import com.google.common.collect.Lists;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.internal.matchers.StringContains.containsString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
