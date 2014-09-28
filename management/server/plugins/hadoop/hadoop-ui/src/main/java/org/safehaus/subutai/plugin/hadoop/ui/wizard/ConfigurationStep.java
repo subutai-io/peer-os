@@ -55,7 +55,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         //configuration servers number
-        List<Integer> s = new ArrayList<Integer>();
+        List<Integer> s = new ArrayList<>();
         for ( int i = 0; i < 50; i++ )
         {
             s.add( i );
