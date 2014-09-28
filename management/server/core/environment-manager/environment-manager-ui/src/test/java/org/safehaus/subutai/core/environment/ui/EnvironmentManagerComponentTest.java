@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.environment.ui;
 
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
@@ -15,7 +14,7 @@ public class EnvironmentManagerComponentTest
     EnvironmentManagerComponent environmentManagerComponent;
 
 
-//    @Before
+    //    @Before
     public void init()
     {
         environmentManagerComponent = mock( EnvironmentManagerComponent.class );

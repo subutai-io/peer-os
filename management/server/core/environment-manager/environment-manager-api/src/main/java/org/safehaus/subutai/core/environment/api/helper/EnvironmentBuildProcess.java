@@ -24,8 +24,17 @@ public class EnvironmentBuildProcess
     private List<CloneContainersMessage> cloneContainersMessages;
 
 
-    public EnvironmentBuildProcess()
+    /*public EnvironmentBuildProcess()
     {
+        this.uuid = UUID.randomUUID();
+        this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
+        this.cloneContainersMessages = new ArrayList<>();
+    }*/
+
+
+    public EnvironmentBuildProcess( final String name )
+    {
+        this.environmentName = name;
         this.uuid = UUID.randomUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.cloneContainersMessages = new ArrayList<>();
