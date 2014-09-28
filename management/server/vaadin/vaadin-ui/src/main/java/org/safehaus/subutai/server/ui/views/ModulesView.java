@@ -125,20 +125,23 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     private void addModule( final PortalModule module )
     {
 
-        ModuleView moduleView = new ModuleView( module, new ModuleView.ModuleViewListener()
+        if ( module != null )
         {
-            @Override
-            public void OnModuleClick( PortalModule module )
+            ModuleView moduleView = new ModuleView( module, new ModuleView.ModuleViewListener()
             {
-                if ( module != null && !modules.containsKey( module.getId() ) )
+                @Override
+                public void OnModuleClick( PortalModule module )
                 {
-                    autoCreate( module );
-                    modules.put( module.getId(), module );
+                    if ( !modules.containsKey( module.getId() ) )
+                    {
+                        autoCreate( module );
+                        modules.put( module.getId(), module );
+                    }
                 }
-            }
-        } );
-        moduleViews.put( module.getId(), moduleView );
-        modulesLayout.addComponent( moduleView );
+            } );
+            moduleViews.put( module.getId(), moduleView );
+            modulesLayout.addComponent( moduleView );
+        }
     }
 
 
