@@ -1,8 +1,8 @@
-Package: ksks-activemq
+Package: subutai-activemq
 Priority: optional
 Section: devel
 Installed-Size: 89000
-Maintainer: kiskis
-Architecture: all
-Version: 1.0.0
-Description: This is an Apache Activemq package of kiskis distribution.
+Maintainer: safehaus.org
+Architecture: amd64
+Version: 1.0.1
+Description: This is an Apache Activemq package of subutai distribution.

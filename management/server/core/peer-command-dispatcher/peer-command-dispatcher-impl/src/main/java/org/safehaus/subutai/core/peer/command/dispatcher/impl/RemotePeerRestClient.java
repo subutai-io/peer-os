@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,6 +26,8 @@ public class RemotePeerRestClient
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
+    private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
+    private static final long CONNECTION_TIMEOUT = 1000 * 60 * 5;
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
 
@@ -79,7 +83,7 @@ public class RemotePeerRestClient
     }
 
 
-    public boolean invoke( String ip, String port, PeerCommandMessage ccm )
+    public PeerCommandMessage invoke( String ip, String port, PeerCommandMessage ccm )
     {
         String path = "peer/invoke";
         try
@@ -93,26 +97,37 @@ public class RemotePeerRestClient
             form.set( "commandType", ccm.getType().toString() );
             form.set( "command", ccm.toJson() );
 
+
+            HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+            HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+            httpClientPolicy.setConnectionTimeout( CONNECTION_TIMEOUT );
+            httpClientPolicy.setReceiveTimeout( RECEIVE_TIMEOUT );
+
+            httpConduit.setClient( httpClientPolicy );
+
             Response response = client.path( path ).type( MediaType.APPLICATION_FORM_URLENCODED_TYPE )
                                       .accept( MediaType.APPLICATION_JSON ).form( form );
 
             String jsonObject = response.readEntity( String.class );
+            PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                //                LOG.info( response.toString() );
-                LOG.info( response.getEntity().toString() );
-                LOG.info( jsonObject );
-                PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
-                ccm.setResult( result.getResult() );
-                LOG.info( String.format( "RESULT: %s", result.toString() ) );
+                //                LOG.info( response.getEntity().toString() );
+                //                LOG.info( jsonObject );
 
-                return true;
+                ccm.setResult( result.getResult() );
+                ccm.setSuccess( result.isSuccess() );
+                //                LOG.info( String.format( "RESULT: %s", result.toString() ) );
+
+                return ccm;
             }
-            else {
-                ccm.setResult( jsonObject );
+            else
+            {
                 ccm.setSuccess( false );
-                return false;
+                ccm.setExceptionMessage( result.getExceptionMessage() );
+                return ccm;
             }
         }
         catch ( Exception e )
@@ -120,6 +135,6 @@ public class RemotePeerRestClient
             LOG.error( e.getMessage() );
         }
 
-        return false;
+        return null;
     }
 }

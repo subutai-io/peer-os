@@ -25,7 +25,7 @@ public class HBasePortalModule implements PortalModule
 {
 
     public static final String MODULE_IMAGE = "hbase.png";
-    protected static final Logger LOG = Logger.getLogger( HBasePortalModule.class.getName() );
+    private static final Logger LOG = Logger.getLogger( HBasePortalModule.class.getName() );
     private final ServiceLocator serviceLocator;
     private ExecutorService executor;
 

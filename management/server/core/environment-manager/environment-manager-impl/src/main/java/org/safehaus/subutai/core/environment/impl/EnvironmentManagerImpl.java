@@ -10,8 +10,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.Notification;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
@@ -294,7 +297,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
 
 
-        Environment environment = new Environment( "environment", environmentBuildProcess.getUuid() );
+        Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
 
@@ -302,20 +305,28 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             try
             {
                 peerCommandDispatcher.invoke( ccm );
+                if ( ccm == null )
+                {
+                    throw new EnvironmentBuildException( "CloneContainerMessage returned null" );
+                }
                 boolean result = ccm.isSuccess();
                 if ( result )
                 {
                     Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
-                    for ( Agent agent : agents )
+                    if ( !agents.isEmpty() )
                     {
-                        LOG.info( String.format( "------------> Adding container: %s", agent.toString() ) );
-                        EnvironmentContainer container = new EnvironmentContainer();
-                        container.setPeerId( agent.getSiteId() );
-                        container.setAgentId( agent.getUuid() );
-                        container.setHostname( agent.getHostname() );
-                        container.setDescription( ccm.getTemplate() );
-                        container.setName( agent.getHostname() );
-                        environment.addContainer( container );
+                        for ( Agent agent : agents )
+                        {
+                            //                            LOG.info( String.format( "------------> Adding container:
+                            // %s", agent.toString() ) );
+                            EnvironmentContainer container = new EnvironmentContainer();
+                            container.setPeerId( agent.getSiteId() );
+                            container.setAgentId( agent.getUuid() );
+                            container.setHostname( agent.getHostname() );
+                            container.setDescription( ccm.getTemplate() );
+                            container.setName( agent.getHostname() );
+                            environment.addContainer( container );
+                        }
                     }
                 }
             }
@@ -324,7 +335,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 LOG.error( e.getMessage(), e );
                 throw new EnvironmentBuildException( e.getMessage() );
             }
+        }
+
+        if ( !environment.getContainers().isEmpty() )
+        {
             saveEnvironment( environment );
+        }
+        else
+        {
+            throw new EnvironmentBuildException( "No containers assigned to e" );
         }
     }
 
@@ -360,7 +379,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean startContainer( final EnvironmentContainer container )
     {
         PeerCommandMessage cm =
-                new PeerCommandMessage( PeerCommandType.START, container.getPeerId(), container.getAgentId() );
+                new DefaultCommandMessage( PeerCommandType.START, container.getPeerId(), container.getAgentId() );
         peerCommandDispatcher.invoke( cm );
         return cm.isSuccess();
     }
@@ -370,7 +389,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean stopContainer( final EnvironmentContainer container )
     {
         PeerCommandMessage cm =
-                new PeerCommandMessage( PeerCommandType.STOP, container.getPeerId(), container.getAgentId() );
+                new DefaultCommandMessage( PeerCommandType.STOP, container.getPeerId(), container.getAgentId() );
         peerCommandDispatcher.invoke( cm );
         return cm.isSuccess();
     }
@@ -380,7 +399,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean isContainerConnected( final EnvironmentContainer container )
     {
         PeerCommandMessage cm =
-                new PeerCommandMessage( PeerCommandType.ISCONNECTED, container.getPeerId(), container.getAgentId() );
+                new DefaultCommandMessage( PeerCommandType.ISCONNECTED, container.getPeerId(), container.getAgentId() );
         peerCommandDispatcher.invoke( cm );
         return cm.isSuccess();
     }

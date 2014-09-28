@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Container;
 public class EnvironmentContainer extends Container
 {
 
-    private EnvironmentManager environmentManager;
+    private transient EnvironmentManager environmentManager;
 
 
     public void setEnvironmentManager( EnvironmentManager environmentManager )

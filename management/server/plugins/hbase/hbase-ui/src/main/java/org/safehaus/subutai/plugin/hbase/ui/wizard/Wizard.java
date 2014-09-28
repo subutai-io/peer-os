@@ -17,7 +17,6 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
-
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 

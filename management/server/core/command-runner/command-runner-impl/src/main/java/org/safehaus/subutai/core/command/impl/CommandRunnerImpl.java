@@ -145,7 +145,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      */
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents )
     {
-        return new CommandImpl( null, requestBuilder, agents, this );
+        return createCommand( null, requestBuilder, agents );
     }
 
 
@@ -171,7 +171,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
     @Override
     public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders )
     {
-        return new CommandImpl( null, agentRequestBuilders, this );
+        return createCommand( null, agentRequestBuilders );
     }
 
 

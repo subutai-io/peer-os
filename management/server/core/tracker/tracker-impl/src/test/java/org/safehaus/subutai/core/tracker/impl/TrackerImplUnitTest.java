@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for TrackerImpl class
  */
+@Ignore
 public class TrackerImplUnitTest
 {
 

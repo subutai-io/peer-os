@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hbase.ui.manager;
 
 
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
@@ -13,6 +14,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 public class StartTask implements Runnable
 {
 
+    private static final Logger LOG = Logger.getLogger( StartTask.class.getName() );
     private final String clusterName;
     private final CompleteEvent completeEvent;
     private final HBase hbase;
@@ -50,6 +52,7 @@ public class StartTask implements Runnable
                     }
                     catch ( InterruptedException e )
                     {
+                        LOG.warning( "Waiting hbase services to start" );
                         e.printStackTrace();
                     }
                     completeEvent.onComplete( po.getLog() );
