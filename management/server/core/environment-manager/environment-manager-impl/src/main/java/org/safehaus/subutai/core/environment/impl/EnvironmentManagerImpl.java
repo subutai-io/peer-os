@@ -293,8 +293,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
             throws EnvironmentBuildException
     {
-
-
         Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
@@ -341,7 +339,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         else
         {
-            throw new EnvironmentBuildException( "No containers assigned to e" );
+            throw new EnvironmentBuildException( "No containers assigned to the Environment" );
         }
     }
 
