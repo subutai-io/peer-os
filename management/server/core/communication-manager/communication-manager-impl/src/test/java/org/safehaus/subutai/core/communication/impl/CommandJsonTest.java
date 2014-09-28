@@ -16,9 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-/**
- * Created by dilshat on 9/26/14.
- */
 public class CommandJsonTest
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

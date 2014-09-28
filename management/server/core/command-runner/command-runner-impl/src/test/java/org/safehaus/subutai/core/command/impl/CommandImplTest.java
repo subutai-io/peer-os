@@ -24,10 +24,10 @@ import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.jayway.awaitility.Awaitility;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.internal.matchers.StringContains.containsString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -71,7 +71,7 @@ public class CommandImplTest
     }
 
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailZeroRequestsCountBroadcast()
     {
         new CommandImpl( mock( RequestBuilder.class ), 0, mock( AbstractCommandRunner.class ) );

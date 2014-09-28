@@ -83,11 +83,7 @@ public class PeerDAO
                 }
             }
         }
-        catch ( JsonSyntaxException e )
-        {
-            LOG.error( e.getMessage() );
-        }
-        catch ( DBException e )
+        catch ( JsonSyntaxException | DBException e )
         {
             LOG.error( e.getMessage() );
         }
@@ -127,11 +123,7 @@ public class PeerDAO
                 }
             }
         }
-        catch ( JsonSyntaxException e )
-        {
-            LOG.error( e.getMessage() );
-        }
-        catch ( DBException e )
+        catch ( JsonSyntaxException | DBException e )
         {
             LOG.error( e.getMessage() );
         }
