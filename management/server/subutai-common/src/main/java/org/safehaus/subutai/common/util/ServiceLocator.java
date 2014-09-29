@@ -57,15 +57,6 @@ public class ServiceLocator
 
         return null;
     }
-   /* public static <T> T getServiceNoCache( Class<T> clazz ) throws NamingException
-    {
-        Preconditions.checkNotNull( clazz, "Class is null" );
-
-        String serviceName = clazz.getName();
-        InitialContext ctx = new InitialContext();
-        String jndiName = "osgi:service/" + serviceName;
-        return clazz.cast( ctx.lookup( jndiName ) );
-    }*/
 
 
     /**
@@ -101,21 +92,4 @@ public class ServiceLocator
 
         return clazz.cast( cachedObj );
     }
-
-    /*public <T> T getService( Class<T> clazz ) throws NamingException
-        {
-            Preconditions.checkNotNull( clazz, "Class is null" );
-
-            String serviceName = clazz.getName();
-            Object cachedObj = cache.get( serviceName );
-            if ( cachedObj == null )
-            {
-                InitialContext ctx = new InitialContext();
-                String jndiName = "osgi:service/" + serviceName;
-                cachedObj = ctx.lookup( jndiName );
-                cache.put( serviceName, cachedObj );
-            }
-
-            return clazz.cast( cachedObj );
-        }*/
 }
