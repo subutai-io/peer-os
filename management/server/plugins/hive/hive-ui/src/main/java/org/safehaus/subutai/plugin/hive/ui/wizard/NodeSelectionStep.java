@@ -225,7 +225,6 @@ public class NodeSelectionStep extends Panel
         final Set<Agent> set = new HashSet<>( items );
         new Thread( new Runnable()
         {
-
             @Override
             public void run()
             {
