@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.environment.ui;
 
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -14,12 +15,13 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.manage.EnvironmentBuildWizard;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -27,21 +29,22 @@ import static org.mockito.Mockito.mock;
  */
 public class EnvironmentBuildWizardTest
 {
-
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     EnvironmentBuildWizard sub;
     private EnvironmentManagerPortalModule module;
+    private PeerManager peerManager;
 
 
     @Before
     public void setUp() throws Exception
     {
         module = mock( EnvironmentManagerPortalModule.class );
+        peerManager = mock( PeerManager.class );
         EnvironmentBuildTask task = getTask();
+        when( module.getPeerManager() ).thenReturn( peerManager );
+        when( peerManager.peers() ).thenReturn( Collections.<Peer>emptyList() );
         sub = new EnvironmentBuildWizard( "Wizard", module, task );
     }
-
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
     @Test
@@ -56,7 +59,6 @@ public class EnvironmentBuildWizardTest
         }
 
         EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
-
         System.out.println( GSON.toJson( process ) );
     }
 

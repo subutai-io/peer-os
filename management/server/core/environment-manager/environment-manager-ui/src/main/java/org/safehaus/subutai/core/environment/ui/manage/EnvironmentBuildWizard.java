@@ -34,7 +34,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentBuildWizard.class.getName() );
-    private int step = 1;
+    private int step = 0;
     private EnvironmentBuildTask environmentBuildTask;
     private Table peersTable;
     private Table containerToPeerTable;
@@ -49,6 +49,8 @@ public class EnvironmentBuildWizard extends DetailsWindow
         this.environmentBuildTask = environmentBuildTask;
         next();
     }
+
+
 
 
     public void next()
@@ -196,7 +198,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 comboBox.setContainerDataSource( bic );
                 comboBox.setNullSelectionAllowed( false );
                 comboBox.setTextInputAllowed( false );
-                comboBox.setItemCaptionPropertyId( "name" );
+                //                comboBox.setItemCaptionPropertyId( "name" );
                 containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), comboBox
                 }, ng.getTemplateName() );
