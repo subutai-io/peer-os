@@ -8,7 +8,7 @@
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="template/get-master-template-name">
+    <command name="template/get-hbaseMaster-template-name">
       <action class="org.safehaus.subutai.core.template.cli.MasterTemplateName">
         <property name="templateManager" ref="templateManager" />
       </action>

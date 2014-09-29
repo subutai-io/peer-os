@@ -8,20 +8,20 @@ package org.safehaus.subutai.core.command.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.AbstractCommand;
-import org.safehaus.subutai.common.command.AbstractCommandRunner;
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandExecutor;
-import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AbstractCommand;
+import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.CommandExecutor;
+import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
+import org.safehaus.subutai.core.command.api.command.CommandStatus;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import com.google.common.base.Preconditions;
@@ -36,6 +36,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
 
     private final CommunicationManager communicationManager;
     private final AgentManager agentManager;
+    private int inactiveCommandDropTimeout = Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC;
 
 
     public CommandRunnerImpl( CommunicationManager communicationManager, AgentManager agentManager )
@@ -47,6 +48,12 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
 
         this.communicationManager = communicationManager;
         this.agentManager = agentManager;
+    }
+
+
+    protected void setInactiveCommandDropTimeout( final int inactiveCommandDropTimeout )
+    {
+        this.inactiveCommandDropTimeout = inactiveCommandDropTimeout;
     }
 
 
@@ -106,8 +113,9 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
         CommandExecutor commandExecutor = new CommandExecutor( commandImpl, commandCallback );
 
         //put command to cache
-        boolean queued = commandExecutors.put( commandImpl.getCommandUUID(), commandExecutor,
-                Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 2000, new CommandExecutorExpiryCallback() );
+        boolean queued = commandExecutors
+                .put( commandImpl.getCommandUUID(), commandExecutor, inactiveCommandDropTimeout * 1000 + 2000,
+                        new CommandExecutorExpiryCallback() );
 
         if ( queued )
         {
@@ -137,7 +145,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
      */
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents )
     {
-        return new CommandImpl( null, requestBuilder, agents, this );
+        return createCommand( null, requestBuilder, agents );
     }
 
 
@@ -163,7 +171,7 @@ public class CommandRunnerImpl extends AbstractCommandRunner implements CommandR
     @Override
     public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders )
     {
-        return new CommandImpl( null, agentRequestBuilders, this );
+        return createCommand( null, agentRequestBuilders );
     }
 
 

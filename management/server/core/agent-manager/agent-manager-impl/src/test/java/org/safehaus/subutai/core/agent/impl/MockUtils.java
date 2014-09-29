@@ -6,10 +6,13 @@
 package org.safehaus.subutai.core.agent.impl;
 
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.ResponseType;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 
 import static org.mockito.Mockito.mock;
@@ -48,5 +51,34 @@ public class MockUtils
         when( response.getType() ).thenReturn( ResponseType.REGISTRATION_REQUEST );
 
         return response;
+    }
+
+
+    public static Response getRegistrationRequestFromLxcAgentWithEnvironmentId( UUID envId )
+    {
+        Response response = getRegistrationRequestFromLxcAgent();
+        when( response.getEnvironmentId() ).thenReturn( envId );
+        return response;
+    }
+
+
+    public static Set<Agent> getAgents( UUID... agentUUIDs )
+    {
+        Set<Agent> agents = new HashSet<>();
+        for ( UUID agentUUID : agentUUIDs )
+        {
+            agents.add( getAgent( agentUUID ) );
+        }
+
+        return agents;
+    }
+
+
+    public static Agent getAgent( UUID agentUUID )
+    {
+        Agent agent = mock( Agent.class );
+        when( agent.getUuid() ).thenReturn( agentUUID );
+
+        return agent;
     }
 }

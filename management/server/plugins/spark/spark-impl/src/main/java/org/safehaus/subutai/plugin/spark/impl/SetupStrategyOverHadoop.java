@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -143,7 +143,6 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             SetupHelper helper = new SetupHelper( manager, config, po );
             helper.configureMasterIP( config.getSlaveNodes() );
             helper.registerSlaves();
-            helper.startCluster();
         }
         else
         {

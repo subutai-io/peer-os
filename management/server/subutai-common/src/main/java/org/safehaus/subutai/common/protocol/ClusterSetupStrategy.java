@@ -9,6 +9,5 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
  */
 public interface ClusterSetupStrategy
 {
-
     public ConfigBase setup() throws ClusterSetupException;
 }

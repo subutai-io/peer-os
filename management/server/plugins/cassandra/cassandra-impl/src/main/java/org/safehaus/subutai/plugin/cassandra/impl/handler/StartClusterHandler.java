@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;

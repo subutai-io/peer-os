@@ -81,12 +81,12 @@ public class MainUI extends UI
     private String username = "administrator";
 
     private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
-    private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>()
+    private HashMap<String, View> routes = new HashMap<String, View>()
     {
         {
-            put( "/modules", ModulesView.class );
-            put( "/monitor", MonitorView.class );
-            put( "/core", CoreModulesView.class );
+            put( "/modules", new ModulesView() );
+            put( "/monitor", new MonitorView() );
+            put( "/core", new CoreModulesView() );
         }
     };
 

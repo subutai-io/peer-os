@@ -17,5 +17,7 @@ public interface Pig extends ApiBase<PigConfig>
 
     public UUID destroyNode( String clusterName, String lxcHostname );
 
+    public UUID addNode( String clusterName, String lxcHostname );
+
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, PigConfig config, ProductOperation po );
 }

@@ -4,8 +4,8 @@ package org.safehaus.subutai.core.filetracker.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;

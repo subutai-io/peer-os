@@ -6,128 +6,110 @@
 package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.plugin.hbase.ui.HBasePortalModule;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.GridLayout;
 
 
-/**
- * @author dilshat
- */
 public class Wizard
 {
 
-    private final VerticalLayout vlayout;
+    private final GridLayout grid;
+    private final ServiceLocator serviceLocator;
+    private final ExecutorService executor;
+    private final Tracker tracker;
+    private final Hadoop hadoop;
+    private final HBase hbase;
     private int step = 1;
     private HBaseClusterConfig config = new HBaseClusterConfig();
-    private HBasePortalModule hBasePortalModule;
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
-    public Wizard( HBasePortalModule hBasePortalModule )
+    public Wizard( ExecutorService executor, ServiceLocator serviceLocator ) throws NamingException
     {
-        this.hBasePortalModule = hBasePortalModule;
-        vlayout = new VerticalLayout();
-        vlayout.setSizeFull();
-        vlayout.setMargin( true );
+        this.serviceLocator = serviceLocator;
+        this.executor = executor;
+
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.hbase = serviceLocator.getService( HBase.class );
+
+        grid = new GridLayout( 1, 20 );
+        grid.setMargin( true );
+        grid.setSizeFull();
         putForm();
     }
 
 
     private void putForm()
     {
-        vlayout.removeAllComponents();
+        grid.removeComponent( 0, 1 );
+        Component component = null;
         switch ( step )
         {
             case 1:
             {
-                vlayout.addComponent( new StepStart( this ) );
+                component = new WelcomeStep( this );
                 break;
             }
             case 2:
             {
-                vlayout.addComponent( new ConfigurationStep( this ) );
+                component = new ConfigurationStep( hadoop, this );
                 break;
             }
             case 3:
             {
-                vlayout.addComponent( new StepSetMaster( this ) );
-                break;
-            }
-            case 4:
-            {
-                vlayout.addComponent( new StepSetRegion( this ) );
-                break;
-            }
-            case 5:
-            {
-                vlayout.addComponent( new StepSetQuorum( this ) );
-                break;
-            }
-            case 6:
-            {
-                vlayout.addComponent( new StepSetBackupMasters( this ) );
-                break;
-            }
-            case 7:
-            {
-                vlayout.addComponent( new VerificationStep( this ) );
+                component = new VerificationStep( tracker, hbase, executor, this );
                 break;
             }
             default:
             {
-                step = 1;
-                vlayout.addComponent( new StepStart( this ) );
                 break;
             }
         }
-    }
 
-
-    public HBasePortalModule gethBasePortalModule()
-    {
-        return hBasePortalModule;
-    }
-
-
-    public void sethBasePortalModule( final HBasePortalModule hBasePortalModule )
-    {
-        this.hBasePortalModule = hBasePortalModule;
+        if ( component != null )
+        {
+            grid.addComponent( component, 0, 1, 0, 19 );
+        }
     }
 
 
     public Component getContent()
     {
-        return vlayout;
+        return grid;
     }
 
 
-    public void next()
+    protected void next()
     {
         step++;
         putForm();
     }
 
 
-    public void back()
+    protected void back()
     {
         step--;
         putForm();
     }
 
 
-    public void cancel()
-    {
-        step = 1;
-        putForm();
-    }
-
-
-    public void init()
+    protected void init()
     {
         step = 1;
         config = new HBaseClusterConfig();
+        hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
 
@@ -135,5 +117,11 @@ public class Wizard
     public HBaseClusterConfig getConfig()
     {
         return config;
+    }
+
+
+    public HadoopClusterConfig getHadoopConfig()
+    {
+        return hadoopConfig;
     }
 }

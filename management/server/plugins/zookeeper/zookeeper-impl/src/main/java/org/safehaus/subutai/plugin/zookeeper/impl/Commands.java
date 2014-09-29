@@ -9,13 +9,13 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.collect.Sets;
 
@@ -114,7 +114,7 @@ public class Commands extends CommandsSingleton
     public static Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents )
     {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
-                agents );
+                        String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
+                                propertyName ) ), agents );
     }
 }

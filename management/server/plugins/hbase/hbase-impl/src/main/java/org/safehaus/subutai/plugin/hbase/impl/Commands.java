@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.hbase.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -13,6 +13,10 @@ import org.safehaus.subutai.core.command.api.CommandsSingleton;
 
 public class Commands extends CommandsSingleton
 {
+
+    protected final static String PACKAGE_NAME = "ksks-hbase";
+    protected final static String PACKAGE_PREFIX = "ksks";
+
 
     public Commands( CommandRunner commandRunner )
     {
@@ -34,9 +38,9 @@ public class Commands extends CommandsSingleton
     {
 
         return createCommand(
-                new RequestBuilder( "sleep 20; apt-get --assume-yes --force-yes install ksks-hbase" ).withTimeout( 360 )
-                                                                                                     .withStdOutRedirection(
-                                                                                                             OutputRedirection.NO ),
+                new RequestBuilder( "apt-get --assume-yes --force-yes install " + PACKAGE_NAME ).withTimeout( 360 )
+                                                                                                .withStdOutRedirection(
+                                                                                                        OutputRedirection.NO ),
                 agents );
     }
 
@@ -45,9 +49,9 @@ public class Commands extends CommandsSingleton
     {
 
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-hbase" ).withTimeout( 360 )
-                                                                                         .withStdOutRedirection(
-                                                                                                 OutputRedirection.NO ),
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 360 )
+                                                                                              .withStdOutRedirection(
+                                                                                                      OutputRedirection.NO ),
                 agents );
     }
 
@@ -60,7 +64,7 @@ public class Commands extends CommandsSingleton
 
     public static Command getStopCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service hbase stop &" ), agents );
+        return createCommand( new RequestBuilder( "service hbase stop" ).withTimeout( 360 ), agents );
     }
 
 
@@ -70,44 +74,38 @@ public class Commands extends CommandsSingleton
     }
 
 
-    /*public static Command getConfigureCommand( Set<Agent> agents, String param ) {
-
-        return createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s", param ) ),
-                agents );
-    }*/
-
-
-    // $HBASE_HOME/scripts/
-    public static Command getConfigBackupMastersCommand( Set<Agent> agents, String hostname )
+    public static Command getConfigBackupMastersCommand( Set<Agent> agents, String backUpMasters )
     {
-        return createCommand( new RequestBuilder( String.format( ". /etc/profile && backUpMasters.sh %s", hostname ) ),
+        return createCommand(
+                new RequestBuilder( String.format( ". /etc/profile && backUpMasters.sh %s", backUpMasters ) ), agents );
+    }
+
+
+    public static Command getConfigQuorumCommand( Set<Agent> agents, String quorumPeers )
+    {
+        return createCommand( new RequestBuilder( String.format( ". /etc/profile && quorum.sh %s", quorumPeers ) ),
                 agents );
     }
 
 
-    //$HBASE_HOME/scripts/
-    public static Command getConfigQuorumCommand( Set<Agent> agents, String quorums )
+    public static Command getConfigRegionCommand( Set<Agent> agents, String regionServers )
     {
-        return createCommand( new RequestBuilder( String.format( ". /etc/profile && quorum.sh %s", quorums ) ),
+        return createCommand( new RequestBuilder( String.format( ". /etc/profile && region.sh %s", regionServers ) ),
                 agents );
     }
 
 
-    //$HBASE_HOME/scripts/
-    public static Command getConfigRegionCommand( Set<Agent> agents, String hostnames )
-    {
-        return createCommand( new RequestBuilder( String.format( ". /etc/profile && region.sh %s", hostnames ) ),
-                agents );
-    }
-
-
-    //$HBASE_HOME/scripts/
-    public static Command getConfigMasterTask( Set<Agent> agents, String hadoopNameNodeHostname,
-                                               String hMasterMachineHostname )
+    public static Command getConfigMasterCommand( Set<Agent> agents, String hadoopNameNodeHostname,
+                                                  String hMasterMachineHostname )
     {
         return createCommand( new RequestBuilder(
                         String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
                                 hMasterMachineHostname ) ), agents );
+    }
+
+
+    public static Command getCheckInstalledCommand( Set<Agent> agents )
+    {
+        return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + PACKAGE_PREFIX ), agents );
     }
 }

@@ -1,13 +1,10 @@
 package org.safehaus.subutai.core.peer.command.dispatcher.impl;
 
 
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.PeerCommand;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
-import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +15,7 @@ import org.slf4j.LoggerFactory;
 public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerCommandDispatcherImpl.class.getName() );
+    private static final String port = "8181";
     private PeerManager peerManager;
     private RemotePeerRestClient remotePeerRestClient;
 
@@ -59,29 +57,17 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 
 
     @Override
-    public boolean invoke( final PeerCommand peerCommand ) throws PeerCommandException
+    public void invoke( PeerCommandMessage peerCommand )
     {
-        boolean result;
-        if ( peerManager.getSiteId().equals( peerCommand.getMessage().getPeerId() ) )
+        if ( peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
         {
-
-            try
-            {
-                result = peerManager.invoke( peerCommand );
-            }
-            catch ( PeerException pe )
-            {
-                LOG.error( pe.getMessage() );
-                throw new PeerCommandException( pe.getMessage() );
-            }
+            peerManager.invoke( peerCommand );
         }
         else
         {
-            Peer peer = peerManager.getPeerByUUID( peerCommand.getMessage().getPeerId() );
-            CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommand.getMessage();
+            Peer peer = peerManager.getPeerByUUID( peerCommand.getPeerId() );
             remotePeerRestClient = new RemotePeerRestClient();
-            result = remotePeerRestClient.createRemoteContainers( peer.getIp(), "8181", ccm );
+            remotePeerRestClient.invoke( peer.getIp(), port, peerCommand );
         }
-        return result;
     }
 }

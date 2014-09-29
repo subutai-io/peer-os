@@ -19,6 +19,7 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+      <version>${org.osgi.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -27,6 +28,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
+      <version>${org.slf4j.version}</version>
     </dependency>
   </dependencies>
 

@@ -4,14 +4,14 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Strings;

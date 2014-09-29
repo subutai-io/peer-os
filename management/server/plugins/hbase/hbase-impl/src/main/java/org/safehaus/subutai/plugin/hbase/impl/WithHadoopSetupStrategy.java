@@ -8,9 +8,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 
-/**
- * Created by bahadyr on 9/4/14.
- */
 public class WithHadoopSetupStrategy extends HBaseSetupStrategy
 {
 

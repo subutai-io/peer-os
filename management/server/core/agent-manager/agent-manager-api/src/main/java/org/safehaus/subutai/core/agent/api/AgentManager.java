@@ -80,8 +80,6 @@ public interface AgentManager
      */
     public void removeListener( AgentListener listener );
 
-    public Set<Agent> getAgentsByHostnames( Set<String> hostnames );
-
 
     public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
 

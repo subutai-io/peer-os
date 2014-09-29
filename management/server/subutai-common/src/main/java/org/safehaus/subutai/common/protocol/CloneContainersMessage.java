@@ -2,6 +2,7 @@ package org.safehaus.subutai.common.protocol;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -15,6 +16,7 @@ public class CloneContainersMessage extends PeerCommandMessage
     private int numberOfNodes;
     private String Strategy;
     private List<String> criteria;
+    private Set<Agent> agents;
 
 
     public UUID getEnvId()
@@ -74,5 +76,37 @@ public class CloneContainersMessage extends PeerCommandMessage
     public void setCriteria( final List<String> criteria )
     {
         this.criteria = criteria;
+    }
+
+
+    @Override
+    public void setResult( final Object result )
+    {
+        if (result instanceof Set)
+            agents = (Set<Agent>)result;
+        else
+            throw new IllegalArgumentException( "Result must be set of Agent." );
+    }
+
+
+    @Override
+    public Object getResult()
+    {
+        return agents;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "CloneContainersMessage{" +
+                "envId=" + envId +
+                ", template='" + template + '\'' +
+                ", numberOfNodes=" + numberOfNodes +
+                ", Strategy='" + Strategy + '\'' +
+                ", criteria=" + criteria +
+                ", agents=" + agents +
+                ", success=" + success +
+                '}';
     }
 }

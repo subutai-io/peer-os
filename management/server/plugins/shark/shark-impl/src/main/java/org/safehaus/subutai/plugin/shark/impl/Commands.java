@@ -2,17 +2,25 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 
 import java.util.Set;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
     public static final String PACKAGE_NAME = "ksks-shark";
+
+    private static CommandRunner commandRunner;
+
+
+    public static void init( CommandRunner commandRunner )
+    {
+        Commands.commandRunner = commandRunner;
+    }
 
 
     public static Command getInstallCommand( Set<Agent> agents )
@@ -43,6 +51,12 @@ public class Commands extends CommandsSingleton
         return createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && sharkConf.sh clear master ; sharkConf.sh master %s",
                                masterNode.getHostname() ) ).withTimeout( 60 ), agents );
+    }
+
+
+    private static Command createCommand( RequestBuilder rb, Set<Agent> agents )
+    {
+        return commandRunner.createCommand( rb, agents );
     }
 
 

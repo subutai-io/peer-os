@@ -57,26 +57,26 @@ public class RestServiceImpl implements RestService
 
         HBaseClusterConfig hbcc = new HBaseClusterConfig();
         /*hbcc.setClusterName( clusterName );
-        hbcc.setMaster( master );
+        hbcc.setHbaseMaster( master );
         hbcc.setBackupMasters( backupMasters );
         hbcc.setHadoopNameNode( hadoopNameNode );
 
 
         if ( !Strings.isNullOrEmpty( nodes ) ) {
             for ( String node : nodes.split( "," ) ) {
-                hbcc.getNodes().add( node );
+                hbcc.getHadoopNodes().add( node );
             }
         }
 
         if ( !Strings.isNullOrEmpty( quorum ) ) {
             for ( String node : quorum.split( "," ) ) {
-                hbcc.getQuorum().add( node );
+                hbcc.getQuorumPeers().add( node );
             }
         }
 
         if ( !Strings.isNullOrEmpty( region ) ) {
             for ( String node : region.split( "," ) ) {
-                hbcc.getRegion().add( node );
+                hbcc.getRegionServers().add( node );
             }
         }*/
 

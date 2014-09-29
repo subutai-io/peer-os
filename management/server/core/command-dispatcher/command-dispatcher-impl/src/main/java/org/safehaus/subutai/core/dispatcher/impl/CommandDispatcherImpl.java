@@ -8,16 +8,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.command.AbstractCommandRunner;
-import org.safehaus.subutai.common.command.AgentRequestBuilder;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.command.CommandCallback;
-import org.safehaus.subutai.common.command.CommandException;
-import org.safehaus.subutai.common.command.CommandExecutor;
-import org.safehaus.subutai.common.command.CommandExecutorExpiryCallback;
-import org.safehaus.subutai.common.command.CommandStatus;
-import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
@@ -25,6 +15,16 @@ import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.CommandExecutor;
+import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
+import org.safehaus.subutai.core.command.api.command.CommandStatus;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
@@ -266,7 +266,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     @Override
     public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents )
     {
-        return new CommandImpl( null, requestBuilder, agents, peerManager, this );
+        return createCommand( null, requestBuilder, agents );
     }
 
 
@@ -281,7 +281,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     @Override
     public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders )
     {
-        return new CommandImpl( null, agentRequestBuilders, peerManager, this );
+        return createCommand( null, agentRequestBuilders );
     }
 
 

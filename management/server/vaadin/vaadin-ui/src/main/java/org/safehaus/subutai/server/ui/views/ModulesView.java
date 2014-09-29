@@ -44,14 +44,20 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     private HashMap<String, AbstractLayout> moduleViews = new HashMap<>();
 
 
-    @Override
-    public void enter( ViewChangeEvent event )
+    public ModulesView()
     {
         setSizeFull();
         addStyleName( "reports" );
 
         addComponent( buildDraftsView() );
         getPortalModuleService().addListener( this );
+    }
+
+
+    @Override
+    public void enter( ViewChangeEvent event )
+    {
+
     }
 
 
@@ -150,9 +156,12 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     @Override
     public void moduleRegistered( PortalModule module )
     {
-        if ( module != null ) if ( !module.isCorePlugin() )
+        if ( module != null )
         {
-            addModule( module );
+            if ( !module.isCorePlugin() )
+            {
+                addModule( module );
+            }
         }
     }
 

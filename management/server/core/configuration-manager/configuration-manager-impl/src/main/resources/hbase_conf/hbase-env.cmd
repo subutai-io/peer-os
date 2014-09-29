@@ -69,7 +69,7 @@ set HBASE_OPTS="-XX:+UseConcMarkSweepGC" "-Djava.net.preferIPv4Stack=true"
 
 @rem Seconds to sleep between slave commands.  Unset by default.  This
 @rem can be useful in large clusters, where, e.g., slave rsyncs can
-@rem otherwise arrive faster than the master can service them.
+@rem otherwise arrive faster than the hbaseMaster can service them.
 @rem set HBASE_SLAVE_SLEEP=0.1
 
 @rem Tell HBase whether it should manage it's own instance of Zookeeper or not.

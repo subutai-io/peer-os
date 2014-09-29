@@ -52,4 +52,9 @@ public class TestUtils
             }
         };
     }
+
+
+    public static String getRequestCommandJson(){
+        return "";
+    }
 }

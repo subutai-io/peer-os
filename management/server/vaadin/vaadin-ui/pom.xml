@@ -164,6 +164,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <version>${com.google.guava.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- OSGi dependencies -->
@@ -175,6 +176,7 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+      <version>${org.osgi.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -196,6 +198,7 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+      <version>${com.google.code.gson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>

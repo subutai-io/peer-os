@@ -7,8 +7,14 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -16,17 +22,15 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
-public class VerificationStep extends VerticalLayout
+public class VerificationStep extends Panel
 {
 
-    public VerificationStep( final Wizard wizard )
+    public VerificationStep( final Tracker tracker, final HBase hbase, final ExecutorService executor,
+                             final Wizard wizard )
     {
 
         setSizeFull();
@@ -37,33 +41,59 @@ public class VerificationStep extends VerticalLayout
         grid.setSizeFull();
 
         Label confirmationLbl = new Label( "<strong>Please verify the installation settings "
-                + "(You may change them by clicking on Back button)</strong><br/>" );
+                + "(you may change them by clicking on Back button)</strong><br/>" );
         confirmationLbl.setContentMode( ContentMode.HTML );
+
+        final HBaseClusterConfig config = wizard.getConfig();
+        final HadoopClusterConfig hc = wizard.getHadoopConfig();
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "Master", wizard.getConfig().getMaster() + "\n" );
-        for ( String hostname : wizard.getConfig().getRegion() )
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            cfgView.addStringCfg( "Region", hostname + "\n" );
+            cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
+            cfgView.addStringCfg( "Master Node", wizard.getConfig().getHbaseMaster().getHostname() );
+            for ( Agent agent : wizard.getConfig().getRegionServers() )
+            {
+                cfgView.addStringCfg( "Region Servers", agent.getHostname() + "" );
+            }
+
+            for ( Agent agent : wizard.getConfig().getQuorumPeers() )
+            {
+                cfgView.addStringCfg( "Quorum Peers", agent.getHostname() + "" );
+            }
+
+            for ( Agent agent : wizard.getConfig().getBackupMasters() )
+            {
+                cfgView.addStringCfg( "Backup Masters", agent.getHostname() + "" );
+            }
         }
-        for ( String hostname : wizard.getConfig().getQuorum() )
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
-            cfgView.addStringCfg( "Quorum", hostname + "\n" );
+            cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
+            cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Domain name", hc.getDomainName() );
         }
-        cfgView.addStringCfg( "Backup master", wizard.getConfig().getBackupMasters() + "\n" );
-        cfgView.addStringCfg( "Hadoop name node", wizard.getConfig().getHadoopNameNode() + "\n" );
 
         Button install = new Button( "Install" );
-        install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = wizard.gethBasePortalModule().getHbaseManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( wizard.gethBasePortalModule().getExecutor(),
-                        wizard.gethBasePortalModule().getTracker(), trackID, HBaseClusterConfig.PRODUCT_KEY );
+                UUID trackId = null;
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
+                    trackId = hbase.installCluster( config );
+                }
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
+                    trackId = hbase.installCluster( config );
+                }
+
+                ProgressWindow window =
+                        new ProgressWindow( executor, tracker, trackId, HBaseClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -77,7 +107,6 @@ public class VerificationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
-        back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -97,6 +126,6 @@ public class VerificationStep extends VerticalLayout
 
         grid.addComponent( buttons, 0, 4 );
 
-        addComponent( grid );
+        setContent( grid );
     }
 }

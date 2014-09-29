@@ -59,7 +59,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
 
     private void setupStandalone()
     {
-
         try
         {
             Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(

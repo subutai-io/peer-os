@@ -22,6 +22,8 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
+import org.safehaus.subutai.plugin.pig.impl.handler.AddNodeOperationHandler;
+import org.safehaus.subutai.plugin.pig.impl.handler.DestroyClusterOperationHandler;
 import org.safehaus.subutai.plugin.pig.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.pig.impl.handler.InstallOperationHandler;
 
@@ -141,12 +143,9 @@ public class PigImpl implements Pig
     @Override
     public UUID installCluster( PigConfig config )
     {
-
         Preconditions.checkNotNull( config, "Configuration is null" );
-
         AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -154,21 +153,23 @@ public class PigImpl implements Pig
     @Override
     public UUID uninstallCluster( final String clusterName )
     {
-        return null;
+        AbstractOperationHandler operationHandler = new DestroyClusterOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
     @Override
     public List<PigConfig> getClusters()
     {
-        return dbManager.getInfo( PigConfig.PRODUCT_KEY, PigConfig.class );
+        return pluginDao.getInfo( PigConfig.PRODUCT_KEY, PigConfig.class );
     }
 
 
     @Override
     public PigConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( PigConfig.PRODUCT_KEY, clusterName, PigConfig.class );
+        return pluginDao.getInfo( PigConfig.PRODUCT_KEY, clusterName, PigConfig.class );
     }
 
 
@@ -185,11 +186,17 @@ public class PigImpl implements Pig
     @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
-
         executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
 
+
+    @Override
+    public UUID addNode( final String clusterName, final String lxcHostname )
+    {
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 

@@ -1,10 +1,12 @@
 package org.safehaus.subutai.plugin.hbase.api;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -19,14 +21,18 @@ public class HBaseClusterConfig implements ConfigBase
     private String templateName = PRODUCT_NAME;
     private int numberOfNodes = 4;
     private UUID uuid;
-    private String master;
-    private String backupMasters;
+
+
     private String clusterName = "";
     private String hadoopNameNode;
 
-    private Set<String> nodes = Sets.newHashSet();
-    private Set<String> region = Sets.newHashSet();
-    private Set<String> quorum = Sets.newHashSet();
+    private String hadoopClusterName;
+    private Agent hbaseMaster;
+    private Set<Agent> hadoopNodes = Sets.newHashSet();
+    private Set<Agent> regionServers = Sets.newHashSet();
+    private Set<Agent> quorumPeers = Sets.newHashSet();
+    private Set<Agent> backupMasters = Sets.newHashSet();
+    private Set<Agent> allNodes = Sets.newHashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private SetupType setupType;
 
@@ -91,6 +97,18 @@ public class HBaseClusterConfig implements ConfigBase
     }
 
 
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( String hadoopClusterName )
+    {
+        this.hadoopClusterName = hadoopClusterName;
+    }
+
+
     public UUID getUuid()
     {
         return uuid;
@@ -105,72 +123,24 @@ public class HBaseClusterConfig implements ConfigBase
 
     public void reset()
     {
-        this.master = null;
-        this.region = null;
-        this.quorum = null;
+        this.hbaseMaster = null;
+        this.regionServers = null;
+        this.quorumPeers = null;
         this.backupMasters = null;
         this.domainName = "";
         this.clusterName = "";
     }
 
 
-    public String getMaster()
+    public Set<Agent> getHadoopNodes()
     {
-        return master;
+        return hadoopNodes;
     }
 
 
-    public void setMaster( String master )
+    public void setHadoopNodes( Set<Agent> hadoopNodes )
     {
-        this.master = master;
-    }
-
-
-    public Set<String> getRegion()
-    {
-        return region;
-    }
-
-
-    public void setRegion( Set<String> region )
-    {
-        this.region = region;
-    }
-
-
-    public Set<String> getQuorum()
-    {
-        return quorum;
-    }
-
-
-    public void setQuorum( Set<String> quorum )
-    {
-        this.quorum = quorum;
-    }
-
-
-    public String getBackupMasters()
-    {
-        return backupMasters;
-    }
-
-
-    public void setBackupMasters( String backupMasters )
-    {
-        this.backupMasters = backupMasters;
-    }
-
-
-    public Set<String> getNodes()
-    {
-        return nodes;
-    }
-
-
-    public void setNodes( Set<String> nodes )
-    {
-        this.nodes = nodes;
+        this.hadoopNodes = hadoopNodes;
     }
 
 
@@ -211,14 +181,86 @@ public class HBaseClusterConfig implements ConfigBase
         return "HBaseConfig{" +
                 "numberOfNodes=" + numberOfNodes +
                 ", uuid=" + uuid +
-                ", master='" + master + '\'' +
-                ", region=" + region +
-                ", quorum=" + quorum +
+                ", hbaseMaster='" + hbaseMaster + '\'' +
+                ", regionServers=" + regionServers +
+                ", quorumPeers=" + quorumPeers +
                 ", backupMasters='" + backupMasters + '\'' +
                 ", domainName='" + domainName + '\'' +
-                ", nodes=" + nodes +
+                ", hadoopNodes=" + hadoopNodes +
                 ", clusterName='" + clusterName + '\'' +
                 ", hadoopNameNode='" + hadoopNameNode + '\'' +
                 '}';
+    }
+
+
+    public Set<Agent> getAllNodes()
+    {
+        final Set<Agent> allNodes = new HashSet<>();
+
+        allNodes.add( getHbaseMaster() );
+
+        for ( Agent agent : getRegionServers() )
+        {
+            allNodes.add( agent );
+        }
+
+        for ( Agent agent : getQuorumPeers() )
+        {
+            allNodes.add( agent );
+        }
+
+        for ( Agent agent : getBackupMasters() )
+        {
+            allNodes.add( agent );
+        }
+        return allNodes;
+    }
+
+
+    public Agent getHbaseMaster()
+    {
+        return hbaseMaster;
+    }
+
+
+    public void setHbaseMaster( Agent hbaseMaster )
+    {
+        this.hbaseMaster = hbaseMaster;
+    }
+
+
+    public Set<Agent> getRegionServers()
+    {
+        return regionServers;
+    }
+
+
+    public void setRegionServers( Set<Agent> regionServers )
+    {
+        this.regionServers = regionServers;
+    }
+
+
+    public Set<Agent> getQuorumPeers()
+    {
+        return quorumPeers;
+    }
+
+
+    public void setQuorumPeers( Set<Agent> quorumPeers )
+    {
+        this.quorumPeers = quorumPeers;
+    }
+
+
+    public Set<Agent> getBackupMasters()
+    {
+        return backupMasters;
+    }
+
+
+    public void setBackupMasters( Set<Agent> backupMasters )
+    {
+        this.backupMasters = backupMasters;
     }
 }

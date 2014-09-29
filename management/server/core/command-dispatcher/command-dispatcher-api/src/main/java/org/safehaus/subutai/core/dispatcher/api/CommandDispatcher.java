@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.dispatcher.api;
 
 
-import org.safehaus.subutai.common.command.CommandRunnerBase;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 
 
 /**

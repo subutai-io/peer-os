@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 
 import static junit.framework.Assert.assertEquals;

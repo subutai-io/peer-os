@@ -4,19 +4,14 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
-    private ProductOperation po;
     private HBaseClusterConfig config;
 
 
@@ -24,7 +19,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
