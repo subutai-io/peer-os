@@ -59,7 +59,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
 
         if ( environmentManager.getEnvironments() != null && environmentManager.getEnvironments().size() > 0 )
         {
-            this.environment = environmentManager.getEnvironments().get( 1 );
+            this.environment = environmentManager.getEnvironments().get( 0 );
         }
 
         setSizeFull();

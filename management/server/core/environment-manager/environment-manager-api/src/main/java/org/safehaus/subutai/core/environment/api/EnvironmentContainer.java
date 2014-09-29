@@ -14,7 +14,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 public class EnvironmentContainer extends Container
 {
 
-    private Environment environment;
+    private transient Environment environment;
 
 
     public Environment getEnvironment()
