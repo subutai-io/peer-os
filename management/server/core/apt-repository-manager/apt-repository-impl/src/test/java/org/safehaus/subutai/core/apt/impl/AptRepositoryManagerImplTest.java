@@ -3,7 +3,9 @@ package org.safehaus.subutai.core.apt.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.verify;
 /**
  * Test for AptRepositoryManagerImpl
  */
-@SuppressWarnings( "ResultOfMethodCallIgnored" )
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class AptRepositoryManagerImplTest
 {
 
@@ -117,7 +119,7 @@ public class AptRepositoryManagerImplTest
     }
 
 
-    @Test( expected = AptRepoException.class )
+    @Test(expected = AptRepoException.class)
     public void shouldThrowAptException() throws AptRepoException
     {
         Agent agent = MockUtils.getAgent( UUID.randomUUID() );
@@ -158,5 +160,18 @@ public class AptRepositoryManagerImplTest
         assertThat( packageInfo.toString(), containsString( STATUS ) );
         assertThat( packageInfo.toString(), containsString( NAME ) );
         assertThat( packageInfo.toString(), containsString( DESCRIPTION ) );
+    }
+
+
+    @Test()
+    public void checkHashCode()
+    {
+        PackageInfo packageInfo = new PackageInfo( STATUS, NAME, DESCRIPTION );
+
+        Map<PackageInfo, PackageInfo> map = new HashMap();
+
+        map.put( packageInfo, packageInfo );
+
+        assertEquals( packageInfo, map.get( packageInfo ) );
     }
 }
