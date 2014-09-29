@@ -1,29 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui;
 
 
+import com.vaadin.ui.Component;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-
 import javax.naming.NamingException;
-
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
 
-
-/**
- * @author dilshat
- */
 public class SharkPortalModule implements PortalModule
 {
 
@@ -58,6 +47,7 @@ public class SharkPortalModule implements PortalModule
     }
 
 
+    @Override
     public String getName()
     {
         return SharkClusterConfig.PRODUCT_KEY;
@@ -71,6 +61,7 @@ public class SharkPortalModule implements PortalModule
     }
 
 
+    @Override
     public Component createComponent()
     {
         try
@@ -90,4 +81,7 @@ public class SharkPortalModule implements PortalModule
     {
         return false;
     }
+
+
 }
+

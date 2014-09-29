@@ -5,7 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 
 /**
@@ -29,9 +34,10 @@ public class Environment
     }
 
 
-    public void addContainer( EnvironmentContainer containerUuid )
+    public void addContainer( EnvironmentContainer container )
     {
-        this.containers.add( containerUuid );
+        container.setEnvironment( this );
+        this.containers.add( container );
     }
 
 
@@ -62,6 +68,22 @@ public class Environment
     public UUID getUuid()
     {
         return uuid;
+    }
+
+
+    public void invoke( PeerCommandMessage commandMessage )
+    {
+        try
+        {
+            EnvironmentManager environmentManager = ServiceLocator.getServiceNoCache( EnvironmentManager.class );
+            environmentManager.invoke( commandMessage );
+        }
+        catch ( NamingException e )
+        {
+            commandMessage.setProccessed( true );
+            commandMessage.setExceptionMessage( e.toString() );
+            commandMessage.setSuccess( false );
+        }
     }
 
 

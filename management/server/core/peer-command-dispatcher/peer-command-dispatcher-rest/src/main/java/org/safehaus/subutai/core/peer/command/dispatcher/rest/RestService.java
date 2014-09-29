@@ -24,12 +24,12 @@ public interface RestService
     @Consumes(MediaType.TEXT_PLAIN)
     public Peer registerPeer( @QueryParam( "peer" ) String peer );
 
-    @POST
-    @Path("containers")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public String createContainers( String createContainersMsg );
-
+//    @POST
+//    @Path("containers")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Consumes(MediaType.TEXT_PLAIN)
+//    public String createContainers( String createContainersMsg );
+//
 
     @GET
     @Path("containers/format")

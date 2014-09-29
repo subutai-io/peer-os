@@ -1,21 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.manager;
 
-
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
@@ -28,11 +12,17 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.shark.api.Shark;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public class AddNodeWindow extends Window
 {
 
@@ -48,6 +38,7 @@ public class AddNodeWindow extends Window
         setModal( true );
 
         setWidth( 600, Unit.PIXELS );
+        setHeight( 400, Unit.PIXELS );
 
         GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
@@ -60,20 +51,20 @@ public class AddNodeWindow extends Window
         content.addComponent( topContent );
         topContent.addComponent( new Label( "Nodes:" ) );
 
-        final ComboBox hadoopNodes = new ComboBox();
-        hadoopNodes.setImmediate( true );
-        hadoopNodes.setTextInputAllowed( false );
-        hadoopNodes.setNullSelectionAllowed( false );
-        hadoopNodes.setRequired( true );
-        hadoopNodes.setWidth( 200, Unit.PIXELS );
+        final ComboBox cmbNodes = new ComboBox();
+        cmbNodes.setImmediate( true );
+        cmbNodes.setTextInputAllowed( false );
+        cmbNodes.setNullSelectionAllowed( false );
+        cmbNodes.setRequired( true );
+        cmbNodes.setWidth( 80, Unit.PERCENTAGE );
         for ( Agent node : nodes )
         {
-            hadoopNodes.addItem( node );
-            hadoopNodes.setItemCaption( node, node.getHostname() );
+            cmbNodes.addItem( node );
+            cmbNodes.setItemCaption( node, node.getHostname() );
         }
-        hadoopNodes.setValue( nodes.iterator().next() );
+        cmbNodes.setValue( nodes.iterator().next() );
 
-        topContent.addComponent( hadoopNodes );
+        topContent.addComponent( cmbNodes );
 
         final Button addNodeBtn = new Button( "Add" );
         addNodeBtn.addStyleName( "default" );
@@ -86,17 +77,18 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
+                Agent agent = ( Agent ) cmbNodes.getValue();
                 final UUID trackID = shark.addNode( config.getClusterName(), agent.getHostname() );
                 executorService.execute( new Runnable()
                 {
 
+                    @Override
                     public void run()
                     {
                         while ( track )
                         {
-                            ProductOperationView po =
-                                    tracker.getProductOperation( SharkClusterConfig.PRODUCT_KEY, trackID );
+                            ProductOperationView po
+                                    = tracker.getProductOperation( SharkClusterConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
                                 setOutput(
@@ -112,18 +104,14 @@ public class AddNodeWindow extends Window
                                 setOutput( "Product operation not found. Check logs" );
                                 break;
                             }
-                            try
-                            {
-                                Thread.sleep( 1000 );
-                            }
-                            catch ( InterruptedException ex )
-                            {
-                                break;
-                            }
                         }
                     }
+
+
                 } );
             }
+
+
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
@@ -148,10 +136,11 @@ public class AddNodeWindow extends Window
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                //close window
                 track = false;
                 close();
             }
+
+
         } );
 
         HorizontalLayout bottomContent = new HorizontalLayout();
@@ -191,7 +180,10 @@ public class AddNodeWindow extends Window
     @Override
     public void close()
     {
-        super.close();
         track = false;
+        super.close();
     }
+
+
 }
+
