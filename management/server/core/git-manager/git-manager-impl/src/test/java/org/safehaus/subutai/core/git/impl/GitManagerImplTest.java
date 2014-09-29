@@ -39,6 +39,10 @@ public class GitManagerImplTest
     private static final String DIFF_FILE_OUTPUT = "+new content\n-old content";
     private static final String FILE_PATH = "some/file/path";
     private static final String SOME_DUMMY_OUTPUT = "some dummy output";
+    private static final String COMMIT_MESSAGE = "commit message";
+    private static final String COMMIT_ID = "24b6f79";
+    private static final String COMMIT_OUTPUT =
+            "[core-unit-test 24b6f79] Core Unit Test\n 2 files changed, 35 insertions(+), 3 deletions(-)";
 
 
     @Test( expected = NullPointerException.class )
@@ -192,5 +196,21 @@ public class GitManagerImplTest
         gitManager.delete( agent, REPOSITORY_ROOT, Lists.newArrayList( "" ) );
 
         verify( command, times( 1 ) ).execute();
+    }
+
+
+    @Test
+    public void shouldCommitAndReturnCommitId() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), COMMIT_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        String commitId = gitManager.commit( agent, REPOSITORY_ROOT, Lists.newArrayList( "" ), COMMIT_MESSAGE, false );
+
+        assertEquals( COMMIT_ID, commitId );
     }
 }
