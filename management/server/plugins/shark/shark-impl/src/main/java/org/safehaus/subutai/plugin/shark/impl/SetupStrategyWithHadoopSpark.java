@@ -10,12 +10,12 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
 public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements ClusterSetupStrategy
 {
     Environment environment;
-    Agent sparkMaster;
 
 
     public SetupStrategyWithHadoopSpark( SharkImpl manager, SharkClusterConfig config, ProductOperation po )
@@ -27,12 +27,6 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
     public void setEnvironment( Environment environment )
     {
         this.environment = environment;
-    }
-
-
-    public void setSparkMaster( Agent sparkMaster )
-    {
-        this.sparkMaster = sparkMaster;
     }
 
 
@@ -49,9 +43,11 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
-        if ( sparkMaster == null )
+        // check underlying Spark cluster
+        SparkClusterConfig spark = checkAndGetSparkConfig();
+        if ( manager.getAgentManager().getAgentByHostname( spark.getMasterNode().getHostname() ) == null )
         {
-            throw new ClusterSetupException( "Master node not specified" );
+            throw new ClusterSetupException( "Spark master is not connected" );
         }
 
         if ( config.getNodes() == null )
@@ -71,7 +67,7 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
         }
 
         checkConnected();
-        setupMasterIp( sparkMaster );
+        setupMasterIp( spark.getMasterNode() );
 
         po.addLog( "Saving cluster info..." );
         try

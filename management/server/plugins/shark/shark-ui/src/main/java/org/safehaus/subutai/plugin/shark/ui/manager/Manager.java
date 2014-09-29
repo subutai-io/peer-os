@@ -166,43 +166,39 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                if ( config != null )
+                if ( config == null )
                 {
-                    SparkClusterConfig info = spark.
-                            getCluster( config.getClusterName() );
-                    if ( info != null )
+                    show( "Please, select cluster" );
+                    return;
+                }
+                SparkClusterConfig sparkInfo = spark.getCluster( config.getClusterName() );
+                if ( sparkInfo != null )
+                {
+                    Set<Agent> nodes = new HashSet<>( sparkInfo.getAllNodes() );
+                    nodes.removeAll( config.getNodes() );
+                    if ( !nodes.isEmpty() )
                     {
-                        Set<Agent> nodes = new HashSet<>( info.getAllNodes() );
-                        nodes.removeAll( config.getNodes() );
-                        if ( !nodes.isEmpty() )
+                        AddNodeWindow win = new AddNodeWindow( shark, executorService, tracker, config, nodes );
+                        contentRoot.getUI().addWindow( win );
+                        win.addCloseListener( new Window.CloseListener()
                         {
-                            AddNodeWindow addNodeWindow
-                                    = new AddNodeWindow( shark, executorService, tracker, config, nodes );
-                            contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener()
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
                             {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
+                                refreshClustersInfo();
+                            }
 
 
-                            } );
-                        }
-                        else
-                        {
-                            show( "All nodes in corresponding Spark cluster have Shark installed" );
-                        }
+                        } );
                     }
                     else
                     {
-                        show( "Spark cluster info not found" );
+                        show( "All nodes in corresponding Spark cluster have Shark installed" );
                     }
                 }
                 else
                 {
-                    show( "Please, select cluster" );
+                    show( "Spark cluster info not found" );
                 }
             }
 
@@ -218,39 +214,36 @@ public class Manager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                if ( config != null )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to Actualize master IP in %s cluster?",
-                                           config.getClusterName() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = shark.actualizeMasterIP( config.getClusterName() );
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                                                        SharkClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-
-
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-
-
-                    } );
-                }
-                else
+                if ( config == null )
                 {
                     show( "Please, select cluster" );
+                    return;
                 }
+                ConfirmationDialog alert = new ConfirmationDialog( String.format(
+                        "Do you want to Actualize master IP in %s cluster?", config.getClusterName() ), "Yes", "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+                        UUID trackID = shark.actualizeMasterIP( config.getClusterName() );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                                                    SharkClusterConfig.PRODUCT_KEY );
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                refreshClustersInfo();
+                            }
+
+
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+
+
+                } );
             }
 
 

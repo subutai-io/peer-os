@@ -5,13 +5,20 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.shark.api.SetupType;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -29,81 +36,41 @@ public class ConfigurationStep extends Panel
         content.setSpacing( true );
         content.setMargin( true );
 
-        ComboBox sparkClusters = new ComboBox( "Spark cluster" );
+        final SharkClusterConfig config = wizard.getConfig();
 
-        sparkClusters.setImmediate( true );
-        sparkClusters.setTextInputAllowed( false );
-        sparkClusters.setRequired( true );
-        sparkClusters.setNullSelectionAllowed( false );
-
-        List<SparkClusterConfig> clusters = spark.getClusters();
-        if ( !clusters.isEmpty() )
+        TextField nameTxt = new TextField( "Cluster name" );
+        nameTxt.setRequired( true );
+        nameTxt.addValueChangeListener( new Property.ValueChangeListener()
         {
-            for ( SparkClusterConfig info : clusters )
-            {
-                sparkClusters.addItem( info );
-                sparkClusters.setItemCaption( info, info.getClusterName() );
-            }
-        }
 
-        sparkClusters.addValueChangeListener( new Property.ValueChangeListener()
-        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
+            public void valueChange( Property.ValueChangeEvent e )
             {
-                if ( event.getProperty().getValue() != null )
+                String val = e.getProperty().getValue().toString().trim();
+                config.setClusterName( val );
+                if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
                 {
-                    SparkClusterConfig config = ( SparkClusterConfig ) event.getProperty().getValue();
-                    wizard.getConfig().setClusterName( config.getClusterName() );
-                    wizard.getConfig().setNodes( config.getAllNodes() );
+                    config.setSparkClusterName( val );
                 }
             }
 
 
         } );
+        nameTxt.setValue( config.getClusterName() );
+        content.addComponent( nameTxt );
 
-
-        if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+        if ( config.getSetupType() == SetupType.OVER_SPARK )
         {
-            if ( !clusters.isEmpty() )
-            {
-                sparkClusters.setValue( clusters.iterator().next() );
-            }
+            addOverSparkComponents( content, spark, config );
         }
-        else
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
         {
-            SparkClusterConfig info = spark.getCluster( wizard.getConfig().getClusterName() );
-            if ( info != null )
-            {
-                //restore cluster
-                sparkClusters.setValue( info );
-            }
-            else if ( !clusters.isEmpty() )
-            {
-                sparkClusters.setValue( clusters.iterator().next() );
-            }
+            addWithHadoopComponents( content, config, wizard.getHadoopConfig() );
         }
-
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
-                {
-                    show( "Please, select Spark cluster" );
-                }
-                else
-                {
-                    wizard.next();
-                }
-            }
-
-
-        } );
+        next.addClickListener( new NextClickHandler( wizard ) );
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
@@ -127,16 +94,223 @@ public class ConfigurationStep extends Panel
         buttons.addComponent( back );
         buttons.addComponent( next );
 
-        content.addComponent( sparkClusters );
         content.addComponent( buttons );
 
         setContent( layout );
     }
 
 
+    private void addOverSparkComponents( ComponentContainer parent, Spark spark, final SharkClusterConfig config )
+    {
+        ComboBox sparkClusters = new ComboBox( "Spark cluster" );
+        sparkClusters.setImmediate( true );
+        sparkClusters.setTextInputAllowed( false );
+        sparkClusters.setRequired( true );
+        sparkClusters.setNullSelectionAllowed( false );
+        sparkClusters.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
+                    SparkClusterConfig sparkConfig = ( SparkClusterConfig ) event.getProperty().getValue();
+                    config.setSparkClusterName( sparkConfig.getClusterName() );
+                    config.setNodes( sparkConfig.getAllNodes() );
+                }
+            }
+
+
+        } );
+
+        List<SparkClusterConfig> clusters = spark.getClusters();
+        if ( !clusters.isEmpty() )
+        {
+            for ( SparkClusterConfig info : clusters )
+            {
+                sparkClusters.addItem( info );
+                sparkClusters.setItemCaption( info, info.getClusterName() );
+            }
+        }
+
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) )
+        {
+            if ( !clusters.isEmpty() )
+            {
+                sparkClusters.setValue( clusters.iterator().next() );
+            }
+        }
+        else
+        {
+            SparkClusterConfig info = spark.getCluster( config.getClusterName() );
+            if ( info != null )
+            {
+                //restore cluster
+                sparkClusters.setValue( info );
+            }
+            else if ( !clusters.isEmpty() )
+            {
+                sparkClusters.setValue( clusters.iterator().next() );
+            }
+        }
+
+        parent.addComponent( sparkClusters );
+    }
+
+
+    private void addWithHadoopComponents( ComponentContainer parent, final SharkClusterConfig config,
+                                          final HadoopClusterConfig hadoopConfig )
+    {
+        Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+
+        final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
+        txtHadoopClusterName.setRequired( true );
+        txtHadoopClusterName.setMaxLength( 20 );
+        if ( hadoopConfig.getClusterName() != null )
+        {
+            txtHadoopClusterName.setValue( hadoopConfig.getClusterName() );
+        }
+        txtHadoopClusterName.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                String name = event.getProperty().getValue().toString().trim();
+                config.setHadoopClusterName( name );
+                hadoopConfig.setClusterName( name );
+            }
+
+
+        } );
+
+        ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
+        cmbSlaveNodes.setImmediate( true );
+        cmbSlaveNodes.setTextInputAllowed( false );
+        cmbSlaveNodes.setNullSelectionAllowed( false );
+        cmbSlaveNodes.setValue( hadoopConfig.getCountOfSlaveNodes() );
+        cmbSlaveNodes.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
+            }
+
+
+        } );
+
+        ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
+        cmbReplFactor.setImmediate( true );
+        cmbReplFactor.setTextInputAllowed( false );
+        cmbReplFactor.setNullSelectionAllowed( false );
+        cmbReplFactor.setValue( hadoopConfig.getReplicationFactor() );
+        cmbReplFactor.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
+            }
+
+
+        } );
+
+        TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
+        txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
+        txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
+        txtHadoopDomain.setMaxLength( 20 );
+        txtHadoopDomain.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                String val = event.getProperty().getValue().toString().trim();
+                if ( !val.isEmpty() )
+                {
+                    hadoopConfig.setDomainName( val );
+                }
+            }
+
+
+        } );
+
+        parent.addComponent( new Label( "Hadoop settings" ) );
+        parent.addComponent( txtHadoopClusterName );
+        parent.addComponent( cmbSlaveNodes );
+        parent.addComponent( cmbReplFactor );
+        parent.addComponent( txtHadoopDomain );
+    }
+
+
     private void show( String notification )
     {
         Notification.show( notification );
+    }
+
+
+    private class NextClickHandler implements Button.ClickListener
+    {
+
+        private final Wizard wizard;
+
+
+        public NextClickHandler( Wizard wizard )
+        {
+            this.wizard = wizard;
+        }
+
+
+        @Override
+        public void buttonClick( Button.ClickEvent event )
+        {
+            SharkClusterConfig config = wizard.getConfig();
+            if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+            {
+                show( "Enter cluster name" );
+                return;
+            }
+            if ( config.getSetupType() == SetupType.OVER_SPARK )
+            {
+                if ( config.getSparkClusterName() == null || config.getSparkClusterName().isEmpty() )
+                {
+                    show( "Select Spark cluster" );
+                }
+                else
+                {
+                    wizard.next();
+                }
+            }
+            else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
+            {
+                HadoopClusterConfig hc = wizard.getHadoopConfig();
+                if ( hc.getClusterName() == null || hc.getClusterName().isEmpty() )
+                {
+                    show( "Enter Hadoop cluster name" );
+                }
+                else if ( hc.getCountOfSlaveNodes() <= 0 )
+                {
+                    show( "Invalid number of Hadoop slave nodes" );
+                }
+                else if ( hc.getReplicationFactor() <= 0 )
+                {
+                    show( "Invalid replication factor" );
+                }
+                else if ( hc.getDomainName() == null || hc.getDomainName().isEmpty() )
+                {
+                    show( "Enter Hadoop domain name" );
+                }
+                else
+                {
+                    wizard.next();
+                }
+            }
+            else
+            {
+                show( "Installation type not supported" );
+            }
+        }
+
+
     }
 
 

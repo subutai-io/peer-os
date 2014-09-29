@@ -26,16 +26,7 @@ public class SetupStrategyOverSpark extends SetupStartegyBase implements Cluster
     {
         checkConfig();
 
-        if ( config.getSparkClusterName() == null )
-        {
-            throw new ClusterSetupException( "Spark cluster not specified" );
-        }
-        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
-        if ( sparkConfig == null )
-        {
-            throw new ClusterSetupException( String.format( "Spark cluster '%s' not found. Installation aborted",
-                                                            config.getClusterName() ) );
-        }
+        SparkClusterConfig sparkConfig = checkAndGetSparkConfig();
 
         config.setNodes( sparkConfig.getAllNodes() );
         checkConnected();

@@ -46,7 +46,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         ClusterSetupStrategy css;
         if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
         {
-            SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
             if ( hadoopConfig == null )
             {
                 po.addLogFailed( "No Hadoop configuration specified" );
@@ -63,6 +62,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
                 css = manager.getHadoopManager().getClusterSetupStrategy( po, hadoopConfig, env );
                 css.setup();
 
+                SparkClusterConfig sparkConfig = new SparkClusterConfig();
+                sparkConfig.setClusterName( config.getSparkClusterName() );
+                sparkConfig.setSetupType( org.safehaus.subutai.plugin.spark.api.SetupType.WITH_HADOOP );
                 css = manager.getSparkManager().getClusterSetupStrategy( po, sparkConfig, env );
                 css.setup();
             }

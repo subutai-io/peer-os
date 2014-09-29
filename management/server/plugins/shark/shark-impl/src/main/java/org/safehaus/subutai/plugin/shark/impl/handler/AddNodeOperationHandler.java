@@ -1,7 +1,9 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -72,7 +74,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         productOperation.addLog( "Checking prerequisites..." );
 
         //check installed packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
+        Set<Agent> set = new HashSet<>( Arrays.asList( agent ) );
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand( set );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -105,14 +108,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
 
         productOperation.addLog( "Installing Shark..." );
 
-        Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+        Command installCommand = Commands.getInstallCommand( set );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )
         {
             productOperation.addLog( "Installation succeeded. Setting Master IP..." );
 
-            Command cmd = Commands.getSetMasterIPCommand( Sets.newHashSet( agent ), sparkConfig.getMasterNode() );
+            Command cmd = Commands.getSetMasterIPCommand( set, sparkConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( cmd );
 
             if ( cmd.hasSucceeded() )

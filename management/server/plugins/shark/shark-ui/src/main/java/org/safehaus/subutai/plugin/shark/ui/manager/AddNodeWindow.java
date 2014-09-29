@@ -38,6 +38,7 @@ public class AddNodeWindow extends Window
         setModal( true );
 
         setWidth( 600, Unit.PIXELS );
+        setHeight( 400, Unit.PIXELS );
 
         GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
@@ -50,20 +51,20 @@ public class AddNodeWindow extends Window
         content.addComponent( topContent );
         topContent.addComponent( new Label( "Nodes:" ) );
 
-        final ComboBox hadoopNodes = new ComboBox();
-        hadoopNodes.setImmediate( true );
-        hadoopNodes.setTextInputAllowed( false );
-        hadoopNodes.setNullSelectionAllowed( false );
-        hadoopNodes.setRequired( true );
-        hadoopNodes.setWidth( 200, Unit.PIXELS );
+        final ComboBox cmbNodes = new ComboBox();
+        cmbNodes.setImmediate( true );
+        cmbNodes.setTextInputAllowed( false );
+        cmbNodes.setNullSelectionAllowed( false );
+        cmbNodes.setRequired( true );
+        cmbNodes.setWidth( 80, Unit.PERCENTAGE );
         for ( Agent node : nodes )
         {
-            hadoopNodes.addItem( node );
-            hadoopNodes.setItemCaption( node, node.getHostname() );
+            cmbNodes.addItem( node );
+            cmbNodes.setItemCaption( node, node.getHostname() );
         }
-        hadoopNodes.setValue( nodes.iterator().next() );
+        cmbNodes.setValue( nodes.iterator().next() );
 
-        topContent.addComponent( hadoopNodes );
+        topContent.addComponent( cmbNodes );
 
         final Button addNodeBtn = new Button( "Add" );
         addNodeBtn.addStyleName( "default" );
@@ -76,7 +77,7 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
+                Agent agent = ( Agent ) cmbNodes.getValue();
                 final UUID trackID = shark.addNode( config.getClusterName(), agent.getHostname() );
                 executorService.execute( new Runnable()
                 {
@@ -101,14 +102,6 @@ public class AddNodeWindow extends Window
                             else
                             {
                                 setOutput( "Product operation not found. Check logs" );
-                                break;
-                            }
-                            try
-                            {
-                                Thread.sleep( 1000 );
-                            }
-                            catch ( InterruptedException ex )
-                            {
                                 break;
                             }
                         }
@@ -143,7 +136,6 @@ public class AddNodeWindow extends Window
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                //close window
                 track = false;
                 close();
             }
@@ -188,8 +180,8 @@ public class AddNodeWindow extends Window
     @Override
     public void close()
     {
-        super.close();
         track = false;
+        super.close();
     }
 
 

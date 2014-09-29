@@ -6,6 +6,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
 public class SetupStartegyBase
@@ -36,6 +37,21 @@ public class SetupStartegyBase
                     "Cluster with name '%s' already exists. Installation aborted",
                     config.getClusterName() ) );
         }
+    }
+
+
+    SparkClusterConfig checkAndGetSparkConfig() throws ClusterSetupException
+    {
+        if ( config.getSparkClusterName() == null || config.getSparkClusterName().isEmpty() )
+        {
+            throw new ClusterSetupException( "Spark cluster not specified" );
+        }
+        SparkClusterConfig spark = manager.getSparkManager().getCluster( config.getSparkClusterName() );
+        if ( spark == null )
+        {
+            throw new ClusterSetupException( "Spark cluster not found: " + config.getSparkClusterName() );
+        }
+        return spark;
     }
 
 

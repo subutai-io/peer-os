@@ -21,14 +21,14 @@ public class SharkComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
+        TabSheet tabSheet = new TabSheet();
+        tabSheet.setSizeFull();
 
         Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
-        verticalLayout.addComponent( mongoSheet );
+        tabSheet.addTab( wizard.getContent(), "Install" );
+        tabSheet.addTab( manager.getContent(), "Manage" );
+        verticalLayout.addComponent( tabSheet );
 
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();

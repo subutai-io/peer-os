@@ -1,7 +1,8 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.HashSet;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -57,7 +58,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             return;
         }
         productOperation.addLog( "Uninstalling Shark..." );
-        Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+        Command uninstallCommand = Commands.getUninstallCommand( new HashSet<>( Arrays.asList( agent ) ) );
         manager.getCommandRunner().runCommand( uninstallCommand );
 
         if ( uninstallCommand.hasCompleted() )
