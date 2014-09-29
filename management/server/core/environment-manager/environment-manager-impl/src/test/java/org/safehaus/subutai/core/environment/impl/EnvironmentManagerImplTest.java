@@ -88,7 +88,7 @@ public class EnvironmentManagerImplTest
     public void testNotifier() throws EnvironmentBuildException
     {
         EnvironmentBuildProcess process = createEnvironmentBuildProcess();
-        environmentManager.buildEnvironment( process );
+//        environmentManager.buildEnvironment( process );
     }
 
 
