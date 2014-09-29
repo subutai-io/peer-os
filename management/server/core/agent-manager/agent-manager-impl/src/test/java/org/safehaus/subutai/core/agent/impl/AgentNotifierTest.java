@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -23,6 +24,11 @@ import static org.mockito.Mockito.when;
  */
 public class AgentNotifierTest
 {
+    private AgentNotifier agentNotifier;
+    private AgentListener agentListener;
+    private Set<Agent> agents;
+    private Queue<AgentListener> agentListenerQueue;
+
 
     @Test( expected = NullPointerException.class )
     public void constructorShouldFail()
@@ -31,19 +37,25 @@ public class AgentNotifierTest
     }
 
 
-    @Test
-    public void shouldNotifyListeners() throws InterruptedException
+    @Before
+    public void setUp()
     {
-        AgentListener agentListener = mock( AgentListener.class );
-        Queue<AgentListener> agentListenerQueue = new ConcurrentLinkedQueue<>();
+        agentListener = mock( AgentListener.class );
+        agentListenerQueue = new ConcurrentLinkedQueue<>();
         agentListenerQueue.add( agentListener );
         UUID agentId = UUID.randomUUID();
         AgentManagerImpl agentManager = mock( AgentManagerImpl.class );
         when( agentManager.isNotifyAgentListeners() ).thenReturn( true );
-        Set<Agent> agents = MockUtils.getAgents( agentId );
+        agents = MockUtils.getAgents( agentId );
         when( agentManager.getAgents() ).thenReturn( agents );
         when( agentManager.getListenersQueue() ).thenReturn( agentListenerQueue );
-        final AgentNotifier agentNotifier = new AgentNotifier( agentManager );
+        agentNotifier = new AgentNotifier( agentManager );
+    }
+
+
+    @Test
+    public void shouldNotifyListeners() throws InterruptedException
+    {
 
 
         Thread t = new Thread( new Runnable()
@@ -65,18 +77,8 @@ public class AgentNotifierTest
     @Test
     public void shouldRemoveListenerOnError() throws InterruptedException
     {
-        AgentListener agentListener = mock( AgentListener.class );
-        Queue<AgentListener> agentListenerQueue = new ConcurrentLinkedQueue<>();
-        agentListenerQueue.add( agentListener );
-        UUID agentId = UUID.randomUUID();
-        AgentManagerImpl agentManager = mock( AgentManagerImpl.class );
-        when( agentManager.isNotifyAgentListeners() ).thenReturn( true );
-        Set<Agent> agents = MockUtils.getAgents( agentId );
-        when( agentManager.getAgents() ).thenReturn( agents );
-        when( agentManager.getListenersQueue() ).thenReturn( agentListenerQueue );
-        final AgentNotifier agentNotifier = new AgentNotifier( agentManager );
 
-        Mockito.doThrow( new RuntimeException() ).when(agentListener).onAgent( anySet() );
+        Mockito.doThrow( new RuntimeException() ).when( agentListener ).onAgent( anySet() );
 
 
         Thread t = new Thread( new Runnable()
