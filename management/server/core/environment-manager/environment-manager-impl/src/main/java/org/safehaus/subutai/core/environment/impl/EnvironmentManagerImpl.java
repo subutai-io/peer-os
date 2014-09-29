@@ -6,13 +6,11 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
@@ -59,7 +57,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private DbManager dbManager;
     private PeerCommandDispatcher peerCommandDispatcher;
-    private Set<EnvironmentContainer> containers = new HashSet<>();
+    private List<Environment> environments;
+    //    private Set<EnvironmentContainer> containers = new HashSet<>();
 
 
     public EnvironmentManagerImpl()
@@ -84,6 +83,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager );
+
+        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
@@ -206,7 +207,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public List<Environment> getEnvironments()
     {
-        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
+        return environments;
     }
 
 
@@ -349,51 +350,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Set<EnvironmentContainer> getContainers()
+    public void invoke( final PeerCommandMessage commandMessage )
     {
-        return containers;
-    }
-
-
-    @Override
-    public void addContainer( final EnvironmentContainer container )
-    {
-        if ( container == null )
-        {
-            throw new IllegalArgumentException( "Environment container could not be null." );
-        }
-
-        container.setEnvironmentManager( this );
-        containers.add( container );
-    }
-
-
-    @Override
-    public boolean startContainer( final EnvironmentContainer container )
-    {
-        PeerCommandMessage cm =
-                new DefaultCommandMessage( PeerCommandType.START, container.getPeerId(), container.getAgentId() );
-        peerCommandDispatcher.invoke( cm );
-        return cm.isSuccess();
-    }
-
-
-    @Override
-    public boolean stopContainer( final EnvironmentContainer container )
-    {
-        PeerCommandMessage cm =
-                new DefaultCommandMessage( PeerCommandType.STOP, container.getPeerId(), container.getAgentId() );
-        peerCommandDispatcher.invoke( cm );
-        return cm.isSuccess();
-    }
-
-
-    @Override
-    public boolean isContainerConnected( final EnvironmentContainer container )
-    {
-        PeerCommandMessage cm =
-                new DefaultCommandMessage( PeerCommandType.ISCONNECTED, container.getPeerId(), container.getAgentId() );
-        peerCommandDispatcher.invoke( cm );
-        return cm.isSuccess();
+        peerCommandDispatcher.invoke( commandMessage );
     }
 }

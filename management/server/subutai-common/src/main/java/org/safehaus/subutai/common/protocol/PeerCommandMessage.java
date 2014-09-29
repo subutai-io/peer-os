@@ -11,23 +11,27 @@ import org.safehaus.subutai.common.util.JsonUtil;
  */
 public abstract class PeerCommandMessage
 {
+    protected UUID id;
     protected UUID agentId;
     protected UUID peerId;
-    protected PeerCommandType type;
+    protected UUID envId;
+    protected PeerCommandType type = PeerCommandType.UNKNOWN;
     protected String exceptionMessage;
     protected boolean success = false;
+    protected boolean proccessed = false;
 
 
-    public PeerCommandMessage()
+    private PeerCommandMessage()
     {
-        this.type = PeerCommandType.UNKNOWN;
     }
 
 
-    public PeerCommandMessage( PeerCommandType type, UUID peerId, UUID agentId )
+    public PeerCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
     {
+        this.id = UUID.randomUUID();
         this.peerId = peerId;
         this.agentId = agentId;
+        this.envId = envId;
         this.type = type;
     }
 
@@ -98,9 +102,40 @@ public abstract class PeerCommandMessage
     }
 
 
-    abstract public void setResult(Object result);
+    public boolean isProccessed()
+    {
+        return proccessed;
+    }
+
+
+    public void setProccessed( final boolean proccessed )
+    {
+        this.proccessed = proccessed;
+    }
+
+
+    abstract public void setResult( Object result );
 
     abstract public Object getResult();
+
+
+    public UUID getId()
+    {
+        return id;
+    }
+
+
+    public UUID getEnvId()
+    {
+        return envId;
+    }
+
+
+    public void setEnvId( final UUID envId )
+    {
+        this.envId = envId;
+    }
+
 
     @Override
     public String toString()

@@ -80,24 +80,26 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public String createContainers( final String createContainersMsg )
-    {
-        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
-        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
-        peerManager.createContainers( ccm );
-        return JsonUtil.toJson( ccm.getResult() );
-    }
+//    @Override
+//    public String createContainers( final String createContainersMsg )
+//    {
+//        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
+//        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
+////        peerManager.createContainers( ccm );
+//
+//        return JsonUtil.toJson( ccm.getResult() );
+//
+//    }
 
 
     @Override
     public String getCreateContainersMsgJsonFormat()
     {
-        CloneContainersMessage ccm = new CloneContainersMessage();
+        CloneContainersMessage ccm = new CloneContainersMessage(UUID.randomUUID(), UUID.randomUUID());
         ccm.setStrategy( "ROUND_ROBIN" );
-        ccm.setEnvId( UUID.randomUUID() );
+//        ccm.setEnvId( UUID.randomUUID() );
         ccm.setNumberOfNodes( 2 );
-        ccm.setPeerId( UUID.randomUUID() );
+//        ccm.setPeerId( UUID.randomUUID() );
         ccm.setTemplate( "master" );
         return GSON.toJson( ccm );
     }

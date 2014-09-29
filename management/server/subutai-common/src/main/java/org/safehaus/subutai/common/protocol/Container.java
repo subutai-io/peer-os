@@ -16,6 +16,7 @@ public abstract class Container
     protected String hostname;
     protected String name;
     protected String description;
+    protected ContainerState state;
 
 
     public UUID getAgentId()
@@ -75,6 +76,18 @@ public abstract class Container
     public void setDescription( final String description )
     {
         this.description = description;
+    }
+
+
+    public ContainerState getState()
+    {
+        return state;
+    }
+
+
+    public void setState( final ContainerState state )
+    {
+        this.state = state;
     }
 
 

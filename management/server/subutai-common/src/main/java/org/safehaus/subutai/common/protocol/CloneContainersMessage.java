@@ -11,7 +11,6 @@ import java.util.UUID;
  */
 public class CloneContainersMessage extends PeerCommandMessage
 {
-    private UUID envId;
     private String template;
     private int numberOfNodes;
     private String Strategy;
@@ -19,15 +18,9 @@ public class CloneContainersMessage extends PeerCommandMessage
     private Set<Agent> agents;
 
 
-    public UUID getEnvId()
+    public CloneContainersMessage( UUID envId, UUID peerId )
     {
-        return envId;
-    }
-
-
-    public void setEnvId( final UUID envId )
-    {
-        this.envId = envId;
+        super( PeerCommandType.CLONE, envId, peerId, null );
     }
 
 
