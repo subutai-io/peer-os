@@ -50,6 +50,8 @@ public class GitManagerImplTest
             "[core-unit-test 24b6f79] Core Unit Test\n 2 files changed, 35 insertions(+), 3 deletions(-)";
     private static final String GIT_BRANCH_DUMMY_OUTPUT = "* dummy\n" + "  master";
     private static final String GIT_BRANCH_OUTPUT = " dummy\n" + "  master";
+    private static final String GIT_BRANCH_REMOTE_OUTPUT = "  origin/karaf-3\n  origin/lucene-fix-ui\n  origin/master";
+    private static final String REMOTE_MASTER_BRANCH = "origin/master";
 
     private Agent agent;
     private Command command;
@@ -373,5 +375,22 @@ public class GitManagerImplTest
         assertEquals( 2, gitBranches.size() );
         assertTrue( gitBranches.contains( new GitBranch( MASTER_BRANCH, false ) ) );
         assertTrue( gitBranches.contains( new GitBranch( DUMMY_BRANCH, true ) ) );
+    }
+
+
+    @Test
+    public void shouldListRemoteBranches() throws GitException
+    {
+
+        setCommandStatus( true, true, GIT_BRANCH_REMOTE_OUTPUT );
+
+
+        List<GitBranch> gitBranches = gitManager.listBranches( agent, REPOSITORY_ROOT, true );
+
+
+        verify( commandRunner ).createCommand( new RequestBuilder( "git branch -r" ).withCwd( REPOSITORY_ROOT ),
+                Sets.newHashSet( agent ) );
+        assertEquals( 3, gitBranches.size() );
+        assertTrue( gitBranches.contains( new GitBranch( REMOTE_MASTER_BRANCH, false ) ) );
     }
 }
