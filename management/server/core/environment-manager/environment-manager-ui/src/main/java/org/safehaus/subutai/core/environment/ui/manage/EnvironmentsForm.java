@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
@@ -93,6 +94,7 @@ public class EnvironmentsForm
 
                     Table containersTable = new Table();
                     containersTable.addContainerProperty( "Name", String.class, null );
+                    containersTable.addContainerProperty( "Location", UUID.class, null );
                     containersTable.addContainerProperty( "Destroy", Button.class, null );
                     containersTable.setPageLength( 10 );
                     containersTable.setSelectable( false );
@@ -106,7 +108,7 @@ public class EnvironmentsForm
                     {
 
                         containersTable.addItem( new Object[] {
-                                container.getName(), new Button( "Destroy" )
+                                container.getName(), container.getPeerId(), new Button( "Destroy" )
                         }, null );
                     }
 
