@@ -47,21 +47,24 @@ public class EnvironmentBuildWizardTest
     }
 
 
-    @Test
+//    @Test
     public void testName() throws Exception
     {
-        Map<String, Peer> topology = new HashMap<>();
+        Map<Object, Peer> topology = new HashMap<>();
 
         Peer peer1 = new Peer();
         peer1.setId( UUID.randomUUID() );
 
+        Peer peer2 = new Peer();
+        peer2.setId( UUID.randomUUID() );
+
         for ( NodeGroup ng : getTask().getEnvironmentBlueprint().getNodeGroups() )
         {
-            topology.put( ng.getTemplateName(), peer1 );
+            topology.put( 1, peer1 );
         }
 
-//        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
-//        System.out.println( GSON.toJson( process ) );
+        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
+        System.out.println( GSON.toJson( process ) );
     }
 
 

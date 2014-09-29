@@ -166,6 +166,9 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
+    Map<Object, NodeGroup> map;
+
+
     private TabSheet genContainerToPeersTable()
     {
 
@@ -185,6 +188,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
         containerToPeerTable.setSizeFull();
 
 
+        map = new HashMap<>();
         for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
@@ -196,9 +200,10 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 comboBox.setNullSelectionAllowed( false );
                 comboBox.setTextInputAllowed( false );
                 comboBox.setItemCaptionPropertyId( "name" );
-                containerToPeerTable.addItem( new Object[] {
+                Object itemId = containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), comboBox
                 }, null );
+                map.put( itemId, ng );
             }
         }
         Button nextButton = new Button( "Build" );
@@ -207,7 +212,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                Map<String, Peer> topology = topologySelection();
+                Map<Object, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
                     managerUI.getEnvironmentManager().saveBuildProcess(
@@ -248,13 +253,15 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
 
     public EnvironmentBuildProcess createBackgroundEnvironmentBuildProcess( EnvironmentBuildTask ebt,
-                                                                            Map<String, Peer> topology )
+                                                                            Map<Object, Peer> topology )
     {
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint().getName() );
 
-        for ( NodeGroup ng : ebt.getEnvironmentBlueprint().getNodeGroups() )
+        for ( Object itemId : map.keySet() )
         {
-            Peer peer = topology.get( ng.getTemplateName() );
+            Peer peer = topology.get( itemId );
+            NodeGroup ng = map.get( itemId );
+
             String key = peer.getId().toString() + "-" + ng.getTemplateName();
 
             if ( !process.getMessageMap().containsKey( key ) )
@@ -277,18 +284,19 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    private Map<String, Peer> topologySelection()
+    private Map<Object, Peer> topologySelection()
     {
-        Map<String, Peer> topology = new HashMap<>();
+        Map<Object, Peer> topology = new HashMap<>();
         for ( Object itemId : containerToPeerTable.getItemIds() )
         {
-            String templateName =
-                    ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
+            //            String templateName =
+            //                    ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" )
+            // .getValue();
             ComboBox selection =
                     ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
 
-            topology.put( templateName, peer );
+            topology.put( itemId, peer );
         }
         return topology;
     }
