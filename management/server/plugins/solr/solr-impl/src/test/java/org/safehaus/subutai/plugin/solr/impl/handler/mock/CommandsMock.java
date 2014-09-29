@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 
