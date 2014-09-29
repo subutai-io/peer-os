@@ -8,12 +8,14 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.git.api.GitBranch;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitCommand;
@@ -192,27 +194,34 @@ public class GitManagerImpl implements GitManager
 
     private void runCommand( Command command, Agent host, GitCommand gitCommand, boolean output ) throws GitException
     {
-        commandRunner.runCommand( command );
-
-        if ( !command.hasSucceeded() )
+        try
         {
-            if ( command.hasCompleted() )
+            command.execute();
+            if ( !command.hasSucceeded() )
+            {
+                if ( command.hasCompleted() )
+                {
+                    AgentResult agentResult = command.getResults().get( host.getUuid() );
+                    throw new GitException( String.format( "Error while performing [git %s]: %s%n%s, exit code %s",
+                            gitCommand.getCommand(), agentResult.getStdOut(), agentResult.getStdErr(),
+                            agentResult.getExitCode() ) );
+                }
+                else
+                {
+                    throw new GitException( String.format( "Error while performing [git %s]: Command timed out",
+                            gitCommand.getCommand() ) );
+                }
+            }
+            else if ( output )
             {
                 AgentResult agentResult = command.getResults().get( host.getUuid() );
-                throw new GitException(
-                        String.format( "Error while performing [git %s]: %s%n%s, exit code %s", gitCommand.getCommand(),
-                                agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
-            }
-            else
-            {
-                throw new GitException( String.format( "Error while performing [git %s]: Command timed out",
-                        gitCommand.getCommand() ) );
+                System.out.println( agentResult.getStdOut() );
             }
         }
-        else if ( output )
+        catch ( CommandException e )
         {
-            AgentResult agentResult = command.getResults().get( host.getUuid() );
-            LOG.info( agentResult.getStdOut() );
+            LOG.error( "Error in runCommand", e );
+            throw new GitException( e.getMessage() );
         }
     }
 
@@ -228,7 +237,7 @@ public class GitManagerImpl implements GitManager
     public void add( final Agent host, final String repositoryRoot, final List<String> filePaths ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( filePaths ), FILES_IS_EMPTY_MSG );
 
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git add" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
@@ -267,7 +276,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( filePaths ), FILES_IS_EMPTY_MSG );
 
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git rm" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
@@ -293,7 +302,7 @@ public class GitManagerImpl implements GitManager
                           final String message, boolean afterConflictResolved ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( filePaths ), FILES_IS_EMPTY_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is null or empty" );
 
         Command addCommand = commandRunner.createCommand( new RequestBuilder(
@@ -598,7 +607,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( filePaths ), FILES_IS_EMPTY_MSG );
 
         Command undoCommand = commandRunner.createCommand(
                 new RequestBuilder( "git checkout --" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
