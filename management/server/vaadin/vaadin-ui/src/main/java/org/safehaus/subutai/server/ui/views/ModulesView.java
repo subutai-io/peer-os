@@ -23,6 +23,7 @@ import org.safehaus.subutai.server.ui.api.PortalModuleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.AbstractLayout;
@@ -147,6 +148,8 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
     public void autoCreate( PortalModule module )
     {
+        Preconditions.checkNotNull( module, "Module is null" );
+
         Component component = module.createComponent();
         component.setId( module.getId() );
         TabSheet.Tab tab = editors.addTab( component );
