@@ -65,7 +65,7 @@ public class ProductOperationImpl implements ProductOperation
         this.tracker = tracker;
         log = new StringBuilder();
         state = ProductOperationState.RUNNING;
-        id = UUIDUtil.generateCassandraUUID();
+        id = UUIDUtil.generateTimeBasedUUID();
         createDate = new Date();
     }
 
