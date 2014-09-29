@@ -295,8 +295,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throws EnvironmentBuildException
     {
         Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
-        for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
+        for ( String key : ( Set<String> ) environmentBuildProcess.getMessageMap().keySet() )
         {
+            CloneContainersMessage ccm = environmentBuildProcess.getMessageMap().get( key );
 
             ccm.setType( PeerCommandType.CLONE );
             try
@@ -311,8 +312,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     {
                         for ( Agent agent : agents )
                         {
-                            //                            LOG.info( String.format( "------------> Adding container:
-                            // %s", agent.toString() ) );
                             EnvironmentContainer container = new EnvironmentContainer();
                             container.setPeerId( agent.getSiteId() );
                             container.setAgentId( agent.getUuid() );
