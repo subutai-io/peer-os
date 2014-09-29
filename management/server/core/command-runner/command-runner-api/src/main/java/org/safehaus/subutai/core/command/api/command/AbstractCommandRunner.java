@@ -79,7 +79,7 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
                                 }
                                 catch ( Exception e )
                                 {
-                                    LOG.error( "Error in callback {0}", e );
+                                    LOG.error( "Error in callback {}", e );
                                 }
 
                                 //do cleanup on command completion or interruption by user

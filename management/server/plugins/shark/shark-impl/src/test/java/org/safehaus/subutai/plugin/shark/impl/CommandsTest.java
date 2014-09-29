@@ -13,42 +13,42 @@ import static junit.framework.Assert.assertNotNull;
 public class CommandsTest
 {
 
-    private static Commands commands;
-
-
     @BeforeClass
     public static void setUp()
     {
-        commands = new Commands( new CommandRunnerMock() );
+        Commands.init( new CommandRunnerMock() );
     }
 
 
     @Test
     public void testInstallCommand()
     {
-        Command command = commands.getInstallCommand( null );
+        Command command = Commands.getInstallCommand( null );
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes install ksks-shark", command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription() );
     }
 
 
     @Test
     public void testUninstallCommand()
     {
-        Command command = commands.getUninstallCommand( null );
+        Command command = Commands.getUninstallCommand( null );
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes purge ksks-shark", command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command.getDescription() );
     }
 
 
     @Test
     public void testCheckInstalledCommand()
     {
-        Command command = commands.getCheckInstalledCommand( null );
+        Command command = Commands.getCheckInstalledCommand( null );
 
         assertNotNull( command );
         assertEquals( "dpkg -l | grep '^ii' | grep ksks", command.getDescription() );
     }
+
+
 }
+

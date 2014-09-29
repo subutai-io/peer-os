@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.environment.cli;
 
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
@@ -15,7 +14,7 @@ public class DestroyEnvironmentCommandTest
     DestroyEnvironmentCommand destroyEnvironmentCommand;
 
 
-//    @Before
+    //    @Before
     public void init()
     {
         destroyEnvironmentCommand = mock( DestroyEnvironmentCommand.class );

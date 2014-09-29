@@ -1,4 +1,4 @@
-package org.safehaus.plugin.oozie.rest;
+package org.safehaus.subutai.plugin.oozie.rest;
 
 
 import java.util.HashSet;

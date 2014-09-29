@@ -1,27 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui;
 
-
-import java.util.concurrent.ExecutorService;
-
-import javax.naming.NamingException;
-
-import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.shark.ui.manager.Manager;
-import org.safehaus.subutai.plugin.shark.ui.wizard.Wizard;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import java.util.concurrent.ExecutorService;
+import javax.naming.NamingException;
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.shark.ui.manager.Manager;
+import org.safehaus.subutai.plugin.shark.ui.wizard.Wizard;
 
 
-/**
- * @author dilshat
- */
 public class SharkComponent extends CustomComponent
 {
 
@@ -32,16 +21,19 @@ public class SharkComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
+        TabSheet tabSheet = new TabSheet();
+        tabSheet.setSizeFull();
 
         Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
-        verticalLayout.addComponent( mongoSheet );
+        tabSheet.addTab( wizard.getContent(), "Install" );
+        tabSheet.addTab( manager.getContent(), "Manage" );
+        verticalLayout.addComponent( tabSheet );
 
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }
+
+
 }
+

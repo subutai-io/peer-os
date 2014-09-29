@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
@@ -32,8 +33,7 @@ import com.vaadin.ui.TextField;
  */
 public class TerminalForm extends CustomComponent implements Disposable
 {
-    // TODO: Implement Container tree
-    //    protected final AgentTree agentTree;
+    protected final EnvironmentTree environmentTree;
     protected final TextField programTxtFld;
     protected final TextField timeoutTxtFld;
     protected final TextField workDirTxtFld;
@@ -44,7 +44,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private ExecutorService executor;
 
 
-    public TerminalForm( final EnvironmentManager environmentManager )
+    public TerminalForm( final AgentManager agentManager, final EnvironmentManager environmentManager )
     {
         setSizeFull();
 
@@ -52,8 +52,8 @@ public class TerminalForm extends CustomComponent implements Disposable
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        //        agentTree = new AgentTree( agentManager );
-        //        horizontalSplit.setFirstComponent( agentTree );
+        environmentTree = new EnvironmentTree( agentManager, environmentManager);
+        horizontalSplit.setFirstComponent( environmentTree );
 
         GridLayout grid = new GridLayout( 20, 10 );
         grid.setSizeFull();
@@ -152,8 +152,7 @@ public class TerminalForm extends CustomComponent implements Disposable
 
     public void dispose()
     {
-        //TODO: Dispose container tree
-        //        agentTree.dispose();
+        environmentTree.dispose();
         executor.shutdown();
     }
 }

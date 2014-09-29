@@ -212,23 +212,17 @@ public class CommunicationManagerImpl implements CommunicationManager
 
         cleanup();
 
-        try
-        {
-            //executor service setup
-            exec = Executors.newFixedThreadPool( amqMaxSenderPoolSize );
-            //pooled connection factory setup
-            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( amqUrl );
-            amqFactory.setCheckForDuplicates( true );
-            pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
-            pooledConnectionFactory.setMaxConnections( amqMaxPooledConnections );
-            pooledConnectionFactory.start();
-            setupListener();
-            LOG.info( "Communication Manager started..." );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in init", ex );
-        }
+
+        //executor service setup
+        exec = Executors.newFixedThreadPool( amqMaxSenderPoolSize );
+        //pooled connection factory setup
+        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( amqUrl );
+        amqFactory.setCheckForDuplicates( true );
+        pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
+        pooledConnectionFactory.setMaxConnections( amqMaxPooledConnections );
+        pooledConnectionFactory.start();
+        setupListener();
+        LOG.info( "Communication Manager started..." );
     }
 
 
@@ -273,9 +267,8 @@ public class CommunicationManagerImpl implements CommunicationManager
             {
                 pooledConnectionFactory.stop();
             }
-            catch ( Exception e )
+            catch ( Exception ignore )
             {
-                LOG.warn( "ignore", e );
             }
         }
         if ( communicationMessageListener != null )
@@ -284,9 +277,8 @@ public class CommunicationManagerImpl implements CommunicationManager
             {
                 communicationMessageListener.destroy();
             }
-            catch ( Exception e )
+            catch ( Exception ignore )
             {
-                LOG.warn( "ignore", e );
             }
         }
     }
@@ -297,17 +289,11 @@ public class CommunicationManagerImpl implements CommunicationManager
      */
     public void destroy()
     {
-        try
-        {
-            cleanup();
 
-            exec.shutdown();
+        cleanup();
 
-            LOG.info( "Communication Manager stopped..." );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in destroy", ex );
-        }
+        exec.shutdown();
+
+        LOG.info( "Communication Manager stopped..." );
     }
 }

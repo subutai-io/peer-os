@@ -17,9 +17,9 @@ public interface Command
 {
 
     /**
-     * Returns contained request object if any
+     * Returns contained command object if any
      *
-     * @return - returns wrapped request or null
+     * @return - returns wrapped command or null
      */
     public Request getRequest();
 

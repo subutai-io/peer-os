@@ -6,5 +6,5 @@ package org.safehaus.subutai.core.environment.api.helper;
  */
 public enum ProcessStatusEnum
 {
-    NEW_PROCESS, IN_PROGRESS, FAILED, SUCCESSFUL
+    NEW_PROCESS, IN_PROGRESS, FAILED, TERMINATED, SUCCESSFUL
 }
