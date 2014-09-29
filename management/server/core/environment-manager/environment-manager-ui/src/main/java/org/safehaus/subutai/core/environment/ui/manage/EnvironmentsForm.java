@@ -10,8 +10,6 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyExc
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -23,7 +21,6 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentsForm
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsForm.class.getName() );
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;

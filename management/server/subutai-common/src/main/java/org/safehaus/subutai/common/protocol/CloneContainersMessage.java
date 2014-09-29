@@ -82,10 +82,14 @@ public class CloneContainersMessage extends PeerCommandMessage
     @Override
     public void setResult( final Object result )
     {
-        if (result instanceof Set)
-            agents = (Set<Agent>)result;
+        if ( result instanceof Set )
+        {
+            agents = ( Set<Agent> ) result;
+        }
         else
+        {
             throw new IllegalArgumentException( "Result must be set of Agent." );
+        }
     }
 
 
@@ -108,5 +112,11 @@ public class CloneContainersMessage extends PeerCommandMessage
                 ", agents=" + agents +
                 ", success=" + success +
                 '}';
+    }
+
+
+    public void incrementNumberOfNodes()
+    {
+        numberOfNodes++;
     }
 }
