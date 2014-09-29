@@ -63,8 +63,8 @@ public class ContainerManagerImplTest
         ( ( ContainerManagerImpl ) containerManager ).destroy();
     }
 
-     /*
-    @Test
+
+//    @Test
     public void testCloneSingleContainer() throws Exception
     {
         UUID envId = UUID.randomUUID();
@@ -75,7 +75,7 @@ public class ContainerManagerImplTest
         Agent agent = containerManager.clone( envId, hostName, templateName, cloneName );
     }
 
-
+    /*
     @Test
 	public void testCloneLxcOnHost() {
 

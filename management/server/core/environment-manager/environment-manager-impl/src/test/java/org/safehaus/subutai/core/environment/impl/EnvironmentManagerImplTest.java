@@ -80,8 +80,6 @@ public class EnvironmentManagerImplTest
     @Test
     public void shouldAddContainer()
     {
-
-        // TODO: this method moved to Environment
 //        environmentManager.addContainer( mock( EnvironmentContainer.class ) );
     }
 
@@ -101,9 +99,8 @@ public class EnvironmentManagerImplTest
         ebp.setCompleteStatus( false );
         ebp.setUuid( UUID.randomUUID() );
 
-        //TODO: Removed default constructor
-        CloneContainersMessage ccm = new CloneContainersMessage(null,null);
-        ebp.addCloneContainerMessage( ccm );
+//        CloneContainersMessage ccm = new CloneContainersMessage();
+//        ebp.addCloneContainerMessage( ccm );
 
         return ebp;
     }

@@ -100,7 +100,7 @@ public class CommandJsonTest
         Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
         CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
 
-        assertNotNull( cmd.getCommand() );
+        assertNotNull( cmd.getRequest() );
     }
 
 
