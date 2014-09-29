@@ -18,15 +18,8 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
     public ActualizeMasterIpOperationHandler( SharkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
-                String.format( "Actualizing master IP of %s", clusterName ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId()
-    {
-        return productOperation.getId();
+        productOperation = manager.getTracker().createProductOperation(
+                SharkClusterConfig.PRODUCT_KEY, String.format( "Actualizing master IP of %s", clusterName ) );
     }
 
 
@@ -41,11 +34,15 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
             return;
         }
 
-        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( clusterName );
+        if ( config.getSparkClusterName() == null )
+        {
+            productOperation.addLogFailed( "Spark cluster name not specified" );
+            return;
+        }
+        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
-            productOperation
-                    .addLogFailed( String.format( "Spark cluster '%s' not found\nInstallation aborted", clusterName ) );
+            productOperation.addLogFailed( "Underlying Spark cluster not found: " + clusterName );
             return;
         }
 
@@ -72,4 +69,7 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
                     String.format( "Failed to actualize Master IP, %s", setMasterIPCommand.getAllErrors() ) );
         }
     }
+
+
 }
+

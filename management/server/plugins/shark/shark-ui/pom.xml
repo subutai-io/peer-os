@@ -44,7 +44,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>tracker-api</artifactId>
     </dependency>
-    <!--TODO add spark and shark plugins to parent pom-->
+    <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hadoop-plugin-api</artifactId>
+        <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>spark-plugin-api</artifactId>
