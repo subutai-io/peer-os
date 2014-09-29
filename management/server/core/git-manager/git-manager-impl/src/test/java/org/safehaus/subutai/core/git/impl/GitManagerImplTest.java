@@ -10,12 +10,17 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
 
+import com.google.common.collect.Lists;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 
 /**
@@ -33,7 +38,7 @@ public class GitManagerImplTest
     private static final String DIFF_BRANCH_OUTPUT = String.format( "M %s", MODIFIED_FILE_PATH );
     private static final String DIFF_FILE_OUTPUT = "+new content\n-old content";
     private static final String FILE_PATH = "some/file/path";
-    private static final String SYS_OUT = "some dummy output";
+    private static final String SOME_DUMMY_OUTPUT = "some dummy output";
 
 
     @Test( expected = NullPointerException.class )
@@ -47,7 +52,7 @@ public class GitManagerImplTest
     public void shouldPrintToSysOut() throws GitException
     {
         Agent agent = MockUtils.getAgent( UUID.randomUUID() );
-        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SYS_OUT, null, null );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
         CommandRunner commandRunner = MockUtils.getCommandRunner( command );
 
         GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
@@ -58,21 +63,20 @@ public class GitManagerImplTest
 
         gitManager.init( agent, REPOSITORY_ROOT );
 
-        assertEquals( SYS_OUT, myOut.toString().trim() );
+        assertEquals( SOME_DUMMY_OUTPUT, myOut.toString().trim() );
     }
 
 
-    @Test(expected = GitException.class)
+    @Test( expected = GitException.class )
     public void shouldThrowGitException() throws GitException
     {
         Agent agent = MockUtils.getAgent( UUID.randomUUID() );
-        Command command = MockUtils.getCommand( true, false, agent.getUuid(), SYS_OUT, null, null );
+        Command command = MockUtils.getCommand( true, false, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
         CommandRunner commandRunner = MockUtils.getCommandRunner( command );
 
         GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
 
         gitManager.init( agent, REPOSITORY_ROOT );
-
     }
 
 
@@ -140,5 +144,21 @@ public class GitManagerImplTest
         String diffFile = gitManager.diffFile( agent, REPOSITORY_ROOT, MASTER_BRANCH, FILE_PATH );
 
         assertEquals( diffFile, DIFF_FILE_OUTPUT );
+    }
+
+
+    @Test
+    public void shouldRunAddCommand() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.add( agent, REPOSITORY_ROOT, Lists.newArrayList( "" ) );
+
+        verify( command, times( 1 ) ).execute();
     }
 }
