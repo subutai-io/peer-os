@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.git.impl;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
@@ -58,5 +61,18 @@ public class GitChangedFileTest
         GitChangedFile gitChangedFile = new GitChangedFile( GitFileStatus.MODIFIED, FILE_PATH );
 
         assertEquals( gitChangedFile, new GitChangedFile( GitFileStatus.MODIFIED, FILE_PATH ) );
+    }
+
+
+    @Test
+    public void checkHashCode()
+    {
+        GitChangedFile gitChangedFile = new GitChangedFile( GitFileStatus.MODIFIED, FILE_PATH );
+
+
+        Map<GitChangedFile, GitChangedFile> map = new HashMap<>();
+        map.put( gitChangedFile, gitChangedFile );
+
+        assertEquals( map.get( gitChangedFile ), gitChangedFile );
     }
 }
