@@ -51,8 +51,6 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-
-
     public void next()
     {
         step++;
@@ -138,10 +136,9 @@ public class EnvironmentBuildWizard extends DetailsWindow
         {
             for ( Peer peer : peers )
             {
-                CheckBox ch = new CheckBox();
-
-                Object id = peersTable.addItem( new Object[] {
-                        peer.getName(), ch
+                CheckBox checkBox = new CheckBox();
+                peersTable.addItem( new Object[] {
+                        peer.getName(), checkBox
                 }, peer );
             }
         }
@@ -198,7 +195,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 comboBox.setContainerDataSource( bic );
                 comboBox.setNullSelectionAllowed( false );
                 comboBox.setTextInputAllowed( false );
-                //                comboBox.setItemCaptionPropertyId( "name" );
+                comboBox.setItemCaptionPropertyId( "name" );
                 containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), comboBox
                 }, ng.getTemplateName() );
@@ -238,15 +235,12 @@ public class EnvironmentBuildWizard extends DetailsWindow
     private List<Peer> selectedPeers()
     {
         List<Peer> peers = new ArrayList<>();
-        if ( !peers.isEmpty() )
+        for ( Object itemId : peersTable.getItemIds() )
         {
-            for ( Object itemId : peersTable.getItemIds() )
+            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
+            if ( selection.getValue() )
             {
-                CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
-                if ( selection.getValue() )
-                {
-                    peers.add( ( Peer ) itemId );
-                }
+                peers.add( ( Peer ) itemId );
             }
         }
         return peers;
