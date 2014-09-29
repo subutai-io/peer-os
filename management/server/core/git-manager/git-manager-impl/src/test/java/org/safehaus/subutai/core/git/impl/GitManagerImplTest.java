@@ -298,7 +298,23 @@ public class GitManagerImplTest
         gitManager.checkout( agent, REPOSITORY_ROOT, DUMMY_BRANCH, true );
 
         verify( commandRunner ).createCommand(
-                new RequestBuilder( String.format( "git checkout --track -b %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
-                Sets.newHashSet( agent ) );
+                new RequestBuilder( String.format( "git checkout --track -b %s", DUMMY_BRANCH ) )
+                        .withCwd( REPOSITORY_ROOT ), Sets.newHashSet( agent ) );
+    }
+
+
+    @Test
+    public void shouldRunDeleteBranchCommand() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.deleteBranch( agent, REPOSITORY_ROOT, DUMMY_BRANCH );
+
+        verify( command, times( 1 ) ).execute();
     }
 }
