@@ -106,4 +106,10 @@ public class CloneContainersMessage extends PeerCommandMessage
                 ", success=" + success +
                 '}';
     }
+
+
+    public void incrementNumberOfNodes()
+    {
+        numberOfNodes++;
+    }
 }

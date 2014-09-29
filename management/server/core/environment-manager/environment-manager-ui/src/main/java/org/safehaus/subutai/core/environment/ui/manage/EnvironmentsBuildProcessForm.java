@@ -38,13 +38,12 @@ import com.vaadin.ui.VerticalLayout;
 public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListener
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsBuildProcessForm.class.getName() );
     private static final String OK_ICON_SOURCE = "img/ok.png";
     private static final String ERROR_ICON_SOURCE = "img/cancel.png";
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
     private static final String STATUS = "Status";
     private static final String ACTION = "Action";
-    Map<UUID, ExecutorService> executorServiceMap = new HashMap<>();
+    private Map<UUID, ExecutorService> executorServiceMap = new HashMap<>();
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
