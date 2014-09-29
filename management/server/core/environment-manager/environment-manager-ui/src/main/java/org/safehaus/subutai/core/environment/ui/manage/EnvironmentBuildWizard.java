@@ -252,10 +252,8 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
             if ( !process.getMessageMap().containsKey( key ) )
             {
-                CloneContainersMessage ccm = new CloneContainersMessage();
+                CloneContainersMessage ccm = new CloneContainersMessage( ebt.getUuid(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
-                ccm.setPeerId( peer.getId() );
-                ccm.setEnvId( ebt.getUuid() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
                 process.putCloneContainerMessage( key, ccm );
