@@ -1,4 +1,4 @@
-package org.safehaus.plugin.oozie.rest;
+package org.safehaus.subutai.plugin.hbase.rest;
 
 
 import javax.ws.rs.DELETE;

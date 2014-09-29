@@ -24,7 +24,6 @@ public class EnvironmentsForm
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsForm.class.getName() );
-
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -138,7 +137,7 @@ public class EnvironmentsForm
             } );
             environmentsTable.addItem( new Object[] {
                     environment.getName(), viewEnvironmentInfoButton, destroyEnvironment
-            }, null );
+            }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
     }
