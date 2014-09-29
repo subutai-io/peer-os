@@ -3,6 +3,9 @@ package org.safehaus.subutai.core.environment.api;
 
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
 /**
@@ -11,32 +14,50 @@ import org.safehaus.subutai.common.protocol.Container;
 public class EnvironmentContainer extends Container
 {
 
-    private transient EnvironmentManager environmentManager;
+    private transient Environment environment;
 
 
-    public void setEnvironmentManager( EnvironmentManager environmentManager )
+    public Environment getEnvironment()
     {
-        this.environmentManager = environmentManager;
+        return environment;
+    }
+
+
+    public void setEnvironment( final Environment environment )
+    {
+        this.environment = environment;
     }
 
 
     @Override
     public boolean start() throws ContainerException
     {
-        return environmentManager.startContainer( this );
+        DefaultCommandMessage cmd =
+                new DefaultCommandMessage( PeerCommandType.START, getEnvironment().getUuid(), getPeerId(),
+                        getAgentId() );
+        environment.invoke( cmd );
+        return cmd.isSuccess();
     }
 
 
     @Override
     public boolean stop() throws ContainerException
     {
-        return environmentManager.stopContainer( this );
+        DefaultCommandMessage cmd =
+                new DefaultCommandMessage( PeerCommandType.STOP, getEnvironment().getUuid(), getPeerId(),
+                        getAgentId() );
+        environment.invoke( cmd );
+        return cmd.isSuccess();
     }
 
 
     @Override
     public boolean isConnected() throws ContainerException
     {
-        return environmentManager.isContainerConnected( this );
+        DefaultCommandMessage cmd =
+                new DefaultCommandMessage( PeerCommandType.ISCONNECTED, getEnvironment().getUuid(), getPeerId(),
+                        getAgentId() );
+        environment.invoke( cmd );
+        return cmd.isSuccess();
     }
 }

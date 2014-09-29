@@ -6,14 +6,23 @@ package org.safehaus.subutai.core.git.api;
  */
 public enum GitFileStatus
 {
-    MODIFIED,
-    COPIED,
-    RENAMED,
-    ADDED,
-    DELETED,
-    UNMERGED,
-    UNVERSIONED,
-    UNMODIFIED;
+    MODIFIED( "M" ),
+    COPIED( "C" ),
+    RENAMED( "R" ),
+    ADDED( "A" ),
+    DELETED( "D" ),
+    UNMERGED( "U" ),
+    UNVERSIONED( "X" ),
+    UNMODIFIED( "" );
+
+
+    private final String statusAcronym;
+
+
+    GitFileStatus( String statusAcronym )
+    {
+        this.statusAcronym = statusAcronym;
+    }
 
 
     /**
@@ -25,24 +34,13 @@ public enum GitFileStatus
      */
     public static GitFileStatus parse( String status )
     {
-        switch ( status )
+        for ( GitFileStatus gitFileStatus : GitFileStatus.values() )
         {
-            case "M":
-                return GitFileStatus.MODIFIED;
-            case "C":
-                return GitFileStatus.COPIED;
-            case "R":
-                return GitFileStatus.RENAMED;
-            case "A":
-                return GitFileStatus.ADDED;
-            case "D":
-                return GitFileStatus.DELETED;
-            case "U":
-                return GitFileStatus.UNMERGED;
-            case "X":
-                return GitFileStatus.UNVERSIONED;
-            default:
-                return GitFileStatus.UNMODIFIED;
+            if ( gitFileStatus.statusAcronym.equals( status ) )
+            {
+                return gitFileStatus;
+            }
         }
+        return GitFileStatus.UNMODIFIED;
     }
 }

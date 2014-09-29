@@ -1,4 +1,4 @@
-package org.safehaus.plugin.hbase.rest;
+package org.safehaus.subutai.plugin.hbase.rest;
 
 
 import java.util.List;

@@ -27,13 +27,12 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -42,7 +41,6 @@ import com.google.common.cache.CacheBuilder;
 public class AgentManagerImpl implements ResponseListener, AgentManager
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( AgentManagerImpl.class.getName() );
     /**
      * list of agent listeners
      */
@@ -100,7 +98,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     public Set<Agent> getAgents()
     {
-        return new HashSet( agents.asMap().values() );
+        return Sets.newHashSet( agents.asMap().values() );
     }
 
 
@@ -210,16 +208,10 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     @Override
     public void addListener( AgentListener listener )
     {
-        try
+
+        if ( !listeners.contains( listener ) )
         {
-            if ( !listeners.contains( listener ) )
-            {
-                listeners.add( listener );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in addListener", ex );
+            listeners.add( listener );
         }
     }
 
@@ -232,14 +224,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     @Override
     public void removeListener( AgentListener listener )
     {
-        try
-        {
-            listeners.remove( listener );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in removeListener", ex );
-        }
+
+        listeners.remove( listener );
     }
 
 
@@ -287,24 +273,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     public void init()
     {
-        try
-        {
 
-            Preconditions.checkNotNull( communicationService, "Communication service is null" );
 
-            agents = CacheBuilder.newBuilder().
-                    expireAfterWrite( Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES ).
-                                         build();
+        Preconditions.checkNotNull( communicationService, "Communication service is null" );
 
-            communicationService.addListener( this );
+        agents = CacheBuilder.newBuilder().
+                expireAfterWrite( Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES ).
+                                     build();
 
-            exec = Executors.newSingleThreadExecutor();
-            exec.execute( new AgentNotifier( this ) );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in init", ex );
-        }
+        communicationService.addListener( this );
+
+        exec = Executors.newSingleThreadExecutor();
+        exec.execute( new AgentNotifier( this ) );
     }
 
 
@@ -313,16 +293,10 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     public void destroy()
     {
-        try
-        {
-            agents.invalidateAll();
-            exec.shutdownNow();
-            communicationService.removeListener( this );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in destroy", ex );
-        }
+
+        agents.invalidateAll();
+        exec.shutdownNow();
+        communicationService.removeListener( this );
     }
 
 
@@ -364,38 +338,32 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     private void addAgent( Response response )
     {
-        try
-        {
-            if ( response != null && response.getUuid() != null )
-            {
-                Agent checkAgent = agents.getIfPresent( response.getUuid() );
-                if ( checkAgent != null )
-                {
-                    //update timestamp of agent here & return
-                    agents.put( response.getUuid(), checkAgent );
-                    return;
-                }
-                //create agent from response
-                Agent agent = new Agent( response.getUuid(),
-                        Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
-                        response.getHostname(), response.getParentHostName(), response.getMacAddress(),
-                        response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        //TODO pass proper environmentId
-                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(),
-                        response.getEnvironmentId() == null ? UUIDUtil.generateMACBasedUUID() :
-                        response.getEnvironmentId() );
 
-                //send registration acknowledgement to agent
-                sendAck( agent.getUuid() );
-                //put agent to cache
-                agents.put( response.getUuid(), agent );
-                //notify listeners
-                notifyAgentListeners = true;
-            }
-        }
-        catch ( Exception e )
+        if ( response != null && response.getUuid() != null )
         {
-            LOG.error( "Error in addAgent", e );
+            Agent checkAgent = agents.getIfPresent( response.getUuid() );
+            if ( checkAgent != null )
+            {
+                //update timestamp of agent here & return
+                agents.put( response.getUuid(), checkAgent );
+                return;
+            }
+            //create agent from response
+            Agent agent = new Agent( response.getUuid(),
+                    Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
+                    response.getHostname(), response.getParentHostName(), response.getMacAddress(), response.getIps(),
+                    !Strings.isNullOrEmpty( response.getParentHostName() ),
+                    //TODO pass proper environmentId
+                    response.getTransportId(), UUIDUtil.generateMACBasedUUID(),
+                    response.getEnvironmentId() == null ? UUIDUtil.generateMACBasedUUID() :
+                    response.getEnvironmentId() );
+
+            //send registration acknowledgement to agent
+            sendAck( agent.getUuid() );
+            //put agent to cache
+            agents.put( response.getUuid(), agent );
+            //notify listeners
+            notifyAgentListeners = true;
         }
     }
 
@@ -417,24 +385,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     private void removeAgent( Response response )
     {
-        try
+
+        if ( response != null && response.getTransportId() != null )
         {
-            if ( response != null && response.getTransportId() != null )
+            for ( Agent agent : agents.asMap().values() )
             {
-                for ( Agent agent : agents.asMap().values() )
+                if ( agent.getTransportId().startsWith( response.getTransportId() ) )
                 {
-                    if ( agent.getTransportId().startsWith( response.getTransportId() ) )
-                    {
-                        agents.invalidate( agent.getUuid() );
-                        notifyAgentListeners = true;
-                        return;
-                    }
+                    agents.invalidate( agent.getUuid() );
+                    notifyAgentListeners = true;
+                    return;
                 }
             }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in removeAgent", e );
         }
     }
 }

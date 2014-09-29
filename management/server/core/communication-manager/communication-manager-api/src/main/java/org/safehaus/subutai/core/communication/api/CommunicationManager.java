@@ -12,9 +12,9 @@ public interface CommunicationManager
 {
 
     /**
-     * Sends request to agent
+     * Sends command to agent
      *
-     * @param request - request to send
+     * @param request - command to send
      */
     public void sendRequest( Request request );
 

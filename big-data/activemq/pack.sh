@@ -16,14 +16,15 @@ if ls *.deb ; then
 	rm  *.deb
 fi
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+fileName=`ls | grep subutai | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
 cp -a $SOURCE/etc/ $BASE/$fileName/ 
 cp -a $SOURCE/opt $BASE/$fileName/
 
-wget http://apache.bilkent.edu.tr/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz -P $fileName/opt/
+#http://apache.bilkent.edu.tr/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz
+wget http://www.bizdirusa.com/mirrors/apache/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz -P $fileName/opt/
 cd $fileName/opt
 tar xzvf apache-activemq-5.9.1-bin.tar.gz
 rm apache-activemq-5.9.1-bin.tar.gz
