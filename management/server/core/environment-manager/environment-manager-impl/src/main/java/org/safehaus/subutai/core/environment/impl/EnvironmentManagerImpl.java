@@ -301,10 +301,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             try
             {
                 peerCommandDispatcher.invoke( ccm );
-                if ( ccm == null )
-                {
-                    throw new EnvironmentBuildException( "CloneContainerMessage returned null" );
-                }
+
                 boolean result = ccm.isSuccess();
                 if ( result )
                 {
