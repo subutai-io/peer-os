@@ -202,7 +202,7 @@ public class GitManagerImplTest
 
 
     @Test
-    public void shouldCommitAndReturnCommitId() throws GitException, CommandException
+    public void shouldCommitAndReturnCommitId() throws GitException
     {
         Agent agent = MockUtils.getAgent( UUID.randomUUID() );
         Command command = MockUtils.getCommand( true, true, agent.getUuid(), COMMIT_OUTPUT, null, null );
@@ -218,7 +218,7 @@ public class GitManagerImplTest
 
 
     @Test
-    public void shouldCommitAllAndReturnCommitId() throws GitException, CommandException
+    public void shouldCommitAllAndReturnCommitId() throws GitException
     {
         Agent agent = MockUtils.getAgent( UUID.randomUUID() );
         Command command = MockUtils.getCommand( true, true, agent.getUuid(), COMMIT_OUTPUT, null, null );
@@ -234,7 +234,7 @@ public class GitManagerImplTest
 
 
     @Test
-    public void shouldSupplyProperRequestBuilder() throws GitException, CommandException
+    public void shouldSupplyProperRequestBuilder() throws GitException
     {
         Agent agent = MockUtils.getAgent( UUID.randomUUID() );
         Command command = MockUtils.getCommand( true, true, agent.getUuid(), COMMIT_OUTPUT, null, null );
@@ -248,5 +248,57 @@ public class GitManagerImplTest
         verify( commandRunner ).createCommand(
                 new RequestBuilder( String.format( "git commit -a -m \"%s\"", COMMIT_MESSAGE ) )
                         .withCwd( REPOSITORY_ROOT ), Sets.newHashSet( agent ) );
+    }
+
+
+    @Test
+    public void shouldRunCloneCommand() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.clone( agent, DUMMY_BRANCH, FILE_PATH );
+
+        verify( command, times( 1 ) ).execute();
+    }
+
+
+    @Test
+    public void shouldRunCheckoutCommand() throws GitException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.checkout( agent, REPOSITORY_ROOT, DUMMY_BRANCH, false );
+
+        verify( commandRunner ).createCommand(
+                new RequestBuilder( String.format( "git checkout %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
+                Sets.newHashSet( agent ) );
+    }
+
+
+    @Test
+    public void shouldRunCheckoutCommandWithNewBranch() throws GitException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.checkout( agent, REPOSITORY_ROOT, DUMMY_BRANCH, true );
+
+        verify( commandRunner ).createCommand(
+                new RequestBuilder( String.format( "git checkout --track -b %s", DUMMY_BRANCH ) ).withCwd( REPOSITORY_ROOT ),
+                Sets.newHashSet( agent ) );
     }
 }
