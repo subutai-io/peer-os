@@ -157,12 +157,6 @@ public class ProgressWindow
             outputTxtArea.setValue( output );
             outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
         }
-        /*try {
-            VaadinSession.getCurrent().getLockInstance().lock();
-        }
-        finally {
-            VaadinSession.getCurrent().getLockInstance().unlock();
-        }*/
     }
 
 
