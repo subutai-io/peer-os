@@ -23,7 +23,7 @@ import org.safehaus.subutai.core.git.api.GitFileStatus;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.internal.matchers.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;

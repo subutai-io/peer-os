@@ -4,15 +4,14 @@ package org.safehaus.subutai.core.git.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.safehaus.subutai.core.git.api.GitBranch;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.StringContains.containsString;
 
 
 /**
