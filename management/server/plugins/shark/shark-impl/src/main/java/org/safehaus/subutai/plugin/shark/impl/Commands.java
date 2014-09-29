@@ -1,40 +1,34 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.impl;
 
 
 import java.util.Set;
-
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 
-/**
- * @author dilshat
- */
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
-    public Commands( CommandRunner commandRunner )
+    public static final String PACKAGE_NAME = "ksks-shark";
+
+    private static CommandRunner commandRunner;
+
+
+    public static void init( CommandRunner commandRunner )
     {
-        init( commandRunner );
+        Commands.commandRunner = commandRunner;
     }
 
 
     public static Command getInstallCommand( Set<Agent> agents )
     {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-shark" ).withTimeout( 90 )
-                                                                                           .withStdOutRedirection(
-                                                                                                   OutputRedirection
-                                                                                                           .NO ),
+                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 90 )
+                .withStdOutRedirection(
+                        OutputRedirection.NO ),
                 agents );
     }
 
@@ -42,7 +36,7 @@ public class Commands extends CommandsSingleton
     public static Command getUninstallCommand( Set<Agent> agents )
     {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-shark" ).withTimeout( 60 ), agents );
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ), agents );
     }
 
 
@@ -56,6 +50,15 @@ public class Commands extends CommandsSingleton
     {
         return createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && sharkConf.sh clear master ; sharkConf.sh master %s",
-                        masterNode.getHostname() ) ).withTimeout( 60 ), agents );
+                               masterNode.getHostname() ) ).withTimeout( 60 ), agents );
     }
+
+
+    private static Command createCommand( RequestBuilder rb, Set<Agent> agents )
+    {
+        return commandRunner.createCommand( rb, agents );
+    }
+
+
 }
+

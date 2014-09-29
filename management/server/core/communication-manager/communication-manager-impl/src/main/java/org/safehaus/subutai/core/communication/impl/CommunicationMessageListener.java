@@ -61,7 +61,7 @@ class CommunicationMessageListener implements MessageListener
                 }
                 else
                 {
-                    LOG.warn( "Could not parse response{0}", jsonCmd );
+                    LOG.warn( "Could not parse response {}", jsonCmd );
                 }
             }
             else if ( message instanceof ActiveMQMessage )
@@ -93,11 +93,11 @@ class CommunicationMessageListener implements MessageListener
     {
         if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE )
         {
-            LOG.info( "\nReceived {0}", CommandJson.getCommandJson( CommandJson.getCommandFromJson( json ) ) );
+            LOG.info( "\nReceived {}", CommandJson.getCommandJson( CommandJson.getCommandFromJson( json ) ) );
         }
         else
         {
-            LOG.info( "Heartbeat from {0}", response.getHostname() );
+            LOG.info( "Heartbeat from {}", response.getHostname() );
         }
     }
 

@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -31,8 +30,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
-                String.format( "Installing %s", SparkClusterConfig.PRODUCT_KEY ) );
+        productOperation = manager.getTracker().createProductOperation(
+                SparkClusterConfig.PRODUCT_KEY, String.format( "Installing %s", SparkClusterConfig.PRODUCT_KEY ) );
     }
 
 
@@ -62,6 +61,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
             {
                 EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );
+
+                ClusterSetupStrategy s = manager.getHadoopManager().getClusterSetupStrategy( po, hadoopConfig, env );
+                s.setup();
             }
             catch ( ClusterSetupException ex )
             {
@@ -123,4 +125,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
             productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
         }
     }
+
+
 }
+
