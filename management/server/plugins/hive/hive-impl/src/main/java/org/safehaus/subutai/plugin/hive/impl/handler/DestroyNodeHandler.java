@@ -4,10 +4,10 @@ package org.safehaus.subutai.plugin.hive.impl.handler;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.impl.CommandType;
 import org.safehaus.subutai.plugin.hive.impl.Commands;
@@ -56,7 +56,7 @@ public class DestroyNodeHandler extends AbstractHandler
 
         if ( config.getClients().size() == 1 )
         {
-            po.addLog( "This is the last node in cluster. Destroy cluster instead" );
+            po.addLogFailed( "This is the last node in cluster. Destroy cluster instead" );
             return;
         }
 

@@ -3,12 +3,10 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
@@ -48,7 +46,7 @@ public class AddNodeOperationHandlerTest
     {
         SharkClusterConfig config = new SharkClusterConfig();
         config.setClusterName( "test-cluster" );
-        config.setNodes( new HashSet<Agent>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
+        config.setNodes( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
         mock.setClusterConfig( config );
 
         handler.run();
