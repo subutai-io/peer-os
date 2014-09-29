@@ -18,6 +18,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -66,7 +67,7 @@ public class EnvironmentBuildWizardTest
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
         eb.setName( "blueprint" );
 
-        NodeGroup one = genNodeGroup( "master", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
+        NodeGroup one = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         NodeGroup two = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         eb.addNodeGroup( one );
         eb.addNodeGroup( two );
