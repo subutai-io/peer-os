@@ -255,7 +255,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
         for ( NodeGroup ng : ebt.getEnvironmentBlueprint().getNodeGroups() )
         {
             Peer peer = topology.get( ng.getTemplateName() );
-            String key = peer.getId().toString() + "" + ng.getTemplateName();
+            String key = peer.getId().toString() + "-" + ng.getTemplateName();
 
             if ( !process.getMessageMap().containsKey( key ) )
             {
