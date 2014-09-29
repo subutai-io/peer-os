@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -89,33 +89,6 @@ public class EnvironmentManagerImplTest
     {
         EnvironmentBuildProcess process = createEnvironmentBuildProcess();
         environmentManager.buildEnvironment( process );
-        PeerCommandMessage pcm = getPeerCommandMessage();
-    }
-
-
-    private Void getNewPeerCommandMessage()
-    {
-        return null;
-    }
-
-
-    private PeerCommandMessage getPeerCommandMessage()
-    {
-        return new PeerCommandMessage()
-        {
-            @Override
-            public void setResult( final Object result )
-            {
-
-            }
-
-
-            @Override
-            public Object getResult()
-            {
-                return null;
-            }
-        };
     }
 
 
@@ -125,6 +98,9 @@ public class EnvironmentManagerImplTest
         ebp.setProcessStatusEnum( ProcessStatusEnum.NEW_PROCESS );
         ebp.setCompleteStatus( false );
         ebp.setUuid( UUID.randomUUID() );
+
+        CloneContainersMessage ccm = new CloneContainersMessage();
+        ebp.addCloneContainerMessage( ccm );
 
         return ebp;
     }
