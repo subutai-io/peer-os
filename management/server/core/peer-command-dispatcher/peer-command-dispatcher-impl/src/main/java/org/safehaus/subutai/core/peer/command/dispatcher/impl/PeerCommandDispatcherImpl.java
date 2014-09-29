@@ -5,6 +5,7 @@ import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,17 +58,25 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
 
 
     @Override
-    public void invoke( PeerCommandMessage peerCommand )
+    public void invoke( PeerCommandMessage peerCommand ) throws PeerCommandException
     {
-        if ( peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
+        try
         {
-            peerManager.invoke( peerCommand );
+            if ( peerManager.getSiteId().equals( peerCommand.getPeerId() ) )
+            {
+                peerManager.invoke( peerCommand );
+            }
+            else
+            {
+                Peer peer = peerManager.getPeerByUUID( peerCommand.getPeerId() );
+                remotePeerRestClient = new RemotePeerRestClient();
+                remotePeerRestClient.invoke( peer.getIp(), port, peerCommand );
+            }
         }
-        else
+        catch ( RuntimeException e )
         {
-            Peer peer = peerManager.getPeerByUUID( peerCommand.getPeerId() );
-            remotePeerRestClient = new RemotePeerRestClient();
-            remotePeerRestClient.invoke( peer.getIp(), port, peerCommand );
+            LOG.error( e.getMessage(), e );
+            throw new PeerCommandException( "Error invoking Peer command" );
         }
     }
 }
