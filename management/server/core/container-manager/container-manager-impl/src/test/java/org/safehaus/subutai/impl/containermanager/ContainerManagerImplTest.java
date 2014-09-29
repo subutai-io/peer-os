@@ -63,7 +63,7 @@ public class ContainerManagerImplTest
         ( ( ContainerManagerImpl ) containerManager ).destroy();
     }
 
-
+     /*
     @Test
     public void testCloneSingleContainer() throws Exception
     {
@@ -75,7 +75,7 @@ public class ContainerManagerImplTest
         Agent agent = containerManager.clone( envId, hostName, templateName, cloneName );
     }
 
-    /*
+
     @Test
 	public void testCloneLxcOnHost() {
 
