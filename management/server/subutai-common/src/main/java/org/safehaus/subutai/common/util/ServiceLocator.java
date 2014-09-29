@@ -17,31 +17,56 @@ import com.google.common.base.Preconditions;
 /**
  * Service Locator allows to locate osgi services by interface and caches them locally
  */
-public class ServiceLocator {
+public class ServiceLocator
+{
 
     private final Map<String, Object> cache;
-    private final InitialContext ctx;
 
 
-    public ServiceLocator() throws NamingException {
-        this.ctx = new InitialContext();
+    public ServiceLocator()
+    {
         this.cache = new ConcurrentHashMap<>();
     }
 
 
     /**
+     * Returns service by Interface, bypasses cache
+     *
+     * @param clazz Service Interface class to look up for
+     *
+     * @return service reference
+     *
+     * @throws NamingException thrown if service is not found
+     */
+    public static <T> T getServiceNoCache( Class<T> clazz ) throws NamingException
+    {
+        Preconditions.checkNotNull( clazz, "Class is null" );
+
+        String serviceName = clazz.getName();
+        InitialContext ctx = new InitialContext();
+        String jndiName = "osgi:service/" + serviceName;
+        return clazz.cast( ctx.lookup( jndiName ) );
+    }
+
+
+    /**
+     * Returns service by Interface
+     *
      * @param clazz - Service Interface class to look up for
      *
      * @return - service reference
      *
      * @throws NamingException - thrown if service is not found
      */
-    public <T> T getService( Class<T> clazz ) throws NamingException {
+    public <T> T getService( Class<T> clazz ) throws NamingException
+    {
         Preconditions.checkNotNull( clazz, "Class is null" );
 
         String serviceName = clazz.getName();
         Object cachedObj = cache.get( serviceName );
-        if ( cachedObj == null ) {
+        if ( cachedObj == null )
+        {
+            InitialContext ctx = new InitialContext();
             String jndiName = "osgi:service/" + serviceName;
             cachedObj = ctx.lookup( jndiName );
             cache.put( serviceName, cachedObj );

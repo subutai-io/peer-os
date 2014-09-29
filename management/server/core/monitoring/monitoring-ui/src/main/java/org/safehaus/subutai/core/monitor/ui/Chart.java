@@ -1,74 +1,74 @@
 package org.safehaus.subutai.core.monitor.ui;
 
 
-import org.safehaus.subutai.core.monitor.api.Metric;
-import org.safehaus.subutai.core.monitor.ui.util.FileUtil;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-
-class Chart {
-
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-	private static final String CHART_TEMPLATE = FileUtil.getContent("js/chart.js");
-
-	private final int maxSize;
-//    private final JavaScript javaScript;
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.monitor.api.Metric;
 
 
-	Chart(int maxSize) {
-		this.maxSize = maxSize;
-//        javaScript = new JavaScript( window );
-		loadScripts();
-	}
+class Chart
+{
+
+    private static final String CHART_TEMPLATE = FileUtil.getContent( "js/chart.js", Chart.class );
+    private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+    private final int maxSize;
 
 
-	private void loadScripts() {
-//        javaScript.loadFile( "js/jquery.min.js" );
-//        javaScript.loadFile( "js/jquery.flot.min.js" );
-//        javaScript.loadFile( "js/jquery.flot.time.min.js" );
-		com.vaadin.ui.JavaScript.getCurrent().execute("js/jquery.min.js");
-		com.vaadin.ui.JavaScript.getCurrent().execute("js/jquery.flot.min.js");
-		com.vaadin.ui.JavaScript.getCurrent().execute("js/jquery.flot.time.min.js");
-	}
+    Chart( int maxSize )
+    {
+        this.maxSize = maxSize;
+        loadScripts();
+    }
 
 
-	void load(String host, Metric metric, Map<Date, Double> values) {
-
-		String data = toPoints(values);
-		String label = String.format("%s for %s", metric.toString(), host);
-
-		String chart = CHART_TEMPLATE.replace("$label", label)
-				.replace("$yTitle", metric.getUnit())
-				.replace("$data", data);
-
-//        javaScript.execute( chart );
-		com.vaadin.ui.JavaScript.getCurrent().execute(chart);
-	}
+    private void loadScripts()
+    {
+        com.vaadin.ui.JavaScript.getCurrent().execute( "js/jquery.min.js" );
+        com.vaadin.ui.JavaScript.getCurrent().execute( "js/jquery.flot.min.js" );
+        com.vaadin.ui.JavaScript.getCurrent().execute( "js/jquery.flot.time.min.js" );
+    }
 
 
-	private String toPoints(Map<Date, Double> values) {
+    void load( String host, Metric metric, Map<Date, Double> values )
+    {
 
-		String str = "";
-		int i = 0;
+        String data = toPoints( values );
+        String label = String.format( "%s for %s", metric.toString(), host );
 
-		for (Date date : values.keySet()) {
-			if (!str.isEmpty()) {
-				str += ", ";
-			}
+        String chart = CHART_TEMPLATE.replace( "$label", label ).replace( "$yTitle", metric.getUnit() )
+                                     .replace( "$data", data );
 
-			str += String.format("[Date.parse('%s'), %s ]", DATE_FORMAT.format(date), values.get(date));
-			i++;
+        com.vaadin.ui.JavaScript.getCurrent().execute( chart );
+    }
 
-			if (i > maxSize) {
-				break;
-			}
-		}
 
-		return String.format("[%s]", str);
-	}
+    private String toPoints( Map<Date, Double> values )
+    {
+
+        StringBuilder str = new StringBuilder();
+        int i = 0;
+
+        for ( Map.Entry<Date, Double> entry : values.entrySet() )
+        {
+            if ( str.length() > 0 )
+            {
+                str.append( ", " );
+            }
+
+            str.append(
+                    String.format( "[Date.parse('%s'), %s ]", dateFormat.format( entry.getKey() ), entry.getValue() ) );
+            i++;
+
+            if ( i > maxSize )
+            {
+                break;
+            }
+        }
+
+        return String.format( "[%s]", str );
+    }
 }

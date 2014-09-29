@@ -1,15 +1,16 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
+
+import com.google.common.collect.Sets;
 
 
 public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl>
@@ -21,19 +22,19 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-            String.format( "Adding node to %s", clusterName ) );
+        productOperation = manager.getTracker().createProductOperation( LuceneConfig.PRODUCT_KEY,
+                String.format( "Adding node to %s", clusterName ) );
     }
 
 
     @Override
     public void run()
     {
-        Config config = manager.getCluster( clusterName );
+        LuceneConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
             productOperation.addLogFailed(
-                String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
@@ -42,14 +43,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
         if ( agent == null )
         {
             productOperation
-                .addLogFailed( String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
+                    .addLogFailed( String.format( "Node %s is not connected. Operation aborted", lxcHostname ) );
             return;
         }
 
         if ( config.getNodes().contains( agent ) )
         {
             productOperation.addLogFailed(
-                String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
@@ -61,7 +62,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
         if ( !checkInstalledCommand.hasCompleted() )
         {
             productOperation
-                .addLogFailed( "Failed to check presence of installed subutai packages\nInstallation aborted" );
+                    .addLogFailed( "Failed to check presence of installed subutai packages. Installation aborted" );
             return;
         }
 
@@ -70,13 +71,13 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
         if ( result.getStdOut().contains( "ksks-lucene" ) )
         {
             productOperation.addLogFailed(
-                String.format( "Node %s already has Lucene installed\nInstallation aborted", lxcHostname ) );
+                    String.format( "Node %s already has Lucene installed. Installation aborted", lxcHostname ) );
             return;
         }
         else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
         {
             productOperation.addLogFailed(
-                String.format( "Node %s has no Hadoop installation\nInstallation aborted", lxcHostname ) );
+                    String.format( "Node %s has no Hadoop installation. Installation aborted", lxcHostname ) );
             return;
         }
 
@@ -88,18 +89,18 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
 
         if ( installCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Installation succeeded\nUpdating db..." );
+            productOperation.addLog( "Installation succeeded. Updating db..." );
 
             try
             {
-                manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, clusterName, config );
+                manager.getDbManager().saveInfo2( LuceneConfig.PRODUCT_KEY, clusterName, config );
 
                 productOperation.addLogDone( "Information updated in db" );
             }
             catch ( DBException e )
             {
                 productOperation
-                    .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
+                        .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
             }
         }
         else

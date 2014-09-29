@@ -1,94 +1,94 @@
 <assembly>
 
-    <id>bin</id>
+  <id>bin</id>
 
-    <formats>
-        <format>tar.gz</format>
-    </formats>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
 
-    <fileSets>
+  <fileSets>
 
-        <!-- Expanded Karaf Standard Distribution -->
-        <fileSet>
-            <directory>target/dependencies/apache-karaf-${karaf.version}</directory>
-            <outputDirectory>/</outputDirectory>
-            <excludes>
-                <exclude>**/demos/**</exclude>
-                <exclude>bin/**</exclude>
-                <exclude>LICENSE</exclude>
-                <exclude>NOTICE</exclude>
-                <exclude>README</exclude>
-                <exclude>RELEASE-NOTES</exclude>
-                <exclude>karaf-manual*.html</exclude>
-                <exclude>karaf-manual*.pdf</exclude>
-                <exclude>etc/org.apache.karaf.features.cfg</exclude>
-            </excludes>
-        </fileSet>
+    <!-- Expanded Karaf Standard Distribution -->
+    <fileSet>
+      <directory>target/dependencies/apache-karaf-${karaf.version}</directory>
+      <outputDirectory>/</outputDirectory>
+      <excludes>
+        <exclude>**/demos/**</exclude>
+        <exclude>bin/**</exclude>
+        <exclude>LICENSE</exclude>
+        <exclude>NOTICE</exclude>
+        <exclude>README</exclude>
+        <exclude>RELEASE-NOTES</exclude>
+        <exclude>karaf-manual*.html</exclude>
+        <exclude>karaf-manual*.pdf</exclude>
+        <exclude>etc/org.apache.karaf.features.cfg</exclude>
+      </excludes>
+    </fileSet>
 
-        <!-- Copy over bin/* separately to get the correct file mode -->
-        <fileSet>
-            <directory>target/dependencies/apache-karaf-${karaf.version}</directory>
-            <outputDirectory>/</outputDirectory>
-            <includes>
-                <include>bin/admin</include>
-                <include>bin/karaf</include>
-                <include>bin/start</include>
-                <include>bin/stop</include>
-            </includes>
-            <fileMode>0755</fileMode>
-        </fileSet>
+    <!-- Copy over bin/* separately to get the correct file mode -->
+    <fileSet>
+      <directory>target/dependencies/apache-karaf-${karaf.version}</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>bin/admin</include>
+        <include>bin/karaf</include>
+        <include>bin/start</include>
+        <include>bin/stop</include>
+      </includes>
+      <fileMode>0755</fileMode>
+    </fileSet>
 
-        <!-- Copy over jar files -->
+    <!-- Copy over jar files -->
 
-        <fileSet>
-            <directory>target/dependencies/kiskis-server</directory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-            <outputDirectory>system/kiskis-server</outputDirectory>
-        </fileSet>
+    <fileSet>
+      <directory>target/dependencies/subutai-server</directory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+      <outputDirectory>system/subutai-server</outputDirectory>
+    </fileSet>
 
-        <fileSet>
-            <directory>target/dependencies/kiskis-server</directory>
-            <includes>
-                <include>*.war</include>
-            </includes>
-            <outputDirectory>deploy</outputDirectory>
-        </fileSet>
+    <fileSet>
+      <directory>target/dependencies/subutai-server</directory>
+      <includes>
+        <include>*.war</include>
+      </includes>
+      <outputDirectory>deploy</outputDirectory>
+    </fileSet>
 
-        <fileSet>
-            <directory>src/main/distribution</directory>
-            <outputDirectory>/</outputDirectory>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/classes/etc</directory>
-            <outputDirectory>/etc/</outputDirectory>
-            <lineEnding>unix</lineEnding>
-            <fileMode>0644</fileMode>
-        </fileSet>
-        <fileSet>
-            <directory>target/classes</directory>
-            <outputDirectory>/</outputDirectory>
-            <!--<lineEnding>unix</lineEnding>-->
-            <fileMode>0644</fileMode>
-        </fileSet>
+    <fileSet>
+      <directory>src/main/distribution</directory>
+      <outputDirectory>/</outputDirectory>
+      <fileMode>0644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>target/classes/etc</directory>
+      <outputDirectory>/etc/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+      <!--<lineEnding>unix</lineEnding>-->
+      <fileMode>0644</fileMode>
+    </fileSet>
 
-        <fileSet>
-            <directory>target/features-repo</directory>
-            <outputDirectory>/system</outputDirectory>
-        </fileSet>
+    <fileSet>
+      <directory>target/features-repo</directory>
+      <outputDirectory>/system</outputDirectory>
+    </fileSet>
 
-    </fileSets>
+  </fileSets>
 
-    <files>
-        <file>
-            <source>target/dependencies/apache-karaf-${karaf.version}/bin/karaf</source>
-            <outputDirectory>/bin/</outputDirectory>
-            <destName>my-custom</destName>
-            <fileMode>0755</fileMode>
-            <lineEnding>unix</lineEnding>
-        </file>
-    </files>
+  <files>
+    <file>
+      <source>target/dependencies/apache-karaf-${karaf.version}/bin/karaf</source>
+      <outputDirectory>/bin/</outputDirectory>
+      <destName>my-custom</destName>
+      <fileMode>0755</fileMode>
+      <lineEnding>unix</lineEnding>
+    </file>
+  </files>
 
 </assembly>

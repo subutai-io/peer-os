@@ -5,59 +5,81 @@
  */
 package org.safehaus.subutai.plugin.mongodb.ui.manager;
 
-import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
-import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
-import org.safehaus.subutai.plugin.mongodb.ui.MongoUI;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.enums.NodeState;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
+
 
 /**
  * @author dilshat
  */
-public class CheckTask implements Runnable {
+public class CheckTask implements Runnable
+{
 
-	private final String clusterName, lxcHostname;
-	private final CompleteEvent completeEvent;
+    private final String clusterName, lxcHostname;
+    private final CompleteEvent completeEvent;
+    private final Mongo mongo;
+    private final Tracker tracker;
 
-	public CheckTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
-		this.clusterName = clusterName;
-		this.lxcHostname = lxcHostname;
-		this.completeEvent = completeEvent;
-	}
 
-	public void run() {
+    public CheckTask( Mongo mongo, Tracker tracker, String clusterName, String lxcHostname,
+                      CompleteEvent completeEvent )
+    {
+        this.mongo = mongo;
+        this.tracker = tracker;
+        this.clusterName = clusterName;
+        this.lxcHostname = lxcHostname;
+        this.completeEvent = completeEvent;
+    }
 
-		UUID trackID = MongoUI.getMongoManager().checkNode(clusterName, lxcHostname);
 
-		NodeState state = NodeState.UNKNOWN;
-		long start = System.currentTimeMillis();
-		while (!Thread.interrupted()) {
-			ProductOperationView po = MongoUI.getTracker().getProductOperation(MongoClusterConfig.PRODUCT_KEY, trackID);
-			if (po != null) {
-				if (po.getState() != ProductOperationState.RUNNING) {
-					if (po.getLog().contains(NodeState.STOPPED.toString())) {
-						state = NodeState.STOPPED;
-					} else if (po.getLog().contains(NodeState.RUNNING.toString())) {
-						state = NodeState.RUNNING;
-					}
-					break;
-				}
-			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ex) {
-				break;
-			}
-			if (System.currentTimeMillis() - start > (Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3) * 1000) {
-				break;
-			}
-		}
+    public void run()
+    {
 
-		completeEvent.onComplete(state);
-	}
+        UUID trackID = mongo.checkNode( clusterName, lxcHostname );
 
+        NodeState state = NodeState.UNKNOWN;
+        long start = System.currentTimeMillis();
+        while ( !Thread.interrupted() )
+        {
+            ProductOperationView po = tracker.getProductOperation( MongoClusterConfig.PRODUCT_KEY, trackID );
+            if ( po != null )
+            {
+                if ( po.getState() != ProductOperationState.RUNNING )
+                {
+                    if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
+                    {
+                        state = NodeState.STOPPED;
+                    }
+                    else if ( po.getLog().contains( NodeState.RUNNING.toString() ) )
+                    {
+                        state = NodeState.RUNNING;
+                    }
+                    break;
+                }
+            }
+            try
+            {
+                Thread.sleep( 1000 );
+            }
+            catch ( InterruptedException ex )
+            {
+                break;
+            }
+            if ( System.currentTimeMillis() - start > ( Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC + 3 ) * 1000 )
+            {
+                break;
+            }
+        }
+
+        completeEvent.onComplete( state );
+    }
 }

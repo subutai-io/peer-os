@@ -6,17 +6,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import org.safehaus.subutai.core.communication.api.CommandJson;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.core.communication.api.CommandJson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.RemoveInfo;
@@ -25,9 +25,10 @@ import org.apache.activemq.command.RemoveInfo;
 /**
  * Used internally by CommunicationManagerImpl to notify a response listener on a new message.
  */
-class CommunicationMessageListener implements MessageListener {
+class CommunicationMessageListener implements MessageListener
+{
 
-    private static final Logger LOG = Logger.getLogger( CommunicationMessageListener.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommunicationMessageListener.class.getName() );
 
     private final Queue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
 
@@ -38,35 +39,36 @@ class CommunicationMessageListener implements MessageListener {
      * @param message - received message
      */
     @Override
-    public void onMessage( Message message ) {
-        try {
-            if ( message instanceof BytesMessage ) {
+    public void onMessage( Message message )
+    {
+        try
+        {
+            if ( message instanceof BytesMessage )
+            {
                 BytesMessage msg = ( BytesMessage ) message;
 
-                byte[] msg_bytes = new byte[( int ) msg.getBodyLength()];
-                msg.readBytes( msg_bytes );
-                String jsonCmd = new String( msg_bytes, "UTF-8" );
-                Response response = CommandJson.getResponse( jsonCmd );
+                byte[] msgBytes = new byte[( int ) msg.getBodyLength()];
+                msg.readBytes( msgBytes );
+                String jsonCmd = new String( msgBytes, "UTF-8" );
+                Response response = CommandJson.getResponseFromCommandJson( jsonCmd );
 
-                if ( response != null ) {
-                    if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE ) {
-                        LOG.log( Level.INFO, "\nReceived {0}",
-                                CommandJson.getJson( CommandJson.getCommand( jsonCmd ) ) );
-                    }
-                    else {
-                        LOG.log( Level.INFO, "Heartbeat from {0}", response.getHostname() );
-                    }
+                if ( response != null )
+                {
+                    logResponse( response, jsonCmd );
                     response.setTransportId( ( ( ActiveMQMessage ) message ).getProducerId().toString() );
                     notifyListeners( response );
                 }
-                else {
-                    LOG.log( Level.WARNING, "Could not parse response{0}", jsonCmd );
+                else
+                {
+                    LOG.warn( "Could not parse response{0}", jsonCmd );
                 }
             }
-            else if ( message instanceof ActiveMQMessage ) {
+            else if ( message instanceof ActiveMQMessage )
+            {
                 ActiveMQMessage aMsg = ( ActiveMQMessage ) message;
 
-                if ( aMsg.getDataStructure() instanceof RemoveInfo ) {
+                if ( aMsg.getDataStructure() instanceof RemoveInfo )
+                {
                     Response agentDisconnect = new Response();
                     agentDisconnect.setType( ResponseType.AGENT_DISCONNECT );
                     agentDisconnect
@@ -75,8 +77,22 @@ class CommunicationMessageListener implements MessageListener {
                 }
             }
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in onMessage", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in onMessage", ex );
+        }
+    }
+
+
+    private void logResponse( Response response, String json )
+    {
+        if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE )
+        {
+            LOG.info( "\nReceived {0}", CommandJson.getCommandJson( CommandJson.getCommandFromJson( json ) ) );
+        }
+        else
+        {
+            LOG.info( "Heartbeat from {0}", response.getHostname() );
         }
     }
 
@@ -86,22 +102,38 @@ class CommunicationMessageListener implements MessageListener {
      *
      * @param response - response to notify listeners
      */
-    private void notifyListeners( Response response ) {
-        try {
-            for ( Iterator<ResponseListener> it = listeners.iterator(); it.hasNext(); ) {
-                ResponseListener ai = it.next();
-                try {
-                    ai.onResponse( response );
-                }
-                catch ( Exception e ) {
+    private void notifyListeners( Response response )
+    {
+        try
+        {
+            for ( Iterator<ResponseListener> it = listeners.iterator(); it.hasNext(); )
+            {
+                ResponseListener listener = it.next();
+                if ( !notifyListener( listener, response ) )
+                {
                     it.remove();
-                    LOG.log( Level.SEVERE, "Error notifying message listeners, removing faulting listener", e );
                 }
             }
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in notifyListeners", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in notifyListeners", ex );
         }
+    }
+
+
+    private boolean notifyListener( ResponseListener listener, Response response )
+    {
+        try
+        {
+            listener.onResponse( response );
+            return true;
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error notifying message listeners", e );
+        }
+        return false;
     }
 
 
@@ -110,14 +142,18 @@ class CommunicationMessageListener implements MessageListener {
      *
      * @param listener - listener to add
      */
-    public void addListener( ResponseListener listener ) {
-        try {
-            if ( !listeners.contains( listener ) ) {
+    public void addListener( ResponseListener listener )
+    {
+        try
+        {
+            if ( !listeners.contains( listener ) )
+            {
                 listeners.add( listener );
             }
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error to add a listener:", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error to add a listener:", ex );
         }
     }
 
@@ -127,12 +163,15 @@ class CommunicationMessageListener implements MessageListener {
      *
      * @param listener - - listener to remove
      */
-    public void removeListener( ResponseListener listener ) {
-        try {
+    public void removeListener( ResponseListener listener )
+    {
+        try
+        {
             listeners.remove( listener );
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in removeListener", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in removeListener", ex );
         }
     }
 
@@ -142,7 +181,8 @@ class CommunicationMessageListener implements MessageListener {
      *
      * @return - listeners added
      */
-    Collection<ResponseListener> getListeners() {
+    Collection<ResponseListener> getListeners()
+    {
         return Collections.unmodifiableCollection( listeners );
     }
 
@@ -150,7 +190,8 @@ class CommunicationMessageListener implements MessageListener {
     /**
      * Disposes message listener
      */
-    public void destroy() {
+    public void destroy()
+    {
         listeners.clear();
     }
 }

@@ -14,7 +14,8 @@ import com.google.common.base.Strings;
  * Used to define a physical/lxc host on the network. It could be management server, physical server or container. It
  * just defines a host on the network.
  */
-public class Agent implements Serializable, Comparable<Agent> {
+public class Agent implements Serializable, Comparable<Agent>
+{
 
     private UUID uuid;
     private String macAddress;
@@ -28,7 +29,8 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     public Agent( UUID uuid, String hostname, String parentHostName, String macAddress, List<String> listIP,
-                  boolean isLXC, String transportId, UUID siteId, UUID environmentId ) {
+                  boolean isLXC, String transportId, UUID siteId, UUID environmentId )
+    {
         Preconditions.checkNotNull( uuid, "UUID is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Hostname is null or empty" );
         Preconditions.checkNotNull( siteId, "Site id is null" );
@@ -47,48 +49,57 @@ public class Agent implements Serializable, Comparable<Agent> {
     }
 
 
-    public UUID getSiteId() {
+    public UUID getSiteId()
+    {
         return siteId;
     }
 
 
-    public UUID getEnvironmentId() {
+    public UUID getEnvironmentId()
+    {
         return environmentId;
     }
 
 
-    public String getTransportId() {
+    public String getTransportId()
+    {
         return transportId;
     }
 
 
-    public String getParentHostName() {
+    public String getParentHostName()
+    {
         return parentHostName;
     }
 
 
-    public boolean isLXC() {
+    public boolean isLXC()
+    {
         return isLXC;
     }
 
 
-    public UUID getUuid() {
+    public UUID getUuid()
+    {
         return uuid;
     }
 
 
-    public String getMacAddress() {
+    public String getMacAddress()
+    {
         return macAddress;
     }
 
 
-    public List<String> getListIP() {
+    public List<String> getListIP()
+    {
         return Collections.unmodifiableList( listIP );
     }
 
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         int hash = 5;
         hash = 83 * hash + ( this.uuid != null ? this.uuid.hashCode() : 0 );
         return hash;
@@ -96,11 +107,14 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     @Override
-    public boolean equals( Object obj ) {
-        if ( obj == null ) {
+    public boolean equals( Object obj )
+    {
+        if ( obj == null )
+        {
             return false;
         }
-        if ( getClass() != obj.getClass() ) {
+        if ( getClass() != obj.getClass() )
+        {
             return false;
         }
         final Agent other = ( Agent ) obj;
@@ -109,7 +123,8 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP="
                 + listIP + ", isLXC=" + isLXC + ", parentHostName=" + parentHostName + ", transportId=" + transportId
                 + '}';
@@ -117,8 +132,10 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     @Override
-    public int compareTo( Agent o ) {
-        if ( hostname != null && o != null ) {
+    public int compareTo( Agent o )
+    {
+        if ( hostname != null && o != null )
+        {
             return hostname.compareTo( o.getHostname() );
         }
 
@@ -126,12 +143,14 @@ public class Agent implements Serializable, Comparable<Agent> {
     }
 
 
-    public String getHostname() {
+    public String getHostname()
+    {
         return hostname;
     }
 
 
-    public void setHostname( String hostname ) {
+    public void setHostname( String hostname )
+    {
         this.hostname = hostname;
     }
 }

@@ -1,46 +1,54 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
-import com.google.common.base.Strings;
+import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+
+import com.google.common.base.Strings;
 
 
 /**
  * CLI for TemplateRegistryManager.getTemplate command
  */
-@Command (scope = "registry", name = "get-template", description = "Get template by name")
-public class GetTemplateCommand extends OsgiCommandSupport {
-	@Argument (index = 0, name = "template name", required = true, multiValued = false,
-			description = "template name")
-	String templateName;
-	@Argument (index = 1, name = "lxc arch", required = false, multiValued = false,
-			description = "lxc arch, default = amd64")
-	String lxcArch;
+@Command(scope = "registry", name = "get-template", description = "Get template by name")
+public class GetTemplateCommand extends OsgiCommandSupport
+{
+    @Argument(index = 0, name = "template name", required = true, multiValued = false,
+            description = "template name")
+    String templateName;
+    @Argument(index = 1, name = "lxc arch", required = false, multiValued = false,
+            description = "lxc arch, default = amd64")
+    String lxcArch;
 
 
-	private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
 
 
-	public void setTemplateRegistryManager(final TemplateRegistryManager templateRegistryManager) {
-		this.templateRegistryManager = templateRegistryManager;
-	}
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    {
+        this.templateRegistry = templateRegistry;
+    }
 
 
-	@Override
-	protected Object doExecute() throws Exception {
-		Template template = Strings.isNullOrEmpty(lxcArch) ? templateRegistryManager.getTemplate(templateName) :
-				templateRegistryManager.getTemplate(templateName, lxcArch);
+    @Override
+    protected Object doExecute() throws Exception
+    {
+        Template template = Strings.isNullOrEmpty( lxcArch ) ? templateRegistry.getTemplate( templateName ) :
+                            templateRegistry.getTemplate( templateName, lxcArch );
 
-		if (template != null) {
-			System.out.println(template);
-		} else {
-			System.out.println(String.format("Template %s not found", templateName));
-		}
+        if ( template != null )
+        {
+            System.out.println( template );
+        }
+        else
+        {
+            System.out.println( String.format( "Template %s not found", templateName ) );
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

@@ -7,7 +7,7 @@ export SUBUTAI_VERSION=2.1.0
 #export SUBUTAI_APT_MIRROR=172.16.2.140
 
 # The Site Git Repository: set to have push take place on template creation
-export SUBUTAI_SITE_GIT=
+export SUBUTAI_SITE_GIT=git@gw:subutai.git
 
 # A large area where some debian package builds occur
 export SUBUTAI_TMPDIR=/lxc-data/tmpdir

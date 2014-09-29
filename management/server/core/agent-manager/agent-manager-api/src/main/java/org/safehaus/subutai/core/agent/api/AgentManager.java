@@ -15,7 +15,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Agent Manager provides methods for working with connected agents
  */
-public interface AgentManager {
+public interface AgentManager
+{
 
     /**
      * Returns all agents currently connected to the mgmt server.
@@ -79,8 +80,8 @@ public interface AgentManager {
      */
     public void removeListener( AgentListener listener );
 
-    public Set<Agent> getAgentsByHostnames( Set<String> hostnames );
-
 
     public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
+
+    public Agent waitForRegistration( String hostname, long timeout );
 }

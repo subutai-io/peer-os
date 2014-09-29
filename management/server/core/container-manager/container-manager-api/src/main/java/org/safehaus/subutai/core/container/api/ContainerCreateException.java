@@ -9,9 +9,11 @@ package org.safehaus.subutai.core.container.api;
 /**
  * Exception which can be thrown while creating containers
  */
-public class ContainerCreateException extends Exception {
+public class ContainerCreateException extends ContainerException
+{
 
-	public ContainerCreateException(String message) {
-		super(message);
-	}
+    public ContainerCreateException( String message )
+    {
+        super( message );
+    }
 }

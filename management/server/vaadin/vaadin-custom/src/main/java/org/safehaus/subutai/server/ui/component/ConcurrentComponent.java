@@ -5,25 +5,35 @@
  */
 package org.safehaus.subutai.server.ui.component;
 
+
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+
 
 /**
  * @author dilshat
  */
-public abstract class ConcurrentComponent extends VerticalLayout {
+public abstract class ConcurrentComponent extends VerticalLayout
+{
 
-	protected void executeUpdate(Runnable update) {
-		UI application;
-		synchronized (this) {
-			application = UI.getCurrent();
-			if (application == null) {
-				update.run();
-				return;
-			}
-		}
-		synchronized (application) {
-			update.run();
-		}
-	}
+    protected void executeUpdate( Runnable update )
+    {
+        UI application;
+        synchronized ( this )
+        {
+            application = UI.getCurrent();
+            if ( application == null )
+            {
+                new Thread( update ).start();
+                //                update.run();
+                return;
+            }
+        }
+        synchronized ( application )
+        {
+
+            new Thread( update ).start();
+            //            update.run();
+        }
+    }
 }

@@ -14,7 +14,8 @@ import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 /**
  * @author dilshat
  */
-public class TrimmedZKConfig {
+public class TrimmedZKConfig
+{
 
     private String clusterName = "";
     private int numberOfNodes = 3;
@@ -22,22 +23,26 @@ public class TrimmedZKConfig {
     private SetupType setupType;
 
 
-    public SetupType getSetupType() {
+    public SetupType getSetupType()
+    {
         return setupType;
     }
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public int getNumberOfNodes() {
+    public int getNumberOfNodes()
+    {
         return numberOfNodes;
     }
 
 
-    public Set<String> getNodes() {
+    public Set<String> getNodes()
+    {
         return nodes;
     }
 }

@@ -7,22 +7,29 @@ package org.safehaus.subutai.core.container.api;
 
 
 /**
- * Possible states of containermanager
+ * Possible states of container
  */
-public enum ContainerState {
+public enum ContainerState
+{
 
-	UNKNOWN, RUNNING, STOPPED, FROZEN;
+    UNKNOWN, RUNNING, STOPPED, FROZEN;
 
 
-	public static ContainerState parseState(String state) {
-		if (RUNNING.name().equalsIgnoreCase(state)) {
-			return RUNNING;
-		} else if (STOPPED.name().equalsIgnoreCase(state)) {
-			return STOPPED;
-		} else if (FROZEN.name().equalsIgnoreCase(state)) {
-			return FROZEN;
-		}
+    public static ContainerState parseState( String state )
+    {
+        if ( RUNNING.name().equalsIgnoreCase( state ) )
+        {
+            return RUNNING;
+        }
+        else if ( STOPPED.name().equalsIgnoreCase( state ) )
+        {
+            return STOPPED;
+        }
+        else if ( FROZEN.name().equalsIgnoreCase( state ) )
+        {
+            return FROZEN;
+        }
 
-		return UNKNOWN;
-	}
+        return UNKNOWN;
+    }
 }

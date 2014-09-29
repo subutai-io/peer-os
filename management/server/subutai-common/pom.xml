@@ -19,14 +19,17 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+      <version>${org.osgi.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+      <version>${com.google.code.gson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <version>${com.google.guava.version}</version>
     </dependency>
     <dependency>
       <groupId>org.doomdark</groupId>
@@ -37,8 +40,27 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-        <groupId>com.eaio.uuid</groupId>
-        <artifactId>uuid</artifactId>
+      <groupId>com.eaio.uuid</groupId>
+      <artifactId>uuid</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${org.slf4j.version}</version>
+    </dependency>
+    <!--CXF-->
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+      <version>${org.apache.cxf.version}</version>
     </dependency>
   </dependencies>
 
@@ -58,6 +80,7 @@
               {local-packages};
               {local-packages}.*;
               version=${project.version};-noimport:=true
+              org.apache.http;org.apache.http.*
             </Export-Package>
           </instructions>
         </configuration>

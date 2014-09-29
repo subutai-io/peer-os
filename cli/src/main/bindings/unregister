@@ -97,6 +97,7 @@ function unregister {
   # (2) Unregister the template
   # ----------------------------------------------------------------------------
   
+  git_delete_branch $template
   delete_n_unregister $template 
 
   unlock_container_write $template

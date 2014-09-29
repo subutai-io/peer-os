@@ -1,54 +1,67 @@
 package org.safehaus.subutai.core.git.cli;
 
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Reverts the specified commit
  */
-@Command (scope = "git", name = "revert-commit",
-		description = "Reverts the repo to the state previous to the specified commit")
-public class RevertCommit extends OsgiCommandSupport {
+@Command(scope = "git", name = "revert-commit",
+        description = "Reverts the repo to the state previous to the specified commit")
+public class RevertCommit extends OsgiCommandSupport
+{
 
-	@Argument (index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
-	String hostname;
-	@Argument (index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
-	String repoPath;
-	@Argument (index = 2, name = "commit id", required = true, multiValued = false,
-			description = "commit id to revert")
-	String commitId;
-	private AgentManager agentManager;
-	private GitManager gitManager;
+    private static final Logger LOG = LoggerFactory.getLogger( RevertCommit.class.getName() );
 
 
-	public void setAgentManager(AgentManager agentManager) {
-		this.agentManager = agentManager;
-	}
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    String hostname;
+    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    String repoPath;
+    @Argument(index = 2, name = "commit id", required = true, multiValued = false,
+            description = "commit id to revert")
+    String commitId;
+    private AgentManager agentManager;
+    private GitManager gitManager;
 
 
-	public void setGitManager(final GitManager gitManager) {
-		this.gitManager = gitManager;
-	}
+    public void setAgentManager( AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
 
 
-	protected Object doExecute() {
+    public void setGitManager( final GitManager gitManager )
+    {
+        this.gitManager = gitManager;
+    }
 
-		Agent agent = agentManager.getAgentByHostname(hostname);
 
-		try {
+    protected Object doExecute()
+    {
 
-			gitManager.revertCommit(agent, repoPath, commitId);
-		} catch (GitException e) {
-			System.out.println(e);
-		}
+        Agent agent = agentManager.getAgentByHostname( hostname );
 
-		return null;
-	}
+        try
+        {
+
+            gitManager.revertCommit( agent, repoPath, commitId );
+        }
+        catch ( GitException e )
+        {
+            LOG.error( "Error in doExecute", e );
+        }
+
+        return null;
+    }
 }

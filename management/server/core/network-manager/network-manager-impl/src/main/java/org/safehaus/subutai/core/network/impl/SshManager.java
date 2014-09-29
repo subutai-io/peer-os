@@ -1,101 +1,154 @@
 package org.safehaus.subutai.core.network.impl;
 
-import com.google.common.base.Strings;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+
+
 /**
- * Created by daralbaev on 04.04.14.
+ * Ssh manager for exchanging ssh keys and enabling passwordless communication
  */
-public class SshManager {
-	private List<Agent> agentList;
-	private String keys;
+public class SshManager
+{
 
-	public SshManager(List<Agent> agentList) {
-		this.agentList = agentList;
-	}
+    private static final Logger LOG = LoggerFactory.getLogger( SshManager.class.getName() );
 
-	public boolean execute() {
-		if (agentList != null && !agentList.isEmpty()) {
-			if (create()) {
-				if (read()) {
-					if (write()) {
-						return config();
-					}
-				}
-			}
-		}
+    private List<Agent> agentList;
+    private String keys;
+    private Commands commands;
 
-		return false;
-	}
 
-	private boolean create() {
-		Command command = Commands.getCreateSSHCommand(agentList);
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
+    public SshManager( Commands commands, List<Agent> agentList )
+    {
+        this.agentList = agentList;
+        this.commands = commands;
+    }
 
-		return command.hasSucceeded();
-	}
 
-	private boolean read() {
-		Command command = Commands.getReadSSHCommand(agentList);
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
+    public boolean execute()
+    {
+        if ( agentList != null && !agentList.isEmpty() )
+        {
+            return create() && read() && write() && config();
+        }
+        return false;
+    }
 
-		StringBuilder value = new StringBuilder();
-		if (command.hasCompleted()) {
-			for (Agent agent : agentList) {
-				AgentResult result = command.getResults().get(agent.getUuid());
-				if (!Strings.isNullOrEmpty(result.getStdOut())) {
-					value.append(result.getStdOut());
-				}
-			}
-		}
-		keys = value.toString();
 
-		if (!Strings.isNullOrEmpty(keys) && command.hasSucceeded()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    private boolean create()
+    {
+        Command command = commands.getCreateSSHCommand( agentList );
+        try
+        {
+            command.execute();
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
+        }
 
-	private boolean write() {
-		Command command = Commands.getWriteSSHCommand(agentList, keys);
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
+        return command.hasSucceeded();
+    }
 
-		return command.hasSucceeded();
-	}
 
-	private boolean config() {
-		Command command = Commands.getConfigSSHCommand(agentList);
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
+    private boolean read()
+    {
+        Command command = commands.getReadSSHCommand( agentList );
+        try
+        {
+            command.execute();
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
+        }
 
-		return command.hasSucceeded();
-	}
+        StringBuilder value = new StringBuilder();
+        if ( command.hasCompleted() )
+        {
+            for ( Agent agent : agentList )
+            {
+                AgentResult result = command.getResults().get( agent.getUuid() );
+                if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
+                {
+                    value.append( result.getStdOut() );
+                }
+            }
+        }
+        keys = value.toString();
 
-	public boolean execute(Agent agent) {
-		if (agentList != null && !agentList.isEmpty() && agent != null) {
-			if (create(agent)) {
-				agentList.add(agent);
+        return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
+    }
 
-				if (read()) {
-					if (write()) {
-						return config();
-					}
-				}
-			}
-		}
 
-		return false;
-	}
+    private boolean write()
+    {
+        Command command = commands.getWriteSSHCommand( agentList, keys );
+        try
+        {
+            command.execute();
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+        }
 
-	private boolean create(Agent agent) {
-		Command command = Commands.getCreateSSHCommand(Arrays.asList(agent));
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-		return command.hasSucceeded();
-	}
+        return command.hasSucceeded();
+    }
+
+
+    private boolean config()
+    {
+        Command command = commands.getConfigSSHCommand( agentList );
+        try
+        {
+            command.execute();
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
+        }
+
+
+        return command.hasSucceeded();
+    }
+
+
+    public boolean execute( Agent agent )
+    {
+        if ( agentList != null && !agentList.isEmpty() && agent != null && create( agent ) )
+        {
+            agentList.add( agent );
+
+            return read() && write() && config();
+        }
+
+        return false;
+    }
+
+
+    private boolean create( Agent agent )
+    {
+        Command command = commands.getCreateSSHCommand( Arrays.asList( agent ) );
+        try
+        {
+            command.execute();
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+        }
+
+        return command.hasSucceeded();
+    }
 }

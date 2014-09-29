@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 import java.util.List;
 
-import org.safehaus.subutai.plugin.shark.ui.SharkUI;
+import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.base.Strings;
@@ -26,9 +26,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends Panel
+{
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( Spark spark, final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -44,18 +46,23 @@ public class ConfigurationStep extends Panel {
         sparkClusters.setRequired( true );
         sparkClusters.setNullSelectionAllowed( false );
 
-        List<SparkClusterConfig> clusters = SharkUI.getSparkManager().getClusters();
-        if ( clusters.size() > 0 ) {
-            for ( SparkClusterConfig info : clusters ) {
+        List<SparkClusterConfig> clusters = spark.getClusters();
+        if ( !clusters.isEmpty() )
+        {
+            for ( SparkClusterConfig info : clusters )
+            {
                 sparkClusters.addItem( info );
                 sparkClusters.setItemCaption( info, info.getClusterName() );
             }
         }
 
-        sparkClusters.addValueChangeListener( new Property.ValueChangeListener() {
+        sparkClusters.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                if ( event.getProperty().getValue() != null )
+                {
                     SparkClusterConfig config = ( SparkClusterConfig ) event.getProperty().getValue();
                     wizard.getConfig().setClusterName( config.getClusterName() );
                     wizard.getConfig().setNodes( config.getAllNodes() );
@@ -64,18 +71,23 @@ public class ConfigurationStep extends Panel {
         } );
 
 
-        if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
-            if ( clusters.size() > 0 ) {
+        if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+        {
+            if ( !clusters.isEmpty() )
+            {
                 sparkClusters.setValue( clusters.iterator().next() );
             }
         }
-        else {
-            SparkClusterConfig info = SharkUI.getSparkManager().getCluster( wizard.getConfig().getClusterName() );
-            if ( info != null ) {
+        else
+        {
+            SparkClusterConfig info = spark.getCluster( wizard.getConfig().getClusterName() );
+            if ( info != null )
+            {
                 //restore cluster
                 sparkClusters.setValue( info );
             }
-            else if ( clusters.size() > 0 ) {
+            else if ( !clusters.isEmpty() )
+            {
                 sparkClusters.setValue( clusters.iterator().next() );
             }
         }
@@ -83,13 +95,17 @@ public class ConfigurationStep extends Panel {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                {
                     show( "Please, select Spark cluster" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -97,9 +113,11 @@ public class ConfigurationStep extends Panel {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -120,7 +138,8 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

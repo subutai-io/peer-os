@@ -16,20 +16,26 @@
 
   <description>Parent project for the Subutai Project Artifacts</description>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <quiet>true</quiet>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <quiet>true</quiet>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
   <repositories>
+
+    <repository>
+      <id>Central</id>
+      <name>central-mirror</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
     <repository>
       <id>apache-repo</id>
       <name>apache-repo</name>
@@ -75,6 +81,10 @@
   <properties>
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Sonar -->
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <!-- Runtime -->
     <karaf.version>2.3.7</karaf.version>
     <karaf.features.version>2.3.7</karaf.features.version>
@@ -479,11 +489,6 @@
         <artifactId>slf4j-simple</artifactId>
         <version>${org.slf4j.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.url</groupId>
-        <artifactId>pax-url-wrap</artifactId>
-        <version>1.4.2</version>
-      </dependency>
 
       <!-- Core Modules - START -->
 
@@ -690,37 +695,54 @@
         <version>${project.version}</version>
       </dependency>
 
-        <!-- Strategy Manager -->
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>strategy-manager-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <!-- Strategy Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>strategy-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>strategy-manager-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>strategy-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-        <!-- Container Manager -->
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>container-manager-ui</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>container-manager-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>container-manager-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <!-- Peer command Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-command-dispatcher-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-command-dispatcher-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-command-dispatcher-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-        <!-- LXC Manager -->
+      <!-- Container Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>container-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>container-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>container-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- LXC Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>lxc-manager-ui</artifactId>
@@ -853,12 +875,6 @@
         <artifactId>peer-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>peer-manager-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- Core Modules - END -->
 
       <!--Vaadin - START-->
@@ -1398,6 +1414,32 @@
   </dependencyManagement>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.2.201409121644</version>
+        <configuration>
+          <destFile>${sonar.jacoco.reportPath}</destFile>
+          <append>true</append>
+        </configuration>
+        <executions>
+          <execution>
+            <id>jacoco-initialize</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-site</id>
+            <phase>install</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>

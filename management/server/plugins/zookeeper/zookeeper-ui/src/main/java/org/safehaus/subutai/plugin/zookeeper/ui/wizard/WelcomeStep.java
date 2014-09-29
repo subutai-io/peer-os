@@ -6,10 +6,10 @@
 package org.safehaus.subutai.plugin.zookeeper.ui.wizard;
 
 
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
-import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -23,9 +23,11 @@ import com.vaadin.ui.Panel;
 /**
  * @author dilshat
  */
-public class WelcomeStep extends Panel {
+public class WelcomeStep extends Panel
+{
 
-    public WelcomeStep( final Wizard wizard ) {
+    public WelcomeStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -40,7 +42,7 @@ public class WelcomeStep extends Panel {
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( ZookeeperUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( ZookeeperPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 204, Unit.PIXELS );
         logoImg.setWidth( 150, Unit.PIXELS );
@@ -59,25 +61,31 @@ public class WelcomeStep extends Panel {
         grid.addComponent( startWithHadoop, 8, 4, 8, 4 );
         grid.setComponentAlignment( startWithHadoop, Alignment.BOTTOM_RIGHT );
 
-        startStandalone.addClickListener( new Button.ClickListener() {
+        startStandalone.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.STANDALONE );
                 wizard.next();
             }
         } );
-        startOverHadoop.addClickListener( new Button.ClickListener() {
+        startOverHadoop.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.OVER_HADOOP );
                 wizard.next();
             }
         } );
-        startWithHadoop.addClickListener( new Button.ClickListener() {
+        startWithHadoop.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.WITH_HADOOP );
                 wizard.next();

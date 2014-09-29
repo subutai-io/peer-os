@@ -1,13 +1,17 @@
 package org.safehaus.subutai.plugin.pig.impl.handler;
 
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.pig.api.Config;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
+import org.safehaus.subutai.plugin.pig.api.SetupType;
+import org.safehaus.subutai.plugin.pig.impl.Commands;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
+
+import com.google.common.collect.Sets;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImpl>
@@ -19,80 +23,106 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-            String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
+        productOperation = manager.getTracker().createProductOperation( PigConfig.PRODUCT_KEY,
+                String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
 
     @Override
     public void run()
     {
-        Config config = manager.getCluster( clusterName );
+        ProductOperation po = productOperation;
+        PigConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
-                String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            productOperation.addLogFailed(
-                String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed(
+                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
+        if ( config.getNodes().size() == 1 )
+        {
+            po.addLogFailed(
+                    "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            return;
+        }
+
+        //check if node is in the cluster
         if ( !config.getNodes().contains( agent ) )
         {
-            productOperation.addLogFailed(
-                String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+            po.addLogFailed( String.format( "Node %s does not belong to this cluster\nOperation aborted",
+                    agent.getHostname() ) );
             return;
         }
 
-        productOperation.addLog( "Uninstalling Pig..." );
-        Command uninstallCommand = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
-        manager.getCommandRunner().runCommand( uninstallCommand );
-
-        if ( uninstallCommand.hasCompleted() )
+        boolean ok = false;
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
-            if ( result.getExitCode() != null && result.getExitCode() == 0 )
-            {
-                if ( result.getStdOut().contains(
-                    String.format( "Package %s is not installed, so not removed", Config.PRODUCT_PACKAGE ) ) )
-                {
-                    productOperation.addLog(
-                        String.format( "Pig is not installed, so not removed on node %s", agent.getHostname() ) );
-                }
-                else
-                {
-                    productOperation.addLog( String.format( "Pig is removed from node %s", agent.getHostname() ) );
-                }
-            }
-            else
-            {
-                productOperation
-                    .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
-            }
-
-            config.getNodes().remove( agent );
-            productOperation.addLog( "Updating db..." );
-
-            if ( config.getNodes().isEmpty() ?
-                manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) :
-                manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
-            {
-                productOperation.addLogDone( "Cluster info update in DB\nDone" );
-            }
-            else
-            {
-                productOperation.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
-            }
+            ok = uninstall( agent );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
+            ok = destroyNode( agent );
         }
         else
         {
-            productOperation.addLogFailed( "Uninstallation failed, command timed out" );
+            po.addLog( "Undefined setup type" );
+        }
+
+        if ( ok )
+        {
+            config.getNodes().remove( agent );
+            po.addLog( "Updating db..." );
+
+            manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Cluster info updated in DB\nDone" );
+        }
+        else
+        {
+            po.addLogFailed( "Failed to destroy node" );
+        }
+    }
+
+
+    private boolean uninstall( Agent agent )
+    {
+        ProductOperation po = productOperation;
+        po.addLog( "Uninstalling Pig..." );
+
+        Command cmd = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+        manager.getCommandRunner().runCommand( cmd );
+
+        if ( cmd.hasSucceeded() )
+        {
+            po.addLog( "Pig removed from " + agent.getHostname() );
+            return true;
+        }
+        else
+        {
+            po.addLog( "Uninstallation failed: " + cmd.getAllErrors() );
+            return false;
+        }
+    }
+
+
+    private boolean destroyNode( Agent agent )
+    {
+        try
+        {
+            manager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
+            return true;
+        }
+        catch ( LxcDestroyException ex )
+        {
+            productOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
+            return false;
         }
     }
 }

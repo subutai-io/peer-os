@@ -6,279 +6,401 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.management.Notification;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
-import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 
 /**
  * This is an implementation of EnvironmentManager
  */
-public class EnvironmentManagerImpl implements EnvironmentManager {
+public class EnvironmentManagerImpl implements EnvironmentManager
+{
 
-    private String ENVIRONMENT = "ENVIRONMENT";
-    private String BLUEPRINT = "BLUEPRINT";
-
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class.getName() );
+    private static final String ENVIRONMENT = "ENVIRONMENT";
+    private static final String PROCESS = "PROCESS";
+    private static final String BLUEPRINT = "BLUEPRINT";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
-    private BlueprintParser blueprintParser;
     private ContainerManager containerManager;
-    private TemplateRegistryManager templateRegistryManager;
+    private TemplateRegistry templateRegistry;
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private DbManager dbManager;
+    private PeerCommandDispatcher peerCommandDispatcher;
+    private Set<EnvironmentContainer> containers = new HashSet<>();
 
 
-    public EnvironmentManagerImpl() {
+    public EnvironmentManagerImpl()
+    {
     }
 
 
-    public void init() {
-        this.blueprintParser = new BlueprintParser();
+    public PeerCommandDispatcher getPeerCommandDispatcher()
+    {
+        return peerCommandDispatcher;
+    }
+
+
+    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
+    {
+        this.peerCommandDispatcher = peerCommandDispatcher;
+    }
+
+
+    public void init()
+    {
+
         this.environmentDAO = new EnvironmentDAO( dbManager );
-        environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
+        environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager );
     }
 
 
-    public void destroy() {
-
+    public void destroy()
+    {
+        this.environmentDAO = null;
+        this.environmentBuilder = null;
+        this.containerManager = null;
+        this.templateRegistry = null;
+        this.agentManager = null;
+        this.networkManager = null;
+        this.dbManager = null;
     }
 
 
-    public EnvironmentDAO getEnvironmentDAO() {
+    public EnvironmentDAO getEnvironmentDAO()
+    {
         return environmentDAO;
     }
 
 
-    public void setEnvironmentDAO( final EnvironmentDAO environmentDAO ) {
+    public void setEnvironmentDAO( final EnvironmentDAO environmentDAO )
+    {
         this.environmentDAO = environmentDAO;
     }
 
 
-    public EnvironmentBuilder getEnvironmentBuilder() {
+    public EnvironmentBuilder getEnvironmentBuilder()
+    {
         return environmentBuilder;
     }
 
 
-    public void setEnvironmentBuilder( final EnvironmentBuilder environmentBuilder ) {
+    public void setEnvironmentBuilder( final EnvironmentBuilder environmentBuilder )
+    {
         this.environmentBuilder = environmentBuilder;
     }
 
 
-    public BlueprintParser getBlueprintParser() {
-        return blueprintParser;
-    }
-
-
-    public void setBlueprintParser( final BlueprintParser blueprintParser ) {
-        this.blueprintParser = blueprintParser;
-    }
-
-
-    public ContainerManager getContainerManager() {
+    public ContainerManager getContainerManager()
+    {
         return containerManager;
     }
 
 
-    public void setContainerManager( final ContainerManager containerManager ) {
+    public void setContainerManager( final ContainerManager containerManager )
+    {
         this.containerManager = containerManager;
     }
 
 
-    public TemplateRegistryManager getTemplateRegistryManager() {
-        return templateRegistryManager;
+    public TemplateRegistry getTemplateRegistry()
+    {
+        return templateRegistry;
     }
 
 
-    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager ) {
-        this.templateRegistryManager = templateRegistryManager;
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    {
+        this.templateRegistry = templateRegistry;
     }
 
 
-    public AgentManager getAgentManager() {
+    public AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public NetworkManager getNetworkManager() {
+    public NetworkManager getNetworkManager()
+    {
         return networkManager;
     }
 
 
-    public void setNetworkManager( final NetworkManager networkManager ) {
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
         this.networkManager = networkManager;
     }
 
 
-    public DbManager getDbManager() {
+    public DbManager getDbManager()
+    {
         return dbManager;
     }
 
 
-    public void setDbManager( final DbManager dbManager ) {
+    public void setDbManager( final DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
 
-    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask ) {
-        return build( environmentBuildTask );
-    }
+    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
+    {
+        LOG.info( "saved to " );
+        //        return build( environmentBuildTask );
+        //TODO build environment in background
 
 
-    /**
-     * Builds an environment by provided blueprint description
-     */
-    //    @Override
-    //    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask) {
-
-    //        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-    //        environmentBuildTask.setPhysicalNodes( physicalServers );
-
-    //        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-
-    //        environmentBuildTask.setEnvironmentBlueprint( blueprint );
-    //        return build( environmentBuildTask );
-    //    }
-    private boolean build( EnvironmentBuildTask environmentBuildTask ) {
-
-        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
-                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) ) {
-            try {
-                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
-                environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-            }
-            catch ( EnvironmentBuildException e ) {
-                System.out.println( e.getMessage() );
-            }
-            catch ( DBException e ) {
-                e.printStackTrace();
-            }
-        }
-        return false;
+        return true;
     }
 
 
     @Override
     public Environment buildEnvironmentAndReturn( final EnvironmentBuildTask environmentBuildTask )
-            throws EnvironmentBuildException {
+            throws EnvironmentBuildException
+    {
 
         return environmentBuilder.build( environmentBuildTask, containerManager );
     }
 
 
     @Override
-    public List<Environment> getEnvironments() {
-        try {
-            return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
-        }
-        catch ( DBException e ) {
-            e.printStackTrace();
-            return null;
-        }
+    public List<Environment> getEnvironments()
+    {
+        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
     @Override
-    public Environment getEnvironmentInfo( final String environmentName ) {
-        try {
-            return environmentDAO.getInfo( ENVIRONMENT, environmentName, Environment.class );
-        }
-        catch ( DBException e ) {
-            e.printStackTrace();
-        }
-        return null;
-        //        .getEnvironment( environmentName );
+    public Environment getEnvironmentInfo( final String uuid )
+    {
+        return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
 
 
     @Override
-    public boolean destroyEnvironment( final String environmentName ) {
-        Environment environment = getEnvironmentInfo( environmentName );
-        try {
+    public boolean destroyEnvironment( final String uuid )
+    {
+        Environment environment = getEnvironmentInfo( uuid );
+        try
+        {
             environmentBuilder.destroy( environment );
-            environmentDAO.deleteInfo( ENVIRONMENT, environmentName );
-            return true;
+            return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
         }
-        catch ( EnvironmentDestroyException e ) {
-            e.printStackTrace();
-        }
-        catch ( DBException e ) {
-            e.printStackTrace();
+        catch ( EnvironmentDestroyException e )
+        {
+            LOG.error( e.getMessage(), e );
         }
         return false;
     }
 
 
     @Override
-    public boolean saveBlueprint( String blueprintStr ) {
-        try {
-
-            EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+    public boolean saveBlueprint( String blueprintStr )
+    {
+        try
+        {
+            EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprintStr, EnvironmentBlueprint.class );
             EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-            environmentBuildTask.setEnvironmentBlueprint( blueprint );
+            environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
-            environmentDAO.saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
-            return true;
+            return environmentDAO
+                    .saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
         }
-        catch ( DBException e ) {
-
-        }
-        catch ( JsonSyntaxException jse ) {
-
+        catch ( JsonParseException e )
+        {
+            LOG.info( e.getMessage() );
         }
         return false;
     }
 
 
     @Override
-    public List<EnvironmentBuildTask> getBlueprints() {
-        try {
-            return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
-        }
-        catch ( DBException e ) {
-            e.printStackTrace();
-        }
-        return null;
+    public List<EnvironmentBuildTask> getBlueprints()
+    {
+        return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
     }
 
 
     @Override
-    public boolean deleteBlueprint( String uuid ) {
-        try {
-            environmentDAO.deleteInfo( BLUEPRINT, uuid );
-            return true;
-        }
-        catch ( DBException e ) {
-            e.printStackTrace();
-        }
-        return false;
+    public boolean deleteBlueprint( String uuid )
+    {
+        return environmentDAO.deleteInfo( BLUEPRINT, uuid );
     }
 
 
     @Override
-    public String parseBlueprint( final EnvironmentBlueprint blueprint ) {
-        return blueprintParser.parseEnvironmentBlueprint( blueprint );
+    public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress )
+    {
+        return environmentDAO.saveInfo( PROCESS, buildProgress.getUuid().toString(), buildProgress );
+    }
+
+
+    @Override
+    public List<EnvironmentBuildProcess> getBuildProcesses()
+    {
+        return environmentDAO.getInfo( PROCESS, EnvironmentBuildProcess.class );
+    }
+
+
+    @Override
+    public void saveEnvironment( final Environment environment )
+    {
+        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+    }
+
+
+    @Override
+    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+            throws EnvironmentBuildException
+    {
+
+
+        Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
+        for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
+        {
+
+            ccm.setType( PeerCommandType.CLONE );
+            try
+            {
+                peerCommandDispatcher.invoke( ccm );
+                if ( ccm == null )
+                {
+                    throw new EnvironmentBuildException( "CloneContainerMessage returned null" );
+                }
+                boolean result = ccm.isSuccess();
+                if ( result )
+                {
+                    Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
+                    if ( !agents.isEmpty() )
+                    {
+                        for ( Agent agent : agents )
+                        {
+                            //                            LOG.info( String.format( "------------> Adding container:
+                            // %s", agent.toString() ) );
+                            EnvironmentContainer container = new EnvironmentContainer();
+                            container.setPeerId( agent.getSiteId() );
+                            container.setAgentId( agent.getUuid() );
+                            container.setHostname( agent.getHostname() );
+                            container.setDescription( ccm.getTemplate() );
+                            container.setName( agent.getHostname() );
+                            environment.addContainer( container );
+                        }
+                    }
+                }
+            }
+            catch ( PeerCommandException e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new EnvironmentBuildException( e.getMessage() );
+            }
+        }
+
+        if ( !environment.getContainers().isEmpty() )
+        {
+            saveEnvironment( environment );
+        }
+        else
+        {
+            throw new EnvironmentBuildException( "No containers assigned to e" );
+        }
+    }
+
+
+    @Override
+    public void deleteBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+        environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getUuid().toString() );
+    }
+
+
+    @Override
+    public Set<EnvironmentContainer> getContainers()
+    {
+        return containers;
+    }
+
+
+    @Override
+    public void addContainer( final EnvironmentContainer container )
+    {
+        if ( container == null )
+        {
+            throw new IllegalArgumentException( "Environment container could not be null." );
+        }
+
+        container.setEnvironmentManager( this );
+        containers.add( container );
+    }
+
+
+    @Override
+    public boolean startContainer( final EnvironmentContainer container )
+    {
+        PeerCommandMessage cm =
+                new DefaultCommandMessage( PeerCommandType.START, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
+    }
+
+
+    @Override
+    public boolean stopContainer( final EnvironmentContainer container )
+    {
+        PeerCommandMessage cm =
+                new DefaultCommandMessage( PeerCommandType.STOP, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
+    }
+
+
+    @Override
+    public boolean isContainerConnected( final EnvironmentContainer container )
+    {
+        PeerCommandMessage cm =
+                new DefaultCommandMessage( PeerCommandType.ISCONNECTED, container.getPeerId(), container.getAgentId() );
+        peerCommandDispatcher.invoke( cm );
+        return cm.isSuccess();
     }
 }

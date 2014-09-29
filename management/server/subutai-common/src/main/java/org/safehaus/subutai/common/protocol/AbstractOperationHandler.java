@@ -1,11 +1,12 @@
 package org.safehaus.subutai.common.protocol;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.tracker.ProductOperation;
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public abstract class AbstractOperationHandler<T extends ApiBase> implements Runnable

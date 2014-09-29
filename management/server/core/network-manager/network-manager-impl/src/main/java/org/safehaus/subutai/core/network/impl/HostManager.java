@@ -1,69 +1,73 @@
 package org.safehaus.subutai.core.network.impl;
 
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.common.protocol.Agent;
-
 import java.util.List;
+
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 
 /**
- * Created by daralbaev on 04.04.14.
+ * HostManager enables to register agent's hostname in /etc/hosts file of other agents
  */
-public class HostManager {
-	private List<Agent> agentList;
-	private String domainName;
+public class HostManager
+{
+    private static final Logger LOG = LoggerFactory.getLogger( HostManager.class.getName() );
+
+    private List<Agent> agentList;
+    private String domainName;
+    private Commands commands;
 
 
-	public HostManager(List<Agent> agentList, String domainName) {
-		this.agentList = agentList;
-		this.domainName = domainName;
-	}
+    public HostManager( Commands commands, List<Agent> agentList, String domainName )
+    {
+        this.agentList = agentList;
+        this.domainName = domainName;
+        this.commands = commands;
+    }
 
 
-	public boolean execute() {
-		if (agentList != null && !agentList.isEmpty()) {
-			return write();
-		}
+    public boolean execute()
+    {
+        if ( agentList != null && !agentList.isEmpty() )
+        {
+            return write();
+        }
 
-		return false;
-	}
-
-	private boolean write() {
-		//        String hosts = prepareHost();
-		//        Command command = Commands.getWriteHostsCommand(agentList, hosts);
-		Command command = Commands.getAddIpHostToEtcHostsCommand(domainName, Sets.newHashSet(agentList));
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
-
-		return command.hasSucceeded();
-	}
-
-	public boolean execute(Agent agent) {
-		if (agentList != null && !agentList.isEmpty() && agent != null) {
-			agentList.add(agent);
-			return write();
-		}
-
-		return false;
-	}
+        return false;
+    }
 
 
-	//    private String prepareHost() {
-	//        StringBuilder value = new StringBuilder();
-	//
-	//        for ( Agent agent : agentList ) {
-	//            value.append( agent.getListIP().get( 0 ) );
-	//            value.append( "\t" );
-	//            value.append( agent.getHostname() );
-	//            value.append( "." );
-	//            value.append( domainName );
-	//            value.append( "\t" );
-	//            value.append( agent.getHostname() );
-	//            value.append( "\n" );
-	//        }
-	//        value.append( "127.0.0.1\tlocalhost" );
-	//
-	//        return value.toString();
-	//    }
+    private boolean write()
+    {
+
+        Command command = commands.getAddIpHostToEtcHostsCommand( domainName, Sets.newHashSet( agentList ) );
+        try
+        {
+            command.execute();
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
+        }
+
+        return command.hasSucceeded();
+    }
+
+
+    public boolean execute( Agent agent )
+    {
+        if ( agentList != null && !agentList.isEmpty() && agent != null )
+        {
+            agentList.add( agent );
+            return write();
+        }
+
+        return false;
+    }
 }

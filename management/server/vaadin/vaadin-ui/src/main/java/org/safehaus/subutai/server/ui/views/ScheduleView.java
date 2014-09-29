@@ -10,6 +10,7 @@
 
 package org.safehaus.subutai.server.ui.views;
 
+
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.CssLayout;
@@ -17,30 +18,40 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Window;
 
-public class ScheduleView extends CssLayout implements View {
 
-	private CssLayout catalog;
+public class ScheduleView extends CssLayout implements View
+{
 
-	private Window popup;
+    private CssLayout catalog;
 
-	// private CSSInject css;
+    private Window popup;
 
-	@Override
-	public void enter(ViewChangeEvent event) {
-		setSizeFull();
-		addStyleName("schedule");
+    // private CSSInject css;
 
-		// css = new CSSInject(UI.getCurrent());
 
-		TabSheet tabs = new TabSheet();
-		tabs.setSizeFull();
-		tabs.addStyleName("borderless");
-		addComponent(tabs);
-		tabs.addComponent(new Label("Shedule"));
+    public ScheduleView()
+    {
+        setSizeFull();
+        addStyleName( "schedule" );
 
-		catalog = new CssLayout();
-		catalog.setCaption("Catalog");
-		catalog.addStyleName("catalog");
-		tabs.addComponent(catalog);
-	}
+        // css = new CSSInject(UI.getCurrent());
+
+        TabSheet tabs = new TabSheet();
+        tabs.setSizeFull();
+        tabs.addStyleName( "borderless" );
+        addComponent( tabs );
+        tabs.addComponent( new Label( "Shedule" ) );
+
+        catalog = new CssLayout();
+        catalog.setCaption( "Catalog" );
+        catalog.addStyleName( "catalog" );
+        tabs.addComponent( catalog );
+    }
+
+
+    @Override
+    public void enter( ViewChangeEvent event )
+    {
+
+    }
 }

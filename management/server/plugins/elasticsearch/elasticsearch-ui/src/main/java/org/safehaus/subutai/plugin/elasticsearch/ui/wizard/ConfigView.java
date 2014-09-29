@@ -1,31 +1,40 @@
 package org.safehaus.subutai.plugin.elasticsearch.ui.wizard;
 
+
 import com.vaadin.data.Item;
 import com.vaadin.ui.TreeTable;
 
-public class ConfigView {
 
-	private final TreeTable configTbl;
+public class ConfigView
+{
 
-	public ConfigView(String cfgCaption) {
-		configTbl = new TreeTable();
-		configTbl.setSizeFull();
-		configTbl.addContainerProperty(cfgCaption, String.class, "");
+    private final TreeTable configTbl;
 
-	}
 
-	public void addStringCfg(String cfgCategory, String cfgValue) {
-		Item ctg = configTbl.getItem(cfgCategory);
-		if (ctg == null) {
-			configTbl.addItem(new Object[] {cfgCategory}, cfgCategory);
-		}
-		configTbl.addItem(new Object[] {cfgValue}, cfgCategory + "_" + cfgValue);
-		configTbl.setParent(cfgCategory + "_" + cfgValue, cfgCategory);
-		configTbl.setChildrenAllowed(cfgCategory + "_" + cfgValue, false);
-		configTbl.setCollapsed(cfgCategory, false);
-	}
+    public ConfigView( String cfgCaption )
+    {
+        configTbl = new TreeTable();
+        configTbl.setSizeFull();
+        configTbl.addContainerProperty( cfgCaption, String.class, "" );
+    }
 
-	public TreeTable getCfgTable() {
-		return configTbl;
-	}
+
+    public void addStringCfg( String cfgCategory, String cfgValue )
+    {
+        Item ctg = configTbl.getItem( cfgCategory );
+        if ( ctg == null )
+        {
+            configTbl.addItem( new Object[] { cfgCategory }, cfgCategory );
+        }
+        configTbl.addItem( new Object[] { cfgValue }, cfgCategory + "_" + cfgValue );
+        configTbl.setParent( cfgCategory + "_" + cfgValue, cfgCategory );
+        configTbl.setChildrenAllowed( cfgCategory + "_" + cfgValue, false );
+        configTbl.setCollapsed( cfgCategory, false );
+    }
+
+
+    public TreeTable getCfgTable()
+    {
+        return configTbl;
+    }
 }

@@ -1,18 +1,28 @@
 package org.safehaus.subutai.plugin.hive.ui.manager;
 
 
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hive.api.Hive;
+import org.safehaus.subutai.plugin.hive.api.HiveConfig;
+
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.hive.api.HiveConfig;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.hive.ui.HiveUI;
-
-import java.util.Set;
-import java.util.UUID;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Window;
 
 
 class AddNodeWindow extends Window
@@ -24,7 +34,8 @@ class AddNodeWindow extends Window
     private volatile boolean track = true;
 
 
-    public AddNodeWindow( final HiveConfig config, Set<Agent> nodes )
+    public AddNodeWindow( final Hive hive, final ExecutorService executorService, final Tracker tracker,
+                          final HiveConfig config, Set<Agent> nodes )
     {
         super( "Add New Node" );
         setModal( true );
@@ -70,21 +81,19 @@ class AddNodeWindow extends Window
                 addNodeBtn.setEnabled( false );
                 showProgress();
                 Agent agent = ( Agent ) hadoopNodes.getValue();
-                final UUID trackID = HiveUI.getManager().addNode(
-                    config.getClusterName(), agent.getHostname() );
-                HiveUI.getExecutor().execute( new Runnable()
+                final UUID trackID = hive.addNode( config.getClusterName(), agent.getHostname() );
+                executorService.execute( new Runnable()
                 {
 
                     public void run()
                     {
                         while ( track )
                         {
-                            ProductOperationView po = HiveUI.getTracker().getProductOperation(
-                                HiveConfig.PRODUCT_KEY, trackID );
+                            ProductOperationView po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
-                                setOutput( po.getDescription() + "\nState: "
-                                    + po.getState() + "\nLogs:\n" + po.getLog() );
+                                setOutput(
+                                        po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
                                 if ( po.getState() != ProductOperationState.RUNNING )
                                 {
                                     hideProgress();
@@ -180,5 +189,4 @@ class AddNodeWindow extends Window
         super.close();
         track = false;
     }
-
 }

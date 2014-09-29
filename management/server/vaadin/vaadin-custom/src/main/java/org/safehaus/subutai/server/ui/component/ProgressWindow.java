@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
-import com.google.common.base.Strings;
+import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -28,10 +28,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
-public class ProgressWindow {
+public class ProgressWindow
+{
     private Window window;
     private TextArea outputTxtArea;
     private Button ok;
@@ -43,7 +41,8 @@ public class ProgressWindow {
     private ExecutorService executor;
 
 
-    public ProgressWindow( ExecutorService executor, Tracker tracker, UUID trackID, String source ) {
+    public ProgressWindow( ExecutorService executor, Tracker tracker, UUID trackID, String source )
+    {
 
         final VerticalLayout l = new VerticalLayout();
         window = new Window( "Operation progress", l );
@@ -71,9 +70,11 @@ public class ProgressWindow {
 
         ok = new Button( "Ok" );
         ok.setStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener() {
+        ok.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 //close window
                 track = false;
                 window.close();
@@ -100,31 +101,41 @@ public class ProgressWindow {
     }
 
 
-    private synchronized void start() {
-        showProgress();
-        executor.execute( new Runnable() {
+    private synchronized void start()
+    {
 
-            public void run() {
-                while ( track ) {
+        showProgress();
+        executor.execute( new Runnable()
+        {
+
+            public void run()
+            {
+                while ( track )
+                {
                     ProductOperationView po = tracker.getProductOperation( source, trackID );
-                    if ( po != null ) {
+                    if ( po != null )
+                    {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
 
                         if ( po.getState() == ProductOperationState.SUCCEEDED
-                                || po.getState() == ProductOperationState.FAILED ) {
+                                || po.getState() == ProductOperationState.FAILED )
+                        {
                             hideProgress();
                             break;
                         }
                     }
-                    else {
+                    else
+                    {
                         setOutput( "Product operation not found. Check logs" );
 
                         break;
                     }
-                    try {
+                    try
+                    {
                         Thread.sleep( 1000 );
                     }
-                    catch ( InterruptedException ex ) {
+                    catch ( InterruptedException ex )
+                    {
                         break;
                     }
                 }
@@ -133,7 +144,8 @@ public class ProgressWindow {
     }
 
 
-    private void showProgress() {
+    private void showProgress()
+    {
         indicator.setVisible( true );
         ok.setEnabled( false );
     }
@@ -153,13 +165,15 @@ public class ProgressWindow {
     }
 
 
-    private void hideProgress() {
+    private void hideProgress()
+    {
         indicator.setVisible( false );
         ok.setEnabled( true );
     }
 
 
-    public Window getWindow() {
+    public Window getWindow()
+    {
         return window;
     }
 }

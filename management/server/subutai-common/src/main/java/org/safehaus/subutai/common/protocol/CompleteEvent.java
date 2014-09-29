@@ -9,11 +9,7 @@ package org.safehaus.subutai.common.protocol;
 import org.safehaus.subutai.common.enums.NodeState;
 
 
-/**
- * @author dilshat
- */
 public interface CompleteEvent
 {
-
     public void onComplete( NodeState state );
 }

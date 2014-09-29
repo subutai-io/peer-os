@@ -12,54 +12,63 @@ import java.util.Set;
 /**
  * @author dilshat
  */
-public class TrimmedAccumuloConfig {
+public class TrimmedAccumuloConfig
+{
 
-	private String clusterName = "";
-	private String instanceName = "";
-	private String password = "";
-	private String masterNode;
-	private String gcNode;
-	private String monitor;
-	private Set<String> tracers;
-	private Set<String> slaves;
-
-
-	public String getClusterName() {
-		return clusterName;
-	}
+    private String clusterName = "";
+    private String instanceName = "";
+    private String password = "";
+    private String masterNode;
+    private String gcNode;
+    private String monitor;
+    private Set<String> tracers;
+    private Set<String> slaves;
 
 
-	public String getInstanceName() {
-		return instanceName;
-	}
+    public String getClusterName()
+    {
+        return clusterName;
+    }
 
 
-	public String getPassword() {
-		return password;
-	}
+    public String getInstanceName()
+    {
+        return instanceName;
+    }
 
 
-	public String getMasterNode() {
-		return masterNode;
-	}
+    public String getPassword()
+    {
+        return password;
+    }
 
 
-	public String getGcNode() {
-		return gcNode;
-	}
+    public String getMasterNode()
+    {
+        return masterNode;
+    }
 
 
-	public String getMonitor() {
-		return monitor;
-	}
+    public String getGcNode()
+    {
+        return gcNode;
+    }
 
 
-	public Set<String> getTracers() {
-		return tracers;
-	}
+    public String getMonitor()
+    {
+        return monitor;
+    }
 
 
-	public Set<String> getSlaves() {
-		return slaves;
-	}
+    public Set<String> getTracers()
+    {
+        return tracers;
+    }
+
+
+    public Set<String> getSlaves()
+    {
+        return slaves;
+    }
 }

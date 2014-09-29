@@ -1,16 +1,17 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import java.util.UUID;
+
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 
-import java.util.UUID;
+import com.google.common.collect.Sets;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
@@ -23,7 +24,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
-            String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
+                String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
 
@@ -40,7 +41,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
         SharkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -76,19 +78,18 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             {
                 if ( result.getStdOut().contains( "Package ksks-shark is not installed, so not removed" ) )
                 {
-                    productOperation.addLog( String.format( "Shark is not installed, so not removed on node %s",
-                            agent.getHostname() ) );
+                    productOperation.addLog(
+                            String.format( "Shark is not installed, so not removed on node %s", agent.getHostname() ) );
                 }
                 else
                 {
-                    productOperation.addLog( String.format( "Shark is removed from node %s",
-                            agent.getHostname() ) );
+                    productOperation.addLog( String.format( "Shark is removed from node %s", agent.getHostname() ) );
                 }
             }
             else
             {
-                productOperation.addLog( String.format( "Error %s on node %s", result.getStdErr(),
-                        agent.getHostname() ) );
+                productOperation
+                        .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
             }
 
             config.getNodes().remove( agent );

@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
+
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
@@ -8,10 +9,14 @@ import org.safehaus.subutai.plugin.accumulo.impl.handler.mock.AccumuloImplMock;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-public class RemovePropertyOperationHandlerTest {
+
+public class RemovePropertyOperationHandlerTest
+{
     @Test
-    public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new RemovePropertyOperationHandler( new AccumuloImplMock(), "test-cluster", "test-property" );
+    public void testWithoutCluster()
+    {
+        AbstractOperationHandler operationHandler =
+                new RemovePropertyOperationHandler( new AccumuloImplMock(), "test-cluster", "test-property" );
 
         operationHandler.run();
 

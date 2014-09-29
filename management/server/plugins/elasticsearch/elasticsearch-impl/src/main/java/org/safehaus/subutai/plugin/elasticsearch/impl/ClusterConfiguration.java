@@ -1,93 +1,108 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
-import org.safehaus.subutai.common.command.Command;
-import org.safehaus.subutai.plugin.elasticsearch.api.Config;
-import org.safehaus.subutai.common.exception.*;
-import org.safehaus.subutai.common.tracker.*;
+
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 
-public class ClusterConfiguration {
+public class ClusterConfiguration
+{
 
     private ElasticsearchImpl manager;
     private ProductOperation po;
 
 
-    public ClusterConfiguration( final ElasticsearchImpl manager, final ProductOperation po ) {
+    public ClusterConfiguration( final ElasticsearchImpl manager, final ProductOperation po )
+    {
         this.manager = manager;
         this.po = po;
     }
 
 
-    public void configureCluster( final Config config ) throws ClusterConfigurationException {
+    public void configureCluster( final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration )
+            throws ClusterConfigurationException
+    {
 
         // Setting cluster name
 
-        po.addLog( "Setting cluster name: " + config.getClusterName() );
+        po.addLog( "Setting cluster name: " + elasticsearchClusterConfiguration.getClusterName() );
 
-        Command setClusterNameCommand =
-                Commands.getConfigureCommand( config.getNodes(), "cluster.name " + config.getClusterName() );
+        Command setClusterNameCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+                "cluster.name " + elasticsearchClusterConfiguration.getClusterName() );
         manager.getCommandRunner().runCommand( setClusterNameCommand );
 
-        if ( setClusterNameCommand.hasSucceeded() ) {
+        if ( setClusterNameCommand.hasSucceeded() )
+        {
             po.addLog( "Configure cluster name succeeded" );
         }
-        else {
-            throw new ClusterConfigurationException( String.format( "Installation failed, %s", setClusterNameCommand.getAllErrors() ) );
+        else
+        {
+            throw new ClusterConfigurationException(
+                    String.format( "Installation failed, %s", setClusterNameCommand.getAllErrors() ) );
         }
 
         // Setting master nodes
-
         po.addLog( "Setting master nodes..." );
-
-        Command setMasterNodesCommand = Commands.getConfigureCommand( config.getMasterNodes(), "node.master true" );
+        Command setMasterNodesCommand =
+                Commands.getConfigureCommand( elasticsearchClusterConfiguration.getMasterNodes(), "node.master true" );
         manager.getCommandRunner().runCommand( setMasterNodesCommand );
 
-        if ( setMasterNodesCommand.hasSucceeded() ) {
+        if ( setMasterNodesCommand.hasSucceeded() )
+        {
             po.addLog( "Master nodes setup successful" );
         }
-        else {
-            throw new ClusterConfigurationException( String.format( "Installation failed, %s", setMasterNodesCommand.getAllErrors() ) );
+        else
+        {
+            throw new ClusterConfigurationException(
+                    String.format( "Installation failed, %s", setMasterNodesCommand.getAllErrors() ) );
         }
 
         // Setting data nodes
-
         po.addLog( "Setting data nodes..." );
-
-        Command dataNodesCommand = Commands.getConfigureCommand( config.getDataNodes(), "node.data true" );
+        Command dataNodesCommand =
+                Commands.getConfigureCommand( elasticsearchClusterConfiguration.getDataNodes(), "node.data true" );
         manager.getCommandRunner().runCommand( dataNodesCommand );
 
-        if ( dataNodesCommand.hasSucceeded() ) {
+        if ( dataNodesCommand.hasSucceeded() )
+        {
             po.addLog( "Data nodes setup successful" );
         }
-        else {
-            throw new ClusterConfigurationException( String.format( "Installation failed, %s", dataNodesCommand.getAllErrors() ) );
+        else
+        {
+            throw new ClusterConfigurationException(
+                    String.format( "Installation failed, %s", dataNodesCommand.getAllErrors() ) );
         }
 
         // Setting number of shards
 
         po.addLog( "Setting number of shards..." );
 
-        Command shardsCommand = Commands.getConfigureCommand( config.getNodes(),
-                "index.number_of_shards " + config.getNumberOfShards() );
+        Command shardsCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+                "index.number_of_shards " + elasticsearchClusterConfiguration.getNumberOfShards() );
         manager.getCommandRunner().runCommand( shardsCommand );
 
-        if ( !shardsCommand.hasSucceeded() ) {
-            throw new ClusterConfigurationException( String.format( "Installation failed, %s", shardsCommand.getAllErrors() ) );
+        if ( !shardsCommand.hasSucceeded() )
+        {
+            throw new ClusterConfigurationException(
+                    String.format( "Installation failed, %s", shardsCommand.getAllErrors() ) );
         }
 
         // Setting number of replicas
 
         po.addLog( "Setting number of replicas..." );
 
-        Command numberOfReplicasCommand = Commands.getConfigureCommand( config.getNodes(),
-                "index.number_of_replicas " + config.getNumberOfReplicas() );
+        Command numberOfReplicasCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+                "index.number_of_replicas " + elasticsearchClusterConfiguration.getNumberOfReplicas() );
         manager.getCommandRunner().runCommand( numberOfReplicasCommand );
 
-        if ( !numberOfReplicasCommand.hasSucceeded() ) {
-            throw new ClusterConfigurationException( String.format( "Installation failed, %s", numberOfReplicasCommand.getAllErrors() ) );
+        if ( !numberOfReplicasCommand.hasSucceeded() )
+        {
+            throw new ClusterConfigurationException(
+                    String.format( "Installation failed, %s", numberOfReplicasCommand.getAllErrors() ) );
         }
 
         po.addLogDone( "Installation of Elasticsearch cluster succeeded" );
     }
-
 }

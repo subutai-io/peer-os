@@ -17,10 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
-.v-tabsheet-tabs-hover-closable .v-tabsheet-caption-close {
+.v-tabsheet-tabs-hover-closable .v-tabsheet-caption-close
+{
     visibility: hidden;
 }
 
-.v-tabsheet-tabs-hover-closable .v-tabsheet-tabitem:hover .v-tabsheet-caption-close {
+.v-tabsheet-tabs-hover-closable .v-tabsheet-tabitem:hover .v-tabsheet-caption-close
+{
     visibility: visible;
 }

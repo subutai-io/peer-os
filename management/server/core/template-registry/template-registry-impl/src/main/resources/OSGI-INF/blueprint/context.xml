@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.db.api.DbManager"/>
+  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.db.api.DbManager" />
 
-    <bean id="templateRegistryManager" scope="singleton"
-          class="org.safehaus.subutai.core.registry.impl.TemplateRegistryManagerImpl">
-        <argument ref="dbManager"/>
-    </bean>
+  <bean id="templateRegistry" scope="singleton"
+        class="org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl">
+    <argument ref="dbManager" />
+  </bean>
 
-    <service ref="templateRegistryManager"
-             interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager"/>
+  <service ref="templateRegistry"
+           interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
 </blueprint>

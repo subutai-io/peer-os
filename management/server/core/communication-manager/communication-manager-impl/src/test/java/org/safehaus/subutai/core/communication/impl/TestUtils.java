@@ -24,19 +24,19 @@ public class TestUtils
     public static Request getRequestTemplate( UUID uuid )
     {
         return new Request( "SOURCE", RequestType.EXECUTE_REQUEST, // type
-            uuid, //                        !! agent uuid
-            UUID.randomUUID(), //                        !! task uuid
-            1, //                           !! request sequence number
-            "/", //                         cwd
-            "pwd", //                        program
-            OutputRedirection.RETURN, //    std output redirection
-            OutputRedirection.RETURN, //    std error redirection
-            null, //                        stdout capture file path
-            null, //                        stderr capture file path
-            "root", //                      runas
-            null, //                        arg
-            null, //                        env vars
-            null, 30 ); //
+                uuid, //                        !! agent uuid
+                UUID.randomUUID(), //                        !! task uuid
+                1, //                           !! request sequence number
+                "/", //                         cwd
+                "pwd", //                        program
+                OutputRedirection.RETURN, //    std output redirection
+                OutputRedirection.RETURN, //    std error redirection
+                null, //                        stdout capture file path
+                null, //                        stderr capture file path
+                "root", //                      runas
+                null, //                        arg
+                null, //                        env vars
+                null, 30 ); //
     }
 
 
@@ -51,5 +51,10 @@ public class TestUtils
 
             }
         };
+    }
+
+
+    public static String getRequestCommandJson(){
+        return "";
     }
 }

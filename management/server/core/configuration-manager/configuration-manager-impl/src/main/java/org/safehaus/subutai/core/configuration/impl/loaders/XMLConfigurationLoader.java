@@ -1,47 +1,43 @@
 package org.safehaus.subutai.core.configuration.impl.loaders;
 
 
-import com.google.gson.JsonObject;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
+import java.util.logging.Logger;
+
 import org.safehaus.subutai.core.configuration.api.TextInjector;
+
+import com.google.gson.JsonObject;
 
 
 /**
  * Created by bahadyr on 7/16/14.
  */
-public class XMLConfigurationLoader implements ConfigurationLoader {
+public class XMLConfigurationLoader implements ConfigurationLoader
+{
 
-	//            String xmlConfig = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/core-site.xml";
-
-	private TextInjector textInjector;
-
-
-	public XMLConfigurationLoader(final TextInjector textInjector) {
-		this.textInjector = textInjector;
-	}
+    private static final Logger LOG = Logger.getLogger( XMLConfigurationLoader.class.getName() );
+    private TextInjector textInjector;
 
 
-	@Override
-	public JsonObject getConfiguration(String hostname, String configPathFilename) {
-		try {
-			//TODO cat file from given agent, convert to required format, detect types and form a Config
-			//TODO convert text to XML object
-			XMLConfiguration xmlConfiguration = new XMLConfiguration(configPathFilename);
-			//TODO XML to Config converter
-			JsonObject jsonObject = new JsonObject();
-		} catch (ConfigurationException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public XMLConfigurationLoader( final TextInjector textInjector )
+    {
+        this.textInjector = textInjector;
+    }
 
 
-	@Override
-	public boolean setConfiguration(String hostname, String configFilePath, String config) {
-		//TODO Read config from instance, set values from Config, inject Config
-		return true;
-	}
+    @Override
+    public JsonObject getConfiguration( String hostname, String configPathFilename )
+    {
+        //TODO cat file from given agent, convert to required format, detect types and form a Config
+        //TODO convert text to XML object
+        //TODO XML to Config converter
+        return null;
+    }
 
 
+    @Override
+    public boolean setConfiguration( String hostname, String configFilePath, String config )
+    {
+        //TODO Read config from instance, set values from Config, inject Config
+        return true;
+    }
 }

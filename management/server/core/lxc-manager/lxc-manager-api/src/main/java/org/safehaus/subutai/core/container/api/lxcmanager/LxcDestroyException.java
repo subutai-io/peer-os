@@ -9,9 +9,11 @@ package org.safehaus.subutai.core.container.api.lxcmanager;
 /**
  * Exception which can be thrown while destroying lxcs
  */
-public class LxcDestroyException extends Exception {
+public class LxcDestroyException extends Exception
+{
 
-	public LxcDestroyException(String message) {
-		super(message);
-	}
+    public LxcDestroyException( String message )
+    {
+        super( message );
+    }
 }

@@ -5,75 +5,111 @@
  */
 package org.safehaus.subutai.plugin.mongodb.ui.wizard;
 
+
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+
 
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
-	private final GridLayout grid;
-	private int step = 1;
-	private MongoClusterConfig mongoClusterConfig = new MongoClusterConfig();
+    private final GridLayout grid;
+    private final Mongo mongo;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
+    private int step = 1;
+    private MongoClusterConfig mongoClusterConfig = new MongoClusterConfig();
 
-	public Wizard() {
-		grid = new GridLayout(1, 20);
-		grid.setMargin(true);
-		grid.setSizeFull();
 
-		putForm();
-	}
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
+        this.executorService = executorService;
+        this.mongo = serviceLocator.getService( Mongo.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+        grid = new GridLayout( 1, 20 );
+        grid.setMargin( true );
+        grid.setSizeFull();
 
-	private void putForm() {
-		grid.removeComponent(0, 1);
-		Component component = null;
-		switch (step) {
-			case 1: {
-				component = new WelcomeStep(this);
-				break;
-			}
-			case 2: {
-				component = new ConfigurationStep(this);
-				break;
-			}
-			case 3: {
-				component = new VerificationStep(this);
-				break;
-			}
-			default: {
-				break;
-			}
-		}
+        putForm();
+    }
 
-		if (component != null) {
-			grid.addComponent(component, 0, 1, 0, 19);
-		}
-	}
 
-	public Component getContent() {
-		return grid;
-	}
+    private void putForm()
+    {
+        grid.removeComponent( 0, 1 );
+        Component component = null;
+        switch ( step )
+        {
+            case 1:
+            {
+                component = new WelcomeStep( this );
+                break;
+            }
+            case 2:
+            {
+                component = new ConfigurationStep( this );
+                break;
+            }
+            case 3:
+            {
+                component = new VerificationStep( mongo, executorService, tracker, this );
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
 
-	protected void next() {
-		step++;
-		putForm();
-	}
+        if ( component != null )
+        {
+            grid.addComponent( component, 0, 1, 0, 19 );
+        }
+    }
 
-	protected void back() {
-		step--;
-		putForm();
-	}
 
-	protected void init() {
-		step = 1;
-		mongoClusterConfig = new MongoClusterConfig();
-		putForm();
-	}
+    public Component getContent()
+    {
+        return grid;
+    }
 
-	public MongoClusterConfig getMongoClusterConfig() {
-		return mongoClusterConfig;
-	}
 
+    protected void next()
+    {
+        step++;
+        putForm();
+    }
+
+
+    protected void back()
+    {
+        step--;
+        putForm();
+    }
+
+
+    protected void init()
+    {
+        step = 1;
+        mongoClusterConfig = new MongoClusterConfig();
+        putForm();
+    }
+
+
+    public MongoClusterConfig getMongoClusterConfig()
+    {
+        return mongoClusterConfig;
+    }
 }

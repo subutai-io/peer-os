@@ -1,37 +1,37 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="peer/register">
-            <action class="org.safehaus.subutai.core.peer.cli.RegisterCommand">
-                <property name="peerManager" ref="peerManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/register">
+      <action class="org.safehaus.subutai.core.peer.cli.RegisterCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="peer/ls">
-            <action class="org.safehaus.subutai.core.peer.cli.ListCommand">
-                <property name="peerManager" ref="peerManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/ls">
+      <action class="org.safehaus.subutai.core.peer.cli.ListCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="peer/unregister">
-            <action class="org.safehaus.subutai.core.peer.cli.UnregisterCommand">
-                <property name="peerManager" ref="peerManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/unregister">
+      <action class="org.safehaus.subutai.core.peer.cli.UnregisterCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
 
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="peer/id">
-            <action class="org.safehaus.subutai.core.peer.cli.GetIdCommand">
-                <property name="peerManager" ref="peerManager"/>
-            </action>
-        </command>
-    </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/id">
+      <action class="org.safehaus.subutai.core.peer.cli.GetIdCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
 
-    <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager"/>
+  <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
 </blueprint>

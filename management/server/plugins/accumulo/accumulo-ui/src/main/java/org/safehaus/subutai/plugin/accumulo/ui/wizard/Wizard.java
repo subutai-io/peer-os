@@ -6,8 +6,17 @@
 package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.vaadin.ui.Component;
@@ -17,16 +26,30 @@ import com.vaadin.ui.GridLayout;
 /**
  * @author dilshat
  */
-public class Wizard {
+public class Wizard
+{
 
     private final GridLayout grid;
+    private final Hadoop hadoop;
+    private final Accumulo accumulo;
+    private final Zookeeper zookeeper;
+    private final Tracker tracker;
+    private final ExecutorService executorService;
     private int step = 1;
     private AccumuloClusterConfig config = new AccumuloClusterConfig();
     private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
     private ZookeeperClusterConfig zookeeperClusterConfig = new ZookeeperClusterConfig();
 
 
-    public Wizard() {
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
+
+        this.executorService = executorService;
+        this.accumulo = serviceLocator.getService( Accumulo.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.zookeeper = serviceLocator.getService( Zookeeper.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
         grid.setSizeFull();
@@ -35,51 +58,62 @@ public class Wizard {
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         grid.removeComponent( 0, 1 );
         Component component = null;
-        switch ( step ) {
-            case 1: {
+        switch ( step )
+        {
+            case 1:
+            {
                 component = new WelcomeStep( this );
                 break;
             }
-            case 2: {
-                component = new ConfigurationStep( this );
+            case 2:
+            {
+                component = new ConfigurationStep( hadoop, zookeeper, this );
                 break;
             }
-            case 3: {
-                component = new VerificationStep( this );
+            case 3:
+            {
+                component = new VerificationStep( accumulo, executorService, tracker, this );
                 break;
             }
-            default: {
+            default:
+            {
                 break;
             }
         }
 
-        if ( component != null ) {
+        if ( component != null )
+        {
             grid.addComponent( component, 0, 1, 0, 19 );
         }
     }
 
 
-    public Component getContent() {
+    public Component getContent()
+    {
         return grid;
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         config = new AccumuloClusterConfig();
         hadoopClusterConfig = new HadoopClusterConfig();
@@ -88,17 +122,20 @@ public class Wizard {
     }
 
 
-    public AccumuloClusterConfig getConfig() {
+    public AccumuloClusterConfig getConfig()
+    {
         return config;
     }
 
 
-    public HadoopClusterConfig getHadoopClusterConfig() {
+    public HadoopClusterConfig getHadoopClusterConfig()
+    {
         return hadoopClusterConfig;
     }
 
 
-    public ZookeeperClusterConfig getZookeeperClusterConfig() {
+    public ZookeeperClusterConfig getZookeeperClusterConfig()
+    {
         return zookeeperClusterConfig;
     }
 }

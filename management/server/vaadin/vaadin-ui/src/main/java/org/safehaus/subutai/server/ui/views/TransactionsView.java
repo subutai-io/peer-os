@@ -10,16 +10,25 @@
 
 package org.safehaus.subutai.server.ui.views;
 
+
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.VerticalLayout;
 
-public class TransactionsView extends VerticalLayout implements View {
 
-	@Override
-	public void enter(ViewChangeEvent event) {
+public class TransactionsView extends VerticalLayout implements View
+{
 
-		setSizeFull();
-		addStyleName("transactions");
-	}
+    public TransactionsView()
+    {
+        setSizeFull();
+        addStyleName( "transactions" );
+    }
+
+    @Override
+    public void enter( ViewChangeEvent event )
+    {
+
+
+    }
 }

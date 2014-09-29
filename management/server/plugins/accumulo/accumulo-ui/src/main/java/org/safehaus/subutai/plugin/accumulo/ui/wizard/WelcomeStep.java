@@ -6,9 +6,9 @@
 package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 
-import org.safehaus.subutai.plugin.accumulo.api.SetupType;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.plugin.accumulo.api.SetupType;
+import org.safehaus.subutai.plugin.accumulo.ui.AccumuloPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -22,9 +22,11 @@ import com.vaadin.ui.Panel;
 /**
  * @author dilshat
  */
-public class WelcomeStep extends Panel {
+public class WelcomeStep extends Panel
+{
 
-    public WelcomeStep( final Wizard wizard ) {
+    public WelcomeStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -39,7 +41,7 @@ public class WelcomeStep extends Panel {
 
         Label logoImg = new Label();
         // Image as a file resource
-        logoImg.setIcon( new FileResource( FileUtil.getFile( AccumuloUI.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( AccumuloPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 56, Unit.PIXELS );
         logoImg.setWidth( 220, Unit.PIXELS );
@@ -54,17 +56,21 @@ public class WelcomeStep extends Panel {
         grid.addComponent( startWithHadoopNZK, 8, 4, 8, 4 );
         grid.setComponentAlignment( startWithHadoopNZK, Alignment.BOTTOM_RIGHT );
 
-        startOverHadoopNZK.addClickListener( new Button.ClickListener() {
+        startOverHadoopNZK.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.OVER_HADOOP_N_ZK );
                 wizard.next();
             }
         } );
-        startWithHadoopNZK.addClickListener( new Button.ClickListener() {
+        startWithHadoopNZK.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.WITH_HADOOP_N_ZK );
                 wizard.next();

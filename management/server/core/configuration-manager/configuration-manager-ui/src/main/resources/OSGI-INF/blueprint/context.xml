@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="configManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.configuration.api.ConfigManager"/>
+  <reference id="configurationManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.configuration.api.ConfigurationManager" />
 
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.core.configuration.ui.ConfigurationManagerUI"
-          init-method="init" destroy-method="destroy">
-        <property name="configManager" ref="configManager"/>
-    </bean>
+  <bean id="module" scope="singleton"
+        class="org.safehaus.subutai.core.configuration.ui.ConfigurationManagerPortalModule"
+        init-method="init" destroy-method="destroy">
+    <property name="configurationManager" ref="configurationManager" />
+  </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
+  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

@@ -13,11 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -36,11 +36,14 @@ import com.vaadin.ui.TwinColSelect;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends Panel
+{
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Hadoop hadoop, final Wizard wizard )
+    {
 
-        if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE ) {
+        if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE )
+        {
 
             //Standalone cluster installation controls
 
@@ -54,9 +57,11 @@ public class ConfigurationStep extends Panel {
             clusterNameTxtFld.setRequired( true );
             clusterNameTxtFld.setMaxLength( 20 );
             clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
-            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
                 }
             } );
@@ -69,24 +74,30 @@ public class ConfigurationStep extends Panel {
             nodesCountCombo.setNullSelectionAllowed( false );
             nodesCountCombo.setValue( wizard.getConfig().getNumberOfNodes() );
 
-            nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getConfig().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
                 }
             } );
 
             Button next = new Button( "Next" );
             next.addStyleName( "default" );
-            next.addClickListener( new Button.ClickListener() {
+            next.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
 
-                    if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                    if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                    {
                         show( "Please provide cluster name" );
                     }
-                    else {
+                    else
+                    {
                         wizard.next();
                     }
                 }
@@ -94,9 +105,11 @@ public class ConfigurationStep extends Panel {
 
             Button back = new Button( "Back" );
             back.addStyleName( "default" );
-            back.addClickListener( new Button.ClickListener() {
+            back.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     wizard.back();
                 }
             } );
@@ -114,7 +127,8 @@ public class ConfigurationStep extends Panel {
 
             setContent( standaloneInstallationControls );
         }
-        else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP ) {
+        else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
+        {
 
             //Over Hadoop cluster installation controls
 
@@ -128,9 +142,11 @@ public class ConfigurationStep extends Panel {
             clusterNameTxtFld.setRequired( true );
             clusterNameTxtFld.setMaxLength( 20 );
             clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
-            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
                 }
             } );
@@ -143,35 +159,42 @@ public class ConfigurationStep extends Panel {
             hadoopClustersCombo.setRequired( true );
             hadoopClustersCombo.setNullSelectionAllowed( false );
 
-            List<HadoopClusterConfig> hadoopClusterConfigs = ZookeeperUI.getHadoopManager().getClusters();
-            if ( hadoopClusterConfigs.size() > 0 ) {
-                for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusterConfigs ) {
+            List<HadoopClusterConfig> hadoopClusterConfigs = hadoop.getClusters();
+            if ( !hadoopClusterConfigs.isEmpty() )
+            {
+                for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusterConfigs )
+                {
                     hadoopClustersCombo.addItem( hadoopClusterInfo );
                     hadoopClustersCombo.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
                 }
             }
 
-            HadoopClusterConfig info =
-                    ZookeeperUI.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
+            HadoopClusterConfig info = hadoop.getCluster( wizard.getConfig().getHadoopClusterName() );
 
-            if ( info != null ) {
+            if ( info != null )
+            {
                 hadoopClustersCombo.setValue( info );
             }
-            else if ( hadoopClusterConfigs.size() > 0 ) {
+            else if ( !hadoopClusterConfigs.isEmpty() )
+            {
                 hadoopClustersCombo.setValue( hadoopClusterConfigs.iterator().next() );
             }
 
-            if ( hadoopClustersCombo.getValue() != null ) {
+            if ( hadoopClustersCombo.getValue() != null )
+            {
                 HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                 wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
                 hadoopNodesSelect
                         .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
             }
 
-            hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
-                    if ( event.getProperty().getValue() != null ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
+                    if ( event.getProperty().getValue() != null )
+                    {
                         HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                         hadoopNodesSelect.setValue( null );
                         hadoopNodesSelect.setContainerDataSource(
@@ -191,13 +214,17 @@ public class ConfigurationStep extends Panel {
             hadoopNodesSelect.setWidth( 100, Unit.PERCENTAGE );
             hadoopNodesSelect.setRequired( true );
 
-            if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
+            if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) )
+            {
                 hadoopNodesSelect.setValue( wizard.getConfig().getNodes() );
             }
-            hadoopNodesSelect.addValueChangeListener( new Property.ValueChangeListener() {
+            hadoopNodesSelect.addValueChangeListener( new Property.ValueChangeListener()
+            {
 
-                public void valueChange( Property.ValueChangeEvent event ) {
-                    if ( event.getProperty().getValue() != null ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
+                    if ( event.getProperty().getValue() != null )
+                    {
                         Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
                         wizard.getConfig().setNodes( agentList );
                     }
@@ -206,20 +233,26 @@ public class ConfigurationStep extends Panel {
 
             Button next = new Button( "Next" );
             next.addStyleName( "default" );
-            next.addClickListener( new Button.ClickListener() {
+            next.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
-                    if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
+                    if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                    {
                         show( "Please, prvide cluster name" );
                     }
-                    else if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) ) {
+                    else if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) )
+                    {
                         show( "Please, select Hadoop cluster" );
                     }
-                    else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
+                    else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) )
+                    {
                         show( "Please, select zk nodes" );
                     }
-                    else {
+                    else
+                    {
                         wizard.next();
                     }
                 }
@@ -227,9 +260,11 @@ public class ConfigurationStep extends Panel {
 
             Button back = new Button( "Back" );
             back.addStyleName( "default" );
-            back.addClickListener( new Button.ClickListener() {
+            back.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     wizard.back();
                 }
             } );
@@ -246,7 +281,8 @@ public class ConfigurationStep extends Panel {
             overHadoopInstallationControls.addComponent( buttons );
             setContent( overHadoopInstallationControls );
         }
-        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ) {
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP )
+        {
             //Hadoop+Zookeeper combo template based cluster installation controls
 
             //Hadoop settings
@@ -255,19 +291,23 @@ public class ConfigurationStep extends Panel {
             hadoopClusterNameTxtFld.setInputPrompt( "Hadoop cluster name" );
             hadoopClusterNameTxtFld.setRequired( true );
             hadoopClusterNameTxtFld.setMaxLength( 20 );
-            if ( !Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
+            if ( !Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) )
+            {
                 hadoopClusterNameTxtFld.setValue( wizard.getHadoopClusterConfig().getClusterName() );
             }
-            hadoopClusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+            hadoopClusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getHadoopClusterConfig().setClusterName( event.getProperty().getValue().toString().trim() );
                 }
             } );
 
             //configuration servers number
             List<Integer> count = new ArrayList<>();
-            for ( int i = 1; i < 50; i++ ) {
+            for ( int i = 1; i < 50; i++ )
+            {
                 count.add( i );
             }
 
@@ -277,9 +317,11 @@ public class ConfigurationStep extends Panel {
             hadoopSlaveNodesComboBox.setNullSelectionAllowed( false );
             hadoopSlaveNodesComboBox.setValue( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() );
 
-            hadoopSlaveNodesComboBox.addValueChangeListener( new Property.ValueChangeListener() {
+            hadoopSlaveNodesComboBox.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getHadoopClusterConfig().setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
                 }
             } );
@@ -292,9 +334,11 @@ public class ConfigurationStep extends Panel {
             hadoopReplicationFactorComboBox.setNullSelectionAllowed( false );
             hadoopReplicationFactorComboBox.setValue( wizard.getHadoopClusterConfig().getReplicationFactor() );
 
-            hadoopReplicationFactorComboBox.addValueChangeListener( new Property.ValueChangeListener() {
+            hadoopReplicationFactorComboBox.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getHadoopClusterConfig().setReplicationFactor( ( Integer ) event.getProperty().getValue() );
                 }
             } );
@@ -303,9 +347,11 @@ public class ConfigurationStep extends Panel {
             HadoopDomainTxtFld.setInputPrompt( wizard.getHadoopClusterConfig().getDomainName() );
             HadoopDomainTxtFld.setValue( wizard.getHadoopClusterConfig().getDomainName() );
             HadoopDomainTxtFld.setMaxLength( 20 );
-            HadoopDomainTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+            HadoopDomainTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     String value = event.getProperty().getValue().toString().trim();
                     wizard.getHadoopClusterConfig().setDomainName( value );
                 }
@@ -324,9 +370,11 @@ public class ConfigurationStep extends Panel {
             clusterNameTxtFld.setRequired( true );
             clusterNameTxtFld.setMaxLength( 20 );
             clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
-            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
                 }
             } );
@@ -339,45 +387,56 @@ public class ConfigurationStep extends Panel {
             nodesCountCombo.setNullSelectionAllowed( false );
             nodesCountCombo.setValue( wizard.getConfig().getNumberOfNodes() );
 
-            nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
+            {
                 @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
+                public void valueChange( Property.ValueChangeEvent event )
+                {
                     wizard.getConfig().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
                 }
             } );
 
             Button next = new Button( "Next" );
             next.addStyleName( "default" );
-            next.addClickListener( new Button.ClickListener() {
+            next.addClickListener( new Button.ClickListener()
+            {
 
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
 
-                    if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                    if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
+                    {
                         show( "Please provide Zookeeper cluster name" );
                     }
-                    else if ( wizard.getConfig().getNumberOfNodes() <= 0 ) {
+                    else if ( wizard.getConfig().getNumberOfNodes() <= 0 )
+                    {
                         show( "Please enter number of ZK nodes" );
                     }
                     else if ( wizard.getConfig().getNumberOfNodes()
                             > HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY + wizard.getHadoopClusterConfig()
-                                                                                               .getCountOfSlaveNodes
-                                                                                                       () ) {
+                                                                                               .getCountOfSlaveNodes() )
+                    {
                         show( "Number of ZK nodes must not exceed total number of Hadoop nodes" );
                     }
-                    else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
+                    else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) )
+                    {
                         show( "Please provide Hadoop cluster name" );
                     }
-                    else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getDomainName() ) ) {
+                    else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getDomainName() ) )
+                    {
                         show( "Please provide Hadoop cluster domain name" );
                     }
-                    else if ( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() <= 0 ) {
+                    else if ( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() <= 0 )
+                    {
                         show( "Please provide number of Hadoop slave nodes" );
                     }
-                    else if ( wizard.getHadoopClusterConfig().getReplicationFactor() <= 0 ) {
+                    else if ( wizard.getHadoopClusterConfig().getReplicationFactor() <= 0 )
+                    {
                         show( "Please provide Hadoop cluster replicaton factor" );
                     }
-                    else {
+                    else
+                    {
                         wizard.next();
                     }
                 }
@@ -385,9 +444,11 @@ public class ConfigurationStep extends Panel {
 
             Button back = new Button( "Back" );
             back.addStyleName( "default" );
-            back.addClickListener( new Button.ClickListener() {
+            back.addClickListener( new Button.ClickListener()
+            {
                 @Override
-                public void buttonClick( Button.ClickEvent event ) {
+                public void buttonClick( Button.ClickEvent event )
+                {
                     wizard.back();
                 }
             } );
@@ -416,7 +477,8 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

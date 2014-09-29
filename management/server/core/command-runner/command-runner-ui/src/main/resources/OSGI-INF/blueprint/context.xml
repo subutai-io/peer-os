@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint
-        default-activation="eager"
-        xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    default-activation="eager"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
-    <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.core.command.ui.CommandRunnerUI"
-          init-method="init" destroy-method="destroy">
-        <property name="commandRunner" ref="commandRunner"/>
-        <property name="agentManager" ref="agentManager"/>
-    </bean>
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.core.command.ui.CommandRunnerPortalModule">
+    <property name="commandRunner" ref="commandRunner" />
+    <property name="agentManager" ref="agentManager" />
+  </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
+  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

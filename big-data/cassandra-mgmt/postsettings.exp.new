@@ -35,11 +35,11 @@ sleep 5
 #import cassandra keyspace
 expect "# " { send "/opt/cassandra-2.0.4/bin/cqlsh\r" }
 sleep 2
-expect "cqlsh> " { send "drop keyspace kiskis;\r" }
+expect "cqlsh> " { send "drop keyspace subutai;\r" }
 sleep 2
 expect "cqlsh> " { send "exit;\r" }
 sleep 2
-expect "# " { send "/opt/cassandra-2.0.4/bin/cqlsh -f kiskis.sql\r" }
+expect "# " { send "/opt/cassandra-2.0.4/bin/cqlsh -f subutai.cql\r" }
 sleep 2
 expect "# " { send "service cassandra stop\r"  }
 sleep 2

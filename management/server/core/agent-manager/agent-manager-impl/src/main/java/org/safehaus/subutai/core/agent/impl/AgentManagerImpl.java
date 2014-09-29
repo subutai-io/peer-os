@@ -9,7 +9,6 @@ package org.safehaus.subutai.core.agent.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -17,8 +16,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -26,11 +23,12 @@ import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -41,9 +39,10 @@ import com.google.common.cache.CacheBuilder;
 /**
  * Implementation of Agent Manager Interface
  */
-public class AgentManagerImpl implements ResponseListener, AgentManager {
+public class AgentManagerImpl implements ResponseListener, AgentManager
+{
 
-    private static final Logger LOG = Logger.getLogger( AgentManagerImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AgentManagerImpl.class.getName() );
     /**
      * list of agent listeners
      */
@@ -52,7 +51,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * reference to communication manager
      */
     private final CommunicationManager communicationService;
-    private final PeerManager peerManager;
     /**
      * executor for notifying agent listeners
      */
@@ -66,18 +64,33 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     private volatile boolean notifyAgentListeners = true;
 
 
-    public AgentManagerImpl( final CommunicationManager communicationService, final PeerManager peerManager ) {
+    public AgentManagerImpl( final CommunicationManager communicationService )
+    {
         Preconditions.checkNotNull( communicationService, "Communication Manager is null" );
-        Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
 
         this.communicationService = communicationService;
-        this.peerManager = peerManager;
     }
 
 
-    public Collection<AgentListener> getListeners() {
+    public boolean isNotifyAgentListeners()
+    {
+        return notifyAgentListeners;
+    }
+
+
+    public void setNotifyAgentListeners( final boolean notifyAgentListeners )
+    {
+        this.notifyAgentListeners = notifyAgentListeners;
+    }
+
+
+    public Collection<AgentListener> getListeners()
+    {
         return Collections.unmodifiableCollection( listeners );
     }
+
+
+    protected Queue<AgentListener> getListenersQueue() {return listeners;}
 
 
     /**
@@ -85,7 +98,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      *
      * @return set of all agents connected to the mgmt server.
      */
-    public Set<Agent> getAgents() {
+    public Set<Agent> getAgents()
+    {
         return new HashSet( agents.asMap().values() );
     }
 
@@ -95,10 +109,13 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      *
      * @return set of all physical agents currently connected to the mgmt server.
      */
-    public Set<Agent> getPhysicalAgents() {
+    public Set<Agent> getPhysicalAgents()
+    {
         Set<Agent> physicalAgents = new HashSet<>();
-        for ( Agent agent : agents.asMap().values() ) {
-            if ( !agent.isLXC() ) {
+        for ( Agent agent : agents.asMap().values() )
+        {
+            if ( !agent.isLXC() )
+            {
                 physicalAgents.add( agent );
             }
         }
@@ -111,10 +128,13 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      *
      * @return set of all lxc agents currently connected to the mgmt server.
      */
-    public Set<Agent> getLxcAgents() {
+    public Set<Agent> getLxcAgents()
+    {
         Set<Agent> lxcAgents = new HashSet<>();
-        for ( Agent agent : agents.asMap().values() ) {
-            if ( agent.isLXC() ) {
+        for ( Agent agent : agents.asMap().values() )
+        {
+            if ( agent.isLXC() )
+            {
                 lxcAgents.add( agent );
             }
         }
@@ -129,10 +149,14 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      *
      * @return agent
      */
-    public Agent getAgentByHostname( String hostname ) {
-        if ( !Strings.isNullOrEmpty( hostname ) ) {
-            for ( Agent agent : agents.asMap().values() ) {
-                if ( hostname.equalsIgnoreCase( agent.getHostname() ) ) {
+    public Agent getAgentByHostname( String hostname )
+    {
+        if ( !Strings.isNullOrEmpty( hostname ) )
+        {
+            for ( Agent agent : agents.asMap().values() )
+            {
+                if ( hostname.equalsIgnoreCase( agent.getHostname() ) )
+                {
                     return agent;
                 }
             }
@@ -148,7 +172,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      *
      * @return agent
      */
-    public Agent getAgentByUUID( UUID uuid ) {
+    public Agent getAgentByUUID( UUID uuid )
+    {
         return agents.getIfPresent( uuid );
     }
 
@@ -160,11 +185,15 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      *
      * @return agent
      */
-    public Set<Agent> getLxcAgentsByParentHostname( String parentHostname ) {
+    public Set<Agent> getLxcAgentsByParentHostname( String parentHostname )
+    {
         Set<Agent> lxcAgents = new HashSet<>();
-        if ( !Strings.isNullOrEmpty( parentHostname ) ) {
-            for ( Agent agent : agents.asMap().values() ) {
-                if ( parentHostname.equalsIgnoreCase( agent.getParentHostName() ) ) {
+        if ( !Strings.isNullOrEmpty( parentHostname ) )
+        {
+            for ( Agent agent : agents.asMap().values() )
+            {
+                if ( parentHostname.equalsIgnoreCase( agent.getParentHostName() ) )
+                {
                     lxcAgents.add( agent );
                 }
             }
@@ -179,14 +208,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * @param listener - listener to add
      */
     @Override
-    public void addListener( AgentListener listener ) {
-        try {
-            if ( !listeners.contains( listener ) ) {
+    public void addListener( AgentListener listener )
+    {
+        try
+        {
+            if ( !listeners.contains( listener ) )
+            {
                 listeners.add( listener );
             }
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in addListener", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in addListener", ex );
         }
     }
 
@@ -197,22 +230,29 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * @param listener - - listener to remove
      */
     @Override
-    public void removeListener( AgentListener listener ) {
-        try {
+    public void removeListener( AgentListener listener )
+    {
+        try
+        {
             listeners.remove( listener );
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in removeListener", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in removeListener", ex );
         }
     }
 
 
     @Override
-    public Set<Agent> getAgentsByHostnames( final Set<String> hostnames ) {
+    public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId )
+    {
         Set<Agent> agentSet = new HashSet<>();
-        if ( !CollectionUtil.isCollectionEmpty( hostnames ) ) {
-            for ( Agent agent : agents.asMap().values() ) {
-                if ( hostnames.contains( agent.getHostname() ) ) {
+        if ( environmentId != null )
+        {
+            for ( Agent agent : getLxcAgents() )
+            {
+                if ( agent.getEnvironmentId() != null && environmentId.compareTo( agent.getEnvironmentId() ) == 0 )
+                {
                     agentSet.add( agent );
                 }
             }
@@ -222,24 +262,33 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
 
 
     @Override
-    public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId ) {
-        Set<Agent> agentSet = new HashSet<>();
-        if ( environmentId != null ) {
-            for ( Agent agent : agents.asMap().values() ) {
-                if ( agent.getEnvironmentId() != null && environmentId.compareTo( agent.getEnvironmentId() ) == 0 ) {
-                    agentSet.add( agent );
-                }
+    public Agent waitForRegistration( final String hostname, final long timeout )
+    {
+        long threshold = System.currentTimeMillis() + timeout;
+        Agent result = getAgentByHostname( hostname );
+        while ( result == null && System.currentTimeMillis() < threshold )
+        {
+            try
+            {
+                Thread.sleep( 1000 );
             }
+            catch ( InterruptedException ignore )
+            {
+                break;
+            }
+            result = getAgentByHostname( hostname );
         }
-        return agentSet;
+        return result;
     }
 
 
     /**
      * Initialized agent manager
      */
-    public void init() {
-        try {
+    public void init()
+    {
+        try
+        {
 
             Preconditions.checkNotNull( communicationService, "Communication service is null" );
 
@@ -250,40 +299,11 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             communicationService.addListener( this );
 
             exec = Executors.newSingleThreadExecutor();
-            exec.execute( new Runnable() {
-
-                public void run() {
-                    long lastNotify = System.currentTimeMillis();
-                    while ( !Thread.interrupted() ) {
-                        try {
-                            if ( notifyAgentListeners || System.currentTimeMillis() - lastNotify
-                                    > Common.AGENT_FRESHNESS_MIN * 60 * 1000 / 2 ) {
-                                lastNotify = System.currentTimeMillis();
-                                notifyAgentListeners = false;
-                                Set<Agent> freshAgents = new HashSet( agents.asMap().values() );
-                                for ( Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); ) {
-                                    AgentListener listener = it.next();
-                                    try {
-                                        listener.onAgent( freshAgents );
-                                    }
-                                    catch ( Exception e ) {
-                                        it.remove();
-                                        LOG.log( Level.SEVERE,
-                                                "Error notifying agent listeners, removing faulting listener", e );
-                                    }
-                                }
-                            }
-                            Thread.sleep( 1000 );
-                        }
-                        catch ( InterruptedException ex ) {
-                            break;
-                        }
-                    }
-                }
-            } );
+            exec.execute( new AgentNotifier( this ) );
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in init", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in init", ex );
         }
     }
 
@@ -291,14 +311,17 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Disposes agent manager
      */
-    public void destroy() {
-        try {
+    public void destroy()
+    {
+        try
+        {
             agents.invalidateAll();
             exec.shutdownNow();
             communicationService.removeListener( this );
         }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in destroy", ex );
+        catch ( Exception ex )
+        {
+            LOG.error( "Error in destroy", ex );
         }
     }
 
@@ -306,22 +329,29 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Communication manager event when response from agent arrives
      */
-    public void onResponse( Response response ) {
-        if ( response != null && response.getType() != null ) {
-            switch ( response.getType() ) {
-                case REGISTRATION_REQUEST: {
+    public void onResponse( Response response )
+    {
+        if ( response != null && response.getType() != null )
+        {
+            switch ( response.getType() )
+            {
+                case REGISTRATION_REQUEST:
+                {
                     addAgent( response );
                     break;
                 }
-                case HEARTBEAT_RESPONSE: {
+                case HEARTBEAT_RESPONSE:
+                {
                     addAgent( response );
                     break;
                 }
-                case AGENT_DISCONNECT: {
+                case AGENT_DISCONNECT:
+                {
                     removeAgent( response );
                     break;
                 }
-                default: {
+                default:
+                {
                     break;
                 }
             }
@@ -332,11 +362,15 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Adds agent to the cache of connected agents
      */
-    private void addAgent( Response response ) {
-        try {
-            if ( response != null && response.getUuid() != null ) {
+    private void addAgent( Response response )
+    {
+        try
+        {
+            if ( response != null && response.getUuid() != null )
+            {
                 Agent checkAgent = agents.getIfPresent( response.getUuid() );
-                if ( checkAgent != null ) {
+                if ( checkAgent != null )
+                {
                     //update timestamp of agent here & return
                     agents.put( response.getUuid(), checkAgent );
                     return;
@@ -346,7 +380,10 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId(), peerManager.getSiteId(), response.getEnvironmentId() );
+                        //TODO pass proper environmentId
+                        response.getTransportId(), UUIDUtil.generateMACBasedUUID(),
+                        response.getEnvironmentId() == null ? UUIDUtil.generateMACBasedUUID() :
+                        response.getEnvironmentId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
@@ -356,8 +393,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                 notifyAgentListeners = true;
             }
         }
-        catch ( Exception e ) {
-            LOG.log( Level.SEVERE, "Error in addAgent", e );
+        catch ( Exception e )
+        {
+            LOG.error( "Error in addAgent", e );
         }
     }
 
@@ -365,7 +403,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Sends ack to agent when it is registered with the management server
      */
-    private void sendAck( UUID agentUUID ) {
+    private void sendAck( UUID agentUUID )
+    {
         Request ack =
                 new Request( "AGENT-MANAGER", RequestType.REGISTRATION_REQUEST_DONE, agentUUID, UUID.randomUUID(), null,
                         null, null, null, null, null, null, null, null, null, null, null );
@@ -376,11 +415,16 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * Removes agent from the cache of connected agents
      */
-    private void removeAgent( Response response ) {
-        try {
-            if ( response != null && response.getTransportId() != null ) {
-                for ( Agent agent : agents.asMap().values() ) {
-                    if ( agent.getTransportId().startsWith( response.getTransportId() ) ) {
+    private void removeAgent( Response response )
+    {
+        try
+        {
+            if ( response != null && response.getTransportId() != null )
+            {
+                for ( Agent agent : agents.asMap().values() )
+                {
+                    if ( agent.getTransportId().startsWith( response.getTransportId() ) )
+                    {
                         agents.invalidate( agent.getUuid() );
                         notifyAgentListeners = true;
                         return;
@@ -388,8 +432,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                 }
             }
         }
-        catch ( Exception e ) {
-            LOG.log( Level.SEVERE, "Error in removeAgent", e );
+        catch ( Exception e )
+        {
+            LOG.error( "Error in removeAgent", e );
         }
     }
 }

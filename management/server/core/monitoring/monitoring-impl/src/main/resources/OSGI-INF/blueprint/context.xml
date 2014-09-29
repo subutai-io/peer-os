@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean id="monitor-impl" scope="singleton" class="org.safehaus.subutai.core.monitor.impl.MonitorImpl"/>
+  <bean id="monitoring-impl" scope="singleton" class="org.safehaus.subutai.core.monitor.impl.MonitoringImpl" />
 
-    <service ref="monitor-impl" interface="org.safehaus.subutai.core.monitor.api.Monitor"/>
+  <service ref="monitoring-impl" interface="org.safehaus.subutai.core.monitor.api.Monitoring" />
 
 </blueprint>

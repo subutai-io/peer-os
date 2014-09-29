@@ -12,7 +12,6 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
@@ -24,7 +23,8 @@ import com.google.common.base.Strings;
 /**
  * Solr cluster setup strategy
  */
-public class SolrSetupStrategy implements ClusterSetupStrategy {
+public class SolrSetupStrategy implements ClusterSetupStrategy
+{
 
     private SolrImpl manager;
     private ProductOperation po;
@@ -33,7 +33,8 @@ public class SolrSetupStrategy implements ClusterSetupStrategy {
 
 
     public SolrSetupStrategy( final SolrImpl manager, final ProductOperation po, final SolrClusterConfig config,
-                              final Environment environment ) {
+                              final Environment environment )
+    {
         Preconditions.checkNotNull( manager, "Solr Manager is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );
         Preconditions.checkNotNull( config, "Solr config is null" );
@@ -45,41 +46,50 @@ public class SolrSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public static PlacementStrategy getPlacementStrategy() {
+    public static PlacementStrategy getPlacementStrategy()
+    {
         return PlacementStrategy.ROUND_ROBIN;
     }
 
 
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
 
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) || config.getNumberOfNodes() <= 0 ) {
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) || config.getNumberOfNodes() <= 0 )
+        {
             throw new ClusterSetupException( "Malformed configuration" );
         }
 
-        if ( manager.getCluster( config.getClusterName() ) != null ) {
+        if ( manager.getCluster( config.getClusterName() ) != null )
+        {
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getNodes().isEmpty() ) {
+        if ( environment.getNodes().isEmpty() )
+        {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
-        if ( environment.getNodes().size() < config.getNumberOfNodes() ) {
+        if ( environment.getNodes().size() < config.getNumberOfNodes() )
+        {
             throw new ClusterSetupException(
                     String.format( "Environment has %d nodes but %d nodes are required", environment.getNodes().size(),
                             config.getNumberOfNodes() ) );
         }
 
         Set<Node> solrNodes = new HashSet<>();
-        for ( Node node : environment.getNodes() ) {
-            if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) ) {
+        for ( Node node : environment.getNodes() )
+        {
+            if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) )
+            {
                 solrNodes.add( node );
             }
         }
 
-        if ( solrNodes.size() < config.getNumberOfNodes() ) {
+        if ( solrNodes.size() < config.getNumberOfNodes() )
+        {
             throw new ClusterSetupException(
                     String.format( "Number of nodes with Solr installed is %d, but %d is required", solrNodes.size(),
                             config.getNumberOfNodes() ) );
@@ -87,7 +97,8 @@ public class SolrSetupStrategy implements ClusterSetupStrategy {
 
         Set<Agent> solrAgents = new HashSet<>();
         Iterator<Node> it = solrNodes.iterator();
-        for ( int i = 0; i < config.getNumberOfNodes(); i++ ) {
+        for ( int i = 0; i < config.getNumberOfNodes(); i++ )
+        {
             solrAgents.add( it.next().getAgent() );
         }
 
@@ -95,14 +106,8 @@ public class SolrSetupStrategy implements ClusterSetupStrategy {
 
         po.addLog( "Saving cluster information to database..." );
 
-        try {
-            manager.getPluginDAO().saveInfo( SolrClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster information saved to database" );
-        }
-        catch ( DBException e ) {
-            throw new ClusterSetupException(
-                    String.format( "Error saving cluster information to database, %s", e.getMessage() ) );
-        }
+        manager.getPluginDAO().saveInfo( SolrClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster information saved to database" );
 
         return config;
     }

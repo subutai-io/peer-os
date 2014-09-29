@@ -20,9 +20,11 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends VerticalLayout {
+public class ConfigurationStep extends VerticalLayout
+{
 
-    public ConfigurationStep( final Wizard wizard ) {
+    public ConfigurationStep( final Wizard wizard )
+    {
 
         setSizeFull();
 
@@ -36,9 +38,11 @@ public class ConfigurationStep extends VerticalLayout {
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setMaxLength( 20 );
         clusterNameTxtFld.setValue( wizard.getSolrClusterConfig().getClusterName() );
-        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 wizard.getSolrClusterConfig().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
@@ -46,13 +50,17 @@ public class ConfigurationStep extends VerticalLayout {
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getSolrClusterConfig().getClusterName() ) ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( Strings.isNullOrEmpty( wizard.getSolrClusterConfig().getClusterName() ) )
+                {
                     show( "Please provide installation name" );
                 }
-                else {
+                else
+                {
                     wizard.next();
                 }
             }
@@ -60,9 +68,11 @@ public class ConfigurationStep extends VerticalLayout {
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
+        back.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 wizard.back();
             }
         } );
@@ -83,7 +93,8 @@ public class ConfigurationStep extends VerticalLayout {
     }
 
 
-    private void show( String notification ) {
+    private void show( String notification )
+    {
         Notification.show( notification );
     }
 }

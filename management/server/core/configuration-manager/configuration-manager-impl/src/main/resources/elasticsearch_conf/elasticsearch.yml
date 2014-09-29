@@ -39,12 +39,12 @@
 #
 #node.name: "Franz Kafka"
 
-# Every node can be configured to allow or deny being eligible as the master,
+# Every node can be configured to allow or deny being eligible as the hbaseMaster,
 # and to allow or deny to store the data.
 #
-# Allow this node to be eligible as a master node (enabled by default):
+# Allow this node to be eligible as a hbaseMaster node (enabled by default):
 #
-#node.master: true
+#node.hbaseMaster: true
 #
 # Allow this node to store data (enabled by default):
 #
@@ -52,23 +52,23 @@
 
 # You can exploit these settings to design advanced cluster topologies.
 #
-# 1. You want this node to never become a master node, only to hold data.
+# 1. You want this node to never become a hbaseMaster node, only to hold data.
 #    This will be the "workhorse" of your cluster.
 #
-#node.master: false
+#node.hbaseMaster: false
 #node.data: true
 #
-# 2. You want this node to only serve as a master: to not store any data and
+# 2. You want this node to only serve as a hbaseMaster: to not store any data and
 #    to have free resources. This will be the "coordinator" of your cluster.
 #
-#node.master: true
+#node.hbaseMaster: true
 #node.data: false
 #
-# 3. You want this node to be neither master nor data node, but
-#    to act as a "search load balancer" (fetching data from nodes,
+# 3. You want this node to be neither hbaseMaster nor data node, but
+#    to act as a "search load balancer" (fetching data from hadoopNodes,
 #    aggregating results, etc.)
 #
-#node.master: false
+#node.hbaseMaster: false
 #node.data: false
 
 # Use the Cluster Health API [http://localhost:9200/_cluster/health], the
@@ -84,7 +84,7 @@
 #
 #node.rack: rack314
 
-# By default, multiple nodes are allowed to start from the same installation location
+# By default, multiple hadoopNodes are allowed to start from the same installation location
 # to disable it, set the following:
 #node.max_local_storage_nodes: 1
 
@@ -131,7 +131,7 @@
 # by using the Index Update Settings API.
 #
 # Elasticsearch takes care about load balancing, relocating, gathering the
-# results from nodes, etc. Experiment with different settings to fine-tune
+# results from hadoopNodes, etc. Experiment with different settings to fine-tune
 # your setup.
 
 # Use the Index Status API (<http://localhost:9200/A/_status>) to inspect
@@ -202,7 +202,7 @@
 #
 #network.bind_host: 192.168.0.1
 
-# Set the address other nodes will use to communicate with this node. If not
+# Set the address other hadoopNodes will use to communicate with this node. If not
 # set, it is automatically derived. It must point to an actual IP address.
 #
 #network.publish_host: 192.168.0.1
@@ -215,7 +215,7 @@
 #
 #transport.tcp.port: 9300
 
-# Enable compression for all communication between nodes (disabled by default):
+# Enable compression for all communication between hadoopNodes (disabled by default):
 #
 #transport.tcp.compress: true
 
@@ -250,16 +250,16 @@
 # a full cluster restart (to reuse as much local data as possible when using shared
 # gateway).
 
-# Allow recovery process after N nodes in a cluster are up:
+# Allow recovery process after N hadoopNodes in a cluster are up:
 #
 #gateway.recover_after_nodes: 1
 
-# Set the timeout to initiate the recovery process, once the N nodes
+# Set the timeout to initiate the recovery process, once the N hadoopNodes
 # from previous setting are up (accepts time value):
 #
 #gateway.recover_after_time: 5m
 
-# Set how many nodes are expected in this cluster. Once these N nodes
+# Set how many hadoopNodes are expected in this cluster. Once these N hadoopNodes
 # are up (and recover_after_nodes is met), begin recovery process immediately
 # (without waiting for recover_after_time to expire):
 #
@@ -269,8 +269,8 @@
 ############################# Recovery Throttling #############################
 
 # These settings allow to control the process of shards allocation between
-# nodes during initial recovery, replica allocation, rebalancing,
-# or when adding and removing nodes.
+# hadoopNodes during initial recovery, replica allocation, rebalancing,
+# or when adding and removing hadoopNodes.
 
 # Set the number of concurrent recoveries happening on a node:
 #
@@ -278,7 +278,7 @@
 #
 #cluster.routing.allocation.node_initial_primaries_recoveries: 4
 #
-# 2. During adding/removing nodes, rebalancing, etc
+# 2. During adding/removing hadoopNodes, rebalancing, etc
 #
 #cluster.routing.allocation.node_concurrent_recoveries: 2
 
@@ -294,16 +294,16 @@
 
 ################################## Discovery ##################################
 
-# Discovery infrastructure ensures nodes can be found within a cluster
-# and master node is elected. Multicast discovery is the default.
+# Discovery infrastructure ensures hadoopNodes can be found within a cluster
+# and hbaseMaster node is elected. Multicast discovery is the default.
 
-# Set to ensure a node sees N other master eligible nodes to be considered
+# Set to ensure a node sees N other hbaseMaster eligible hadoopNodes to be considered
 # operational within the cluster. Its recommended to set it to a higher value
-# than 1 when running more than 2 nodes in the cluster.
+# than 1 when running more than 2 hadoopNodes in the cluster.
 #
 #discovery.zen.minimum_master_nodes: 1
 
-# Set the time to wait for ping responses from other nodes when discovering.
+# Set the time to wait for ping responses from other hadoopNodes when discovering.
 # Set this option to a higher value on a slow or congested network
 # to minimize discovery failures:
 #
@@ -312,7 +312,7 @@
 # For more information, see
 # <http://elasticsearch.org/guide/en/elasticsearch/reference/current/modules-discovery-zen.html>
 
-# Unicast discovery allows to explicitly control which nodes will be used
+# Unicast discovery allows to explicitly control which hadoopNodes will be used
 # to discover the cluster. It can be used when multicast is not present,
 # or to restrict the cluster communication-wise.
 #
@@ -320,8 +320,8 @@
 #
 #discovery.zen.ping.multicast.enabled: false
 #
-# 2. Configure an initial list of master nodes in the cluster
-#    to perform discovery when new nodes (master or data) are started:
+# 2. Configure an initial list of hbaseMaster hadoopNodes in the cluster
+#    to perform discovery when new hadoopNodes (hbaseMaster or data) are started:
 #
 #discovery.zen.ping.unicast.hosts: ["host1", "host2:port"]
 

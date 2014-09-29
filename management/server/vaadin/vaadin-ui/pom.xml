@@ -57,7 +57,6 @@
               com.vaadin.client.*;
               <!--com.vaadin.shared.*;-->
               com.google.gwt.*;
-              <!--{local-packages};version=${project.version};-noimport:=true-->
             </Export-Package>
 
             <!-- Package format version - do not change -->
@@ -83,6 +82,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
+        <version>2.2</version>
         <configuration>
           <webResources>
             <resource>
@@ -118,6 +118,7 @@
           <plugin>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-maven-plugin</artifactId>
+            <version>7.4.0.alpha8</version>
             <configuration>
               <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets/</webappDirectory>
               <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
@@ -163,6 +164,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <version>${com.google.guava.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- OSGi dependencies -->
@@ -174,6 +176,7 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+      <version>${org.osgi.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -195,6 +198,17 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+      <version>${com.google.code.gson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin</artifactId>
+      <version>6.8.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${org.slf4j.version}</version>
     </dependency>
   </dependencies>
 </project>

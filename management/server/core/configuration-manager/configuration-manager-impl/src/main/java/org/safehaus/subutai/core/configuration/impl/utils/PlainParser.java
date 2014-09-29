@@ -1,40 +1,42 @@
 package org.safehaus.subutai.core.configuration.impl.utils;
 
 
-import com.google.gson.JsonObject;
-import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.safehaus.subutai.core.configuration.api.ConfiguraitonTypeEnum;
+
+import com.google.gson.JsonObject;
 
 
 /**
  * Created by bahadyr on 8/4/14.
  */
-public class PlainParser implements ConfigParser {
+public class PlainParser implements ConfigParser
+{
 
-	private String content;
-
-
-	public PlainParser(final String content) {
-		this.content = content;
-	}
+    private String content;
 
 
-	@Override
-	public JsonObject parserConfig(final String pathToConfig, final ConfigTypeEnum configTypeEnum) {
-		ConfigBuilder configBuilder = new ConfigBuilder();
-		JsonObject jo = configBuilder.getConfigJsonObject(pathToConfig, configTypeEnum);
+    public PlainParser( final String content )
+    {
+        this.content = content;
+    }
 
-		List<JsonObject> fields = new ArrayList<>();
-		String key = "plain";
-		String value = content;
-		JsonObject field =
-				configBuilder.buildFieldJsonObject(key.trim(), key.trim(), true, "textfield", true, value.trim());
-		fields.add(field);
 
-		JsonObject njo = configBuilder.addJsonArrayToConfig(jo, fields);
+    @Override
+    public JsonObject parserConfig( final String pathToConfig, final ConfiguraitonTypeEnum configuraitonTypeEnum )
+    {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configuraitonTypeEnum );
 
-		return njo;
-	}
+        List<JsonObject> fields = new ArrayList<>();
+        String key = "plain";
+        String value = content;
+        JsonObject field =
+                configBuilder.buildFieldJsonObject( key.trim(), key.trim(), true, "textfield", true, value.trim() );
+        fields.add( field );
+
+        return configBuilder.addJsonArrayToConfig( jo, fields );
+    }
 }

@@ -1,19 +1,22 @@
 package org.safehaus.subutai.plugin.common.mock;
 
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.protocol.Agent;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
 
-public class CommonMockBuilder {
+import com.google.common.collect.Sets;
 
-    public static Map<Agent, Set<Agent>> getLxcMap() {
+
+public class CommonMockBuilder
+{
+
+    public static Map<Agent, Set<Agent>> getLxcMap()
+    {
         Agent agent = CommonMockBuilder.createAgent();
         Map<Agent, Set<Agent>> lxcMap = new HashMap<>();
 
@@ -23,7 +26,8 @@ public class CommonMockBuilder {
     }
 
 
-    public static Agent createAgent() {
+    public static Agent createAgent()
+    {
         return new Agent( UUID.randomUUID(), "127.0.0.1", "", "00:00:00:00", Arrays.asList( "127.0.0.1", "127.0.0.1" ),
                 true, "transportId", UUID.randomUUID(), UUID.randomUUID() );
     }
