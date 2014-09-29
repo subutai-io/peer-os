@@ -208,8 +208,15 @@ public class EnvironmentBuildWizard extends DetailsWindow
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
                 Map<String, Peer> topology = topologySelection();
-                managerUI.getEnvironmentManager()
-                         .saveBuildProcess( createBackgroundEnvironmentBuildProcess( environmentBuildTask, topology ) );
+                if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
+                {
+                    managerUI.getEnvironmentManager().saveBuildProcess(
+                            createBackgroundEnvironmentBuildProcess( environmentBuildTask, topology ) );
+                }
+                else
+                {
+                    Notification.show( "Topology is not properly set" );
+                }
                 close();
             }
         } );
@@ -252,7 +259,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
             if ( !process.getMessageMap().containsKey( key ) )
             {
-                CloneContainersMessage ccm = new CloneContainersMessage();
+                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
                 ccm.setPeerId( peer.getId() );
                 ccm.setEnvId( ebt.getUuid() );
