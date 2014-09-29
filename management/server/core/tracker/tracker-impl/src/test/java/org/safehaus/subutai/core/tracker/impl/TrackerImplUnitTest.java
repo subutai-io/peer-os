@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 /**
  * Test for TrackerImpl class
  */
-@Ignore
 public class TrackerImplUnitTest
 {
 
