@@ -46,6 +46,11 @@ public class CommunicationManagerImplTest
 
     private CommunicationManagerImpl communicationManagerImpl = null;
     private static final String SERVICE_QUEUE_NAME = "SERVICE_QUEUE";
+    private static final String VM_BROKER_URL = "vm://localhost?broker.persistent=false";
+    private static final int amqMaxSenderPoolSize = 5;
+    private static final int amqMaxMessageToAgentTtlSec = 30;
+    private static final int aqMaxPooledConnections = 5;
+    private static final boolean isPersistentMessages = false;
 
 
     @Before
@@ -54,13 +59,21 @@ public class CommunicationManagerImplTest
 
         //init target object
         communicationManagerImpl = new CommunicationManagerImpl();
-        communicationManagerImpl.setAmqMaxMessageToAgentTtlSec( 30 );
-        communicationManagerImpl.setAmqUrl( "vm://localhost?broker.persistent=false" );
-        communicationManagerImpl.setPersistentMessages( false );
-        communicationManagerImpl.setAmqMaxSenderPoolSize( 5 );
-        communicationManagerImpl.setAmqMaxPooledConnections( 5 );
+        communicationManagerImpl.setAmqMaxMessageToAgentTtlSec( amqMaxMessageToAgentTtlSec );
+        communicationManagerImpl.setAmqUrl( VM_BROKER_URL );
+        communicationManagerImpl.setPersistentMessages( isPersistentMessages );
+        communicationManagerImpl.setAmqMaxSenderPoolSize( amqMaxSenderPoolSize );
+        communicationManagerImpl.setAmqMaxPooledConnections( aqMaxPooledConnections );
         communicationManagerImpl.setAmqServiceTopic( SERVICE_QUEUE_NAME );
         communicationManagerImpl.init();
+    }
+
+
+    @Test
+    public void testProperties()
+    {
+        assertEquals( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec(), amqMaxMessageToAgentTtlSec );
+        assertEquals( communicationManagerImpl.isPersistentMessages(), isPersistentMessages );
     }
 
 
@@ -181,13 +194,11 @@ public class CommunicationManagerImplTest
     {
 
         private final Semaphore signal = new Semaphore( 0 );
-        private Response response;
 
 
         public void onResponse( Response response )
         {
 
-            this.response = response;
 
             signal.release();
         }

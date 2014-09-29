@@ -29,14 +29,29 @@ public class HiveComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                    manager.refreshUI();
+                    manager.checkServer();
+                }
+            }
+        } );
 
-        verticalLayout.addComponent( mongoSheet );
+        verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }

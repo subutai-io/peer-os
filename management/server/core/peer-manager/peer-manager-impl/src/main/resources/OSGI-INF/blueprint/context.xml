@@ -6,6 +6,10 @@
 
   <reference id="dbManager" availability="mandatory"
              interface="org.safehaus.subutai.core.db.api.DbManager" />
+
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager" />
@@ -15,6 +19,7 @@
     <property name="dbManager" ref="dbManager" />
     <property name="agentManager" ref="agentManager" />
     <property name="containerManager" ref="containerManager" />
+    <property name="commandRunner" ref="commandRunner" />
   </bean>
 
 </blueprint>

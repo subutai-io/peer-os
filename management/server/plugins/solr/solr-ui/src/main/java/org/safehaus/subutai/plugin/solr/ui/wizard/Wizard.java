@@ -19,9 +19,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 
 
-/**
- * @author dilshat
- */
 public class Wizard
 {
     private final GridLayout grid;

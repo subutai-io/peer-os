@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 public class HiveConfig implements ConfigBase
 {
 
-    public static final String PRODUCT_KEY = "Hive2";
+    public static final String PRODUCT_KEY = "Hive";
     public static final String TEMPLATE_NAME = "hadoophive";
 
     private SetupType setupType;
@@ -100,6 +100,21 @@ public class HiveConfig implements ConfigBase
     public void setHadoopNodes( Set<Agent> hadoopNodes )
     {
         this.hadoopNodes = hadoopNodes;
+    }
+
+
+    public Set<Agent> getAllNodes()
+    {
+        Set<Agent> allNodes = new HashSet<>();
+        if ( clients != null )
+        {
+            allNodes.addAll( clients );
+        }
+        if ( server != null )
+        {
+            allNodes.add( server );
+        }
+        return allNodes;
     }
 
 

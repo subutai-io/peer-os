@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui;
 
 
@@ -19,9 +14,6 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class SharkComponent extends CustomComponent
 {
 
@@ -32,16 +24,29 @@ public class SharkComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
 
-        Manager manager = new Manager( executorService, serviceLocator );
+        final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
-        verticalLayout.addComponent( mongoSheet );
-
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( "Manage".equals( caption ) )
+                {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }
 }
+

@@ -11,6 +11,10 @@
              interface="org.safehaus.subutai.core.db.api.DbManager" />
   <reference id="sparkManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.spark.api.Spark" />
+  <reference id="hadoopManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="shark-impl" scope="singleton" class="org.safehaus.subutai.plugin.shark.impl.SharkImpl"
         init-method="init" destroy-method="destroy">
@@ -19,6 +23,8 @@
     <argument ref="dbManager" />
     <argument ref="tracker" />
     <argument ref="sparkManager" />
+    <argument ref="hadoopManager" />
+    <argument ref="environmentManager" />
   </bean>
 
   <service ref="shark-impl" interface="org.safehaus.subutai.plugin.shark.api.Shark" />

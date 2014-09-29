@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 
@@ -10,9 +5,6 @@ import com.vaadin.data.Item;
 import com.vaadin.ui.TreeTable;
 
 
-/**
- * @author dilshat
- */
 public class ConfigView
 {
 

@@ -23,8 +23,6 @@ import com.vaadin.ui.themes.Runo;
  */
 public class EnvironmentManagerComponent extends CustomComponent implements Disposable
 {
-
-
     private BlueprintUploadForm blueprintManager;
     private BlueprintsForm blueprintsForm;
     private EnvironmentsForm environmentForm;

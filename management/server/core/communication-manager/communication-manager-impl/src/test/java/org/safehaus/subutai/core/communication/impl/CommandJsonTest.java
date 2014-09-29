@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.communication.impl;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -11,9 +13,11 @@ import org.safehaus.subutai.core.communication.api.CommandJson;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 
 public class CommandJsonTest
@@ -27,6 +31,8 @@ public class CommandJsonTest
 
         String actual = CommandJson.getRequestCommandJson( TestUtils.getRequestTemplate( UUID.randomUUID() ) );
         String expected = GSON.toJson( GSON.fromJson( actual, CommandJson.CommandImpl.class ) );
+
+
         assertEquals( expected, actual );
     }
 
@@ -37,6 +43,8 @@ public class CommandJsonTest
         Response response = new Response();
         String expected = GSON.toJson( new CommandJson.CommandImpl( response ) );
         String actual = CommandJson.getResponseCommandJson( response );
+
+
         assertEquals( expected, actual );
     }
 
@@ -47,6 +55,8 @@ public class CommandJsonTest
 
         String actual = CommandJson.getCommandJson( new CommandJson.CommandImpl( new Response() ) );
         String expected = GSON.toJson( GSON.fromJson( actual, CommandJson.CommandImpl.class ) );
+
+
         assertEquals( expected, actual );
     }
 
@@ -57,6 +67,8 @@ public class CommandJsonTest
         Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
         Command expected = new CommandJson.CommandImpl( request );
         Command actual = CommandJson.getCommandFromJson( GSON.toJson( expected ) );
+
+
         assertEquals( expected, actual );
     }
 
@@ -67,6 +79,8 @@ public class CommandJsonTest
         Request expected = TestUtils.getRequestTemplate( UUID.randomUUID() );
         String cmdJson = GSON.toJson( new CommandJson.CommandImpl( expected ) );
         Request actual = CommandJson.getRequestFromCommandJson( cmdJson );
+
+
         assertEquals( expected, actual );
     }
 
@@ -77,6 +91,8 @@ public class CommandJsonTest
         Response expected = new Response();
         String cmdJson = GSON.toJson( new CommandJson.CommandImpl( expected ) );
         Response actual = CommandJson.getResponseFromCommandJson( cmdJson );
+
+
         assertEquals( expected, actual );
     }
 
@@ -86,6 +102,7 @@ public class CommandJsonTest
     {
         Response response = new Response();
         CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( response );
+
 
         assertNotNull( cmd.getResponse() );
     }
@@ -97,7 +114,47 @@ public class CommandJsonTest
         Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
         CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
 
+
         assertNotNull( cmd.getRequest() );
+    }
+
+
+    @Test
+    public void checkEquals()
+    {
+        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
+        String cmdJson = CommandJson.getRequestCommandJson( request );
+        Command cmd2 = CommandJson.getCommandFromJson( cmdJson );
+
+
+        assertEquals( cmd, cmd2 );
+    }
+
+
+    @Test
+    public void checkHashCode()
+    {
+        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
+        String cmdJson = CommandJson.getRequestCommandJson( request );
+        Command cmd2 = CommandJson.getCommandFromJson( cmdJson );
+        Map<Command, Command> map = new HashMap<>();
+        map.put( cmd, cmd );
+
+
+        assertEquals( cmd, map.get( cmd2 ) );
+    }
+
+
+    @Test
+    public void shouldReturnNullOnMalformedJson()
+    {
+        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        String cmdJson = CommandJson.getRequestCommandJson( request ) + "invalid";
+
+
+        assertNull( CommandJson.getCommandFromJson( cmdJson ));
     }
 
 
@@ -105,6 +162,7 @@ public class CommandJsonTest
     public void shouldEscapeString()
     {
         String str = "\"\\\b\f\n\r\t/" + '\u007F';
+
 
         assertEquals( "\"\\\b\f\n\r\t\\/" + "\\u007F", CommandJson.escape( str ) );
     }

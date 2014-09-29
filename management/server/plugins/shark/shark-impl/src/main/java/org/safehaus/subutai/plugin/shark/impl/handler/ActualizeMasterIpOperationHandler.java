@@ -1,11 +1,9 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
@@ -24,13 +22,6 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
 
 
     @Override
-    public UUID getTrackerId()
-    {
-        return productOperation.getId();
-    }
-
-
-    @Override
     public void run()
     {
         SharkClusterConfig config = manager.getCluster( clusterName );
@@ -41,11 +32,15 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
             return;
         }
 
-        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( clusterName );
+        if ( config.getSparkClusterName() == null )
+        {
+            productOperation.addLogFailed( "Spark cluster name not specified" );
+            return;
+        }
+        SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
-            productOperation
-                    .addLogFailed( String.format( "Spark cluster '%s' not found\nInstallation aborted", clusterName ) );
+            productOperation.addLogFailed( "Underlying Spark cluster not found: " + clusterName );
             return;
         }
 
@@ -73,3 +68,4 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
         }
     }
 }
+

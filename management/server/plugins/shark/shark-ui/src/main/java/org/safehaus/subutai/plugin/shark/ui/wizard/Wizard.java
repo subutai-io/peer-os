@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 
@@ -12,6 +7,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.Spark;
@@ -20,9 +16,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 
 
-/**
- * @author dilshat
- */
 public class Wizard
 {
 
@@ -32,7 +25,8 @@ public class Wizard
     private final Spark spark;
     private final Shark shark;
     private int step = 1;
-    private SharkClusterConfig config = new SharkClusterConfig();
+    private SharkClusterConfig config;
+    private HadoopClusterConfig hadoopConfig;
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -109,6 +103,7 @@ public class Wizard
     {
         step = 1;
         config = new SharkClusterConfig();
+        hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
 
@@ -117,4 +112,11 @@ public class Wizard
     {
         return config;
     }
+
+
+    public HadoopClusterConfig getHadoopConfig()
+    {
+        return hadoopConfig;
+    }
 }
+

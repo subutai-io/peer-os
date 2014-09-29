@@ -17,6 +17,7 @@ import org.safehaus.subutai.server.ui.MainUI;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;

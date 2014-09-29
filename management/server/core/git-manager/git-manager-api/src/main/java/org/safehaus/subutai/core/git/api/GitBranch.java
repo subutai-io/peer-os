@@ -64,4 +64,32 @@ public class GitBranch
                 ", current=" + current +
                 '}';
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof GitBranch ) )
+        {
+            return false;
+        }
+
+        final GitBranch gitBranch = ( GitBranch ) o;
+
+        return current == gitBranch.current && !( name != null ? !name.equals( gitBranch.name ) :
+                                                  gitBranch.name != null );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + ( current ? 1 : 0 );
+        return result;
+    }
 }

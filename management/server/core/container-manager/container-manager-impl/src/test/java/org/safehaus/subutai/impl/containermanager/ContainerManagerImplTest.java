@@ -6,33 +6,77 @@
 package org.safehaus.subutai.impl.containermanager;
 
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.UUID;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.container.impl.ContainerManagerImpl;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.Monitoring;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import org.safehaus.subutai.core.template.api.TemplateManager;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+
 /**
  * Test for ContainerManagerImpl class
  */
-public class ContainerManagerImplUT
+public class ContainerManagerImplTest
 {
 
-    //    private ContainerManager lxcManager;
+    private ContainerManager containerManager;
+    private TemplateManager templateManager;
+    private TemplateRegistry templateRegistry;
+    private DbManager dbManager;
+    private StrategyManager strategyManager;
 
-/*
+
     @Before
-	public void setUpMethod() {
-		Monitor monitor = mock(Monitor.class);
-		when(monitor.getData(any(String.class), any(Metric.class), any(Date.class), any(Date.class)))
-				.thenReturn(Collections.EMPTY_MAP);
-		lxcManager = new ContainerManagerImpl(new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor);
-		((ContainerManagerImpl) lxcManager).init();
-	}
+    public void setUpMethod()
+    {
+        Monitoring monitor = mock( Monitoring.class );
+        when( monitor.getData( any( String.class ), any( Metric.class ), any( Date.class ), any( Date.class ) ) )
+                .thenReturn( Collections.EMPTY_MAP );
+        templateManager = mock(TemplateManager.class);
+        templateRegistry = mock(TemplateRegistry.class);
+        dbManager = mock(DbManager.class);
+        strategyManager = mock( StrategyManager.class );
+        containerManager = new ContainerManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor,
+                templateManager, templateRegistry, dbManager, strategyManager ); ( ( ContainerManagerImpl ) containerManager ).init();
+    }
 
 
-	@After
-	public void tearDownMethod() {
+    @After
+    public void tearDownMethod()
+    {
 
-		((ContainerManagerImpl) lxcManager).destroy();
-	}
+        ( ( ContainerManagerImpl ) containerManager ).destroy();
+    }
 
 
-	@Test
+//    @Test
+    public void testCloneSingleContainer() throws Exception
+    {
+        UUID envId = UUID.randomUUID();
+        String hostName ="testHostName";
+        String templateName = "master";
+        String cloneName = "testContainerName";
+        when( templateManager.clone( hostName, templateName, cloneName, envId.toString())).thenReturn( true );
+        Agent agent = containerManager.clone( envId, hostName, templateName, cloneName );
+    }
+
+    /*
+    @Test
 	public void testCloneLxcOnHost() {
 
 		boolean result =
