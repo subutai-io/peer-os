@@ -200,7 +200,8 @@ public class MockitoSelfTemporaryFileTest
     public void testCapturingArguments()
     {
 
-        ArgumentCaptor<TestClass> argument = ArgumentCaptor.forClass( TestClass.class );
+        ArgumentCaptor<String> argument = ArgumentCaptor.forClass( String.class );
+        testClass.someMethod( "Bahadyr" );
         verify( testClass ).someMethod( argument.capture() );
         //        assertEquals("Bahadyr", argument.getValue().someMethod( "Bahadyr" ));
     }
