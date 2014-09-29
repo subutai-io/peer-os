@@ -11,11 +11,13 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -212,5 +214,39 @@ public class GitManagerImplTest
         String commitId = gitManager.commit( agent, REPOSITORY_ROOT, Lists.newArrayList( "" ), COMMIT_MESSAGE, false );
 
         assertEquals( COMMIT_ID, commitId );
+    }
+
+
+    @Test
+    public void shouldCommitAllAndReturnCommitId() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), COMMIT_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        String commitId = gitManager.commitAll( agent, REPOSITORY_ROOT, COMMIT_MESSAGE );
+
+        assertEquals( COMMIT_ID, commitId );
+    }
+
+
+    @Test
+    public void shouldSupplyProperRequestBuilder() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), COMMIT_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.commitAll( agent, REPOSITORY_ROOT, COMMIT_MESSAGE );
+
+        verify( commandRunner ).createCommand(
+                new RequestBuilder( String.format( "git commit -a -m \"%s\"", COMMIT_MESSAGE ) )
+                        .withCwd( REPOSITORY_ROOT ), Sets.newHashSet( agent ) );
     }
 }
