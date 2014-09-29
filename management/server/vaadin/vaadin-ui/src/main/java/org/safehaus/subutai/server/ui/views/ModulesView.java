@@ -133,10 +133,13 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
                 @Override
                 public void OnModuleClick( PortalModule module )
                 {
-                    if ( !modules.containsKey( module.getId() ) )
+                    if ( module != null )
                     {
-                        autoCreate( module );
-                        modules.put( module.getId(), module );
+                        if ( !modules.containsKey( module.getId() ) )
+                        {
+                            autoCreate( module );
+                            modules.put( module.getId(), module );
+                        }
                     }
                 }
             } );
