@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 /**
  * Test for ProductOperation class
  */
-@Ignore
 public class ProductOperationImplTest
 {
 

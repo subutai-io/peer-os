@@ -34,7 +34,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentBuildWizard.class.getName() );
-    private int step = 1;
+    private int step = 0;
     private EnvironmentBuildTask environmentBuildTask;
     private Table peersTable;
     private Table containerToPeerTable;
@@ -47,6 +47,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
         super( caption );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
+        next();
     }
 
 
@@ -135,10 +136,9 @@ public class EnvironmentBuildWizard extends DetailsWindow
         {
             for ( Peer peer : peers )
             {
-                CheckBox ch = new CheckBox();
-
-                Object id = peersTable.addItem( new Object[] {
-                        peer.getName(), ch
+                CheckBox checkBox = new CheckBox();
+                peersTable.addItem( new Object[] {
+                        peer.getName(), checkBox
                 }, peer );
             }
         }

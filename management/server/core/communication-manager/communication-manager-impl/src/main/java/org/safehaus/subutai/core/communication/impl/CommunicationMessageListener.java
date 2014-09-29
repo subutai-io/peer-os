@@ -109,20 +109,14 @@ class CommunicationMessageListener implements MessageListener
      */
     private void notifyListeners( Response response )
     {
-        try
+
+        for ( Iterator<ResponseListener> it = listeners.iterator(); it.hasNext(); )
         {
-            for ( Iterator<ResponseListener> it = listeners.iterator(); it.hasNext(); )
+            ResponseListener listener = it.next();
+            if ( !notifyListener( listener, response ) )
             {
-                ResponseListener listener = it.next();
-                if ( !notifyListener( listener, response ) )
-                {
-                    it.remove();
-                }
+                it.remove();
             }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in notifyListeners", ex );
         }
     }
 
@@ -149,16 +143,9 @@ class CommunicationMessageListener implements MessageListener
      */
     public void addListener( ResponseListener listener )
     {
-        try
+        if ( !listeners.contains( listener ) )
         {
-            if ( !listeners.contains( listener ) )
-            {
-                listeners.add( listener );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error to add a listener:", ex );
+            listeners.add( listener );
         }
     }
 
@@ -170,14 +157,8 @@ class CommunicationMessageListener implements MessageListener
      */
     public void removeListener( ResponseListener listener )
     {
-        try
-        {
-            listeners.remove( listener );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error in removeListener", ex );
-        }
+
+        listeners.remove( listener );
     }
 
 
