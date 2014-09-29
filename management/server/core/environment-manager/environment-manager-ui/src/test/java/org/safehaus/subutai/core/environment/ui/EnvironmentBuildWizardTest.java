@@ -12,7 +12,6 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.manage.EnvironmentBuildWizard;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -47,27 +46,6 @@ public class EnvironmentBuildWizardTest
     }
 
 
-//    @Test
-    public void testName() throws Exception
-    {
-        Map<Object, Peer> topology = new HashMap<>();
-
-        Peer peer1 = new Peer();
-        peer1.setId( UUID.randomUUID() );
-
-        Peer peer2 = new Peer();
-        peer2.setId( UUID.randomUUID() );
-
-        for ( NodeGroup ng : getTask().getEnvironmentBlueprint().getNodeGroups() )
-        {
-            topology.put( 1, peer1 );
-        }
-
-        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
-        System.out.println( GSON.toJson( process ) );
-    }
-
-
     private EnvironmentBuildTask getTask()
     {
         EnvironmentBuildTask task = new EnvironmentBuildTask();
@@ -96,5 +74,26 @@ public class EnvironmentBuildWizardTest
         ng.setLinkHosts( lh );
         ng.setPlacementStrategy( ps );
         return ng;
+    }
+
+
+    @Test
+    public void testName() throws Exception
+    {
+        Map<Object, Peer> topology = new HashMap<>();
+
+        Peer peer1 = new Peer();
+        peer1.setId( UUID.randomUUID() );
+
+        Peer peer2 = new Peer();
+        peer2.setId( UUID.randomUUID() );
+
+        for ( NodeGroup ng : getTask().getEnvironmentBlueprint().getNodeGroups() )
+        {
+            topology.put( 1, peer1 );
+        }
+
+        //        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
+        //        System.out.println( GSON.toJson( process ) );
     }
 }

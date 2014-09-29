@@ -39,6 +39,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
     private Table peersTable;
     private Table containerToPeerTable;
     private EnvironmentManagerPortalModule managerUI;
+    private Map<Object, NodeGroup> nodeGroupMap;
 
 
     public EnvironmentBuildWizard( final String caption, EnvironmentManagerPortalModule managerUI,
@@ -166,9 +167,6 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    Map<Object, NodeGroup> map;
-
-
     private TabSheet genContainerToPeersTable()
     {
 
@@ -188,7 +186,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
         containerToPeerTable.setSizeFull();
 
 
-        map = new HashMap<>();
+        nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
@@ -203,7 +201,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 Object itemId = containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), comboBox
                 }, null );
-                map.put( itemId, ng );
+                nodeGroupMap.put( itemId, ng );
             }
         }
         Button nextButton = new Button( "Build" );
@@ -257,10 +255,10 @@ public class EnvironmentBuildWizard extends DetailsWindow
     {
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint().getName() );
 
-        for ( Object itemId : map.keySet() )
+        for ( Object itemId : nodeGroupMap.keySet() )
         {
             Peer peer = topology.get( itemId );
-            NodeGroup ng = map.get( itemId );
+            NodeGroup ng = nodeGroupMap.get( itemId );
 
             String key = peer.getId().toString() + "-" + ng.getTemplateName();
 
@@ -289,9 +287,6 @@ public class EnvironmentBuildWizard extends DetailsWindow
         Map<Object, Peer> topology = new HashMap<>();
         for ( Object itemId : containerToPeerTable.getItemIds() )
         {
-            //            String templateName =
-            //                    ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" )
-            // .getValue();
             ComboBox selection =
                     ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
