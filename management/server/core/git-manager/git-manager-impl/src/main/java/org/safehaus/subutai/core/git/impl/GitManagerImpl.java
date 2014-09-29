@@ -276,7 +276,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( filePaths ), FILES_IS_EMPTY_MSG );
 
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git rm" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
@@ -302,7 +302,7 @@ public class GitManagerImpl implements GitManager
                           final String message, boolean afterConflictResolved ) throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( filePaths ), FILES_IS_EMPTY_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is null or empty" );
 
         Command addCommand = commandRunner.createCommand( new RequestBuilder(
@@ -607,7 +607,7 @@ public class GitManagerImpl implements GitManager
             throws GitException
     {
         validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), FILES_IS_EMPTY_MSG );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( filePaths ), FILES_IS_EMPTY_MSG );
 
         Command undoCommand = commandRunner.createCommand(
                 new RequestBuilder( "git checkout --" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),

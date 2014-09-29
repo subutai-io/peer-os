@@ -161,4 +161,36 @@ public class GitManagerImplTest
 
         verify( command, times( 1 ) ).execute();
     }
+
+
+    @Test
+    public void shouldRunAddAllCommand() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.addAll( agent, REPOSITORY_ROOT );
+
+        verify( command, times( 1 ) ).execute();
+    }
+
+
+    @Test
+    public void shouldRunDeleteCommand() throws GitException, CommandException
+    {
+        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Command command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
+        CommandRunner commandRunner = MockUtils.getCommandRunner( command );
+
+        GitManagerImpl gitManager = new GitManagerImpl( commandRunner );
+
+
+        gitManager.delete( agent, REPOSITORY_ROOT, Lists.newArrayList( "" ) );
+
+        verify( command, times( 1 ) ).execute();
+    }
 }
