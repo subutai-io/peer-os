@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +35,7 @@ import com.vaadin.ui.UI;
 /**
  * @author tjamakeev
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 
 public final class EnvironmentTree extends ConcurrentComponent implements AgentListener, Disposable
 {
@@ -47,7 +46,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
     private final Tree tree;
     private HierarchicalContainer container;
     private Set<Agent> currentAgents = new HashSet<>();
-    private Set<EnvironmentContainer> selectedContainers = new HashSet<>();
+    private EnvironmentContainer selectedContainer;
     private Environment environment;
     private String peerId;
 
@@ -60,7 +59,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
 
         if ( environmentManager.getEnvironments() != null && environmentManager.getEnvironments().size() > 0 )
         {
-            this.environment = environmentManager.getEnvironments().get( 0 );
+            this.environment = environmentManager.getEnvironments().get( 1 );
         }
 
         setSizeFull();
@@ -102,7 +101,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
                 {
                     Tree t = ( Tree ) event.getProperty();
 
-                    Set<EnvironmentContainer> selectedList = new HashSet<EnvironmentContainer>();
+                    List<EnvironmentContainer> selectedList = new ArrayList<EnvironmentContainer>();
 
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
@@ -114,7 +113,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
                         }
                     }
 
-                    selectedContainers = selectedList;
+                    selectedContainer = selectedList.get( 0 );
                 }
             }
         } );
@@ -318,9 +317,9 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
     }
 
 
-    public Set<EnvironmentContainer> getSelectedContainers()
+    public EnvironmentContainer getSelectedContainer()
     {
-        return Collections.unmodifiableSet( selectedContainers );
+        return selectedContainer;
     }
 
 
@@ -367,6 +366,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
                     Item item = container.getItem( itemId );
                     item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
                 }
+                else
                 {
                     Item item = container.getItem( itemId );
                     item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );

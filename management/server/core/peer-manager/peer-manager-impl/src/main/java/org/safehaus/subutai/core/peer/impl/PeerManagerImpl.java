@@ -26,6 +26,11 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -41,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
@@ -58,6 +64,8 @@ public class PeerManagerImpl implements PeerManager
     private AgentManager agentManager;
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
+    private CommandRunner commandRunner;
+
     private Set<PeerContainer> containers = new HashSet<>();
 
 
@@ -81,6 +89,12 @@ public class PeerManagerImpl implements PeerManager
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
+        this.commandRunner = commandRunner;
     }
 
 
@@ -531,9 +545,33 @@ public class PeerManagerImpl implements PeerManager
 
     private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
     {
-        ecm.setResult( "Command executor stub!!!" );
-        ecm.setSuccess( true );
-        // TODO: Implement me
+        Agent agent = agentManager.getAgentByUUID( ecm.getAgentId() );
+        RequestBuilder requestBuilder = new RequestBuilder( ecm.getCommand() );
+
+
+        if ( ecm.getCwd() != null && !Strings.isNullOrEmpty( ecm.getCwd() ) )
+        {
+            requestBuilder.withCwd( ecm.getCwd() );
+        }
+
+        int timeout = ecm.getTimeout();
+
+        requestBuilder.withTimeout( timeout );
+        Command cmd = commandRunner.createCommand( "Remote command", requestBuilder, Sets.newHashSet( agent ) );
+        try
+        {
+            cmd.execute();
+            AgentResult result = cmd.getResults().get( ecm.getAgentId() );
+            ecm.setStdOut( result.getStdOut() );
+            ecm.setStdErr( result.getStdErr() );
+            ecm.setExitCode( result.getExitCode() );
+            ecm.setSuccess( true );
+        }
+        catch ( CommandException e )
+        {
+            ecm.setSuccess( false );
+            ecm.setExceptionMessage( e.toString() );
+        }
     }
 
 

@@ -1,23 +1,20 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
+import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,24 +33,26 @@ public class SendButtonListener implements Button.ClickListener
     private final TerminalForm form;
     private final EnvironmentManager environmentManager;
     private final ExecutorService executor;
+    //    private final CommandRunner commandRunner;
 
 
     public SendButtonListener( final TerminalForm form, final EnvironmentManager environmentManager,
-                               final ExecutorService executor )
+                               ExecutorService executor )
     {
         this.form = form;
         this.environmentManager = environmentManager;
         this.executor = executor;
+        //        this.commandRunner = commandRunner;
     }
 
 
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        Set<Agent> agents = new HashSet<>();// = form.agentTree.getSelectedContainers();
-        if ( agents.isEmpty() )
+        EnvironmentContainer container = form.environmentTree.getSelectedContainer();
+        if ( container == null )
         {
-            form.show( "Please, select nodes" );
+            form.show( "Please, select node" );
         }
         else if ( form.programTxtFld.getValue() == null || Strings.isNullOrEmpty( form.programTxtFld.getValue() ) )
         {
@@ -61,12 +60,12 @@ public class SendButtonListener implements Button.ClickListener
         }
         else
         {
-            executeCommand( agents );
+            executeCommand( container );
         }
     }
 
 
-    private void executeCommand( Set<Agent> agents )
+    private void executeCommand( EnvironmentContainer container )
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
@@ -91,13 +90,16 @@ public class SendButtonListener implements Button.ClickListener
 
             int timeout = Integer.valueOf( form.timeoutTxtFld.getValue() );
             requestBuilder.withTimeout( timeout );
+            UUID taskUuid = UUIDUtil.generateTimeBasedUUID();
+            Request request = requestBuilder.build( container.getAgentId(), taskUuid );
 
             form.indicator.setVisible( true );
 
-            //            executor.execute(
-            //                    new ExecuteCommandTask( commandDispatcher.createCommand( requestBuilder, agents ),
-            // agentManager,
-            //                            form ) );
+            ExecuteCommandMessage ecm =
+                    new ExecuteCommandMessage( container.getEnvironment().getUuid(), container.getPeerId(),
+                            container.getAgentId(), form.programTxtFld.getValue(), RequestType.EXECUTE_REQUEST,
+                             timeout, form.workDirTxtFld.getValue() );
+            executor.execute( new ExecuteCommandTask( ecm, environmentManager, form ) );
         }
     }
 
@@ -131,38 +133,36 @@ public class SendButtonListener implements Button.ClickListener
     private static class ExecuteCommandTask implements Runnable
     {
 
-        private final Command command;
-        private final AgentManager agentManager;
+        private final EnvironmentManager environmentManager;
         private final TerminalForm form;
+        private final ExecuteCommandMessage ecm;
 
 
-        private ExecuteCommandTask( final Command command, final AgentManager agentManager, final TerminalForm form )
+        private ExecuteCommandTask( ExecuteCommandMessage ecm, final EnvironmentManager environmentManager,
+                                    final TerminalForm form )
         {
-            this.command = command;
-            this.agentManager = agentManager;
+            this.environmentManager = environmentManager;
             this.form = form;
+            this.ecm = ecm;
             form.taskCount.incrementAndGet();
         }
 
 
         public void run()
         {
-            try
-            {
-                command.execute( new CommandCallback()
-                {
+            environmentManager.invoke( ecm );
 
-                    @Override
-                    public void onResponse( Response response, AgentResult agentResult, Command command )
-                    {
-                        displayResponse( response );
-                    }
-                } );
-            }
-            catch ( CommandException e )
+            if ( ecm.isSuccess() )
             {
-                LOG.error( "Error in ExecuteCommandTask", e );
-                form.show( e.getMessage() );
+                form.addOutput( ecm.getStdOut() );
+                form.addOutput( ecm.getStdErr() );
+                //                form.addOutput( ecm.getExitCode().toString() );
+            }
+            else
+            {
+                form.addOutput( "Exception: " + ecm.getExceptionMessage() );
+
+                LOG.warn( String.format( "Execute Command Message Response is null %s", ecm ) );
             }
 
             form.taskCount.decrementAndGet();
@@ -198,12 +198,13 @@ public class SendButtonListener implements Button.ClickListener
 
             if ( out.length() > 0 )
             {
-                Agent agent = agentManager.getAgentByUUID( response.getUuid() );
-                StringBuilder host = new StringBuilder(
-                        agent == null ? String.format( "Offline[%s]", response.getUuid() ) : agent.getHostname() );
-
-                host.append( " [" ).append( response.getPid() ).append( "]" ).append( ":\n" );
-                out.insert( 0, host );
+                //                Agent agent = agentManager.getAgentByUUID( response.getUuid() );
+                //                StringBuilder host = new StringBuilder(
+                //                        agent == null ? String.format( "Offline[%s]",
+                // response.getUuid() ) : agent.getHostname() );
+                //
+                //                host.append( " [" ).append( response.getPid() ).append( "]" ).append( ":\n" );
+                //                out.insert( 0, host );
                 form.addOutput( out.toString() );
             }
         }
