@@ -2,8 +2,9 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -12,7 +13,10 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -29,7 +33,8 @@ import com.vaadin.ui.themes.Runo;
 public class EnvironmentBuildWizard extends DetailsWindow
 {
 
-    private int step = 0;
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentBuildWizard.class.getName() );
+    private int step = 1;
     private EnvironmentBuildTask environmentBuildTask;
     private Table peersTable;
     private Table containerToPeerTable;
@@ -42,7 +47,6 @@ public class EnvironmentBuildWizard extends DetailsWindow
         super( caption );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
-        next();
     }
 
 
@@ -118,7 +122,6 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
         peersTable = new Table();
         peersTable.addContainerProperty( "Name", String.class, null );
-        peersTable.addContainerProperty( "ID", UUID.class, null );
         peersTable.addContainerProperty( "Select", CheckBox.class, null );
         peersTable.setPageLength( 10 );
         peersTable.setSelectable( false );
@@ -128,14 +131,16 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
 
         List<Peer> peers = managerUI.getPeerManager().peers();
-        for ( Peer peer : peers )
+        if ( !peers.isEmpty() )
         {
-            CheckBox ch = new CheckBox();
+            for ( Peer peer : peers )
+            {
+                CheckBox ch = new CheckBox();
 
-            Object id = peersTable.addItem( new Object[] {
-                    peer.getName(), peer.getId(), ch
-            }, null );
-            peersTable.setItemCaptionPropertyId( "name" );
+                Object id = peersTable.addItem( new Object[] {
+                        peer.getName(), ch
+                }, peer );
+            }
         }
         Button nextButton = new Button( "Next" );
         nextButton.addClickListener( new Button.ClickListener()
@@ -184,12 +189,16 @@ public class EnvironmentBuildWizard extends DetailsWindow
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
             {
-                ComboBox comboBox = new ComboBox( "", selectedPeers() );
+                ComboBox comboBox = new ComboBox();
+                BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
+                bic.addAll( selectedPeers() );
+                comboBox.setContainerDataSource( bic );
                 comboBox.setNullSelectionAllowed( false );
                 comboBox.setTextInputAllowed( false );
+                comboBox.setItemCaptionPropertyId( "name" );
                 containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), comboBox
-                }, null );
+                }, ng.getTemplateName() );
             }
         }
         Button nextButton = new Button( "Build" );
@@ -198,7 +207,9 @@ public class EnvironmentBuildWizard extends DetailsWindow
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                createBackgroundEnvironmentBuildProcess();
+                Map<String, Peer> topology = topologySelection();
+                managerUI.getEnvironmentManager()
+                         .saveBuildProcess( createBackgroundEnvironmentBuildProcess( environmentBuildTask, topology ) );
                 close();
             }
         } );
@@ -214,46 +225,64 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    private List<UUID> selectedPeers()
+    private List<Peer> selectedPeers()
     {
-        List<UUID> uuids = new ArrayList<>();
+        List<Peer> peers = new ArrayList<>();
         for ( Object itemId : peersTable.getItemIds() )
         {
-            UUID uuid = ( UUID ) peersTable.getItem( itemId ).getItemProperty( "ID" ).getValue();
             CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
             if ( selection.getValue() )
             {
-                uuids.add( uuid );
+                peers.add( ( Peer ) itemId );
             }
         }
-        return uuids;
+        return peers;
     }
 
 
-    private void createBackgroundEnvironmentBuildProcess()
+    public EnvironmentBuildProcess createBackgroundEnvironmentBuildProcess( EnvironmentBuildTask ebt,
+                                                                            Map<String, Peer> topology )
     {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess();
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint().getName() );
+
+        for ( NodeGroup ng : ebt.getEnvironmentBlueprint().getNodeGroups() )
+        {
+            Peer peer = topology.get( ng.getTemplateName() );
+            String key = peer.getId().toString() + "" + ng.getTemplateName();
+
+            if ( !process.getMessageMap().containsKey( key ) )
+            {
+                CloneContainersMessage ccm = new CloneContainersMessage();
+                ccm.setTemplate( ng.getTemplateName() );
+                ccm.setPeerId( peer.getId() );
+                ccm.setEnvId( ebt.getUuid() );
+                ccm.setNumberOfNodes( 1 );
+                ccm.setStrategy( ng.getPlacementStrategy().toString() );
+                process.putCloneContainerMessage( key, ccm );
+            }
+            else
+            {
+                process.getMessageMap().get( key ).incrementNumberOfNodes();
+            }
+        }
+
+        return process;
+    }
 
 
+    private Map<String, Peer> topologySelection()
+    {
+        Map<String, Peer> topology = new HashMap<>();
         for ( Object itemId : containerToPeerTable.getItemIds() )
         {
             String templateName =
                     ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
             ComboBox selection =
                     ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
-            UUID peerUuid = ( UUID ) selection.getValue();
+            Peer peer = ( Peer ) selection.getValue();
 
-
-            CloneContainersMessage ccm = new CloneContainersMessage();
-            ccm.setTemplate( templateName );
-            ccm.setPeerId( peerUuid );
-            ccm.setEnvId( environmentBuildTask.getUuid() );
-            ccm.setNumberOfNodes( 2 );
-            ccm.setStrategy( "ROUND_ROBIN" );
-            process.getCloneContainersMessages().add( ccm );
+            topology.put( templateName, peer );
         }
-
-
-        managerUI.getEnvironmentManager().saveBuildProcess( process );
+        return topology;
     }
 }

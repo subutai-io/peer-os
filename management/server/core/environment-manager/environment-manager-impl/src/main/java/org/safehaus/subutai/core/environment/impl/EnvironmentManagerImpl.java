@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.Notification;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
@@ -295,8 +293,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
             throws EnvironmentBuildException
     {
-
-
         Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
         for ( CloneContainersMessage ccm : environmentBuildProcess.getCloneContainersMessages() )
         {
@@ -305,10 +301,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             try
             {
                 peerCommandDispatcher.invoke( ccm );
-                if ( ccm == null )
-                {
-                    throw new EnvironmentBuildException( "CloneContainerMessage returned null" );
-                }
+
                 boolean result = ccm.isSuccess();
                 if ( result )
                 {
@@ -343,7 +336,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         else
         {
-            throw new EnvironmentBuildException( "No containers assigned to e" );
+            throw new EnvironmentBuildException( "No containers assigned to the Environment" );
         }
     }
 
