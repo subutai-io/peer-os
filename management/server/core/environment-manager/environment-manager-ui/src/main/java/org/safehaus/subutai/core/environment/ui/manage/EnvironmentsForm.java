@@ -111,8 +111,8 @@ public class EnvironmentsForm
                     {
 
                         containersTable.addItem( new Object[] {
-                                container.getName(), container.getPeerId(), new Button( "Start" ), new Button( "Stop" ),
-                                new Button( "Destroy" )
+                                container.getName(), container.getPeerId(), startButton( container ),
+                                stopButton( container ), destroyButton( container )
                         }, null );
                     }
 
@@ -152,6 +152,51 @@ public class EnvironmentsForm
             }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private Object startButton( final Container container )
+    {
+        Button button = new Button( "Start" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Start" );
+            }
+        } );
+        return button;
+    }
+
+
+    private Object stopButton( final Container container )
+    {
+        Button button = new Button( "Stop" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Stop" );
+            }
+        } );
+        return button;
+    }
+
+
+    private Object destroyButton( final Container container )
+    {
+        Button button = new Button( "Destroy" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Destory" );
+            }
+        } );
+        return button;
     }
 
 
