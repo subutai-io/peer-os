@@ -47,6 +47,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
         super( caption );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
+        next();
     }
 
 
@@ -235,12 +236,15 @@ public class EnvironmentBuildWizard extends DetailsWindow
     private List<Peer> selectedPeers()
     {
         List<Peer> peers = new ArrayList<>();
-        for ( Object itemId : peersTable.getItemIds() )
+        if ( !peers.isEmpty() )
         {
-            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
-            if ( selection.getValue() )
+            for ( Object itemId : peersTable.getItemIds() )
             {
-                peers.add( ( Peer ) itemId );
+                CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
+                if ( selection.getValue() )
+                {
+                    peers.add( ( Peer ) itemId );
+                }
             }
         }
         return peers;
