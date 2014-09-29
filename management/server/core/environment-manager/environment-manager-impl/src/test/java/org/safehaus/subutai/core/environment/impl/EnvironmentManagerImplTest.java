@@ -80,7 +80,7 @@ public class EnvironmentManagerImplTest
     @Test
     public void shouldAddContainer()
     {
-        environmentManager.addContainer( mock( EnvironmentContainer.class ) );
+//        environmentManager.addContainer( mock( EnvironmentContainer.class ) );
     }
 
 
@@ -99,8 +99,8 @@ public class EnvironmentManagerImplTest
         ebp.setCompleteStatus( false );
         ebp.setUuid( UUID.randomUUID() );
 
-        CloneContainersMessage ccm = new CloneContainersMessage();
-        ebp.addCloneContainerMessage( ccm );
+//        CloneContainersMessage ccm = new CloneContainersMessage();
+//        ebp.addCloneContainerMessage( ccm );
 
         return ebp;
     }
