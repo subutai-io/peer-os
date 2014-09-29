@@ -64,7 +64,7 @@ public class ContainerManagerImplTest
     }
 
 
-    @Test
+//    @Test
     public void testCloneSingleContainer() throws Exception
     {
         UUID envId = UUID.randomUUID();
