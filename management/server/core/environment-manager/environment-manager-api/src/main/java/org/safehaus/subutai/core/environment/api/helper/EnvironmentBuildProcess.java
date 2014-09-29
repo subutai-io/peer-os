@@ -1,9 +1,7 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,7 +21,7 @@ public class EnvironmentBuildProcess
     private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
     private int timestamp;
-    private List<CloneContainersMessage> cloneContainersMessages;
+    //    private List<CloneContainersMessage> cloneContainersMessages;
     private Map<String, CloneContainersMessage> messageMap;
 
 
@@ -32,7 +30,7 @@ public class EnvironmentBuildProcess
         this.environmentName = name;
         this.uuid = UUID.randomUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
-        this.cloneContainersMessages = new ArrayList<>();
+        //        this.cloneContainersMessages = new ArrayList<>();
         this.messageMap = new HashMap<>();
     }
 
@@ -43,10 +41,10 @@ public class EnvironmentBuildProcess
     }
 
 
-    public void setCloneContainersMessages( final List<CloneContainersMessage> cloneContainersMessages )
+   /* public void setCloneContainersMessages( final List<CloneContainersMessage> cloneContainersMessages )
     {
         this.cloneContainersMessages = cloneContainersMessages;
-    }
+    }*/
 
 
     public Map<String, CloneContainersMessage> getMessageMap()
@@ -61,7 +59,7 @@ public class EnvironmentBuildProcess
     }
 
 
-    public List<CloneContainersMessage> getCloneContainersMessages()
+   /* public List<CloneContainersMessage> getCloneContainersMessages()
     {
         return cloneContainersMessages;
     }
@@ -70,7 +68,7 @@ public class EnvironmentBuildProcess
     public void addCloneContainerMessage( CloneContainersMessage ccm )
     {
         this.cloneContainersMessages.add( ccm );
-    }
+    }*/
 
 
     public ProcessStatusEnum getProcessStatusEnum()
