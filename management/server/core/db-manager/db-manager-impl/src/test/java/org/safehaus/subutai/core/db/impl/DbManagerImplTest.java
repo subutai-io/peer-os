@@ -12,7 +12,6 @@ import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -31,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for DbManagerImpl class
  */
-@Ignore
 public class DbManagerImplTest
 {
 
