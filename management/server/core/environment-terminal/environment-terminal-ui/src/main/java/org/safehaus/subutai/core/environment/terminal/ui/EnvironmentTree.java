@@ -22,11 +22,13 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
@@ -43,6 +45,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
     private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
     private final AgentManager agentManager;
     private final EnvironmentManager environmentManager;
+    private final ComboBox env;
     private final Tree tree;
     private HierarchicalContainer container;
     private Set<Agent> currentAgents = new HashSet<>();
@@ -57,13 +60,32 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
 
         this.environmentManager = environmentManager;
 
-        if ( environmentManager.getEnvironments() != null && environmentManager.getEnvironments().size() > 0 )
-        {
-            this.environment = environmentManager.getEnvironments().get( 0 );
-        }
+        //        if ( environmentManager.getEnvironments() != null && environmentManager.getEnvironments().size() > 0 )
+        //        {
+        //            this.environment = environmentManager.getEnvironments().get( 0 );
+        //        }
 
         setSizeFull();
         setMargin( true );
+
+        BeanItemContainer<Environment> environments = new BeanItemContainer<Environment>( Environment.class );
+        environments.addAll( environmentManager.getEnvironments() );
+        env = new ComboBox( null, environments );
+        env.setItemCaptionPropertyId( "uuid" );
+        //        env.setWidth( 200, Unit.PIXELS );
+        env.setImmediate( true );
+        env.setTextInputAllowed( false );
+        env.setNullSelectionAllowed( false );
+        Property.ValueChangeListener listener = new Property.ValueChangeListener()
+        {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                environment = ( Environment ) event.getProperty().getValue();
+                tree.setContainerDataSource( getNodeContainer() );
+            }
+        };
+
+        env.addValueChangeListener( listener );
 
         tree = new Tree( "List of containers" );
         tree.setContainerDataSource( getNodeContainer() );
@@ -90,33 +112,23 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
                 return description;
             }
         } );
-        tree.setMultiSelect( true );
+        tree.setMultiSelect( false );
         tree.setImmediate( true );
         tree.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                if ( event.getProperty().getValue() instanceof Set )
+                LOG.info( event.getProperty().toString() );
+                Item item = container.getItem( event.getProperty().getValue() );
+                if ( item.getItemProperty( "value" ).getValue() instanceof EnvironmentContainer )
                 {
-                    Tree t = ( Tree ) event.getProperty();
-
-                    List<EnvironmentContainer> selectedList = new ArrayList<EnvironmentContainer>();
-
-                    for ( Object o : ( Iterable<?> ) t.getValue() )
-                    {
-                        if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
-                        {
-                            EnvironmentContainer environmentContainer =
-                                    ( EnvironmentContainer ) tree.getItem( o ).getItemProperty( "value" ).getValue();
-                            selectedList.add( environmentContainer );
-                        }
-                    }
-
-                    selectedContainer = selectedList.get( 0 );
+                    selectedContainer = ( EnvironmentContainer ) item.getItemProperty( "value" ).getValue();
+                    LOG.info( "Selected container: " + selectedContainer );
                 }
             }
         } );
+        addComponent( env );
         addComponent( tree );
 
         agentManager.addListener( this );
@@ -130,13 +142,20 @@ public final class EnvironmentTree extends ConcurrentComponent implements AgentL
         container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
 
         tree.removeAllItems();
-        for ( EnvironmentContainer ec : environment.getContainers() )
+        if ( environment != null )
         {
-            String itemId = ec.getPeerId() + ":" + ec.getAgentId();
-            Item item = container.addItem( itemId );
-            container.setChildrenAllowed( itemId, false );
-            tree.setItemCaption( item, ec.getHostname() );
-            item.getItemProperty( "value" ).setValue( ec );
+            for ( EnvironmentContainer ec : environment.getContainers() )
+            {
+                String itemId = ec.getPeerId() + ":" + ec.getAgentId();
+                Item item = container.addItem( itemId );
+                container.setChildrenAllowed( itemId, false );
+                tree.setItemCaption( item, ec.getHostname() );
+                item.getItemProperty( "value" ).setValue( ec );
+            }
+        }
+        else
+        {
+            LOG.info( "Environment is null" );
         }
         //        refreshAgents( agentManager.getAgents() );
 
