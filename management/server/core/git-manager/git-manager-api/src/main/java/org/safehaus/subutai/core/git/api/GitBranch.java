@@ -80,16 +80,8 @@ public class GitBranch
 
         final GitBranch gitBranch = ( GitBranch ) o;
 
-        if ( current != gitBranch.current )
-        {
-            return false;
-        }
-        if ( name != null ? !name.equals( gitBranch.name ) : gitBranch.name != null )
-        {
-            return false;
-        }
-
-        return true;
+        return current == gitBranch.current && !( name != null ? !name.equals( gitBranch.name ) :
+                                                  gitBranch.name != null );
     }
 
 

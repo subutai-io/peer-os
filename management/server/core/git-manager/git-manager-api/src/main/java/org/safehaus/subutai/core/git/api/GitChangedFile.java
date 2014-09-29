@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.git.api;
 
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+
 /**
  * Represents a path to a changed file with the status of file
  */
@@ -13,6 +17,8 @@ public class GitChangedFile
 
     public GitChangedFile( final GitFileStatus gitFileStatus, final String gitFilePath )
     {
+        Preconditions.checkNotNull( gitFileStatus, "Git file status is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gitFilePath ), "Git file path is null or empty" + "" );
         this.gitFileStatus = gitFileStatus;
         this.gitFilePath = gitFilePath;
     }
@@ -54,16 +60,8 @@ public class GitChangedFile
 
         final GitChangedFile that = ( GitChangedFile ) o;
 
-        if ( gitFilePath != null ? !gitFilePath.equals( that.gitFilePath ) : that.gitFilePath != null )
-        {
-            return false;
-        }
-        if ( gitFileStatus != that.gitFileStatus )
-        {
-            return false;
-        }
-
-        return true;
+        return !( gitFilePath != null ? !gitFilePath.equals( that.gitFilePath ) : that.gitFilePath != null )
+                && gitFileStatus == that.gitFileStatus;
     }
 
 
