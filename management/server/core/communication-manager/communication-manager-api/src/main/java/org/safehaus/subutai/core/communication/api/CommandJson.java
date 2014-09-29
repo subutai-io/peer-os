@@ -34,19 +34,19 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized request from json string
+     * Returns deserialized request from command json string
      *
      * @param json - command in json format
      *
-     * @return command
+     * @return request
      */
     public static Request getRequestFromCommandJson( String json )
     {
 
         Command cmd = getCommandFromJson( json );
-        if ( cmd != null && cmd.getCommand() != null )
+        if ( cmd != null && cmd.getRequest() != null )
         {
-            return cmd.getCommand();
+            return cmd.getRequest();
         }
 
         return null;
@@ -54,7 +54,7 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized command from json string
+     * Returns deserialized command from command json string
      *
      * @param json - command in json format
      *
@@ -145,9 +145,9 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized response from json string
+     * Returns deserialized response from command json string
      *
-     * @param json - response in json format
+     * @param json - command in json format
      *
      * @return response
      */
@@ -165,9 +165,9 @@ public class CommandJson
 
 
     /**
-     * Returns serialized command from Request POJO
+     * Returns serialized command from {@code Request}
      *
-     * @param request - command in pojo format
+     * @param request - request
      *
      * @return command in json format
      */
@@ -186,11 +186,11 @@ public class CommandJson
 
 
     /**
-     * Returns serialized command from Response POJO
+     * Returns serialized command from {@code Response}
      *
-     * @param response - response in pojo format
+     * @param response - response
      *
-     * @return response in json format
+     * @return command in json format
      */
     public static String getResponseCommandJson( Response response )
     {
@@ -207,11 +207,11 @@ public class CommandJson
 
 
     /**
-     * Returns serialized command from Command POJO
+     * Returns serialized command from {@code Command}
      *
-     * @param cmd - command in pojo format
+     * @param cmd - command
      *
-     * @return command in command format
+     * @return command in json format
      */
     public static String getCommandJson( Command cmd )
     {
@@ -251,7 +251,7 @@ public class CommandJson
 
 
         @Override
-        public Request getCommand()
+        public Request getRequest()
         {
             return command;
         }
