@@ -153,18 +153,10 @@ public class ProgressWindow
 
     private void setOutput( String output )
     {
-        try
+        if ( !Strings.isNullOrEmpty( output ) )
         {
-            VaadinSession.getCurrent().getLockInstance().lock();
-            if ( !com.google.gwt.thirdparty.guava.common.base.Strings.isNullOrEmpty( output ) )
-            {
-                outputTxtArea.setValue( output );
-                outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
-            }
-        }
-        finally
-        {
-            VaadinSession.getCurrent().getLockInstance().unlock();
+            outputTxtArea.setValue( output );
+            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
         }
     }
 
