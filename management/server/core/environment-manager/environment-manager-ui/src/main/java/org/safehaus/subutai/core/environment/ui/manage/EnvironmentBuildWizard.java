@@ -247,10 +247,8 @@ public class EnvironmentBuildWizard extends DetailsWindow
             Peer peer = ( Peer ) selection.getValue();
 
 
-            CloneContainersMessage ccm = new CloneContainersMessage();
+            CloneContainersMessage ccm = new CloneContainersMessage(environmentBuildTask.getUuid(),peer.getId() );
             ccm.setTemplate( templateName );
-            ccm.setPeerId( peer.getId() );
-            ccm.setEnvId( environmentBuildTask.getUuid() );
             ccm.setNumberOfNodes( 1 );
             ccm.setStrategy( "ROUND_ROBIN" );
             process.getCloneContainersMessages().add( ccm );
