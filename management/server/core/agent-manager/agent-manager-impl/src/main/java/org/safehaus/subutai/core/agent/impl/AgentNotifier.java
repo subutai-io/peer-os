@@ -10,6 +10,8 @@ import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Runnable to notify listeners about change in connected agents set
@@ -23,6 +25,9 @@ public class AgentNotifier implements Runnable
 
     public AgentNotifier( final AgentManagerImpl agentManager )
     {
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+
         this.agentManager = agentManager;
     }
 

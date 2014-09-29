@@ -259,6 +259,7 @@ public class AgentManagerImplTest
         agentManager.addListener( mock( AgentListener.class ) );
 
         assertFalse( agentManager.getListeners().isEmpty() );
+        assertFalse( agentManager.getListenersQueue().isEmpty() );
     }
 
 
@@ -272,5 +273,6 @@ public class AgentManagerImplTest
         agentManager.removeListener( listener );
 
         assertTrue( agentManager.getListeners().isEmpty() );
+        assertTrue( agentManager.getListenersQueue().isEmpty() );
     }
 }

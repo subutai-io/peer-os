@@ -1,14 +1,17 @@
 package org.safehaus.subutai.plugin.shark.ui;
 
 
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
 import java.util.concurrent.ExecutorService;
+
 import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.shark.ui.manager.Manager;
 import org.safehaus.subutai.plugin.shark.ui.wizard.Wizard;
+
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
 
 
 public class SharkComponent extends CustomComponent
@@ -21,19 +24,29 @@ public class SharkComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet tabSheet = new TabSheet();
-        tabSheet.setSizeFull();
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
 
-        Manager manager = new Manager( executorService, serviceLocator );
+        final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
-        tabSheet.addTab( wizard.getContent(), "Install" );
-        tabSheet.addTab( manager.getContent(), "Manage" );
-        verticalLayout.addComponent( tabSheet );
-
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( "Manage".equals( caption ) )
+                {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }
-
-
 }
 

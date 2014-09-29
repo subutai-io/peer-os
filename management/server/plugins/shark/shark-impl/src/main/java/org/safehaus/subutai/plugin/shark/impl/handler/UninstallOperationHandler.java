@@ -1,12 +1,10 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
@@ -18,8 +16,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
     public UninstallOperationHandler( SharkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.productOperation = manager.getTracker().createProductOperation(
-                SharkClusterConfig.PRODUCT_KEY, String.format( "Destroying cluster %s", clusterName ) );
+        this.productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+                String.format( "Destroying cluster %s", clusterName ) );
     }
 
 
@@ -60,8 +58,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
                 }
                 else
                 {
-                    productOperation.addLog(
-                            String.format( "Error on node %s: %s", a.getHostname(), result.getStdErr() ) );
+                    productOperation
+                            .addLog( String.format( "Error on node %s: %s", a.getHostname(), result.getStdErr() ) );
                 }
             }
             productOperation.addLog( "Updating db..." );
@@ -80,7 +78,5 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
             productOperation.addLogFailed( "Uninstallation failed, command timed out" );
         }
     }
-
-
 }
 
