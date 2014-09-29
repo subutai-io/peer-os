@@ -198,7 +198,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 comboBox.setItemCaptionPropertyId( "name" );
                 containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), comboBox
-                }, ng.getTemplateName() );
+                }, null );
             }
         }
         Button nextButton = new Button( "Build" );

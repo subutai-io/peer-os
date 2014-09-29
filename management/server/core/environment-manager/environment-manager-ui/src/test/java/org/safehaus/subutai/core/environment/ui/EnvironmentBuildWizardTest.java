@@ -51,15 +51,17 @@ public class EnvironmentBuildWizardTest
     public void testName() throws Exception
     {
         Map<String, Peer> topology = new HashMap<>();
-        Peer peer = new Peer();
-        peer.setId( UUID.randomUUID() );
+
+        Peer peer1 = new Peer();
+        peer1.setId( UUID.randomUUID() );
+
         for ( NodeGroup ng : getTask().getEnvironmentBlueprint().getNodeGroups() )
         {
-            topology.put( ng.getTemplateName(), peer );
+            topology.put( ng.getTemplateName(), peer1 );
         }
 
-        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
-        System.out.println( GSON.toJson( process ) );
+//        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
+//        System.out.println( GSON.toJson( process ) );
     }
 
 
@@ -69,7 +71,7 @@ public class EnvironmentBuildWizardTest
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
         eb.setName( "blueprint" );
 
-        NodeGroup one = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
+        NodeGroup one = genNodeGroup( "hadoop", 3, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         NodeGroup two = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         eb.addNodeGroup( one );
         eb.addNodeGroup( two );
