@@ -173,15 +173,8 @@ public class CommandJson
      */
     public static String getRequestCommandJson( Request request )
     {
-        try
-        {
-            return GSON.toJson( new CommandImpl( request ) );
-        }
-        catch ( RuntimeException ex )
-        {
-            LOG.error( "Error in getRequestCommandJson", ex );
-        }
-        return null;
+
+        return GSON.toJson( new CommandImpl( request ) );
     }
 
 
@@ -194,15 +187,8 @@ public class CommandJson
      */
     public static String getResponseCommandJson( Response response )
     {
-        try
-        {
-            return GSON.toJson( new CommandImpl( response ) );
-        }
-        catch ( RuntimeException ex )
-        {
-            LOG.error( "Error in getResponseCommandJson", ex );
-        }
-        return null;
+
+        return GSON.toJson( new CommandImpl( response ) );
     }
 
 
@@ -215,15 +201,8 @@ public class CommandJson
      */
     public static String getCommandJson( Command cmd )
     {
-        try
-        {
-            return GSON.toJson( cmd );
-        }
-        catch ( RuntimeException ex )
-        {
-            LOG.error( "Error in getCommandJson", ex );
-        }
-        return null;
+
+        return GSON.toJson( cmd );
     }
 
 
