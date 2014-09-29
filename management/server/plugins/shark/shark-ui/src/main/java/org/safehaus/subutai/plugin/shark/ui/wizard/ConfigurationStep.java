@@ -1,6 +1,16 @@
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.shark.api.SetupType;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.Spark;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -13,14 +23,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.shark.api.SetupType;
-import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-import org.safehaus.subutai.plugin.spark.api.Spark;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
 public class ConfigurationStep extends Panel
@@ -53,8 +55,6 @@ public class ConfigurationStep extends Panel
                     config.setSparkClusterName( val );
                 }
             }
-
-
         } );
         nameTxt.setValue( config.getClusterName() );
         content.addComponent( nameTxt );
@@ -81,8 +81,6 @@ public class ConfigurationStep extends Panel
             {
                 wizard.back();
             }
-
-
         } );
 
         VerticalLayout layout = new VerticalLayout();
@@ -119,8 +117,6 @@ public class ConfigurationStep extends Panel
                     config.setNodes( sparkConfig.getAllNodes() );
                 }
             }
-
-
         } );
 
         List<SparkClusterConfig> clusters = spark.getClusters();
@@ -179,8 +175,6 @@ public class ConfigurationStep extends Panel
                 config.setHadoopClusterName( name );
                 hadoopConfig.setClusterName( name );
             }
-
-
         } );
 
         ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
@@ -195,8 +189,6 @@ public class ConfigurationStep extends Panel
             {
                 hadoopConfig.setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
             }
-
-
         } );
 
         ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
@@ -211,8 +203,6 @@ public class ConfigurationStep extends Panel
             {
                 hadoopConfig.setReplicationFactor( ( Integer ) event.getProperty().getValue() );
             }
-
-
         } );
 
         TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
@@ -230,8 +220,6 @@ public class ConfigurationStep extends Panel
                     hadoopConfig.setDomainName( val );
                 }
             }
-
-
         } );
 
         parent.addComponent( new Label( "Hadoop settings" ) );
@@ -309,10 +297,6 @@ public class ConfigurationStep extends Panel
                 show( "Installation type not supported" );
             }
         }
-
-
     }
-
-
 }
 

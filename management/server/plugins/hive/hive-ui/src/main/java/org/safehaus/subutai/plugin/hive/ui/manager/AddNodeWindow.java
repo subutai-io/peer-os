@@ -29,8 +29,8 @@ class AddNodeWindow extends Window
 {
 
     private final TextArea outputTxtArea;
-    private final Button ok;
     private final Label indicator;
+    Button ok;
     private volatile boolean track = true;
 
 
@@ -72,6 +72,21 @@ class AddNodeWindow extends Window
         final Button addNodeBtn = new Button( "Add" );
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
+
+
+        ok = new Button( "Ok" );
+        ok.addStyleName( "default" );
+        ok.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                //close window
+                track = false;
+                close();
+            }
+        } );
+
 
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -133,19 +148,6 @@ class AddNodeWindow extends Window
         indicator.setHeight( 11, Unit.PIXELS );
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
-
-        ok = new Button( "Ok" );
-        ok.addStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                //close window
-                track = false;
-                close();
-            }
-        } );
 
         HorizontalLayout bottomContent = new HorizontalLayout();
         bottomContent.addComponent( indicator );

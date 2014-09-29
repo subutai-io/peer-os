@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
@@ -23,8 +24,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation = manager.getTracker().createProductOperation(
-                SharkClusterConfig.PRODUCT_KEY, String.format( "Adding node to %s", clusterName ) );
+        this.productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+                String.format( "Adding node to %s", clusterName ) );
     }
 
 
@@ -58,6 +59,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
             productOperation.addLogFailed( "Spark cluster name not specified" );
             return;
         }
+
         SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
@@ -131,9 +133,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
         {
             productOperation.addLogFailed( "Installation failed: " + installCommand.getAllErrors() );
         }
-
     }
-
-
 }
 

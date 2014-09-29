@@ -33,9 +33,9 @@ public class SetupStartegyBase
 
         if ( manager.getCluster( config.getClusterName() ) != null )
         {
-            throw new ClusterSetupException( String.format(
-                    "Cluster with name '%s' already exists. Installation aborted",
-                    config.getClusterName() ) );
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists. Installation aborted",
+                            config.getClusterName() ) );
         }
     }
 
@@ -65,8 +65,8 @@ public class SetupStartegyBase
         {
             if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
-                throw new ClusterSetupException( String.format( "Node %s is not connected. Installation aborted",
-                                                                a.getHostname() ) );
+                throw new ClusterSetupException(
+                        String.format( "Node %s is not connected. Installation aborted", a.getHostname() ) );
             }
         }
     }
@@ -88,7 +88,5 @@ public class SetupStartegyBase
             throw new ClusterSetupException( "Failed to set Master IP: " + cmd.getAllErrors() );
         }
     }
-
-
 }
 

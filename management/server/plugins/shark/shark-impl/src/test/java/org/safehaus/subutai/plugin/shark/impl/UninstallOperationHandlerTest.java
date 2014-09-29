@@ -34,7 +34,5 @@ public class UninstallOperationHandlerTest
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
-
-
 }
 

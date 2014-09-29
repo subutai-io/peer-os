@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.shark.api;
 
 
 import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
@@ -92,7 +93,5 @@ public class SharkClusterConfig implements ConfigBase
     {
         return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
     }
-
-
 }
 
