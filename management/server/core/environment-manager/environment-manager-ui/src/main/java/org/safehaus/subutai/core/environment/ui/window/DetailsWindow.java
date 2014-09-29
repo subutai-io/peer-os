@@ -11,8 +11,6 @@ import com.vaadin.ui.Window;
 public abstract class DetailsWindow extends Window
 {
 
-    //    public TextArea blueprintTxtArea;
-
     public VerticalLayout verticalLayout = getVLayout();
 
 
@@ -24,8 +22,6 @@ public abstract class DetailsWindow extends Window
         setVisible( false );
         setWidth( 800, UNITS_PIXELS );
         setHeight( 600, UNITS_PIXELS );
-        //        blueprintTxtArea = getTextArea();
-        //        verticalLayout.addComponent( blueprintTxtArea );
         setContent( verticalLayout );
     }
 
@@ -38,7 +34,4 @@ public abstract class DetailsWindow extends Window
         content.setSpacing( true );
         return content;
     }
-
-
-    //    public abstract void setContent(EnvironmentBlueprint blueprint);
 }
