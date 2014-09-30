@@ -121,4 +121,60 @@ public class RestServiceImplTest
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertEquals( agent, JsonUtil.fromJson( response.getEntity().toString(), Agent.class ) );
     }
+
+
+    @Test
+    public void shouldMissAgentByHostname()
+    {
+        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
+
+
+        Response response = restService.getAgentByHostname( HOSTNAME );
+
+
+        verify( agentManager ).getAgentByHostname( HOSTNAME );
+        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
+    }
+
+
+    @Test
+    public void shouldReturnAgentByUUID()
+    {
+        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
+        when( agentManager.getAgentByUUID( RANDOM_ID ) ).thenReturn( agent );
+
+
+        Response response = restService.getAgentByUUID( RANDOM_ID.toString() );
+
+
+        verify( agentManager ).getAgentByUUID( RANDOM_ID );
+        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
+        assertEquals( agent, JsonUtil.fromJson( response.getEntity().toString(), Agent.class ) );
+    }
+
+
+    @Test
+    public void shouldMissAgentByUUID()
+    {
+        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
+
+
+        Response response = restService.getAgentByUUID( RANDOM_ID.toString() );
+
+
+        verify( agentManager ).getAgentByUUID( RANDOM_ID );
+        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
+    }
+
+
+    @Test
+    public void shouldFailByInvalidUUID()
+    {
+
+
+        Response response = restService.getAgentByUUID( null );
+
+
+        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+    }
 }

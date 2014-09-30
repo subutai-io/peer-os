@@ -84,7 +84,7 @@ public class RestServiceImpl implements RestService
                 return Response.status( Response.Status.NOT_FOUND ).build();
             }
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException | IllegalArgumentException e )
         {
             LOG.error( "Error in getAgentByUUID", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
