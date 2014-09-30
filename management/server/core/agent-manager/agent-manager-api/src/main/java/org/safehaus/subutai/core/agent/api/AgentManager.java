@@ -80,8 +80,22 @@ public interface AgentManager
      */
     public void removeListener( AgentListener listener );
 
-
+    /**
+     * Returning set of agents belonging to an environment
+     *
+     * @param environmentId - environment id
+     *
+     * @return set of agents
+     */
     public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
 
+    /**
+     * Wait until agent connects to server
+     *
+     * @param hostname hostname of agent container
+     * @param timeout max timeout in sec to wait untill agent connects
+     *
+     * @return agent if agents is connected within timeout or null otherwise
+     */
     public Agent waitForRegistration( String hostname, long timeout );
 }

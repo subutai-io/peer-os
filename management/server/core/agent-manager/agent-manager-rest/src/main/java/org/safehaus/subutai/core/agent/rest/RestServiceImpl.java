@@ -12,16 +12,19 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
-    AgentManager agentManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public RestServiceImpl( final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
         this.agentManager = agentManager;
     }
 
@@ -81,7 +84,7 @@ public class RestServiceImpl implements RestService
                 return Response.status( Response.Status.NOT_FOUND ).build();
             }
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException | IllegalArgumentException e )
         {
             LOG.error( "Error in getAgentByUUID", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
@@ -106,7 +109,7 @@ public class RestServiceImpl implements RestService
             Set<Agent> agents = agentManager.getAgentsByEnvironmentId( envId );
             return Response.status( Response.Status.OK ).entity( JsonUtil.toJson( agents ) ).build();
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException | IllegalArgumentException e )
         {
             LOG.error( "Error in getAgentsByEnvironmentId", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
