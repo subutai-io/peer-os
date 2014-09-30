@@ -79,4 +79,23 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
             throw new PeerCommandException( "Error invoking Peer command" );
         }
     }
+
+
+    @Override
+    public void invoke( final PeerCommandMessage peerCommand, final long timeout ) throws PeerCommandException
+    {
+        try
+        {
+            Peer peer = peerManager.getPeerByUUID( peerCommand.getPeerId() );
+            remotePeerRestClient = new RemotePeerRestClient( timeout );
+            remotePeerRestClient.invoke( peer.getIp(), port, peerCommand );
+        }
+        catch ( RuntimeException e )
+        {
+            peerCommand.setSuccess( false );
+            peerCommand.setExceptionMessage( e.toString() );
+            LOG.error( e.getMessage(), e );
+            throw new PeerCommandException( "Error invoking Peer command" );
+        }
+    }
 }
