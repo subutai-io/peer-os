@@ -162,7 +162,7 @@
     <org.apache.ant.version>1.8.2</org.apache.ant.version>
     <yamlbeans.version>1.08</yamlbeans.version>
     <http.client.version>4.3.5</http.client.version>
-  <!-- ******************Db Manager Ext  ********************************* -->
+    <!-- ******************Db Manager Ext  ********************************* -->
     <com.h2database.version>1.3.176</com.h2database.version>
     <org.eclipse.persistence.version>2.5.2</org.eclipse.persistence.version>
     <!-- ******************************************************************* -->
@@ -254,7 +254,6 @@
         <version>${javax.annotation.version}</version>
       </dependency>
 
-
       <!--db-manager-impl-->
       <dependency>
         <groupId>org.cassandraunit</groupId>
@@ -275,6 +274,7 @@
         <version>${org.eclipse.persistence.version}</version>
         <scope>compile</scope>
       </dependency>
+
       <!--db-manager-ext-impl-->
 
       <!--CXF-->
@@ -502,7 +502,16 @@
       </dependency>
 
       <!-- Core Modules - START -->
-
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>db-manager-ext-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>db-manager-ext-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>subutai-common</artifactId>
