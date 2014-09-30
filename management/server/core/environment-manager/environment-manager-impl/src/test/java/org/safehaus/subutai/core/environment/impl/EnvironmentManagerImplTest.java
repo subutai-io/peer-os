@@ -23,7 +23,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class EnvironmentManagerImplTest
 {
 
@@ -68,7 +68,7 @@ public class EnvironmentManagerImplTest
     public void testName() throws Exception
     {
         EnvironmentBuildProcess task = getEBT();
-//        manager.buildEnvironment( task );
+        //        manager.buildEnvironment( task );
     }
 
 

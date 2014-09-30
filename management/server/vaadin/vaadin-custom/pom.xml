@@ -49,6 +49,11 @@
       <artifactId>slf4j-simple</artifactId>
       <version>${org.slf4j.version}</version>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
