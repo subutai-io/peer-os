@@ -17,6 +17,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -46,13 +47,17 @@ public class TerminalForm extends CustomComponent implements Disposable
     protected final TextField workDirTxtFld;
     protected final ComboBox requestTypeCombo;
     protected final Label indicator;
-    private final TextArea commandOutputTxtArea;
+    private TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
 
     public TerminalForm( final CommandDispatcher commandRunner, final AgentManager agentManager )
     {
+
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         setSizeFull();
 
         executor = Executors.newCachedThreadPool();
@@ -147,7 +152,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
-    protected void addOutput( String output )
+    public void addOutput( String output )
     {
         if ( !Strings.isNullOrEmpty( output ) )
         {
@@ -161,5 +166,17 @@ public class TerminalForm extends CustomComponent implements Disposable
     {
         agentTree.dispose();
         executor.shutdown();
+    }
+
+
+    public void setCommandOutputTxtArea( final TextArea commandOutputTxtArea )
+    {
+        this.commandOutputTxtArea = commandOutputTxtArea;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
     }
 }

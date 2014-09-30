@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.command.impl;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 
 public class RequestBuilderTest
@@ -52,25 +54,30 @@ public class RequestBuilderTest
     private static final String STD_OUT_PATH = "out/path";
     private static final OutputRedirection STD_REDIRECTION = OutputRedirection.RETURN;
     private static final OutputRedirection ERR_REDIRECTION = OutputRedirection.RETURN;
+    RequestBuilder requestBuilder =
+            new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
+                                         .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
+                                         .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
+                                         .withStdErrRedirection( ERR_REDIRECTION )
+                                         .withStdOutRedirection( STD_REDIRECTION );
+    RequestBuilder requestBuilder2 =
+            new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
+                                         .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
+                                         .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
+                                         .withStdErrRedirection( ERR_REDIRECTION )
+                                         .withStdOutRedirection( STD_REDIRECTION );
 
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailEmptyOrNullCommand()
     {
-        RequestBuilder requestBuilder = new RequestBuilder( null );
+        new RequestBuilder( null );
     }
 
 
     @Test
     public void shouldReturnSameProperties()
     {
-        RequestBuilder requestBuilder =
-                new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
-                                             .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
-                                             .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
-                                             .withStdErrRedirection( ERR_REDIRECTION )
-                                             .withStdOutRedirection( STD_REDIRECTION );
-
         Request request = requestBuilder.build( AGENT_ID, TASK_ID );
 
         assertEquals( AGENT_ID, request.getUuid() );
@@ -88,8 +95,40 @@ public class RequestBuilderTest
         assertEquals( STD_OUT_PATH, request.getStdOutPath() );
         assertEquals( ERR_REDIRECTION, request.getStdErr() );
         assertEquals( STD_REDIRECTION, request.getStdOut() );
+    }
 
 
+    @Test
+    public void testEquals()
+    {
 
+        assertEquals( requestBuilder, requestBuilder2 );
+    }
+
+
+    @Test
+    public void testNotEquals()
+    {
+        RequestBuilder requestBuilder3 =
+                new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
+                                             .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
+                                             .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
+                                             .withStdErrRedirection( OutputRedirection.CAPTURE )
+                                             .withStdOutRedirection( STD_REDIRECTION );
+
+        assertNotEquals( requestBuilder, requestBuilder3 );
+    }
+
+
+    @Test
+    public void testHashcode()
+    {
+
+
+        Map<RequestBuilder, RequestBuilder> map = new HashMap();
+
+        map.put( requestBuilder, requestBuilder );
+
+        assertEquals( requestBuilder, requestBuilder2 );
     }
 }

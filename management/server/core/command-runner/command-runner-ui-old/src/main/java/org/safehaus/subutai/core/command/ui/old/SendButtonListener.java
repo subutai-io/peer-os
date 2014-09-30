@@ -4,11 +4,6 @@ package org.safehaus.subutai.core.command.ui.old;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.command.api.command.CommandException;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -17,10 +12,16 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.vaadin.ui.Button;
 
@@ -41,6 +42,12 @@ public class SendButtonListener implements Button.ClickListener
     public SendButtonListener( final TerminalForm form, final AgentManager agentManager,
                                final CommandDispatcher commandDispatcher, final ExecutorService executor )
     {
+
+        Preconditions.checkNotNull( form, "Terminal form is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( commandDispatcher, "Command Dispatcher is null" );
+        Preconditions.checkNotNull( executor, "Executor is null" );
+
         this.form = form;
         this.agentManager = agentManager;
         this.commandDispatcher = commandDispatcher;
