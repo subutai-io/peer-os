@@ -140,9 +140,9 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         } );
         GridLayout grid = new GridLayout( 1, 3 );
 
-        grid.addComponent( new Label( "Environments:" ), 0, 1 );
-        grid.addComponent( env, 0, 2 );
-        grid.addComponent( tree, 0, 3 );
+        grid.addComponent( new Label( "Environments:" ), 0, 0 );
+        grid.addComponent( env, 0, 1 );
+        grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
 
