@@ -58,19 +58,19 @@ public class Manager {
     protected final static String START_STOP_BUTTON_DEFAULT_CAPTION = "Start/Stop";
     protected final static  String EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION = "Exclude/Include";
 
-    protected final GridLayout contentRoot;
-    protected final ComboBox clusterList;
-    protected final Table masterNodesTable;
-    protected final Table slaveNodesTable;
-    protected final Label replicationFactor;
-    protected final Label domainName;
-    protected final Label slaveNodeCount;
-    protected Button checkAllButton;
-    protected HadoopClusterConfig hadoopCluster;
-    protected ProgressBar progressBar;
-    protected int processCount = 0;
-    protected String decommissionStatus;
-    protected ManagerListener managerListener;
+    private final GridLayout contentRoot;
+    private final ComboBox clusterList;
+    private final Table masterNodesTable;
+    private final Table slaveNodesTable;
+    private final Label replicationFactor;
+    private final Label domainName;
+    private final Label slaveNodeCount;
+    private Button checkAllButton;
+    private HadoopClusterConfig hadoopCluster;
+    private ProgressBar progressBar;
+    private int processCount = 0;
+    private String decommissionStatus;
+    private ManagerListener managerListener;
     private final Hadoop hadoop;
     private final Tracker tracker;
     private final ExecutorService executorService;
@@ -689,5 +689,55 @@ public class Manager {
 
     public HadoopClusterConfig getHadoopCluster() {
         return hadoopCluster;
+    }
+
+
+    public GridLayout getContentRoot() {
+        return contentRoot;
+    }
+
+    public ComboBox getClusterList() {
+        return clusterList;
+    }
+
+    public Table getMasterNodesTable() {
+        return masterNodesTable;
+    }
+
+    public Table getSlaveNodesTable() {
+        return slaveNodesTable;
+    }
+
+    public Label getReplicationFactor() {
+        return replicationFactor;
+    }
+
+    public Label getDomainName() {
+        return domainName;
+    }
+
+    public Label getSlaveNodeCount() {
+        return slaveNodeCount;
+    }
+
+    public Button getCheckAllButton() {
+        return checkAllButton;
+    }
+
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+    public int getProcessCount() {
+        return processCount;
+    }
+
+    public String getDecommissionStatus() {
+        return decommissionStatus;
+    }
+
+
+    public void setDecommissionStatus( String decommissionStatus ) {
+        this.decommissionStatus = decommissionStatus;
     }
 }

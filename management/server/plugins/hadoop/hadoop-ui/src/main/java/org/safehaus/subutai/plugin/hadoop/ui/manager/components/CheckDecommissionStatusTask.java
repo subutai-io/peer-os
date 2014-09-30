@@ -30,6 +30,8 @@ public class CheckDecommissionStatusTask implements Runnable {
 
     public CheckDecommissionStatusTask( Hadoop hadoop, Tracker tracker, HadoopClusterConfig hadoopClusterConfig, CompleteEvent completeEvent,
                                         UUID trackID ) {
+        this.hadoop = hadoop;
+        this.tracker = tracker;
         this.completeEvent = completeEvent;
         this.trackID = trackID;
         this.hadoopClusterConfig = hadoopClusterConfig;

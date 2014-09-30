@@ -30,12 +30,12 @@ public class ConfigurationStep extends VerticalLayout
         setSizeFull();
         GridLayout content = new GridLayout( 2, 7 );
         content.setSizeFull();
-        content.setSpacing( true );
+        content.setSpacing(true);
         content.setMargin( true );
 
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
-        clusterNameTxtFld.setInputPrompt( "Cluster name" );
-        clusterNameTxtFld.setRequired( true );
+        clusterNameTxtFld.setInputPrompt("Cluster name");
+        clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength( 20 );
         if ( !Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) )
         {
@@ -63,8 +63,8 @@ public class ConfigurationStep extends VerticalLayout
 
         ComboBox slaveNodesComboBox = new ComboBox( "Choose number of slave nodes", slaveNodeCountList );
         //        slaveNodesComboBox.setMultiSelect(false);
-        slaveNodesComboBox.setImmediate( true );
-        slaveNodesComboBox.setTextInputAllowed( false );
+        slaveNodesComboBox.setImmediate(true);
+        slaveNodesComboBox.setTextInputAllowed(false);
         slaveNodesComboBox.setNullSelectionAllowed( false );
         slaveNodesComboBox.setValue( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() );
 
@@ -99,7 +99,7 @@ public class ConfigurationStep extends VerticalLayout
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getHadoopClusterConfig().setReplicationFactor( ( Integer ) event.getProperty().getValue() );
+                wizard.getHadoopClusterConfig().setReplicationFactor( Integer.parseInt( (String) event.getProperty().getValue() ) );
             }
         } );
 

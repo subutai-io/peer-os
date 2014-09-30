@@ -35,13 +35,7 @@ import org.safehaus.subutai.plugin.hadoop.impl.common.HadoopSetupStrategy;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.AddOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.BlockTaskTrackerOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.RestartJobTrackerOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StartJobTrackerOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StatusJobTrackerOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StatusTaskTrackerOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StopJobTrackerOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.UnblockTaskTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.*;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.*;
 
 import com.google.common.base.Preconditions;
@@ -282,7 +276,15 @@ public class HadoopImpl implements Hadoop
 
     @Override
     public UUID stopDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+
+
+        AbstractOperationHandler operationHandler =
+                new StopDataNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -290,8 +292,8 @@ public class HadoopImpl implements Hadoop
     public UUID statusDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
-                "Cluster name is null or empty" );
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(hadoopClusterConfig.getClusterName()),
+                "Cluster name is null or empty");
         Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
 
         AbstractOperationHandler operationHandler =
@@ -332,7 +334,7 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID restartJobTracker( HadoopClusterConfig hadoopClusterConfig )
     {
-        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkNotNull(hadoopClusterConfig, "Configuration is null");
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
 
@@ -358,12 +360,24 @@ public class HadoopImpl implements Hadoop
 
     @Override
     public UUID startTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        AbstractOperationHandler operationHandler =
+                new StartTaskTrackerOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
     @Override
     public UUID stopTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        AbstractOperationHandler operationHandler =
+                new StopTaskTrackerOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -385,18 +399,16 @@ public class HadoopImpl implements Hadoop
 
     @Override
     public UUID addNode( String clusterName, int nodeCount ) {
-        //    public UUID addNode( String clusterName ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
         AbstractOperationHandler operationHandler = new AddOperationHandler( this, clusterName, nodeCount );
-        //        AbstractOperationHandler operationHandler = new AddOperationHandler( this, clusterName );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
     @Override
     public UUID addNode(String clusterName) {
-        return null;
+        return addNode( clusterName, 1 );
     }
 
 
@@ -416,22 +428,53 @@ public class HadoopImpl implements Hadoop
 
     @Override
     public UUID destroyNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
+
+        AbstractOperationHandler operationHandler =
+                new DestroyNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
     @Override
     public UUID checkDecomissionStatus(HadoopClusterConfig hadoopClusterConfig) {
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+
+        AbstractOperationHandler operationHandler =
+                new CheckDecommissionStatusOperationHandler( this, hadoopClusterConfig.getClusterName() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
     @Override
     public UUID excludeNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
+
+        AbstractOperationHandler operationHandler =
+                new ExcludeNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
     @Override
     public UUID includeNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-        return null;
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
+
+        AbstractOperationHandler operationHandler =
+                new IncludeNodeOperationHandler( this, hadoopClusterConfig.getClusterName(), agent.getHostname() );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

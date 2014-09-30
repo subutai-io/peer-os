@@ -70,7 +70,7 @@ public class StartTask implements Runnable {
             else if ( nodeType.equals( NodeType.JOBTRACKER ) ) {
                 trackID = hadoop.startJobTracker(hadoopClusterConfig);
             }
-            if ( nodeType.equals( NodeType.DATANODE )  ) {
+            else if ( nodeType.equals( NodeType.DATANODE )  ) {
                 trackID = hadoop.startDataNode(hadoopClusterConfig, agent);
             }
             else {
