@@ -19,8 +19,6 @@ import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutor;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,7 +32,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListener
 {
 
@@ -134,17 +132,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                             }
                         } );
 
-                        destroyButton = new Button( "Destroy" );
-                        destroyButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                destroyBuildProcess( environmentBuildProcess );
-                            }
-                        } );
-
-
                         break;
                     }
                     case IN_PROGRESS:
@@ -162,32 +149,16 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         break;
                     }
                     case FAILED:
+                        icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+                        break;
                     case TERMINATED:
                     {
-                        processButton = new Button( "Destroy" );
                         icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                destroyBuildProcess( environmentBuildProcess );
-                            }
-                        } );
                         break;
                     }
                     case SUCCESSFUL:
                     {
-                        processButton = new Button( "Configure" );
                         icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                configureEnvironment( environmentBuildProcess );
-                            }
-                        } );
                         break;
                     }
 
@@ -196,6 +167,16 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         break;
                     }
                 }
+
+                destroyButton = new Button( "Destroy" );
+                destroyButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        destroyBuildProcess( environmentBuildProcess );
+                    }
+                } );
                 environmentsTable.addItem( new Object[] {
                         environmentBuildProcess.getEnvironmentName(), icon, viewEnvironmentInfoButton, processButton,
                         destroyButton
