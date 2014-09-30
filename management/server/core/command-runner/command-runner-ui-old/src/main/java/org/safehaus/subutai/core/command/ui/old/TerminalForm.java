@@ -17,6 +17,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -40,19 +41,23 @@ import com.vaadin.ui.TextField;
 public class TerminalForm extends CustomComponent implements Disposable
 {
 
-    protected final AgentTree agentTree;
-    protected final TextField programTxtFld;
-    protected final TextField timeoutTxtFld;
-    protected final TextField workDirTxtFld;
-    protected final ComboBox requestTypeCombo;
-    protected final Label indicator;
-    private final TextArea commandOutputTxtArea;
-    protected AtomicInteger taskCount = new AtomicInteger();
+    private final AgentTree agentTree;
+    private final TextField programTxtFld;
+    private final TextField timeoutTxtFld;
+    private final TextField workDirTxtFld;
+    private final ComboBox requestTypeCombo;
+    private final Label indicator;
+    private TextArea commandOutputTxtArea;
+    private AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
 
     public TerminalForm( final CommandDispatcher commandRunner, final AgentManager agentManager )
     {
+
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         setSizeFull();
 
         executor = Executors.newCachedThreadPool();
@@ -141,13 +146,55 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
+    protected AgentTree getAgentTree()
+    {
+        return agentTree;
+    }
+
+
+    protected TextField getProgramTxtFld()
+    {
+        return programTxtFld;
+    }
+
+
+    protected TextField getTimeoutTxtFld()
+    {
+        return timeoutTxtFld;
+    }
+
+
+    protected TextField getWorkDirTxtFld()
+    {
+        return workDirTxtFld;
+    }
+
+
+    protected ComboBox getRequestTypeCombo()
+    {
+        return requestTypeCombo;
+    }
+
+
+    protected Label getIndicator()
+    {
+        return indicator;
+    }
+
+
+    protected AtomicInteger getTaskCount()
+    {
+        return taskCount;
+    }
+
+
     protected void show( String msg )
     {
         Notification.show( msg );
     }
 
 
-    protected void addOutput( String output )
+    public void addOutput( String output )
     {
         if ( !Strings.isNullOrEmpty( output ) )
         {
@@ -161,5 +208,17 @@ public class TerminalForm extends CustomComponent implements Disposable
     {
         agentTree.dispose();
         executor.shutdown();
+    }
+
+
+    public void setCommandOutputTxtArea( final TextArea commandOutputTxtArea )
+    {
+        this.commandOutputTxtArea = commandOutputTxtArea;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
     }
 }
