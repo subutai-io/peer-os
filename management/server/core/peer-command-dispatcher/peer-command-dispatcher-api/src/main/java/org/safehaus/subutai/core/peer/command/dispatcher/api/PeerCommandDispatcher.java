@@ -10,5 +10,7 @@ import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 public interface PeerCommandDispatcher
 {
 
-    public void invoke( PeerCommandMessage peerCommand );
+    public void invoke( PeerCommandMessage peerCommand ) throws PeerCommandException;
+
+    public void invoke( PeerCommandMessage peerCommand, long timeout ) throws PeerCommandException;
 }

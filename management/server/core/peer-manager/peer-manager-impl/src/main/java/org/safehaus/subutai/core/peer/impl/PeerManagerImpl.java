@@ -20,12 +20,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -41,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
@@ -58,6 +65,8 @@ public class PeerManagerImpl implements PeerManager
     private AgentManager agentManager;
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
+    private CommandRunner commandRunner;
+
     private Set<PeerContainer> containers = new HashSet<>();
 
 
@@ -81,6 +90,12 @@ public class PeerManagerImpl implements PeerManager
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
+        this.commandRunner = commandRunner;
     }
 
 
@@ -380,23 +395,11 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public void createContainers( CloneContainersMessage ccm )
+    public Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String strategy )
+            throws ContainerCreateException
     {
-        UUID envId = ccm.getEnvId();
-        String template = ccm.getTemplate();
-        int numberOfNodes = ccm.getNumberOfNodes();
-        String strategy = ccm.getStrategy();
-        try
-        {
-            Set<Agent> result = containerManager.clone( envId, template, numberOfNodes, strategy, null );
-            ccm.setSuccess( true );
-            ccm.setResult( result );
-        }
-        catch ( ContainerCreateException e )
-        {
-            ccm.setSuccess( false );
-            ccm.setExceptionMessage( e.toString() );
-        }
+
+        return containerManager.clone( envId, template, numberOfNodes, strategy, null );
     }
 
 
@@ -454,6 +457,11 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void invoke( PeerCommandMessage peerCommandMessage )
     {
+        if ( !getSiteId().equals( peerCommandMessage.getPeerId() ) )
+        {
+            LOG.warn( String.format( "Orphan command message: %s", peerCommandMessage ) );
+            return;
+        }
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
         LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
         boolean result;
@@ -463,25 +471,49 @@ public class PeerManagerImpl implements PeerManager
                 if ( peerCommandMessage instanceof CloneContainersMessage )
                 {
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
-                    createContainers( ccm );
+                    try
+                    {
+                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getTemplate(), ccm.getNumberOfNodes(),
+                                ccm.getStrategy() );
+                        ccm.setResult( agents );
+                        ccm.setSuccess( true );
+                    }
+                    catch ( ContainerCreateException e )
+                    {
+                        peerCommandMessage.setSuccess( false );
+                        peerCommandMessage.setExceptionMessage( e.toString() );
+                    }
                 }
-                else
+                break;
+            case GET_PEER_ID:
+                UUID peerId = getSiteId();
+                peerCommandMessage.setResult( peerId );
+                peerCommandMessage.setSuccess( true );
+                break;
+            case GET_CONNECTED_CONTAINERS:
+                Set<Agent> agents = agentManager.getAgents();
+
+                Set<PeerContainer> containers = new HashSet<>();
+                for ( Agent agent : agents )
                 {
-                    peerCommandMessage.setSuccess( false );
-                    peerCommandMessage.setResult( "Invalid CLONE command." );
+                    PeerContainer pc = new PeerContainer();
+                    pc.setAgentId( agent.getUuid() );
+                    pc.setPeerId( agent.getSiteId() );
+                    pc.setState( ContainerState.STARTED );
+                    containers.add( pc );
                 }
+                peerCommandMessage.setResult( JsonUtil.toJson( containers ) );
+                peerCommandMessage.setSuccess( true );
                 break;
             case START:
                 result = startContainer( peerContainer );
                 if ( result )
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                 }
                 else
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                     peerCommandMessage.setExceptionMessage( "Could not start container." );
                 }
                 break;
@@ -490,12 +522,10 @@ public class PeerManagerImpl implements PeerManager
                 if ( result )
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                 }
                 else
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                     peerCommandMessage.setExceptionMessage( "Could not stop container." );
                 }
                 break;
@@ -505,12 +535,10 @@ public class PeerManagerImpl implements PeerManager
                 if ( result )
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                 }
                 else
                 {
                     peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setResult( result );
                     peerCommandMessage.setExceptionMessage( "Container is not connected." );
                 }
                 break;
@@ -523,7 +551,6 @@ public class PeerManagerImpl implements PeerManager
                 else
                 {
                     peerCommandMessage.setSuccess( false );
-                    peerCommandMessage.setResult( "Invalid EXECUTE command." );
                 }
                 break;
             default:
@@ -531,16 +558,49 @@ public class PeerManagerImpl implements PeerManager
                 peerCommandMessage.setSuccess( false );
                 break;
         }
+        peerCommandMessage.setProccessed( true );
 
-        LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
+        LOG.debug( String.format( "After =================[%s]", peerCommandMessage ) );
     }
 
 
     private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
     {
-        ecm.setResult( "Command executor stub!!!" );
-        ecm.setSuccess( true );
-        // TODO: Implement me
+        Agent agent = agentManager.getAgentByUUID( ecm.getAgentId() );
+        if ( agent == null )
+        {
+            ecm.setStdErr( "Container is down." );
+            ecm.setStdOut( "Container is down." );
+            ecm.setExitCode( -1 );
+            ecm.setSuccess( true );
+            return;
+        }
+        RequestBuilder requestBuilder = new RequestBuilder( ecm.getCommand() );
+
+
+        if ( ecm.getCwd() != null && !Strings.isNullOrEmpty( ecm.getCwd() ) )
+        {
+            requestBuilder.withCwd( ecm.getCwd() );
+        }
+
+        int timeout = ecm.getTimeout();
+
+        requestBuilder.withTimeout( timeout );
+        Command cmd = commandRunner.createCommand( "Remote command", requestBuilder, Sets.newHashSet( agent ) );
+        try
+        {
+            cmd.execute();
+            AgentResult result = cmd.getResults().get( ecm.getAgentId() );
+            ecm.setStdOut( result.getStdOut() );
+            ecm.setStdErr( result.getStdErr() );
+            ecm.setExitCode( result.getExitCode() );
+            ecm.setSuccess( true );
+        }
+        catch ( CommandException e )
+        {
+            ecm.setSuccess( false );
+            ecm.setExceptionMessage( e.toString() );
+        }
     }
 
 

@@ -114,6 +114,13 @@ public class AgentManagerFake implements AgentManager
     @Override
     public Agent waitForRegistration( final String hostname, final long timeout )
     {
+        for ( Agent agent : agents )
+        {
+            if ( agent.getHostname().equals( hostname ) )
+            {
+                return agent;
+            }
+        }
         return null;
     }
 }

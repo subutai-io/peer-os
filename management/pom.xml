@@ -219,15 +219,13 @@
         <artifactId>jsoup</artifactId>
         <version>${org.jsoup.version}</version>
       </dependency>
-      <!--agent-manager-impl-->
+
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
         <version>${org.mockito.version}</version>
       </dependency>
-      <!--agent-manager-impl-->
 
-      <!--agent-manager-cli-->
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>
         <artifactId>org.apache.karaf.shell.console</artifactId>
@@ -243,24 +241,19 @@
         <artifactId>org.apache.servicemix.bundles.junit</artifactId>
         <version>${org.apache.servicemix.bundles.version}</version>
       </dependency>
-      <!--agent-manager-cli-->
 
-      <!--command-runner-impl-->
       <dependency>
         <groupId>com.jayway.awaitility</groupId>
         <artifactId>awaitility</artifactId>
         <version>${com.jayway.awaitility.version}</version>
       </dependency>
-      <!--command-runner-impl-->
 
-      <!--command-runner-ui-->
-      <!--</dependency>-->
       <dependency>
         <groupId>javax.annotation</groupId>
         <artifactId>javax.annotation-api</artifactId>
         <version>${javax.annotation.version}</version>
       </dependency>
-      <!--command-runner-ui-->
+
 
       <!--db-manager-impl-->
       <dependency>
@@ -644,16 +637,6 @@
         <artifactId>command-dispatcher-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>command-dispatcher-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>command-dispatcher-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <!-- Command Runner -->
       <dependency>
@@ -664,11 +647,6 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>command-runner-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>command-runner-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

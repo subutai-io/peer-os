@@ -9,7 +9,9 @@ package org.safehaus.subutai.core.environment.api;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -66,13 +68,16 @@ public interface EnvironmentManager
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 
-    public Set<EnvironmentContainer> getContainers();
+//    public Set<EnvironmentContainer> getContainers();
 
-    public void addContainer( EnvironmentContainer container );
+//    public void addContainer( EnvironmentContainer container );
 
-    public boolean startContainer( EnvironmentContainer container );
+//    public boolean startContainer( EnvironmentContainer container );
+    //
+    //    public boolean stopContainer( EnvironmentContainer container );
+    //
+    //    public boolean isContainerConnected( EnvironmentContainer container );
+    public void invoke(PeerCommandMessage commandMessage);
 
-    public boolean stopContainer( EnvironmentContainer container );
-
-    public boolean isContainerConnected( EnvironmentContainer container );
+    Set<EnvironmentContainer> getConnectedContainers( Environment environment );
 }

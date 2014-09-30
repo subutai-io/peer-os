@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 
@@ -11,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.shark.api.SetupType;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -24,15 +21,14 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel
 {
 
-    public VerificationStep( final Shark shark, final ExecutorService executorService, final Tracker tracker,
+    public VerificationStep( final Shark shark, final ExecutorService executor, final Tracker tracker,
                              final Wizard wizard )
     {
+        final SharkClusterConfig config = wizard.getConfig();
+        final HadoopClusterConfig hc = wizard.getHadoopConfig();
 
         setSizeFull();
 
@@ -47,9 +43,20 @@ public class VerificationStep extends Panel
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        for ( Agent agent : wizard.getConfig().getNodes() )
+        if ( config.getSetupType() == SetupType.OVER_SPARK )
         {
-            cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
+            cfgView.addStringCfg( "Spark cluster name", config.getSparkClusterName() );
+            for ( Agent agent : wizard.getConfig().getNodes() )
+            {
+                cfgView.addStringCfg( "Node(s) to install", agent.getHostname() );
+            }
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
+        {
+            cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
+            cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Domain name", hc.getDomainName() );
         }
 
         Button install = new Button( "Install" );
@@ -59,10 +66,17 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = shark.installCluster( wizard.getConfig() );
-                ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID, SharkClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener()
+                UUID trackId = null;
+                if ( config.getSetupType() == SetupType.OVER_SPARK )
+                {
+                    trackId = shark.installCluster( wizard.getConfig() );
+                }
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
+                {
+                    trackId = shark.installCluster( wizard.getConfig(), hc );
+                }
+                ProgressWindow w = new ProgressWindow( executor, tracker, trackId, SharkClusterConfig.PRODUCT_KEY );
+                w.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent )
@@ -70,7 +84,7 @@ public class VerificationStep extends Panel
                         wizard.init();
                     }
                 } );
-                getUI().addWindow( window.getWindow() );
+                getUI().addWindow( w.getWindow() );
             }
         } );
 
@@ -90,11 +104,10 @@ public class VerificationStep extends Panel
         buttons.addComponent( install );
 
         grid.addComponent( confirmationLbl, 0, 0 );
-
         grid.addComponent( cfgView.getCfgTable(), 0, 1, 0, 3 );
-
         grid.addComponent( buttons, 0, 4 );
 
         setContent( grid );
     }
 }
+

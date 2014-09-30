@@ -6,6 +6,7 @@
 package org.safehaus.subutai.core.command.api.command;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -284,5 +285,102 @@ public class RequestBuilder
         return new Request( source, type, agentUUID, taskUUID, requestSequenceNumber, cwd, command, outputRedirection,
                 errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout )
                 .setConfPoints( confPoints );
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof RequestBuilder ) )
+        {
+            return false;
+        }
+
+        final RequestBuilder that = ( RequestBuilder ) o;
+
+        if ( pid != that.pid )
+        {
+            return false;
+        }
+        if ( cmdArgs != null ? !cmdArgs.equals( that.cmdArgs ) : that.cmdArgs != null )
+        {
+            return false;
+        }
+        if ( command != null ? !command.equals( that.command ) : that.command != null )
+        {
+            return false;
+        }
+        if ( !Arrays.equals( confPoints, that.confPoints ) )
+        {
+            return false;
+        }
+        if ( cwd != null ? !cwd.equals( that.cwd ) : that.cwd != null )
+        {
+            return false;
+        }
+        if ( envVars != null ? !envVars.equals( that.envVars ) : that.envVars != null )
+        {
+            return false;
+        }
+        if ( errRedirection != that.errRedirection )
+        {
+            return false;
+        }
+        if ( outputRedirection != that.outputRedirection )
+        {
+            return false;
+        }
+        if ( requestSequenceNumber != null ? !requestSequenceNumber.equals( that.requestSequenceNumber ) :
+             that.requestSequenceNumber != null )
+        {
+            return false;
+        }
+        if ( runAs != null ? !runAs.equals( that.runAs ) : that.runAs != null )
+        {
+            return false;
+        }
+        if ( stdErrPath != null ? !stdErrPath.equals( that.stdErrPath ) : that.stdErrPath != null )
+        {
+            return false;
+        }
+        if ( stdOutPath != null ? !stdOutPath.equals( that.stdOutPath ) : that.stdOutPath != null )
+        {
+            return false;
+        }
+        if ( timeout != null ? !timeout.equals( that.timeout ) : that.timeout != null )
+        {
+            return false;
+        }
+        if ( type != that.type )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = requestSequenceNumber != null ? requestSequenceNumber.hashCode() : 0;
+        result = 31 * result + ( command != null ? command.hashCode() : 0 );
+        result = 31 * result + ( cwd != null ? cwd.hashCode() : 0 );
+        result = 31 * result + ( type != null ? type.hashCode() : 0 );
+        result = 31 * result + ( outputRedirection != null ? outputRedirection.hashCode() : 0 );
+        result = 31 * result + ( errRedirection != null ? errRedirection.hashCode() : 0 );
+        result = 31 * result + ( timeout != null ? timeout.hashCode() : 0 );
+        result = 31 * result + ( stdOutPath != null ? stdOutPath.hashCode() : 0 );
+        result = 31 * result + ( stdErrPath != null ? stdErrPath.hashCode() : 0 );
+        result = 31 * result + ( runAs != null ? runAs.hashCode() : 0 );
+        result = 31 * result + ( cmdArgs != null ? cmdArgs.hashCode() : 0 );
+        result = 31 * result + ( envVars != null ? envVars.hashCode() : 0 );
+        result = 31 * result + pid;
+        result = 31 * result + ( confPoints != null ? Arrays.hashCode( confPoints ) : 0 );
+        return result;
     }
 }

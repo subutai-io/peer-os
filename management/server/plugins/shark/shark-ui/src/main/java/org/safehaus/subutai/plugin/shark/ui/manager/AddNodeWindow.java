@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.shark.ui.manager;
 
 
@@ -30,14 +25,12 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class AddNodeWindow extends Window
 {
 
     private final TextArea outputTxtArea;
     private final Label indicator;
+    private Button ok;
     private volatile boolean track = true;
 
 
@@ -48,6 +41,7 @@ public class AddNodeWindow extends Window
         setModal( true );
 
         setWidth( 600, Unit.PIXELS );
+        setHeight( 400, Unit.PIXELS );
 
         GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
@@ -60,24 +54,36 @@ public class AddNodeWindow extends Window
         content.addComponent( topContent );
         topContent.addComponent( new Label( "Nodes:" ) );
 
-        final ComboBox hadoopNodes = new ComboBox();
-        hadoopNodes.setImmediate( true );
-        hadoopNodes.setTextInputAllowed( false );
-        hadoopNodes.setNullSelectionAllowed( false );
-        hadoopNodes.setRequired( true );
-        hadoopNodes.setWidth( 200, Unit.PIXELS );
+        final ComboBox cmbNodes = new ComboBox();
+        cmbNodes.setImmediate( true );
+        cmbNodes.setTextInputAllowed( false );
+        cmbNodes.setNullSelectionAllowed( false );
+        cmbNodes.setRequired( true );
+        cmbNodes.setWidth( 80, Unit.PERCENTAGE );
         for ( Agent node : nodes )
         {
-            hadoopNodes.addItem( node );
-            hadoopNodes.setItemCaption( node, node.getHostname() );
+            cmbNodes.addItem( node );
+            cmbNodes.setItemCaption( node, node.getHostname() );
         }
-        hadoopNodes.setValue( nodes.iterator().next() );
+        cmbNodes.setValue( nodes.iterator().next() );
 
-        topContent.addComponent( hadoopNodes );
+        topContent.addComponent( cmbNodes );
 
         final Button addNodeBtn = new Button( "Add" );
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
+
+        ok = new Button( "Ok" );
+        ok.addStyleName( "default" );
+        ok.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                track = false;
+                close();
+            }
+        } );
 
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -86,11 +92,11 @@ public class AddNodeWindow extends Window
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = ( Agent ) hadoopNodes.getValue();
+                Agent agent = ( Agent ) cmbNodes.getValue();
                 final UUID trackID = shark.addNode( config.getClusterName(), agent.getHostname() );
                 executorService.execute( new Runnable()
                 {
-
+                    @Override
                     public void run()
                     {
                         while ( track )
@@ -141,19 +147,6 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
-        ok.addStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                //close window
-                track = false;
-                close();
-            }
-        } );
-
         HorizontalLayout bottomContent = new HorizontalLayout();
         bottomContent.addComponent( indicator );
         bottomContent.setComponentAlignment( indicator, Alignment.MIDDLE_RIGHT );
@@ -169,6 +162,7 @@ public class AddNodeWindow extends Window
     private void showProgress()
     {
         indicator.setVisible( true );
+        ok.setEnabled( false );
     }
 
 
@@ -185,13 +179,15 @@ public class AddNodeWindow extends Window
     private void hideProgress()
     {
         indicator.setVisible( false );
+        ok.setEnabled( true );
     }
 
 
     @Override
     public void close()
     {
-        super.close();
         track = false;
+        super.close();
     }
 }
+

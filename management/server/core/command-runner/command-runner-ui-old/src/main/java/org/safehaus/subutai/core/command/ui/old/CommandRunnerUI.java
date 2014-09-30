@@ -8,6 +8,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.ui.Component;
 
 
@@ -16,18 +17,16 @@ public class CommandRunnerUI implements PortalModule
 
     public static final String MODULE_IMAGE = "terminal.png";
     public static final String MODULE_NAME = "Terminal Old";
-    private CommandDispatcher commandRunner;
-    private AgentManager agentManager;
+    private final CommandDispatcher commandRunner;
+    private final AgentManager agentManager;
 
 
-    public void setCommandRunner( CommandDispatcher commandRunner )
+    public CommandRunnerUI( final CommandDispatcher commandRunner, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         this.commandRunner = commandRunner;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager )
-    {
         this.agentManager = agentManager;
     }
 

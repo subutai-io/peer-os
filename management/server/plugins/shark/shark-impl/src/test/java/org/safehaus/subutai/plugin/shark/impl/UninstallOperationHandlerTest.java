@@ -35,3 +35,4 @@ public class UninstallOperationHandlerTest
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
 }
+
