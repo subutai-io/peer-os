@@ -16,6 +16,7 @@ public class MahoutClusterConfig implements ConfigBase
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private SetupType setupType;
+    private String hadoopClusterName;
 
     private Set<Agent> nodes = new HashSet();
 
@@ -79,5 +80,17 @@ public class MahoutClusterConfig implements ConfigBase
     public void setSetupType( final SetupType setupType )
     {
         this.setupType = setupType;
+    }
+
+
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( final String hadoopClusterName )
+    {
+        this.hadoopClusterName = hadoopClusterName;
     }
 }

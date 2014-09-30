@@ -8,17 +8,14 @@ package org.safehaus.subutai.plugin.mahout.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 
-/**
- * @author dilshat
- */
 public class Commands extends CommandsSingleton
 {
     public Commands( CommandRunner commandRunner )

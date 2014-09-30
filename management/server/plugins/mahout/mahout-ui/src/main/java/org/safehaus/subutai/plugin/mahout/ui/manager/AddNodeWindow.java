@@ -1,26 +1,26 @@
 package org.safehaus.subutai.plugin.mahout.ui.manager;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutPortalModule;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 
@@ -30,26 +30,17 @@ public class AddNodeWindow extends Window
 
     private final TextArea outputTxtArea;
     private final Label indicator;
-
-    private final ListSelect nodesList = new ListSelect();
-    private final String clusterName;
-
-    private final ArrayList<String> selectedNodes = new ArrayList<>();
-    private MahoutPortalModule mahoutPortalModule;
+    private volatile boolean track = true;
 
 
-    public AddNodeWindow( final MahoutClusterConfig config, Set<Agent> nodes, MahoutPortalModule mahoutPortalModule )
+    public AddNodeWindow( final Mahout mahout, final Tracker tracker, final ExecutorService executorService,
+                          final MahoutClusterConfig config, Set<Agent> nodes )
     {
-
-
         super( "Add New Node" );
-        this.mahoutPortalModule = mahoutPortalModule;
-        clusterName = config.getClusterName();
-
         setModal( true );
 
-        setWidth( 700, Unit.PIXELS );
-        setHeight( 500, Unit.PIXELS );
+        setWidth( 650, Unit.PIXELS );
+        setHeight( 450, Unit.PIXELS );
 
         GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
@@ -62,8 +53,20 @@ public class AddNodeWindow extends Window
         content.addComponent( topContent );
         topContent.addComponent( new Label( "Nodes:" ) );
 
-        initNodesList( nodes );
-        topContent.addComponent( nodesList );
+        final ComboBox hadoopNodes = new ComboBox();
+        hadoopNodes.setImmediate( true );
+        hadoopNodes.setTextInputAllowed( false );
+        hadoopNodes.setNullSelectionAllowed( false );
+        hadoopNodes.setRequired( true );
+        hadoopNodes.setWidth( 200, Unit.PIXELS );
+        for ( Agent node : nodes )
+        {
+            hadoopNodes.addItem( node );
+            hadoopNodes.setItemCaption( node, node.getHostname() );
+        }
+        hadoopNodes.setValue( nodes.iterator().next() );
+
+        topContent.addComponent( hadoopNodes );
 
         final Button addNodeBtn = new Button( "Add" );
         addNodeBtn.addStyleName( "default" );
@@ -74,7 +77,45 @@ public class AddNodeWindow extends Window
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                addButtonClicked();
+                addNodeBtn.setEnabled( false );
+                showProgress();
+                Agent agent = ( Agent ) hadoopNodes.getValue();
+                final UUID trackID = mahout.addNode( config.getClusterName(), agent.getHostname() );
+                executorService.execute( new Runnable()
+                {
+
+                    public void run()
+                    {
+                        while ( track )
+                        {
+                            ProductOperationView po =
+                                    tracker.getProductOperation( MahoutClusterConfig.PRODUCT_KEY, trackID );
+                            if ( po != null )
+                            {
+                                setOutput(
+                                        po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
+                                if ( po.getState() != ProductOperationState.RUNNING )
+                                {
+                                    hideProgress();
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                setOutput( "Product operation not found. Check logs" );
+                                break;
+                            }
+                            try
+                            {
+                                Thread.sleep( 1000 );
+                            }
+                            catch ( InterruptedException ex )
+                            {
+                                break;
+                            }
+                        }
+                    }
+                } );
             }
         } );
 
@@ -100,6 +141,8 @@ public class AddNodeWindow extends Window
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
+                //close window
+                track = false;
                 close();
             }
         } );
@@ -116,112 +159,19 @@ public class AddNodeWindow extends Window
     }
 
 
-    private void initNodesList( Set<Agent> nodes )
-    {
-        nodesList.setRows( 5 );
-        nodesList.setMultiSelect( true );
-        nodesList.setNullSelectionAllowed( false );
-
-        for ( Agent node : nodes )
-        {
-            nodesList.addItem( node.getHostname() );
-        }
-    }
-
-
-    private void setSelectedNodes()
-    {
-
-        selectedNodes.clear();
-
-        for ( Iterator i = nodesList.getItemIds().iterator(); i.hasNext(); )
-        {
-            Object id = i.next();
-            if ( nodesList.isSelected( id ) )
-            {
-                selectedNodes.add( ( String ) id );
-            }
-        }
-    }
-
-
-    private void addNode( String hostname )
-    {
-
-        showProgress();
-
-        final UUID trackID = mahoutPortalModule.getMahoutManager().addNode( clusterName, hostname );
-
-        mahoutPortalModule.getExecutor().execute( new Runnable()
-        {
-            public void run()
-            {
-                while ( true )
-                {
-                    ProductOperationView po = mahoutPortalModule.getTracker()
-                                                                .getProductOperation( MahoutClusterConfig.PRODUCT_KEY,
-                                                                        trackID );
-                    if ( po != null )
-                    {
-                        setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                        if ( po.getState() != ProductOperationState.RUNNING )
-                        {
-                            hideProgress();
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        setOutput( "Product operation not found. Check logs" );
-                        break;
-                    }
-                    try
-                    {
-                        Thread.sleep( 1000 );
-                    }
-                    catch ( InterruptedException ex )
-                    {
-                        break;
-                    }
-                }
-
-                addSelectedNodes();
-            }
-        } );
-    }
-
-
-    private void addButtonClicked()
-    {
-        setSelectedNodes();
-        addSelectedNodes();
-    }
-
-
-    private void addSelectedNodes()
-    {
-        if ( selectedNodes.isEmpty() )
-        {
-            return;
-        }
-
-        String hostname = selectedNodes.get( 0 );
-        selectedNodes.remove( 0 );
-
-        addNode( hostname );
-    }
-
-
-    @Override
-    public void close()
-    {
-        super.close();
-    }
-
-
     private void showProgress()
     {
         indicator.setVisible( true );
+    }
+
+
+    private void setOutput( String output )
+    {
+        if ( !Strings.isNullOrEmpty( output ) )
+        {
+            outputTxtArea.setValue( output );
+            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+        }
     }
 
 
@@ -231,12 +181,11 @@ public class AddNodeWindow extends Window
     }
 
 
-    private void setOutput( String output )
+    @Override
+    public void close()
     {
-        if ( !Strings.isNullOrEmpty( output ) )
-        {
-            outputTxtArea.setValue( output );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().toString().length() - 1 );
-        }
+        super.close();
+        track = false;
     }
 }
+

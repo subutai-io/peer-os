@@ -6,6 +6,11 @@
 package org.safehaus.subutai.plugin.mahout.ui;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.mahout.ui.manager.Manager;
 import org.safehaus.subutai.plugin.mahout.ui.wizard.Wizard;
 
@@ -14,14 +19,10 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class MahoutComponent extends CustomComponent
 {
 
-
-    public MahoutComponent( MahoutPortalModule mahoutPortalModule )
+    public MahoutComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
         setSizeFull();
 
@@ -31,8 +32,9 @@ public class MahoutComponent extends CustomComponent
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        Manager manager = new Manager( mahoutPortalModule );
-        Wizard wizard = new Wizard( mahoutPortalModule );
+
+        Manager manager = new Manager( executorService, serviceLocator );
+        Wizard wizard = new Wizard( executorService, serviceLocator );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
         verticalLayout.addComponent( mongoSheet );
@@ -41,3 +43,4 @@ public class MahoutComponent extends CustomComponent
         manager.refreshClustersInfo();
     }
 }
+

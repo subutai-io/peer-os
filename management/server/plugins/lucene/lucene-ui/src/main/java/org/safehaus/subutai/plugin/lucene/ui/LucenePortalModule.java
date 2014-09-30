@@ -21,9 +21,6 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-/**
- * @author dilshat
- */
 public class LucenePortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "lucene.png";
