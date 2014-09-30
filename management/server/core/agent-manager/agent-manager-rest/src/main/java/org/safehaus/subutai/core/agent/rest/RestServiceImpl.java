@@ -12,16 +12,19 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
-    AgentManager agentManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public RestServiceImpl( final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
         this.agentManager = agentManager;
     }
 

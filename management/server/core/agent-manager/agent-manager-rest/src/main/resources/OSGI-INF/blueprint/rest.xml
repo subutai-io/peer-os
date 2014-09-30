@@ -15,7 +15,7 @@
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <bean id="agentManagerRestServiceBean" class="org.safehaus.subutai.core.agent.rest.RestServiceImpl">
-    <property name="agentManager" ref="agentManager" />
+    <argument ref="agentManager" />
   </bean>
 
   <jaxrs:server address="/agent-manager" id="agentManagerRestService">
