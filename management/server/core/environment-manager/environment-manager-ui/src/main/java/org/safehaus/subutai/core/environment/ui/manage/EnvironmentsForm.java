@@ -18,7 +18,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsForm
 {
 
@@ -58,8 +58,9 @@ public class EnvironmentsForm
     {
         Table table = new Table( caption );
         table.addContainerProperty( "Name", String.class, null );
-        table.addContainerProperty( "Edit", Button.class, null );
         table.addContainerProperty( "Info", Button.class, null );
+        table.addContainerProperty( "Configure", Button.class, null );
+        table.addContainerProperty( "Manage", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -95,7 +96,7 @@ public class EnvironmentsForm
 
                     Table containersTable = new Table();
                     containersTable.addContainerProperty( "Name", String.class, null );
-                    containersTable.addContainerProperty( "Location", UUID.class, null );
+                    containersTable.addContainerProperty( "Properties", Button.class, null );
                     containersTable.addContainerProperty( "Start", Button.class, null );
                     containersTable.addContainerProperty( "Stop", Button.class, null );
                     containersTable.addContainerProperty( "Destroy", Button.class, null );
@@ -111,8 +112,8 @@ public class EnvironmentsForm
                     {
 
                         containersTable.addItem( new Object[] {
-                                container.getName(), container.getPeerId(), startButton( container ),
-                                stopButton( container ), destroyButton( container )
+                                container.getName(), propertiesButton( container ),
+                                startButton( container ), stopButton( container ), destroyButton( container )
                         }, null );
                     }
 
@@ -138,20 +139,46 @@ public class EnvironmentsForm
                     }
                 }
             } );
-            Button editButton = new Button( "Edit" );
-            editButton.addClickListener( new Button.ClickListener()
+            Button configureButton = new Button( "Configure" );
+            configureButton.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
-                    Notification.show( "Edit" );
+                    Notification.show( "Configure" );
                 }
             } );
+
+            Button manageButton = new Button( "Manage" );
+            manageButton.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent )
+                {
+                    Notification.show( "Backup/Move/Manage" );
+                }
+            } );
+
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), viewEnvironmentInfoButton, editButton, destroyEnvironment
+                    environment.getName(), viewEnvironmentInfoButton, manageButton, configureButton, destroyEnvironment
             }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private Object propertiesButton( final Container container )
+    {
+        Button button = new Button( "Properties" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Properties" );
+            }
+        } );
+        return button;
     }
 
 

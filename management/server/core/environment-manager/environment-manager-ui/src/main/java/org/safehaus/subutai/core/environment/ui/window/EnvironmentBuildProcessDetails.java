@@ -2,17 +2,23 @@ package org.safehaus.subutai.core.environment.ui.window;
 
 
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Window;
 
 
 /**
  * Created by bahadyr on 9/14/14.
  */
-public class EnvironmentBuildProcessDetails extends DetailsWindow
+public class EnvironmentBuildProcessDetails extends Window
 {
 
     public EnvironmentBuildProcessDetails( final String caption )
     {
-        super( caption );
+        setCaption( caption );
+        setModal( true );
+        setClosable( true );
+        setVisible( false );
+        setWidth( 900, UNITS_PIXELS );
+        setHeight( 500, UNITS_PIXELS );
     }
 
 
@@ -20,7 +26,7 @@ public class EnvironmentBuildProcessDetails extends DetailsWindow
     {
         TextArea area = getTextArea();
         area.setValue( content );
-        verticalLayout.addComponent( area );
+        setContent( area );
     }
 
 
