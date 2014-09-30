@@ -4,12 +4,11 @@ package org.safehaus.subutai.plugin.sqoop.impl.handler;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
@@ -57,21 +56,10 @@ public class DestroyNodeHandler extends AbstractHandler
         {
             po.addLog( "Sqoop successfully removed from " + hostname );
             config.getNodes().remove( agent );
+            po.addLog( "Updating db..." );
 
-            PluginDAO dao = manager.getPluginDao();
-            if ( config.getNodes().isEmpty() )
-            {
-
-                destroyNodes( config );
-
-                dao.deleteInfo( SqoopConfig.PRODUCT_KEY, config.getClusterName() );
-                po.addLogDone( "Installation info deleted" );
-            }
-            else
-            {
-                dao.saveInfo( SqoopConfig.PRODUCT_KEY, config.getClusterName(), config );
-                po.addLogDone( "Installation info updated" );
-            }
+            manager.getPluginDao().saveInfo( SqoopConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Cluster info updated in DB\nDone" );
         }
         else
         {
@@ -97,7 +85,7 @@ public class DestroyNodeHandler extends AbstractHandler
         }
         catch ( LxcDestroyException ex )
         {
-            String m = "Failed to detroy node(s)";
+            String m = "Failed to destroy node(s)";
             productOperation.addLog( m + ": " + ex.getMessage() );
             manager.getLogger().error( m, ex );
         }
