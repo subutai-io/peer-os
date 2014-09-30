@@ -288,8 +288,6 @@ public class EnvironmentBuildWizard extends Window
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
-                ccm.setPeerId( peer.getId() );
-                ccm.setEnvId( ebt.getUuid() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
                 process.putCloneContainerMessage( key, ccm );

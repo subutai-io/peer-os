@@ -13,12 +13,12 @@ import java.util.UUID;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -30,11 +30,12 @@ import static org.mockito.Mockito.when;
  */
 public class MockUtils
 {
-
-    private static final UUID physicalUUID = UUID.randomUUID();
-    private static final UUID lxcUUID = UUID.randomUUID();
-    private static final String PHYSICAL_HOSTNAME = "py111";
-    private static final String LXC_HOSTNAME = "py111-lxc-222";
+    public static final UUID envUUID = UUID.randomUUID();
+    public static final UUID physicalUUID = UUID.randomUUID();
+    public static final UUID lxcUUID = UUID.randomUUID();
+    public static final String PHYSICAL_HOSTNAME = "py111";
+    public static final String LXC_HOSTNAME = "testContainerName";
+    public static final String templateName = "master";
 
 
     public static Agent getPhysicalAgent()

@@ -28,8 +28,24 @@ public class RemotePeerRestClient
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
     private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
     private static final long CONNECTION_TIMEOUT = 1000 * 60 * 5;
+    private final long receiveTimeout;
+    private final long connectionTimeout;
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
+
+
+    public RemotePeerRestClient()
+    {
+        this.receiveTimeout = RECEIVE_TIMEOUT;
+        this.connectionTimeout = CONNECTION_TIMEOUT;
+    }
+
+
+    public RemotePeerRestClient( long timeout )
+    {
+        this.connectionTimeout = 1000 * 10; // 10 sec
+        this.receiveTimeout = timeout - this.connectionTimeout;
+    }
 
 
     public String getBaseUrl()
@@ -52,7 +68,7 @@ public class RemotePeerRestClient
     }
 
 
-    public boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
+    private boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
     {
         String path = "peer/containers";
         try
@@ -101,8 +117,8 @@ public class RemotePeerRestClient
             HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
             HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-            httpClientPolicy.setConnectionTimeout( CONNECTION_TIMEOUT );
-            httpClientPolicy.setReceiveTimeout( RECEIVE_TIMEOUT );
+            httpClientPolicy.setConnectionTimeout( connectionTimeout );
+            httpClientPolicy.setReceiveTimeout( receiveTimeout );
 
             httpConduit.setClient( httpClientPolicy );
 
@@ -114,13 +130,9 @@ public class RemotePeerRestClient
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                //                LOG.info( response.getEntity().toString() );
-                //                LOG.info( jsonObject );
-
                 ccm.setResult( result.getResult() );
                 ccm.setSuccess( result.isSuccess() );
-                //                LOG.info( String.format( "RESULT: %s", result.toString() ) );
-
+                LOG.debug( String.format( "Remote command result: %s", result.toString() ) );
                 return ccm;
             }
             else

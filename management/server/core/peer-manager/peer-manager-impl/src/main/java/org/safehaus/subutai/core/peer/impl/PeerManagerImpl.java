@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -484,6 +485,26 @@ public class PeerManagerImpl implements PeerManager
                     }
                 }
                 break;
+            case GET_PEER_ID:
+                UUID peerId = getSiteId();
+                peerCommandMessage.setResult( peerId );
+                peerCommandMessage.setSuccess( true );
+                break;
+            case GET_CONNECTED_CONTAINERS:
+                Set<Agent> agents = agentManager.getAgents();
+
+                Set<PeerContainer> containers = new HashSet<>();
+                for ( Agent agent : agents )
+                {
+                    PeerContainer pc = new PeerContainer();
+                    pc.setAgentId( agent.getUuid() );
+                    pc.setPeerId( agent.getSiteId() );
+                    pc.setState( ContainerState.STARTED );
+                    containers.add( pc );
+                }
+                peerCommandMessage.setResult( JsonUtil.toJson( containers ) );
+                peerCommandMessage.setSuccess( true );
+                break;
             case START:
                 result = startContainer( peerContainer );
                 if ( result )
@@ -539,13 +560,21 @@ public class PeerManagerImpl implements PeerManager
         }
         peerCommandMessage.setProccessed( true );
 
-        LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
+        LOG.debug( String.format( "After =================[%s]", peerCommandMessage ) );
     }
 
 
     private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
     {
         Agent agent = agentManager.getAgentByUUID( ecm.getAgentId() );
+        if ( agent == null )
+        {
+            ecm.setStdErr( "Container is down." );
+            ecm.setStdOut( "Container is down." );
+            ecm.setExitCode( -1 );
+            ecm.setSuccess( true );
+            return;
+        }
         RequestBuilder requestBuilder = new RequestBuilder( ecm.getCommand() );
 
 
