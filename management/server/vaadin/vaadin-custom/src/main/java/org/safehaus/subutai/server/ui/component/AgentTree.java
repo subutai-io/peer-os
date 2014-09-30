@@ -24,7 +24,6 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
-import com.vaadin.ui.UI;
 
 
 /**
@@ -35,7 +34,7 @@ import com.vaadin.ui.UI;
 public final class AgentTree extends ConcurrentComponent implements AgentListener, Disposable
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AgentTree.class.getName() );
     private final AgentManager agentManager;
     private final Tree tree;
     private HierarchicalContainer container;

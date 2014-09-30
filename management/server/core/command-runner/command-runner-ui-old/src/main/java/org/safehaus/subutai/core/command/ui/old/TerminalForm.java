@@ -17,6 +17,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -53,6 +54,10 @@ public class TerminalForm extends CustomComponent implements Disposable
 
     public TerminalForm( final CommandDispatcher commandRunner, final AgentManager agentManager )
     {
+
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         setSizeFull();
 
         executor = Executors.newCachedThreadPool();
