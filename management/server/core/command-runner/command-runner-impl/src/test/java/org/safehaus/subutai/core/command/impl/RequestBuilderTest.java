@@ -54,10 +54,10 @@ public class RequestBuilderTest
     private static final OutputRedirection ERR_REDIRECTION = OutputRedirection.RETURN;
 
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailEmptyOrNullCommand()
     {
-        RequestBuilder requestBuilder = new RequestBuilder( null );
+        new RequestBuilder( null );
     }
 
 
@@ -88,8 +88,5 @@ public class RequestBuilderTest
         assertEquals( STD_OUT_PATH, request.getStdOutPath() );
         assertEquals( ERR_REDIRECTION, request.getStdErr() );
         assertEquals( STD_REDIRECTION, request.getStdOut() );
-
-
-
     }
 }
