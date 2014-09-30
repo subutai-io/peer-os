@@ -48,7 +48,5 @@ public class CommandsTest
         assertNotNull( command );
         assertEquals( "dpkg -l | grep '^ii' | grep ksks", command.getDescription() );
     }
-
-
 }
 

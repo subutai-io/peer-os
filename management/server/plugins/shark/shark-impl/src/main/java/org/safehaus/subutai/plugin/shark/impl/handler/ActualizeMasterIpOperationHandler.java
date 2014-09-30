@@ -1,11 +1,9 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
@@ -18,8 +16,8 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
     public ActualizeMasterIpOperationHandler( SharkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation(
-                SharkClusterConfig.PRODUCT_KEY, String.format( "Actualizing master IP of %s", clusterName ) );
+        productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+                String.format( "Actualizing master IP of %s", clusterName ) );
     }
 
 
@@ -69,7 +67,5 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
                     String.format( "Failed to actualize Master IP, %s", setMasterIPCommand.getAllErrors() ) );
         }
     }
-
-
 }
 

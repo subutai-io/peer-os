@@ -52,7 +52,7 @@ public class TerminalForm extends CustomComponent implements Disposable
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        environmentTree = new EnvironmentTree( agentManager, environmentManager);
+        environmentTree = new EnvironmentTree( agentManager, environmentManager );
         horizontalSplit.setFirstComponent( environmentTree );
 
         GridLayout grid = new GridLayout( 20, 10 );
@@ -85,7 +85,7 @@ public class TerminalForm extends CustomComponent implements Disposable
         controls.addComponent( timeoutLbl );
         controls.addComponent( timeoutTxtFld );
         Label requestTypeLabel = new Label( "Req Type" );
-        controls.addComponent( requestTypeLabel );
+        //        controls.addComponent( requestTypeLabel );
         requestTypeCombo = new ComboBox( null,
                 Arrays.asList( RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST, RequestType.PS_REQUEST ) );
         requestTypeCombo.setImmediate( true );
@@ -93,7 +93,7 @@ public class TerminalForm extends CustomComponent implements Disposable
         requestTypeCombo.setNullSelectionAllowed( false );
         requestTypeCombo.setValue( RequestType.EXECUTE_REQUEST );
         requestTypeCombo.setWidth( 150, Unit.PIXELS );
-        controls.addComponent( requestTypeCombo );
+        //        controls.addComponent( requestTypeCombo );
         Button clearBtn = new Button( "Clear" );
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );

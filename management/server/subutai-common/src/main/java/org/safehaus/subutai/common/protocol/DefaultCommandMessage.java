@@ -8,8 +8,9 @@ import java.util.UUID;
  * Created by bahadyr on 9/26/14.
  */
 public class DefaultCommandMessage extends PeerCommandMessage
-
 {
+    private String result;
+
     public DefaultCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
     {
         super( type, envId, peerId, agentId );
@@ -20,18 +21,18 @@ public class DefaultCommandMessage extends PeerCommandMessage
     public void setResult( final Object result )
     {
 
-        if ( !( result instanceof Boolean ) )
+        if ( !( result instanceof String ) )
         {
-            throw new IllegalArgumentException( "Argument must be boolean." );
+            throw new IllegalArgumentException( "Argument must be String." );
         }
 
-        this.success = ( Boolean ) result;
+        this.result = ( String ) result;
     }
 
 
     @Override
-    public Boolean getResult()
+    public String getResult()
     {
-        return success;
+        return result;
     }
 }

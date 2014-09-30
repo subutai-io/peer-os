@@ -225,7 +225,7 @@ public abstract class AbstractCommand implements Command
     }
 
 
-    protected void executeCommand( final CommandCallback callback, boolean async ) throws CommandException
+    public void executeCommand( final CommandCallback callback, boolean async ) throws CommandException
     {
         if ( this.commandStatus != CommandStatus.NEW )
         {
@@ -307,7 +307,7 @@ public abstract class AbstractCommand implements Command
     /**
      * Increments count of completed requests
      */
-    protected void incrementCompletedRequestsCount()
+    public void incrementCompletedRequestsCount()
     {
         requestsCompleted.incrementAndGet();
     }
@@ -316,7 +316,7 @@ public abstract class AbstractCommand implements Command
     /**
      * Increments count of succeeded requests
      */
-    protected void incrementSucceededRequestsCount()
+    public void incrementSucceededRequestsCount()
     {
         requestsSucceeded.incrementAndGet();
     }

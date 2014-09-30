@@ -14,6 +14,7 @@ import org.safehaus.subutai.core.command.api.command.ExpiringCache;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -83,12 +84,25 @@ public class ExpiringCacheTest
 
 
     @Test
+    public void shouldClearAllValues()
+    {
+
+        cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
+        cache.dispose();
+
+        assertNull( cache.get( KEY ) );
+    }
+
+
+    @Test
     public void shouldReturnEntries()
     {
 
         cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
 
         assertFalse( cache.getEntries().isEmpty() );
+
+        assertTrue( cache.size() > 0 );
     }
 
 

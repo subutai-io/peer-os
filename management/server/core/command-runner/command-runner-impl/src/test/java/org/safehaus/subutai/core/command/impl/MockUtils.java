@@ -18,7 +18,9 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import static org.mockito.Mockito.any;
@@ -173,5 +175,18 @@ public class MockUtils
         when( agent.getUuid() ).thenReturn( agentUUID );
 
         return agent;
+    }
+
+
+    public static CommandCallback getCommandCallback()
+    {
+        return new CommandCallback()
+        {
+            @Override
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
+            {
+
+            }
+        };
     }
 }
