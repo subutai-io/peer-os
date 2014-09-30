@@ -80,26 +80,26 @@ public class RestServiceImpl implements RestService
     }
 
 
-    //    @Override
-    //    public String createContainers( final String createContainersMsg )
-    //    {
-    //        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
-    //        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
-    ////        peerManager.createContainers( ccm );
-    //
-    //        return JsonUtil.toJson( ccm.getResult() );
-    //
-    //    }
+//    @Override
+//    public String createContainers( final String createContainersMsg )
+//    {
+//        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
+//        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
+////        peerManager.createContainers( ccm );
+//
+//        return JsonUtil.toJson( ccm.getResult() );
+//
+//    }
 
 
     @Override
     public String getCreateContainersMsgJsonFormat()
     {
-        CloneContainersMessage ccm = new CloneContainersMessage( UUID.randomUUID(), UUID.randomUUID() );
+        CloneContainersMessage ccm = new CloneContainersMessage(UUID.randomUUID(), UUID.randomUUID());
         ccm.setStrategy( "ROUND_ROBIN" );
-        //        ccm.setEnvId( UUID.randomUUID() );
+//        ccm.setEnvId( UUID.randomUUID() );
         ccm.setNumberOfNodes( 2 );
-        //        ccm.setPeerId( UUID.randomUUID() );
+//        ccm.setPeerId( UUID.randomUUID() );
         ccm.setTemplate( "master" );
         return GSON.toJson( ccm );
     }
@@ -157,7 +157,7 @@ public class RestServiceImpl implements RestService
     public Response invoke( final String commandType, final String command )
     {
 
-        LOG.info( String.format( "Remote peer sent a command: " ) + commandType );
+        LOG.info(String.format( "Received a new command: " ) + commandType);
         PeerCommandType type = PeerCommandType.valueOf( commandType );
         Class clazz = getMessageClass( type );
         PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
@@ -168,7 +168,7 @@ public class RestServiceImpl implements RestService
         }
 
         LOG.debug( String.format( "Command before invoking PCD [%s]", commandMessage ) );
-        peerCommandDispatcher.invoke( commandMessage );
+        peerManager.invoke( commandMessage );
         LOG.debug( String.format( "Command after invoking PCD [%s]", commandMessage ) );
 
         if ( commandMessage.isSuccess() )
@@ -211,10 +211,9 @@ public class RestServiceImpl implements RestService
 
     private Peer getSamplePeer()
     {
-        String localIp = getLocalIp();
         Peer peer = new Peer();
-        peer.setName( "Peer on " + localIp );
-        peer.setIp( localIp );
+        peer.setName( "Peer name 1" );
+        peer.setIp( getLocalIp() );
         peer.setId( peerManager.getSiteId() );
         peer.setStatus( PeerStatus.REQUESTED );
         return peer;

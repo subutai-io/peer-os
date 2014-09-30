@@ -11,4 +11,6 @@ public interface PeerCommandDispatcher
 {
 
     public void invoke( PeerCommandMessage peerCommand ) throws PeerCommandException;
+
+    public void invoke( PeerCommandMessage peerCommand, long timeout ) throws PeerCommandException;
 }
