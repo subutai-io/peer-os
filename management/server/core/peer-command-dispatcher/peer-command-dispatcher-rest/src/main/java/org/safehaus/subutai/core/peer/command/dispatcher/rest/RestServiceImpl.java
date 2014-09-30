@@ -157,7 +157,7 @@ public class RestServiceImpl implements RestService
     public Response invoke( final String commandType, final String command )
     {
 
-        LOG.info(String.format( "Remote peer sent a command: " ) + commandType);
+        LOG.info(String.format( "Received a new command: " ) + commandType);
         PeerCommandType type = PeerCommandType.valueOf( commandType );
         Class clazz = getMessageClass( type );
         PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );
@@ -168,7 +168,7 @@ public class RestServiceImpl implements RestService
         }
 
         LOG.debug( String.format( "Command before invoking PCD [%s]", commandMessage ) );
-        peerCommandDispatcher.invoke( commandMessage );
+        peerManager.invoke( commandMessage );
         LOG.debug( String.format( "Command after invoking PCD [%s]", commandMessage ) );
 
         if ( commandMessage.isSuccess() )

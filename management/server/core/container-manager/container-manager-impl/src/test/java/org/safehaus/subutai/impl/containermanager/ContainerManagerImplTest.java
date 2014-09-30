@@ -8,7 +8,6 @@ package org.safehaus.subutai.impl.containermanager;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,6 +22,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,12 +47,13 @@ public class ContainerManagerImplTest
         Monitoring monitor = mock( Monitoring.class );
         when( monitor.getData( any( String.class ), any( Metric.class ), any( Date.class ), any( Date.class ) ) )
                 .thenReturn( Collections.EMPTY_MAP );
-        templateManager = mock(TemplateManager.class);
-        templateRegistry = mock(TemplateRegistry.class);
-        dbManager = mock(DbManager.class);
+        templateManager = mock( TemplateManager.class );
+        templateRegistry = mock( TemplateRegistry.class );
+        dbManager = mock( DbManager.class );
         strategyManager = mock( StrategyManager.class );
         containerManager = new ContainerManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor,
-                templateManager, templateRegistry, dbManager, strategyManager ); ( ( ContainerManagerImpl ) containerManager ).init();
+                templateManager, templateRegistry, dbManager, strategyManager );
+        ( ( ContainerManagerImpl ) containerManager ).init();
     }
 
 
@@ -64,29 +65,27 @@ public class ContainerManagerImplTest
     }
 
 
-//    @Test
+    @Test
     public void testCloneSingleContainer() throws Exception
     {
-        UUID envId = UUID.randomUUID();
-        String hostName ="testHostName";
-        String templateName = "master";
-        String cloneName = "testContainerName";
-        when( templateManager.clone( hostName, templateName, cloneName, envId.toString())).thenReturn( true );
-        Agent agent = containerManager.clone( envId, hostName, templateName, cloneName );
+        when( templateManager.clone( MockUtils.PHYSICAL_HOSTNAME, MockUtils.templateName, MockUtils.LXC_HOSTNAME,
+                MockUtils.envUUID.toString() ) ).thenReturn( true );
+        Agent agent = containerManager.clone( MockUtils.envUUID, MockUtils.PHYSICAL_HOSTNAME, MockUtils.templateName,
+                MockUtils.LXC_HOSTNAME );
+        assertNotNull( agent );
     }
 
-    /*
+      /*
     @Test
-	public void testCloneLxcOnHost() {
+    public void testClones() throws Exception
+    {
+        containerManager.clone(  containerManager.clone( MockUtils.envUUID, MockUtils.PHYSICAL_HOSTNAME, MockUtils.templateName,
+                        MockUtils.LXC_HOSTNAME );
 
-		boolean result =
-				lxcManager.cloneLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
-
-		assertTrue(result);
-	}
+    }
 
 
-	@Test
+    @Test
 	public void testGetLxcOnPhysicalServers() {
 
 		Map<String, EnumMap<ContainerState, List<String>>> result = lxcManager.getLxcOnPhysicalServers();

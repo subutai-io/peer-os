@@ -6,15 +6,20 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -27,6 +32,7 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -36,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -353,5 +360,44 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void invoke( final PeerCommandMessage commandMessage )
     {
         peerCommandDispatcher.invoke( commandMessage );
+    }
+
+
+    @Override
+    public Set<EnvironmentContainer> getConnectedContainers( final Environment environment )
+    {
+
+        Set<UUID> peers = new HashSet<>();
+        for ( EnvironmentContainer ec : environment.getContainers() )
+        {
+            peers.add( ec.getPeerId() );
+        }
+
+        Set<EnvironmentContainer> freshContainers = new HashSet<>();
+        for ( UUID peerId : peers )
+        {
+            PeerCommandMessage cmd =
+                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, environment.getUuid(), peerId,
+                            null );
+
+            peerCommandDispatcher.invoke( cmd, 1000 * 15 );
+
+            Set<PeerContainer> containers = JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
+            {
+            }.getType() );
+
+            if ( cmd.isSuccess() && containers != null )
+            {
+                for ( Container c : containers )
+                {
+                    EnvironmentContainer ec = new EnvironmentContainer();
+                    ec.setEnvironment( environment );
+                    ec.setAgentId( c.getAgentId() );
+                    ec.setPeerId( c.getPeerId() );
+                    freshContainers.add( ec );
+                }
+            }
+        }
+        return freshContainers;
     }
 }

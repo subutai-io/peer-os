@@ -11,7 +11,6 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -22,13 +21,14 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Runo;
 
 
 /**
  * Created by bahadyr on 9/10/14.
  */
-public class EnvironmentBuildWizard extends DetailsWindow
+public class EnvironmentBuildWizard extends Window
 {
 
     private int step = 0;
@@ -37,12 +37,19 @@ public class EnvironmentBuildWizard extends DetailsWindow
     private Table containerToPeerTable;
     private EnvironmentManagerPortalModule managerUI;
     private Map<Object, NodeGroup> nodeGroupMap;
+    TabSheet sheet = new TabSheet();
 
 
     public EnvironmentBuildWizard( final String caption, EnvironmentManagerPortalModule managerUI,
                                    EnvironmentBuildTask environmentBuildTask )
     {
         super( caption );
+        setCaption( caption );
+        setModal( true );
+        setClosable( true );
+        setVisible( false );
+        setWidth( 900, UNITS_PIXELS );
+        setHeight( 500, UNITS_PIXELS );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
         next();
@@ -170,12 +177,9 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    private TabSheet genContainerToPeersTable()
+    private VerticalLayout genContainerToPeersTable()
     {
 
-        TabSheet sheet = new TabSheet();
-        sheet.setStyleName( Runo.TABSHEET_SMALL );
-        sheet.setSizeFull();
 
         VerticalLayout vl = new VerticalLayout();
 
@@ -230,11 +234,8 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
         vl.addComponent( containerToPeerTable );
         vl.addComponent( nextButton );
-        sheet.addTab( vl, "Node to Peer" );
-        sheet.addTab( new Button( "test" ), "Blueprint to Peer group" );
-        sheet.addTab( new Button( "test" ), "Node group to Peer group" );
-        sheet.addTab( new Button( "test" ), "Node group to Peer" );
-        return sheet;
+
+        return vl;
     }
 
 
@@ -287,8 +288,6 @@ public class EnvironmentBuildWizard extends DetailsWindow
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
-                ccm.setPeerId( peer.getId() );
-                ccm.setEnvId( ebt.getUuid() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
                 process.putCloneContainerMessage( key, ccm );
