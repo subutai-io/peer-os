@@ -3,13 +3,13 @@
 	<persistence-unit name="DbManagerExt">
 	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 	<class>org.safehaus.subutai.core.db.ext.api.entity.User</class>
-    <class>org.safehaus.subutai.core.db.ext.api.entity.Temp</class>
-	<class>org.safehaus.subutai.core.db.ext.api.entity.Environment</class>
+  <class>org.safehaus.subutai.core.db.ext.api.entity.Environment</class>
 	<class>org.safehaus.subutai.core.db.ext.api.entity.CommandRequest</class>
+  <class>org.safehaus.subutai.core.db.ext.api.entity.CommandResponse</class>
 	<properties>
-	    <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-	    <property name="javax.persistence.jdbc.url" value="jdbc:h2:/home/nurkaly/Dev/DB/subutai"/>
-	    <property name="javax.persistence.jdbc.user" value="sa"/>
+	    <property name="javax.persistence.jdbc.driver"   value="org.h2.Driver"/>
+	    <property name="javax.persistence.jdbc.url"      value="jdbc:h2:/home/nurkaly/Dev/DB/subutai"/>
+	    <property name="javax.persistence.jdbc.user"     value="sa"/>
 	    <property name="javax.persistence.jdbc.password" value=""/>
 	</properties>	
 	</persistence-unit>
