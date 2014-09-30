@@ -3,19 +3,19 @@ package org.safehaus.subutai.plugin.lucene.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 
 public class Commands extends CommandsSingleton
 {
 
     public static final String PACKAGE_NAME = "ksks-lucene";
-    public static final String INSTALL = "sleep 20; apt-get --force-yes --assume-yes install ksks-lucene";
+    public static final String INSTALL = "apt-get --force-yes --assume-yes install ksks-lucene";
     public static final String UNINSTALL = "apt-get --force-yes --assume-yes purge ksks-lucene";
     public static final String CHECK = "dpkg -l | grep '^ii' | grep ksks";
 
@@ -38,7 +38,7 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public Command getInstallCommand( Set<Agent> agents )
+    public static Command getInstallCommand( Set<Agent> agents )
     {
         return createCommand(
                 new RequestBuilder( INSTALL ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ), agents );

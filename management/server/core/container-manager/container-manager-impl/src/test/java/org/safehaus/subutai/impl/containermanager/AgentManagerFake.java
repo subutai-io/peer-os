@@ -114,9 +114,13 @@ public class AgentManagerFake implements AgentManager
     @Override
     public Agent waitForRegistration( final String hostname, final long timeout )
     {
-//        UUID uuid, String hostname, String parentHostName, String macAddress, List<String> listIP,
-//                          boolean isLXC, String transportId, UUID siteId, UUID environmentId
-//        return new Agent(  );
+        for ( Agent agent : agents )
+        {
+            if ( agent.getHostname().equals( hostname ) )
+            {
+                return agent;
+            }
+        }
         return null;
     }
 }

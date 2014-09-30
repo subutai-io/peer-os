@@ -29,12 +29,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
     }
 
 
-    public HadoopClusterConfig getHadoopConfig()
-    {
-        return hadoopConfig;
-    }
-
-
     public void setHadoopConfig( HadoopClusterConfig hadoopConfig )
     {
         this.hadoopConfig = hadoopConfig;
@@ -77,6 +71,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
         }
 
         ClusterSetupStrategy s = manager.getClusterSetupStrategy( env, config, po );
+
         try
         {
             if ( s == null )

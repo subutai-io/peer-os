@@ -27,12 +27,10 @@ import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -51,7 +49,6 @@ public class Manager
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String BUTTON_STYLE_NAME = "default";
-    private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
@@ -83,7 +80,6 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );

@@ -31,7 +31,7 @@ public class LucenePortalModule implements PortalModule
 
     public LucenePortalModule()
     {
-        serviceLocator = new ServiceLocator();
+        this.serviceLocator = new ServiceLocator();
     }
 
 
@@ -43,6 +43,7 @@ public class LucenePortalModule implements PortalModule
 
     public void destroy()
     {
+
         executor.shutdown();
     }
 
@@ -77,7 +78,6 @@ public class LucenePortalModule implements PortalModule
         {
             LOG.severe( e.getMessage() );
         }
-
         return null;
     }
 

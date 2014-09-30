@@ -6,31 +6,32 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.settings.Common;
 
 
 public class LuceneConfig implements ConfigBase
 {
-
-    public static final String PRODUCT_KEY = "Lucene2";
     public static final String TEMPLATE_NAME = "hadooplucene";
+    public static final String PRODUCT_KEY = "Lucene";
+    public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY ).toLowerCase();
 
-    private String hadoopClusterName = "";
     private String clusterName = "";
-    private SetupType setupType = SetupType.OVER_HADOOP;
+    private SetupType setupType;
+    private String hadoopClusterName;
     private Set<Agent> nodes = new HashSet<>();
     private Set<Agent> hadoopNodes = new HashSet<>();
 
 
-    @Override
     public String getClusterName()
     {
         return clusterName;
     }
 
 
-    public void setClusterName( final String clusterName )
+    public LuceneConfig setClusterName( String clusterName )
     {
         this.clusterName = clusterName;
+        return this;
     }
 
 
@@ -38,18 +39,6 @@ public class LuceneConfig implements ConfigBase
     public String getProductName()
     {
         return PRODUCT_KEY;
-    }
-
-
-    public String getHadoopClusterName()
-    {
-        return hadoopClusterName;
-    }
-
-
-    public void setHadoopClusterName( String hadoopClusterName )
-    {
-        this.hadoopClusterName = hadoopClusterName;
     }
 
 
@@ -68,11 +57,7 @@ public class LuceneConfig implements ConfigBase
     @Override
     public String toString()
     {
-        return "Config{" +
-                "hadoopClusterName='" + hadoopClusterName + '\'' +
-                ", clusterName='" + clusterName + '\'' +
-                ", nodes=" + nodes +
-                '}';
+        return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
     }
 
 
@@ -82,9 +67,22 @@ public class LuceneConfig implements ConfigBase
     }
 
 
-    public void setSetupType( final SetupType setupType )
+    public void setSetupType( SetupType setupType )
     {
         this.setupType = setupType;
+    }
+
+
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( String hadoopClusterName )
+    {
+        this.hadoopClusterName = hadoopClusterName;
+        this.clusterName = hadoopClusterName;
     }
 
 
