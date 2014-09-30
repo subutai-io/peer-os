@@ -47,29 +47,13 @@ public class EnvironmentBuildWizardTest
     }
 
 
-    @Test
-    public void testName() throws Exception
-    {
-        Map<String, Peer> topology = new HashMap<>();
-        Peer peer = new Peer();
-        peer.setId( UUID.randomUUID() );
-        for ( NodeGroup ng : getTask().getEnvironmentBlueprint().getNodeGroups() )
-        {
-            topology.put( ng.getTemplateName(), peer );
-        }
-
-        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
-        System.out.println( GSON.toJson( process ) );
-    }
-
-
     private EnvironmentBuildTask getTask()
     {
         EnvironmentBuildTask task = new EnvironmentBuildTask();
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
         eb.setName( "blueprint" );
 
-        NodeGroup one = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
+        NodeGroup one = genNodeGroup( "hadoop", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         NodeGroup two = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         eb.addNodeGroup( one );
         eb.addNodeGroup( two );
@@ -91,5 +75,43 @@ public class EnvironmentBuildWizardTest
         ng.setLinkHosts( lh );
         ng.setPlacementStrategy( ps );
         return ng;
+    }
+
+
+    @Test
+    public void shouldCreateBuildProcess() throws Exception
+    {
+
+        Peer peer1 = new Peer();
+        peer1.setId( UUID.randomUUID() );
+
+        Peer peer2 = new Peer();
+        peer2.setId( UUID.randomUUID() );
+        Peer[] peers = { peer1, peer2 };
+
+        Map<Object, Peer> topology = new HashMap<>();
+
+        EnvironmentBuildTask ebp = getTask();
+        Map<Object, NodeGroup> map = new HashMap<>();
+
+        int itemId = 0;
+        for ( NodeGroup ng : ebp.getEnvironmentBlueprint().getNodeGroups() )
+        {
+            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
+            {
+                map.put( itemId, ng );
+                topology.put( itemId++, peers[getRandom()] );
+            }
+        }
+
+        sub.setNodeGroupMap( map );
+        EnvironmentBuildProcess process = sub.createEnvironmentBuildProcess( ebp, topology );
+        System.out.println( GSON.toJson( process ) );
+    }
+
+
+    private int getRandom()
+    {
+        return ( int ) Math.floor( Math.random() * 2 );
     }
 }
