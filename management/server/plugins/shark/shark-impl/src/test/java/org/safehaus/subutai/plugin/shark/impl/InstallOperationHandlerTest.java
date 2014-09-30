@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class InstallOperationHandlerTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void testWithNullConfig()
     {
         handler = new InstallOperationHandler( mock, null );
@@ -54,7 +55,5 @@ public class InstallOperationHandlerTest
         Assert.assertTrue( po.getLog().toLowerCase().contains( config.getClusterName() ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
-
-
 }
 

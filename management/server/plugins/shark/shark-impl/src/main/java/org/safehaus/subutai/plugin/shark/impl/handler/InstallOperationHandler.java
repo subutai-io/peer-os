@@ -27,8 +27,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         super( manager, config.getClusterName() );
         this.config = config;
         this.hadoopConfig = hadoopConfig;
-        this.productOperation = manager.getTracker().createProductOperation(
-                SharkClusterConfig.PRODUCT_KEY, String.format( "Installing %s", SharkClusterConfig.PRODUCT_KEY ) );
+        this.productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+                String.format( "Installing %s", SharkClusterConfig.PRODUCT_KEY ) );
     }
 
 
@@ -117,7 +117,5 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
             }
         }
     }
-
-
 }
 

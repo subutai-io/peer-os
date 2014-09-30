@@ -9,6 +9,7 @@ package org.safehaus.subutai.core.environment.api;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -77,4 +78,6 @@ public interface EnvironmentManager
     //
     //    public boolean isContainerConnected( EnvironmentContainer container );
     public void invoke(PeerCommandMessage commandMessage);
+
+    Set<EnvironmentContainer> getConnectedContainers( Environment environment );
 }

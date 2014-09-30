@@ -1,16 +1,19 @@
 package org.safehaus.subutai.plugin.shark.ui;
 
 
-import com.vaadin.ui.Component;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+
 import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
 
 
 public class SharkPortalModule implements PortalModule
@@ -81,7 +84,5 @@ public class SharkPortalModule implements PortalModule
     {
         return false;
     }
-
-
 }
 

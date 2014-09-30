@@ -37,7 +37,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Elasti
 
         if ( stopServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Start succeeded" );
+            productOperation.addLogDone( "Stop succeeded" );
         }
         else
         {

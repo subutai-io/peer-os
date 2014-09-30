@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +56,5 @@ public class DestroyNodeOperationHandlerTest
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not connected" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
-
-
 }
 

@@ -70,9 +70,9 @@
       <version>1.9.5</version>
     </dependency>
     <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>environment-manager-api</artifactId>
-        <version>${project.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>environment-manager-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

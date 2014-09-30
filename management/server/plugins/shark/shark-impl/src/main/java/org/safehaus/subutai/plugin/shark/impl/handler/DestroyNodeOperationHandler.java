@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -20,8 +21,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation = manager.getTracker().createProductOperation(
-                SharkClusterConfig.PRODUCT_KEY, String.format( "Destroying %s in %s", hostname, clusterName ) );
+        this.productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+                String.format( "Destroying %s in %s", hostname, clusterName ) );
     }
 
 
@@ -90,7 +91,5 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             productOperation.addLogFailed( "Uninstallation failed, command timed out" );
         }
     }
-
-
 }
 

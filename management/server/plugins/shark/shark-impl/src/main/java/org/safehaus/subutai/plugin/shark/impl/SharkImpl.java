@@ -1,11 +1,11 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 
-import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -27,6 +27,8 @@ import org.safehaus.subutai.plugin.shark.impl.handler.DestroyNodeOperationHandle
 import org.safehaus.subutai.plugin.shark.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.shark.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.spark.api.Spark;
+
+import com.google.common.base.Preconditions;
 
 
 public class SharkImpl implements Shark
@@ -199,7 +201,5 @@ public class SharkImpl implements Shark
         }
         return null;
     }
-
-
 }
 
