@@ -6,12 +6,13 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Window;
 
 
 /**
  * Created by bahadyr on 6/26/14.
  */
-public class BlueprintDetails extends DetailsWindow
+public class BlueprintDetails extends Window
 {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -19,7 +20,12 @@ public class BlueprintDetails extends DetailsWindow
 
     public BlueprintDetails( String caption )
     {
-        super( caption );
+        setCaption( caption );
+        setModal( true );
+        setClosable( true );
+        setVisible( false );
+        setWidth( 900, UNITS_PIXELS );
+        setHeight( 500, UNITS_PIXELS );
     }
 
 
@@ -28,7 +34,7 @@ public class BlueprintDetails extends DetailsWindow
         String value = GSON.toJson( blueprint );
         TextArea area = getTextArea();
         area.setValue( value );
-        verticalLayout.addComponent( area );
+        setContent( area );
     }
 
 
