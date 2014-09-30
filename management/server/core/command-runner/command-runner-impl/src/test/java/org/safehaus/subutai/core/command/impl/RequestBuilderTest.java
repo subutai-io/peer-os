@@ -18,6 +18,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 
 public class RequestBuilderTest
@@ -102,6 +103,20 @@ public class RequestBuilderTest
     {
 
         assertEquals( requestBuilder, requestBuilder2 );
+    }
+
+
+    @Test
+    public void testNotEquals()
+    {
+        RequestBuilder requestBuilder3 =
+                new RequestBuilder( COMMAND ).withCwd( CWD ).withRunAs( RUN_AS ).withTimeout( TIMEOUT ).withPid( PID )
+                                             .withType( REQUEST_TYPE ).withCmdArgs( CMD_ARGS ).withEnvVars( ENV_VARS )
+                                             .withErrPath( ERR_PATH ).withStdOutPath( STD_OUT_PATH )
+                                             .withStdErrRedirection( OutputRedirection.CAPTURE )
+                                             .withStdOutRedirection( STD_REDIRECTION );
+
+        assertNotEquals( requestBuilder, requestBuilder3 );
     }
 
 
