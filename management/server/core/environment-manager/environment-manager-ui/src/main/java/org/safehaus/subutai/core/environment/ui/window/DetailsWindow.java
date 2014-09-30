@@ -16,13 +16,7 @@ public abstract class DetailsWindow extends Window
 
     public DetailsWindow( String caption )
     {
-        setCaption( caption );
-        setModal( true );
-        setClosable( true );
-        setVisible( false );
-        setWidth( 800, UNITS_PIXELS );
-        setHeight( 600, UNITS_PIXELS );
-        setContent( verticalLayout );
+
     }
 
 

@@ -207,7 +207,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public List<Environment> getEnvironments()
     {
-        return environments;
+        //        return environments;
+        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
