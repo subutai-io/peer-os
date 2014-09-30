@@ -3,10 +3,11 @@ package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
+import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
@@ -30,78 +31,98 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Lucene
     @Override
     public void run()
     {
+        ProductOperation po = productOperation;
         LuceneConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            productOperation.addLogFailed(
+            po.addLogFailed(
                     String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
-            return;
-        }
-
-        if ( !config.getNodes().contains( agent ) )
-        {
-            productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
         if ( config.getNodes().size() == 1 )
         {
-            productOperation.addLogFailed(
-                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            po.addLogFailed(
+                    "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted" );
             return;
         }
 
-        productOperation.addLog( "Uninstalling Lucene..." );
-        Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
-        manager.getCommandRunner().runCommand( uninstallCommand );
-
-        if ( uninstallCommand.hasCompleted() )
+        //check if node is in the cluster
+        if ( !config.getNodes().contains( agent ) )
         {
-            AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
-            if ( result.getExitCode() != null && result.getExitCode() == 0 )
-            {
-                if ( result.getStdOut().contains( "Package ksks-lucene is not installed, so not removed" ) )
-                {
-                    productOperation.addLog( String.format( "Lucene is not installed, so not removed on node %s",
-                            agent.getHostname() ) );
-                }
-                else
-                {
-                    productOperation.addLog( String.format( "Lucene is removed from node %s", agent.getHostname() ) );
-                }
-            }
-            else
-            {
-                productOperation
-                        .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
-            }
+            po.addLogFailed( String.format( "Node %s does not belong to this cluster\nOperation aborted",
+                    agent.getHostname() ) );
+            return;
+        }
 
-            config.getNodes().remove( agent );
-            productOperation.addLog( "Updating db..." );
-
-            try
-            {
-                manager.getDbManager().saveInfo2( LuceneConfig.PRODUCT_KEY, clusterName, config );
-                productOperation.addLogDone( "Information updated in db" );
-            }
-            catch ( DBException e )
-            {
-                productOperation
-                        .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
-            }
+        boolean ok = false;
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
+            ok = uninstall( agent );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
+            ok = destroyNode( agent );
         }
         else
         {
-            productOperation.addLogFailed( "Uninstallation failed, command timed out" );
+            po.addLog( "Undefined setup type" );
+        }
+
+        if ( ok )
+        {
+            config.getNodes().remove( agent );
+            po.addLog( "Updating db..." );
+
+            manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Cluster info updated in DB\nDone" );
+        }
+        else
+        {
+            po.addLogFailed( "Failed to destroy node" );
+        }
+    }
+
+
+    private boolean uninstall( Agent agent )
+    {
+        ProductOperation po = productOperation;
+        po.addLog( "Uninstalling Lucene..." );
+
+        Command cmd = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+        manager.getCommandRunner().runCommand( cmd );
+
+        if ( cmd.hasSucceeded() )
+        {
+            po.addLog( "Lucene removed from " + agent.getHostname() );
+            return true;
+        }
+        else
+        {
+            po.addLog( "Uninstallation failed: " + cmd.getAllErrors() );
+            return false;
+        }
+    }
+
+
+    private boolean destroyNode( Agent agent )
+    {
+        try
+        {
+            manager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
+            return true;
+        }
+        catch ( LxcDestroyException ex )
+        {
+            productOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
+            return false;
         }
     }
 }

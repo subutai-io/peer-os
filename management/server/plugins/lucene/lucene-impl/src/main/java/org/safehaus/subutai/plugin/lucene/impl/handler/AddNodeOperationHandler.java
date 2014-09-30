@@ -1,12 +1,16 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
+import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
@@ -15,97 +19,124 @@ import com.google.common.collect.Sets;
 
 public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl>
 {
-    private final String lxcHostname;
+    private final String hostname;
 
 
-    public AddNodeOperationHandler( LuceneImpl manager, String clusterName, String lxcHostname )
+    public AddNodeOperationHandler( LuceneImpl manager, String clusterName, String hostname )
     {
         super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
+        this.hostname = hostname;
         productOperation = manager.getTracker().createProductOperation( LuceneConfig.PRODUCT_KEY,
-                String.format( "Adding node to %s", clusterName ) );
+                String.format( "Adding node %s to %s", ( hostname != null ? hostname : "" ), clusterName ) );
     }
 
 
     @Override
     public void run()
     {
+        ProductOperation po = productOperation;
         LuceneConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        // Check if node agent is connected
-        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        try
+        {
+            Agent agent;
+            if ( config.getSetupType() == SetupType.OVER_HADOOP )
+            {
+                agent = setupHost( config );
+            }
+            else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+            {
+                agent = addHost( config );
+            }
+            else
+            {
+                throw new ClusterSetupException( "No setup type" );
+            }
+
+            config.getNodes().add( agent );
+
+            po.addLog( "Saving cluster info..." );
+            manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, clusterName, config );
+            po.addLog( "Saved cluster info" );
+
+            po.addLogDone( null );
+        }
+        catch ( ClusterSetupException ex )
+        {
+            po.addLog( ex.getMessage() );
+            po.addLogFailed( "Add worker node failed" );
+        }
+    }
+
+
+    public Agent setupHost( LuceneConfig config ) throws ClusterSetupException
+    {
+        ProductOperation po = productOperation;
+
+        Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )
         {
-            productOperation
-                    .addLogFailed( String.format( "Node %s is not connected. Operation aborted", lxcHostname ) );
-            return;
+            throw new ClusterSetupException( "New node is not connected" );
         }
 
+        //check if node is in the cluster
         if ( config.getNodes().contains( agent ) )
         {
-            productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
-            return;
+            throw new ClusterSetupException( "Node already belongs to cluster" + clusterName );
         }
 
-        // Check installed ksks packages
-        productOperation.addLog( "Checking prerequisites..." );
+        po.addLog( "Checking prerequisites..." );
+
+        //check installed ksks packages
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            productOperation
-                    .addLogFailed( "Failed to check presence of installed subutai packages. Installation aborted" );
-            return;
+            throw new ClusterSetupException( "Failed to check installed packages" );
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
-
-        if ( result.getStdOut().contains( "ksks-lucene" ) )
+        boolean skipInstall = false;
+        String hadoopPack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME;
+        if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
         {
-            productOperation.addLogFailed(
-                    String.format( "Node %s already has Lucene installed. Installation aborted", lxcHostname ) );
-            return;
+            skipInstall = true;
+            po.addLog( "Node already has Lucene installed" );
         }
-        else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
+        else if ( !result.getStdOut().contains( hadoopPack ) )
         {
-            productOperation.addLogFailed(
-                    String.format( "Node %s has no Hadoop installation. Installation aborted", lxcHostname ) );
-            return;
+            throw new ClusterSetupException( "Node has no Hadoop installation" );
         }
 
-        config.getNodes().add( agent );
-
-        productOperation.addLog( "Installing Lucene..." );
-        Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
-        manager.getCommandRunner().runCommand( installCommand );
-
-        if ( installCommand.hasSucceeded() )
+        //install lucene
+        if ( !skipInstall )
         {
-            productOperation.addLog( "Installation succeeded. Updating db..." );
+            po.addLog( "Installing Lucene..." );
+            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+            manager.getCommandRunner().runCommand( installCommand );
 
-            try
+            if ( installCommand.hasSucceeded() )
             {
-                manager.getDbManager().saveInfo2( LuceneConfig.PRODUCT_KEY, clusterName, config );
-
-                productOperation.addLogDone( "Information updated in db" );
+                po.addLog( "Installation succeeded" );
             }
-            catch ( DBException e )
+            else
             {
-                productOperation
-                        .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
+                throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
             }
         }
-        else
-        {
-            productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
-        }
+        return agent;
+    }
+
+
+    public Agent addHost( LuceneConfig config )
+    {
+
+        return null;
     }
 }

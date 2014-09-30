@@ -102,6 +102,12 @@ public class LuceneImpl implements Lucene
     }
 
 
+    public ContainerManager getContainerManager()
+    {
+        return containerManager;
+    }
+
+
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
