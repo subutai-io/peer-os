@@ -1,44 +1,32 @@
 package org.safehaus.subutai.plugin.mahout.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
+import org.safehaus.subutai.plugin.mahout.api.SetupType;
 import org.safehaus.subutai.plugin.mahout.impl.Commands;
 import org.safehaus.subutai.plugin.mahout.impl.MahoutImpl;
 
 
-/**
- * Created by dilshat on 5/6/14.
- */
 public class UninstallHandler extends AbstractOperationHandler<MahoutImpl>
 {
-    private final ProductOperation po;
-
 
     public UninstallHandler( MahoutImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        po = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId()
-    {
-        return po.getId();
+        productOperation = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
+                String.format( "Destroying %s ", clusterName ) );
     }
 
 
     @Override
     public void run()
     {
+        ProductOperation po = productOperation;
         MahoutClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -55,48 +43,66 @@ public class UninstallHandler extends AbstractOperationHandler<MahoutImpl>
             }
         }
 
-        po.addLog( "Uninstalling Mahout..." );
-
-        Command uninstallCommand = Commands.getUninstallCommand( config.getNodes() );
-        manager.getCommandRunner().runCommand( uninstallCommand );
-
-        if ( uninstallCommand.hasCompleted() )
+        boolean ok = false;
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            for ( AgentResult result : uninstallCommand.getResults().values() )
-            {
-                Agent agent = manager.getAgentManager().getAgentByUUID( result.getAgentUUID() );
-                if ( result.getExitCode() != null && result.getExitCode() == 0 )
-                {
-                    if ( result.getStdOut().contains( "Package ksks-mahout is not installed, so not removed" ) )
-                    {
-                        po.addLog( String.format( "Mahout is not installed, so not removed on node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                    }
-                    else
-                    {
-                        po.addLog( String.format( "Mahout is removed from node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                    }
-                }
-                else
-                {
-                    po.addLog( String.format( "Error %s on node %s", result.getStdErr(),
-                            agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                }
-            }
-            po.addLog( "Updating db..." );
-            if ( manager.getDbManager().deleteInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName() ) )
-            {
-                po.addLogDone( "Cluster info deleted from DB\nDone" );
-            }
-            else
-            {
-                po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
-            }
+            ok = uninstall( config );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
+            ok = destroyNodes( config );
         }
         else
         {
-            po.addLogFailed( "Uninstallation failed, command timed out" );
+            po.addLog( "Undefined setup type" );
+        }
+
+        if ( ok )
+        {
+            po.addLog( "Updating db..." );
+            manager.getPluginDAO().deleteInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName() );
+            po.addLogDone( "Cluster info deleted from DB\nDone" );
+        }
+        else
+        {
+            po.addLogFailed( "Failed to destroy cluster" );
+        }
+    }
+
+
+    private boolean uninstall( MahoutClusterConfig config )
+    {
+        ProductOperation po = productOperation;
+        po.addLog( "Uninstalling Mahout..." );
+
+        Command cmd = Commands.getUninstallCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( cmd );
+
+        if ( cmd.hasSucceeded() )
+        {
+            return true;
+        }
+
+        po.addLog( cmd.getAllErrors() );
+        po.addLogFailed( "Uninstallation failed" );
+        return false;
+    }
+
+
+    private boolean destroyNodes( MahoutClusterConfig config )
+    {
+
+        productOperation.addLog( "Destroying node(s)..." );
+        try
+        {
+            manager.getContainerManager().clonesDestroy( config.getNodes() );
+            productOperation.addLog( "Destroying node(s) completed" );
+            return true;
+        }
+        catch ( LxcDestroyException ex )
+        {
+            productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+            return false;
         }
     }
 }

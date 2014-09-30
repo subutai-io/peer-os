@@ -37,7 +37,7 @@ import com.vaadin.ui.UI;
 /**
  * @author tjamakeev
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 
 public final class EnvironmentTree extends ConcurrentComponent implements Disposable
 {
@@ -140,9 +140,9 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         } );
         GridLayout grid = new GridLayout( 1, 3 );
 
-        grid.addComponent( new Label( "Environments:" ) );
-        grid.addComponent( env );
-        grid.addComponent( tree );
+        grid.addComponent( new Label( "Environments:" ), 0, 0 );
+        grid.addComponent( env, 0, 1 );
+        grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
 
@@ -167,7 +167,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 Item item = container.addItem( itemId );
                 container.setChildrenAllowed( itemId, false );
 
-                tree.setItemCaption( item, "---> " + ec.getHostname() );
+                tree.setItemCaption( itemId, ec.getHostname() );
                 item.getItemProperty( "value" ).setValue( ec );
             }
         }

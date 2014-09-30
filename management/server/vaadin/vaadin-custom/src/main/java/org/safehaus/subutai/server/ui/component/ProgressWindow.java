@@ -151,12 +151,16 @@ public class ProgressWindow
     }
 
 
-    private void setOutput( String output )
-    {
-        if ( !Strings.isNullOrEmpty( output ) )
-        {
-            outputTxtArea.setValue( output );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+    private void setOutput( String output ) {
+        try {
+            VaadinSession.getCurrent().getLockInstance().lock();
+            if ( !Strings.isNullOrEmpty( output ) ) {
+                outputTxtArea.setValue( output );
+                outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+            }
+        }
+        finally {
+            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
 

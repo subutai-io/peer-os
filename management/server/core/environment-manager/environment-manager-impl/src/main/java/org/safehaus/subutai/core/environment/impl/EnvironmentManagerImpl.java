@@ -64,7 +64,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private DbManager dbManager;
     private PeerCommandDispatcher peerCommandDispatcher;
-    private List<Environment> environments;
+    //    private List<Environment> environments;
     //    private Set<EnvironmentContainer> containers = new HashSet<>();
 
 
@@ -87,11 +87,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void init()
     {
-
         this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager );
 
-        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
+        //        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
@@ -299,13 +298,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    public void buildEnvironment( final EnvironmentBuildProcess process )
             throws EnvironmentBuildException
     {
-        Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
-        for ( String key : ( Set<String> ) environmentBuildProcess.getMessageMap().keySet() )
+        Environment environment = new Environment( process.getEnvironmentName() );
+        for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
         {
-            CloneContainersMessage ccm = environmentBuildProcess.getMessageMap().get( key );
+            CloneContainersMessage ccm = process.getMessageMap().get( key );
 
             ccm.setType( PeerCommandType.CLONE );
             try
@@ -382,9 +381,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             peerCommandDispatcher.invoke( cmd, 1000 * 15 );
 
-            Set<PeerContainer> containers = JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-            {
-            }.getType() );
+            Set<PeerContainer> containers =
+                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
+                    {
+                    }.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {

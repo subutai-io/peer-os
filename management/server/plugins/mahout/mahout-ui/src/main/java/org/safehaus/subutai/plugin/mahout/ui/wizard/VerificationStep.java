@@ -7,9 +7,14 @@ package org.safehaus.subutai.plugin.mahout.ui.wizard;
 
 
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
+import org.safehaus.subutai.plugin.mahout.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -21,13 +26,11 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel
 {
 
-    public VerificationStep( final Wizard wizard )
+    public VerificationStep( final Mahout mahout, final ExecutorService executorService, final Tracker tracker,
+                             final Wizard wizard )
     {
 
         setSizeFull();
@@ -41,11 +44,26 @@ public class VerificationStep extends Panel
                 + "(you may change them by clicking on Back button)</strong><br/>" );
         confirmationLbl.setContentMode( ContentMode.HTML );
 
+        final MahoutClusterConfig config = wizard.getConfig();
+
         ConfigView cfgView = new ConfigView( "Installation configuration" );
-        cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        for ( Agent agent : wizard.getConfig().getNodes() )
+        cfgView.addStringCfg( "Installation Name", wizard.getConfig().getClusterName() );
+        cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
+
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
+            for ( Agent agent : wizard.getConfig().getNodes() )
+            {
+                cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
+            }
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
+            HadoopClusterConfig hc = wizard.getHadoopConfig();
+
+            cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Domain name", hc.getDomainName() );
         }
 
         Button install = new Button( "Install" );
@@ -55,9 +73,19 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = wizard.getMahoutPortalModule().getMahoutManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( wizard.getMahoutPortalModule().getExecutor(),
-                        wizard.getMahoutPortalModule().getTracker(), trackID, MahoutClusterConfig.PRODUCT_KEY );
+                UUID trackId = null;
+
+                if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                {
+                    trackId = mahout.installCluster( config );
+                }
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                {
+                    trackId = mahout.installCluster( config );
+                }
+
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackId, MahoutClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -66,6 +94,7 @@ public class VerificationStep extends Panel
                         wizard.init();
                     }
                 } );
+
                 getUI().addWindow( window.getWindow() );
             }
         } );

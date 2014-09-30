@@ -62,6 +62,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         productOperation.addLog( "Checking prerequisites..." );
 
         // Check installed packages
+        productOperation.addLog( "Installing Pig..." );
 
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
@@ -90,16 +91,14 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
             throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
         }
 
-        productOperation.addLog( "Updating db..." );
-
-        // Save to db
-        manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
 
         Command installCommand = Commands.getInstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( installCommand );
         if ( installCommand.hasSucceeded() )
         {
             productOperation.addLog( "Installation succeeded" );
+            productOperation.addLog( "Updating db..." );
+            manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
         }
         else
         {

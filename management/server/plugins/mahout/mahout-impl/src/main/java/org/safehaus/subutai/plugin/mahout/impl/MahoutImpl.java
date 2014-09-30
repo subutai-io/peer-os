@@ -28,8 +28,10 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
+import org.safehaus.subutai.plugin.mahout.api.SetupType;
 import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.InstallHandler;
@@ -39,9 +41,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
-/**
- * @author dilshat
- */
 public class MahoutImpl implements Mahout
 {
 
@@ -198,7 +197,18 @@ public class MahoutImpl implements Mahout
     }
 
 
-    public UUID installCluster( final MahoutClusterConfig config )
+    public UUID installCluster( final MahoutClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        InstallHandler operationHandler = new InstallHandler( this, config );
+        operationHandler.setHadoopConfig( hadoopConfig );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID installCluster( MahoutClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new InstallHandler( this, config );
@@ -217,14 +227,14 @@ public class MahoutImpl implements Mahout
 
     public List<MahoutClusterConfig> getClusters()
     {
-        return dbManager.getInfo( MahoutClusterConfig.PRODUCT_KEY, MahoutClusterConfig.class );
+        return pluginDAO.getInfo( MahoutClusterConfig.PRODUCT_KEY, MahoutClusterConfig.class );
     }
 
 
     @Override
     public MahoutClusterConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( MahoutClusterConfig.PRODUCT_KEY, clusterName, MahoutClusterConfig.class );
+        return pluginDAO.getInfo( MahoutClusterConfig.PRODUCT_KEY, clusterName, MahoutClusterConfig.class );
     }
 
 
@@ -266,10 +276,22 @@ public class MahoutImpl implements Mahout
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
-                                                         final MahoutClusterConfig config, final ProductOperation po )
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, MahoutClusterConfig config,
+                                                         ProductOperation po )
     {
-        return new MahoutSetupStrategy( this, po, config );
+
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
+        {
+            return new OverHadoopSetupStrategy( this, config, po );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
+            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy( this, po, config );
+            s.setEnvironment( env );
+            return s;
+        }
+
+        return null;
     }
 
 

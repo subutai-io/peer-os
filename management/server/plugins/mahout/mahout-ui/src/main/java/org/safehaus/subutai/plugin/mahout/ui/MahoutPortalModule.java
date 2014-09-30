@@ -9,109 +9,29 @@ package org.safehaus.subutai.plugin.mahout.ui;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.mahout.api.Mahout;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 
 
-/**
- * @author dilshat
- */
 public class MahoutPortalModule implements PortalModule
 {
-
     public static final String MODULE_IMAGE = "mahout.png";
-
-    private Mahout mahoutManager;
-    private AgentManager agentManager;
-    private Tracker tracker;
-    private Hadoop hadoopManager;
-    private CommandRunner commandRunner;
+    protected static final Logger LOG = Logger.getLogger( MahoutPortalModule.class.getName() );
+    private final ServiceLocator serviceLocator;
     private ExecutorService executor;
 
 
     public MahoutPortalModule()
     {
-    }
-
-
-    public Mahout getMahoutManager()
-    {
-        return mahoutManager;
-    }
-
-
-    public void setMahoutManager( final Mahout mahoutManager )
-    {
-        this.mahoutManager = mahoutManager;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-    }
-
-
-    public Tracker getTracker()
-    {
-        return tracker;
-    }
-
-
-    public void setTracker( final Tracker tracker )
-    {
-        this.tracker = tracker;
-    }
-
-
-    public Hadoop getHadoopManager()
-    {
-        return hadoopManager;
-    }
-
-
-    public void setHadoopManager( final Hadoop hadoopManager )
-    {
-        this.hadoopManager = hadoopManager;
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public void setCommandRunner( final CommandRunner commandRunner )
-    {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public ExecutorService getExecutor()
-    {
-        return executor;
-    }
-
-
-    public void setExecutor( final ExecutorService executor )
-    {
-        this.executor = executor;
+        serviceLocator = new ServiceLocator();
     }
 
 
@@ -123,10 +43,6 @@ public class MahoutPortalModule implements PortalModule
 
     public void destroy()
     {
-        mahoutManager = null;
-        agentManager = null;
-        hadoopManager = null;
-        tracker = null;
         executor.shutdown();
     }
 
@@ -153,7 +69,16 @@ public class MahoutPortalModule implements PortalModule
 
     public Component createComponent()
     {
-        return new MahoutComponent( this );
+        try
+        {
+            return new MahoutComponent( executor, serviceLocator );
+        }
+        catch ( NamingException e )
+        {
+            LOG.severe( e.getMessage() );
+        }
+
+        return null;
     }
 
 
