@@ -167,7 +167,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 Item item = container.addItem( itemId );
                 container.setChildrenAllowed( itemId, false );
 
-                tree.setItemCaption( item, "---> " + ec.getHostname() );
+                tree.setItemCaption( itemId, ec.getHostname() );
                 item.getItemProperty( "value" ).setValue( ec );
             }
         }
