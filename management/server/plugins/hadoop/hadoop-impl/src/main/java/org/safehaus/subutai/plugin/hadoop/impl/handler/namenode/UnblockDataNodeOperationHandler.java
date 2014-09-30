@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
@@ -57,22 +57,20 @@ public class UnblockDataNodeOperationHandler extends AbstractOperationHandler<Ha
         manager.getCommandRunner().runCommand( includeCommand );
         logCommand( includeCommand, productOperation );
 
-        Command refreshCommand = Commands.getStartNameNodeCommand( node );
+        Command refreshCommand = Commands.getStartDataNodeCommand( node );
         manager.getCommandRunner().runCommand( refreshCommand );
         logCommand( refreshCommand, productOperation );
 
         hadoopClusterConfig.getBlockedAgents().remove( node );
-        manager.getPluginDAO()
-               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
-        productOperation.addLog( "Cluster info saved to DB" );
+        manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                hadoopClusterConfig );
+        productOperation.addLogDone( "Cluster info saved to DB" );
     }
 
 
-    private void logCommand( Command command, ProductOperation po )
-    {
-        if ( command.hasSucceeded() )
-        {
-            po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
+    private void logCommand( Command command, ProductOperation po ) {
+        if ( command.hasSucceeded() ) {
+            po.addLog(String.format("Task's operation %s finished", command.getDescription()));
         }
         else if ( command.hasCompleted() )
         {
