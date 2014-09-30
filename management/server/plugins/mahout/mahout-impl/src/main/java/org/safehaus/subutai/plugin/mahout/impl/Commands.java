@@ -18,6 +18,9 @@ import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 public class Commands extends CommandsSingleton
 {
+    public static final String PACKAGE_NAME = "ksks-mahout";
+
+
     public Commands( CommandRunner commandRunner )
     {
         init( commandRunner );
@@ -27,7 +30,7 @@ public class Commands extends CommandsSingleton
     public static Command getInstallCommand( Set<Agent> agents )
     {
         return createCommand( "Install Mahout",
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-mahout" ).withTimeout( 90 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-mahout" ).withTimeout( 360 )
                                                                                             .withStdOutRedirection(
                                                                                                     OutputRedirection
                                                                                                             .NO ),

@@ -33,14 +33,14 @@ public class AddNodeWindow extends Window
     private volatile boolean track = true;
 
 
-    public AddNodeWindow( final Mahout mahout, final Tracker tracker, final ExecutorService executorService,
+    public AddNodeWindow( final Mahout mahout, final ExecutorService executorService, final Tracker tracker,
                           final MahoutClusterConfig config, Set<Agent> nodes )
     {
         super( "Add New Node" );
         setModal( true );
 
-        setWidth( 650, Unit.PIXELS );
-        setHeight( 450, Unit.PIXELS );
+        setWidth( 600, Unit.PIXELS );
+        setHeight( 400, Unit.PIXELS );
 
         GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
@@ -72,6 +72,8 @@ public class AddNodeWindow extends Window
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
+        final Button ok = new Button( "Ok" );
+
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -81,9 +83,11 @@ public class AddNodeWindow extends Window
                 showProgress();
                 Agent agent = ( Agent ) hadoopNodes.getValue();
                 final UUID trackID = mahout.addNode( config.getClusterName(), agent.getHostname() );
+
+                ok.setEnabled( false );
                 executorService.execute( new Runnable()
                 {
-
+                    @Override
                     public void run()
                     {
                         while ( track )
@@ -96,7 +100,9 @@ public class AddNodeWindow extends Window
                                         po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
                                 if ( po.getState() != ProductOperationState.RUNNING )
                                 {
+
                                     hideProgress();
+                                    ok.setEnabled( true );
                                     break;
                                 }
                             }
@@ -120,8 +126,8 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
-        outputTxtArea.setRows( 13 );
-        outputTxtArea.setColumns( 43 );
+        outputTxtArea.setRows( 10 );
+        outputTxtArea.setColumns( 30 );
         outputTxtArea.setImmediate( true );
         outputTxtArea.setWordwrap( true );
 
@@ -134,14 +140,13 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
+
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                //close window
                 track = false;
                 close();
             }
@@ -188,4 +193,3 @@ public class AddNodeWindow extends Window
         track = false;
     }
 }
-

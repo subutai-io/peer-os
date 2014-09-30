@@ -13,14 +13,14 @@ abstract class MahoutSetupStrategy implements ClusterSetupStrategy
 
     final MahoutImpl manager;
     final MahoutClusterConfig config;
-    final ProductOperation po;
+    final ProductOperation productOperation;
 
 
     public MahoutSetupStrategy( MahoutImpl manager, MahoutClusterConfig config, ProductOperation po )
     {
         this.manager = manager;
         this.config = config;
-        this.po = po;
+        this.productOperation = po;
     }
 
 

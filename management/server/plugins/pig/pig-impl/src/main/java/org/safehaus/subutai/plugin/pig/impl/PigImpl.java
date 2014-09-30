@@ -140,14 +140,7 @@ public class PigImpl implements Pig
     }
 
 
-    @Override
-    public UUID installCluster( PigConfig config )
-    {
-        Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
+
 
 
     @Override
@@ -178,6 +171,16 @@ public class PigImpl implements Pig
     {
         InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
         operationHandler.setHadoopConfig( hadoopConfig );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID installCluster( PigConfig config )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

@@ -1,16 +1,18 @@
 package org.safehaus.subutai.plugin.mahout.impl;
 
 
-
 import java.util.Iterator;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
+
+import com.google.common.base.Strings;
 
 
 class OverHadoopSetupStrategy extends MahoutSetupStrategy
@@ -26,12 +28,17 @@ class OverHadoopSetupStrategy extends MahoutSetupStrategy
     public ConfigBase setup() throws ClusterSetupException
     {
 
-        checkConfig();
-
-        if ( manager.getHadoopManager().getCluster( config.getHadoopClusterName() ) == null )
+        if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || CollectionUtil
+                .isCollectionEmpty( config.getNodes() ) )
         {
-            throw new ClusterSetupException( String.format( "Hadoop cluster '%s' not found\nInstallation aborted",
-                    config.getHadoopClusterName() ) );
+            throw new ClusterSetupException( "Malformed configuration\nInstallation aborted" );
+        }
+
+        if ( manager.getCluster( config.getClusterName() ) != null )
+        {
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                            config.getClusterName() ) );
         }
 
         // Check if node agent is connected
@@ -40,8 +47,9 @@ class OverHadoopSetupStrategy extends MahoutSetupStrategy
             Agent node = it.next();
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
-                po.addLog( String.format( "Node %s is not connected. Omitting this node from installation",
-                        node.getHostname() ) );
+                productOperation.addLog(
+                        String.format( "Node %s is not connected. Omitting this node from installation",
+                                node.getHostname() ) );
                 it.remove();
             }
         }
@@ -51,16 +59,16 @@ class OverHadoopSetupStrategy extends MahoutSetupStrategy
             throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
         }
 
-        po.addLog( "Checking prerequisites..." );
+        productOperation.addLog( "Checking prerequisites..." );
 
-        // Check installed ksks packages
+        // Check installed packages
+
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            throw new ClusterSetupException(
-                    "Failed to check presence of installed subutai packages\nInstallation aborted" );
+            throw new ClusterSetupException( "Failed to check presence of installed packages\nInstallation aborted" );
         }
 
         for ( Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); )
@@ -68,16 +76,11 @@ class OverHadoopSetupStrategy extends MahoutSetupStrategy
             Agent node = it.next();
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( "ksks-mahout" ) )
+            if ( result.getStdOut().contains( MahoutClusterConfig.PRODUCT_PACKAGE ) )
             {
-                po.addLog( String.format( "Node %s already has Mahout installed. Omitting this node from installation",
-                        node.getHostname() ) );
-                it.remove();
-            }
-            else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
-            {
-                po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
-                        node.getHostname() ) );
+                productOperation.addLog(
+                        String.format( "Node %s already has Mahout installed. Omitting this node from installation",
+                                node.getHostname() ) );
                 it.remove();
             }
         }
@@ -87,22 +90,20 @@ class OverHadoopSetupStrategy extends MahoutSetupStrategy
             throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
         }
 
+        productOperation.addLog( "Updating db..." );
+
         // Save to db
-        po.addLog( "Installing Mahout..." );
+        manager.getPluginDAO().saveInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
 
         Command installCommand = Commands.getInstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( installCommand );
-
         if ( installCommand.hasSucceeded() )
         {
-            po.addLog( "Installation succeeded\nUpdating db..." );
-            manager.getPluginDAO().saveInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster information saved into database" );
+            productOperation.addLog( "Installation succeeded" );
         }
         else
         {
-            throw new ClusterSetupException(
-                    String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+            productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
 
         return config;

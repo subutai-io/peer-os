@@ -23,7 +23,7 @@ import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutPortalModule;
+import org.safehaus.subutai.plugin.mahout.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -45,14 +45,21 @@ import com.vaadin.ui.Window;
 
 public class Manager
 {
-
+    protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
+    protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
+    protected static final String HOST_COLUMN_CAPTION = "Host";
+    protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String BUTTON_STYLE_NAME = "default";
+    final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Hadoop hadoop;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
     private final Mahout mahout;
-    private MahoutPortalModule mahoutPortalModule;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
     private Table nodesTable;
@@ -102,8 +109,7 @@ public class Manager
 
         controlsContent.addComponent( clusterCombo );
 
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
-        refreshClustersBtn.addStyleName( "default" );
+        refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -112,11 +118,27 @@ public class Manager
                 refreshClustersInfo();
             }
         } );
-
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
-        destroyClusterBtn.addStyleName( "default" );
+
+        destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        addClickListenerToDestroyClusterButton();
+        controlsContent.addComponent( destroyClusterBtn );
+
+
+        addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addClickListenerToAddNodeButton();
+        controlsContent.addComponent( addNodeBtn );
+
+        addStyleNameToButtons( refreshClustersBtn, destroyClusterBtn, addNodeBtn );
+
+        contentRoot.addComponent( controlsContent, 0, 0 );
+        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+    }
+
+
+    public void addClickListenerToDestroyClusterButton()
+    {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -132,7 +154,9 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
+
                             UUID trackID = mahout.uninstallCluster( config.getClusterName() );
+
                             ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
                                     MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
@@ -155,70 +179,109 @@ public class Manager
                 }
             }
         } );
+    }
 
-        controlsContent.addComponent( destroyClusterBtn );
 
-        Button addNodeBtn = new Button( "Add Node" );
-        addNodeBtn.addStyleName( "default" );
+    public void addClickListenerToAddNodeButton()
+    {
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                if ( config != null )
-                {
-                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
-                    if ( hadoopConfig != null )
-                    {
-                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                        nodes.removeAll( config.getNodes() );
-                        if ( !nodes.isEmpty() )
-                        {
-                            AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( mahout, tracker, executorService, config, nodes );
-                            contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                        }
-                        else
-                        {
-                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
-                        }
-                    }
-                    else
-                    {
-                        show( "Hadoop cluster info not found" );
-                    }
-                }
-                else
+                if ( config == null )
                 {
                     show( "Please, select cluster" );
                 }
+                else
+                {
+                    if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                    {
+                        String hn = config.getHadoopClusterName();
+                        if ( hn == null || hn.isEmpty() )
+                        {
+                            show( "Undefined Hadoop cluster name" );
+                            return;
+                        }
+                        HadoopClusterConfig info = hadoop.getCluster( hn );
+                        if ( info != null )
+                        {
+                            HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            nodes.removeAll( config.getNodes() );
+                            if ( !nodes.isEmpty() )
+                            {
+                                AddNodeWindow addNodeWindow =
+                                        new AddNodeWindow( mahout, executorService, tracker, config, nodes );
+                                contentRoot.getUI().addWindow( addNodeWindow );
+                                addNodeWindow.addCloseListener( new Window.CloseListener()
+                                {
+                                    @Override
+                                    public void windowClose( Window.CloseEvent closeEvent )
+                                    {
+                                        refreshClustersInfo();
+                                    }
+                                } );
+                            }
+                            else
+                            {
+                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
+                            }
+                        }
+                        else
+                        {
+                            show( "Hadoop cluster info not found" );
+                        }
+                    }
+                    else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                    {
+                        ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
+                        d.getOk().addClickListener( new Button.ClickListener()
+                        {
+
+                            @Override
+                            public void buttonClick( Button.ClickEvent event )
+                            {
+                                UUID trackId = mahout.addNode( config.getClusterName(), null );
+                                ProgressWindow w = new ProgressWindow( executorService, tracker, trackId,
+                                        MahoutClusterConfig.PRODUCT_KEY );
+                                contentRoot.getUI().addWindow( w.getWindow() );
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( d.getAlert() );
+                    }
+                }
             }
         } );
-        controlsContent.addComponent( addNodeBtn );
+    }
 
-        contentRoot.addComponent( controlsContent, 0, 0 );
-        contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
+
+    public void addStyleNameToButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.addStyleName( BUTTON_STYLE_NAME );
+        }
     }
 
 
     private Table createTableTemplate( String caption )
     {
         final Table table = new Table( caption );
-        table.addContainerProperty( "Host", String.class, null );
-        table.addContainerProperty( "Destroy", Button.class, null );
+        table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
+
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
+        addClickListenerToNodesTable( table );
+        return table;
+    }
 
+
+    public void addClickListenerToNodesTable( final Table table )
+    {
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
             @Override
@@ -243,7 +306,6 @@ public class Manager
                 }
             }
         } );
-        return table;
     }
 
 
@@ -268,48 +330,72 @@ public class Manager
 
     private void populateTable( final Table table, Set<Agent> agents )
     {
-
         table.removeAllItems();
-
         for ( final Agent agent : agents )
         {
-            final Button destroyBtn = new Button( "Destroy" );
+            final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
             destroyBtn.addStyleName( "default" );
+
+            final HorizontalLayout availableOperations = new HorizontalLayout();
+            availableOperations.addStyleName( "default" );
+            availableOperations.setSpacing( true );
+
+            addGivenComponents( availableOperations, destroyBtn );
+
             table.addItem( new Object[] {
-                    agent.getHostname(), destroyBtn
+                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
             }, null );
 
-            destroyBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener()
-                    {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent )
-                        {
-                            UUID trackID = mahout.destroyNode( config.getClusterName(), agent.getHostname() );
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    MahoutClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener()
-                            {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent )
-                                {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-            } );
+            addClickListenerToDestroyButton( agent, destroyBtn );
         }
+    }
+
+
+    private void addClickListenerToDestroyButton( final Agent agent, Button... buttons )
+    {
+        getButton( DESTROY_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent )
+                    {
+                        UUID trackID = mahout.destroyNode( config.getClusterName(), agent.getHostname() );
+                        ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                MahoutClusterConfig.PRODUCT_KEY );
+                        window.getWindow().addCloseListener( new Window.CloseListener()
+                        {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent )
+                            {
+                                refreshClustersInfo();
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+    }
+
+
+    public Button getButton( String caption, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            if ( b.getCaption().equals( caption ) )
+            {
+                return b;
+            }
+        }
+        return null;
     }
 
 
@@ -340,6 +426,15 @@ public class Manager
             {
                 clusterCombo.setValue( clustersInfo.iterator().next() );
             }
+        }
+    }
+
+
+    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
         }
     }
 

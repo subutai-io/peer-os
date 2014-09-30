@@ -28,6 +28,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.SetupType;
@@ -196,7 +197,18 @@ public class MahoutImpl implements Mahout
     }
 
 
-    public UUID installCluster( final MahoutClusterConfig config )
+    public UUID installCluster( final MahoutClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        InstallHandler operationHandler = new InstallHandler( this, config );
+        operationHandler.setHadoopConfig( hadoopConfig );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID installCluster( MahoutClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new InstallHandler( this, config );
@@ -264,7 +276,8 @@ public class MahoutImpl implements Mahout
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, MahoutClusterConfig config, ProductOperation po )
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, MahoutClusterConfig config,
+                                                         ProductOperation po )
     {
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
