@@ -37,6 +37,10 @@ public class RestServiceImplTest
     private static final UUID RANDOM_ID = UUID.randomUUID();
     private static final List<String> IPS = Lists.newArrayList( "127.0.0.1" );
 
+    private Agent agent =
+            new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
+    private Set<Agent> agents = Sets.newHashSet( agent );
+
 
     @Before
     public void setUp()
@@ -56,8 +60,8 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnAgents()
     {
-        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
-        when( agentManager.getAgents() ).thenReturn( Sets.newHashSet( agent ) );
+
+        when( agentManager.getAgents() ).thenReturn( agents );
 
 
         Response response = restService.getAgents();
@@ -65,17 +69,15 @@ public class RestServiceImplTest
 
         verify( agentManager ).getAgents();
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-        assertEquals( Sets.newHashSet( agent ),
-                JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-                {}.getType() ) );
+        assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
+        {}.getType() ) );
     }
 
 
     @Test
     public void shouldReturnPhysicalAgents()
     {
-        Agent agent = new Agent( RANDOM_ID, HOSTNAME, null, MAC_ADDRESS, IPS, false, null, RANDOM_ID, RANDOM_ID );
-        when( agentManager.getPhysicalAgents() ).thenReturn( Sets.newHashSet( agent ) );
+        when( agentManager.getPhysicalAgents() ).thenReturn( agents );
 
 
         Response response = restService.getPhysicalAgents();
@@ -83,17 +85,16 @@ public class RestServiceImplTest
 
         verify( agentManager ).getPhysicalAgents();
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-        assertEquals( Sets.newHashSet( agent ),
-                JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-                {}.getType() ) );
+        assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
+        {}.getType() ) );
     }
 
 
     @Test
     public void shouldReturnLxcAgents()
     {
-        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
-        when( agentManager.getLxcAgents() ).thenReturn( Sets.newHashSet( agent ) );
+
+        when( agentManager.getLxcAgents() ).thenReturn( agents );
 
 
         Response response = restService.getLxcAgents();
@@ -101,16 +102,15 @@ public class RestServiceImplTest
 
         verify( agentManager ).getLxcAgents();
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-        assertEquals( Sets.newHashSet( agent ),
-                JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-                {}.getType() ) );
+        assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
+        {}.getType() ) );
     }
 
 
     @Test
     public void shouldReturnAgentByHostname()
     {
-        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
+
         when( agentManager.getAgentByHostname( HOSTNAME ) ).thenReturn( agent );
 
 
@@ -126,8 +126,6 @@ public class RestServiceImplTest
     @Test
     public void shouldMissAgentByHostname()
     {
-        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
-
 
         Response response = restService.getAgentByHostname( HOSTNAME );
 
@@ -140,7 +138,7 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnAgentByUUID()
     {
-        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
+
         when( agentManager.getAgentByUUID( RANDOM_ID ) ).thenReturn( agent );
 
 
@@ -156,8 +154,6 @@ public class RestServiceImplTest
     @Test
     public void shouldMissAgentByUUID()
     {
-        Agent agent = new Agent( RANDOM_ID, HOSTNAME, PARENT_NAME, MAC_ADDRESS, IPS, true, null, RANDOM_ID, RANDOM_ID );
-
 
         Response response = restService.getAgentByUUID( RANDOM_ID.toString() );
 
@@ -171,8 +167,52 @@ public class RestServiceImplTest
     public void shouldFailByInvalidUUID()
     {
 
-
         Response response = restService.getAgentByUUID( null );
+
+
+        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+    }
+
+
+    @Test
+    public void shouldReturnAgentsByParentHostname()
+    {
+
+        when( agentManager.getLxcAgentsByParentHostname( HOSTNAME ) ).thenReturn( agents );
+
+
+        Response response = restService.getLxcAgentsByParentHostname( HOSTNAME );
+
+
+        verify( agentManager ).getLxcAgentsByParentHostname( HOSTNAME );
+        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
+        assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
+        {}.getType() ) );
+    }
+
+
+    @Test
+    public void shouldReturnAgentsByEnvId()
+    {
+
+        when( agentManager.getAgentsByEnvironmentId( RANDOM_ID ) ).thenReturn( agents );
+
+
+        Response response = restService.getAgentsByEnvironmentId( RANDOM_ID.toString() );
+
+
+        verify( agentManager ).getAgentsByEnvironmentId( RANDOM_ID );
+        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
+        assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
+        {}.getType() ) );
+    }
+
+
+    @Test
+    public void shouldFailByInvalidEnvId()
+    {
+
+        Response response = restService.getAgentsByEnvironmentId( null );
 
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );

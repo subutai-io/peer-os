@@ -109,7 +109,7 @@ public class RestServiceImpl implements RestService
             Set<Agent> agents = agentManager.getAgentsByEnvironmentId( envId );
             return Response.status( Response.Status.OK ).entity( JsonUtil.toJson( agents ) ).build();
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException | IllegalArgumentException e )
         {
             LOG.error( "Error in getAgentsByEnvironmentId", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
