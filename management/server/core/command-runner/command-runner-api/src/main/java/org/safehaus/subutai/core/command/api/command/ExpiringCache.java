@@ -63,7 +63,7 @@ public class ExpiringCache<KeyType, ValueType>
                                                 ( ( CacheEntryWithExpiryCallback ) entry.getValue() )
                                                         .callExpiryCallback();
                                             }
-                                            catch ( Exception e )
+                                            catch ( Exception ignored )
                                             {
                                             }
                                         }
