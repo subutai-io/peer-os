@@ -37,7 +37,7 @@ import com.vaadin.ui.UI;
 /**
  * @author tjamakeev
  */
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 
 public final class EnvironmentTree extends ConcurrentComponent implements Disposable
 {
@@ -212,29 +212,26 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         List<String> agentIdList = new ArrayList<>();
         for ( EnvironmentContainer container : freshContainers )
         {
-            if ( peerId == null )
-            {
-                peerId = container.getPeerId().toString();
-            }
-            agentIdList.add( container.getAgentId().toString() );
+            //            if ( peerId == null )
+            //            {
+            //                peerId = container.getPeerId().toString();
+            //            }
+            agentIdList.add( String
+                    .format( "%s:%s", container.getPeerId().toString(), container.getAgentId().toString() ) );
         }
 
         for ( Object itemObj : container.getItemIds() )
         {
             String itemId = ( String ) itemObj;
-            String[] itemIds = itemId.split( ":" );
-            if ( itemIds[0].equals( peerId ) )
+            if ( agentIdList.contains( itemId ) )
             {
-                if ( agentIdList.contains( itemIds[1] ) )
-                {
-                    Item item = container.getItem( itemId );
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-                }
-                else
-                {
-                    Item item = container.getItem( itemId );
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
-                }
+                Item item = container.getItem( itemId );
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+            }
+            else
+            {
+                Item item = container.getItem( itemId );
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
             }
         }
     }
