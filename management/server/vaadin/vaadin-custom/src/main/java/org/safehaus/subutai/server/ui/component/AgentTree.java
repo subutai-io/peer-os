@@ -31,7 +31,7 @@ import com.vaadin.ui.Tree;
  */
 @SuppressWarnings("serial")
 
-public final class AgentTree extends ConcurrentComponent implements AgentListener, Disposable
+public class AgentTree extends ConcurrentComponent implements AgentListener, Disposable
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( AgentTree.class.getName() );

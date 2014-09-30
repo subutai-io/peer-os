@@ -58,12 +58,12 @@ public class SendButtonListener implements Button.ClickListener
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        Set<Agent> agents = form.agentTree.getSelectedAgents();
+        Set<Agent> agents = form.getAgentTree().getSelectedAgents();
         if ( agents.isEmpty() )
         {
             form.show( "Please, select nodes" );
         }
-        else if ( form.programTxtFld.getValue() == null || Strings.isNullOrEmpty( form.programTxtFld.getValue() ) )
+        else if ( Strings.isNullOrEmpty( form.getProgramTxtFld().getValue() ) )
         {
             form.show( "Please, enter command" );
         }
@@ -77,30 +77,31 @@ public class SendButtonListener implements Button.ClickListener
     private void executeCommand( Set<Agent> agents )
     {
 
-        RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
+        RequestBuilder requestBuilder = new RequestBuilder( form.getProgramTxtFld().getValue() );
 
-        if ( checkRequest( requestBuilder ) )
+        if ( checkRequest() )
         {
 
-            if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
+            if ( form.getRequestTypeCombo().getValue() == RequestType.TERMINATE_REQUEST )
             {
-                requestBuilder.withPid( Integer.valueOf( form.programTxtFld.getValue() ) );
+                requestBuilder.withPid( Integer.valueOf( form.getProgramTxtFld().getValue() ) );
                 requestBuilder.withType( RequestType.TERMINATE_REQUEST );
             }
-            else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
+            else if ( form.getRequestTypeCombo().getValue() == RequestType.PS_REQUEST )
             {
                 requestBuilder.withType( RequestType.PS_REQUEST );
             }
 
-            if ( form.workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( form.workDirTxtFld.getValue() ) )
+            if ( form.getWorkDirTxtFld().getValue() != null && !Strings
+                    .isNullOrEmpty( form.getWorkDirTxtFld().getValue() ) )
             {
-                requestBuilder.withCwd( form.workDirTxtFld.getValue() );
+                requestBuilder.withCwd( form.getWorkDirTxtFld().getValue() );
             }
 
-            int timeout = Integer.valueOf( form.timeoutTxtFld.getValue() );
+            int timeout = Integer.valueOf( form.getTimeoutTxtFld().getValue() );
             requestBuilder.withTimeout( timeout );
 
-            form.indicator.setVisible( true );
+            form.getIndicator().setVisible( true );
 
             executor.execute(
                     new ExecuteCommandTask( commandDispatcher.createCommand( requestBuilder, agents ), agentManager,
@@ -109,19 +110,19 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private boolean checkRequest( RequestBuilder requestBuilder )
+    private boolean checkRequest()
     {
-        if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && !(
-                StringUtil.isNumeric( form.programTxtFld.getValue() )
-                        && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
+        if ( form.getRequestTypeCombo().getValue() == RequestType.TERMINATE_REQUEST && !(
+                StringUtil.isNumeric( form.getProgramTxtFld().getValue() )
+                        && Integer.valueOf( form.getProgramTxtFld().getValue() ) > 0 ) )
         {
 
             form.show( "Please, enter numeric PID greater than 0 to kill" );
             return false;
         }
 
-        if ( !( StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) && NumUtil
-                .isIntBetween( Integer.valueOf( form.timeoutTxtFld.getValue() ), Common.MIN_COMMAND_TIMEOUT_SEC,
+        if ( !( StringUtil.isNumeric( form.getTimeoutTxtFld().getValue() ) && NumUtil
+                .isIntBetween( Integer.valueOf( form.getTimeoutTxtFld().getValue() ), Common.MIN_COMMAND_TIMEOUT_SEC,
                         Common.MAX_COMMAND_TIMEOUT_SEC ) ) )
         {
 
@@ -135,7 +136,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private static class ExecuteCommandTask implements Runnable
+    public static class ExecuteCommandTask implements Runnable
     {
 
         private final Command command;
@@ -143,12 +144,12 @@ public class SendButtonListener implements Button.ClickListener
         private final TerminalForm form;
 
 
-        private ExecuteCommandTask( final Command command, final AgentManager agentManager, final TerminalForm form )
+        public ExecuteCommandTask( final Command command, final AgentManager agentManager, final TerminalForm form )
         {
             this.command = command;
             this.agentManager = agentManager;
             this.form = form;
-            form.taskCount.incrementAndGet();
+            form.getTaskCount().incrementAndGet();
         }
 
 
@@ -172,15 +173,15 @@ public class SendButtonListener implements Button.ClickListener
                 form.show( e.getMessage() );
             }
 
-            form.taskCount.decrementAndGet();
-            if ( form.taskCount.get() == 0 )
+            form.getTaskCount().decrementAndGet();
+            if ( form.getTaskCount().get() == 0 )
             {
-                form.indicator.setVisible( false );
+                form.getIndicator().setVisible( false );
             }
         }
 
 
-        private void displayResponse( Response response )
+        public void displayResponse( Response response )
         {
             StringBuilder out = new StringBuilder();
             if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
