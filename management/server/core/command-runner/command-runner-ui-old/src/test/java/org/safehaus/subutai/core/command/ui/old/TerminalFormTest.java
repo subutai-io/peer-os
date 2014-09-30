@@ -43,7 +43,7 @@ public class TerminalFormTest
     {
 
         TerminalForm terminalForm = new TerminalForm( mock( CommandDispatcher.class ), mock( AgentManager.class ) );
-        ExecutorService executorService = mock(ExecutorService.class);
+        ExecutorService executorService = mock( ExecutorService.class );
         terminalForm.setExecutor( executorService );
 
         terminalForm.dispose();
@@ -67,14 +67,5 @@ public class TerminalFormTest
 
 
         verify( textArea ).setValue( String.format( "%s%s", DUMMY_OUTPUT, DUMMY_OUTPUT ) );
-    }
-
-
-    @Test( expected = NullPointerException.class )
-    public void sendButtonListenerConstructorShouldFailOnForm()
-    {
-
-        new SendButtonListener( mock( TerminalForm.class ), mock( AgentManager.class ), mock( CommandDispatcher.class ),
-                null );
     }
 }
