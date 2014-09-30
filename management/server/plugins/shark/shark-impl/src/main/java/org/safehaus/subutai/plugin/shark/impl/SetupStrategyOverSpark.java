@@ -45,9 +45,9 @@ public class SetupStrategyOverSpark extends SetupStartegyBase implements Cluster
             AgentResult result = checkCmd.getResults().get( node.getUuid() );
             if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
             {
-                throw new ClusterSetupException( String.format(
-                        "Node %s already has Shark installed. Installation aborted",
-                        node.getHostname() ) );
+                throw new ClusterSetupException(
+                        String.format( "Node %s already has Shark installed. Installation aborted",
+                                node.getHostname() ) );
             }
         }
 
@@ -59,7 +59,8 @@ public class SetupStrategyOverSpark extends SetupStartegyBase implements Cluster
         }
         catch ( Exception ex )
         {
-            throw new ClusterSetupException( "Could not save cluster info to DB! Please see logs. Installation aborted" );
+            throw new ClusterSetupException(
+                    "Could not save cluster info to DB! Please see logs. Installation aborted" );
         }
 
         po.addLog( "Installing Shark..." );
@@ -78,7 +79,5 @@ public class SetupStrategyOverSpark extends SetupStartegyBase implements Cluster
 
         return config;
     }
-
-
 }
 

@@ -1,8 +1,19 @@
 package org.safehaus.subutai.plugin.shark.ui.manager;
 
 
-import com.google.common.base.Strings;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.shark.api.Shark;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
+
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -12,15 +23,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
 
 public class AddNodeWindow extends Window
@@ -28,6 +30,7 @@ public class AddNodeWindow extends Window
 
     private final TextArea outputTxtArea;
     private final Label indicator;
+    private Button ok;
     private volatile boolean track = true;
 
 
@@ -70,6 +73,18 @@ public class AddNodeWindow extends Window
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
+        ok = new Button( "Ok" );
+        ok.addStyleName( "default" );
+        ok.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                track = false;
+                close();
+            }
+        } );
+
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -81,14 +96,13 @@ public class AddNodeWindow extends Window
                 final UUID trackID = shark.addNode( config.getClusterName(), agent.getHostname() );
                 executorService.execute( new Runnable()
                 {
-
                     @Override
                     public void run()
                     {
                         while ( track )
                         {
-                            ProductOperationView po
-                                    = tracker.getProductOperation( SharkClusterConfig.PRODUCT_KEY, trackID );
+                            ProductOperationView po =
+                                    tracker.getProductOperation( SharkClusterConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
                                 setOutput(
@@ -104,14 +118,18 @@ public class AddNodeWindow extends Window
                                 setOutput( "Product operation not found. Check logs" );
                                 break;
                             }
+                            try
+                            {
+                                Thread.sleep( 1000 );
+                            }
+                            catch ( InterruptedException ex )
+                            {
+                                break;
+                            }
                         }
                     }
-
-
                 } );
             }
-
-
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
@@ -129,20 +147,6 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
-        ok.addStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                track = false;
-                close();
-            }
-
-
-        } );
-
         HorizontalLayout bottomContent = new HorizontalLayout();
         bottomContent.addComponent( indicator );
         bottomContent.setComponentAlignment( indicator, Alignment.MIDDLE_RIGHT );
@@ -158,15 +162,24 @@ public class AddNodeWindow extends Window
     private void showProgress()
     {
         indicator.setVisible( true );
+        ok.setEnabled( false );
     }
 
 
     private void setOutput( String output )
     {
-        if ( !Strings.isNullOrEmpty( output ) )
+        try
         {
-            outputTxtArea.setValue( output );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+            VaadinSession.getCurrent().getLockInstance().lock();
+            if ( !com.google.gwt.thirdparty.guava.common.base.Strings.isNullOrEmpty( output ) )
+            {
+                outputTxtArea.setValue( output );
+                outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+            }
+        }
+        finally
+        {
+            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
 
@@ -174,6 +187,7 @@ public class AddNodeWindow extends Window
     private void hideProgress()
     {
         indicator.setVisible( false );
+        ok.setEnabled( true );
     }
 
 
@@ -183,7 +197,5 @@ public class AddNodeWindow extends Window
         track = false;
         super.close();
     }
-
-
 }
 

@@ -1,11 +1,9 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 
@@ -50,35 +48,47 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SolrImpl>
             return;
         }
 
-        productOperation.addLog( "Stopping node..." );
+        Command stopServiceCommand = manager.getCommands().getStopCommand( node );
+        manager.getCommandRunner().runCommand( stopServiceCommand );
 
-        Command stopCommand = manager.getCommands().getStopCommand( node );
-        manager.getCommandRunner().runCommand( stopCommand );
-        Command statusCommand = manager.getCommands().getStatusCommand( node );
-        manager.getCommandRunner().runCommand( statusCommand );
-        AgentResult result = statusCommand.getResults().get( node.getUuid() );
-        NodeState nodeState = NodeState.UNKNOWN;
-
-        if ( result != null )
+        if ( stopServiceCommand.hasSucceeded() )
         {
-            if ( result.getStdOut().contains( "is running" ) )
-            {
-                nodeState = NodeState.RUNNING;
-            }
-            else if ( result.getStdOut().contains( "is not running" ) )
-            {
-                nodeState = NodeState.STOPPED;
-            }
-        }
-
-        if ( NodeState.STOPPED.equals( nodeState ) )
-        {
-            productOperation.addLogDone( String.format( "Node on %s stopped", lxcHostname ) );
+            productOperation.addLogDone( "Stop succeeded" );
         }
         else
         {
-            productOperation.addLogFailed(
-                    String.format( "Failed to stop node %s. %s", lxcHostname, stopCommand.getAllErrors() ) );
+            productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
         }
+
+        //        productOperation.addLog( "Stopping node..." );
+        //
+        //        Command stopCommand = manager.getCommands().getStopCommand( node );
+        //        manager.getCommandRunner().runCommand( stopCommand );
+        //        Command statusCommand = manager.getCommands().getStatusCommand( node );
+        //        manager.getCommandRunner().runCommand( statusCommand );
+        //        AgentResult result = statusCommand.getResults().get( node.getUuid() );
+        //        NodeState nodeState = NodeState.UNKNOWN;
+        //
+        //        if ( result != null )
+        //        {
+        //            if ( result.getStdOut().contains( "is running" ) )
+        //            {
+        //                nodeState = NodeState.RUNNING;
+        //            }
+        //            else if ( result.getStdOut().contains( "is not running" ) )
+        //            {
+        //                nodeState = NodeState.STOPPED;
+        //            }
+        //        }
+        //
+        //        if ( NodeState.STOPPED.equals( nodeState ) )
+        //        {
+        //            productOperation.addLogDone( String.format( "Node on %s stopped", lxcHostname ) );
+        //        }
+        //        else
+        //        {
+        //            productOperation.addLogFailed(
+        //                    String.format( "Failed to stop node %s. %s", lxcHostname, stopCommand.getAllErrors() ) );
+        //        }
     }
 }

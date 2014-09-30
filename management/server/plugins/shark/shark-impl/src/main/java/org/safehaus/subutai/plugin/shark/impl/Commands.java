@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 
 import java.util.Set;
+
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -27,8 +28,8 @@ public class Commands
     {
         return createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 90 )
-                .withStdOutRedirection(
-                        OutputRedirection.NO ),
+                                                                                                .withStdOutRedirection(
+                                                                                                        OutputRedirection.NO ),
                 agents );
     }
 
@@ -36,7 +37,8 @@ public class Commands
     public static Command getUninstallCommand( Set<Agent> agents )
     {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ), agents );
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ),
+                agents );
     }
 
 
@@ -50,7 +52,7 @@ public class Commands
     {
         return createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && sharkConf.sh clear master ; sharkConf.sh master %s",
-                               masterNode.getHostname() ) ).withTimeout( 60 ), agents );
+                        masterNode.getHostname() ) ).withTimeout( 60 ), agents );
     }
 
 
@@ -58,7 +60,5 @@ public class Commands
     {
         return commandRunner.createCommand( rb, agents );
     }
-
-
 }
 

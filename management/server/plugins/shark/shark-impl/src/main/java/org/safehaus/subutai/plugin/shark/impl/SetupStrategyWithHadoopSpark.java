@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 
 import java.util.HashSet;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -82,7 +83,5 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
 
         return config;
     }
-
-
 }
 
