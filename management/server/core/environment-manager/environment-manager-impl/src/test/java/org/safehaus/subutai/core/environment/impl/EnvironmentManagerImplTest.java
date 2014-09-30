@@ -68,7 +68,7 @@ public class EnvironmentManagerImplTest
     public void testName() throws Exception
     {
         EnvironmentBuildProcess task = getEBT();
-        manager.buildEnvironment( task );
+//        manager.buildEnvironment( task );
     }
 
 
