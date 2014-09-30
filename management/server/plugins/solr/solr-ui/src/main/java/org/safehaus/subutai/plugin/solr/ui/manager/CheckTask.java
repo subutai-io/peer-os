@@ -8,8 +8,6 @@ package org.safehaus.subutai.plugin.solr.ui.manager;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -17,9 +15,6 @@ import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public class CheckTask implements Runnable
 {
 
@@ -43,8 +38,6 @@ public class CheckTask implements Runnable
     {
 
         UUID trackID = solr.checkNode( clusterName, lxcHostname );
-
-        NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
@@ -53,14 +46,7 @@ public class CheckTask implements Runnable
             {
                 if ( po.getState() != ProductOperationState.RUNNING )
                 {
-                    if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
-                    {
-                        state = NodeState.STOPPED;
-                    }
-                    else if ( po.getLog().contains( NodeState.RUNNING.toString() ) )
-                    {
-                        state = NodeState.RUNNING;
-                    }
+                    completeEvent.onComplete( po.getLog() );
                     break;
                 }
             }
@@ -77,7 +63,5 @@ public class CheckTask implements Runnable
                 break;
             }
         }
-
-        completeEvent.onComplete( state );
     }
 }

@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.common.settings.Common;
@@ -17,6 +18,23 @@ public class EnvironmentBlueprint
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
+
+
+    public EnvironmentBlueprint()
+    {
+        this.nodeGroups = new HashSet<>();
+    }
+
+
+    public EnvironmentBlueprint( final String name, final String domainName, final boolean linkHosts,
+                                 final boolean exchangeSshKeys )
+    {
+        this.name = name;
+        this.domainName = domainName;
+        this.linkHosts = linkHosts;
+        this.exchangeSshKeys = exchangeSshKeys;
+        this.nodeGroups = new HashSet<>();
+    }
 
 
     public String getDomainName()
@@ -89,5 +107,11 @@ public class EnvironmentBlueprint
                 ", exchangeSshKeys=" + exchangeSshKeys +
                 ", domainName='" + domainName + '\'' +
                 '}';
+    }
+
+
+    public void addNodeGroup( final NodeGroup ng )
+    {
+        this.nodeGroups.add( ng );
     }
 }

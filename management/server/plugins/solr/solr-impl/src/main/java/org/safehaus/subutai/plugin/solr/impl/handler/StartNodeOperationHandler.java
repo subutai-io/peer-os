@@ -1,11 +1,14 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.enums.NodeState;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 
@@ -50,35 +53,64 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
             return;
         }
 
-        productOperation.addLog( "Starting node..." );
 
-        Command startCommand = manager.getCommands().getStartCommand( node );
-        manager.getCommandRunner().runCommand( startCommand );
-        Command statusCommand = manager.getCommands().getStatusCommand( node );
-        manager.getCommandRunner().runCommand( statusCommand );
-        AgentResult result = statusCommand.getResults().get( node.getUuid() );
-        NodeState nodeState = NodeState.UNKNOWN;
-
-        if ( result != null )
+        Command startNodeCommand = manager.getCommands().getStartCommand( node );
+        final AtomicBoolean ok = new AtomicBoolean();
+        manager.getCommandRunner().runCommand( startNodeCommand, new CommandCallback()
         {
-            if ( result.getStdOut().contains( "is running" ) )
-            {
-                nodeState = NodeState.RUNNING;
-            }
-            else if ( result.getStdOut().contains( "is not running" ) )
-            {
-                nodeState = NodeState.STOPPED;
-            }
-        }
 
-        if ( NodeState.RUNNING.equals( nodeState ) )
+            @Override
+            public void onResponse( Response response, AgentResult agentResult, Command command )
+            {
+                if ( agentResult.getStdOut().contains( "Starting" ) )
+                {
+                    ok.set( true );
+                    stop();
+                }
+            }
+        } );
+
+        if ( ok.get() )
         {
-            productOperation.addLogDone( String.format( "Node on %s started", lxcHostname ) );
+            productOperation.addLogDone( String.format( "Node %s started", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogFailed(
-                    String.format( "Failed to start node %s. %s", lxcHostname, startCommand.getAllErrors() ) );
+            productOperation.addLogFailed( String.format( "Starting node %s failed, %s", node.getHostname(),
+                    startNodeCommand.getAllErrors() ) );
         }
+
+        //
+        //        productOperation.addLog( "Starting node..." );
+        //
+        //        Command startCommand = manager.getCommands().getStartCommand( node );
+        //        manager.getCommandRunner().runCommand( startCommand );
+        //        Command statusCommand = manager.getCommands().getStatusCommand( node );
+        //        manager.getCommandRunner().runCommand( statusCommand );
+        //        AgentResult result = statusCommand.getResults().get( node.getUuid() );
+        //        NodeState nodeState = NodeState.UNKNOWN;
+        //
+        //        if ( result != null )
+        //        {
+        //            if ( result.getStdOut().contains( "is running" ) )
+        //            {
+        //                nodeState = NodeState.RUNNING;
+        //            }
+        //            else if ( result.getStdOut().contains( "is not running" ) )
+        //            {
+        //                nodeState = NodeState.STOPPED;
+        //            }
+        //        }
+        //
+        //        if ( NodeState.RUNNING.equals( nodeState ) )
+        //        {
+        //            productOperation.addLogDone( String.format( "Node on %s started", lxcHostname ) );
+        //        }
+        //        else
+        //        {
+        //            productOperation.addLogFailed(
+        //                    String.format( "Failed to start node %s. %s", lxcHostname,
+        // startCommand.getAllErrors() ) );
+        //        }
     }
 }

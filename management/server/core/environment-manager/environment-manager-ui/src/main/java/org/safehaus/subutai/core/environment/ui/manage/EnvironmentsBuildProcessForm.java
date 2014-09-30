@@ -1,25 +1,24 @@
 package org.safehaus.subutai.core.environment.ui.manage;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
+import org.safehaus.subutai.core.environment.ui.executor.BuildCommandFactory;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEvent;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEventType;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionListener;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutor;
 import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutorImpl;
-import org.safehaus.subutai.core.environment.ui.executor.BuildCommandFactory;
 import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,16 +32,16 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListener
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentsBuildProcessForm.class.getName() );
     private static final String OK_ICON_SOURCE = "img/ok.png";
     private static final String ERROR_ICON_SOURCE = "img/cancel.png";
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
     private static final String STATUS = "Status";
     private static final String ACTION = "Action";
+    private Map<UUID, ExecutorService> executorServiceMap = new HashMap<>();
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -75,7 +74,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private Table createTable( String caption, int size )
     {
         Table table = new Table( caption );
-        table.addContainerProperty( "Name", UUID.class, null );
+        table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( STATUS, Embedded.class, null );
         table.addContainerProperty( "Info", Button.class, null );
         table.addContainerProperty( ACTION, Button.class, null );
@@ -116,12 +115,14 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
                 Button processButton = null;
                 Button destroyButton = null;
+                Embedded icon = null;
 
                 switch ( environmentBuildProcess.getProcessStatusEnum() )
                 {
                     case NEW_PROCESS:
                     {
                         processButton = new Button( "Build" );
+                        icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
                         processButton.addClickListener( new Button.ClickListener()
                         {
                             @Override
@@ -131,22 +132,12 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                             }
                         } );
 
-                        destroyButton = new Button( "Destroy" );
-                        destroyButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                destroyBuildProcess( environmentBuildProcess );
-                            }
-                        } );
-
-
                         break;
                     }
                     case IN_PROGRESS:
                     {
                         processButton = new Button( "Terminate" );
+                        icon = new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) );
                         processButton.addClickListener( new Button.ClickListener()
                         {
                             @Override
@@ -158,39 +149,38 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         break;
                     }
                     case FAILED:
+                        icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
+                        break;
+                    case TERMINATED:
                     {
-                        processButton = new Button( "Destroy" );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                destroyBuildProcess( environmentBuildProcess );
-                            }
-                        } );
+                        icon = new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) );
                         break;
                     }
                     case SUCCESSFUL:
                     {
-                        processButton = new Button( "Configure" );
-                        processButton.addClickListener( new Button.ClickListener()
-                        {
-                            @Override
-                            public void buttonClick( final Button.ClickEvent clickEvent )
-                            {
-                                configureEnvironment( environmentBuildProcess );
-                            }
-                        } );
+                        icon = new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) );
                         break;
                     }
+
                     default:
                     {
                         break;
                     }
                 }
+
+                destroyButton = new Button( "Destroy" );
+                destroyButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        destroyBuildProcess( environmentBuildProcess );
+                    }
+                } );
                 environmentsTable.addItem( new Object[] {
-                        environmentBuildProcess.getUuid(), null, viewEnvironmentInfoButton, processButton, destroyButton
-                }, environmentBuildProcess.getUuid());
+                        environmentBuildProcess.getEnvironmentName(), icon, viewEnvironmentInfoButton, processButton,
+                        destroyButton
+                }, environmentBuildProcess.getUuid() );
             }
         }
         else
@@ -210,7 +200,25 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private void terminateBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
 
-        //TODO:terminate code
+        if ( executorServiceMap.containsKey( environmentBuildProcess.getUuid() ) )
+        {
+            ExecutorService executorService = executorServiceMap.get( environmentBuildProcess.getUuid() );
+            if ( executorService.isTerminated() )
+            {
+                executorService.shutdown();
+                executorServiceMap.remove( environmentBuildProcess.getUuid() );
+
+                //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
+                managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+                environmentBuildProcess.setCompleteStatus( true );
+                environmentBuildProcess.setProcessStatusEnum( ProcessStatusEnum.TERMINATED );
+                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+            }
+        }
+        else
+        {
+            //TODO: check build process actual state in db and/or environments
+        }
     }
 
 
@@ -225,8 +233,10 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
         buildProcessExecutor.addListener( this );
-        //        ExecutorService executor = Executors.newFixedThreadPool( 10 );
         ExecutorService executor = Executors.newCachedThreadPool();
+        executorServiceMap.put( environmentBuildProcess.getUuid(), executor );
+
+
         buildProcessExecutor.execute( executor,
                 new BuildCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
         executor.shutdown();
@@ -257,6 +267,13 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         actionBtn.setEnabled( false );
                         p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
                         Notification.show( EnvAnswer.START.getAnswer() );
+
+                        //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
+                        managerUI.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
+                        EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
+                        ebp.setCompleteStatus( true );
+                        ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
+                        managerUI.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
@@ -274,6 +291,13 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     {
                         p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
                         Notification.show( EnvAnswer.FAIL.getAnswer() );
+
+                        //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
+                        managerUI.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
+                        EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
+                        ebp.setCompleteStatus( true );
+                        ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
+                        managerUI.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                 }
             }

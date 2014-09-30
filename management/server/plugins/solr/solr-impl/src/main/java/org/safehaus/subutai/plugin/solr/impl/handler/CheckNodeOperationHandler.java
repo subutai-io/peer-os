@@ -1,11 +1,14 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.enums.NodeState;
+import java.util.Map;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 
@@ -51,35 +54,42 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
             return;
         }
 
-        productOperation.addLog( "Checking node..." );
 
-        Command checkNodeCommand = manager.getCommands().getStatusCommand( node );
-        manager.getCommandRunner().runCommand( checkNodeCommand );
+        Command statusServiceCommand = manager.getCommands().getStatusCommand( node );
+        manager.getCommandRunner().runCommand( statusServiceCommand );
 
-        NodeState nodeState = NodeState.UNKNOWN;
-
-        if ( checkNodeCommand.hasCompleted() )
+        if ( statusServiceCommand.hasSucceeded() )
         {
-            AgentResult result = checkNodeCommand.getResults().get( node.getUuid() );
-
-            if ( result.getStdOut().contains( "is running" ) )
-            {
-                nodeState = NodeState.RUNNING;
-            }
-            else if ( result.getStdOut().contains( "is not running" ) )
-            {
-                nodeState = NodeState.STOPPED;
-            }
-        }
-
-        if ( NodeState.UNKNOWN.equals( nodeState ) )
-        {
-            productOperation.addLogFailed(
-                    String.format( "Failed to check status of %s, %s", lxcHostname, checkNodeCommand.getAllErrors() ) );
+            productOperation.addLogDone( "Solr is running" );
         }
         else
         {
-            productOperation.addLogDone( String.format( "Node %s is %s", lxcHostname, nodeState ) );
+            logStatusResults( productOperation, statusServiceCommand );
         }
+    }
+
+
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    {
+
+        StringBuilder log = new StringBuilder();
+
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() )
+        {
+
+            String status = "UNKNOWN";
+            if ( e.getValue().getExitCode() == 0 )
+            {
+                status = "Solr is running";
+            }
+            else if ( e.getValue().getExitCode() == 768 )
+            {
+                status = "Solr is not running";
+            }
+
+            log.append( String.format( "%s\n", status ) ).append( "\n" );
+        }
+
+        po.addLogDone( log.toString() );
     }
 }

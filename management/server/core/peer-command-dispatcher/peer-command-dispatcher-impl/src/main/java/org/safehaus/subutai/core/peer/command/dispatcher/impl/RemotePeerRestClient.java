@@ -83,7 +83,7 @@ public class RemotePeerRestClient
     }
 
 
-    public PeerCommandMessage invoke( String ip, String port, PeerCommandMessage ccm )
+    public PeerCommandMessage invoke( String ip, String port, PeerCommandMessage ccm ) throws RuntimeException
     {
         String path = "peer/invoke";
         try
@@ -133,8 +133,9 @@ public class RemotePeerRestClient
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
+            throw new RuntimeException( "Error while invoking REST Client" );
         }
 
-        return null;
+        //return null;
     }
 }

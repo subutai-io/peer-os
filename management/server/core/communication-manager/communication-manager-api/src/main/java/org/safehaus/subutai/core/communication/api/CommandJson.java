@@ -34,9 +34,9 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized request from json string
+     * Returns deserialized request from command json string
      *
-     * @param json - request in json format
+     * @param json - command in json format
      *
      * @return request
      */
@@ -54,11 +54,11 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized request from json string
+     * Returns deserialized command from command json string
      *
-     * @param json - request in json format
+     * @param json - command in json format
      *
-     * @return request
+     * @return command
      */
     public static Command getCommandFromJson( String json )
     {
@@ -145,9 +145,9 @@ public class CommandJson
 
 
     /**
-     * Returns deserialized response from json string
+     * Returns deserialized response from command json string
      *
-     * @param json - response in json format
+     * @param json - command in json format
      *
      * @return response
      */
@@ -165,72 +165,51 @@ public class CommandJson
 
 
     /**
-     * Returns serialized request from Request POJO
+     * Returns serialized command from {@code Request}
      *
-     * @param request - request in pojo format
+     * @param request - request
      *
-     * @return request in json format
+     * @return command in json format
      */
     public static String getRequestCommandJson( Request request )
     {
-        try
-        {
-            return GSON.toJson( new CommandImpl( request ) );
-        }
-        catch ( RuntimeException ex )
-        {
-            LOG.error( "Error in getRequestCommandJson", ex );
-        }
-        return null;
+
+        return GSON.toJson( new CommandImpl( request ) );
     }
 
 
     /**
-     * Returns serialized response from Response POJO
+     * Returns serialized command from {@code Response}
      *
-     * @param response - response in pojo format
+     * @param response - response
      *
-     * @return response in json format
+     * @return command in json format
      */
     public static String getResponseCommandJson( Response response )
     {
-        try
-        {
-            return GSON.toJson( new CommandImpl( response ) );
-        }
-        catch ( RuntimeException ex )
-        {
-            LOG.error( "Error in getResponseCommandJson", ex );
-        }
-        return null;
+
+        return GSON.toJson( new CommandImpl( response ) );
     }
 
 
     /**
-     * Returns serialized request from Command POJO
+     * Returns serialized command from {@code Command}
      *
-     * @param cmd - request in pojo format
+     * @param cmd - command
      *
-     * @return request in request format
+     * @return command in json format
      */
     public static String getCommandJson( Command cmd )
     {
-        try
-        {
-            return GSON.toJson( cmd );
-        }
-        catch ( RuntimeException ex )
-        {
-            LOG.error( "Error in getCommandJson", ex );
-        }
-        return null;
+
+        return GSON.toJson( cmd );
     }
 
 
     public static class CommandImpl implements Command
     {
 
-        Request request;
+        Request command;
         Response response;
 
 
@@ -241,7 +220,7 @@ public class CommandJson
 
             if ( message instanceof Request )
             {
-                this.request = ( Request ) message;
+                this.command = ( Request ) message;
             }
             else if ( message instanceof Response )
             {
@@ -253,7 +232,7 @@ public class CommandJson
         @Override
         public Request getRequest()
         {
-            return request;
+            return command;
         }
 
 
@@ -278,7 +257,7 @@ public class CommandJson
 
             final CommandImpl command = ( CommandImpl ) o;
 
-            if ( request != null ? !request.equals( command.request ) : command.request != null )
+            if ( this.command != null ? !this.command.equals( command.command ) : command.command != null )
             {
                 return false;
             }
@@ -294,7 +273,7 @@ public class CommandJson
         @Override
         public int hashCode()
         {
-            int result = request != null ? request.hashCode() : 0;
+            int result = command != null ? command.hashCode() : 0;
             result = 31 * result + ( response != null ? response.hashCode() : 0 );
             return result;
         }
