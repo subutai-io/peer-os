@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 
 import com.vaadin.event.MouseEvents;
 
@@ -77,8 +78,7 @@ public class JobTracker extends ClusterNode
             slaveNode.setLoading( true );
         }
 
-        executorService.execute( new CheckTask( hadoop, tracker, cluster, new CompleteEvent()
-        {
+        executorService.execute( new CheckTask( hadoop, tracker, NodeType.JOBTRACKER, cluster, new CompleteEvent() {
 
             public void onComplete( NodeState state )
             {

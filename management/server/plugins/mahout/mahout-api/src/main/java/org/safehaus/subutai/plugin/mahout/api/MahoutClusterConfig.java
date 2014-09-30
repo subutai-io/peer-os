@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.settings.Common;
 
 
 public class MahoutClusterConfig implements ConfigBase
@@ -14,8 +15,11 @@ public class MahoutClusterConfig implements ConfigBase
     public static final String PRODUCT_KEY = "Mahout";
     public static final String PRODUCT_NAME = "Mahout";
     private String templateName = PRODUCT_NAME;
+    public static final String TEMPLATE_NAME = "hadoopmahout";
+    public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY ).toLowerCase();
     private String clusterName = "";
     private SetupType setupType;
+    private String hadoopClusterName;
 
     private Set<Agent> nodes = new HashSet();
 
@@ -79,5 +83,17 @@ public class MahoutClusterConfig implements ConfigBase
     public void setSetupType( final SetupType setupType )
     {
         this.setupType = setupType;
+    }
+
+
+    public String getHadoopClusterName()
+    {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( final String hadoopClusterName )
+    {
+        this.hadoopClusterName = hadoopClusterName;
     }
 }

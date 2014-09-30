@@ -1,12 +1,13 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
+import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
@@ -19,18 +20,18 @@ public class UninstallOperationHandler extends AbstractOperationHandler<LuceneIm
     {
         super( manager, clusterName );
         productOperation = manager.getTracker().createProductOperation( LuceneConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
+                String.format( "Destroying %s ", clusterName ) );
     }
 
 
     @Override
     public void run()
     {
+        ProductOperation po = productOperation;
         LuceneConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -38,59 +39,71 @@ public class UninstallOperationHandler extends AbstractOperationHandler<LuceneIm
         {
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
-                productOperation.addLogFailed(
-                        String.format( "Node %s is not connected\nOperation aborted", node.getHostname() ) );
+                po.addLogFailed( String.format( "Node %s is not connected\nOperation aborted", node.getHostname() ) );
                 return;
             }
         }
 
-        productOperation.addLog( "Uninstalling Lucene..." );
-        Command uninstallCommand = Commands.getUninstallCommand( config.getNodes() );
-        manager.getCommandRunner().runCommand( uninstallCommand );
-
-        if ( uninstallCommand.hasCompleted() )
+        boolean ok = false;
+        if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
-            for ( AgentResult result : uninstallCommand.getResults().values() )
-            {
-                Agent agent = manager.getAgentManager().getAgentByUUID( result.getAgentUUID() );
-
-                if ( result.getExitCode() != null && result.getExitCode() == 0 )
-                {
-                    if ( result.getStdOut().contains( "Package ksks-lucene is not installed, so not removed" ) )
-                    {
-                        productOperation.addLog( String.format( "Lucene is not installed, so not removed on node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                    }
-                    else
-                    {
-                        productOperation.addLog( String.format( "Lucene is removed from node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                    }
-                }
-                else
-                {
-                    productOperation.addLog( String.format( "Error %s on node %s", result.getStdErr(),
-                            agent == null ? result.getAgentUUID() : agent.getHostname() ) );
-                }
-            }
-
-            productOperation.addLog( "Updating db..." );
-
-            try
-            {
-                manager.getDbManager().deleteInfo2( LuceneConfig.PRODUCT_KEY, clusterName );
-
-                productOperation.addLogDone( "Information updated in db" );
-            }
-            catch ( DBException e )
-            {
-                productOperation
-                        .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
-            }
+            ok = uninstall( config );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+        {
+            ok = destroyNodes( config );
         }
         else
         {
-            productOperation.addLogFailed( "Uninstallation failed, command timed out" );
+            po.addLog( "Undefined setup type" );
+        }
+
+        if ( ok )
+        {
+            po.addLog( "Updating db..." );
+            manager.getPluginDao().deleteInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName() );
+            po.addLogDone( "Cluster info deleted from DB\nDone" );
+        }
+        else
+        {
+            po.addLogFailed( "Failed to destroy cluster" );
+        }
+    }
+
+
+    private boolean uninstall( LuceneConfig config )
+    {
+        ProductOperation po = productOperation;
+        po.addLog( "Uninstalling Presto..." );
+
+        Command cmd = Commands.getUninstallCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( cmd );
+
+        if ( cmd.hasSucceeded() )
+        {
+            return true;
+        }
+
+        po.addLog( cmd.getAllErrors() );
+        po.addLogFailed( "Uninstallation failed" );
+        return false;
+    }
+
+
+    private boolean destroyNodes( LuceneConfig config )
+    {
+
+        productOperation.addLog( "Destroying node(s)..." );
+        try
+        {
+            manager.getContainerManager().clonesDestroy( config.getNodes() );
+            productOperation.addLog( "Destroying node(s) completed" );
+            return true;
+        }
+        catch ( LxcDestroyException ex )
+        {
+            productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+            return false;
         }
     }
 }

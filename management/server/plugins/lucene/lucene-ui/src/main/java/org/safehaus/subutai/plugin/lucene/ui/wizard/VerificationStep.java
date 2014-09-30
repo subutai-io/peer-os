@@ -39,11 +39,11 @@ public class VerificationStep extends Panel
                 + "(you may change them by clicking on Back button)</strong><br/>" );
         confirmationLbl.setContentMode( ContentMode.HTML );
 
-        final LuceneConfig config = wizard.getConfig();
+        // Display config values
 
+        final LuceneConfig config = wizard.getConfig();
         ConfigView cfgView = new ConfigView( "Installation configuration" );
-        cfgView.addStringCfg( "Installation Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
+        cfgView.addStringCfg( "Hadoop cluster name", config.getHadoopClusterName() );
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
@@ -55,11 +55,13 @@ public class VerificationStep extends Panel
         else if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-
+            cfgView.addStringCfg( "Hadoop cluster name", hc.getClusterName() );
             cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
             cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
             cfgView.addStringCfg( "Domain name", hc.getDomainName() );
         }
+
+        // Install button
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
@@ -68,6 +70,7 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
+
                 UUID trackId = null;
 
                 if ( config.getSetupType() == SetupType.OVER_HADOOP )
@@ -79,7 +82,8 @@ public class VerificationStep extends Panel
                     trackId = lucene.installCluster( config, wizard.getHadoopConfig() );
                 }
 
-                ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, LuceneConfig.PRODUCT_KEY );
+                ProgressWindow window =
+                        new ProgressWindow( executorService, tracker, trackId, LuceneConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -88,7 +92,6 @@ public class VerificationStep extends Panel
                         wizard.init();
                     }
                 } );
-
                 getUI().addWindow( window.getWindow() );
             }
         } );

@@ -1,68 +1,94 @@
 package org.safehaus.subutai.plugin.mahout.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
+import org.safehaus.subutai.plugin.mahout.api.SetupType;
 import org.safehaus.subutai.plugin.mahout.impl.Commands;
 import org.safehaus.subutai.plugin.mahout.impl.MahoutImpl;
 
 import com.google.common.collect.Sets;
 
 
-/**
- * Created by dilshat on 5/6/14.
- */
 public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
 {
-    private final ProductOperation po;
-    private final String lxcHostname;
+
+    private final String hostname;
 
 
-    public AddNodeHandler( MahoutImpl manager, String clusterName, String lxcHostname )
+    public AddNodeHandler( MahoutImpl manager, String clusterName, String hostname )
     {
         super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
-                String.format( "Adding node to %s", clusterName ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId()
-    {
-        return po.getId();
+        this.hostname = hostname;
+        productOperation = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
+                String.format( "Adding node %s to %s", ( hostname != null ? hostname : "" ), clusterName ) );
     }
 
 
     @Override
     public void run()
     {
+        ProductOperation po = productOperation;
         MahoutClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        //check if node agent is connected
-        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        try
+        {
+            Agent agent;
+            if ( config.getSetupType() == SetupType.OVER_HADOOP )
+            {
+                agent = setupHost( config );
+            }
+            else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+            {
+                agent = addHost( config );
+            }
+            else
+            {
+                throw new ClusterSetupException( "No setup type" );
+            }
+
+            config.getNodes().add( agent );
+
+            po.addLog( "Saving cluster info..." );
+            manager.getPluginDAO().saveInfo( MahoutClusterConfig.PRODUCT_KEY, clusterName, config );
+            po.addLog( "Saved cluster info" );
+
+            po.addLogDone( null );
+        }
+        catch ( ClusterSetupException ex )
+        {
+            po.addLog( ex.getMessage() );
+            po.addLogFailed( "Add worker node failed" );
+        }
+    }
+
+
+    public Agent setupHost( MahoutClusterConfig config ) throws ClusterSetupException
+    {
+        ProductOperation po = productOperation;
+
+        Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )
         {
-            po.addLogFailed( String.format( "Node %s is not connected. Operation aborted", lxcHostname ) );
-            return;
+            throw new ClusterSetupException( "New node is not connected" );
         }
 
+        //check if node is in the cluster
         if ( config.getNodes().contains( agent ) )
         {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
-            return;
+            throw new ClusterSetupException( "Node already belongs to cluster" + clusterName );
         }
 
         po.addLog( "Checking prerequisites..." );
@@ -73,48 +99,45 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            po.addLogFailed( "Failed to check presence of installed ksks packages. Installation aborted" );
-            return;
+            throw new ClusterSetupException( "Failed to check installed packages" );
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
-
-        if ( result.getStdOut().contains( "ksks-mahout" ) )
+        boolean skipInstall = false;
+        String hadoopPack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME;
+        if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
         {
-            po.addLogFailed(
-                    String.format( "Node %s already has Mahout installed. Installation aborted", lxcHostname ) );
-            return;
+            skipInstall = true;
+            po.addLog( "Node already has Mahout installed" );
         }
-        else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
+        else if ( !result.getStdOut().contains( hadoopPack ) )
         {
-            po.addLogFailed( String.format( "Node %s has no Hadoop installation. Installation aborted", lxcHostname ) );
-            return;
+            throw new ClusterSetupException( "Node has no Hadoop installation" );
         }
 
-        config.getNodes().add( agent );
-        po.addLog( "Updating db..." );
-        //save to db
-        if ( manager.getDbManager().saveInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        //install mahout
+        if ( !skipInstall )
         {
-            po.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
-            //install mahout
-
+            po.addLog( "Installing Mahout..." );
             Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )
             {
-                po.addLogDone( "Installation succeeded\nDone" );
+                po.addLog( "Installation succeeded" );
             }
             else
             {
-
-                po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                throw new ClusterSetupException( "Installation failed: " + installCommand.getAllErrors() );
             }
         }
-        else
-        {
-            po.addLogFailed( "Could not update cluster info in DB! Please see logs. Installation aborted" );
-        }
+        return agent;
+    }
+
+
+    public Agent addHost( MahoutClusterConfig config )
+    {
+
+        return null;
     }
 }

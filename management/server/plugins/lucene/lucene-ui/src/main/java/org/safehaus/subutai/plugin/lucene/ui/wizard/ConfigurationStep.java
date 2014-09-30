@@ -12,6 +12,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -39,33 +40,14 @@ public class ConfigurationStep extends Panel
 
         setSizeFull();
 
-        GridLayout content = new GridLayout( 1, 2 );
+        GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
         content.setSpacing( true );
         content.setMargin( true );
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSpacing( true );
-        layout.addComponent( new Label( "Please, specify installation settings" ) );
-        layout.addComponent( content );
-
-        TextField txtClusterName = new TextField( "Lucene installation name: " );
-        txtClusterName.setRequired( true );
-        txtClusterName.addValueChangeListener( new Property.ValueChangeListener()
-        {
-
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                String v = event.getProperty().getValue().toString().trim();
-                wizard.getConfig().setClusterName( v );
-            }
-        } );
-        txtClusterName.setValue( wizard.getConfig().getClusterName() );
-
-        content.addComponent( txtClusterName );
 
         SetupType st = wizard.getConfig().getSetupType();
+
         if ( st == SetupType.OVER_HADOOP )
         {
             addOverHadoopControls( content, wizard.getConfig() );
@@ -75,7 +57,9 @@ public class ConfigurationStep extends Panel
             addWithHadoopControls( content, wizard.getConfig(), wizard.getHadoopConfig() );
         }
 
-        // --- buttons ---
+        // --------------------------------------------------
+        // Buttons
+
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
@@ -83,7 +67,14 @@ public class ConfigurationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                nextButtonClickHandler( wizard );
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) )
+                {
+                    show( "Please, enter Hadoop cluster" );
+                }
+                else
+                {
+                    wizard.next();
+                }
             }
         } );
 
@@ -98,6 +89,11 @@ public class ConfigurationStep extends Panel
             }
         } );
 
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing( true );
+        layout.addComponent( new Label( "Please, specify installation settings" ) );
+        layout.addComponent( content );
+
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent( back );
         buttons.addComponent( next );
@@ -110,6 +106,7 @@ public class ConfigurationStep extends Panel
 
     private void addOverHadoopControls( ComponentContainer parent, final LuceneConfig config )
     {
+
         final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
@@ -266,6 +263,12 @@ public class ConfigurationStep extends Panel
     }
 
 
+    private void show( String notification )
+    {
+        Notification.show( notification );
+    }
+
+
     private void nextButtonClickHandler( Wizard wizard )
     {
         LuceneConfig config = wizard.getConfig();
@@ -318,11 +321,5 @@ public class ConfigurationStep extends Panel
         {
             show( "Installation type not supported" );
         }
-    }
-
-
-    private void show( String notification )
-    {
-        Notification.show( notification );
     }
 }

@@ -21,9 +21,6 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import com.vaadin.ui.Component;
 
 
-/**
- * @author dilshat
- */
 public class LucenePortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "lucene.png";
@@ -34,7 +31,7 @@ public class LucenePortalModule implements PortalModule
 
     public LucenePortalModule()
     {
-        serviceLocator = new ServiceLocator();
+        this.serviceLocator = new ServiceLocator();
     }
 
 
@@ -46,6 +43,7 @@ public class LucenePortalModule implements PortalModule
 
     public void destroy()
     {
+
         executor.shutdown();
     }
 
@@ -80,7 +78,6 @@ public class LucenePortalModule implements PortalModule
         {
             LOG.severe( e.getMessage() );
         }
-
         return null;
     }
 

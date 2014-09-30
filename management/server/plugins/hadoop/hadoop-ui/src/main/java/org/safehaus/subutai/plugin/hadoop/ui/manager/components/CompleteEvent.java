@@ -3,16 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.plugin.hadoop.api;
+package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
+
+
+import org.safehaus.subutai.common.enums.NodeState;
 
 
 /**
  * @author dilshat
  */
-public enum NodeType
+public interface CompleteEvent
 {
 
-	MASTER_NODE, SLAVE_NODE, DEFAULT_NODE,
-    NAMENODE, SECONDARY_NAMENODE, JOBTRACKER, DATANODE, TASKTRACKER
+    public void onComplete( String operationLog );
 
 }

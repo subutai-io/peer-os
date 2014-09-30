@@ -13,14 +13,14 @@ abstract class LuceneSetupStrategy implements ClusterSetupStrategy
 
     final LuceneImpl manager;
     final LuceneConfig config;
-    final ProductOperation po;
+    final ProductOperation productOperation;
 
 
     public LuceneSetupStrategy( LuceneImpl manager, LuceneConfig config, ProductOperation po )
     {
         this.manager = manager;
         this.config = config;
-        this.po = po;
+        this.productOperation = po;
     }
 
 
