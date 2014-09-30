@@ -41,14 +41,14 @@ import com.vaadin.ui.TextField;
 public class TerminalForm extends CustomComponent implements Disposable
 {
 
-    protected final AgentTree agentTree;
-    protected final TextField programTxtFld;
-    protected final TextField timeoutTxtFld;
-    protected final TextField workDirTxtFld;
-    protected final ComboBox requestTypeCombo;
-    protected final Label indicator;
+    private final AgentTree agentTree;
+    private final TextField programTxtFld;
+    private final TextField timeoutTxtFld;
+    private final TextField workDirTxtFld;
+    private final ComboBox requestTypeCombo;
+    private final Label indicator;
     private TextArea commandOutputTxtArea;
-    protected AtomicInteger taskCount = new AtomicInteger();
+    private AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
 
@@ -143,6 +143,48 @@ public class TerminalForm extends CustomComponent implements Disposable
                 commandOutputTxtArea.setValue( "" );
             }
         } );
+    }
+
+
+    protected AgentTree getAgentTree()
+    {
+        return agentTree;
+    }
+
+
+    protected TextField getProgramTxtFld()
+    {
+        return programTxtFld;
+    }
+
+
+    protected TextField getTimeoutTxtFld()
+    {
+        return timeoutTxtFld;
+    }
+
+
+    protected TextField getWorkDirTxtFld()
+    {
+        return workDirTxtFld;
+    }
+
+
+    protected ComboBox getRequestTypeCombo()
+    {
+        return requestTypeCombo;
+    }
+
+
+    protected Label getIndicator()
+    {
+        return indicator;
+    }
+
+
+    protected AtomicInteger getTaskCount()
+    {
+        return taskCount;
     }
 
 
