@@ -634,6 +634,18 @@
                 <!-- Vaadin - END -->
 
                 <!-- Core Modules - START -->
+
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>db-manager-ext-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>db-manager-ext-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>subutai-common</artifactId>

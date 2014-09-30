@@ -17,6 +17,8 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
+import javax.naming.NamingException;
+
 
 /**
  * @author dilshat

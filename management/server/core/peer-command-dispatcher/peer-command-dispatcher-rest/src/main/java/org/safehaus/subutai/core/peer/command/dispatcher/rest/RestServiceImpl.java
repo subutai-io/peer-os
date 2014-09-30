@@ -211,9 +211,10 @@ public class RestServiceImpl implements RestService
 
     private Peer getSamplePeer()
     {
+        String localIp = getLocalIp();
         Peer peer = new Peer();
-        peer.setName( "Peer name 1" );
-        peer.setIp( getLocalIp() );
+        peer.setName( "Peer on " + localIp );
+        peer.setIp( localIp );
         peer.setId( peerManager.getSiteId() );
         peer.setStatus( PeerStatus.REQUESTED );
         return peer;

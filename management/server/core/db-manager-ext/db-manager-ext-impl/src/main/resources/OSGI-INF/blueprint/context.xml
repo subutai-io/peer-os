@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+
+  <bean id="dbManager" class="org.safehaus.subutai.core.db.ext.impl.DbManagerImpl"
+        init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
+  </bean>
+  <service ref="dbManager"
+           interface="org.safehaus.subutai.core.db.ext.api.DbManager">
+   <service-properties>
+      <entry key="service.exported.interfaces" value="*" />
+    </service-properties>
+  </service>
+</blueprint>

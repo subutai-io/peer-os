@@ -37,7 +37,7 @@ public class HadoopComponent extends CustomComponent
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.addTab( manager, "Manage" );
+        sheet.addTab( manager.getContent(), "Manage" );
 
 
         verticalLayout.addComponent( sheet );
