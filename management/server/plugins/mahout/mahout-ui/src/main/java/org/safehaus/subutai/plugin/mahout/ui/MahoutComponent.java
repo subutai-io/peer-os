@@ -6,6 +6,11 @@
 package org.safehaus.subutai.plugin.mahout.ui;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.mahout.ui.manager.Manager;
 import org.safehaus.subutai.plugin.mahout.ui.wizard.Wizard;
 
@@ -14,14 +19,10 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class MahoutComponent extends CustomComponent
 {
 
-
-    public MahoutComponent( MahoutPortalModule mahoutPortalModule )
+    public MahoutComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
         setSizeFull();
 
@@ -29,15 +30,30 @@ public class MahoutComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
-        Manager manager = new Manager( mahoutPortalModule );
-        Wizard wizard = new Wizard( mahoutPortalModule );
-        mongoSheet.addTab( wizard.getContent(), "Install" );
-        mongoSheet.addTab( manager.getContent(), "Manage" );
-        verticalLayout.addComponent( mongoSheet );
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
+
+        final Manager manager = new Manager( executorService, serviceLocator );
+        Wizard wizard = new Wizard( executorService, serviceLocator );
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( sheet );
 
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }
 }
+

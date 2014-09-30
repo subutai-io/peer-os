@@ -56,7 +56,7 @@ public class ConfigurationStep extends Panel
             addWithHadoopControls( content, wizard.getConfig(), wizard.getHadoopConfig() );
         }
 
-        // -------------------------------------------------------------------------------------------------------------
+        // --------------------------------------------------
         // Buttons
 
         Button next = new Button( "Next" );

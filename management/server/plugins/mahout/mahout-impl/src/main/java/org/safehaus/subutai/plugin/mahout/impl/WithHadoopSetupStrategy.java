@@ -8,9 +8,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 
 
-/**
- * Created by bahadyr on 9/4/14.
- */
 public class WithHadoopSetupStrategy extends MahoutSetupStrategy
 {
 
@@ -19,7 +16,7 @@ public class WithHadoopSetupStrategy extends MahoutSetupStrategy
 
     public WithHadoopSetupStrategy( MahoutImpl manager, ProductOperation po, MahoutClusterConfig config )
     {
-        super( manager, po, config );
+        super( manager, config, po );
     }
 
 

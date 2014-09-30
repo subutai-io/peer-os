@@ -6,28 +6,42 @@
 package org.safehaus.subutai.plugin.mahout.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutPortalModule;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 
 
-/**
- * @author dilshat
- */
 public class Wizard
 {
 
-    private MahoutPortalModule mahoutPortalModule;
-    private GridLayout grid;
+    private final GridLayout grid;
+    private final Hadoop hadoop;
+    private final ExecutorService executorService;
+    private final Tracker tracker;
+    private final Mahout mahout;
     private int step = 1;
     private MahoutClusterConfig config = new MahoutClusterConfig();
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 
-    public Wizard( final MahoutPortalModule mahoutPortalModule )
+    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
-        this.mahoutPortalModule = mahoutPortalModule;
+
+        this.executorService = executorService;
+        this.hadoop = serviceLocator.getService( Hadoop.class );
+        this.tracker = serviceLocator.getService( Tracker.class );
+        this.mahout = serviceLocator.getService( Mahout.class );
+
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
         grid.setSizeFull();
@@ -49,12 +63,12 @@ public class Wizard
             }
             case 2:
             {
-                component = new ConfigurationStep( this );
+                component = new ConfigurationStep( hadoop, this );
                 break;
             }
             case 3:
             {
-                component = new VerificationStep( this );
+                component = new VerificationStep( mahout, executorService, tracker, this );
                 break;
             }
             default:
@@ -67,6 +81,12 @@ public class Wizard
         {
             grid.addComponent( component, 0, 1, 0, 19 );
         }
+    }
+
+
+    public HadoopClusterConfig getHadoopConfig()
+    {
+        return hadoopConfig;
     }
 
 
@@ -101,17 +121,5 @@ public class Wizard
     public MahoutClusterConfig getConfig()
     {
         return config;
-    }
-
-
-    public MahoutPortalModule getMahoutPortalModule()
-    {
-        return mahoutPortalModule;
-    }
-
-
-    public void setMahoutPortalModule( final MahoutPortalModule mahoutPortalModule )
-    {
-        this.mahoutPortalModule = mahoutPortalModule;
     }
 }

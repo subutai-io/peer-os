@@ -20,10 +20,10 @@ public class Wizard
 {
 
     private final GridLayout grid;
-    private final Hadoop hadoop;
     private final ExecutorService executorService;
-    private final Tracker tracker;
+    private final Hadoop hadoop;
     private final Lucene lucene;
+    private final Tracker tracker;
     private int step = 1;
     private LuceneConfig config = new LuceneConfig();
     private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
@@ -33,9 +33,9 @@ public class Wizard
     {
 
         this.executorService = executorService;
+        this.lucene = serviceLocator.getService( Lucene.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
-        this.lucene = serviceLocator.getService( Lucene.class );
 
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
@@ -79,12 +79,6 @@ public class Wizard
     }
 
 
-    public HadoopClusterConfig getHadoopConfig()
-    {
-        return hadoopConfig;
-    }
-
-
     public Component getContent()
     {
         return grid;
@@ -116,5 +110,17 @@ public class Wizard
     public LuceneConfig getConfig()
     {
         return config;
+    }
+
+
+    public HadoopClusterConfig getHadoopConfig()
+    {
+        return hadoopConfig;
+    }
+
+
+    public void setHadoopConfig( HadoopClusterConfig hadoopConfig )
+    {
+        this.hadoopConfig = hadoopConfig;
     }
 }
