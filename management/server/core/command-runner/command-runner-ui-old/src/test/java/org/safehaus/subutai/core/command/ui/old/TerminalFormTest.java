@@ -1,11 +1,17 @@
 package org.safehaus.subutai.core.command.ui.old;
 
 
+import java.util.concurrent.ExecutorService;
+
 import org.junit.Test;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
+import com.vaadin.ui.TextArea;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -29,6 +35,38 @@ public class TerminalFormTest
     {
 
         new TerminalForm( mock( CommandDispatcher.class ), null );
+    }
+
+
+    @Test
+    public void shouldShutDownExecutor()
+    {
+
+        TerminalForm terminalForm = new TerminalForm( mock( CommandDispatcher.class ), mock( AgentManager.class ) );
+        ExecutorService executorService = mock(ExecutorService.class);
+        terminalForm.setExecutor( executorService );
+
+        terminalForm.dispose();
+
+        verify( executorService ).shutdown();
+    }
+
+
+    @Test
+    public void shouldWriteToTextArea()
+    {
+
+        TerminalForm terminalForm = new TerminalForm( mock( CommandDispatcher.class ), mock( AgentManager.class ) );
+        TextArea textArea = mock( TextArea.class );
+        when( textArea.getValue() ).thenReturn( DUMMY_OUTPUT );
+
+        terminalForm.setCommandOutputTxtArea( textArea );
+
+
+        terminalForm.addOutput( DUMMY_OUTPUT );
+
+
+        verify( textArea ).setValue( String.format( "%s%s", DUMMY_OUTPUT, DUMMY_OUTPUT ) );
     }
 
 

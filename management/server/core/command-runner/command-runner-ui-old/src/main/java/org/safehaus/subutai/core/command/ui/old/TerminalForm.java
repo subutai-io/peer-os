@@ -47,7 +47,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     protected final TextField workDirTxtFld;
     protected final ComboBox requestTypeCombo;
     protected final Label indicator;
-    private final TextArea commandOutputTxtArea;
+    private TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
@@ -152,7 +152,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     }
 
 
-    protected void addOutput( String output )
+    public void addOutput( String output )
     {
         if ( !Strings.isNullOrEmpty( output ) )
         {
@@ -166,5 +166,17 @@ public class TerminalForm extends CustomComponent implements Disposable
     {
         agentTree.dispose();
         executor.shutdown();
+    }
+
+
+    public void setCommandOutputTxtArea( final TextArea commandOutputTxtArea )
+    {
+        this.commandOutputTxtArea = commandOutputTxtArea;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
     }
 }
