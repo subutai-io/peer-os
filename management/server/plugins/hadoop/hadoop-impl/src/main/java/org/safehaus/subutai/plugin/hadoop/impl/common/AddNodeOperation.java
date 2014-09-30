@@ -32,7 +32,7 @@ public class AddNodeOperation
         commandList.add( Commands.getExcludeTaskTrackerCommand( hadoopClusterConfig, agent ) );
         commandList.add( Commands.getSetDataNodeCommand( hadoopClusterConfig, agent ) );
         commandList.add( Commands.getSetTaskTrackerCommand( hadoopClusterConfig, agent ) );
-        commandList.add( Commands.getStartNameNodeCommand( agent ) );
+        commandList.add( Commands.getStartDataNodeCommand( agent ) );
         commandList.add( Commands.getStartTaskTrackerCommand( agent ) );
     }
 
