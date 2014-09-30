@@ -162,6 +162,10 @@
     <org.apache.ant.version>1.8.2</org.apache.ant.version>
     <yamlbeans.version>1.08</yamlbeans.version>
     <http.client.version>4.3.5</http.client.version>
+  <!-- ******************Db Manager Ext  ********************************* -->
+    <com.h2database.version>1.3.176</com.h2database.version>
+    <org.eclipse.persistence.version>2.5.2</org.eclipse.persistence.version>
+    <!-- ******************************************************************* -->
   </properties>
 
   <dependencyManagement>
@@ -265,6 +269,20 @@
         <version>${org.cassandraunit.version}</version>
       </dependency>
       <!--db-manager-impl-->
+
+      <!--db-manager-ext-impl-->
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${com.h2database.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>eclipselink</artifactId>
+        <version>${org.eclipse.persistence.version}</version>
+        <scope>compile</scope>
+      </dependency>
+      <!--db-manager-ext-impl-->
 
       <!--CXF-->
       <dependency>
