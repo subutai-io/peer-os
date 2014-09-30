@@ -63,8 +63,7 @@ public class SendButtonListener implements Button.ClickListener
         {
             form.show( "Please, select nodes" );
         }
-        else if ( form.getProgramTxtFld().getValue() == null || Strings
-                .isNullOrEmpty( form.getProgramTxtFld().getValue() ) )
+        else if ( Strings.isNullOrEmpty( form.getProgramTxtFld().getValue() ) )
         {
             form.show( "Please, enter command" );
         }
@@ -137,7 +136,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private static class ExecuteCommandTask implements Runnable
+    public static class ExecuteCommandTask implements Runnable
     {
 
         private final Command command;
@@ -145,7 +144,7 @@ public class SendButtonListener implements Button.ClickListener
         private final TerminalForm form;
 
 
-        private ExecuteCommandTask( final Command command, final AgentManager agentManager, final TerminalForm form )
+        public ExecuteCommandTask( final Command command, final AgentManager agentManager, final TerminalForm form )
         {
             this.command = command;
             this.agentManager = agentManager;
@@ -182,7 +181,7 @@ public class SendButtonListener implements Button.ClickListener
         }
 
 
-        private void displayResponse( Response response )
+        public void displayResponse( Response response )
         {
             StringBuilder out = new StringBuilder();
             if ( !Strings.isNullOrEmpty( response.getStdOut() ) )
