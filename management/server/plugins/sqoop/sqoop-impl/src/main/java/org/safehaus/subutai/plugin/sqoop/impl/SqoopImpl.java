@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.sqoop.impl;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -12,7 +13,9 @@ import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
+import org.safehaus.subutai.plugin.sqoop.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.sqoop.impl.handler.CheckHandler;
+import org.safehaus.subutai.plugin.sqoop.impl.handler.DestroyAllOperationHandler;
 import org.safehaus.subutai.plugin.sqoop.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.sqoop.impl.handler.ExportHandler;
 import org.safehaus.subutai.plugin.sqoop.impl.handler.ImportHandler;
@@ -37,7 +40,10 @@ public class SqoopImpl extends SqoopBase
     @Override
     public UUID uninstallCluster( String clusterName )
     {
-        return null;
+        ProductOperation po = tracker.createProductOperation( SqoopConfig.PRODUCT_KEY, "Destroy all nodes...");
+        DestroyAllOperationHandler h = new DestroyAllOperationHandler( this, clusterName, po );
+        executor.execute( h );
+        return po.getId();
     }
 
 
@@ -89,6 +95,16 @@ public class SqoopImpl extends SqoopBase
         executor.execute( h );
         return po.getId();
     }
+
+
+    @Override
+    public UUID addNode( final String clusterName, final String lxcHostname )
+    {
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
 
 
     @Override
