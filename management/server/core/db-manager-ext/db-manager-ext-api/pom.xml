@@ -31,7 +31,6 @@
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>eclipselink</artifactId>
       <version>${org.eclipse.persistence.version}</version>
-      <scope>compile</scope>
     </dependency>
     <!--db-manager-ext-impl-->
 
