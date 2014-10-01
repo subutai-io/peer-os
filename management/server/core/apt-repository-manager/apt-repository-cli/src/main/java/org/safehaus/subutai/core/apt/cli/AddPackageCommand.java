@@ -39,6 +39,12 @@ public class AddPackageCommand extends OsgiCommandSupport
     }
 
 
+    public void setPackagePath( final String packagePath )
+    {
+        this.packagePath = packagePath;
+    }
+
+
     @Override
     protected Object doExecute()
     {
