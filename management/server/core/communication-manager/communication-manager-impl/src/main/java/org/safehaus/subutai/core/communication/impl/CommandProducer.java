@@ -11,7 +11,6 @@ import javax.jms.TextMessage;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.communication.api.CommandJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +56,8 @@ class CommandProducer implements Runnable
             connection = communicationManagerImpl.createConnection();
             connection.start();
             session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination destination =
-                    session.createTopic( isBroadcast ? Common.BROADCAST_TOPIC : command.getUuid().toString() );
+            Destination destination = session.createTopic(
+                    isBroadcast ? communicationManagerImpl.getAmqBroadcastTopic() : command.getUuid().toString() );
             producer = session.createProducer( destination );
             producer.setDeliveryMode( communicationManagerImpl.isPersistentMessages() ? DeliveryMode.PERSISTENT :
                                       DeliveryMode.NON_PERSISTENT );

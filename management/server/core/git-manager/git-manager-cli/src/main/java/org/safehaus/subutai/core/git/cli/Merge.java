@@ -12,6 +12,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Merges current branch with specified branch
@@ -30,19 +32,30 @@ public class Merge extends OsgiCommandSupport
     @Argument(index = 2, name = "branch name", required = false, multiValued = false,
             description = "branch name to merge with (master = default)")
     String branchName;
-    private AgentManager agentManager;
-    private GitManager gitManager;
+
+    private final GitManager gitManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public Merge( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
+    }
+
+
+    public void setBranchName( final String branchName )
+    {
+        this.branchName = branchName;
     }
 
 
@@ -50,21 +63,28 @@ public class Merge extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-            if ( branchName != null )
-            {
-                gitManager.merge( agent, repoPath, branchName );
-            }
-            else
-            {
-                gitManager.merge( agent, repoPath );
-            }
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+                if ( branchName != null )
+                {
+                    gitManager.merge( agent, repoPath, branchName );
+                }
+                else
+                {
+                    gitManager.merge( agent, repoPath );
+                }
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println( e.getMessage() );
+            }
         }
 
         return null;
