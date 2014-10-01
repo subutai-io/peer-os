@@ -32,13 +32,7 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
         //shutdown all executors which are still there
         for ( Map.Entry<UUID, CacheEntry<CommandExecutor>> entry : entries.entrySet() )
         {
-            try
-            {
-                entry.getValue().getValue().getExecutor().shutdown();
-            }
-            catch ( Exception ignore )
-            {
-            }
+            entry.getValue().getValue().getExecutor().shutdown();
         }
         commandExecutors.dispose();
     }
@@ -53,56 +47,72 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
 
             if ( commandExecutor != null )
             {
-
                 //process command response
-                commandExecutor.getExecutor().execute( new Runnable()
-                {
-
-                    public void run()
-                    {
-                        //obtain command lock
-                        commandExecutor.getCommand().getUpdateLock();
-                        try
-                        {
-                            if ( commandExecutors.get( response.getTaskUuid() ) != null )
-                            {
-
-                                //append results to command
-                                commandExecutor.getCommand().appendResult( response );
-
-                                //call command callback
-                                try
-                                {
-                                    commandExecutor.getCallback().onResponse( response,
-                                            commandExecutor.getCommand().getResults().get( response.getUuid() ),
-                                            commandExecutor.getCommand() );
-                                }
-                                catch ( Exception e )
-                                {
-                                    LOG.error( "Error in callback {}", e );
-                                }
-
-                                //do cleanup on command completion or interruption by user
-                                if ( commandExecutor.getCommand().hasCompleted() || commandExecutor.getCallback()
-                                                                                                   .isStopped() )
-                                {
-                                    //remove command executor so that
-                                    //if response comes from agent it is not processed by callback
-                                    commandExecutors.remove( commandExecutor.getCommand().getCommandUUID() );
-                                    //call this to notify all waiting threads that command completed
-                                    commandExecutor.getCommand().notifyWaitingThreads();
-                                    //shutdown command executor
-                                    commandExecutor.getExecutor().shutdown();
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            commandExecutor.getCommand().releaseUpdateLock();
-                        }
-                    }
-                } );
+                submitResponse( commandExecutor, response );
             }
+        }
+    }
+
+
+    private void submitResponse( final CommandExecutor commandExecutor, final Response response )
+    {
+        commandExecutor.getExecutor().execute( new Runnable()
+        {
+
+            public void run()
+            {
+                processResponse( commandExecutor, response );
+            }
+        } );
+    }
+
+
+    private void processResponse( CommandExecutor commandExecutor, Response response )
+    {
+        //obtain command lock
+        commandExecutor.getCommand().getUpdateLock();
+        try
+        {
+            if ( commandExecutors.get( response.getTaskUuid() ) != null )
+            {
+
+                //append results to command
+                commandExecutor.getCommand().appendResult( response );
+
+                //call command callback
+                try
+                {
+                    commandExecutor.getCallback().onResponse( response,
+                            commandExecutor.getCommand().getResults().get( response.getUuid() ),
+                            commandExecutor.getCommand() );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in callback {}", e );
+                }
+
+                cleanupExecutor( commandExecutor );
+            }
+        }
+        finally
+        {
+            commandExecutor.getCommand().releaseUpdateLock();
+        }
+    }
+
+
+    private void cleanupExecutor( CommandExecutor commandExecutor )
+    {
+        //do cleanup on command completion or interruption by user
+        if ( commandExecutor.getCommand().hasCompleted() || commandExecutor.getCallback().isStopped() )
+        {
+            //remove command executor so that
+            //if response comes from agent it is not processed by callback
+            commandExecutors.remove( commandExecutor.getCommand().getCommandUUID() );
+            //call this to notify all waiting threads that command completed
+            commandExecutor.getCommand().notifyWaitingThreads();
+            //shutdown command executor
+            commandExecutor.getExecutor().shutdown();
         }
     }
 
