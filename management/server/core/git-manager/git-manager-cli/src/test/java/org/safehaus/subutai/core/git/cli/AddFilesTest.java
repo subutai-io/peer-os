@@ -34,11 +34,15 @@ public class AddFilesTest
     private static final List<String> FILES = Lists.newArrayList( "file" );
     private static final String HOSTNAME = "hostname";
     private static final String ERR_MSG = "OOPS";
+    private Agent agent = mock( Agent.class );
+    private AgentManager agentManager = mock( AgentManager.class );
+    private GitManager gitManager = mock( GitManager.class );
 
 
     @Before
     public void setUp()
     {
+        when( agentManager.getAgentByHostname( HOSTNAME ) ).thenReturn( agent );
         myOut = new ByteArrayOutputStream();
         System.setOut( new PrintStream( myOut ) );
     }
@@ -85,10 +89,6 @@ public class AddFilesTest
     @Test
     public void shouldExecuteCommand() throws GitException
     {
-        Agent agent = mock( Agent.class );
-        AgentManager agentManager = mock( AgentManager.class );
-        when( agentManager.getAgentByHostname( HOSTNAME ) ).thenReturn( agent );
-        GitManager gitManager = mock( GitManager.class );
         AddFiles addFiles = new AddFiles( gitManager, agentManager );
         addFiles.setHostname( HOSTNAME );
         addFiles.setRepoPath( REPOSITORY_ROOT );
@@ -103,10 +103,6 @@ public class AddFilesTest
     @Test
     public void shouldThrowException() throws GitException
     {
-        Agent agent = mock( Agent.class );
-        AgentManager agentManager = mock( AgentManager.class );
-        when( agentManager.getAgentByHostname( HOSTNAME ) ).thenReturn( agent );
-        GitManager gitManager = mock( GitManager.class );
         Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).add( agent, REPOSITORY_ROOT, FILES );
         AddFiles addFiles = new AddFiles( gitManager, agentManager );
         addFiles.setHostname( HOSTNAME );

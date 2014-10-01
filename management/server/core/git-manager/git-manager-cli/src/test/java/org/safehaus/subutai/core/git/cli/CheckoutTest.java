@@ -14,15 +14,18 @@ import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 /**
- * Test for AddAll
+ * Test for AddFiles
  */
-public class AddAllTest
+public class CheckoutTest
 {
 
     private ByteArrayOutputStream myOut;
@@ -33,6 +36,7 @@ public class AddAllTest
     private Agent agent = mock( Agent.class );
     private AgentManager agentManager = mock( AgentManager.class );
     private GitManager gitManager = mock( GitManager.class );
+
 
     @Before
     public void setUp()
@@ -59,23 +63,23 @@ public class AddAllTest
     @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullGitManager()
     {
-        new AddAll( null, mock( AgentManager.class ) );
+        new Checkout( null, mock( AgentManager.class ) );
     }
 
 
     @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullAgentManager()
     {
-        new AddAll( mock( GitManager.class ), null );
+        new Checkout( mock( GitManager.class ), null );
     }
 
 
     @Test
     public void shouldFailOnMissingAgent()
     {
-        AddAll addAll = new AddAll( mock( GitManager.class ), mock( AgentManager.class ) );
+        Checkout checkout = new Checkout( mock( GitManager.class ), mock( AgentManager.class ) );
 
-        addAll.doExecute();
+        checkout.doExecute();
 
         assertEquals( AGENT_NOT_CONNECTED_MSG, getSysOut() );
     }
@@ -84,25 +88,27 @@ public class AddAllTest
     @Test
     public void shouldExecuteCommand() throws GitException
     {
-        AddAll addAll = new AddAll( gitManager, agentManager );
-        addAll.setHostname( HOSTNAME );
-        addAll.setRepoPath( REPOSITORY_ROOT );
 
-        addAll.doExecute();
+        Checkout checkout = new Checkout( gitManager, agentManager );
+        checkout.setHostname( HOSTNAME );
+        checkout.setRepoPath( REPOSITORY_ROOT );
 
-        verify( gitManager ).addAll( agent, REPOSITORY_ROOT );
+        checkout.doExecute();
+
+        verify( gitManager ).checkout( eq( agent ), eq( REPOSITORY_ROOT ), anyString(), anyBoolean() );
     }
 
 
     @Test
     public void shouldThrowException() throws GitException
     {
-        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).addAll( agent, REPOSITORY_ROOT );
-        AddAll addAll = new AddAll( gitManager, agentManager );
-        addAll.setHostname( HOSTNAME );
-        addAll.setRepoPath( REPOSITORY_ROOT );
+        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
+               .checkout( eq( agent ), eq( REPOSITORY_ROOT ), anyString(), anyBoolean() );
+        Checkout checkout = new Checkout( gitManager, agentManager );
+        checkout.setHostname( HOSTNAME );
+        checkout.setRepoPath( REPOSITORY_ROOT );
 
-        addAll.doExecute();
+        checkout.doExecute();
 
         assertEquals( ERR_MSG, getSysOut() );
     }
