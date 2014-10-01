@@ -16,9 +16,6 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import com.google.common.collect.Sets;
 
 
-/**
- * Created by bahadyr on 9/4/14.
- */
 public class OverHadoopSetupStrategy extends OozieSetupStrategy
 {
 
@@ -71,18 +68,18 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy
         }
 
         Command cmd = oozieManager.getCommandRunner()
-                                  .createCommand( new RequestBuilder( Commands.make( CommandType.STATUS ) ),
-                                          allOozieAgents );
+                .createCommand( new RequestBuilder( Commands.make( CommandType.STATUS ) ),
+                        allOozieAgents );
         oozieManager.getCommandRunner().runCommand( cmd );
         if ( !cmd.hasSucceeded() )
         {
             throw new ClusterSetupException( "Failed to check installed packages" );
         }
 
-        po.addLog( "Installing Oozie server..." );
+        po.addLog( String.format( "Installing Oozie server on %s...", config.getServer() ) );
         String sserver = Commands.make( CommandType.INSTALL_SERVER );
         Agent serverAgent = oozieManager.getAgentManager().getAgentByHostname( config.getServer() );
-        cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 180 ),
+        cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 1800 ),
                 Sets.newHashSet( serverAgent ) );
         oozieManager.getCommandRunner().runCommand( cmd );
 
@@ -95,30 +92,38 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
         }
 
-        po.addLog( "Installing Oozie client..." );
-        String sclient = Commands.make( CommandType.INSTALL_SERVER );
 
-        Set<Agent> clients = new HashSet<>();
-        for ( String clientHostname : config.getClients() )
-        {
-            Agent clientAgent = oozieManager.getAgentManager().getAgentByHostname( clientHostname );
-            clients.add( clientAgent );
-        }
-        cmd = oozieManager.getCommandRunner()
-                          .createCommand( new RequestBuilder( sclient ).withTimeout( 180 ), clients );
-        oozieManager.getCommandRunner().runCommand( cmd );
+        if ( !config.getClients().isEmpty() ) {
+            po.addLog( "Installing Oozie client ..." );
+            String sclient = Commands.make( CommandType.INSTALL_CLIENT );
 
-        if ( cmd.hasSucceeded() )
-        {
-            po.addLog( "Installation of clients succeeded" );
-            po.addLog( "Saving to db..." );
-            oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster info successfully saved" );
+            Set<Agent> clients = new HashSet<>();
+            for ( String clientHostname : config.getClients() )
+            {
+                Agent clientAgent = oozieManager.getAgentManager().getAgentByHostname( clientHostname );
+                clients.add( clientAgent );
+            }
+            cmd = oozieManager.getCommandRunner()
+                    .createCommand( new RequestBuilder( sclient ).withTimeout( 1800 ), clients );
+            oozieManager.getCommandRunner().runCommand( cmd );
+
+            if ( cmd.hasSucceeded() )
+            {
+                po.addLog( "Installation of clients succeeded" );
+            }
+            else
+            {
+                throw new ClusterSetupException( "Installation of clients failed: " + cmd.getAllErrors() );
+            }
+
         }
-        else
-        {
-            throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
+        else {
+            po.addLog( "No client is selected, continuing" );
         }
+
+        po.addLog( "Saving to db..." );
+        oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster info successfully saved" );
 
         return config;
     }

@@ -32,9 +32,9 @@ public class Commands extends CommandsSingleton
             case STATUS:
                 return "dpkg -l | grep '^ii' | grep ksks";
             case INSTALL_SERVER:
-                return "apt-get --assume-yes --force-yes install " + SERVER_PACKAGE_NAME;
+                return "export DEBIAN_FRONTEND=noninteractive && apt-get --assume-yes --force-yes install " + SERVER_PACKAGE_NAME;
             case INSTALL_CLIENT:
-                return "apt-get --assume-yes --force-yes install " + CLIENT_PACKAGE_NAME;
+                return "export DEBIAN_FRONTEND=noninteractive && apt-get --assume-yes --force-yes install " + CLIENT_PACKAGE_NAME;
             case PURGE:
                 StringBuilder sb = new StringBuilder();
                 sb.append( "apt-get --force-yes --assume-yes " );

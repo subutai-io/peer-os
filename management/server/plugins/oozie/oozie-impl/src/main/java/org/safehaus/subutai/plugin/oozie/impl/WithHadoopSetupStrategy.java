@@ -95,7 +95,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
         po.addLog( "Installing Oozie server..." );
         String sserver = Commands.make( CommandType.INSTALL_SERVER );
         Agent serverAgent = oozieManager.getAgentManager().getAgentByHostname( config.getServer() );
-        cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 180 ),
+        cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 300 ),
                 Sets.newHashSet( serverAgent ) );
         oozieManager.getCommandRunner().runCommand( cmd );
 
@@ -108,30 +108,33 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
         }
 
-        po.addLog( "Installing Oozie client..." );
-        String sclient = Commands.make( CommandType.INSTALL_SERVER );
+        if ( config.getClients().isEmpty() ) {
+            po.addLog( "Installing Oozie client..." );
+            String sclient = Commands.make( CommandType.INSTALL_CLIENT );
 
-        Set<Agent> clients = new HashSet<>();
-        for ( String clientHostname : config.getClients() )
-        {
-            Agent clientAgent = oozieManager.getAgentManager().getAgentByHostname( clientHostname );
-            clients.add( clientAgent );
-        }
-        cmd = oozieManager.getCommandRunner()
-                          .createCommand( new RequestBuilder( sclient ).withTimeout( 180 ), clients );
-        oozieManager.getCommandRunner().runCommand( cmd );
+            Set<Agent> clients = new HashSet<>();
+            for ( String clientHostname : config.getClients() )
+            {
+                Agent clientAgent = oozieManager.getAgentManager().getAgentByHostname( clientHostname );
+                clients.add( clientAgent );
+            }
+            cmd = oozieManager.getCommandRunner()
+                    .createCommand( new RequestBuilder( sclient ).withTimeout( 180 ), clients );
+            oozieManager.getCommandRunner().runCommand( cmd );
 
-        if ( cmd.hasSucceeded() )
-        {
-            po.addLog( "Installation of clients succeeded" );
-            po.addLog( "Saving to db..." );
-            oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster info successfully saved" );
+            if ( cmd.hasSucceeded() )
+            {
+                po.addLog( "Installation of clients succeeded" );
+            }
+            else
+            {
+                throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
+            }
         }
-        else
-        {
-            throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
-        }
+
+        po.addLog( "Saving to db..." );
+        oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster info successfully saved" );
 
         return config;
     }

@@ -3,7 +3,9 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -12,11 +14,9 @@ import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
 {
+    private final ProductOperation productOperation;
 
 
     public StartServerHandler( final OozieImpl manager, final String clusterName )
@@ -24,6 +24,13 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
         super( manager, clusterName );
         productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Starting server on %s cluster...", clusterName ) );
+    }
+
+
+    @Override
+    public UUID getTrackerId()
+    {
+        return productOperation.getId();
     }
 
 
@@ -36,7 +43,7 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
 
             public void run()
             {
-                OozieClusterConfig config = manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
+                OozieClusterConfig config = manager.getPluginDAO().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
                         OozieClusterConfig.class );
                 if ( config == null )
                 {

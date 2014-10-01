@@ -214,14 +214,14 @@ public class OozieImpl extends OozieBase
 
     public List<OozieClusterConfig> getClusters()
     {
-        return dbManager.getInfo( OozieClusterConfig.PRODUCT_KEY, OozieClusterConfig.class );
+        return pluginDAO.getInfo( OozieClusterConfig.PRODUCT_KEY, OozieClusterConfig.class );
     }
 
 
     @Override
     public OozieClusterConfig getCluster( String clusterName )
     {
-        return dbManager.getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
+        return pluginDAO.getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
     }
 
 

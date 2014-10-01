@@ -1,10 +1,12 @@
 package org.safehaus.subutai.plugin.oozie.api;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -184,7 +186,9 @@ public class OozieClusterConfig implements ConfigBase
 
     public Set<String> getAllOozieAgents()
     {
-        clients.add( server );
-        return clients;
+        Set<String> allAgents = new HashSet<>();
+        allAgents.addAll(clients);
+        allAgents.add(server);
+        return allAgents;
     }
 }
