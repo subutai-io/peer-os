@@ -12,6 +12,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Reverts the specified commit
@@ -31,19 +33,24 @@ public class RevertCommit extends OsgiCommandSupport
     @Argument(index = 2, name = "commit id", required = true, multiValued = false,
             description = "commit id to revert")
     String commitId;
-    private AgentManager agentManager;
-    private GitManager gitManager;
+
+    private final GitManager gitManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public RevertCommit( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
     }
 
 
@@ -51,15 +58,21 @@ public class RevertCommit extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-
-            gitManager.revertCommit( agent, repoPath, commitId );
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+                gitManager.revertCommit( agent, repoPath, commitId );
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println( e.getMessage() );
+            }
         }
 
         return null;
