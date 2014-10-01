@@ -48,9 +48,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class Manager
 {
 

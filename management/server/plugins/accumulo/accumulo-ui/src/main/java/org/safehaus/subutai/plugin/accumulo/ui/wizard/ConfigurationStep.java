@@ -59,16 +59,20 @@ public class ConfigurationStep extends Panel
         {
             //hadoop combo
             final ComboBox hadoopClustersCombo = UiUtil.getCombo( "Hadoop cluster" );
+
             //zookeeper combo
             final ComboBox zkClustersCombo = UiUtil.getCombo( "Zookeeper cluster" );
+
             //master nodes
             final ComboBox masterNodeCombo = UiUtil.getCombo( "Master node" );
             final ComboBox gcNodeCombo = UiUtil.getCombo( "GC node" );
             final ComboBox monitorNodeCombo = UiUtil.getCombo( "Monitor node" );
+
             //accumulo init controls
             TextField clusterNameTxtFld = UiUtil.getTextField( "Cluster name", "Cluster name", 20 );
             TextField instanceNameTxtFld = UiUtil.getTextField( "Instance name", "Instance name", 20 );
             TextField passwordTxtFld = UiUtil.getTextField( "Password", "Password", 20 );
+
             //tracers
             final TwinColSelect tracersSelect =
                     UiUtil.getTwinSelect( "Tracers", "hostname", "Available Nodes", "Selected Nodes", 4 );
@@ -92,8 +96,11 @@ public class ConfigurationStep extends Panel
                 }
             }
             //try to find zk cluster info based on one saved in the configuration
-            ZookeeperClusterConfig zookeeperClusterConfig =
-                    zookeeper.getCluster( wizard.getConfig().getZookeeperClusterName() );
+            ZookeeperClusterConfig zookeeperClusterConfig = null;
+            if ( wizard.getConfig().getZookeeperClusterName() != null )
+            {
+                zookeeperClusterConfig = zookeeper.getCluster( wizard.getConfig().getZookeeperClusterName() );
+            }
 
             //select if saved found
             if ( zookeeperClusterConfig != null )
@@ -137,15 +144,14 @@ public class ConfigurationStep extends Panel
             }
 
             //try to find hadoop cluster info based on one saved in the configuration
-            HadoopClusterConfig hadoopClusterConfig = hadoop.getCluster( wizard.getConfig().getHadoopClusterName() );
+            HadoopClusterConfig hadoopClusterConfig = null;
+            if ( wizard.getConfig().getHadoopClusterName() != null )
+            {
+                hadoop.getCluster( wizard.getConfig().getHadoopClusterName() );
+            }
 
             //select if saved found
-            if ( hadoopClusterConfig != null )
-            {
-                hadoopClustersCombo.setValue( hadoopClusterConfig );
-                hadoopClustersCombo.setItemCaption( hadoopClusterConfig, hadoopClusterConfig.getClusterName() );
-            }
-            else if ( !hadoopClusters.isEmpty() )
+            if ( !hadoopClusters.isEmpty() )
             {
                 //select first one if saved not found
                 hadoopClustersCombo.setValue( hadoopClusters.iterator().next() );
@@ -288,6 +294,16 @@ public class ConfigurationStep extends Panel
             {
                 slavesSelect.setValue( wizard.getConfig().getSlaves() );
             }
+
+            clusterNameTxtFld.setValue( wizard.getConfig().getInstanceName() );
+            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener()
+            {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event )
+                {
+                    wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
+                }
+            } );
 
 
             instanceNameTxtFld.setValue( wizard.getConfig().getInstanceName() );
@@ -644,11 +660,9 @@ public class ConfigurationStep extends Panel
             next.addStyleName( "default" );
             next.addClickListener( new Button.ClickListener()
             {
-
                 @Override
                 public void buttonClick( Button.ClickEvent event )
                 {
-
                     wizard.getConfig().setHadoopClusterName( wizard.getHadoopClusterConfig().getClusterName() );
                     wizard.getConfig().setZookeeperClusterName( wizard.getZookeeperClusterConfig().getClusterName() );
 

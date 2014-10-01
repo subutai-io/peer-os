@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;

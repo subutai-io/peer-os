@@ -22,9 +22,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 
 
-/**
- * Created by dilshat on 4/28/14.
- */
 public class UiUtil
 {
 
