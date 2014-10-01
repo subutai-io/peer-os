@@ -7,7 +7,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="agent/get-agent-by-hostname">
       <action class="org.safehaus.subutai.core.agent.cli.GetAgentByHostnameCommand">
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>

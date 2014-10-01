@@ -8,46 +8,47 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
- * Displays the last log entries
+ * Displays agent details searching by agents' container hostname
  */
-@Command(scope = "agent", name = "get-agent-by-hostname", description = "get agent by hostname")
+@Command( scope = "agent", name = "get-agent-by-hostname", description = "get agent by hostname" )
 public class GetAgentByHostnameCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    private AgentManager agentManager;
+    private final AgentManager agentManager;
 
 
-    public AgentManager getAgentManager()
+    public void setHostname( final String hostname )
     {
-        return agentManager;
+        this.hostname = hostname;
     }
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public GetAgentByHostnameCommand( final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         this.agentManager = agentManager;
     }
 
 
-    protected Object doExecute()
+    public Object doExecute()
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-        StringBuilder sb = new StringBuilder();
-        sb.append( "Hostname: " ).append( agent.getHostname() ).append( "\n" );
-        for ( String ip : agent.getListIP() )
+        if ( agent != null )
         {
-            sb.append( "IP: " ).append( ip ).append( "\n" );
+            System.out.println( agent );
         }
-        sb.append( "MAC address: " ).append( agent.getMacAddress() ).append( "\n" );
-        sb.append( "Parent hostname: " ).append( agent.getParentHostName() ).append( "\n" );
-        sb.append( "Transport ID: " ).append( agent.getTransportId() ).append( "\n" );
-        sb.append( "UUID: " ).append( agent.getUuid() ).append( "\n" );
-        System.out.println( sb.toString() );
+        else
+        {
+            System.out.println( "Agent not found" );
+        }
         return null;
     }
 }
