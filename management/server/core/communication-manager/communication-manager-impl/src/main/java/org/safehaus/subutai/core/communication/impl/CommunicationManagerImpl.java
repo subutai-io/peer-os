@@ -279,23 +279,11 @@ public class CommunicationManagerImpl implements CommunicationManager
     {
         if ( pooledConnectionFactory != null )
         {
-            try
-            {
-                pooledConnectionFactory.stop();
-            }
-            catch ( Exception ignore )
-            {
-            }
+            pooledConnectionFactory.stop();
         }
         if ( communicationMessageListener != null )
         {
-            try
-            {
-                communicationMessageListener.destroy();
-            }
-            catch ( Exception ignore )
-            {
-            }
+            communicationMessageListener.destroy();
         }
     }
 
