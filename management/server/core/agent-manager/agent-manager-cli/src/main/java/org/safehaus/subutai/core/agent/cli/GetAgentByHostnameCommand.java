@@ -37,7 +37,7 @@ public class GetAgentByHostnameCommand extends OsgiCommandSupport
     }
 
 
-    public Object doExecute()
+    protected Object doExecute()
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
