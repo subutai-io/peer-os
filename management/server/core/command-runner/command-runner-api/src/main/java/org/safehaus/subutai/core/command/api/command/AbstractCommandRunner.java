@@ -155,7 +155,7 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
             @Override
             public void onResponse( final Response response, final AgentResult agentResult, final Command command )
             {
-
+                //dummy callback
             }
         } );
     }
@@ -173,7 +173,7 @@ public abstract class AbstractCommandRunner implements CommandRunnerBase, Respon
             @Override
             public void onResponse( final Response response, final AgentResult agentResult, final Command command )
             {
-
+                //dummy callback
             }
         } );
         ( ( AbstractCommand ) command ).waitCompletion();
