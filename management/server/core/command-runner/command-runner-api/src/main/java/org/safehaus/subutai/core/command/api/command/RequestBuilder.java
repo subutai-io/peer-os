@@ -264,7 +264,7 @@ public class RequestBuilder
      * Sets configuration points to track. This is actual for command with type INOTIFY_CREATE_REQUEST or
      * INOTIFY_REMOVE_REQUEST
      */
-    public RequestBuilder withConfPoints( String confPoints[] )
+    public RequestBuilder withConfPoints( String[] confPoints )
     {
 
         this.confPoints = confPoints.clone();
