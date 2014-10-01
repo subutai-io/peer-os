@@ -43,9 +43,11 @@ public class VerificationStep extends Panel
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
         cfgView.addStringCfg( "Server", wizard.getConfig().getServer() + "\n" );
-        for ( String agent : wizard.getConfig().getClients() )
-        {
-            cfgView.addStringCfg( "Clients", agent + "\n" );
+        if ( wizard.getConfig().getClients() != null ) {
+            for ( String agent : wizard.getConfig().getClients() )
+            {
+                cfgView.addStringCfg( "Clients", agent + "\n" );
+            }
         }
 
         Button install = new Button( "Install" );
@@ -55,9 +57,9 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = wizard.getOoziePortalModule().getOozieManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( wizard.getOoziePortalModule().getExecutor(),
-                        wizard.getOoziePortalModule().getTracker(), trackID, OozieClusterConfig.PRODUCT_KEY );
+                UUID trackID = wizard.getOozieManager().installCluster( wizard.getConfig() );
+                ProgressWindow window = new ProgressWindow( wizard.getExecutor(),
+                        wizard.getTracker(), trackID, OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

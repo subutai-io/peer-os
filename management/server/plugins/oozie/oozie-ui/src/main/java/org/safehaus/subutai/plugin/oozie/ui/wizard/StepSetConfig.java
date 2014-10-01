@@ -1,18 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.vaadin.data.Property;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -32,9 +26,6 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class StepSetConfig extends Panel
 {
 
@@ -74,8 +65,8 @@ public class StepSetConfig extends Panel
         cbServers.setRequired( true );
         cbServers.setNullSelectionAllowed( false );
 
-        HadoopClusterConfig hcc = wizard.getOoziePortalModule().getHadoopManager()
-                                        .getCluster( wizard.getConfig().getHadoopClusterName() );
+        final HadoopClusterConfig hcc = wizard.getHadoopManager()
+                .getCluster( wizard.getConfig().getHadoopClusterName() );
         for ( Agent agent : hcc.getAllNodes() )
         {
             cbServers.addItem( agent.getHostname() );
@@ -84,7 +75,7 @@ public class StepSetConfig extends Panel
 
         vl.addComponent( cbServers );
 
-        if ( !Strings.isNullOrEmpty( wizard.getConfig().getServer() ) )
+        if (  wizard.getConfig().getServer() != null )
         {
             cbServers.setValue( wizard.getConfig().getServer() );
         }
@@ -98,7 +89,6 @@ public class StepSetConfig extends Panel
         selectClients.setLeftColumnCaption( "Available nodes" );
         selectClients.setRightColumnCaption( "Client nodes" );
         selectClients.setWidth( 100, Unit.PERCENTAGE );
-        selectClients.setRequired( true );
         selectClients.setContainerDataSource( new BeanItemContainer<>( Agent.class, hcc.getAllNodes() ) );
 
         if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getClients() ) )
@@ -117,27 +107,27 @@ public class StepSetConfig extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                wizard.getConfig().setServer( ( String ) cbServers.getValue() );
-                wizard.getConfig().setClients( ( Set<String> ) selectClients.getValue() );
-
-                if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getClients() ) )
-                {
-                    show( "Please select nodes for Oozie clients" );
+                wizard.getConfig().setServer( (String) cbServers.getValue() );
+                Set<String> clientNodes = new HashSet<String>();
+                if ( selectClients.getValue() != null ) {
+                    for ( Agent node : (Set<Agent>) selectClients.getValue() ) {
+                        clientNodes.add( node.getHostname() );
+                    }
+                    wizard.getConfig().setClients( clientNodes );
                 }
-                else if ( wizard.getConfig().getServer() == null )
+
+                if ( wizard.getConfig().getServer() == null )
                 {
                     show( "Please select node for Oozie server" );
                 }
+                else if ( wizard.getConfig().getClients() != null &&
+                        wizard.getConfig().getClients().contains( wizard.getConfig().getServer() ) )
+                {
+                    show( "Oozie server and client can not be installed on the same host" );
+                }
                 else
                 {
-                    if ( wizard.getConfig().getClients().contains( wizard.getConfig().getServer() ) )
-                    {
-                        show( "Oozie server and client can not be installed on the same host" );
-                    }
-                    else
-                    {
-                        wizard.next();
-                    }
+                    wizard.next();
                 }
             }
         } );
@@ -151,6 +141,25 @@ public class StepSetConfig extends Panel
                 wizard.back();
             }
         } );
+
+        cbServers.addValueChangeListener( new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                String selectedServerNode = event.getProperty().getValue().toString();
+                List<Agent> hadoopNodes = hcc.getAllNodes();
+                List<Agent> availableOozieClientNodes = new ArrayList<Agent>();
+                availableOozieClientNodes.addAll(hadoopNodes);
+                for ( Agent node : hadoopNodes ) {
+                    if ( selectedServerNode.equals( node.getHostname() ) ) {
+                        availableOozieClientNodes.remove( node );
+                    }
+                }
+                selectClients.setContainerDataSource( new BeanItemContainer<>( Agent.class, availableOozieClientNodes ) );
+                selectClients.markAsDirty();
+
+            }
+        });
+
 
         verticalLayout.addComponent( grid );
 

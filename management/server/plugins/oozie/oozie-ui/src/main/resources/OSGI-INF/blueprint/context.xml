@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="oozieManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.oozie.api.Oozie" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+    <reference id="oozieManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.oozie.api.Oozie" />
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.agent.api.AgentManager" />
+    <reference id="tracker" availability="mandatory"
+               interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.oozie.ui.OoziePortalModule"
-        init-method="init" destroy-method="destroy">
-    <property name="agentManager" ref="agentManager" />
-    <property name="tracker" ref="tracker" />
-    <property name="hadoopManager" ref="hadoopManager" />
-    <property name="oozieManager" ref="oozieManager" />
-    <property name="commandRunner" ref="commandRunner" />
-  </bean>
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.oozie.ui.OoziePortalModule"
+          init-method="init" destroy-method="destroy">
+    </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

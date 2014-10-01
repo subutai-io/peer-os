@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.oozie.ui;
 
 
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.plugin.oozie.ui.manager.Manager;
 import org.safehaus.subutai.plugin.oozie.ui.wizard.Wizard;
 
@@ -13,10 +9,10 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
+import javax.naming.NamingException;
+import java.util.concurrent.ExecutorService;
 
-/**
- * @author dilshat
- */
+
 public class OozieComponent extends CustomComponent
 {
 
@@ -24,8 +20,7 @@ public class OozieComponent extends CustomComponent
     private final Manager manager;
 
 
-    public OozieComponent( OoziePortalModule ooziePortalModule )
-    {
+    public OozieComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
 
 
         setSizeFull();
@@ -36,8 +31,8 @@ public class OozieComponent extends CustomComponent
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        manager = new Manager( ooziePortalModule );
-        wizard = new Wizard( ooziePortalModule );
+        manager = new Manager( executorService, serviceLocator );
+        wizard = new Wizard( executorService, serviceLocator );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
         verticalLayout.addComponent( mongoSheet );
