@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.command.api.command;
 
 
 /**
- * Created by dilshat on 9/15/14.
+ * Exception which might be thrown by Command.execute call
  */
 public class CommandException extends Exception
 {

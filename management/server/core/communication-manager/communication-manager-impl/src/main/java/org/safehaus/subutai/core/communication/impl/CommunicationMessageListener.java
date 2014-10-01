@@ -77,10 +77,6 @@ class CommunicationMessageListener implements MessageListener
                     notifyListeners( agentDisconnect );
                 }
             }
-            else
-            {
-                LOG.warn( message.toString() );
-            }
         }
         catch ( Exception ex )
         {
