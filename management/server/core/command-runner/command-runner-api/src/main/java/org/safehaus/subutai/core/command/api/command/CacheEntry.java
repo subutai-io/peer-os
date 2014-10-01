@@ -12,13 +12,13 @@ import com.google.common.base.Preconditions;
 /**
  * This class represents entry for {@code ExpiringCache}. Holds generic value for the specified ttl.
  */
-public class CacheEntry<VALUE>
+public class CacheEntry<V>
 {
 
     /**
      * entry value
      */
-    private final VALUE value;
+    private final V value;
     /**
      * time-to-live for this value
      */
@@ -35,7 +35,7 @@ public class CacheEntry<VALUE>
      * @param value - entry value
      * @param ttlMs - entry time to live in milliseconds
      */
-    public CacheEntry( VALUE value, long ttlMs )
+    public CacheEntry( V value, long ttlMs )
     {
         Preconditions.checkNotNull( value, "Value is null" );
         Preconditions.checkArgument( ttlMs > 0, "Time-to-live must be greater than 0" );
@@ -51,7 +51,7 @@ public class CacheEntry<VALUE>
      *
      * @return entry value
      */
-    public VALUE getValue()
+    public V getValue()
     {
         return value;
     }

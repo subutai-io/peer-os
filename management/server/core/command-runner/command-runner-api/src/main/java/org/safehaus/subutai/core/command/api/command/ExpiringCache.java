@@ -18,11 +18,11 @@ import java.util.concurrent.Executors;
  * This is a cache with entries having time-to-live setting. After the specified interval entry gets evicted (expires).
  * It is possible to add expiry callback to an entry to handle the expiration event
  */
-public class ExpiringCache<KEY, VALUE>
+public class ExpiringCache<K, V>
 {
 
     private static final long EVICTION_RUN_INTERVAL_MS = 10;
-    private final Map<KEY, CacheEntry<VALUE>> entries = new ConcurrentHashMap<>();
+    private final Map<K, CacheEntry<V>> entries = new ConcurrentHashMap<>();
 
     private ExecutorService evictor;
 
@@ -61,9 +61,9 @@ public class ExpiringCache<KEY, VALUE>
 
     private void evictExpiredEntries()
     {
-        for ( Iterator<Map.Entry<KEY, CacheEntry<VALUE>>> it = entries.entrySet().iterator(); it.hasNext(); )
+        for ( Iterator<Map.Entry<K, CacheEntry<V>>> it = entries.entrySet().iterator(); it.hasNext(); )
         {
-            final Map.Entry<KEY, CacheEntry<VALUE>> entry = it.next();
+            final Map.Entry<K, CacheEntry<V>> entry = it.next();
             if ( entry.getValue().isExpired() )
             {
                 it.remove();
@@ -96,11 +96,11 @@ public class ExpiringCache<KEY, VALUE>
      *
      * @return value of entry or null
      */
-    public VALUE get( KEY key )
+    public V get( K key )
     {
         if ( key != null )
         {
-            CacheEntry<VALUE> entry = entries.get( key );
+            CacheEntry<V> entry = entries.get( key );
             if ( entry != null && !entry.isExpired() )
             {
                 entry.resetCreationTimestamp();
@@ -120,7 +120,7 @@ public class ExpiringCache<KEY, VALUE>
      *
      * @return - return true if added successfully and false in case of error
      */
-    public boolean put( KEY key, VALUE value, long ttlMs )
+    public boolean put( K key, V value, long ttlMs )
     {
         if ( key != null && value != null && ttlMs > 0 )
         {
@@ -141,7 +141,7 @@ public class ExpiringCache<KEY, VALUE>
      *
      * @return - return true if added successfully and false in case of error
      */
-    public boolean put( KEY key, VALUE value, long ttlMs, EntryExpiryCallback<VALUE> callback )
+    public boolean put( K key, V value, long ttlMs, EntryExpiryCallback<V> callback )
     {
         if ( key != null && value != null && ttlMs > 0 )
         {
@@ -159,11 +159,11 @@ public class ExpiringCache<KEY, VALUE>
      *
      * @return entry value
      */
-    public VALUE remove( KEY key )
+    public V remove( K key )
     {
         if ( key != null )
         {
-            CacheEntry<VALUE> entry = entries.remove( key );
+            CacheEntry<V> entry = entries.remove( key );
             if ( entry != null )
             {
                 return entry.getValue();
@@ -178,7 +178,7 @@ public class ExpiringCache<KEY, VALUE>
      *
      * @return map of entries
      */
-    public Map<KEY, CacheEntry<VALUE>> getEntries()
+    public Map<K, CacheEntry<V>> getEntries()
     {
         return Collections.unmodifiableMap( entries );
     }
