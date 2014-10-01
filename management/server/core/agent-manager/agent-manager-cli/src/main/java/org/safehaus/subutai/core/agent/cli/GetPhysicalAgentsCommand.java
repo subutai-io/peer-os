@@ -9,25 +9,23 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
- * Displays the last log entries
+ * Displays list of physical agents
  */
-@Command(scope = "agent", name = "get-physical-agents", description = "get the list of physical-agents")
+@Command( scope = "agent", name = "get-physical-agents", description = "get list of physical agents" )
 public class GetPhysicalAgentsCommand extends OsgiCommandSupport
 {
 
-    private AgentManager agentManager;
+    private final AgentManager agentManager;
 
 
-    public AgentManager getAgentManager()
+    public GetPhysicalAgentsCommand( final AgentManager agentManager )
     {
-        return agentManager;
-    }
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
 
-
-    public void setAgentManager( AgentManager agentManager )
-    {
         this.agentManager = agentManager;
     }
 
@@ -38,13 +36,10 @@ public class GetPhysicalAgentsCommand extends OsgiCommandSupport
         StringBuilder sb = new StringBuilder();
         for ( Agent agent : agentSet )
         {
-            sb.append( "Hostname: " ).append( agent.getHostname() ).append( " " ).append( "UUID: " )
-              .append( agent.getUuid() ).append( " " ).append( "Parent hostname: " ).append( agent.getParentHostName() )
-              .append( " " ).append( "MAC address: " ).append( agent.getMacAddress() ).append( " " ).append( "IPs: " )
-              .append( agent.getListIP() ).append( " " ).append( "\n" );
+            sb.append( agent.getHostname() ).append( "\n" );
         }
-
         System.out.println( sb.toString() );
+
         return null;
     }
 }

@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 
 /**
- * Test for GetAgentByHostnameCommand
+ * Test for GetAgentByUUIDCommand
  */
 public class GetAgentByUUIDCommandTest
 {

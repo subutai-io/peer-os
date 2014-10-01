@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 public class GetAgentByUUIDCommand extends OsgiCommandSupport
 {
 
-    @Argument( index = 0, name = "uuid", required = true, multiValued = false, description = "agent UUID" )
+    @Argument( index = 0, name = "uuid", required = true, multiValued = false, description = "agent uuid" )
     String uuid;
 
     private final AgentManager agentManager;
