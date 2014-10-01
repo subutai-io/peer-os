@@ -23,7 +23,7 @@ public class SqoopComponent extends CustomComponent
     private final Wizard wizard;
     private final Manager manager;
 
-    private final TabSheet tabSheet;
+    private final TabSheet sheet;
 
 
     public SqoopComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -36,12 +36,25 @@ public class SqoopComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        tabSheet = new TabSheet();
-        tabSheet.setSizeFull();
-        tabSheet.addTab( wizard.getContent(), "Install" );
-        tabSheet.addTab( manager.getContent(), "Manage" );
+        sheet = new TabSheet();
+        sheet.setSizeFull();
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
 
-        verticalLayout.addComponent( tabSheet );
+        verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }
@@ -49,7 +62,7 @@ public class SqoopComponent extends CustomComponent
 
     public void addTab( ImportExportBase component )
     {
-        TabSheet.Tab tab = tabSheet.addTab( component );
+        TabSheet.Tab tab = sheet.addTab( component );
         if ( component instanceof ExportPanel )
         {
             tab.setCaption( "Export" );
@@ -58,6 +71,6 @@ public class SqoopComponent extends CustomComponent
         {
             tab.setCaption( "Import" );
         }
-        tabSheet.setSelectedTab( component );
+        sheet.setSelectedTab( component );
     }
 }

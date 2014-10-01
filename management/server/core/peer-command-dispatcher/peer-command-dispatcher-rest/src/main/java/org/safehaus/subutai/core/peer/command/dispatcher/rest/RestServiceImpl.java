@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -188,6 +189,8 @@ public class RestServiceImpl implements RestService
         {
             case CLONE:
                 return CloneContainersMessage.class;
+            case EXECUTE:
+                return ExecuteCommandMessage.class;
             default:
                 return DefaultCommandMessage.class;
         }

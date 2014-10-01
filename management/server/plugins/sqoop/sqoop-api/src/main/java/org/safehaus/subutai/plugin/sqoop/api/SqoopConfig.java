@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 public class SqoopConfig implements ConfigBase
 {
 
-    public static final String PRODUCT_KEY = "Sqoop2";
+    public static final String PRODUCT_KEY = "Sqoop";
     public static final String TEMPLATE_NAME = "hadoopsqoop";
 
     private String clusterName = "";
