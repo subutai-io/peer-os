@@ -12,12 +12,10 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.server.ui.MainUI;
 
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -106,9 +104,9 @@ public class ProgressWindow
     {
 
         showProgress();
-        MainUI.getInstance().access( new Runnable()
+        executor.execute( new Runnable()
         {
-            @Override
+
             public void run()
             {
                 while ( track )
@@ -142,43 +140,6 @@ public class ProgressWindow
                 }
             }
         } );
-//        executor.execute( new Runnable()
-        //        {
-        //
-        //            public void run()
-        //            {
-        //                while ( track )
-        //                {
-        //                    ProductOperationView po = tracker.getProductOperation( source, trackID );
-        //                    if ( po != null )
-        //                    {
-        //                        setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po
-        // .getLog() );
-        //
-        //                        if ( po.getState() == ProductOperationState.SUCCEEDED
-        //                                || po.getState() == ProductOperationState.FAILED )
-        //                        {
-        //                            hideProgress();
-        //                            break;
-        //                        }
-        //                    }
-        //                    else
-        //                    {
-        //                        setOutput( "Product operation not found. Check logs" );
-        //
-        //                        break;
-        //                    }
-        //                    try
-        //                    {
-        //                        Thread.sleep( 1000 );
-        //                    }
-        //                    catch ( InterruptedException ex )
-        //                    {
-        //                        break;
-        //                    }
-        //                }
-        //            }
-        //        } );
     }
 
 
@@ -196,14 +157,6 @@ public class ProgressWindow
             outputTxtArea.setValue( output );
             outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
         }
-        //        try
-        //        {
-        //            MainUI.getInstance().getSession().getLockInstance().lock();
-        //        }
-        //        finally
-        //        {
-        //            MainUI.getInstance().getSession().getLockInstance().unlock();
-        //        }
     }
 
 
