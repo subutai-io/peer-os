@@ -19,12 +19,12 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 public class AccumuloClusterConfig implements ConfigBase
 {
 
-    public static final String PRODUCT_KEY = "Accumulo2";
+    public static final String PRODUCT_KEY = "Accumulo";
     public static final int DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY = 3;
     public static final String PRODUCT_NAME = "accumulo";
-    private String clusterName = "";
-    private String instanceName = "";
-    private String password = "";
+    private String clusterName;
+    private String instanceName;
+    private String password;
     private Agent masterNode;
     private Agent gcNode;
     private Agent monitor;

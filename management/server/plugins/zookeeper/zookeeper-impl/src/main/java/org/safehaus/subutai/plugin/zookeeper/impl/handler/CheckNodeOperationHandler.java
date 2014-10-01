@@ -3,10 +3,8 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
@@ -67,7 +65,8 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Zookeepe
 
         if ( checkCommand.hasCompleted() )
         {
-            productOperation.addLogDone( String.format( "%s", checkCommand.getResults().get( node.getUuid() ).getStdOut() ) );
+            productOperation
+                    .addLogDone( String.format( "%s", checkCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
         else
         {

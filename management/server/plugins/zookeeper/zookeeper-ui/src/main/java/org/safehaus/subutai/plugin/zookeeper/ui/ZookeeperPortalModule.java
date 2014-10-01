@@ -22,9 +22,6 @@ import org.slf4j.LoggerFactory;
 import com.vaadin.ui.Component;
 
 
-/**
- * @author dilshat
- */
 public class ZookeeperPortalModule implements PortalModule
 {
     public static final String MODULE_IMAGE = "zookeeper.png";

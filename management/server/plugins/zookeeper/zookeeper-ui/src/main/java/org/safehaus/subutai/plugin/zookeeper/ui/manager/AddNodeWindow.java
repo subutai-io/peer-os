@@ -30,9 +30,6 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class AddNodeWindow extends Window
 {
 
