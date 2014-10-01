@@ -10,8 +10,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,11 +24,12 @@ import java.util.concurrent.Executors;
  */
 public class ExpiringCache<K, V>
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractCommand.class.getName() );
 
     private static final long EVICTION_RUN_INTERVAL_MS = 10;
     private final Map<K, CacheEntry<V>> entries = new ConcurrentHashMap<>();
 
-    private ExecutorService evictor;
+    private final ScheduledExecutorService evictor;
 
 
     /**
@@ -33,29 +38,22 @@ public class ExpiringCache<K, V>
     public ExpiringCache()
     {
 
-        evictor = Executors.newCachedThreadPool();
+        evictor = Executors.newSingleThreadScheduledExecutor();
 
-        evictor.execute( new Runnable()
+        evictor.scheduleWithFixedDelay( new Runnable()
         {
-
             public void run()
             {
-                while ( !Thread.interrupted() )
+                try
                 {
-                    try
-                    {
-
-                        evictExpiredEntries();
-
-                        Thread.sleep( EVICTION_RUN_INTERVAL_MS );
-                    }
-                    catch ( InterruptedException ex )
-                    {
-                        break;
-                    }
+                    evictExpiredEntries();
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in eviction task", e );
                 }
             }
-        } );
+        }, 0, EVICTION_RUN_INTERVAL_MS, TimeUnit.MILLISECONDS );
     }
 
 
