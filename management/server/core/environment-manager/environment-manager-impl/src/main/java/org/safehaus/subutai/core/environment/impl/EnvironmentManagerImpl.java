@@ -298,8 +298,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess process )
-            throws EnvironmentBuildException
+    public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
         Environment environment = new Environment( process.getEnvironmentName() );
         for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
@@ -359,6 +358,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void invoke( final PeerCommandMessage commandMessage )
     {
         peerCommandDispatcher.invoke( commandMessage );
+    }
+
+
+    @Override
+    public void invoke( final PeerCommandMessage commandMessage, long timeout )
+    {
+        peerCommandDispatcher.invoke( commandMessage, timeout );
     }
 
 
