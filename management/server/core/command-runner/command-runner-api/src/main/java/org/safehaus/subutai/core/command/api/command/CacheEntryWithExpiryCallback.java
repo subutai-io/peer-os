@@ -13,13 +13,13 @@ import com.google.common.base.Preconditions;
  * This class represents entry for {@code ExpiringCache}. Holds generic value for the specified ttl. When entry is
  * expired the supplied ExpiryCallback is called.
  */
-public class CacheEntryWithExpiryCallback<VALUE> extends CacheEntry<VALUE>
+public class CacheEntryWithExpiryCallback<V> extends CacheEntry<V>
 {
 
     /**
      * callback to trigger when entry expires
      */
-    private final EntryExpiryCallback<VALUE> expiryCallback;
+    private final EntryExpiryCallback<V> expiryCallback;
 
 
     /**
@@ -29,7 +29,7 @@ public class CacheEntryWithExpiryCallback<VALUE> extends CacheEntry<VALUE>
      * @param ttlMs - entry ttl in milliseconds
      * @param expiryCallback -- callback to trigger when entry expires
      */
-    public CacheEntryWithExpiryCallback( VALUE value, long ttlMs, EntryExpiryCallback<VALUE> expiryCallback )
+    public CacheEntryWithExpiryCallback( V value, long ttlMs, EntryExpiryCallback<V> expiryCallback )
     {
         super( value, ttlMs );
         Preconditions.checkNotNull( expiryCallback, "Callback is null" );
