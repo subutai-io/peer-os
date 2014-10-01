@@ -47,7 +47,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="agent/get-physical-agents">
       <action class="org.safehaus.subutai.core.agent.cli.GetPhysicalAgentsCommand">
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>

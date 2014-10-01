@@ -353,7 +353,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
                     Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                     response.getHostname(), response.getParentHostName(), response.getMacAddress(), response.getIps(),
                     !Strings.isNullOrEmpty( response.getParentHostName() ),
-                    //TODO pass proper environmentId
+                    //TODO pass proper site & environment ids
                     response.getTransportId(), UUIDUtil.generateMACBasedUUID(),
                     response.getEnvironmentId() == null ? UUIDUtil.generateMACBasedUUID() :
                     response.getEnvironmentId() );
