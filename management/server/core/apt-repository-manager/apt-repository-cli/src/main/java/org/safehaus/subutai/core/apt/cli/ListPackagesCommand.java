@@ -15,6 +15,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 @Command(scope = "apt", name = "list-packages", description = "List packages in apt repository by pattern")
 public class ListPackagesCommand extends OsgiCommandSupport
@@ -25,18 +27,16 @@ public class ListPackagesCommand extends OsgiCommandSupport
     @Argument(index = 0, name = "pattern", required = true, multiValued = false, description = "search pattern")
     String pattern;
 
-    private AptRepositoryManager aptRepositoryManager;
-    private AgentManager agentManager;
+    private final AptRepositoryManager aptRepositoryManager;
+    private final AgentManager agentManager;
 
 
-    public void setAptRepositoryManager( final AptRepositoryManager aptRepositoryManager )
+    public ListPackagesCommand( final AptRepositoryManager aptRepositoryManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( aptRepositoryManager, "Apt Repo Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         this.aptRepositoryManager = aptRepositoryManager;
-    }
-
-
-    public void setAgentManager( final AgentManager agentManager )
-    {
         this.agentManager = agentManager;
     }
 
@@ -57,7 +57,9 @@ public class ListPackagesCommand extends OsgiCommandSupport
         catch ( AptRepoException e )
         {
             LOG.error( "Error in doExecute", e );
+            System.out.println( e.getMessage() );
         }
+
         return null;
     }
 }

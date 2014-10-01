@@ -8,32 +8,32 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="apt/list-packages">
       <action class="org.safehaus.subutai.core.apt.cli.ListPackagesCommand">
-        <property name="aptRepositoryManager" ref="aptRepositoryManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="aptRepositoryManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="apt/read-files">
       <action class="org.safehaus.subutai.core.apt.cli.ReadFilesCommand">
-        <property name="aptRepositoryManager" ref="aptRepositoryManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="aptRepositoryManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="apt/add-package">
       <action class="org.safehaus.subutai.core.apt.cli.AddPackageCommand">
-        <property name="aptRepositoryManager" ref="aptRepositoryManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="aptRepositoryManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="apt/remove-package">
       <action class="org.safehaus.subutai.core.apt.cli.RemovePackageCommand">
-        <property name="aptRepositoryManager" ref="aptRepositoryManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="aptRepositoryManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
