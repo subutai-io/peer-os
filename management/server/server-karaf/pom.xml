@@ -288,11 +288,6 @@
       <version>${http.client.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>${com.h2database.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>eclipselink</artifactId>
       <version>${org.eclipse.eclipselink.version}</version>
@@ -362,6 +357,7 @@
                 <feature>ssh</feature>
                 <feature>jndi</feature>
                 <feature>cxf</feature>
+
               </features>
               <repository>target/features-repo</repository>
             </configuration>
@@ -623,11 +619,7 @@
                   <version>${org.apache.commons.codec.version}</version>
                 </artifactItem>
                 <!-- Db Manager Ext-->
-                <artifactItem>
-                  <groupId>com.h2database</groupId>
-                  <artifactId>h2</artifactId>
-                  <version>${com.h2database.version}</version>
-                </artifactItem>
+
                 <artifactItem>
                   <groupId>org.eclipse.persistence</groupId>
                   <artifactId>eclipselink</artifactId>

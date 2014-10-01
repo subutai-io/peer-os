@@ -7,6 +7,12 @@
         init-method="init" destroy-method="destroy" scope="singleton">
   </bean>
   <service ref="dbManager" interface="org.safehaus.subutai.core.db.ext.api.DbManager">
-   <service-properties><entry key="service.exported.interfaces" value="*" /></service-properties>
+  <service-properties><entry key="service.exported.interfaces" value="*" /></service-properties>
+  </service>
+
+  <bean id = "ELINK_PP" class = "org.eclipse.persistence.jpa.PersistenceProvider" scope = "prototype">
+  </bean>
+  <service ref="ELINK_PP" interface="javax.persistence.spi.PersistenceProvider" >
+  <service-properties><entry key  ="javax.persistence.provider" value="org.eclipse.persistence.jpa.PersistenceProvider"/></service-properties>
   </service>
 </blueprint>
