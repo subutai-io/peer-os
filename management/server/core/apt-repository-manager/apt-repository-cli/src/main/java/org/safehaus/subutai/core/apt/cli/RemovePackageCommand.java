@@ -12,6 +12,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 @Command(scope = "apt", name = "remove-package", description = "Remove package from apt repository by name")
 public class RemovePackageCommand extends OsgiCommandSupport
@@ -21,19 +23,23 @@ public class RemovePackageCommand extends OsgiCommandSupport
     @Argument(index = 0, name = "package name", required = true, multiValued = false, description = "name of package")
     String packageName;
 
-    private AptRepositoryManager aptRepositoryManager;
-    private AgentManager agentManager;
+    private final AptRepositoryManager aptRepositoryManager;
+    private final AgentManager agentManager;
 
 
-    public void setAptRepositoryManager( final AptRepositoryManager aptRepositoryManager )
+    public RemovePackageCommand( final AptRepositoryManager aptRepositoryManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( aptRepositoryManager, "Apt Repo Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         this.aptRepositoryManager = aptRepositoryManager;
+        this.agentManager = agentManager;
     }
 
 
-    public void setAgentManager( final AgentManager agentManager )
+    public void setPackageName( final String packageName )
     {
-        this.agentManager = agentManager;
+        this.packageName = packageName;
     }
 
 
@@ -50,7 +56,9 @@ public class RemovePackageCommand extends OsgiCommandSupport
         catch ( AptRepoException e )
         {
             LOG.error( "Error in doExecute", e );
+            System.out.println( e.getMessage() );
         }
+
         return null;
     }
 }
