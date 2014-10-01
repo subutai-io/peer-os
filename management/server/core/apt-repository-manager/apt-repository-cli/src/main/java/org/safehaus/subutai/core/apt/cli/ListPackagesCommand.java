@@ -41,6 +41,12 @@ public class ListPackagesCommand extends OsgiCommandSupport
     }
 
 
+    public void setPattern( final String pattern )
+    {
+        this.pattern = pattern;
+    }
+
+
     @Override
     protected Object doExecute()
     {
