@@ -37,6 +37,12 @@ public class RemovePackageCommand extends OsgiCommandSupport
     }
 
 
+    public void setPackageName( final String packageName )
+    {
+        this.packageName = packageName;
+    }
+
+
     @Override
     protected Object doExecute()
     {
