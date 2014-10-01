@@ -79,5 +79,7 @@ public interface EnvironmentManager
     //    public boolean isContainerConnected( EnvironmentContainer container );
     public void invoke(PeerCommandMessage commandMessage);
 
+    public void invoke(PeerCommandMessage commandMessage, long timeout);
+
     Set<EnvironmentContainer> getConnectedContainers( Environment environment );
 }

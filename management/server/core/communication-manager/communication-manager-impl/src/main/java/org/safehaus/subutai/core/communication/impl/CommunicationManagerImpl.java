@@ -53,9 +53,13 @@ public class CommunicationManagerImpl implements CommunicationManager
      */
     private String amqUrl;
     /**
-     * service queue to listen on responses from agents
+     * service topic to listen on responses from agents
      */
     private String amqServiceTopic;
+    /**
+     * service topic to send broadcast message to all agents
+     */
+    private String amqBroadcastTopic;
     /**
      * ttl of message from server to agent
      */
@@ -108,6 +112,18 @@ public class CommunicationManagerImpl implements CommunicationManager
     public void setAmqServiceTopic( String amqServiceTopic )
     {
         this.amqServiceTopic = amqServiceTopic;
+    }
+
+
+    public void setAmqBroadcastTopic( final String amqBroadcastTopic )
+    {
+        this.amqBroadcastTopic = amqBroadcastTopic;
+    }
+
+
+    String getAmqBroadcastTopic()
+    {
+        return amqBroadcastTopic;
     }
 
 
