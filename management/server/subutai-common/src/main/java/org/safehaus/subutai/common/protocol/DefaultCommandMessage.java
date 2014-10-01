@@ -1,7 +1,10 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.lang.reflect.Type;
 import java.util.UUID;
+
+import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -9,7 +12,6 @@ import java.util.UUID;
  */
 public class DefaultCommandMessage extends PeerCommandMessage
 {
-    private String result;
 
     public DefaultCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
     {
@@ -18,21 +20,10 @@ public class DefaultCommandMessage extends PeerCommandMessage
 
 
     @Override
-    public void setResult( final Object result )
+    public Type getResultObjectType()
     {
-
-        if ( !( result instanceof String ) )
+        return new TypeToken<String>()
         {
-            throw new IllegalArgumentException( "Argument must be String." );
-        }
-
-        this.result = ( String ) result;
-    }
-
-
-    @Override
-    public String getResult()
-    {
-        return result;
+        }.getType();
     }
 }

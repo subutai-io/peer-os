@@ -47,4 +47,12 @@ public class JsonUtil
 
         return GSON.fromJson( value, type );
     }
+
+
+    public static String toJson( Object value, Type type )
+    {
+
+        return GSON.toJson( value, type);
+    }
+
 }
