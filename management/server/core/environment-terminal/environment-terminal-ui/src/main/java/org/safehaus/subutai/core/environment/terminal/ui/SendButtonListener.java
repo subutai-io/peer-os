@@ -73,15 +73,15 @@ public class SendButtonListener implements Button.ClickListener
         if ( checkRequest( requestBuilder ) )
         {
 
-            if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
-            {
-                requestBuilder.withPid( Integer.valueOf( form.programTxtFld.getValue() ) );
-                requestBuilder.withType( RequestType.TERMINATE_REQUEST );
-            }
-            else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
-            {
-                requestBuilder.withType( RequestType.PS_REQUEST );
-            }
+//            if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
+//            {
+//                requestBuilder.withPid( Integer.valueOf( form.programTxtFld.getValue() ) );
+//                requestBuilder.withType( RequestType.TERMINATE_REQUEST );
+//            }
+//            else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
+//            {
+//                requestBuilder.withType( RequestType.PS_REQUEST );
+//            }
 
             if ( form.workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( form.workDirTxtFld.getValue() ) )
             {
@@ -104,14 +104,14 @@ public class SendButtonListener implements Button.ClickListener
 
     private boolean checkRequest( RequestBuilder requestBuilder )
     {
-        if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && !(
-                StringUtil.isNumeric( form.programTxtFld.getValue() )
-                        && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
-        {
-
-            form.show( "Please, enter numeric PID greater than 0 to kill" );
-            return false;
-        }
+//        if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && !(
+//                StringUtil.isNumeric( form.programTxtFld.getValue() )
+//                        && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
+//        {
+//
+//            form.show( "Please, enter numeric PID greater than 0 to kill" );
+//            return false;
+//        }
 
         if ( !( StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) && NumUtil
                 .isIntBetween( Integer.valueOf( form.timeoutTxtFld.getValue() ), Common.MIN_COMMAND_TIMEOUT_SEC,
