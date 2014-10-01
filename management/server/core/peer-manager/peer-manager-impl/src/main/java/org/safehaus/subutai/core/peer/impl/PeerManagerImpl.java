@@ -570,7 +570,7 @@ public class PeerManagerImpl implements PeerManager
         if ( agent == null )
         {
             ecm.setStdErr( "Container is down." );
-            ecm.setStdOut( "Container is down." );
+            ecm.setStdOut( "" );
             ecm.setExitCode( -1 );
             ecm.setSuccess( true );
             return;
