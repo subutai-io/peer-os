@@ -28,11 +28,11 @@ import com.google.common.base.Strings;
 public class RequestBuilder
 {
 
-    //source of command
-    private static final String source = "COMMAND-RUNNER";
+    //SOURCE of command
+    private static final String SOURCE = "COMMAND-RUNNER";
 
     //the same for all commands
-    private final Integer requestSequenceNumber = 1;
+    private static final Integer REQUEST_SEQUENCE_NUMBER = 1;
 
     //the command to execute, e.g. ls
     private final String command;
@@ -282,7 +282,7 @@ public class RequestBuilder
     public Request build( UUID agentUUID, UUID taskUUID )
     {
 
-        return new Request( source, type, agentUUID, taskUUID, requestSequenceNumber, cwd, command, outputRedirection,
+        return new Request( SOURCE, type, agentUUID, taskUUID, REQUEST_SEQUENCE_NUMBER, cwd, command, outputRedirection,
                 errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout )
                 .setConfPoints( confPoints );
     }
@@ -334,11 +334,6 @@ public class RequestBuilder
         {
             return false;
         }
-        if ( requestSequenceNumber != null ? !requestSequenceNumber.equals( that.requestSequenceNumber ) :
-             that.requestSequenceNumber != null )
-        {
-            return false;
-        }
         if ( runAs != null ? !runAs.equals( that.runAs ) : that.runAs != null )
         {
             return false;
@@ -367,8 +362,7 @@ public class RequestBuilder
     @Override
     public int hashCode()
     {
-        int result = requestSequenceNumber != null ? requestSequenceNumber.hashCode() : 0;
-        result = 31 * result + ( command != null ? command.hashCode() : 0 );
+        int result = command != null ? command.hashCode() : 0;
         result = 31 * result + ( cwd != null ? cwd.hashCode() : 0 );
         result = 31 * result + ( type != null ? type.hashCode() : 0 );
         result = 31 * result + ( outputRedirection != null ? outputRedirection.hashCode() : 0 );
