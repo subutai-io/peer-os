@@ -48,6 +48,15 @@ public interface DbManager {
     /**
      * *******************************************************
      */
+    public void executeUpdate(String sqlScript) throws Exception;
+    /**
+    * *******************************************************
+    */
+    public List executeQuery(String sqlScript) throws Exception;
+
+    /**
+    * *******************************************************
+    */
     public void commitData() throws Exception;
 
 }

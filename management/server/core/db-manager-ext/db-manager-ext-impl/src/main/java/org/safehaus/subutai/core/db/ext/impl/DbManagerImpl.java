@@ -192,12 +192,57 @@ public class DbManagerImpl implements DbManager{
         }
     }
     /**
+     * *******************************************************
+     */
+    public void executeUpdate(String sqlScript) throws Exception {
+
+        try
+        {
+            if(!entManager.getTransaction().isActive())
+            {
+                entManager.getTransaction().begin();
+            }
+
+            Query q  =  entManager.createQuery( sqlScript );
+            q.executeUpdate();
+            entManager.getTransaction().commit();
+        }
+        catch(Exception ex)
+        {
+            LOG.error( "DbManager,Error in executeUpdate:", ex );
+            throw ex;
+        }
+    }
+    /**
+       * *******************************************************
+       */
+    public List executeQuery(String sqlScript) throws Exception {
+
+        List dataList;
+
+        try
+        {
+            Query q  =  entManager.createQuery( sqlScript );
+            dataList =  q.getResultList();
+
+
+        }
+        catch(Exception ex)
+        {
+            LOG.error( "DbManager,Error in executeQuery:", ex );
+            throw ex;
+        }
+
+        return dataList;
+  }
+
+    /**
     * *******************************************************
     */
 
     public static void main(String[] args) throws Exception {
 
-        /*
+
         DbManagerImpl DbMan = new DbManagerImpl();
 
         DbMan.init();
@@ -205,11 +250,13 @@ public class DbManagerImpl implements DbManager{
         List dataList = DbMan.getDataList( "CommandResponse" );
         String PrimaryKey = "";
 
+        /*
         for (CommandRequest temp : dataList)
         {
              System.out.println(temp.getCommandId());
              PrimaryKey = temp.getCommandId();
         }
+
 
         CommandResponseId  commandResponseId = new CommandResponseId() ;
         commandResponseId.setAgentId( "44e842e0-1aee-4e05-bbf9-ba24088dbcad" );
@@ -239,7 +286,8 @@ public class DbManagerImpl implements DbManager{
         CmdR = (CommandResponse)DbMan.getData(CommandResponse.class,commandResponseId );
         System.out.println(CmdR.getResponseNumber() );
 
-        DbMan.destroy();
         */
+        DbMan.destroy();
+
     }
 }
