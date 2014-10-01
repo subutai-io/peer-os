@@ -45,6 +45,18 @@ public class ReadFilesCommand extends OsgiCommandSupport
     }
 
 
+    public void setPackagePath( final String packagePath )
+    {
+        this.packagePath = packagePath;
+    }
+
+
+    public void setFilesPaths( final Collection<String> filesPaths )
+    {
+        this.filesPaths = filesPaths;
+    }
+
+
     @Override
     protected Object doExecute()
     {
@@ -63,7 +75,7 @@ public class ReadFilesCommand extends OsgiCommandSupport
         catch ( AptRepoException e )
         {
             LOG.error( "Error in doExecute", e );
-            System.out.println(e.getMessage());
+            System.out.println( e.getMessage() );
         }
 
         return null;
