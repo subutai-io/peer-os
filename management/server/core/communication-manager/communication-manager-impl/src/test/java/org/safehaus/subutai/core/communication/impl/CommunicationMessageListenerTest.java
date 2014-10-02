@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import org.apache.activemq.command.ActiveMQMessage;
-import org.apache.activemq.command.DataStructure;
 import org.apache.activemq.command.RemoveInfo;
 
 import static org.mockito.Mockito.mock;
@@ -39,7 +38,6 @@ public class CommunicationMessageListenerTest
     {
 
         ActiveMQMessage message = mock( ActiveMQMessage.class );
-        DataStructure dataStructure = mock( DataStructure.class );
         when( message.getDataStructure() ).thenReturn( new RemoveInfo() );
         communicationMessageListener.onMessage( message );
     }
