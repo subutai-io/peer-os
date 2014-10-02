@@ -55,6 +55,7 @@ public class ElasticsearchImpl implements Elasticsearch
     private PluginDAO pluginDAO;
     private ContainerManager containerManager;
     private EnvironmentManager environmentManager;
+    private Commands commands;
 
 
     public PluginDAO getPluginDAO()
@@ -137,9 +138,15 @@ public class ElasticsearchImpl implements Elasticsearch
 
     public void init()
     {
-        Commands.init( commandRunner );
+        commands = new Commands( commandRunner );
         this.pluginDAO = new PluginDAO( dbManager );
         executor = Executors.newCachedThreadPool();
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 
