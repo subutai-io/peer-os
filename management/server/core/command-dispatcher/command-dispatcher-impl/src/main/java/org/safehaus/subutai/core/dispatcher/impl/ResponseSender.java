@@ -9,6 +9,8 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -33,7 +35,7 @@ public class ResponseSender
     private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
     private static final int RETRY_ATTEMPT_WIDENING_INTERVAL_SEC = 30;
     private static final int SELECT_RECORDS_LIMIT = 50;
-    private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
     private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
     private final PeerManager peerManager;
@@ -49,26 +51,22 @@ public class ResponseSender
 
     public void init()
     {
-        mainLoopExecutor.submit( new Runnable()
+        mainLoopExecutor.scheduleWithFixedDelay( new Runnable()
         {
             @Override
             public void run()
             {
 
-                while ( !Thread.interrupted() )
+                try
                 {
-                    try
-                    {
-                        Thread.sleep( SLEEP_BETWEEN_ITERATIONS_SEC * 1000L );
-                    }
-                    catch ( InterruptedException e )
-                    {
-                        break;
-                    }
                     send();
                 }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in sender", e );
+                }
             }
-        } );
+        }, 0, SLEEP_BETWEEN_ITERATIONS_SEC, TimeUnit.SECONDS );
     }
 
 

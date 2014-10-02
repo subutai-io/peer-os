@@ -72,6 +72,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
 
     public boolean isNotifyAgentListeners()
     {
+
         return notifyAgentListeners;
     }
 
@@ -88,7 +89,10 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     }
 
 
-    protected Queue<AgentListener> getListenersQueue() {return listeners;}
+    protected Queue<AgentListener> getListenersQueue()
+    {
+        return listeners;
+    }
 
 
     /**

@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
@@ -153,7 +154,7 @@ public class CommandImplTest
     }
 
 
-    @Test( expected = CommandException.class )
+    @Test(expected = CommandException.class)
     public void shouldThrowCommandException2() throws CommandException
     {
 
@@ -163,7 +164,7 @@ public class CommandImplTest
     }
 
 
-    @Test( expected = CommandException.class )
+    @Test(expected = CommandException.class)
     public void shouldThrowCommandException3() throws CommandException
     {
 
@@ -173,7 +174,7 @@ public class CommandImplTest
     }
 
 
-    @Test( expected = CommandException.class )
+    @Test(expected = CommandException.class)
     public void shouldThrowCommandException4() throws CommandException
     {
 
@@ -192,6 +193,16 @@ public class CommandImplTest
 
 
         verify( commandRunner ).runCommand( command, commandCallback );
+    }
+
+
+    @Test(expected = CommandException.class)
+    public void shouldThrowCommandCommand() throws CommandException
+    {
+
+        Mockito.doThrow( new RuntimeException( "OOPS" ) ).when( commandRunner ).runCommand( command, commandCallback );
+
+        command.executeCommand( commandCallback, false );
     }
 
 

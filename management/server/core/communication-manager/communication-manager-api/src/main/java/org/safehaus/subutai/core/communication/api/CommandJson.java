@@ -255,13 +255,13 @@ public class CommandJson
                 return false;
             }
 
-            final CommandImpl command = ( CommandImpl ) o;
+            final CommandImpl cmd = ( CommandImpl ) o;
 
-            if ( this.command != null ? !this.command.equals( command.command ) : command.command != null )
+            if ( this.command != null ? !this.command.equals( cmd.command ) : cmd.command != null )
             {
                 return false;
             }
-            if ( response != null ? !response.equals( command.response ) : command.response != null )
+            if ( response != null ? !response.equals( cmd.response ) : cmd.response != null )
             {
                 return false;
             }
