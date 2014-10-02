@@ -1,10 +1,7 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
@@ -13,15 +10,9 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
-import org.safehaus.subutai.core.registry.api.TemplateTree;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;
@@ -67,6 +58,7 @@ public class TemplateRegistryImplTest
     private String templateName = "templateRegistryImplTestName";
     private int counter = 0;
 
+
     private static class CustomIterator implements Iterator
     {
         Row row;
@@ -101,6 +93,7 @@ public class TemplateRegistryImplTest
 
         }
     }
+
 
     @Before
     public void setupClasses() throws DBException
@@ -139,12 +132,6 @@ public class TemplateRegistryImplTest
         verify( dbManager ).executeUpdate2( any( String.class ), anyVararg() );
     }
 
-    @Test
-    public void testMethod()
-    {
-//        templateRegistry.
-    }
-
 
     @Test
     public void shouldCallDbManagerExecuteUpdateOnUnregisteredTemplate() throws RegistryException, DBException
@@ -160,9 +147,6 @@ public class TemplateRegistryImplTest
         templateRegistry.unregisterTemplate( templateName );
         verify( dbManager ).executeUpdate2( any( String.class ), anyVararg() );
     }
-
-
-
 
 
     @Test
@@ -244,7 +228,7 @@ public class TemplateRegistryImplTest
     public void testGetParentTemplates() throws DBException
     {
         templateRegistry.getParentTemplates( templateName );
-//        verify( dbManager ).executeQuery2( any( String.class ), anyVararg() );
+        //        verify( dbManager ).executeQuery2( any( String.class ), anyVararg() );
         verify( dbManager ).executeQuery2( any( String.class ), anyVararg() );
     }
 
@@ -262,15 +246,15 @@ public class TemplateRegistryImplTest
     public void testGetAllTemplates() throws DBException
     {
         templateRegistry.getAllTemplates();
-        verify( dbManager ).executeQuery2( any(String.class), anyVararg() );
+        verify( dbManager ).executeQuery2( any( String.class ), anyVararg() );
     }
 
 
     @Test
-    public void getAllTemplatesWithTwoParameters() throws DBException
+    public void getAllTemplatesWithParameter() throws DBException
     {
         templateRegistry.getAllTemplates( Common.DEFAULT_LXC_ARCH );
-        verify( dbManager ).executeQuery2( any(String.class), anyVararg() );
+        verify( dbManager ).executeQuery2( any( String.class ), anyVararg() );
     }
 
 
@@ -285,7 +269,7 @@ public class TemplateRegistryImplTest
                         Common.DEFAULT_LXC_ARCH.toLowerCase() ) ) ).thenReturn( rsQuery );
 
         templateRegistry.updateTemplateUsage( "faiHostName", templateName, true );
-        verify(dbManager).executeQuery2( any(String.class), anyVararg() );
+        verify( dbManager ).executeQuery2( any( String.class ), anyVararg() );
     }
 
 
