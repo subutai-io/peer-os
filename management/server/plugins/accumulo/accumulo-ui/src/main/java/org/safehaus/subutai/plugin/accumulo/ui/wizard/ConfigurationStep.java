@@ -15,7 +15,6 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
-import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
@@ -27,6 +26,7 @@ import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -58,27 +58,27 @@ public class ConfigurationStep extends Panel
         if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK )
         {
             //hadoop combo
-            final ComboBox hadoopClustersCombo = UiUtil.getCombo( "Hadoop cluster" );
+            final ComboBox hadoopClustersCombo = getCombo( "Hadoop cluster" );
 
             //zookeeper combo
-            final ComboBox zkClustersCombo = UiUtil.getCombo( "Zookeeper cluster" );
+            final ComboBox zkClustersCombo = getCombo( "Zookeeper cluster" );
 
             //master nodes
-            final ComboBox masterNodeCombo = UiUtil.getCombo( "Master node" );
-            final ComboBox gcNodeCombo = UiUtil.getCombo( "GC node" );
-            final ComboBox monitorNodeCombo = UiUtil.getCombo( "Monitor node" );
+            final ComboBox masterNodeCombo = getCombo( "Master node" );
+            final ComboBox gcNodeCombo = getCombo( "GC node" );
+            final ComboBox monitorNodeCombo = getCombo( "Monitor node" );
 
             //accumulo init controls
-            TextField clusterNameTxtFld = UiUtil.getTextField( "Cluster name", "Cluster name", 20 );
-            TextField instanceNameTxtFld = UiUtil.getTextField( "Instance name", "Instance name", 20 );
-            TextField passwordTxtFld = UiUtil.getTextField( "Password", "Password", 20 );
+            TextField clusterNameTxtFld = getTextField( "Cluster name", "Cluster name", 20 );
+            TextField instanceNameTxtFld = getTextField( "Instance name", "Instance name", 20 );
+            TextField passwordTxtFld = getTextField( "Password", "Password", 20 );
 
             //tracers
             final TwinColSelect tracersSelect =
-                    UiUtil.getTwinSelect( "Tracers", "hostname", "Available Nodes", "Selected Nodes", 4 );
+                    getTwinSelect( "Tracers", "hostname", "Available Nodes", "Selected Nodes", 4 );
             //slave nodes
             final TwinColSelect slavesSelect =
-                    UiUtil.getTwinSelect( "Slaves", "hostname", "Available Nodes", "Selected Nodes", 4 );
+                    getTwinSelect( "Slaves", "hostname", "Available Nodes", "Selected Nodes", 4 );
 
             //get existing hadoop clusters
             List<HadoopClusterConfig> hadoopClusters = hadoop.getClusters();
@@ -762,6 +762,41 @@ public class ConfigurationStep extends Panel
         }
     }
 
+
+    public static ComboBox getCombo( String title )
+    {
+        ComboBox combo = new ComboBox( title );
+        combo.setImmediate( true );
+        combo.setTextInputAllowed( false );
+        combo.setRequired( true );
+        combo.setNullSelectionAllowed( false );
+        return combo;
+    }
+
+
+    public static TwinColSelect getTwinSelect( String title, String captionProperty, String leftTitle,
+                                               String rightTitle, int rows )
+    {
+        TwinColSelect twinColSelect = new TwinColSelect( title );
+        twinColSelect.setItemCaptionPropertyId( captionProperty );
+        twinColSelect.setRows( rows );
+        twinColSelect.setMultiSelect( true );
+        twinColSelect.setImmediate( true );
+        twinColSelect.setLeftColumnCaption( leftTitle );
+        twinColSelect.setRightColumnCaption( rightTitle );
+        twinColSelect.setWidth( 100, Sizeable.Unit.PERCENTAGE );
+        twinColSelect.setRequired( true );
+        return twinColSelect;
+    }
+
+    public static TextField getTextField( String caption, String prompt, int maxLength )
+    {
+        TextField textField = new TextField( caption );
+        textField.setInputPrompt( prompt );
+        textField.setMaxLength( maxLength );
+        textField.setRequired( true );
+        return textField;
+    }
 
     private void setComboDS( ComboBox target, List<Agent> agents )
     {
