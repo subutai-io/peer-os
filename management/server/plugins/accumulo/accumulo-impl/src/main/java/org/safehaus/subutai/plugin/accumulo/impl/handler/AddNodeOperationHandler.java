@@ -54,7 +54,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
     public void run()
     {
         //check of node type is allowed for addition
-        if ( !( nodeType == NodeType.TRACER || nodeType.isSlave() ) )
+        if ( !( nodeType == NodeType.Tracer || nodeType.isSlave() ) )
         {
             productOperation.addLogFailed( "Only tracer or slave node can be added" );
             return;
@@ -76,7 +76,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
 
         //check if node already belongs to specified role
-        if ( nodeType == NodeType.TRACER && accumuloClusterConfig.getTracers().contains( lxcAgent ) )
+        if ( nodeType == NodeType.Tracer && accumuloClusterConfig.getTracers().contains( lxcAgent ) )
         {
             productOperation.addLogFailed( String.format( "Agent %s already belongs to tracers", lxcHostname ) );
             return;

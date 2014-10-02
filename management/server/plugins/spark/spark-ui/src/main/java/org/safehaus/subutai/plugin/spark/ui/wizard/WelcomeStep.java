@@ -41,13 +41,13 @@ public class WelcomeStep extends Panel
         Button next = new Button( "Start over-Hadoop installation" );
         next.addStyleName( "default" );
         next.addClickListener( new NextClickHandler( wizard, SetupType.OVER_HADOOP ) );
-        grid.addComponent( next, 6, 4, 6, 4 );
+        grid.addComponent( next, 4, 4, 4, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
         Button next2 = new Button( "Start with-Hadoop installation" );
         next2.addStyleName( "default" );
         next2.addClickListener( new NextClickHandler( wizard, SetupType.WITH_HADOOP ) );
-        grid.addComponent( next2, 7, 4, 7, 4 );
+        grid.addComponent( next2, 5, 4, 4, 4 );
         grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
 
         setContent( grid );

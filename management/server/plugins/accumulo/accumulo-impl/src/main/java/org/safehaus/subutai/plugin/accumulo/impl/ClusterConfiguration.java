@@ -312,7 +312,7 @@ public class ClusterConfiguration
             throws ClusterConfigurationException
     {
         Command unregisterNodeCommand;
-        if ( nodeType == NodeType.TRACER )
+        if ( nodeType == NodeType.Tracer )
         {
             unregisterNodeCommand = Commands.getClearTracerCommand( accumuloClusterConfig.getAllNodes(), agent );
             accumuloClusterConfig.getTracers().remove( agent );

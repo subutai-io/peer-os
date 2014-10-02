@@ -491,7 +491,7 @@ public class Manager
                     else if ( config.getSetupType() == SetupType.OVER_HADOOP
                             || config.getSetupType() == SetupType.WITH_HADOOP )
                     {
-                        HadoopClusterConfig info = hadoop.getCluster( config.getClusterName() );
+                        HadoopClusterConfig info = hadoop.getCluster( config.getHadoopClusterName() );
 
                         if ( info != null )
                         {
