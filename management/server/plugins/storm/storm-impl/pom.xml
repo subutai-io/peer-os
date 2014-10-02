@@ -71,11 +71,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>lxc-manager-api</artifactId>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>zookeeper-plugin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
