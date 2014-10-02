@@ -11,16 +11,6 @@ public interface DbManager {
 
 
     /**
-    * Init db manager *******************************************************
-    */
-    public void init()  throws Exception;
-
-    /**
-    * Destroy db manager *******************************************************
-    */
-    public void destroy()  throws Exception;
-
-    /**
     * *******************************************************
     */
     public List getDataList(String entityName) throws Exception;
@@ -48,6 +38,15 @@ public interface DbManager {
     /**
      * *******************************************************
      */
+    public void executeUpdate(String sqlScript) throws Exception;
+    /**
+    * *******************************************************
+    */
+    public List executeQuery(String sqlScript) throws Exception;
+
+    /**
+    * *******************************************************
+    */
     public void commitData() throws Exception;
 
 }
