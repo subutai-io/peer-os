@@ -21,7 +21,7 @@ public class BatchRequestTest
     private static final UUID AGENT_ID = UUID.randomUUID();
     private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final UUID ENV_ID = UUID.randomUUID();
-    private static final String SOURCE = Common.DISPATCHER_NAME;
+    private static final String SOURCE = "source";
 
 
     @Test( expected = NullPointerException.class )
@@ -59,7 +59,6 @@ public class BatchRequestTest
         assertEquals( COMMAND_ID, batchRequest.getCommandId() );
         assertEquals( 1, batchRequest.getRequestsCount() );
         assertTrue( batchRequest.getAgentIds().contains( AGENT_ID ) );
-        assertEquals( Common.DISPATCHER_NAME, batchRequest.getRequests().iterator().next().getSource() );
     }
 
 
