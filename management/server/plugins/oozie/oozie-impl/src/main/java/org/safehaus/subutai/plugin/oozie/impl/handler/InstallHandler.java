@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -13,15 +15,13 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
-import java.util.UUID;
-
 
 public class InstallHandler extends AbstractOperationHandler<OozieImpl>
 {
 
+    private final ProductOperation productOperation;
     private OozieClusterConfig config;
     private HadoopClusterConfig hadoopConfig;
-    private final ProductOperation productOperation;
 
 
     public InstallHandler( final OozieImpl manager, final OozieClusterConfig config )
@@ -32,11 +32,13 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
+
     @Override
     public UUID getTrackerId()
     {
         return productOperation.getId();
     }
+
 
     @Override
     public void run()

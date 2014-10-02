@@ -1,16 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
@@ -19,27 +15,28 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
-import javax.naming.NamingException;
-import java.util.concurrent.ExecutorService;
 
 public class Wizard
 {
 
     private final VerticalLayout vlayout;
+    private final ExecutorService executor;
+    private final Oozie oozieManager;
+    private final Tracker tracker;
     private int step = 1;
     private OozieClusterConfig config = new OozieClusterConfig();
-    private final ExecutorService executor;
     private Hadoop hadoopManager;
-    private final Oozie oozieManager;
+    private AgentManager agentManager;
 
-    private final Tracker tracker;
 
-    public Wizard( final ExecutorService executorService, final ServiceLocator serviceLocator ) throws NamingException {
+    public Wizard( final ExecutorService executorService, final ServiceLocator serviceLocator ) throws NamingException
+    {
 
-        this.tracker = serviceLocator.getService( Tracker.class );
+        tracker = serviceLocator.getService( Tracker.class );
         hadoopManager = serviceLocator.getService( Hadoop.class );
+        agentManager = serviceLocator.getService( AgentManager.class );
         oozieManager = serviceLocator.getService( Oozie.class );
-        this.executor = executorService;
+        executor = executorService;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin( true );
@@ -123,22 +120,32 @@ public class Wizard
     }
 
 
-    public Hadoop getHadoopManager() {
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
 
-    public ExecutorService getExecutor() {
+    public ExecutorService getExecutor()
+    {
         return executor;
     }
 
 
-    public Tracker getTracker() {
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
 
-    public Oozie getOozieManager() {
+    public Oozie getOozieManager()
+    {
         return oozieManager;
+    }
+
+
+    public AgentManager getAgentManager()
+    {
+        return agentManager;
     }
 }

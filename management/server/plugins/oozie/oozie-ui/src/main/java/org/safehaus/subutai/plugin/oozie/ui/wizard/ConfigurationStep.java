@@ -8,11 +8,10 @@ package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 import java.util.List;
 
-import com.vaadin.event.FieldEvents;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
-import com.google.common.base.Strings;
 import com.vaadin.data.Property;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
@@ -31,8 +30,8 @@ public class ConfigurationStep extends Panel
 {
 
     private final ComboBox hadoopClusters;
-    private TextField oozieClusterName;
     HadoopClusterConfig hadoopClusterConfig = null;
+    private TextField oozieClusterName;
 
 
     public ConfigurationStep( final Wizard wizard )
@@ -73,7 +72,7 @@ public class ConfigurationStep extends Panel
         if ( hadoopClusters.getValue() != null )
         {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClusters.getValue();
-            wizard.getConfig().setHadoopClusterName(hadoopInfo.getClusterName());
+            wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
         }
 
         hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
@@ -88,12 +87,14 @@ public class ConfigurationStep extends Panel
             }
         } );
 
-        oozieClusterName.addTextChangeListener( new FieldEvents.TextChangeListener() {
+        oozieClusterName.addTextChangeListener( new FieldEvents.TextChangeListener()
+        {
             @Override
-            public void textChange(FieldEvents.TextChangeEvent event) {
+            public void textChange( FieldEvents.TextChangeEvent event )
+            {
                 wizard.getConfig().setClusterName( event.getText() );
             }
-        });
+        } );
 
 
         Button next = new Button( "Next" );
@@ -152,7 +153,9 @@ public class ConfigurationStep extends Panel
         Notification.show( notification );
     }
 
-    public void setHadoopCluster( Wizard wizard, HadoopClusterConfig hadoopClusterConfig ) {
+
+    public void setHadoopCluster( Wizard wizard, HadoopClusterConfig hadoopClusterConfig )
+    {
         this.hadoopClusterConfig = hadoopClusterConfig;
         wizard.getConfig().setHadoopClusterName( hadoopClusterConfig.getClusterName() );
     }

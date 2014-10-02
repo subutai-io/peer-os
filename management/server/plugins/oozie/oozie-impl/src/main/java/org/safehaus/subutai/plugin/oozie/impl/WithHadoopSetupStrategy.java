@@ -4,12 +4,12 @@ package org.safehaus.subutai.plugin.oozie.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -108,7 +108,8 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
         }
 
-        if ( config.getClients().isEmpty() ) {
+        if ( config.getClients().isEmpty() )
+        {
             po.addLog( "Installing Oozie client..." );
             String sclient = Commands.make( CommandType.INSTALL_CLIENT );
 
@@ -119,7 +120,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
                 clients.add( clientAgent );
             }
             cmd = oozieManager.getCommandRunner()
-                    .createCommand( new RequestBuilder( sclient ).withTimeout( 180 ), clients );
+                              .createCommand( new RequestBuilder( sclient ).withTimeout( 180 ), clients );
             oozieManager.getCommandRunner().runCommand( cmd );
 
             if ( cmd.hasSucceeded() )

@@ -6,12 +6,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.common.ui.BaseManager;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -35,29 +37,29 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
-import javax.naming.NamingException;
 
-
-public class Manager
+public class Manager extends BaseManager
 {
 
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table serverTable;
     private final Table clientsTable;
-    private OozieClusterConfig config;
     private final Oozie oozieManager;
     private final Tracker tracker;
     private final ExecutorService executorService;
     private final CommandRunner commandRunner;
     private final AgentManager agentManager;
+    private OozieClusterConfig config;
 
-    public Manager( final ExecutorService executorService, final ServiceLocator serviceLocator ) throws NamingException {
+
+    public Manager( final ExecutorService executorService, final ServiceLocator serviceLocator ) throws NamingException
+    {
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
         this.oozieManager = serviceLocator.getService( Oozie.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class);
-        this.agentManager = serviceLocator.getService( AgentManager.class);
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -117,8 +119,6 @@ public class Manager
             }
         } );
 
-        // TODO add restart hadoop button
-
         Button destroyClusterBtn = new Button( "Destroy cluster" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
@@ -136,11 +136,9 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
-                            UUID trackID =
-                                    oozieManager.uninstallCluster(config.getClusterName());
-                            ProgressWindow window =
-                                    new ProgressWindow( executorService, tracker,
-                                            trackID, OozieClusterConfig.PRODUCT_KEY );
+                            UUID trackID = oozieManager.uninstallCluster( config.getClusterName() );
+                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
+                                    OozieClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -223,8 +221,7 @@ public class Manager
 
                 UUID trackID = oozieManager.checkServerStatus( config );
                 ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID,
-                                OozieClusterConfig.PRODUCT_KEY );
+                        new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -248,8 +245,7 @@ public class Manager
 
                 UUID trackID = oozieManager.startServer( config );
                 ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID,
-                                OozieClusterConfig.PRODUCT_KEY );
+                        new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -271,8 +267,7 @@ public class Manager
 
                 UUID trackID = oozieManager.stopServer( config );
                 ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackID,
-                                OozieClusterConfig.PRODUCT_KEY );
+                        new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
@@ -361,8 +356,8 @@ public class Manager
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService,
-                                        commandRunner, agentManager );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -404,8 +399,8 @@ public class Manager
                     if ( lxcAgent != null )
                     {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService,
-                                        commandRunner, agentManager );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), executorService, commandRunner,
+                                        agentManager );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else
@@ -423,4 +418,5 @@ public class Manager
     {
         return contentRoot;
     }
+
 }

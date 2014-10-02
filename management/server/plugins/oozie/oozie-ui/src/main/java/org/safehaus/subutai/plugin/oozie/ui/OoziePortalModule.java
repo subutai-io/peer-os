@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -23,8 +25,6 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 
-import javax.naming.NamingException;
-
 
 /**
  * @author dilshat
@@ -32,16 +32,15 @@ import javax.naming.NamingException;
 public class OoziePortalModule implements PortalModule
 {
 
-    protected static final Logger LOG = Logger.getLogger( OoziePortalModule.class.getName() );
     public static final String MODULE_IMAGE = "oozie.png";
+    protected static final Logger LOG = Logger.getLogger( OoziePortalModule.class.getName() );
+    private final ServiceLocator serviceLocator;
     Oozie oozieManager;
     AgentManager agentManager;
     Tracker tracker;
     Hadoop hadoopManager;
     CommandRunner commandRunner;
     ExecutorService executor;
-    private final ServiceLocator serviceLocator;
-
 
 
     public OoziePortalModule()
@@ -154,10 +153,13 @@ public class OoziePortalModule implements PortalModule
 
     public Component createComponent()
     {
-        try {
+        try
+        {
             return new OozieComponent( executor, serviceLocator );
-        } catch (NamingException e) {
-            LOG.severe(e.getMessage());
+        }
+        catch ( NamingException e )
+        {
+            LOG.severe( e.getMessage() );
         }
 
         return null;

@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
@@ -18,6 +18,7 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
 {
 
     private final ProductOperation productOperation;
+
 
     public StopServerHandler( final OozieImpl manager, final String clusterName )
     {

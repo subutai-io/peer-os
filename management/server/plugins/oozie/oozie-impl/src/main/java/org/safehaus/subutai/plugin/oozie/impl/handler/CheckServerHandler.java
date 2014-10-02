@@ -6,10 +6,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
@@ -55,7 +55,8 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                 Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
                 if ( serverAgent == null )
                 {
-                    productOperation.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
+                    productOperation
+                            .addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
                 Set<Agent> servers = new HashSet<Agent>();
@@ -66,7 +67,8 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                 if ( statusServiceCommand.hasCompleted() )
                 {
 
-                    productOperation.addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
+                    productOperation
+                            .addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                 }
                 else
                 {
