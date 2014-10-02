@@ -29,14 +29,27 @@ public class FlumeComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        TabSheet tabSheet = new TabSheet();
-        tabSheet.setSizeFull();
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
-        tabSheet.addTab( wizard.getContent(), "Install" );
-        tabSheet.addTab( manager.getContent(), "Manage" );
+        sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+        {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+            {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) )
+                {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
 
-        verticalLayout.addComponent( tabSheet );
+        verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
         manager.refreshClustersInfo();
     }
