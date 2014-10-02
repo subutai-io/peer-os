@@ -10,8 +10,8 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.base.Preconditions;
@@ -21,19 +21,19 @@ import com.google.common.collect.Sets;
 public class Commands
 {
 
-    private final CommandRunner commandRunner;
+    private final CommandRunnerBase commandRunner;
 
 
-    public Commands( CommandRunner commandRunner )
+    public Commands( CommandRunnerBase commandRunner )
     {
 
         Preconditions.checkNotNull( "Command Runner is null" );
-        
+
         this.commandRunner = commandRunner;
     }
 
 
-    public  Command getInstallCommand( Set<Agent> agents )
+    public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 360 )
@@ -43,7 +43,7 @@ public class Commands
     }
 
 
-    public  Command getUninstallCommand( Set<Agent> agents )
+    public Command getUninstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-accumulo" ).withTimeout( 60 ),
@@ -51,38 +51,41 @@ public class Commands
     }
 
 
-    public  Command getCheckInstalledCommand( Set<Agent> agents )
+    public Command getCheckInstalledCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
     }
 
 
-    public  Command getStartCommand( Agent agent )
+    public Command getStartCommand( Agent agent )
     {
         return commandRunner.createCommand( new RequestBuilder( "/etc/init.d/accumulo start" ).withTimeout( 60 ),
                 Sets.newHashSet( agent ) );
     }
 
 
-    public  Command getStopCommand( Agent agent )
+    public Command getStopCommand( Agent agent )
     {
-        return commandRunner.createCommand( new RequestBuilder( "/etc/init.d/accumulo stop" ), Sets.newHashSet( agent ) );
+        return commandRunner
+                .createCommand( new RequestBuilder( "/etc/init.d/accumulo stop" ), Sets.newHashSet( agent ) );
     }
 
 
-    public  Command getRestartCommand( Agent agent )
+    public Command getRestartCommand( Agent agent )
     {
-        return commandRunner.createCommand( new RequestBuilder( "/etc/init.d/accumulo restart" ), Sets.newHashSet( agent ) );
+        return commandRunner
+                .createCommand( new RequestBuilder( "/etc/init.d/accumulo restart" ), Sets.newHashSet( agent ) );
     }
 
 
-    public  Command getStatusCommand( Agent agent )
+    public Command getStatusCommand( Agent agent )
     {
-        return commandRunner.createCommand( new RequestBuilder( "/etc/init.d/accumulo status" ), Sets.newHashSet( agent ) );
+        return commandRunner
+                .createCommand( new RequestBuilder( "/etc/init.d/accumulo status" ), Sets.newHashSet( agent ) );
     }
 
 
-    public  Command getAddMasterCommand( Set<Agent> nodes, Agent masterNode )
+    public Command getAddMasterCommand( Set<Agent> nodes, Agent masterNode )
     {
         return commandRunner.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && accumuloMastersConf.sh masters clear && accumuloMastersConf.sh masters add %s",
@@ -90,7 +93,7 @@ public class Commands
     }
 
 
-    public  Command getAddTracersCommand( Set<Agent> nodes, Set<Agent> tracerNodes )
+    public Command getAddTracersCommand( Set<Agent> nodes, Set<Agent> tracerNodes )
     {
         StringBuilder tracersSpaceSeparated = new StringBuilder();
         for ( Agent tracer : tracerNodes )
@@ -103,7 +106,7 @@ public class Commands
     }
 
 
-    public  Command getClearTracerCommand( Set<Agent> nodes, Agent tracerNode )
+    public Command getClearTracerCommand( Set<Agent> nodes, Agent tracerNode )
     {
         return commandRunner.createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && accumuloMastersConf.sh tracers clear %s",
@@ -111,7 +114,7 @@ public class Commands
     }
 
 
-    public  Command getAddGCCommand( Set<Agent> nodes, Agent gcNode )
+    public Command getAddGCCommand( Set<Agent> nodes, Agent gcNode )
     {
         return commandRunner.createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && accumuloMastersConf.sh gc clear && accumuloMastersConf.sh gc add %s",
@@ -119,7 +122,7 @@ public class Commands
     }
 
 
-    public  Command getAddMonitorCommand( Set<Agent> nodes, Agent monitor )
+    public Command getAddMonitorCommand( Set<Agent> nodes, Agent monitor )
     {
         return commandRunner.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && accumuloMastersConf.sh monitor clear && accumuloMastersConf.sh monitor add %s",
@@ -127,7 +130,7 @@ public class Commands
     }
 
 
-    public  Command getAddSlavesCommand( Set<Agent> nodes, Set<Agent> slaveNodes )
+    public Command getAddSlavesCommand( Set<Agent> nodes, Set<Agent> slaveNodes )
     {
         StringBuilder slavesSpaceSeparated = new StringBuilder();
         for ( Agent tracer : slaveNodes )
@@ -140,15 +143,15 @@ public class Commands
     }
 
 
-    public  Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
+    public Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s", slaveNode.getHostname() ) ),
-                nodes );
+                        String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s",
+                                slaveNode.getHostname() ) ), nodes );
     }
 
 
-    public  Command getBindZKClusterCommand( Set<Agent> nodes, Set<Agent> zkNodes )
+    public Command getBindZKClusterCommand( Set<Agent> nodes, Set<Agent> zkNodes )
     {
         StringBuilder zkNodesCommaSeparated = new StringBuilder();
         for ( Agent zkNode : zkNodes )
@@ -164,15 +167,15 @@ public class Commands
     }
 
 
-    public  Command getAddPropertyCommand( String propertyName, String propertyValue, Set<Agent> agents )
+    public Command getAddPropertyCommand( String propertyName, String propertyValue, Set<Agent> agents )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName, propertyValue ) ),
-                agents );
+                        String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName,
+                                propertyValue ) ), agents );
     }
 
 
-    public  Command getRemovePropertyCommand( String propertyName, Set<Agent> agents )
+    public Command getRemovePropertyCommand( String propertyName, Set<Agent> agents )
     {
         return commandRunner.createCommand(
                 new RequestBuilder( String.format( ". /etc/profile && accumulo-property.sh clear %s", propertyName ) ),
@@ -180,7 +183,7 @@ public class Commands
     }
 
 
-    public  Command getInitCommand( String instanceName, String password, Agent agent )
+    public Command getInitCommand( String instanceName, String password, Agent agent )
     {
         return commandRunner.createCommand( new RequestBuilder(
                         String.format( ". /etc/profile && accumulo-init.sh %s %s", instanceName, password ) ),
@@ -188,7 +191,7 @@ public class Commands
     }
 
 
-    public  Command getRemoveAccumuloFromHFDSCommand( Agent agent )
+    public Command getRemoveAccumuloFromHFDSCommand( Agent agent )
     {
         return commandRunner.createCommand( new RequestBuilder( ". /etc/profile && hadoop dfs -rmr /accumulo" ),
                 Sets.newHashSet( agent ) );

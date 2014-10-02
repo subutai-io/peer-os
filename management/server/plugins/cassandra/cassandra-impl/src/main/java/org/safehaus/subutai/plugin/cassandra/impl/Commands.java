@@ -13,9 +13,9 @@ import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.base.Preconditions;
@@ -26,10 +26,10 @@ public class Commands
 {
 
     public static final String PACKAGE_NAME = "ksks-cassandra";
-    private final CommandRunner commandRunner;
+    private final CommandRunnerBase commandRunner;
 
 
-    public Commands( CommandRunner commandRunner )
+    public Commands( CommandRunnerBase commandRunner )
     {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
 

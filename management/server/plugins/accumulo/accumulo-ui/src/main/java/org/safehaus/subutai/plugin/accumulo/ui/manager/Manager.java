@@ -49,7 +49,6 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.Window;
 
 
@@ -106,8 +105,6 @@ public class Manager
         this.tracker = serviceLocator.getService( Tracker.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
         this.commandRunner = serviceLocator.getService( CommandRunner.class );
-        AgentManager agentManager = serviceLocator.getService( AgentManager.class );
-        CommandRunner commandRunner = serviceLocator.getService( CommandRunner.class );
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );

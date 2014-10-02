@@ -8,8 +8,8 @@ package org.safehaus.subutai.core.configuration.impl.command;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.base.Preconditions;
@@ -21,10 +21,10 @@ import com.google.common.collect.Sets;
  */
 public class Commands
 {
-    private final CommandRunner commandRunner;
+    private final CommandRunnerBase commandRunner;
 
 
-    public Commands( final CommandRunner commandRunner )
+    public Commands( final CommandRunnerBase commandRunner )
     {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
 
