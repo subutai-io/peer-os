@@ -116,4 +116,11 @@ public interface ContainerManager
      * Removes container event listener
      */
     public void removeListener( ContainerEventListener listener );
+
+    /**
+     * Returns the templates list
+     *
+     * @return
+     */
+    public List<String> getTemplates();
 }

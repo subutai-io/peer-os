@@ -55,7 +55,7 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class Cloner extends VerticalLayout implements AgentExecutionListener
 {
     private static final Logger LOG = Logger.getLogger( Cloner.class.getName() );
@@ -65,6 +65,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
     private final TextField textFieldLxcName;
     private final Slider slider;
     private final ComboBox strategy;
+    private final ComboBox template;
     private final Label indicator;
     private final TreeTable lxcTable;
     private final GridLayout topContent;
@@ -174,8 +175,15 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         criteriaLayout = new HorizontalLayout();
         criteriaLayout.setVisible( false );
 
-        topContent = new GridLayout( 7, 2 );
+        topContent = new GridLayout( 9, 2 );
         topContent.setSpacing( true );
+
+        template = new ComboBox( null, containerManager.getTemplates() );
+        template.setWidth( 200, Unit.PIXELS );
+        template.setImmediate( true );
+        template.setTextInputAllowed( false );
+        template.setNullSelectionAllowed( false );
+
         strategy = new ComboBox( null, container );
         strategy.setItemCaptionPropertyId( "title" );
         strategy.setWidth( 200, Unit.PIXELS );
@@ -226,6 +234,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
 
         topContent.addComponent( new Label( "Product name" ) );
         topContent.addComponent( textFieldLxcName );
+        topContent.addComponent( new Label( "Template" ) );
+        topContent.addComponent( template );
         topContent.addComponent( new Label( "Containers count" ) );
         topContent.addComponent( slider );
         topContent.addComponent( cloneBtn );
@@ -346,7 +356,6 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         populateLxcTable( agentFamilies );
         countProcessed = new AtomicInteger( ( int ) ( count ) );
         errorProcessed = new AtomicInteger( 0 );
-        //TODO: set UUID on cloning from UI
         UUID envId = UUID.randomUUID();
         for ( final Map.Entry<Agent, List<String>> agent : agentFamilies.entrySet() )
         {
@@ -354,7 +363,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
             agentExecutor.addListener( this );
             ExecutorService executor = Executors.newFixedThreadPool( 1 );
             agentExecutor.execute( executor,
-                    new CloneCommandFactory( containerManager, envId, agent.getKey().getHostname(), "master" ) );
+                    new CloneCommandFactory( containerManager, envId, agent.getKey().getHostname(),
+                            ( String ) template.getValue() ) );
             executor.shutdown();
         }
     }
