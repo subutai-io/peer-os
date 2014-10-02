@@ -291,14 +291,8 @@ public abstract class AbstractCommand implements Command
                 }
                 if ( getRequestsCompleted() == getRequestsCount() )
                 {
-                    if ( getRequestsCompleted() == getRequestsSucceeded() )
-                    {
-                        setCommandStatus( CommandStatus.SUCCEEDED );
-                    }
-                    else
-                    {
-                        setCommandStatus( CommandStatus.FAILED );
-                    }
+                    setCommandStatus( getRequestsCompleted() == getRequestsSucceeded() ? CommandStatus.SUCCEEDED :
+                                      CommandStatus.FAILED );
                 }
             }
         }
