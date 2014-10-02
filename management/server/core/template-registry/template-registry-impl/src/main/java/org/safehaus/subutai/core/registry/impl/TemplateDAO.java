@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -88,7 +90,7 @@ public class TemplateDAO
      *
      * @return {@code List<Template>}
      */
-    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) throws DBException
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch ) throws DBException
     {
         if ( parentTemplateName != null && lxcArch != null )
         {
@@ -102,8 +104,8 @@ public class TemplateDAO
             }
             catch ( JsonSyntaxException ex )
             {
-                LOG.error( "Error in geChildTemplates", ex );
-                throw new DBException( String.format( "Error in geChildTemplates %s", ex ) );
+                LOG.error( "Error in getChildTemplates", ex );
+                throw new DBException( String.format( "Error in getChildTemplates %s", ex ) );
             }
         }
         return Collections.emptyList();
@@ -126,7 +128,6 @@ public class TemplateDAO
             {
                 ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where template = ?",
                         String.format( TEMPLATE_ARCH_FORMAT, templateName.toLowerCase(), lxcArch.toLowerCase() ) );
-
                 List<Template> list = getTemplatesFromResultSet( rs );
                 if ( !list.isEmpty() )
                 {
@@ -150,13 +151,15 @@ public class TemplateDAO
      */
     public void saveTemplate( Template template ) throws DBException
     {
-
+        Type templateType = new TypeToken<Template>()
+        {
+        }.getType();
         dbManager.executeUpdate2( "insert into template_registry_info(template, parent, info) values(?,?,?)",
                 String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
                         template.getLxcArch().toLowerCase() ),
                 Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
                 String.format( TEMPLATE_ARCH_FORMAT, template.getParentTemplateName().toLowerCase(),
-                        template.getLxcArch().toLowerCase() ), GSON.toJson( template ) );
+                        template.getLxcArch().toLowerCase() ), GSON.toJson( template, templateType ) );
     }
 
 

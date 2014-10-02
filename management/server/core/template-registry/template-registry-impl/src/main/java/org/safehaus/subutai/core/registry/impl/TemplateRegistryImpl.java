@@ -291,7 +291,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
         //retrieve template from storage
-
         try
         {
             return templateDAO.getTemplateByName( templateName, lxcArch );
@@ -335,7 +334,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         //retrieve child templates from storage
         try
         {
-            return templateDAO.geChildTemplates( parentTemplateName, lxcArch );
+            return templateDAO.getChildTemplates( parentTemplateName, lxcArch );
         }
         catch ( DBException e )
         {
