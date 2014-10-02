@@ -43,11 +43,10 @@ public class HBaseClusterConfig implements ConfigBase
     }
 
 
-    public static String getProductKey()
-    {
+    @Override
+    public String getProductKey() {
         return PRODUCT_KEY;
     }
-
 
     public SetupType getSetupType()
     {

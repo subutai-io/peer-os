@@ -89,6 +89,11 @@ public class ZookeeperClusterConfig implements ConfigBase
         return PRODUCT_NAME;
     }
 
+    @Override
+    public String getProductKey() {
+        return PRODUCT_KEY;
+    }
+
 
     public int getNumberOfNodes()
     {
