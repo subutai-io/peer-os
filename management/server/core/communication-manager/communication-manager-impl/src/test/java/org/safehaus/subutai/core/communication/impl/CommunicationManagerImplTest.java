@@ -26,9 +26,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.communication.api.CommandJson;
-import org.slf4j.LoggerFactory;
 
 import com.jayway.awaitility.Awaitility;
 
@@ -42,7 +40,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class CommunicationManagerImplTest
 {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
 
     private CommunicationManagerImpl communicationManagerImpl = null;
     private static final String SERVICE_TOPIC = "SERVICE_TOPIC";
@@ -164,13 +161,45 @@ public class CommunicationManagerImplTest
 
 
     @Test
+    public void testHeartbeat() throws JMSException
+    {
+        //setup listener
+        final TestResponseListener responseListener = new TestResponseListener();
+        communicationManagerImpl.addListener( responseListener );
+
+
+        Connection connection = communicationManagerImpl.createConnection();
+        connection.start();
+        final Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+        Destination topic = session.createTopic( SERVICE_TOPIC );
+        final MessageProducer producer = session.createProducer( topic );
+
+        BytesMessage message = session.createBytesMessage();
+        message.writeBytes( CommandJson.getResponseCommandJson(
+                CommandJson.getResponseFromCommandJson( "{response:{type:HEARTBEAT_RESPONSE}}" ) ).getBytes() );
+        producer.send( message );
+
+        Awaitility.await().atMost( 2, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+                  .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
+        {
+
+            public Boolean call() throws Exception
+            {
+                responseListener.signal.acquire();
+                return true;
+            }
+        } );
+    }
+
+
+    @Test
     public void testBroadcastMessage() throws JMSException
     {
         UUID uuid = UUID.randomUUID();
         Request request = TestUtils.getRequestTemplate( uuid );
         //setup listener
 
-        MessageConsumer consumer = createConsumer( communicationManagerImpl.getAmqBroadcastTopic());
+        MessageConsumer consumer = createConsumer( communicationManagerImpl.getAmqBroadcastTopic() );
 
         communicationManagerImpl.sendBroadcastRequest( request );
 

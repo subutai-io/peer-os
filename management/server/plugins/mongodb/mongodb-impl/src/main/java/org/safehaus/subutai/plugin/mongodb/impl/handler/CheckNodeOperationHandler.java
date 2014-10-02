@@ -3,15 +3,14 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
-import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 
 
 /**
@@ -62,8 +61,8 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImp
             return;
         }
         po.addLog( "Checking node..." );
-        Command checkNodeCommand =
-                Commands.getCheckInstanceRunningCommand( node, config.getDomainName(), config.getNodePort( node ) );
+        Command checkNodeCommand = manager.getCommands().
+                getCheckInstanceRunningCommand( node, config.getDomainName(), config.getNodePort( node ) );
         manager.getCommandRunner().runCommand( checkNodeCommand );
 
         if ( checkNodeCommand.hasCompleted() )

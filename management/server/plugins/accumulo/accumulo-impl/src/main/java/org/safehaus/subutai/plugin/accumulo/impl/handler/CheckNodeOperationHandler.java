@@ -62,7 +62,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
             return;
         }
 
-        Command checkNodeCommand = Commands.getStatusCommand( node );
+        Command checkNodeCommand = manager.getCommands().getStatusCommand( node );
         manager.getCommandRunner().runCommand( checkNodeCommand );
 
         if ( checkNodeCommand.hasSucceeded() )

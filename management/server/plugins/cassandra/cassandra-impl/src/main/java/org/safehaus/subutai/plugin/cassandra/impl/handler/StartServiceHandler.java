@@ -7,7 +7,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
-import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 import com.google.common.collect.Sets;
 
@@ -52,7 +51,7 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        Command startCommand = Commands.getStartCommand( Sets.newHashSet( node ) );
+        Command startCommand = manager.getCommands().getStartCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( startCommand );
 
         if ( startCommand.hasSucceeded() )

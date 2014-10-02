@@ -1,11 +1,10 @@
 package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 import com.google.common.collect.Sets;
@@ -45,7 +44,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
         }
 
 
-        Command stopCommand = Commands.getStopCommand( Sets.newHashSet( master ) );
+        Command stopCommand = manager.getCommands().getStopCommand( Sets.newHashSet( master ) );
         manager.getCommandRunner().runCommand( stopCommand );
 
         if ( stopCommand.hasSucceeded() )

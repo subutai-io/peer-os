@@ -26,7 +26,7 @@ public class CommandsTest
     @Test
     public void testInstallCommand()
     {
-        Command command = Commands.getInstallCommand( null );
+        Command command = commands.getInstallCommand( null );
 
         assertNotNull( command );
         assertEquals( "apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription() );
@@ -36,7 +36,7 @@ public class CommandsTest
     @Test
     public void getStartCommand()
     {
-        Command command = Commands.getStartCommand( null );
+        Command command = commands.getStartCommand( null );
 
         assertNotNull( command );
         assertEquals( "service cassandra start", command.getDescription() );
@@ -46,7 +46,7 @@ public class CommandsTest
     @Test
     public void getStopCommand()
     {
-        Command command = Commands.getStopCommand( null );
+        Command command = commands.getStopCommand( null );
 
         assertNotNull( command );
         assertEquals( "service cassandra stop", command.getDescription() );

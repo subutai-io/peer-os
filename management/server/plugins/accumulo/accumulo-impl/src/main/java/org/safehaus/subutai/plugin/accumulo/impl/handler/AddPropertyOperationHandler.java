@@ -56,14 +56,14 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
         productOperation.addLog( "Adding property..." );
 
         Command addPropertyCommand =
-                Commands.getAddPropertyCommand( propertyName, propertyValue, accumuloClusterConfig.getAllNodes() );
+                manager.getCommands().getAddPropertyCommand( propertyName, propertyValue, accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( addPropertyCommand );
 
         if ( addPropertyCommand.hasSucceeded() )
         {
             productOperation.addLog( "Property added successfully\nRestarting cluster..." );
 
-            Command restartClusterCommand = Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
+            Command restartClusterCommand = manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {

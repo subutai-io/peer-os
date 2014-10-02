@@ -5,59 +5,72 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
+import com.google.common.base.Preconditions;
 
-public class Commands extends CommandsSingleton
+
+public class Commands
 {
+    private final CommandRunnerBase commandRunner;
 
-    public static Command getInstallCommand( Set<Agent> agents )
+
+    public Commands( final CommandRunnerBase commandRunner )
+    {
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+
+        this.commandRunner = commandRunner;
+    }
+
+
+    public Command getInstallCommand( Set<Agent> agents )
     {
 
-        return createCommand(
+        return commandRunner.createCommand(
                 new RequestBuilder( "sleep 10; apt-get --force-yes --assume-yes install ksks-elasticsearch" )
                         .withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
-    public static Command getUninstallCommand( Set<Agent> agents )
+    public Command getUninstallCommand( Set<Agent> agents )
     {
-        return createCommand( "Uninstall Mahout",
+        return commandRunner.createCommand( "Uninstall Mahout",
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-elasticsearch" ).withTimeout( 60 ),
                 agents );
     }
 
 
-    public static Command getConfigureCommand( Set<Agent> agents, String param )
+    public Command getConfigureCommand( Set<Agent> agents, String param )
     {
-        return createCommand( new RequestBuilder( String.format( " . /etc/profile && es-conf.sh %s ", param ) ),
-                agents );
+        return commandRunner
+                .createCommand( new RequestBuilder( String.format( " . /etc/profile && es-conf.sh %s ", param ) ),
+                        agents );
     }
 
 
-    public static Command getStatusCommand( Set<Agent> agents )
+    public Command getStatusCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service elasticsearch status" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service elasticsearch status" ), agents );
     }
 
 
-    public static Command getStartCommand( Set<Agent> agents )
+    public Command getStartCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service elasticsearch start" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service elasticsearch start" ), agents );
     }
 
 
-    public static Command getStopCommand( Set<Agent> agents )
+    public Command getStopCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service elasticsearch stop" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service elasticsearch stop" ), agents );
     }
 
 
-    public static Command getCheckInstalledCommand( Set<Agent> agents )
+    public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return createCommand( "Check installed ksks packages", new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ),
-                agents );
+        return commandRunner.createCommand( "Check installed ksks packages",
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
     }
 }

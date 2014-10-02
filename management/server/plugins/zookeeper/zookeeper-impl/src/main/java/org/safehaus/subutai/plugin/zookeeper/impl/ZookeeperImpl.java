@@ -52,6 +52,7 @@ public class ZookeeperImpl implements Zookeeper
     private final Hadoop hadoopManager;
     private ExecutorService executor;
     private PluginDAO pluginDAO;
+    private final Commands commands;
 
 
     public ZookeeperImpl( final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
@@ -75,7 +76,13 @@ public class ZookeeperImpl implements Zookeeper
         this.hadoopManager = hadoopManager;
         this.pluginDAO = new PluginDAO( dbManager );
 
-        Commands.init( commandRunner );
+        this.commands = new Commands( commandRunner );
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 

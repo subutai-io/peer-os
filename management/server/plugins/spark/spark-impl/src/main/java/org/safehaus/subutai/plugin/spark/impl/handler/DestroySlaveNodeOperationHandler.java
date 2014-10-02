@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 import com.google.common.collect.Sets;
@@ -71,14 +70,14 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) != null )
         {
 
-            Command clearSlavesCommand = Commands.getClearSlaveCommand( agent, config.getMasterNode() );
+            Command clearSlavesCommand = manager.getCommands().getClearSlaveCommand( agent, config.getMasterNode() );
             manager.getCommandRunner().runCommand( clearSlavesCommand );
 
             if ( clearSlavesCommand.hasSucceeded() )
             {
                 po.addLog( "Successfully unregistered slave from master\nRestarting master..." );
 
-                Command restartMasterCommand = Commands.getRestartMasterCommand( config.getMasterNode() );
+                Command restartMasterCommand = manager.getCommands().getRestartMasterCommand( config.getMasterNode() );
                 final AtomicBoolean ok = new AtomicBoolean();
                 manager.getCommandRunner().runCommand( restartMasterCommand, new CommandCallback()
                 {
@@ -121,7 +120,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         {
             po.addLog( "Uninstalling Spark..." );
 
-            Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+            Command uninstallCommand = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( uninstallCommand );
 
             if ( uninstallCommand.hasCompleted() )
@@ -154,7 +153,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         {
             po.addLog( "Stopping slave..." );
 
-            Command stopSlaveCommand = Commands.getStopSlaveCommand( agent );
+            Command stopSlaveCommand = manager.getCommands().getStopSlaveCommand( agent );
             manager.getCommandRunner().runCommand( stopSlaveCommand );
 
             if ( stopSlaveCommand.hasSucceeded() )

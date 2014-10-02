@@ -86,7 +86,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
 
         //check installed ksks packages
         Set<Agent> allNodes = config.getAllNodes();
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( allNodes );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -133,7 +133,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
         manager.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLog( "Cluster info saved to DB\nInstalling Spark..." );
         //install spark
-        Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
+        Command installCommand = manager.getCommands().getInstallCommand( config.getAllNodes() );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )

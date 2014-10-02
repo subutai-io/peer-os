@@ -62,8 +62,13 @@ public class OozieImpl extends OozieBase
         this.pluginDAO = new PluginDAO( dbManager );
         this.commands = new Commands( commandRunner );
 
-        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 

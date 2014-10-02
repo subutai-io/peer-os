@@ -52,14 +52,14 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
         productOperation.addLog( "Removing property..." );
 
         Command removePropertyCommand =
-                Commands.getRemovePropertyCommand( propertyName, accumuloClusterConfig.getAllNodes() );
+                manager.getCommands().getRemovePropertyCommand( propertyName, accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( removePropertyCommand );
 
         if ( removePropertyCommand.hasSucceeded() )
         {
             productOperation.addLog( "Property removed successfully\nRestarting cluster..." );
 
-            Command restartClusterCommand = Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
+            Command restartClusterCommand = manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {
