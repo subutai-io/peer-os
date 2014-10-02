@@ -837,22 +837,6 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- LXC Manager -->
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>lxc-manager-ui</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>lxc-manager-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>lxc-manager-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
 
                 <!-- Template Manager -->
                 <artifactItem>
@@ -910,22 +894,6 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Package Manager -->
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>package-manager-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>package-manager-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>package-manager-cli</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
 
                 <!-- Environment Manager -->
                 <artifactItem>

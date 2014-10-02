@@ -21,13 +21,11 @@
     <module>db-manager-ext</module>
     <module>strategy-manager</module>
     <module>container-manager</module>
-    <module>lxc-manager</module>
     <module>network-manager</module>
     <module>tracker</module>
     <module>monitoring</module>
     <module>command-runner</module>
     <module>git-manager</module>
-    <module>package-manager</module>
     <module>apt-repository-manager</module>
     <module>environment-manager</module>
     <module>template-registry</module>
