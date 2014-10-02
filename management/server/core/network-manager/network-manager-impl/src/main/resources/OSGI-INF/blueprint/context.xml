@@ -3,7 +3,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.core.network.impl.NetwokManagerImpl">
+  <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.core.network.impl.NetworkManagerImpl">
     <argument ref="commandRunner" />
   </bean>
 
