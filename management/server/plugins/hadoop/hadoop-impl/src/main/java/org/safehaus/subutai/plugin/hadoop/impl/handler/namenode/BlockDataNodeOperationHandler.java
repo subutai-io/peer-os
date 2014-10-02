@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class BlockDataNodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -49,28 +48,30 @@ public class BlockDataNodeOperationHandler extends AbstractOperationHandler<Hado
             return;
         }
 
-        Command removeCommand = Commands.getRemoveDataNodeCommand( hadoopClusterConfig, node );
+        Command removeCommand = manager.getCommands().getRemoveDataNodeCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( removeCommand );
         logCommand( removeCommand, productOperation );
 
-        Command includeCommand = Commands.getIncludeDataNodeCommand( hadoopClusterConfig, node );
+        Command includeCommand = manager.getCommands().getIncludeDataNodeCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( includeCommand );
         logCommand( includeCommand, productOperation );
 
-        Command refreshCommand = Commands.getRefreshNameNodeCommand( hadoopClusterConfig );
+        Command refreshCommand = manager.getCommands().getRefreshNameNodeCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshCommand );
         logCommand( refreshCommand, productOperation );
 
         hadoopClusterConfig.getBlockedAgents().add( node );
-        manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                hadoopClusterConfig );
+        manager.getPluginDAO()
+               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
         productOperation.addLogDone( "Cluster info saved to DB" );
     }
 
 
-    private void logCommand( Command command, ProductOperation po ) {
-        if ( command.hasSucceeded() ) {
-            po.addLog(String.format("Task's operation %s finished", command.getDescription()));
+    private void logCommand( Command command, ProductOperation po )
+    {
+        if ( command.hasSucceeded() )
+        {
+            po.addLog( String.format( "Task's operation %s finished", command.getDescription() ) );
         }
         else if ( command.hasCompleted() )
         {
