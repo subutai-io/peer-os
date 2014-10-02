@@ -15,6 +15,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Adds file(s) to commit
@@ -32,19 +34,35 @@ public class AddFiles extends OsgiCommandSupport
     String repoPath;
     @Argument(index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to add")
     Collection<String> files;
-    private AgentManager agentManager;
-    private GitManager gitManager;
+    private final GitManager gitManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public AddFiles( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
+    }
+
+
+    public void setRepoPath( final String repoPath )
+    {
+        this.repoPath = repoPath;
+    }
+
+
+    public void setFiles( final Collection<String> files )
+    {
+        this.files = files;
     }
 
 
@@ -52,14 +70,21 @@ public class AddFiles extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-            gitManager.add( agent, repoPath, new ArrayList<>( files ) );
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+                gitManager.add( agent, repoPath, new ArrayList<>( files ) );
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println( e.getMessage() );
+            }
         }
 
         return null;
