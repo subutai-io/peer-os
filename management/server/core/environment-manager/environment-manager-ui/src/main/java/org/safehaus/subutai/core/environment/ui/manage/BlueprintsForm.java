@@ -20,23 +20,19 @@ public class BlueprintsForm
     private static final String NO_BLUEPRINTS = "No blueprints found";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManagerPortalModule managerUI;
+    private EnvironmentManagerPortalModule module;
+    private Button environmentsButton;
 
-
-    public BlueprintsForm( EnvironmentManagerPortalModule managerUI )
+    public BlueprintsForm( EnvironmentManagerPortalModule module )
     {
-        this.managerUI = managerUI;
-
-
+        this.module = module;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
-
         environmentsTable = createTable( "Blueprints", 300 );
 
-        Button getEnvironmentsButton = new Button( "View" );
-
-        getEnvironmentsButton.addClickListener( new Button.ClickListener()
+        environmentsButton = new Button( "View" );
+        environmentsButton.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
@@ -45,7 +41,7 @@ public class BlueprintsForm
             }
         } );
 
-        contentRoot.addComponent( getEnvironmentsButton );
+        contentRoot.addComponent( environmentsButton );
         contentRoot.addComponent( environmentsTable );
     }
 
@@ -69,10 +65,10 @@ public class BlueprintsForm
     private void updateTableData()
     {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildTask> environmentBuildTasks = managerUI.getEnvironmentManager().getBlueprints();
-        if ( !environmentBuildTasks.isEmpty() )
+        List<EnvironmentBuildTask> tasks = module.getEnvironmentManager().getBlueprints();
+        if ( !tasks.isEmpty() )
         {
-            for ( final EnvironmentBuildTask environmentBuildTask : environmentBuildTasks )
+            for ( final EnvironmentBuildTask task : tasks )
             {
 
                 final Button viewButton = new Button( "View" );
@@ -82,38 +78,38 @@ public class BlueprintsForm
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         BlueprintDetails details = new BlueprintDetails( "Blueprint details" );
-                        details.setContent( environmentBuildTask.getEnvironmentBlueprint() );
+                        details.setContent( task.getEnvironmentBlueprint() );
                         contentRoot.getUI().addWindow( details );
                         details.setVisible( true );
                     }
                 } );
 
-                final Button buildEnvironmentButton = new Button( "Build" );
-                buildEnvironmentButton.addClickListener( new Button.ClickListener()
+                final Button buildButton = new Button( "Build" );
+                buildButton.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         EnvironmentBuildWizard environmentBuildWizard =
-                                new EnvironmentBuildWizard( "Wizard", managerUI, environmentBuildTask );
+                                new EnvironmentBuildWizard( "Wizard", module, task );
                         contentRoot.getUI().addWindow( environmentBuildWizard );
                         environmentBuildWizard.setVisible( true );
                     }
                 } );
 
-                final Button deleteBlueprintButton = new Button( "Delete" );
-                deleteBlueprintButton.addClickListener( new Button.ClickListener()
+                final Button deleteButton = new Button( "Delete" );
+                deleteButton.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        managerUI.getEnvironmentManager().deleteBlueprint( environmentBuildTask.getUuid().toString() );
+                        module.getEnvironmentManager().deleteBlueprint( task.getUuid().toString() );
+                        environmentsButton.click();
                     }
                 } );
 
                 environmentsTable.addItem( new Object[] {
-                        environmentBuildTask.getEnvironmentBlueprint().getName(), viewButton, buildEnvironmentButton,
-                        deleteBlueprintButton
+                        task.getEnvironmentBlueprint().getName(), viewButton, buildButton, deleteButton
                 }, null );
             }
         }

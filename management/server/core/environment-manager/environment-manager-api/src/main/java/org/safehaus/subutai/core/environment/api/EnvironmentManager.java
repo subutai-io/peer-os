@@ -27,7 +27,7 @@ public interface EnvironmentManager
     /**
      * Builds the environment with a given blueprint descriptor.
      */
-    boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask );
+//    boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask );
 
     //    public boolean buildEnvironment( EnvironmentBlueprint blueprint );
 

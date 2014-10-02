@@ -21,6 +21,26 @@ public abstract class PeerCommandMessage
     protected boolean success = false;
     protected boolean proccessed = false;
     protected String jsonResult;
+    protected long createTimestamp = System.currentTimeMillis();
+    protected long completeTimestamp;
+
+
+    public void setCompleteTimestamp( final long completeTimestamp )
+    {
+        this.completeTimestamp = completeTimestamp;
+    }
+
+
+    public long getCreateTimestamp()
+    {
+        return createTimestamp;
+    }
+
+
+    public long getCompleteTimestamp()
+    {
+        return completeTimestamp;
+    }
 
 
     private PeerCommandMessage()
