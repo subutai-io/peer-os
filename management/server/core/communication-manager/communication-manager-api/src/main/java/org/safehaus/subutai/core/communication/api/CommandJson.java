@@ -44,7 +44,7 @@ public class CommandJson
     {
 
         Command cmd = getCommandFromJson( json );
-        if ( cmd != null && cmd.getRequest() != null )
+        if ( cmd != null )
         {
             return cmd.getRequest();
         }
@@ -155,7 +155,7 @@ public class CommandJson
     {
 
         Command cmd = getCommandFromJson( json );
-        if ( cmd != null && cmd.getResponse() != null )
+        if ( cmd != null )
         {
             return cmd.getResponse();
         }

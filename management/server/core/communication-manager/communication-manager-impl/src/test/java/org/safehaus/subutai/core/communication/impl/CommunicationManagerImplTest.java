@@ -26,9 +26,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.communication.api.CommandJson;
-import org.slf4j.LoggerFactory;
 
 import com.jayway.awaitility.Awaitility;
 
@@ -42,7 +40,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class CommunicationManagerImplTest
 {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
 
     private CommunicationManagerImpl communicationManagerImpl = null;
     private static final String SERVICE_TOPIC = "SERVICE_TOPIC";
@@ -170,7 +167,7 @@ public class CommunicationManagerImplTest
         Request request = TestUtils.getRequestTemplate( uuid );
         //setup listener
 
-        MessageConsumer consumer = createConsumer( communicationManagerImpl.getAmqBroadcastTopic());
+        MessageConsumer consumer = createConsumer( communicationManagerImpl.getAmqBroadcastTopic() );
 
         communicationManagerImpl.sendBroadcastRequest( request );
 
