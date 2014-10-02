@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
- * Created by dilshat on 9/15/14.
+ * Base interface for Command Runner implementations
  */
 public interface CommandRunnerBase
 {
