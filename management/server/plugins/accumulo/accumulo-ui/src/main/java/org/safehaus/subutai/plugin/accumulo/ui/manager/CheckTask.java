@@ -15,9 +15,6 @@ import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public class CheckTask implements Runnable
 {
 

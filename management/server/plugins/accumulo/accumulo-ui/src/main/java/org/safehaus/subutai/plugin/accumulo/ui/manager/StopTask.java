@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.hbase.ui.manager;
+package org.safehaus.subutai.plugin.accumulo.ui.manager;
 
 
 import java.util.UUID;
@@ -6,26 +6,24 @@ import java.util.UUID;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 
 
-public class CheckTask implements Runnable
+public class StopTask implements Runnable
 {
 
-    private final String clusterName, lxcHostname;
+    private final String clusterName;
     private final CompleteEvent completeEvent;
-    private final HBase hbase;
+    private final Accumulo accumulo;
     private final Tracker tracker;
 
 
-    public CheckTask( final HBase hbase, final Tracker tracker, String clusterName, String lxcHostname,
-                      CompleteEvent completeEvent )
+    public StopTask( final Accumulo accumulo1, final Tracker tracker, String clusterName, CompleteEvent completeEvent )
     {
         this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
         this.completeEvent = completeEvent;
-        this.hbase = hbase;
+        this.accumulo = accumulo1;
         this.tracker = tracker;
     }
 
@@ -33,12 +31,14 @@ public class CheckTask implements Runnable
     @Override
     public void run()
     {
-        UUID trackID = hbase.checkNode( clusterName, lxcHostname );
+
+        UUID trackID = accumulo.stopCluster( clusterName );
 
         long start = System.currentTimeMillis();
+
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( HBaseClusterConfig.PRODUCT_KEY, trackID );
+            ProductOperationView po = tracker.getProductOperation( AccumuloClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != ProductOperationState.RUNNING )
@@ -55,8 +55,7 @@ public class CheckTask implements Runnable
             {
                 break;
             }
-
-            if ( System.currentTimeMillis() - start > 60 * 1000 )
+            if ( System.currentTimeMillis() - start > 120 * 1000 )
             {
                 break;
             }

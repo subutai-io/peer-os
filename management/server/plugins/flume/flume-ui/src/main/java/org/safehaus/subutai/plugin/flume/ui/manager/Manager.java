@@ -19,6 +19,8 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -32,6 +34,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
@@ -39,7 +42,16 @@ import com.vaadin.ui.Window;
 
 public class Manager
 {
-
+    protected static final String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
+    protected static final String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
+    protected static final String START_BUTTON_CAPTION = "Start";
+    protected static final String STOP_BUTTON_CAPTION = "Stop";
+    protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
+    protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
+    protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
+    protected static final String HOST_COLUMN_CAPTION = "Host";
+    protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String STYLE_NAME = "default";
     private final ExecutorService executorService;
     private final Flume flume;
     private final Tracker tracker;
@@ -49,6 +61,7 @@ public class Manager
     private ComboBox clusterCombo;
     private Table nodesTable;
     private FlumeConfig config;
+    private Hadoop hadoop;
 
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -59,6 +72,7 @@ public class Manager
         this.tracker = serviceLocator.getService( Tracker.class );
         this.commandRunner = serviceLocator.getService( CommandRunner.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
 
         contentRoot = new GridLayout();
         contentRoot.setColumns( 1 );
@@ -87,7 +101,7 @@ public class Manager
 
     private void getAddNodeButton( HorizontalLayout controlsContent )
     {
-        Button addNodeBtn = new Button( "Add Node" );
+        Button addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
         addNodeBtn.addStyleName( "default" );
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -96,25 +110,33 @@ public class Manager
             {
                 if ( config != null )
                 {
-                    Set<Agent> nodes = new HashSet<>( config.getHadoopNodes() );
-                    nodes.removeAll( config.getNodes() );
-                    if ( !nodes.isEmpty() )
+                    HadoopClusterConfig hadoopConfig = hadoop.getCluster( config.getHadoopClusterName() );
+                    if ( hadoopConfig != null )
                     {
-                        AddNodeWindow addNodeWindow =
-                                new AddNodeWindow( flume, executorService, tracker, config, nodes );
-                        contentRoot.getUI().addWindow( addNodeWindow );
-                        addNodeWindow.addCloseListener( new Window.CloseListener()
+                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        nodes.removeAll( config.getNodes() );
+                        if ( !nodes.isEmpty() )
                         {
-                            @Override
-                            public void windowClose( Window.CloseEvent closeEvent )
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( flume, executorService, tracker, config, nodes );
+                            contentRoot.getUI().addWindow( addNodeWindow );
+                            addNodeWindow.addCloseListener( new Window.CloseListener()
                             {
-                                refreshClustersInfo();
-                            }
-                        } );
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent )
+                                {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                        }
+                        else
+                        {
+                            show( "All nodes in corresponding Hadoop cluster have Lucene installed" );
+                        }
                     }
                     else
                     {
-                        show( "All nodes in corresponding Hadoop cluster have Flume installed" );
+                        show( "Hadoop cluster info not found" );
                     }
                 }
                 else
@@ -130,7 +152,7 @@ public class Manager
 
     private void getDestroyClusterButton( HorizontalLayout controlsContent )
     {
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -177,7 +199,7 @@ public class Manager
 
     private void getRefreshClusterButton( HorizontalLayout controlsContent )
     {
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        Button refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -232,18 +254,20 @@ public class Manager
 
         for ( final Agent agent : agents )
         {
-            final Button destroyBtn = new Button( "Destroy" );
-            destroyBtn.addStyleName( "default" );
-            final Button startBtn = new Button( "Start" );
-            startBtn.addStyleName( "default" );
-            final Button stopBtn = new Button( "Stop" );
-            stopBtn.addStyleName( "default" );
-            stopBtn.setEnabled( true );
-            startBtn.setEnabled( true );
+            final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            final Button startBtn = new Button( START_BUTTON_CAPTION );
+            final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
 
-            String ip = agent.getListIP() != null && !agent.getListIP().isEmpty() ? agent.getListIP().get( 0 ) : "";
+            enableButton( stopBtn, startBtn );
+
+            final HorizontalLayout availableOperations = new HorizontalLayout();
+            availableOperations.setSpacing( true );
+
+            addStyleName( startBtn, stopBtn, destroyBtn, availableOperations );
+            addGivenComponents( availableOperations, startBtn, stopBtn, destroyBtn );
+
             table.addItem( new Object[] {
-                    agent.getHostname(), ip, startBtn, stopBtn, destroyBtn
+                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
             }, null );
 
             startBtn.addClickListener( new Button.ClickListener()
@@ -251,9 +275,7 @@ public class Manager
                 @Override
                 public void buttonClick( Button.ClickEvent clickEvent )
                 {
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
+                    disableButton( startBtn, stopBtn, destroyBtn );
 
                     final UUID trackID = flume.startNode( config.getClusterName(), agent.getHostname() );
                     ProgressWindow window =
@@ -348,6 +370,42 @@ public class Manager
     }
 
 
+    private void addGivenComponents( Layout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
+
+    private void enableButton( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( true );
+        }
+    }
+
+
+    private void disableButton( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    private void addStyleName( Component... components )
+    {
+        for ( Component c : components )
+        {
+            c.addStyleName( STYLE_NAME );
+        }
+    }
+
+
     public void refreshClustersInfo()
     {
         List<FlumeConfig> clustersInfo = flume.getClusters();
@@ -389,16 +447,20 @@ public class Manager
     private Table createTableTemplate( String caption )
     {
         final Table table = new Table( caption );
-        table.addContainerProperty( "Host", String.class, null );
-        table.addContainerProperty( "IP address", String.class, null );
-        table.addContainerProperty( "Start", Button.class, null );
-        table.addContainerProperty( "Stop", Button.class, null );
-        table.addContainerProperty( "Destroy", Button.class, null );
+        table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
+        addClickListenerToTable( table );
+        return table;
+    }
 
+
+    private void addClickListenerToTable( final Table table )
+    {
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
             @Override
@@ -423,7 +485,6 @@ public class Manager
                 }
             }
         } );
-        return table;
     }
 
 

@@ -74,7 +74,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<LuceneIm
     private boolean uninstall( LuceneConfig config )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Presto..." );
+        po.addLog( "Uninstalling Lucene..." );
 
         Command cmd = Commands.getUninstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );

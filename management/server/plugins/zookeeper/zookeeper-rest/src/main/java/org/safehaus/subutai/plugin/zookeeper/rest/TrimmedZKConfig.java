@@ -11,9 +11,6 @@ import java.util.Set;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 
 
-/**
- * @author dilshat
- */
 public class TrimmedZKConfig
 {
 

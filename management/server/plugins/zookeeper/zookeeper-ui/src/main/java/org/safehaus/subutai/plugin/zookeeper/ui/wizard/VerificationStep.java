@@ -25,9 +25,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel
 {
 
