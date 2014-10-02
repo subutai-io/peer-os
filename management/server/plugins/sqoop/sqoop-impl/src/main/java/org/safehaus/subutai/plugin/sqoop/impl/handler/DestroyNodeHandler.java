@@ -46,6 +46,13 @@ public class DestroyNodeHandler extends AbstractHandler
             return;
         }
 
+        if ( config.getNodes().size() == 1 )
+        {
+            po.addLogFailed(
+                    "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            return;
+        }
+
         String s = CommandFactory.build( CommandType.PURGE, null );
         Command cmd = manager.getCommandRunner()
                              .createCommand( new RequestBuilder( s ), new HashSet<>( Arrays.asList( agent ) ) );
