@@ -18,9 +18,9 @@ import com.google.common.base.Preconditions;
 public class CommandExecutor
 {
 
-    final private AbstractCommand command;
-    final private ExecutorService executor;
-    final private CommandCallback callback;
+    private final AbstractCommand command;
+    private final ExecutorService executor;
+    private final CommandCallback callback;
 
 
     public CommandExecutor( AbstractCommand command, CommandCallback callback )
