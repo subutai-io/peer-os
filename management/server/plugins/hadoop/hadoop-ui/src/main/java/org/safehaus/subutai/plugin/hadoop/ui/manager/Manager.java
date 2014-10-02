@@ -5,15 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -27,8 +29,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
-
-import javax.naming.NamingException;
 
 
 public class Manager {
@@ -439,7 +439,7 @@ public class Manager {
             statusGroup.addComponent( statusDecommission );
         }
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(), cluster.getNodeRoles( agent ).toString(), statusGroup, availableOperations
+                agent.getHostname(), agent.getListIP().toString(), getNodeRoles( cluster, agent ).toString(), statusGroup, availableOperations
         }, null );
 
 
@@ -485,6 +485,25 @@ public class Manager {
             excludeIncludeNodeButton.addClickListener( managerListener.slaveNodeExcludeIncludeButtonListener( row ) );
             destroyButton.addClickListener( managerListener.slaveNodeDestroyButtonListener( row ) );
         }
+    }
+
+
+    private List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final Agent agent )
+    {
+        List<NodeType> nodeRoles = new ArrayList<>();
+
+        if ( clusterConfig.isNameNode( agent ) )
+            nodeRoles.add( NodeType.NAMENODE );
+        if ( clusterConfig.isSecondaryNameNode( agent ) )
+            nodeRoles.add( NodeType.SECONDARY_NAMENODE );
+        if ( clusterConfig.isJobTracker( agent ) )
+            nodeRoles.add( NodeType.JOBTRACKER );
+        if ( clusterConfig.isDataNode( agent ) )
+            nodeRoles.add( NodeType.DATANODE );
+        if ( clusterConfig.isTaskTracker( agent ) )
+            nodeRoles.add( NodeType.TASKTRACKER );
+
+        return nodeRoles;
     }
 
 

@@ -10,8 +10,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
-import com.google.common.base.Predicates;
-
 
 /**
  * Created by daralbaev on 02.04.14.
@@ -280,24 +278,6 @@ public class HadoopClusterConfig implements ConfigBase
             return true;
         else
             return false;
-    }
-
-
-    public List<NodeType> getNodeRoles( Agent agent) {
-        List<NodeType> nodeRoles = new ArrayList<>();
-
-        if ( isNameNode( agent ) )
-            nodeRoles.add( NodeType.NAMENODE );
-        if ( isSecondaryNameNode( agent ) )
-                    nodeRoles.add( NodeType.SECONDARY_NAMENODE );
-        if ( isJobTracker( agent ) )
-                    nodeRoles.add( NodeType.JOBTRACKER );
-        if ( isDataNode( agent ) )
-                    nodeRoles.add( NodeType.DATANODE );
-        if ( isTaskTracker( agent ) )
-                    nodeRoles.add( NodeType.TASKTRACKER );
-
-        return nodeRoles;
     }
 
 
