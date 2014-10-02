@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 
@@ -75,7 +74,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
         ProductOperation po = productOperation;
         po.addLog( "Uninstalling Spark..." );
 
-        Command cmd = Commands.getUninstallCommand( config.getAllNodes() );
+        Command cmd = manager.getCommands().getUninstallCommand( config.getAllNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

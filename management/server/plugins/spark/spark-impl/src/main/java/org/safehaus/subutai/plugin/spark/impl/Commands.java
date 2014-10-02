@@ -5,29 +5,29 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.collect.Sets;
 
 
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
     public static final String PACKAGE_NAME = "ksks-spark";
+    private final CommandRunnerBase commandRunnerBase;
 
 
-    public Commands( CommandRunner commandRunner )
+    public Commands( CommandRunnerBase commandRunnerBase )
     {
-        init( commandRunner );
+        this.commandRunnerBase = commandRunnerBase;
     }
 
 
-    public static Command getInstallCommand( Set<Agent> agents )
+    public Command getInstallCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 600 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
@@ -35,131 +35,132 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getUninstallCommand( Set<Agent> agents )
+    public Command getUninstallCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ),
                 agents );
     }
 
 
-    public static Command getCheckInstalledCommand( Set<Agent> agents )
+    public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+        return commandRunnerBase.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
     }
 
 
-    public static Command getStartAllCommand( Agent masterNode )
+    public Command getStartAllCommand( Agent masterNode )
     {
-        return createCommand( new RequestBuilder( "service spark-all start" ).withTimeout( 360 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-all start" ).withTimeout( 360 ),
                 Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getStopAllCommand( Agent masterNode )
+    public Command getStopAllCommand( Agent masterNode )
     {
-        return createCommand( new RequestBuilder( "service spark-all stop" ).withTimeout( 60 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-all stop" ).withTimeout( 60 ),
                 Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getStatusAllCommand( Agent agent )
+    public Command getStatusAllCommand( Agent agent )
     {
-        return createCommand( new RequestBuilder( "service spark-all status" ).withTimeout( 60 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-all status" ).withTimeout( 60 ),
                 Sets.newHashSet( agent ) );
     }
 
 
-    public static Command getStartMasterCommand( Agent masterNode )
+    public Command getStartMasterCommand( Agent masterNode )
     {
-        return createCommand( new RequestBuilder( "service spark-master start" ).withTimeout( 90 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-master start" ).withTimeout( 90 ),
                 Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getRestartMasterCommand( Agent masterNode )
+    public Command getRestartMasterCommand( Agent masterNode )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "service spark-master stop && service spark-master start" ).withTimeout( 60 ),
                 Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getRestartClusterCommand( Agent masterNode )
+    public Command getRestartClusterCommand( Agent masterNode )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "service spark-all stop && service spark-all start" ).withTimeout( 60 ),
                 Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getStopMasterCommand( Agent masterNode )
+    public Command getStopMasterCommand( Agent masterNode )
     {
-        return createCommand( new RequestBuilder( "service spark-master stop" ).withTimeout( 60 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-master stop" ).withTimeout( 60 ),
                 Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getStatusMasterCommand( Agent masterNode )
+    public Command getStatusMasterCommand( Agent masterNode )
     {
-        return createCommand( new RequestBuilder( "service spark-master status" ).withTimeout( 60 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-master status" ).withTimeout( 60 ),
                 Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getStartSlaveCommand( Agent slaveNode )
+    public Command getStartSlaveCommand( Agent slaveNode )
     {
-        return createCommand( new RequestBuilder( "service spark-slave start" ).withTimeout( 90 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-slave start" ).withTimeout( 90 ),
                 Sets.newHashSet( slaveNode ) );
     }
 
 
-    public static Command getStatusSlaveCommand( Agent slaveNode )
+    public Command getStatusSlaveCommand( Agent slaveNode )
     {
-        return createCommand( new RequestBuilder( "service spark-slave status" ).withTimeout( 90 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-slave status" ).withTimeout( 90 ),
                 Sets.newHashSet( slaveNode ) );
     }
 
 
-    public static Command getStopSlaveCommand( Agent slaveNode )
+    public Command getStopSlaveCommand( Agent slaveNode )
     {
-        return createCommand( new RequestBuilder( "service spark-slave stop" ).withTimeout( 60 ),
+        return commandRunnerBase.createCommand( new RequestBuilder( "service spark-slave stop" ).withTimeout( 60 ),
                 Sets.newHashSet( slaveNode ) );
     }
 
 
-    public static Command getSetMasterIPCommand( Agent masterNode, Set<Agent> agents )
+    public Command getSetMasterIPCommand( Agent masterNode, Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder(
+        return commandRunnerBase.createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && sparkMasterConf.sh clear ; sparkMasterConf.sh %s",
                         masterNode.getHostname() ) ).withTimeout( 60 ), agents );
     }
 
 
-    public static Command getClearSlavesCommand( Agent masterNode )
+    public Command getClearSlavesCommand( Agent masterNode )
     {
-        return createCommand( new RequestBuilder( ". /etc/profile && sparkSlaveConf.sh clear" ).withTimeout( 60 ),
-                Sets.newHashSet( masterNode ) );
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( ". /etc/profile && sparkSlaveConf.sh clear" ).withTimeout( 60 ),
+                        Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getClearSlaveCommand( Agent slave, Agent masterNode )
+    public Command getClearSlaveCommand( Agent slave, Agent masterNode )
     {
-        return createCommand( new RequestBuilder(
+        return commandRunnerBase.createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && sparkSlaveConf.sh clear %s", slave.getHostname() ) )
                 .withTimeout( 60 ), Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getAddSlaveCommand( Agent slave, Agent masterNode )
+    public Command getAddSlaveCommand( Agent slave, Agent masterNode )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( String.format( ". /etc/profile && sparkSlaveConf.sh %s", slave.getHostname() ) )
                         .withTimeout( 60 ), Sets.newHashSet( masterNode ) );
     }
 
 
-    public static Command getAddSlavesCommand( Set<Agent> slaveNodes, Agent masterNode )
+    public Command getAddSlavesCommand( Set<Agent> slaveNodes, Agent masterNode )
     {
         StringBuilder slaves = new StringBuilder();
         for ( Agent slaveNode : slaveNodes )
@@ -167,7 +168,7 @@ public class Commands extends CommandsSingleton
             slaves.append( slaveNode.getHostname() ).append( " " );
         }
 
-        return createCommand( new RequestBuilder(
+        return commandRunnerBase.createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && sparkSlaveConf.sh clear ; sparkSlaveConf.sh %s", slaves ) )
                 .withTimeout( 60 ), Sets.newHashSet( masterNode ) );
     }
