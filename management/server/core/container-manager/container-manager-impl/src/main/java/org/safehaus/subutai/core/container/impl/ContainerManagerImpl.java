@@ -325,6 +325,28 @@ public class ContainerManagerImpl extends ContainerManagerBase
         if ( !pAgents.isEmpty() )
         {
 
+            Command templateListCommand = Commands.getTemplateListCommand( pAgents );
+
+            commandRunner.runCommand( templateListCommand );
+
+            Map<UUID, Set<String>> agentTemplates = new HashMap<>();
+            if ( templateListCommand.hasCompleted() )
+            {
+
+                for ( AgentResult result : templateListCommand.getResults().values() )
+                {
+                    Set<String> templates = new HashSet<>();
+                    UUID agentUuid = result.getAgentUUID();
+                    String stdOut = result.getStdOut();
+                    String[] outLines = result.getStdOut().split( "\\n" );
+
+                    for ( int i = 2; i < outLines.length; i++ )
+                    {
+                        templates.add( outLines[i] );
+                    }
+                    agentTemplates.put( agentUuid, templates );
+                }
+            }
             Command getLxcListCommand = Commands.getLxcListCommand( pAgents );
             commandRunner.runCommand( getLxcListCommand );
 
@@ -345,8 +367,9 @@ public class ContainerManagerImpl extends ContainerManagerBase
                         if ( lxcProperties.length > 1 )
                         {
                             String lxcHostname = lxcProperties[0];
-                            if ( !( Common.BASE_CONTAINER_NAME.equalsIgnoreCase( lxcHostname )
-                                    || Common.MASTER_TEMPLATE_NAME.equalsIgnoreCase( lxcHostname ) ) )
+                            if (!agentTemplates.get(result.getAgentUUID()  ).contains( lxcHostname ))
+//                            if ( !( Common.BASE_CONTAINER_NAME.equalsIgnoreCase( lxcHostname )
+                            //                                    || Common.MASTER_TEMPLATE_NAME.equalsIgnoreCase( lxcHostname ) ) )
                             {
                                 String lxcStatus = lxcProperties[1];
 
