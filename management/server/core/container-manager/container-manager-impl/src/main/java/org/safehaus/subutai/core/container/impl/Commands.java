@@ -54,6 +54,12 @@ public class Commands extends CommandsSingleton
     }
 
 
+    public static Command getTemplateListCommand( Set<Agent> agents )
+    {
+        return createCommand( new RequestBuilder( "/usr/bin/subutai list -t" ).withTimeout( 60 ), agents );
+    }
+
+
     public static Command getLxcInfoCommand( Agent physicalAgent, String lxcHostName )
     {
         return createCommand(
