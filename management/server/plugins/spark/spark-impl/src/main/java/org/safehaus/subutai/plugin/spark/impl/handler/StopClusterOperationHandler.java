@@ -9,7 +9,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 
@@ -36,7 +35,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<SparkI
             return;
         }
 
-        Command stopCommand = Commands.getStopAllCommand( config.getMasterNode() );
+        Command stopCommand = manager.getCommands().getStopAllCommand( config.getMasterNode() );
         final AtomicBoolean ok = new AtomicBoolean();
         manager.getCommandRunner().runCommand( stopCommand, new CommandCallback()
         {

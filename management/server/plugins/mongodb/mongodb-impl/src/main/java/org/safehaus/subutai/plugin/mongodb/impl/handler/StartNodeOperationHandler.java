@@ -3,18 +3,17 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
-import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 
 import com.google.common.collect.Sets;
 
@@ -72,16 +71,20 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImp
 
         if ( nodeType == NodeType.CONFIG_NODE )
         {
-            startNodeCommand = Commands.getStartConfigServerCommand( config.getCfgSrvPort(), Sets.newHashSet( node ) );
+            startNodeCommand = manager.getCommands()
+                                      .getStartConfigServerCommand( config.getCfgSrvPort(), Sets.newHashSet( node ) );
         }
         else if ( nodeType == NodeType.DATA_NODE )
         {
-            startNodeCommand = Commands.getStartDataNodeCommand( config.getDataNodePort(), Sets.newHashSet( node ) );
+            startNodeCommand =
+                    manager.getCommands().getStartDataNodeCommand( config.getDataNodePort(), Sets.newHashSet( node ) );
         }
         else
         {
-            startNodeCommand = Commands.getStartRouterCommand( config.getRouterPort(), config.getCfgSrvPort(),
-                    config.getDomainName(), config.getConfigServers(), Sets.newHashSet( node ) );
+            startNodeCommand = manager.getCommands()
+                                      .getStartRouterCommand( config.getRouterPort(), config.getCfgSrvPort(),
+                                              config.getDomainName(), config.getConfigServers(),
+                                              Sets.newHashSet( node ) );
         }
         po.addLog( "Starting node..." );
         manager.getCommandRunner().runCommand( startNodeCommand, new CommandCallback()

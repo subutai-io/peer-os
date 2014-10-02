@@ -93,7 +93,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
         po.addLog( "Checking prerequisites..." );
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -118,7 +118,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
         if ( !skipInstall )
         {
             po.addLog( "Installing Lucene..." );
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+            Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )

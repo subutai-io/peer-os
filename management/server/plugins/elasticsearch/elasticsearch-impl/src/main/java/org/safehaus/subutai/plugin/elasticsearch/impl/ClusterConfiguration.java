@@ -29,8 +29,10 @@ public class ClusterConfiguration
 
         po.addLog( "Setting cluster name: " + elasticsearchClusterConfiguration.getClusterName() );
 
-        Command setClusterNameCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
-                "cluster.name " + elasticsearchClusterConfiguration.getClusterName() );
+        Command setClusterNameCommand = manager.getCommands()
+                                               .getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+                                                       "cluster.name " + elasticsearchClusterConfiguration
+                                                               .getClusterName() );
         manager.getCommandRunner().runCommand( setClusterNameCommand );
 
         if ( setClusterNameCommand.hasSucceeded() )
@@ -45,8 +47,9 @@ public class ClusterConfiguration
 
         // Setting master nodes
         po.addLog( "Setting master nodes..." );
-        Command setMasterNodesCommand =
-                Commands.getConfigureCommand( elasticsearchClusterConfiguration.getMasterNodes(), "node.master true" );
+        Command setMasterNodesCommand = manager.getCommands()
+                                               .getConfigureCommand( elasticsearchClusterConfiguration.getMasterNodes(),
+                                                       "node.master true" );
         manager.getCommandRunner().runCommand( setMasterNodesCommand );
 
         if ( setMasterNodesCommand.hasSucceeded() )
@@ -61,8 +64,9 @@ public class ClusterConfiguration
 
         // Setting data nodes
         po.addLog( "Setting data nodes..." );
-        Command dataNodesCommand =
-                Commands.getConfigureCommand( elasticsearchClusterConfiguration.getDataNodes(), "node.data true" );
+        Command dataNodesCommand = manager.getCommands()
+                                          .getConfigureCommand( elasticsearchClusterConfiguration.getDataNodes(),
+                                                  "node.data true" );
         manager.getCommandRunner().runCommand( dataNodesCommand );
 
         if ( dataNodesCommand.hasSucceeded() )
@@ -79,7 +83,7 @@ public class ClusterConfiguration
 
         po.addLog( "Setting number of shards..." );
 
-        Command shardsCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+        Command shardsCommand = manager.getCommands().getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
                 "index.number_of_shards " + elasticsearchClusterConfiguration.getNumberOfShards() );
         manager.getCommandRunner().runCommand( shardsCommand );
 
@@ -93,8 +97,10 @@ public class ClusterConfiguration
 
         po.addLog( "Setting number of replicas..." );
 
-        Command numberOfReplicasCommand = Commands.getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
-                "index.number_of_replicas " + elasticsearchClusterConfiguration.getNumberOfReplicas() );
+        Command numberOfReplicasCommand = manager.getCommands()
+                                                 .getConfigureCommand( elasticsearchClusterConfiguration.getNodes(),
+                                                         "index.number_of_replicas " + elasticsearchClusterConfiguration
+                                                                 .getNumberOfReplicas() );
         manager.getCommandRunner().runCommand( numberOfReplicasCommand );
 
         if ( !numberOfReplicasCommand.hasSucceeded() )

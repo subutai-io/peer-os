@@ -12,62 +12,74 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
 /**
  * Holds all mongo related commands
  */
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
-    public static Command getRegisterSecondaryNodeWithPrimaryCommand( Agent secondaryNodeAgent, int dataNodePort,
-                                                                      String domainName, Agent primaryNodeAgent )
+    private final CommandRunnerBase commandRunnerBase;
+
+
+    public Commands( final CommandRunnerBase commandRunnerBase )
+    {
+        Preconditions.checkNotNull( commandRunnerBase, "Command Runner is null" );
+
+        this.commandRunnerBase = commandRunnerBase;
+    }
+
+
+    public Command getRegisterSecondaryNodeWithPrimaryCommand( Agent secondaryNodeAgent, int dataNodePort,
+                                                               String domainName, Agent primaryNodeAgent )
     {
 
-        return createCommand( "Register node with replica", new RequestBuilder(
+        return commandRunnerBase.createCommand( "Register node with replica", new RequestBuilder(
                 String.format( "mongo --port %s --eval \"%s\"", dataNodePort,
                         "rs.add('" + secondaryNodeAgent.getHostname() + "." + domainName + ":" + dataNodePort
                                 + "');" ) ).withTimeout( 90 ), Sets.newHashSet( primaryNodeAgent ) );
     }
 
 
-    public static Command getUnregisterSecondaryNodeFromPrimaryCommand( Agent primaryNodeAgent, int dataNodePort,
-                                                                        Agent removeNode, String domainName )
+    public Command getUnregisterSecondaryNodeFromPrimaryCommand( Agent primaryNodeAgent, int dataNodePort,
+                                                                 Agent removeNode, String domainName )
     {
-        return createCommand( "Unregister node from replica", new RequestBuilder(
+        return commandRunnerBase.createCommand( "Unregister node from replica", new RequestBuilder(
                         String.format( "mongo --port %s --eval \"rs.remove('%s.%s:%s');\"", dataNodePort,
                                 removeNode.getHostname(), domainName, dataNodePort ) ).withTimeout( 30 ),
                 Sets.newHashSet( primaryNodeAgent ) );
     }
 
 
-    public static Command getCheckInstanceRunningCommand( Agent node, String domainName, int port )
+    public Command getCheckInstanceRunningCommand( Agent node, String domainName, int port )
     {
-        return createCommand( "Check node(s)", new RequestBuilder(
+        return commandRunnerBase.createCommand( "Check node(s)", new RequestBuilder(
                 String.format( "mongo --host %s.%s --port %s", node.getHostname(), domainName, port ) )
                 .withTimeout( Timeouts.CHECK_NODE_STATUS_TIMEOUT_SEC ), Sets.newHashSet( node ) );
     }
 
 
-    public static Command getStopNodeCommand( Set<Agent> nodes )
+    public Command getStopNodeCommand( Set<Agent> nodes )
     {
-        return createCommand( "Stop node(s)",
+        return commandRunnerBase.createCommand( "Stop node(s)",
                 new RequestBuilder( "/usr/bin/pkill -2 mongo" ).withTimeout( Timeouts.STOP_NODE_TIMEOUT_SEC ), nodes );
     }
 
 
-    public static List<Command> getInstallationCommands( MongoClusterConfig config )
+    public List<Command> getInstallationCommands( MongoClusterConfig config )
     {
         List<Command> commands = new ArrayList<>();
 
@@ -101,7 +113,7 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getAddIpHostToEtcHostsCommand( String domainName, Set<Agent> agents )
+    public Command getAddIpHostToEtcHostsCommand( String domainName, Set<Agent> agents )
     {
         Set<AgentRequestBuilder> requestBuilders = new HashSet<>();
 
@@ -139,30 +151,30 @@ public class Commands extends CommandsSingleton
                     .withTimeout( 30 ) );
         }
 
-        return createCommand( "Add ip-host pair to /etc/hosts", requestBuilders );
+        return commandRunnerBase.createCommand( "Add ip-host pair to /etc/hosts", requestBuilders );
     }
 
 
-    public static Command getSetReplicaSetNameCommand( String replicaSetName, Set<Agent> agents )
+    public Command getSetReplicaSetNameCommand( String replicaSetName, Set<Agent> agents )
     {
-        return createCommand( "Set replica set name", new RequestBuilder(
+        return commandRunnerBase.createCommand( "Set replica set name", new RequestBuilder(
                 String.format( "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'", replicaSetName,
                         Constants.DATA_NODE_CONF_FILE ) ).withTimeout( 30 ), agents );
     }
 
 
     // LIFECYCLE COMMANDS =======================================================
-    public static Command getStartConfigServerCommand( int cfgSrvPort, Set<Agent> configServers )
+    public Command getStartConfigServerCommand( int cfgSrvPort, Set<Agent> configServers )
     {
-        return createCommand( "Start config server(s)", new RequestBuilder( String.format(
+        return commandRunnerBase.createCommand( "Start config server(s)", new RequestBuilder( String.format(
                 "/bin/mkdir -p %s ; mongod --configsvr --dbpath %s --port %s --fork --logpath %s/mongodb.log",
                 Constants.CONFIG_DIR, Constants.CONFIG_DIR, cfgSrvPort, Constants.LOG_DIR ) )
                 .withTimeout( Timeouts.START_CONFIG_SERVER_TIMEOUT_SEC ), configServers );
     }
 
 
-    public static Command getStartRouterCommand( int routerPort, int cfgSrvPort, String domainName,
-                                                 Set<Agent> configServers, Set<Agent> routers )
+    public Command getStartRouterCommand( int routerPort, int cfgSrvPort, String domainName, Set<Agent> configServers,
+                                          Set<Agent> routers )
     {
 
         StringBuilder configServersArg = new StringBuilder();
@@ -177,24 +189,24 @@ public class Commands extends CommandsSingleton
             configServersArg.setLength( configServersArg.length() - 1 );
         }
 
-        return createCommand( "Start router(s)", new RequestBuilder(
+        return commandRunnerBase.createCommand( "Start router(s)", new RequestBuilder(
                 String.format( "mongos --configdb %s --port %s --fork --logpath %s/mongodb.log",
                         configServersArg.toString(), routerPort, Constants.LOG_DIR ) )
                 .withTimeout( Timeouts.START_ROUTER_TIMEOUT_SEC ), routers );
     }
 
 
-    public static Command getStartDataNodeCommand( int dataNodePort, Set<Agent> dataNodes )
+    public Command getStartDataNodeCommand( int dataNodePort, Set<Agent> dataNodes )
     {
-        return createCommand( "Start data node(s)", new RequestBuilder(
+        return commandRunnerBase.createCommand( "Start data node(s)", new RequestBuilder(
                 String.format( "mongod --config %s --port %s --fork --logpath %s/mongodb.log",
                         Constants.DATA_NODE_CONF_FILE, dataNodePort, Constants.LOG_DIR ) )
                 .withTimeout( Timeouts.START_DATE_NODE_TIMEOUT_SEC ), dataNodes );
     }
 
 
-    public static Command getRegisterSecondaryNodesWithPrimaryCommand( Set<Agent> dataNodes, int dataNodePort,
-                                                                       String domainName )
+    public Command getRegisterSecondaryNodesWithPrimaryCommand( Set<Agent> dataNodes, int dataNodePort,
+                                                                String domainName )
     {
 
         StringBuilder secondaryStr = new StringBuilder();
@@ -208,15 +220,15 @@ public class Commands extends CommandsSingleton
                                 append( ":" ).append( dataNodePort ).append( "');" );
         }
 
-        return createCommand( "Initiate replica set", new RequestBuilder( String.format(
+        return commandRunnerBase.createCommand( "Initiate replica set", new RequestBuilder( String.format(
                         "mongo --port %s --eval \"rs.initiate();\" ; sleep 30 ; mongo --port %s --eval \"%s\"",
                         dataNodePort, dataNodePort, secondaryStr.toString() ) ).withTimeout( 180 ),
                 Sets.newHashSet( primaryNodeAgent ) );
     }
 
 
-    public static Command getRegisterReplicaWithRouterCommand( Set<Agent> dataNodes, int routerPort, int dataNodePort,
-                                                               String domainName, String replicaSetName, Agent router )
+    public Command getRegisterReplicaWithRouterCommand( Set<Agent> dataNodes, int routerPort, int dataNodePort,
+                                                        String domainName, String replicaSetName, Agent router )
     {
         StringBuilder shard = new StringBuilder();
         for ( Agent agent : dataNodes )
@@ -226,13 +238,13 @@ public class Commands extends CommandsSingleton
                          append( ":" ).append( dataNodePort ).append( "');" );
         }
 
-        return createCommand( "Register replica with router", new RequestBuilder(
+        return commandRunnerBase.createCommand( "Register replica with router", new RequestBuilder(
                 String.format( "sleep 30 ; mongo --port %s --eval \"%s\"", routerPort, shard.toString() ) )
                 .withTimeout( 120 ), Sets.newHashSet( router ) );
     }
 
 
-    public static List<Command> getAddRouterCommands( MongoClusterConfig config, Agent newRouterAgent )
+    public List<Command> getAddRouterCommands( MongoClusterConfig config, Agent newRouterAgent )
     {
 
         List<Command> commands = new ArrayList<>();
@@ -254,7 +266,7 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static List<Command> getAddDataNodeCommands( MongoClusterConfig config, Agent newDataNodeAgent )
+    public List<Command> getAddDataNodeCommands( MongoClusterConfig config, Agent newDataNodeAgent )
     {
 
         List<Command> commands = new ArrayList<>();
@@ -280,9 +292,9 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getFindPrimaryNodeCommand( Agent secondaryNode, int dataNodePort )
+    public Command getFindPrimaryNodeCommand( Agent secondaryNode, int dataNodePort )
     {
-        return createCommand( "Find primary node",
+        return commandRunnerBase.createCommand( "Find primary node",
                 new RequestBuilder( String.format( "/bin/echo 'db.isMaster()' | mongo --port %s", dataNodePort ) )
                         .withTimeout( 30 ), Sets.newHashSet( secondaryNode ) );
     }

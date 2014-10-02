@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 
@@ -73,11 +72,11 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SparkImp
         Command startCommand;
         if ( master )
         {
-            startCommand = Commands.getStartMasterCommand( node );
+            startCommand = manager.getCommands().getStartMasterCommand( node );
         }
         else
         {
-            startCommand = Commands.getStartSlaveCommand( node );
+            startCommand = manager.getCommands().getStartSlaveCommand( node );
         }
 
         final AtomicBoolean ok = new AtomicBoolean();

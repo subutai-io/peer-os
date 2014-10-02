@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.SetupType;
-import org.safehaus.subutai.plugin.mahout.impl.Commands;
 import org.safehaus.subutai.plugin.mahout.impl.MahoutImpl;
 
 
@@ -75,7 +74,7 @@ public class UninstallHandler extends AbstractOperationHandler<MahoutImpl>
         ProductOperation po = productOperation;
         po.addLog( "Uninstalling Mahout..." );
 
-        Command cmd = Commands.getUninstallCommand( config.getNodes() );
+        Command cmd = manager.getCommands().getUninstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 
@@ -15,10 +15,10 @@ public class Commands
 
     public static final String PACKAGE_NAME = "ksks-shark";
 
-    private static CommandRunner commandRunner;
+    private static CommandRunnerBase commandRunner;
 
 
-    public static void init( CommandRunner commandRunner )
+    public static void init( CommandRunnerBase commandRunner )
     {
         Commands.commandRunner = commandRunner;
     }

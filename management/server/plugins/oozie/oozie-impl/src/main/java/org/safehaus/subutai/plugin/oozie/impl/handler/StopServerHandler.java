@@ -4,11 +4,10 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
-import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
@@ -52,7 +51,7 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                 }
                 Set<Agent> servers = new HashSet<Agent>();
                 servers.add( serverAgent );
-                Command stopServiceCommand = Commands.getStopServerCommand( servers );
+                Command stopServiceCommand = manager.getCommands().getStopServerCommand( servers );
                 manager.getCommandRunner().runCommand( stopServiceCommand );
 
                 if ( stopServiceCommand.hasSucceeded() )

@@ -154,7 +154,7 @@ public class HBaseImpl implements HBase
         this.pluginDAO = new PluginDAO( dbManager );
         this.commands = new Commands( commandRunner );
 
-        Commands.init( commandRunner );
+        commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
@@ -162,6 +162,12 @@ public class HBaseImpl implements HBase
     public void destroy()
     {
         executor.shutdown();
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 

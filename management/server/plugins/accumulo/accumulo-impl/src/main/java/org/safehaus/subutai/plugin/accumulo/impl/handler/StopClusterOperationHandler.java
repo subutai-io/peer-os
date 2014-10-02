@@ -52,7 +52,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
 
         productOperation.addLog( "Stopping cluster..." );
 
-        Command stopCommand = Commands.getStopCommand( accumuloClusterConfig.getMasterNode() );
+        Command stopCommand = manager.getCommands().getStopCommand( accumuloClusterConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( stopCommand );
 
         if ( stopCommand.hasSucceeded() )

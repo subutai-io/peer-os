@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 
@@ -32,7 +31,8 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Elast
             return;
         }
 
-        Command stopServiceCommand = Commands.getStartCommand( elasticsearchClusterConfiguration.getNodes() );
+        Command stopServiceCommand =
+                manager.getCommands().getStartCommand( elasticsearchClusterConfiguration.getNodes() );
         manager.getCommandRunner().runCommand( stopServiceCommand );
 
         if ( stopServiceCommand.hasSucceeded() )

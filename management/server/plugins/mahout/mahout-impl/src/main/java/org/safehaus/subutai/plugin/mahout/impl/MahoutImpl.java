@@ -80,12 +80,6 @@ public class MahoutImpl implements Mahout
     }
 
 
-    public void setCommands( final Commands commands )
-    {
-        this.commands = commands;
-    }
-
-
     public ExecutorService getExecutor()
     {
         return executor;
@@ -184,7 +178,6 @@ public class MahoutImpl implements Mahout
 
     public void init()
     {
-        Commands.init( commandRunner );
         this.pluginDAO = new PluginDAO( dbManager );
         this.commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();

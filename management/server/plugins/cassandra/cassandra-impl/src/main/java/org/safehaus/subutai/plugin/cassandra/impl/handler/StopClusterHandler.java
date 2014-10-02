@@ -5,7 +5,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
-import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 
 public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
@@ -34,7 +33,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        Command stopServiceCommand = Commands.getStopCommand( config.getNodes() );
+        Command stopServiceCommand = manager.getCommands().getStopCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( stopServiceCommand );
 
         if ( stopServiceCommand.hasSucceeded() )

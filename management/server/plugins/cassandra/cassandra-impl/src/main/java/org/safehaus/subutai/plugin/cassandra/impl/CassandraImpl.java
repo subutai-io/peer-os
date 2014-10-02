@@ -183,12 +183,17 @@ public class CassandraImpl implements Cassandra
     }
 
 
+    public Commands getCommands()
+    {
+        return commands;
+    }
+
+
     public void init()
     {
         this.pluginDAO = new PluginDAO( dbManager );
         this.commands = new Commands( commandRunner );
 
-        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
