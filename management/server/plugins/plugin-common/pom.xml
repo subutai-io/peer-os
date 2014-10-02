@@ -38,6 +38,11 @@
       <artifactId>lxc-manager-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-custom</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${com.google.guava.version}</version>
@@ -56,6 +61,16 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <version>${org.mockito.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hadoop-plugin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>oozie-plugin-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
