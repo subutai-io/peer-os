@@ -38,10 +38,38 @@ public class CommandsTest
     }
 
 
+    @Test( expected = NullPointerException.class )
+    public void constructorShouldFailOnNUllCommandRunner()
+    {
+        new Commands( null );
+    }
+
+
+    @Test
+    public void testCreateSSHCommand()
+    {
+
+        commands.getCreateSSHCommand( Lists.newArrayList( agent ) );
+
+
+        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySet() );
+    }
+
+
+    @Test
+    public void testReadSSHCommand()
+    {
+
+        commands.getReadSSHCommand( Lists.newArrayList( agent ) );
+
+
+        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySet() );
+    }
+
+
     @Test
     public void testWriteSSHCommand()
     {
-
 
         commands.getWriteSSHCommand( Lists.newArrayList( agent ), "" );
 
@@ -64,7 +92,6 @@ public class CommandsTest
     @Test
     public void testEtcHostsCommand()
     {
-
 
         commands.getAddIpHostToEtcHostsCommand( "intra.lan", Sets.newHashSet( agent ) );
 

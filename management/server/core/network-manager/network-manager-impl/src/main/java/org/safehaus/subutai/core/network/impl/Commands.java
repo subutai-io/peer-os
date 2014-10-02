@@ -28,6 +28,7 @@ public class Commands
     public Commands( final CommandRunner commandRunner )
     {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+
         this.commandRunner = commandRunner;
     }
 
