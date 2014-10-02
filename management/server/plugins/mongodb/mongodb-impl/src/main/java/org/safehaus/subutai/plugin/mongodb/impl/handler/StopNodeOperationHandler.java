@@ -3,13 +3,12 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
-import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 
 import com.google.common.collect.Sets;
 
@@ -63,7 +62,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
         }
 
         po.addLog( "Stopping node..." );
-        Command stopNodeCommand = Commands.getStopNodeCommand( Sets.newHashSet( node ) );
+        Command stopNodeCommand = manager.getCommands().getStopNodeCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( stopNodeCommand );
 
         if ( stopNodeCommand.hasSucceeded() )

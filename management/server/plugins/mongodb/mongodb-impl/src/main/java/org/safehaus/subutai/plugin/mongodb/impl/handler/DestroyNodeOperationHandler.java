@@ -6,18 +6,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
-import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 
 import com.google.common.base.Strings;
 
@@ -93,16 +92,17 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             config.setNumberOfConfigServers( config.getNumberOfConfigServers() - 1 );
             //restart routers
             po.addLog( "Restarting routers..." );
-            Command stopRoutersCommand = Commands.getStopNodeCommand( config.getRouterServers() );
+            Command stopRoutersCommand = manager.getCommands().getStopNodeCommand( config.getRouterServers() );
             manager.getCommandRunner().runCommand( stopRoutersCommand );
             //don't check status of this command since it always ends with execute_timeouted
             if ( stopRoutersCommand.hasCompleted() )
             {
                 final AtomicInteger okCount = new AtomicInteger();
-                manager.getCommandRunner().runCommand(
-                        Commands.getStartRouterCommand( config.getRouterPort(), config.getCfgSrvPort(),
-                                config.getDomainName(), config.getConfigServers(), config.getRouterServers() ),
-                        new CommandCallback()
+                manager.getCommandRunner().runCommand( manager.getCommands()
+                                                              .getStartRouterCommand( config.getRouterPort(),
+                                                                      config.getCfgSrvPort(), config.getDomainName(),
+                                                                      config.getConfigServers(),
+                                                                      config.getRouterServers() ), new CommandCallback()
                         {
 
                             @Override
@@ -136,7 +136,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             config.setNumberOfDataNodes( config.getNumberOfDataNodes() - 1 );
             //unregister from primary
             po.addLog( "Unregistering this node from replica set..." );
-            Command findPrimaryNodeCommand = Commands.getFindPrimaryNodeCommand( agent, config.getDataNodePort() );
+            Command findPrimaryNodeCommand =
+                    manager.getCommands().getFindPrimaryNodeCommand( agent, config.getDataNodePort() );
             manager.getCommandRunner().runCommand( findPrimaryNodeCommand );
 
             if ( findPrimaryNodeCommand.hasCompleted() && !findPrimaryNodeCommand.getResults().isEmpty() )
@@ -157,9 +158,12 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
                 {
                     if ( primaryNodeAgent != agent )
                     {
-                        Command unregisterSecondaryNodeFromPrimaryCommand =
-                                Commands.getUnregisterSecondaryNodeFromPrimaryCommand( primaryNodeAgent,
-                                        config.getDataNodePort(), agent, config.getDomainName() );
+                        Command unregisterSecondaryNodeFromPrimaryCommand = manager.getCommands()
+                                                                                   .getUnregisterSecondaryNodeFromPrimaryCommand(
+                                                                                           primaryNodeAgent,
+                                                                                           config.getDataNodePort(),
+                                                                                           agent,
+                                                                                           config.getDomainName() );
 
                         manager.getCommandRunner().runCommand( unregisterSecondaryNodeFromPrimaryCommand );
                         if ( !unregisterSecondaryNodeFromPrimaryCommand.hasCompleted() )
