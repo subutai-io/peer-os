@@ -6,7 +6,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
 import com.google.common.collect.Sets;
@@ -51,7 +50,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
             return;
         }
 
-        Command checkNodeCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
+        Command checkNodeCommand = manager.getCommands().getStatusCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( checkNodeCommand );
         if ( checkNodeCommand.hasCompleted() )
         {
