@@ -91,7 +91,7 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         po.addLog( "Checking prerequisites..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( accumuloClusterConfig.getAllNodes() );
+        Command checkInstalledCommand = accumuloManager.getCommands().getCheckInstalledCommand( accumuloClusterConfig.getAllNodes() );
         accumuloManager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -119,7 +119,7 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         po.addLog( "Installing Accumulo..." );
 
         //install
-        Command installCommand = Commands.getInstallCommand( accumuloClusterConfig.getAllNodes() );
+        Command installCommand = accumuloManager.getCommands().getInstallCommand( accumuloClusterConfig.getAllNodes() );
         accumuloManager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )

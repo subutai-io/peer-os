@@ -73,7 +73,7 @@ public class AccumuloImpl implements Accumulo
         this.pluginDAO = new PluginDAO( dbManager );
         this.commands = new Commands( commandRunner );
 
-        Commands.init( commandRunner );
+        commands = new Commands( commandRunner );
     }
 
 
