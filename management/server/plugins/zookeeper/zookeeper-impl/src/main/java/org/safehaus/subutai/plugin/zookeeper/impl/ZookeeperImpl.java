@@ -148,12 +148,8 @@ public class ZookeeperImpl implements Zookeeper
     public UUID uninstallCluster( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-
-
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 

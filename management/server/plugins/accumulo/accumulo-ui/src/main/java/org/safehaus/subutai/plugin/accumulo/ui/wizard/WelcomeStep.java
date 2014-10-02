@@ -49,11 +49,11 @@ public class WelcomeStep extends Panel
 
         Button startOverHadoopNZK = new Button( "Start over Hadoop & ZK installation" );
         startOverHadoopNZK.addStyleName( "default" );
-        grid.addComponent( startOverHadoopNZK, 7, 4, 7, 4 );
+        grid.addComponent( startOverHadoopNZK, 4, 4, 4, 4 );
         grid.setComponentAlignment( startOverHadoopNZK, Alignment.BOTTOM_RIGHT );
         Button startWithHadoopNZK = new Button( "Start with Hadoop & ZK installation" );
         startWithHadoopNZK.addStyleName( "default" );
-        grid.addComponent( startWithHadoopNZK, 8, 4, 8, 4 );
+        grid.addComponent( startWithHadoopNZK, 5, 4, 5, 4 );
         grid.setComponentAlignment( startWithHadoopNZK, Alignment.BOTTOM_RIGHT );
 
         startOverHadoopNZK.addClickListener( new Button.ClickListener()

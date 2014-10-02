@@ -48,7 +48,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
     public void run()
     {
         //check of node type is allowed for removal
-        if ( !( nodeType == NodeType.TRACER || nodeType.isSlave() ) )
+        if ( !( nodeType == NodeType.Tracer || nodeType.isSlave() ) )
         {
             productOperation.addLogFailed( "Only tracer or slave node can be destroyed" );
             return;
@@ -87,7 +87,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
         }
 
         //check if node is the last node of its role
-        if ( nodeType == NodeType.TRACER )
+        if ( nodeType == NodeType.Tracer )
         {
             if ( accumuloClusterConfig.getTracers().size() == 1 )
             {

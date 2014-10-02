@@ -143,6 +143,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             SetupHelper helper = new SetupHelper( manager, config, po );
             helper.configureMasterIP( config.getSlaveNodes() );
             helper.registerSlaves();
+            helper.startCluster();
         }
         else
         {

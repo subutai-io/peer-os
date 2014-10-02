@@ -621,7 +621,7 @@ public class Manager
             }, null );
 
 
-            addClickListenerToCheckButton( agent, resultHolder, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToSlaveCheckButton( agent, resultHolder, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToStartButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToStopButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToDestroyButton( agent, destroyBtn );
@@ -649,13 +649,59 @@ public class Manager
                 availableOperations
         }, null );
 
-        addClickListenerToCheckButton( master, resultHolder, checkBtn, startBtn, stopBtn );
+        addClickListenerToMasterCheckButton( master, resultHolder, checkBtn, startBtn, stopBtn );
         addClickListenerToStartButton( master, checkBtn, startBtn, stopBtn );
         addClickListenerToStopButton( master, checkBtn, startBtn, stopBtn );
     }
 
 
-    public void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button... buttons )
+    public void addClickListenerToSlaveCheckButton( final Agent agent, final Label resultHolder, final Button... buttons )
+    {
+        getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                progressIcon.setVisible( true );
+                disableButtons( buttons );
+
+                executor.execute( new CheckTaskSlave( spark, tracker, config.getClusterName(), agent.getHostname(),
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( progressIcon )
+                                {
+                                    resultHolder.setValue( result );
+                                    if ( result.contains( "NOT" ) )
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                    }
+                                    else
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    progressIcon.setVisible( false );
+                                    for ( Button b : buttons )
+                                    {
+                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption().equals(
+                                                DESTROY_BUTTON_CAPTION ) )
+                                        {
+                                            enableButtons( b );
+                                        }
+                                    }
+                                }
+                            }
+                        } ) );
+            }
+        } );
+    }
+
+    public void addClickListenerToMasterCheckButton( final Agent agent, final Label resultHolder,
+                                                     final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -699,6 +745,7 @@ public class Manager
             }
         } );
     }
+
 
 
     public void addClickListenerToStartButton( final Agent agent, final Button... buttons )

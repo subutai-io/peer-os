@@ -33,9 +33,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 
 
-/**
- * @author dilshat
- */
 public class ConfigurationStep extends Panel
 {
 
@@ -44,9 +41,6 @@ public class ConfigurationStep extends Panel
 
         if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE )
         {
-
-            //Standalone cluster installation controls
-
             GridLayout standaloneInstallationControls = new GridLayout( 1, 5 );
             standaloneInstallationControls.setSizeFull();
             standaloneInstallationControls.setSpacing( true );
@@ -129,9 +123,6 @@ public class ConfigurationStep extends Panel
         }
         else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP )
         {
-
-            //Over Hadoop cluster installation controls
-
             GridLayout overHadoopInstallationControls = new GridLayout( 1, 5 );
             overHadoopInstallationControls.setSizeFull();
             overHadoopInstallationControls.setSpacing( true );
@@ -169,7 +160,11 @@ public class ConfigurationStep extends Panel
                 }
             }
 
-            HadoopClusterConfig info = hadoop.getCluster( wizard.getConfig().getHadoopClusterName() );
+            HadoopClusterConfig info = null;
+            if ( wizard.getConfig().getHadoopClusterName() != null )
+            {
+                info = hadoop.getCluster( wizard.getConfig().getHadoopClusterName() );
+            }
 
             if ( info != null )
             {

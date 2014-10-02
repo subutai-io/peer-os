@@ -105,7 +105,7 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
             }
         }
 
-        po.addLog( String.format( "Installing Zookeeper on %s...", zookeeperClusterConfig.getNodes() ) );
+        po.addLog( String.format( "Installing Zookeeper..." ) );
 
         //install
         Command installCommand = Commands.getInstallCommand( zookeeperClusterConfig.getNodes() );
