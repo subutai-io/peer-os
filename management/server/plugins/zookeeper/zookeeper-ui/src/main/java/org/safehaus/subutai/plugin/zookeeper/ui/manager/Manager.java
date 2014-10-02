@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 
@@ -349,19 +348,18 @@ public class Manager
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
-                            new CompleteEvent()
+                    new StartTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    {
+                        @Override
+                        public void onComplete( String result )
+                        {
+                            synchronized ( PROGRESS_ICON )
                             {
-                                @Override
-                                public void onComplete( String result )
-                                {
-                                    synchronized ( PROGRESS_ICON )
-                                    {
-                                        disableOREnableAllButtonsOnTable( nodesTable, true );
-                                        checkNodesStatus();
-                                    }
-                                }
-                            } ) );
+                                disableOREnableAllButtonsOnTable( nodesTable, true );
+                                checkNodesStatus();
+                            }
+                        }
+                    } ) );
         }
     }
 
@@ -372,8 +370,8 @@ public class Manager
         {
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
-            executorService.execute( new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
-                    new CompleteEvent()
+            executorService.execute(
+                    new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
@@ -493,7 +491,7 @@ public class Manager
                     else if ( config.getSetupType() == SetupType.OVER_HADOOP
                             || config.getSetupType() == SetupType.WITH_HADOOP )
                     {
-                        HadoopClusterConfig info = hadoop.getCluster( config.getClusterName() );
+                        HadoopClusterConfig info = hadoop.getCluster( config.getHadoopClusterName() );
 
                         if ( info != null )
                         {
@@ -728,18 +726,18 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new StopTask( zookeeper, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            enableButtons( buttons );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    enableButtons( buttons );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }

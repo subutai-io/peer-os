@@ -13,9 +13,6 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public interface Accumulo extends ApiBase<AccumuloClusterConfig>
 {
 

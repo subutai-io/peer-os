@@ -15,9 +15,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public interface Zookeeper extends ApiBase<ZookeeperClusterConfig>
 {
 
