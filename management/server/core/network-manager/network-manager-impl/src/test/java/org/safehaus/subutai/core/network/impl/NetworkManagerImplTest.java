@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +32,8 @@ import static org.mockito.Mockito.when;
 public class NetworkManagerImplTest
 {
 
-
+    private static final String DOMAIN = "domain";
+    private static final String ERR_MSG = "oops";
     private CommandRunner commandRunner;
     private NetworkManagerImpl networkManager;
     private Command command;
@@ -55,6 +57,7 @@ public class NetworkManagerImplTest
         when( command.hasCompleted() ).thenReturn( true );
         when( command.getResults() ).thenReturn( results );
         when( commandRunner.createCommand( any( RequestBuilder.class ), anySet() ) ).thenReturn( command );
+        when( commandRunner.createCommand( anyString(), any( RequestBuilder.class ), anySet() ) ).thenReturn( command );
         networkManager = new NetworkManagerImpl( commandRunner );
     }
 
@@ -62,12 +65,13 @@ public class NetworkManagerImplTest
     @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullCommandRunner()
     {
+
         new NetworkManagerImpl( null );
     }
 
 
     @Test
-    public void shouldReturnSshManager()
+    public void shouldSucceedSsh()
     {
 
         boolean result = networkManager.configSshOnAgents( Lists.newArrayList( agent1 ) );
@@ -77,7 +81,7 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void shouldReturnSshManager2()
+    public void shouldSucceedSsh2()
     {
 
         boolean result = networkManager.configSshOnAgents( Lists.newArrayList( agent1 ), agent2 );
@@ -99,14 +103,45 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void shouldFailOnCommandException() throws CommandException
+    public void shouldFailOnCommandExceptionSsh() throws CommandException
     {
 
-        Mockito.doThrow( new CommandException( "OOPS" ) ).when( command ).execute();
+        Mockito.doThrow( new CommandException( ERR_MSG ) ).when( command ).execute();
         boolean result = networkManager.configSshOnAgents( Lists.newArrayList( agent1 ) );
         boolean result2 = networkManager.configSshOnAgents( Lists.newArrayList( agent1 ), agent2 );
 
         assertFalse( result );
         assertFalse( result2 );
+    }
+
+
+    @Test
+    public void shouldSucceedHosts()
+    {
+
+        boolean result = networkManager.configHostsOnAgents( Lists.newArrayList( agent1 ), DOMAIN );
+
+        assertTrue( result );
+    }
+
+
+    @Test
+    public void shouldSucceedHosts2()
+    {
+
+        boolean result = networkManager.configHostsOnAgents( Lists.newArrayList( agent1 ), agent2, DOMAIN );
+
+        assertTrue( result );
+    }
+
+
+    @Test
+    public void shouldFailOnCommandExceptionHosts() throws CommandException
+    {
+        Mockito.doThrow( new CommandException( ERR_MSG ) ).when( command ).execute();
+
+        boolean result = networkManager.configHostsOnAgents( Lists.newArrayList( agent1 ), agent2, DOMAIN );
+
+        assertFalse( result );
     }
 }
