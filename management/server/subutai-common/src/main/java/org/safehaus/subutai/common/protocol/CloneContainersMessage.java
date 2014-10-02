@@ -1,9 +1,12 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -15,7 +18,7 @@ public class CloneContainersMessage extends PeerCommandMessage
     private int numberOfNodes;
     private String Strategy;
     private List<String> criteria;
-    private Set<Agent> agents;
+//    private Set<Agent> agents;
 
 
     public CloneContainersMessage( UUID envId, UUID peerId )
@@ -73,23 +76,11 @@ public class CloneContainersMessage extends PeerCommandMessage
 
 
     @Override
-    public void setResult( final Object result )
+    public Type getResultObjectType()
     {
-        if ( result instanceof Set )
+        return new TypeToken<Set<Agent>>()
         {
-            agents = ( Set<Agent> ) result;
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Result must be set of Agent." );
-        }
-    }
-
-
-    @Override
-    public Object getResult()
-    {
-        return agents;
+        }.getType();
     }
 
 
@@ -102,7 +93,6 @@ public class CloneContainersMessage extends PeerCommandMessage
                 ", numberOfNodes=" + numberOfNodes +
                 ", Strategy='" + Strategy + '\'' +
                 ", criteria=" + criteria +
-                ", agents=" + agents +
                 ", success=" + success +
                 '}';
     }

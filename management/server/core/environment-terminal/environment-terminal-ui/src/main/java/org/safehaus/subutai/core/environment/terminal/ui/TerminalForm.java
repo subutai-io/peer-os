@@ -37,7 +37,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     protected final TextField programTxtFld;
     protected final TextField timeoutTxtFld;
     protected final TextField workDirTxtFld;
-    protected final ComboBox requestTypeCombo;
+//    protected final ComboBox requestTypeCombo;
     protected final Label indicator;
     private final TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
@@ -84,15 +84,16 @@ public class TerminalForm extends CustomComponent implements Disposable
         timeoutTxtFld.setWidth( 30, Unit.PIXELS );
         controls.addComponent( timeoutLbl );
         controls.addComponent( timeoutTxtFld );
-        Label requestTypeLabel = new Label( "Req Type" );
+//        Label requestTypeLabel = new Label( "Req Type" );
         //        controls.addComponent( requestTypeLabel );
-        requestTypeCombo = new ComboBox( null,
-                Arrays.asList( RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST, RequestType.PS_REQUEST ) );
-        requestTypeCombo.setImmediate( true );
-        requestTypeCombo.setTextInputAllowed( false );
-        requestTypeCombo.setNullSelectionAllowed( false );
-        requestTypeCombo.setValue( RequestType.EXECUTE_REQUEST );
-        requestTypeCombo.setWidth( 150, Unit.PIXELS );
+//        requestTypeCombo = new ComboBox( null,
+        //                Arrays.asList( RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST,
+        // RequestType.PS_REQUEST ) );
+        //        requestTypeCombo.setImmediate( true );
+        //        requestTypeCombo.setTextInputAllowed( false );
+        //        requestTypeCombo.setNullSelectionAllowed( false );
+        //        requestTypeCombo.setValue( RequestType.EXECUTE_REQUEST );
+        //        requestTypeCombo.setWidth( 150, Unit.PIXELS );
         //        controls.addComponent( requestTypeCombo );
         Button clearBtn = new Button( "Clear" );
         controls.addComponent( clearBtn );
