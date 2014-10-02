@@ -4,13 +4,15 @@ package org.safehaus.subutai.core.network.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
@@ -29,6 +31,8 @@ public class SshManager
 
     public SshManager( Commands commands, List<Agent> agentList )
     {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agentList ), "Agent list is empty" );
+
         this.agentList = agentList;
         this.commands = commands;
     }
@@ -36,11 +40,8 @@ public class SshManager
 
     public boolean execute()
     {
-        if ( agentList != null && !agentList.isEmpty() )
-        {
-            return create() && read() && write() && config();
-        }
-        return false;
+
+        return create() && read() && write() && config();
     }
 
 
@@ -50,14 +51,13 @@ public class SshManager
         try
         {
             command.execute();
+            return command.hasSucceeded();
         }
         catch ( CommandException e )
         {
             LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
-            return false;
         }
-
-        return command.hasSucceeded();
+        return false;
     }
 
 
@@ -67,28 +67,27 @@ public class SshManager
         try
         {
             command.execute();
+            StringBuilder value = new StringBuilder();
+            if ( command.hasCompleted() )
+            {
+                for ( Agent agent : agentList )
+                {
+                    AgentResult result = command.getResults().get( agent.getUuid() );
+                    if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
+                    {
+                        value.append( result.getStdOut() );
+                    }
+                }
+            }
+            keys = value.toString();
+
+            return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
         }
         catch ( CommandException e )
         {
             LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
-            return false;
         }
-
-        StringBuilder value = new StringBuilder();
-        if ( command.hasCompleted() )
-        {
-            for ( Agent agent : agentList )
-            {
-                AgentResult result = command.getResults().get( agent.getUuid() );
-                if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
-                {
-                    value.append( result.getStdOut() );
-                }
-            }
-        }
-        keys = value.toString();
-
-        return !Strings.isNullOrEmpty( keys ) && command.hasSucceeded();
+        return false;
     }
 
 
@@ -98,15 +97,13 @@ public class SshManager
         try
         {
             command.execute();
+            return command.hasSucceeded();
         }
         catch ( CommandException e )
         {
             LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
-            return false;
         }
-
-
-        return command.hasSucceeded();
+        return false;
     }
 
 
@@ -116,27 +113,26 @@ public class SshManager
         try
         {
             command.execute();
+            return command.hasSucceeded();
         }
         catch ( CommandException e )
         {
             LOG.error( String.format( "Error in config: %s", e.getMessage() ), e );
-            return false;
         }
-
-
-        return command.hasSucceeded();
+        return false;
     }
 
 
     public boolean execute( Agent agent )
     {
-        if ( agentList != null && !agentList.isEmpty() && agent != null && create( agent ) )
+        Preconditions.checkNotNull( agent, "Agent is null" );
+
+        if ( create( agent ) )
         {
             agentList.add( agent );
 
             return read() && write() && config();
         }
-
         return false;
     }
 
@@ -147,13 +143,12 @@ public class SshManager
         try
         {
             command.execute();
+            return command.hasSucceeded();
         }
         catch ( CommandException e )
         {
             LOG.error( String.format( "Error in write: %s", e.getMessage() ), e );
-            return false;
         }
-
-        return command.hasSucceeded();
+        return false;
     }
 }
