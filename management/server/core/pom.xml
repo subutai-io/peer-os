@@ -25,6 +25,7 @@
     <module>tracker</module>
     <module>monitoring</module>
     <module>command-runner</module>
+    <module>lxc-manager</module>
     <module>git-manager</module>
     <module>apt-repository-manager</module>
     <module>environment-manager</module>
