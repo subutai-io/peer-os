@@ -15,7 +15,6 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ClusterConfiguration;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperStandaloneSetupStrategy;
 
@@ -102,7 +101,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         }
 
 
-
         HadoopClusterConfig hadoopClusterConfig =
                 manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
 
@@ -123,7 +121,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         productOperation.addLog( "Checking prerequisites..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -152,7 +150,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         productOperation.addLog( String.format( "Installing %s...", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
         //install
-        Command installCommand = Commands.getInstallCommand( Sets.newHashSet( lxcAgent ) );
+        Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasCompleted() )
@@ -197,7 +195,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         productOperation.addLog( "Preparing for node addition..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
