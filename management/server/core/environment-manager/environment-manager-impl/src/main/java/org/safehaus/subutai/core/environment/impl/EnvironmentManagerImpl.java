@@ -88,7 +88,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void init()
     {
         this.environmentDAO = new EnvironmentDAO( dbManager );
-        environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager );
+        environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager, containerManager );
 
         //        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
@@ -190,7 +190,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
+    /*public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
     {
         LOG.info( "saved to " );
         //        return build( environmentBuildTask );
@@ -198,7 +198,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
         return true;
-    }
+    }*/
 
 
     @Override
@@ -206,7 +206,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throws EnvironmentBuildException
     {
 
-        return environmentBuilder.build( environmentBuildTask, containerManager );
+        return environmentBuilder.build( environmentBuildTask );
     }
 
 
@@ -302,6 +302,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = new Environment( process.getEnvironmentName() );
         int containerCount = 0;
+        long timeout = 1000 * 60;
         for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
         {
             CloneContainersMessage ccm = process.getMessageMap().get( key );
@@ -309,7 +310,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             containerCount = containerCount + ccm.getNumberOfNodes();
             try
             {
-                peerCommandDispatcher.invoke( ccm );
+                peerCommandDispatcher.invoke( ccm, timeout );
 
                 boolean result = ccm.isSuccess();
                 if ( result )
@@ -339,9 +340,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         if ( !environment.getContainers().isEmpty() )
         {
+            saveEnvironment( environment );
             if ( environment.getContainers().size() != containerCount )
             {
-                saveEnvironment( environment );
                 throw new EnvironmentBuildException( "Not all containers created" );
             }
         }

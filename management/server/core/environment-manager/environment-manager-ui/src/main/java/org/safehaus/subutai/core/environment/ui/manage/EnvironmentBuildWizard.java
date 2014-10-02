@@ -22,7 +22,6 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.Runo;
 
 
 /**
@@ -37,7 +36,6 @@ public class EnvironmentBuildWizard extends Window
     private Table containerToPeerTable;
     private EnvironmentManagerPortalModule managerUI;
     private Map<Object, NodeGroup> nodeGroupMap;
-    TabSheet sheet = new TabSheet();
 
 
     public EnvironmentBuildWizard( final String caption, EnvironmentManagerPortalModule managerUI,
@@ -77,12 +75,12 @@ public class EnvironmentBuildWizard extends Window
                 setContent( genContainerToPeersTable() );
                 break;
             }
-            case 3:
+            /*case 3:
             {
                 managerUI.getEnvironmentManager().buildEnvironment( environmentBuildTask );
                 close();
                 break;
-            }
+            }*/
             default:
             {
                 setContent( genPeersTable() );
@@ -104,7 +102,7 @@ public class EnvironmentBuildWizard extends Window
     }
 
 
-    public EnvironmentBuildTask getEnvironmentBuildTask()
+    /*public EnvironmentBuildTask getEnvironmentBuildTask()
     {
         return environmentBuildTask;
     }
@@ -113,7 +111,7 @@ public class EnvironmentBuildWizard extends Window
     public void setEnvironmentBuildTask( final EnvironmentBuildTask environmentBuildTask )
     {
         this.environmentBuildTask = environmentBuildTask;
-    }
+    }*/
 
 
     public void back()
@@ -220,8 +218,9 @@ public class EnvironmentBuildWizard extends Window
                 Map<Object, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
-                    managerUI.getEnvironmentManager()
-                             .saveBuildProcess( createEnvironmentBuildProcess( environmentBuildTask, topology ) );
+                    EnvironmentBuildProcess process = createEnvironmentBuildProcess( environmentBuildTask, topology );
+
+                    managerUI.getEnvironmentManager().saveBuildProcess( process );
                 }
                 else
                 {
