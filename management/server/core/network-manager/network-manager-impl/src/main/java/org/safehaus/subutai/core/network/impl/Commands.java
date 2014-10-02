@@ -45,7 +45,7 @@ public class Commands
     public Command getReadSSHCommand( List<Agent> agentList )
     {
         return commandRunner
-                .createCommand( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ), new HashSet<>( agentList ) );
+                .createCommand( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ), Sets.newHashSet( agentList ) );
     }
 
 
@@ -54,7 +54,7 @@ public class Commands
         return commandRunner.createCommand( new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' > /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) ), new HashSet<>( agentList ) );
+                "chmod 644 /root/.ssh/authorized_keys", key ) ), Sets.newHashSet( agentList ) );
     }
 
 
