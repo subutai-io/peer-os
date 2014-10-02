@@ -295,7 +295,6 @@ public class AccumuloImpl implements Accumulo
                                                          AccumuloClusterConfig accumuloClusterConfig,
                                                          ProductOperation po )
     {
-        Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );
 

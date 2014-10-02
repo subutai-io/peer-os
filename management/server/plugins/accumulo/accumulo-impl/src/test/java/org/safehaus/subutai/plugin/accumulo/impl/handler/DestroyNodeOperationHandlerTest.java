@@ -20,7 +20,7 @@ public class DestroyNodeOperationHandlerTest
     public void testWithoutCluster()
     {
         AbstractOperationHandler operationHandler =
-                new DestroyNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node", NodeType.TRACER );
+                new DestroyNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node", NodeType.Tracer );
 
         operationHandler.run();
 

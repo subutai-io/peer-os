@@ -17,12 +17,12 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
-import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -30,13 +30,11 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
-public class AddNodeWindow extends Window
+class AddNodeWindow extends Window
 {
 
     private final TextArea outputTxtArea;
+    private final Button ok;
     private final Label indicator;
     private volatile boolean track = true;
 
@@ -46,8 +44,10 @@ public class AddNodeWindow extends Window
     {
         super( "Add New Node" );
         setModal( true );
+        setClosable( false );
 
         setWidth( 600, Unit.PIXELS );
+        setHeight( 400, Unit.PIXELS );
 
         GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
@@ -58,14 +58,16 @@ public class AddNodeWindow extends Window
         topContent.setSpacing( true );
 
         content.addComponent( topContent );
-        topContent.addComponent( new Label( "Nodes:" ) );
+        Component lblNodes = new Label( "Nodes:" );
+        lblNodes.addStyleName( "default" );
+        topContent.addComponent( lblNodes );
 
         final ComboBox hadoopNodes = new ComboBox();
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
-        hadoopNodes.setWidth( 200, Unit.PIXELS );
+        hadoopNodes.setWidth( 60, Unit.PERCENTAGE );
         for ( Agent node : nodes )
         {
             hadoopNodes.addItem( node );
@@ -81,9 +83,8 @@ public class AddNodeWindow extends Window
 
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
-
             @Override
-            public void buttonClick( Button.ClickEvent event )
+            public void buttonClick( Button.ClickEvent clickEvent )
             {
                 addNodeBtn.setEnabled( false );
                 showProgress();
@@ -91,13 +92,12 @@ public class AddNodeWindow extends Window
                 final UUID trackID = zookeeper.addNode( config.getClusterName(), agent.getHostname() );
                 executorService.execute( new Runnable()
                 {
-
+                    @Override
                     public void run()
                     {
                         while ( track )
                         {
-                            ProductOperationView po =
-                                    tracker.getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID );
+                            ProductOperationView po = tracker.getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
                                 setOutput(
@@ -128,8 +128,8 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
-        outputTxtArea.setRows( 13 );
-        outputTxtArea.setColumns( 43 );
+        outputTxtArea.setRows( 10 );
+        outputTxtArea.setWidth( 80, Unit.PERCENTAGE );
         outputTxtArea.setImmediate( true );
         outputTxtArea.setWordwrap( true );
 
@@ -142,13 +142,12 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
+        ok = new Button( "Ok" );
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
-
             @Override
-            public void buttonClick( Button.ClickEvent event )
+            public void buttonClick( Button.ClickEvent clickEvent )
             {
                 //close window
                 track = false;
@@ -168,32 +167,34 @@ public class AddNodeWindow extends Window
     }
 
 
-    private void showProgress()
+    @Override
+    public void close()
     {
-        indicator.setVisible( true );
+        super.close();
+        track = false;
     }
 
 
-    private void setOutput( String output )
+    private void showProgress()
     {
-        if ( !Strings.isNullOrEmpty( output ) )
-        {
-            outputTxtArea.setValue( output );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().toString().length() - 1 );
-        }
+        indicator.setVisible( true );
+        ok.setEnabled( false );
     }
 
 
     private void hideProgress()
     {
         indicator.setVisible( false );
+        ok.setEnabled( true );
     }
 
 
-    @Override
-    public void close()
+    private void setOutput( String output )
     {
-        super.close();
-        track = false;
+        if ( output != null )
+        {
+            outputTxtArea.setValue( output );
+            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+        }
     }
 }

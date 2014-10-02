@@ -75,7 +75,7 @@ public class DestroyAllOperationHandler extends AbstractHandler
     private boolean uninstall( SqoopConfig config )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Presto..." );
+        po.addLog( "Uninstalling Sqoop..." );
 
 
         String s = CommandFactory.build( CommandType.PURGE, null );

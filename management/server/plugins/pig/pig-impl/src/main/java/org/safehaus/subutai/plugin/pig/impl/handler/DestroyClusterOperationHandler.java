@@ -73,7 +73,7 @@ public class DestroyClusterOperationHandler extends AbstractOperationHandler<Pig
     private boolean uninstall( PigConfig config )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Presto..." );
+        po.addLog( "Uninstalling Pig..." );
 
         Command cmd = Commands.getUninstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );
