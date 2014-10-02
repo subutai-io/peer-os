@@ -49,4 +49,16 @@ public class DestroyEnvironmentCommand extends OsgiCommandSupport
         }
         return null;
     }
+
+
+    public String getEnvironmentName()
+    {
+        return environmentName;
+    }
+
+
+    public void setEnvironmentName( final String environmentName )
+    {
+        this.environmentName = environmentName;
+    }
 }

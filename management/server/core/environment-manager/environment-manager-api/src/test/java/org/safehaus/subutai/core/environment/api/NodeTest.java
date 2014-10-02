@@ -52,7 +52,7 @@ public class NodeTest
 
 
     @Test
-    public void testName() throws Exception
+    public void testGetTemplate() throws Exception
     {
         Template t = node.getTemplate();
         assertNotNull( t );

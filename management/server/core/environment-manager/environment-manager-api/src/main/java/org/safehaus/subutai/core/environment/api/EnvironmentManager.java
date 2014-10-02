@@ -9,7 +9,6 @@ package org.safehaus.subutai.core.environment.api;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -24,14 +23,7 @@ import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 public interface EnvironmentManager
 {
 
-    /**
-     * Builds the environment with a given blueprint descriptor.
-     */
-//    boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask );
-
-    //    public boolean buildEnvironment( EnvironmentBlueprint blueprint );
-
-    Environment buildEnvironmentAndReturn( EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException;
+    Environment buildEnvironment( EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException;
 
 
     /**
@@ -42,17 +34,17 @@ public interface EnvironmentManager
     /**
      * Gets the environment by given environment name.
      */
-    Environment getEnvironmentInfo( String environmentName );
+    Environment getEnvironment( String environmentName );
 
     /**
-     * Destroys environment by a given environmentt name.
+     * Destroys environment by a given environment name.
      */
     boolean destroyEnvironment( String environmentName ) throws EnvironmentDestroyException;
 
     /**
      * Saves blueprint test into database
      */
-    boolean saveBlueprint( String bluepringStr );
+    boolean saveBlueprint( String blueprint );
 
     List<EnvironmentBuildTask> getBlueprints();
 
@@ -62,24 +54,13 @@ public interface EnvironmentManager
 
     List<EnvironmentBuildProcess> getBuildProcesses();
 
-    void saveEnvironment( Environment environment );
-
     void buildEnvironment( EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException;
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 
-//    public Set<EnvironmentContainer> getContainers();
+    void invoke( PeerCommandMessage commandMessage );
 
-//    public void addContainer( EnvironmentContainer container );
-
-//    public boolean startContainer( EnvironmentContainer container );
-    //
-    //    public boolean stopContainer( EnvironmentContainer container );
-    //
-    //    public boolean isContainerConnected( EnvironmentContainer container );
-    public void invoke(PeerCommandMessage commandMessage);
-
-    public void invoke(PeerCommandMessage commandMessage, long timeout);
+    void invoke( PeerCommandMessage commandMessage, long timeout );
 
     Set<EnvironmentContainer> getConnectedContainers( Environment environment );
 }

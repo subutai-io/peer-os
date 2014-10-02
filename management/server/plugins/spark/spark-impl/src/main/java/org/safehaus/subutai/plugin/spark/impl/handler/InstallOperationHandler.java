@@ -60,7 +60,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
             try
             {
                 EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
-                env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );
+                env = manager.getEnvironmentManager().buildEnvironment( eb );
 
                 ClusterSetupStrategy s = manager.getHadoopManager().getClusterSetupStrategy( po, hadoopConfig, env );
                 s.setup();

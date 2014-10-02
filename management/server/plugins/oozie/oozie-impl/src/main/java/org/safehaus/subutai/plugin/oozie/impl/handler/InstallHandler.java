@@ -54,7 +54,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
             try
             {
                 EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
-                env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );
+                env = manager.getEnvironmentManager().buildEnvironment( eb );
             }
             catch ( ClusterSetupException ex )
             {

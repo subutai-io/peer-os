@@ -32,7 +32,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl>
 
         try
         {
-            Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(
+            Environment env = manager.getEnvironmentManager().buildEnvironment(
                     manager.getDefaultEnvironmentBlueprint( solrClusterConfig ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
