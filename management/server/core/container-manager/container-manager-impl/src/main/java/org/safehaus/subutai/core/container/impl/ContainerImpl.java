@@ -4,13 +4,13 @@ package org.safehaus.subutai.core.container.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.Container;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
@@ -94,7 +94,8 @@ public class ContainerImpl implements Container
 
         if ( parentAgent != null )
         {
-            Command getLxcListCommand = Commands.getLxcListCommand( Sets.newHashSet( parentAgent ) );
+            Command getLxcListCommand =
+                    new Commands( commandRunner ).getLxcListCommand( Sets.newHashSet( parentAgent ) );
             commandRunner.runCommand( getLxcListCommand );
 
             if ( getLxcListCommand.hasCompleted() )
