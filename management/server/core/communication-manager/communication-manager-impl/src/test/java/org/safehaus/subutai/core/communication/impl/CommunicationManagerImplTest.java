@@ -161,6 +161,38 @@ public class CommunicationManagerImplTest
 
 
     @Test
+    public void testHeartbeat() throws JMSException
+    {
+        //setup listener
+        final TestResponseListener responseListener = new TestResponseListener();
+        communicationManagerImpl.addListener( responseListener );
+
+
+        Connection connection = communicationManagerImpl.createConnection();
+        connection.start();
+        final Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+        Destination topic = session.createTopic( SERVICE_TOPIC );
+        final MessageProducer producer = session.createProducer( topic );
+
+        BytesMessage message = session.createBytesMessage();
+        message.writeBytes( CommandJson.getResponseCommandJson(
+                CommandJson.getResponseFromCommandJson( "{response:{type:HEARTBEAT_RESPONSE}}" ) ).getBytes() );
+        producer.send( message );
+
+        Awaitility.await().atMost( 2, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+                  .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
+        {
+
+            public Boolean call() throws Exception
+            {
+                responseListener.signal.acquire();
+                return true;
+            }
+        } );
+    }
+
+
+    @Test
     public void testBroadcastMessage() throws JMSException
     {
         UUID uuid = UUID.randomUUID();
