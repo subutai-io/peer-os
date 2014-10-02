@@ -30,7 +30,7 @@
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>eclipselink</artifactId>
-      <version>${org.eclipse.persistence.version}</version>
+      <version>${org.eclipse.eclipselink.version}</version>
     </dependency>
     <!--db-manager-ext-impl-->
 
@@ -47,7 +47,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.db-ext.api</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.db.ext.api</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
