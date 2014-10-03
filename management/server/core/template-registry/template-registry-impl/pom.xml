@@ -11,7 +11,7 @@
 
   <artifactId>template-registry-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Template Registry</name>
+  <name>Subutai Template Registry Impl</name>
   <description>Subutai Template Registry Impl</description>
 
   <dependencies>
@@ -51,6 +51,12 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <version>${org.mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
