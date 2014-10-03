@@ -30,7 +30,7 @@ public class EnvironmentTest
     public void setUp() throws Exception
     {
 
-        this.environment = new Environment( NAME );
+        this.environment = new Environment( UUID.randomUUID(), NAME );
     }
 
 
@@ -73,6 +73,4 @@ public class EnvironmentTest
         PeerCommandMessage peerCommandMessage = mock( PeerCommandMessage.class );
         environment.invoke( peerCommandMessage );
     }
-
-
 }

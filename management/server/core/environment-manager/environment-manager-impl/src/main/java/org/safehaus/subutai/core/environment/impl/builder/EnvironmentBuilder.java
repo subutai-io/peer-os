@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -44,13 +45,12 @@ public class EnvironmentBuilder
         this.templateRegistry = templateRegistry;
         this.agentManager = agentManager;
         this.networkManager = networkManager;
-        this.containerManager= containerManager;
+        this.containerManager = containerManager;
     }
 
 
     //@todo destroy all containers of all groups inside environment on any failure ???
-    public Environment build( final EnvironmentBuildTask environmentBuildTask )
-            throws EnvironmentBuildException
+    public Environment build( final EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException
     {
 
 
@@ -58,7 +58,7 @@ public class EnvironmentBuilder
         Set<String> physicalNodes = environmentBuildTask.getPhysicalNodes();
 
 
-        Environment environment = new Environment( blueprint.getName() );
+        Environment environment = new Environment( UUID.randomUUID(), blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
         {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
