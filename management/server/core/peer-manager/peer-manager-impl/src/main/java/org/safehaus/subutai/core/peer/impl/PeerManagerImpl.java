@@ -43,6 +43,7 @@ import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,7 @@ public class PeerManagerImpl implements PeerManager
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
     private CommandRunner commandRunner;
+    private TemplateRegistry templateRegistry;
 
     private Set<PeerContainer> containers = new HashSet<>();
 
@@ -96,6 +98,12 @@ public class PeerManagerImpl implements PeerManager
     public void setCommandRunner( final CommandRunner commandRunner )
     {
         this.commandRunner = commandRunner;
+    }
+
+
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    {
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -395,9 +403,23 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String strategy )
+    public Set<Agent> createContainers( UUID envId, UUID peerId, String template, int numberOfNodes, String strategy )
             throws ContainerCreateException
     {
+        if ( peerId == null )
+        {
+            throw new IllegalArgumentException( "Peer could not be null." );
+        }
+        if ( !peerId.equals( getSiteId() ) )
+        {
+            // Is the remote template exists in the local peer?
+            boolean isTemplateExists = templateRegistry.getTemplate( template ) != null;
+            if (! isTemplateExists) {
+                //TODO: download the remote template and register it in the local registry
+
+            }
+        }
+
 
         return containerManager.clone( envId, template, numberOfNodes, strategy, null );
     }
@@ -473,8 +495,8 @@ public class PeerManagerImpl implements PeerManager
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
                     try
                     {
-                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getTemplate(), ccm.getNumberOfNodes(),
-                                ccm.getStrategy() );
+                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getPeerId(), ccm.getTemplate(),
+                                ccm.getNumberOfNodes(), ccm.getStrategy() );
                         ccm.setResult( agents );
                         ccm.setSuccess( true );
                     }
@@ -530,7 +552,7 @@ public class PeerManagerImpl implements PeerManager
                     peerCommandMessage.setExceptionMessage( "Could not stop container." );
                 }
                 break;
-            case ISCONNECTED:
+            case IS_CONNECTED:
 
                 result = isContainerConnected( peerContainer );
                 if ( result )
