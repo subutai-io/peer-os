@@ -34,7 +34,6 @@ public class Response implements Serializable
     private List<String> ips;
     private Boolean isLxc;
     private String transportId;
-    @SkipNull
     private UUID environmentId;
 
 
