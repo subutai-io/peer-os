@@ -61,7 +61,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
     {
         try
         {
-            Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(
+            Environment env = manager.getEnvironmentManager().buildEnvironment(
                     manager.getDefaultEnvironmentBlueprint( elasticsearchClusterConfiguration ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
