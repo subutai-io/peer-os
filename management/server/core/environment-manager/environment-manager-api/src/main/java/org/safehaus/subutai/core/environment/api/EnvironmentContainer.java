@@ -64,7 +64,7 @@ public class EnvironmentContainer extends Container
     public boolean isConnected() throws ContainerException
     {
         DefaultCommandMessage cmd =
-                new DefaultCommandMessage( PeerCommandType.ISCONNECTED, getEnvironment().getUuid(), getPeerId(),
+                new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, getEnvironment().getUuid(), getPeerId(),
                         getAgentId() );
         environment.invoke( cmd );
         return cmd.isSuccess();
