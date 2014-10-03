@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.cli;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class ListEnvironmentCommandTest
     public void test() throws Exception
     {
         List<Environment> l = new ArrayList<>();
-        l.add( new Environment( NAME ) );
+        l.add( new Environment( UUID.randomUUID(),NAME ) );
         when( manager.getEnvironments() ).thenReturn( l );
         command.doExecute();
     }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -78,6 +79,7 @@ public class EnvironmentManagerImplTest
     {
         EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
         when( process.getEnvironmentName() ).thenReturn( "name" );
+        when( process.getUuid() ).thenReturn( UUID.randomUUID());
 
         Map<String, CloneContainersMessage> map = new HashMap<>();
         CloneContainersMessage ccm = mock( CloneContainersMessage.class );
