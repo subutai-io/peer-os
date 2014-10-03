@@ -64,7 +64,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param md5sum - template file's md5 hash
      */
     @Override
-    public synchronized void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
+    public synchronized boolean registerTemplate( final String configFile, final String packagesFile,
+                                                  final String md5sum )
             throws RegistryException
     {
 
@@ -86,6 +87,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             throw new RegistryException(
                     String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
         }
+        return true;
     }
 
 
@@ -204,9 +206,10 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param templateName - name of template to remove
      */
     @Override
-    public void unregisterTemplate( final String templateName ) throws RegistryException
+    public boolean unregisterTemplate( final String templateName ) throws RegistryException
     {
         unregisterTemplate( templateName, Common.DEFAULT_LXC_ARCH );
+        return true;
     }
 
 
@@ -502,7 +505,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param inUse - true - template is in use, false - template is out of use
      */
     @Override
-    public synchronized void updateTemplateUsage( final String faiHostname, final String templateName,
+    public synchronized boolean updateTemplateUsage( final String faiHostname, final String templateName,
                                                   final boolean inUse ) throws RegistryException
     {
 
@@ -527,6 +530,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
                 throw new RegistryException( String.format( "Error saving template information, %s", e.getMessage() ) );
             }
         }
+        return true;
     }
 
 
