@@ -19,6 +19,8 @@ public class RemoveCommandTest
     private ConfigPointTracker configPointTracker;
     private RemoveCommand removeCommand;
 
+    String templateName;
+    String configPath;
 
     @Before
     public void setupClasses()
@@ -39,8 +41,6 @@ public class RemoveCommandTest
     @Test
     public void shouldAccessConfigPointTrackerOnDoExecute()
     {
-        final String templateName = "";
-        final String configPath = "";
         when( configPointTracker.remove( templateName, configPath ) ).thenReturn( true );
         removeCommand.doExecute();
         verify( configPointTracker ).remove( templateName, configPath );

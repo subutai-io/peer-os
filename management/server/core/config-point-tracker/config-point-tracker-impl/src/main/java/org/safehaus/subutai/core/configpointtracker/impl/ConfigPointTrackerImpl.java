@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.configpointtracker.impl;
 
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,20 +20,18 @@ public class ConfigPointTrackerImpl implements ConfigPointTracker
     @Override
     public boolean add( String templateName, String... configPaths )
     {
-
+        boolean result = true;
         Set<String> points = configPoints.get( templateName );
 
         if ( points == null )
         {
             points = new HashSet<>();
             configPoints.put( templateName, points );
+            result = false;
         }
 
-        for ( String path : configPaths )
-        {
-            points.add( path );
-        }
-        return true;
+        Collections.addAll( points, configPaths );
+        return result;
     }
 
 

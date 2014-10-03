@@ -18,6 +18,8 @@ public class AddCommandTest
 
     private ConfigPointTracker configPointTracker;
     private AddCommand addCommand;
+    String configPath;
+    String templateName;
 
 
     @Before
@@ -39,8 +41,6 @@ public class AddCommandTest
     @Test
     public void shouldAccessConfigPointTrackerOnDoExecute()
     {
-        final String configPath = "";
-        final String templateName = "";
         when( configPointTracker.add( templateName, configPath ) ).thenReturn( true );
         addCommand.doExecute();
         verify( configPointTracker ).add( templateName, configPath );

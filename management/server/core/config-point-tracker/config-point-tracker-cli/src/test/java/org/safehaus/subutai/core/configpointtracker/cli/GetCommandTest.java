@@ -19,6 +19,7 @@ public class GetCommandTest
 {
     private ConfigPointTracker configPointTracker;
     private GetCommand getCommand;
+    String templateName;
 
 
     @Before
@@ -40,7 +41,6 @@ public class GetCommandTest
     @Test
     public void shouldAccessConfigPointTrackerOnDoExecute()
     {
-        final String templateName = "";
         when( configPointTracker.get( templateName ) ).thenReturn( Sets.newHashSet( templateName ) );
         getCommand.doExecute();
         verify( configPointTracker ).get( templateName );
