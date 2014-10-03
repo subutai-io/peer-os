@@ -39,8 +39,14 @@ public class DescribeEnvironmentCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Environment environment = environmentManager.getEnvironmentInfo( environmentName );
+        Environment environment = environmentManager.getEnvironment( environmentName );
         System.out.println( environment.toString() );
         return null;
+    }
+
+
+    public void setEnvironmentName( final String environmentName )
+    {
+        this.environmentName = environmentName;
     }
 }

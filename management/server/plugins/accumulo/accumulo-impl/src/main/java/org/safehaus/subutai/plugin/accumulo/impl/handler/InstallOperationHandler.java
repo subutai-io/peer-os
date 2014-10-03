@@ -107,7 +107,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             final String COMBO_TEMPLATE_NAME = "hadoopnzknaccumulo";
             hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
             //create environment
-            Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(
+            Environment env = manager.getEnvironmentManager().buildEnvironment(
                     manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
 
             //setup Hadoop cluster

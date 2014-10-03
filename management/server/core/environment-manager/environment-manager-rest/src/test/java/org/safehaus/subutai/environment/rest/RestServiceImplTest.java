@@ -4,8 +4,6 @@ package org.safehaus.subutai.environment.rest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
-
 
 /**
  * Created by bahadyr on 9/25/14.
@@ -16,9 +14,9 @@ public class RestServiceImplTest
 
 
     @Before
-    public void init()
+    public void setUp() throws Exception
     {
-        restService = mock( RestServiceImpl.class );
+        restService = new RestServiceImpl();
     }
 
 
