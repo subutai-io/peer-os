@@ -88,7 +88,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
             if ( this.environment == null )
             {
-                environment = hadoopManager.getEnvironmentManager().buildEnvironmentAndReturn(
+                environment = hadoopManager.getEnvironmentManager().buildEnvironment(
                         hadoopManager.getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
             }
 

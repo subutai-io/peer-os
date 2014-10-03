@@ -202,7 +202,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment buildEnvironmentAndReturn( final EnvironmentBuildTask environmentBuildTask )
+    public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
             throws EnvironmentBuildException
     {
 
@@ -219,7 +219,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Environment getEnvironmentInfo( final String uuid )
+    public Environment getEnvironment( final String uuid )
     {
         return environmentDAO.getInfo( ENVIRONMENT, uuid, Environment.class );
     }
@@ -228,7 +228,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public boolean destroyEnvironment( final String uuid )
     {
-        Environment environment = getEnvironmentInfo( uuid );
+        Environment environment = getEnvironment( uuid );
         try
         {
             environmentBuilder.destroy( environment );
@@ -243,11 +243,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean saveBlueprint( String blueprintStr )
+    public boolean saveBlueprint( String blueprint )
     {
         try
         {
-            EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprintStr, EnvironmentBlueprint.class );
+            EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprint, EnvironmentBlueprint.class );
             EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
             environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 

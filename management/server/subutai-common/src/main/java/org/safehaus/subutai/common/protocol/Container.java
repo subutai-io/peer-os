@@ -17,6 +17,7 @@ public abstract class Container
     protected String name;
     protected String description;
     protected ContainerState state;
+    public abstract UUID getEnvironmentId();
 
 
     public UUID getAgentId()
