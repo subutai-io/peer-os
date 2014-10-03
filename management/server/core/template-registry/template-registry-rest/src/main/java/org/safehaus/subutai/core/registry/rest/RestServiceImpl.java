@@ -18,6 +18,7 @@ import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -43,6 +44,7 @@ public class RestServiceImpl implements RestService
 
     public void setTemplateRegistry( TemplateRegistry templateRegistry )
     {
+        Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null." );
         this.templateRegistry = templateRegistry;
     }
 
