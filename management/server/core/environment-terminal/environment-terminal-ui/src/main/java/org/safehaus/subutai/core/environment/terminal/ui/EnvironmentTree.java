@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,9 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -43,23 +42,16 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
-    private final AgentManager agentManager;
-    private final EnvironmentManager environmentManager;
     private final ComboBox env;
     private final Tree tree;
     private HierarchicalContainer container;
-    private Set<Agent> currentAgents = new HashSet<>();
-    private EnvironmentContainer selectedContainer;
+    private Set<EnvironmentContainer> selectedContainers = new HashSet<>();
     private Environment environment;
-    private String peerId;
     private final ScheduledExecutorService scheduler;
 
 
-    public EnvironmentTree( AgentManager agentManager, final EnvironmentManager environmentManager )
+    public EnvironmentTree( final EnvironmentManager environmentManager )
     {
-        this.agentManager = agentManager;
-
-        this.environmentManager = environmentManager;
 
         scheduler = Executors.newScheduledThreadPool( 1 );
 
@@ -83,7 +75,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         environments.addAll( environmentManager.getEnvironments() );
         env = new ComboBox( null, environments );
         env.setItemCaptionPropertyId( "name" );
-        //        env.setWidth( 200, Unit.PIXELS );
         env.setImmediate( true );
         env.setTextInputAllowed( false );
         env.setNullSelectionAllowed( false );
@@ -123,18 +114,31 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 return description;
             }
         } );
-        tree.setMultiSelect( false );
+        tree.setMultiSelect( true );
         tree.setImmediate( true );
         tree.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                LOG.info( event.getProperty().toString() );
-                Item item = container.getItem( event.getProperty().getValue() );
-                if ( item != null && item.getItemProperty( "value" ).getValue() instanceof EnvironmentContainer )
+
+                if ( event.getProperty().getValue() instanceof Set )
                 {
-                    selectedContainer = ( EnvironmentContainer ) item.getItemProperty( "value" ).getValue();
+                    Tree t = ( Tree ) event.getProperty();
+
+                    Set<EnvironmentContainer> selectedList = new HashSet<>();
+
+                    for ( Object o : ( Iterable<?> ) t.getValue() )
+                    {
+                        if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
+                        {
+                            EnvironmentContainer environmentContainer =
+                                    ( EnvironmentContainer ) tree.getItem( o ).getItemProperty( "value" ).getValue();
+                            selectedList.add( environmentContainer );
+                        }
+                    }
+
+                    selectedContainers = selectedList;
                 }
             }
         } );
@@ -145,8 +149,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
-
-        //        agentManager.addListener( this );
     }
 
 
@@ -175,30 +177,15 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         {
             LOG.info( "Environment is null" );
         }
-        //        refreshAgents( agentManager.getAgents() );
 
         return container;
     }
 
 
-    public EnvironmentContainer getSelectedContainer()
+    public Set<EnvironmentContainer> getSelectedContainers()
     {
-        return selectedContainer;
+        return Collections.unmodifiableSet( selectedContainers );
     }
-
-
-    //    @Override
-    //    public void onAgent( final Set<Agent> freshAgents )
-    //    {
-    //        executeUpdate( new Runnable()
-    //        {
-    //            @Override
-    //            public void run()
-    //            {
-    //                refreshContainers( getRemoteFreshAgents( environment ) );
-    //            }
-    //        } );
-    //    }
 
 
     private void refreshContainers( final Set<EnvironmentContainer> freshContainers )
@@ -212,10 +199,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         List<String> agentIdList = new ArrayList<>();
         for ( EnvironmentContainer container : freshContainers )
         {
-            //            if ( peerId == null )
-            //            {
-            //                peerId = container.getPeerId().toString();
-            //            }
+
             agentIdList.add( String
                     .format( "%s:%s", container.getPeerId().toString(), container.getAgentId().toString() ) );
         }
@@ -239,7 +223,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
 
     public void dispose()
     {
-        //        agentManager.removeListener( this );
         scheduler.shutdown();
     }
 }

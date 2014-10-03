@@ -1,12 +1,15 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.NumUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
@@ -21,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.ui.Button;
 
 
@@ -51,10 +53,10 @@ public class SendButtonListener implements Button.ClickListener
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        EnvironmentContainer container = form.environmentTree.getSelectedContainer();
-        if ( container == null )
+        Set<EnvironmentContainer> containers = form.environmentTree.getSelectedContainers();
+        if ( CollectionUtil.isCollectionEmpty( containers ) )
         {
-            form.show( "Please, select node" );
+            form.show( "Please, select container(s)" );
         }
         else if ( form.programTxtFld.getValue() == null || Strings.isNullOrEmpty( form.programTxtFld.getValue() ) )
         {
@@ -62,12 +64,12 @@ public class SendButtonListener implements Button.ClickListener
         }
         else
         {
-            executeCommand( container );
+            executeCommand( containers );
         }
     }
 
 
-    private void executeCommand( EnvironmentContainer container )
+    private void executeCommand( Set<EnvironmentContainer> containers )
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );
@@ -92,8 +94,9 @@ public class SendButtonListener implements Button.ClickListener
             // RequestType.EXECUTE_REQUEST, timeout,
             //                            form.workDirTxtFld.getValue() );
 
-            Command command =
-                    commandDispatcher.createContainerCommand( requestBuilder, Sets.<Container>newHashSet( container ) );
+            Set<Container> containerSet = new HashSet<>();
+            containerSet.addAll( containers );
+            Command command = commandDispatcher.createContainerCommand( requestBuilder, containerSet );
             executor.execute( new ExecuteCommandTask( form, command ) );
         }
     }
