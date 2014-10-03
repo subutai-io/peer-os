@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>command-dispatcher-api</artifactId>
+      <artifactId>command-runner-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

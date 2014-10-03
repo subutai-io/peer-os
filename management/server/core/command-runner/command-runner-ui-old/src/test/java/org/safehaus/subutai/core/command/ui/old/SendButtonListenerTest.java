@@ -12,10 +12,10 @@ import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.command.api.command.CommandException;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.google.common.collect.Sets;
@@ -26,7 +26,6 @@ import com.vaadin.ui.TextField;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,7 +49,7 @@ public class SendButtonListenerTest
     {
         terminalForm = mock( TerminalForm.class );
         SendButtonListener sendButtonListener =
-                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandDispatcher.class ),
+                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandRunner.class ),
                         mock( ExecutorService.class ) );
 
         agentTree = mock( AgentTree.class );
@@ -58,11 +57,11 @@ public class SendButtonListenerTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullExecutor()
     {
 
-        new SendButtonListener( mock( TerminalForm.class ), mock( AgentManager.class ), mock( CommandDispatcher.class ),
+        new SendButtonListener( mock( TerminalForm.class ), mock( AgentManager.class ), mock( CommandRunner.class ),
                 null );
     }
 
@@ -72,7 +71,7 @@ public class SendButtonListenerTest
     {
 
         SendButtonListener sendButtonListener =
-                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandDispatcher.class ),
+                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandRunner.class ),
                         mock( ExecutorService.class ) );
         when( agentTree.getSelectedAgents() ).thenReturn( Collections.<Agent>emptySet() );
 
@@ -89,7 +88,7 @@ public class SendButtonListenerTest
     {
 
         SendButtonListener sendButtonListener =
-                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandDispatcher.class ),
+                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandRunner.class ),
                         mock( ExecutorService.class ) );
         when( agentTree.getSelectedAgents() ).thenReturn( Sets.newHashSet( mock( Agent.class ) ) );
         TextField program = mock( TextField.class );
@@ -109,7 +108,7 @@ public class SendButtonListenerTest
 
         ExecutorService executorService = mock( ExecutorService.class );
         SendButtonListener sendButtonListener =
-                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandDispatcher.class ),
+                new SendButtonListener( terminalForm, mock( AgentManager.class ), mock( CommandRunner.class ),
                         executorService );
         when( agentTree.getSelectedAgents() ).thenReturn( Sets.newHashSet( mock( Agent.class ) ) );
         TextField program = mock( TextField.class );
@@ -161,13 +160,13 @@ public class SendButtonListenerTest
                 new SendButtonListener.ExecuteCommandTask( command, mock( AgentManager.class ), terminalForm );
 
         Response response = mock( Response.class );
-        when(response.getStdOut()).thenReturn( DUMMY_OUTPUT );
+        when( response.getStdOut() ).thenReturn( DUMMY_OUTPUT );
 
         executeCommandTask.displayResponse( response );
 
         ArgumentCaptor<String> outputCaptor = ArgumentCaptor.forClass( String.class );
         verify( terminalForm ).addOutput( outputCaptor.capture() );
 
-        assertThat(outputCaptor.getValue(), containsString( DUMMY_OUTPUT));
+        assertThat( outputCaptor.getValue(), containsString( DUMMY_OUTPUT ) );
     }
 }

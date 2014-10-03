@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.junit.Test;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 
 import com.vaadin.ui.TextArea;
 
@@ -22,7 +22,7 @@ public class TerminalFormTest
     private static final String DUMMY_OUTPUT = "some dumy output";
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullCommandRunner()
     {
 
@@ -30,11 +30,11 @@ public class TerminalFormTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullAgentManager()
     {
 
-        new TerminalForm( mock( CommandDispatcher.class ), null );
+        new TerminalForm( mock( CommandRunner.class ), null );
     }
 
 
@@ -42,7 +42,7 @@ public class TerminalFormTest
     public void shouldShutDownExecutor()
     {
 
-        TerminalForm terminalForm = new TerminalForm( mock( CommandDispatcher.class ), mock( AgentManager.class ) );
+        TerminalForm terminalForm = new TerminalForm( mock( CommandRunner.class ), mock( AgentManager.class ) );
         ExecutorService executorService = mock( ExecutorService.class );
         terminalForm.setExecutor( executorService );
 
@@ -56,7 +56,7 @@ public class TerminalFormTest
     public void shouldWriteToTextArea()
     {
 
-        TerminalForm terminalForm = new TerminalForm( mock( CommandDispatcher.class ), mock( AgentManager.class ) );
+        TerminalForm terminalForm = new TerminalForm( mock( CommandRunner.class ), mock( AgentManager.class ) );
         TextArea textArea = mock( TextArea.class );
         when( textArea.getValue() ).thenReturn( DUMMY_OUTPUT );
 
