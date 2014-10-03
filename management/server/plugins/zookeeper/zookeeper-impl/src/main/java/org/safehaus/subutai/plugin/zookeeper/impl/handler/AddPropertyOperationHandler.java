@@ -10,7 +10,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 import com.google.common.base.Strings;
@@ -65,14 +64,14 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
         productOperation.addLog( "Adding property..." );
 
         Command addPropertyCommand =
-                Commands.getAddPropertyCommand( fileName, propertyName, propertyValue, config.getNodes() );
+                manager.getCommands().getAddPropertyCommand( fileName, propertyName, propertyValue, config.getNodes() );
         manager.getCommandRunner().runCommand( addPropertyCommand );
 
         if ( addPropertyCommand.hasSucceeded() )
         {
             productOperation.addLog( "Property added successfully\nRestarting cluster..." );
 
-            Command restartCommand = Commands.getRestartCommand( config.getNodes() );
+            Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
             final AtomicInteger count = new AtomicInteger();
             manager.getCommandRunner().runCommand( restartCommand, new CommandCallback()
             {

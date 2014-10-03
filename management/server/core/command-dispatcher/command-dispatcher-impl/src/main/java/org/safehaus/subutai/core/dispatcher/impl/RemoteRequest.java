@@ -79,18 +79,4 @@ public class RemoteRequest
     {
         return attempts;
     }
-
-
-    @Override
-    public String toString()
-    {
-        return "RemoteRequest{" +
-                "peerId=" + peerId +
-                ", commandId=" + commandId +
-                ", timestamp=" + timestamp +
-                ", requestCount=" + requestCount +
-                ", attempts=" + attempts +
-                ", requestsCompleted=" + requestsCompleted +
-                '}';
-    }
 }

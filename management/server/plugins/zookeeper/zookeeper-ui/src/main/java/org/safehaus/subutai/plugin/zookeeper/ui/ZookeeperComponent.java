@@ -19,9 +19,6 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class ZookeeperComponent extends CustomComponent
 {
 

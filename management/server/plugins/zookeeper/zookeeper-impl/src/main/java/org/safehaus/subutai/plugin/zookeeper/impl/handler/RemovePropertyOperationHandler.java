@@ -10,7 +10,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 import com.google.common.base.Strings;
@@ -62,14 +61,15 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
 
         productOperation.addLog( "Removing property..." );
 
-        Command removePropertyCommand = Commands.getRemovePropertyCommand( fileName, propertyName, config.getNodes() );
+        Command removePropertyCommand =
+                manager.getCommands().getRemovePropertyCommand( fileName, propertyName, config.getNodes() );
         manager.getCommandRunner().runCommand( removePropertyCommand );
 
         if ( removePropertyCommand.hasSucceeded() )
         {
             productOperation.addLog( "Property removed successfully\nRestarting cluster..." );
 
-            Command restartCommand = Commands.getRestartCommand( config.getNodes() );
+            Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
             final AtomicInteger count = new AtomicInteger();
             manager.getCommandRunner().runCommand( restartCommand, new CommandCallback()
             {

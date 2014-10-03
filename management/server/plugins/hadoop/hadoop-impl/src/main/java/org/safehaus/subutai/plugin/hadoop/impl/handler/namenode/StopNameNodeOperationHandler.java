@@ -3,14 +3,13 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class StopNameNodeOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -48,9 +47,9 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
             return;
         }
 
-        Command startCommand = Commands.getNameNodeCommand( node, "stop" );
+        Command startCommand = manager.getCommands().getNameNodeCommand( node, "stop" );
         manager.getCommandRunner().runCommand( startCommand );
-        Command statusCommand = Commands.getNameNodeCommand( node, "status" );
+        Command statusCommand = manager.getCommands().getNameNodeCommand( node, "status" );
         manager.getCommandRunner().runCommand( statusCommand );
 
         AgentResult result = statusCommand.getResults().get( node.getUuid() );

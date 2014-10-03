@@ -8,8 +8,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/diff-branches">
       <action class="org.safehaus.subutai.core.git.cli.DiffBranches">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
 
@@ -17,8 +17,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/diff-file">
       <action class="org.safehaus.subutai.core.git.cli.DiffFile">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -26,8 +26,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/get-current-branch">
       <action class="org.safehaus.subutai.core.git.cli.GetCurrentBranch">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -35,8 +35,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/list-branches">
       <action class="org.safehaus.subutai.core.git.cli.ListBranches">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -44,8 +44,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/commit-all">
       <action class="org.safehaus.subutai.core.git.cli.CommitAll">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -53,8 +53,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/commit-files">
       <action class="org.safehaus.subutai.core.git.cli.CommitFiles">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -62,8 +62,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/add-files">
       <action class="org.safehaus.subutai.core.git.cli.AddFiles">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -71,8 +71,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/add-all">
       <action class="org.safehaus.subutai.core.git.cli.AddAll">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -80,8 +80,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/delete-files">
       <action class="org.safehaus.subutai.core.git.cli.DeleteFiles">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -89,8 +89,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/clone">
       <action class="org.safehaus.subutai.core.git.cli.Clone">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -98,8 +98,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/checkout">
       <action class="org.safehaus.subutai.core.git.cli.Checkout">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -107,8 +107,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/push">
       <action class="org.safehaus.subutai.core.git.cli.Push">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -116,8 +116,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/delete-branch">
       <action class="org.safehaus.subutai.core.git.cli.DeleteBranch">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -125,8 +125,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/pull">
       <action class="org.safehaus.subutai.core.git.cli.Pull">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -134,8 +134,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/merge">
       <action class="org.safehaus.subutai.core.git.cli.Merge">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -143,8 +143,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/init">
       <action class="org.safehaus.subutai.core.git.cli.Init">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -152,8 +152,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/undo-soft">
       <action class="org.safehaus.subutai.core.git.cli.UndoSoft">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -161,8 +161,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/undo-hard">
       <action class="org.safehaus.subutai.core.git.cli.UndoHard">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -170,8 +170,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/revert-commit">
       <action class="org.safehaus.subutai.core.git.cli.RevertCommit">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -179,8 +179,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/stash">
       <action class="org.safehaus.subutai.core.git.cli.Stash">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -188,8 +188,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/unstash">
       <action class="org.safehaus.subutai.core.git.cli.Unstash">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>
@@ -197,8 +197,8 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/list-stashes">
       <action class="org.safehaus.subutai.core.git.cli.ListStashes">
-        <property name="gitManager" ref="gitManager" />
-        <property name="agentManager" ref="agentManager" />
+        <argument ref="gitManager" />
+        <argument ref="agentManager" />
       </action>
     </command>
   </command-bundle>

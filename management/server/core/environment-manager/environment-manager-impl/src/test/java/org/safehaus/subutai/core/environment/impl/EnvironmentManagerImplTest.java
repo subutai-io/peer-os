@@ -1,22 +1,22 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -24,6 +24,7 @@ import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatch
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -33,7 +34,8 @@ import static org.mockito.Mockito.mock;
 public class EnvironmentManagerImplTest
 {
 
-    EnvironmentManagerImpl environmentManager;
+    private static final String HOSTNAME = "hostname";
+    EnvironmentManagerImpl manager;
     @Mock
     ContainerManager containerManager;
     @Mock
@@ -55,53 +57,42 @@ public class EnvironmentManagerImplTest
 
 
     @Before
-    public void init()
+    public void setUp() throws Exception
     {
-        environmentManager = new EnvironmentManagerImpl();
-        environmentManager.setAgentManager( agentManager );
-        environmentManager.setContainerManager( containerManager );
-        environmentManager.setDbManager( dbManager );
-        environmentManager.setEnvironmentBuilder( environmentBuilder );
-        environmentManager.setEnvironmentDAO( environmentDao );
-        environmentManager.setNetworkManager( networkManager );
-        environmentManager.setPeerCommandDispatcher( pcd );
-        environmentManager.setTemplateRegistry( registry );
-        environmentManager.setPeerCommandDispatcher( peerCommandDispatcher );
-    }
 
-
-    @After
-    public void shouldDestroy()
-    {
-        environmentManager.destroy();
+        manager = new EnvironmentManagerImpl();
+        manager.setAgentManager( agentManager );
+        manager.setContainerManager( containerManager );
+        manager.setDbManager( dbManager );
+        manager.setEnvironmentBuilder( environmentBuilder );
+        manager.setEnvironmentDAO( environmentDao );
+        manager.setNetworkManager( networkManager );
+        manager.setPeerCommandDispatcher( pcd );
+        manager.setTemplateRegistry( registry );
+        manager.setPeerCommandDispatcher( peerCommandDispatcher );
     }
 
 
     @Test
-    public void shouldAddContainer()
+    public void shoudBuildEnvironment() throws Exception
     {
-//        environmentManager.addContainer( mock( EnvironmentContainer.class ) );
-    }
+        EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
+        when( process.getEnvironmentName() ).thenReturn( "name" );
 
+        Map<String, CloneContainersMessage> map = new HashMap<>();
+        CloneContainersMessage ccm = mock( CloneContainersMessage.class );
+        when( ccm.isSuccess() ).thenReturn( true );
+        Set<Agent> agents = new HashSet<>();
 
-    @Test
-    public void testNotifier() throws EnvironmentBuildException
-    {
-        EnvironmentBuildProcess process = createEnvironmentBuildProcess();
-//        environmentManager.buildEnvironment( process );
-    }
+        Agent agent = mock( Agent.class );
+        agent.setHostname( HOSTNAME );
+        agents.add( agent );
 
+        when( ccm.getResult() ).thenReturn( agents );
+        map.put( "key", ccm );
 
-    private EnvironmentBuildProcess createEnvironmentBuildProcess()
-    {
-        EnvironmentBuildProcess ebp = new EnvironmentBuildProcess( "Environment name" );
-        ebp.setProcessStatusEnum( ProcessStatusEnum.NEW_PROCESS );
-        ebp.setCompleteStatus( false );
-        ebp.setUuid( UUID.randomUUID() );
-
-//        CloneContainersMessage ccm = new CloneContainersMessage();
-//        ebp.addCloneContainerMessage( ccm );
-
-        return ebp;
+        when( ccm.getNumberOfNodes() ).thenReturn( agents.size() );
+        when( process.getMessageMap() ).thenReturn( map );
+        manager.buildEnvironment( process );
     }
 }

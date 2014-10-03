@@ -12,5 +12,10 @@ package org.safehaus.subutai.common.enums;
 public enum NodeState
 {
 
-    STOPPED, RUNNING, UNKNOWN
+    STOPPED,
+    RUNNING,
+    UNKNOWN,
+    NORMAL,
+    DECOMMISSION_IN_PROGRESS,
+    DECOMMISSIONED,
 }

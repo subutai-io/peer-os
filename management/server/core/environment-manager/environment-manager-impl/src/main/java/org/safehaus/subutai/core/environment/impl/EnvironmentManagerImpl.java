@@ -64,7 +64,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private DbManager dbManager;
     private PeerCommandDispatcher peerCommandDispatcher;
-    private List<Environment> environments;
+    //    private List<Environment> environments;
     //    private Set<EnvironmentContainer> containers = new HashSet<>();
 
 
@@ -87,11 +87,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void init()
     {
-
         this.environmentDAO = new EnvironmentDAO( dbManager );
-        environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager );
+        environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager, containerManager );
 
-        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
+        //        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
@@ -191,7 +190,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
+    /*public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
     {
         LOG.info( "saved to " );
         //        return build( environmentBuildTask );
@@ -199,7 +198,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
         return true;
-    }
+    }*/
 
 
     @Override
@@ -207,7 +206,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             throws EnvironmentBuildException
     {
 
-        return environmentBuilder.build( environmentBuildTask, containerManager );
+        return environmentBuilder.build( environmentBuildTask );
     }
 
 
@@ -299,18 +298,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
-            throws EnvironmentBuildException
+    public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
-        Environment environment = new Environment( environmentBuildProcess.getEnvironmentName() );
-        for ( String key : ( Set<String> ) environmentBuildProcess.getMessageMap().keySet() )
+        Environment environment = new Environment( process.getEnvironmentName() );
+        int containerCount = 0;
+        long timeout = 1000 * 60;
+        for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
         {
-            CloneContainersMessage ccm = environmentBuildProcess.getMessageMap().get( key );
-
+            CloneContainersMessage ccm = process.getMessageMap().get( key );
             ccm.setType( PeerCommandType.CLONE );
+            containerCount = containerCount + ccm.getNumberOfNodes();
             try
             {
-                peerCommandDispatcher.invoke( ccm );
+                peerCommandDispatcher.invoke( ccm, timeout );
 
                 boolean result = ccm.isSuccess();
                 if ( result )
@@ -341,6 +341,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         if ( !environment.getContainers().isEmpty() )
         {
             saveEnvironment( environment );
+            if ( environment.getContainers().size() != containerCount )
+            {
+                throw new EnvironmentBuildException( "Not all containers created" );
+            }
         }
         else
         {
@@ -364,6 +368,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public void invoke( final PeerCommandMessage commandMessage, long timeout )
+    {
+        peerCommandDispatcher.invoke( commandMessage, timeout );
+    }
+
+
+    @Override
     public Set<EnvironmentContainer> getConnectedContainers( final Environment environment )
     {
 
@@ -382,9 +393,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             peerCommandDispatcher.invoke( cmd, 1000 * 15 );
 
-            Set<PeerContainer> containers = JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-            {
-            }.getType() );
+            Set<PeerContainer> containers =
+                    JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
+                    {
+                    }.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {

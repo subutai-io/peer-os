@@ -26,7 +26,7 @@ import com.google.common.base.Strings;
  */
 public abstract class AbstractCommand implements Command
 {
-    protected static final Logger LOG = LoggerFactory.getLogger( AbstractCommand.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractCommand.class.getName() );
     //subset of requests to send to agents
     protected final Set<Request> requests = new HashSet<>();
     //lock used to synchronize update of command state between command executor thread and cache evictor thread
@@ -259,6 +259,7 @@ public abstract class AbstractCommand implements Command
         }
         catch ( RuntimeException e )
         {
+            LOG.error( "Error in executeCommand", e );
             throw new CommandException( e.getMessage() );
         }
     }
@@ -290,14 +291,8 @@ public abstract class AbstractCommand implements Command
                 }
                 if ( getRequestsCompleted() == getRequestsCount() )
                 {
-                    if ( getRequestsCompleted() == getRequestsSucceeded() )
-                    {
-                        setCommandStatus( CommandStatus.SUCCEEDED );
-                    }
-                    else
-                    {
-                        setCommandStatus( CommandStatus.FAILED );
-                    }
+                    setCommandStatus( getRequestsCompleted() == getRequestsSucceeded() ? CommandStatus.SUCCEEDED :
+                                      CommandStatus.FAILED );
                 }
             }
         }
@@ -364,8 +359,9 @@ public abstract class AbstractCommand implements Command
         {
             completionSemaphore.acquire();
         }
-        catch ( InterruptedException ignore )
+        catch ( InterruptedException e )
         {
+            LOG.warn( "Interrupted in waitCompletion", e );
         }
     }
 

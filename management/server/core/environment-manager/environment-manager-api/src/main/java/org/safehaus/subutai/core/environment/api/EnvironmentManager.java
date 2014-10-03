@@ -27,7 +27,7 @@ public interface EnvironmentManager
     /**
      * Builds the environment with a given blueprint descriptor.
      */
-    boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask );
+//    boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask );
 
     //    public boolean buildEnvironment( EnvironmentBlueprint blueprint );
 
@@ -78,6 +78,8 @@ public interface EnvironmentManager
     //
     //    public boolean isContainerConnected( EnvironmentContainer container );
     public void invoke(PeerCommandMessage commandMessage);
+
+    public void invoke(PeerCommandMessage commandMessage, long timeout);
 
     Set<EnvironmentContainer> getConnectedContainers( Environment environment );
 }

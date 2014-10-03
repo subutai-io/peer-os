@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -38,7 +38,7 @@ public class ClusterConfiguration
 
         po.addLog( "Configuring cluster..." );
 
-        Command setMasterCommand = Commands.getAddMasterCommand( accumuloClusterConfig.getAllNodes(),
+        Command setMasterCommand = accumuloManager.getCommands().getAddMasterCommand( accumuloClusterConfig.getAllNodes(),
                 accumuloClusterConfig.getMasterNode() );
         accumuloManager.getCommandRunner().runCommand( setMasterCommand );
 
@@ -46,13 +46,13 @@ public class ClusterConfiguration
         {
             po.addLog( "Setting master node succeeded\nSetting GC node..." );
             Command setGCNodeCommand =
-                    Commands.getAddGCCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig.getGcNode() );
+                    accumuloManager.getCommands().getAddGCCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig.getGcNode() );
             accumuloManager.getCommandRunner().runCommand( setGCNodeCommand );
             if ( setGCNodeCommand.hasSucceeded() )
             {
                 po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
-                Command setMonitorCommand = Commands.getAddMonitorCommand( accumuloClusterConfig.getAllNodes(),
+                Command setMonitorCommand = accumuloManager.getCommands().getAddMonitorCommand( accumuloClusterConfig.getAllNodes(),
                         accumuloClusterConfig.getMonitor() );
                 accumuloManager.getCommandRunner().runCommand( setMonitorCommand );
 
@@ -60,7 +60,7 @@ public class ClusterConfiguration
                 {
                     po.addLog( "Setting monitor node succeeded\nSetting tracers..." );
 
-                    Command setTracersCommand = Commands.getAddTracersCommand( accumuloClusterConfig.getAllNodes(),
+                    Command setTracersCommand = accumuloManager.getCommands().getAddTracersCommand( accumuloClusterConfig.getAllNodes(),
                             accumuloClusterConfig.getTracers() );
                     accumuloManager.getCommandRunner().runCommand( setTracersCommand );
 
@@ -68,7 +68,7 @@ public class ClusterConfiguration
                     {
                         po.addLog( "Setting tracers succeeded\nSetting slaves..." );
 
-                        Command setSlavesCommand = Commands.getAddSlavesCommand( accumuloClusterConfig.getAllNodes(),
+                        Command setSlavesCommand = accumuloManager.getCommands().getAddSlavesCommand( accumuloClusterConfig.getAllNodes(),
                                 accumuloClusterConfig.getSlaves() );
                         accumuloManager.getCommandRunner().runCommand( setSlavesCommand );
 
@@ -77,7 +77,7 @@ public class ClusterConfiguration
                             po.addLog( "Setting slaves succeeded\nSetting ZK cluster..." );
 
                             Command setZkClusterCommand =
-                                    Commands.getBindZKClusterCommand( accumuloClusterConfig.getAllNodes(),
+                                    accumuloManager.getCommands().getBindZKClusterCommand( accumuloClusterConfig.getAllNodes(),
                                             zookeeperClusterConfig.getNodes() );
                             accumuloManager.getCommandRunner().runCommand( setZkClusterCommand );
 
@@ -85,7 +85,7 @@ public class ClusterConfiguration
                             {
                                 po.addLog( "Setting ZK cluster succeeded\nInitializing cluster with HDFS..." );
 
-                                Command initCommand = Commands.getInitCommand( accumuloClusterConfig.getInstanceName(),
+                                Command initCommand = accumuloManager.getCommands().getInitCommand( accumuloClusterConfig.getInstanceName(),
                                         accumuloClusterConfig.getPassword(), accumuloClusterConfig.getMasterNode() );
                                 accumuloManager.getCommandRunner().runCommand( initCommand );
 
@@ -94,7 +94,7 @@ public class ClusterConfiguration
                                     po.addLog( "Initialization succeeded\nStarting cluster..." );
 
                                     Command startClusterCommand =
-                                            Commands.getStartCommand( accumuloClusterConfig.getMasterNode() );
+                                            accumuloManager.getCommands().getStartCommand( accumuloClusterConfig.getMasterNode() );
                                     accumuloManager.getCommandRunner().runCommand( startClusterCommand );
 
                                     if ( startClusterCommand.hasSucceeded() )
@@ -167,7 +167,7 @@ public class ClusterConfiguration
             po.addLog( String.format( "Installing %s on %s node...", AccumuloClusterConfig.PRODUCT_NAME,
                     agent.getHostname() ) );
 
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+            Command installCommand = accumuloManager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
             accumuloManager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )
@@ -187,13 +187,13 @@ public class ClusterConfiguration
         if ( nodeType.isSlave() )
         {
             accumuloClusterConfig.getSlaves().add( agent );
-            addNodeCommand = Commands.getAddSlavesCommand( accumuloClusterConfig.getAllNodes(),
+            addNodeCommand = accumuloManager.getCommands().getAddSlavesCommand( accumuloClusterConfig.getAllNodes(),
                     accumuloClusterConfig.getSlaves() );
         }
         else
         {
             accumuloClusterConfig.getTracers().add( agent );
-            addNodeCommand = Commands.getAddTracersCommand( accumuloClusterConfig.getAllNodes(),
+            addNodeCommand = accumuloManager.getCommands().getAddTracersCommand( accumuloClusterConfig.getAllNodes(),
                     accumuloClusterConfig.getTracers() );
         }
         accumuloManager.getCommandRunner().runCommand( addNodeCommand );
@@ -203,7 +203,7 @@ public class ClusterConfiguration
             po.addLog( "Node registration succeeded\nSetting master node..." );
 
             Command setMasterNodeCommand =
-                    Commands.getAddMasterCommand( Sets.newHashSet( agent ), accumuloClusterConfig.getMasterNode() );
+                    accumuloManager.getCommands().getAddMasterCommand( Sets.newHashSet( agent ), accumuloClusterConfig.getMasterNode() );
             accumuloManager.getCommandRunner().runCommand( setMasterNodeCommand );
 
             if ( setMasterNodeCommand.hasSucceeded() )
@@ -212,7 +212,7 @@ public class ClusterConfiguration
                 po.addLog( "Setting master node succeeded\nSetting GC node..." );
 
                 Command setGcNodeCommand =
-                        Commands.getAddGCCommand( Sets.newHashSet( agent ), accumuloClusterConfig.getGcNode() );
+                        accumuloManager.getCommands().getAddGCCommand( Sets.newHashSet( agent ), accumuloClusterConfig.getGcNode() );
                 accumuloManager.getCommandRunner().runCommand( setGcNodeCommand );
 
                 if ( setGcNodeCommand.hasSucceeded() )
@@ -220,7 +220,7 @@ public class ClusterConfiguration
 
                     po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
-                    Command setMonitorCommand = Commands.getAddMonitorCommand( Sets.newHashSet( agent ),
+                    Command setMonitorCommand = accumuloManager.getCommands().getAddMonitorCommand( Sets.newHashSet( agent ),
                             accumuloClusterConfig.getMonitor() );
                     accumuloManager.getCommandRunner().runCommand( setMonitorCommand );
 
@@ -230,9 +230,9 @@ public class ClusterConfiguration
                         po.addLog( "Setting monitor node succeeded\nSetting tracers/slaves..." );
 
                         Command setTracersSlavesCommand = nodeType.isSlave() ?
-                                                          Commands.getAddTracersCommand( Sets.newHashSet( agent ),
+                                                          accumuloManager.getCommands().getAddTracersCommand( Sets.newHashSet( agent ),
                                                                   accumuloClusterConfig.getTracers() ) :
-                                                          Commands.getAddSlavesCommand( Sets.newHashSet( agent ),
+                                                          accumuloManager.getCommands().getAddSlavesCommand( Sets.newHashSet( agent ),
                                                                   accumuloClusterConfig.getSlaves() );
 
                         accumuloManager.getCommandRunner().runCommand( setTracersSlavesCommand );
@@ -242,7 +242,7 @@ public class ClusterConfiguration
 
                             po.addLog( "Setting tracers/slaves succeeded\nSetting Zk cluster..." );
 
-                            Command setZkClusterCommand = Commands.getBindZKClusterCommand( Sets.newHashSet( agent ),
+                            Command setZkClusterCommand = accumuloManager.getCommands().getBindZKClusterCommand( Sets.newHashSet( agent ),
                                     zookeeperClusterConfig.getNodes() );
                             accumuloManager.getCommandRunner().runCommand( setZkClusterCommand );
 
@@ -251,7 +251,7 @@ public class ClusterConfiguration
                                 po.addLog( "Setting ZK cluster succeeded\nRestarting cluster..." );
 
                                 Command restartClusterCommand =
-                                        Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
+                                        accumuloManager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
                                 accumuloManager.getCommandRunner().runCommand( restartClusterCommand );
 
                                 if ( restartClusterCommand.hasSucceeded() )
@@ -312,14 +312,14 @@ public class ClusterConfiguration
             throws ClusterConfigurationException
     {
         Command unregisterNodeCommand;
-        if ( nodeType == NodeType.TRACER )
+        if ( nodeType == NodeType.Tracer )
         {
-            unregisterNodeCommand = Commands.getClearTracerCommand( accumuloClusterConfig.getAllNodes(), agent );
+            unregisterNodeCommand = accumuloManager.getCommands().getClearTracerCommand( accumuloClusterConfig.getAllNodes(), agent );
             accumuloClusterConfig.getTracers().remove( agent );
         }
         else
         {
-            unregisterNodeCommand = Commands.getClearSlaveCommand( accumuloClusterConfig.getAllNodes(), agent );
+            unregisterNodeCommand = accumuloManager.getCommands().getClearSlaveCommand( accumuloClusterConfig.getAllNodes(), agent );
             accumuloClusterConfig.getSlaves().remove( agent );
         }
 
@@ -330,7 +330,7 @@ public class ClusterConfiguration
         {
             po.addLog( "Node unregistered successfully\nUninstalling Accumulo...." );
 
-            Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+            Command uninstallCommand = accumuloManager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
             accumuloManager.getCommandRunner().runCommand( uninstallCommand );
 
             if ( uninstallCommand.hasSucceeded() )
@@ -344,7 +344,7 @@ public class ClusterConfiguration
             }
 
             po.addLog( "Restarting cluster..." );
-            Command restartClusterCommand = Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
+            Command restartClusterCommand = accumuloManager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             accumuloManager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {
@@ -376,7 +376,7 @@ public class ClusterConfiguration
 
         po.addLog( "Uninstalling cluster..." );
 
-        Command uninstallCommand = Commands.getUninstallCommand( accumuloClusterConfig.getAllNodes() );
+        Command uninstallCommand = accumuloManager.getCommands().getUninstallCommand( accumuloClusterConfig.getAllNodes() );
         accumuloManager.getCommandRunner().runCommand( uninstallCommand );
 
         if ( uninstallCommand.hasCompleted() )
@@ -394,7 +394,7 @@ public class ClusterConfiguration
         po.addLog( "Removing Accumulo from HDFS..." );
 
         Command removeAccumuloFromHDFSCommand =
-                Commands.getRemoveAccumuloFromHFDSCommand( accumuloClusterConfig.getMasterNode() );
+                accumuloManager.getCommands().getRemoveAccumuloFromHFDSCommand( accumuloClusterConfig.getMasterNode() );
         accumuloManager.getCommandRunner().runCommand( removeAccumuloFromHDFSCommand );
 
         if ( removeAccumuloFromHDFSCommand.hasSucceeded() )

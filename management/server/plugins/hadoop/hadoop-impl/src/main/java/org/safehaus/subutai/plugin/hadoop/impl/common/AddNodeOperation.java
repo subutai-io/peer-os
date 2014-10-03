@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.hadoop.impl.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
@@ -19,7 +19,7 @@ public class AddNodeOperation
     private Agent agent;
 
 
-    public AddNodeOperation( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    public AddNodeOperation( Commands commands, HadoopClusterConfig hadoopClusterConfig, Agent agent )
     {
 
         this.hadoopClusterConfig = hadoopClusterConfig;
@@ -27,13 +27,13 @@ public class AddNodeOperation
         commandList = new ArrayList<>();
 
         //		commandList.add(Commands.getInstallCommand(agent));
-        commandList.add( Commands.getSetMastersCommand( hadoopClusterConfig, agent ) );
-        commandList.add( Commands.getExcludeDataNodeCommand( hadoopClusterConfig, agent ) );
-        commandList.add( Commands.getExcludeTaskTrackerCommand( hadoopClusterConfig, agent ) );
-        commandList.add( Commands.getSetDataNodeCommand( hadoopClusterConfig, agent ) );
-        commandList.add( Commands.getSetTaskTrackerCommand( hadoopClusterConfig, agent ) );
-        commandList.add( Commands.getStartNameNodeCommand( agent ) );
-        commandList.add( Commands.getStartTaskTrackerCommand( agent ) );
+        commandList.add( commands.getSetMastersCommand( hadoopClusterConfig, agent ) );
+        commandList.add( commands.getExcludeDataNodeCommand( hadoopClusterConfig, agent ) );
+        commandList.add( commands.getExcludeTaskTrackerCommand( hadoopClusterConfig, agent ) );
+        commandList.add( commands.getSetDataNodeCommand( hadoopClusterConfig, agent ) );
+        commandList.add( commands.getSetTaskTrackerCommand( hadoopClusterConfig, agent ) );
+        commandList.add( commands.getStartDataNodeCommand( agent ) );
+        commandList.add( commands.getStartTaskTrackerCommand( agent ) );
     }
 
 

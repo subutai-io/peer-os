@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
 import com.google.common.collect.Sets;
@@ -58,7 +57,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<PrestoIm
 
         po.addLog( String.format( "Starting node %s...", node.getHostname() ) );
 
-        Command startNodeCommand = Commands.getStartCommand( Sets.newHashSet( node ) );
+        Command startNodeCommand = manager.getCommands().getStartCommand( Sets.newHashSet( node ) );
         final AtomicBoolean ok = new AtomicBoolean();
         manager.getCommandRunner().runCommand( startNodeCommand, new CommandCallback()
         {

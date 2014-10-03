@@ -10,7 +10,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 import com.google.common.collect.Sets;
@@ -58,7 +57,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
             return;
         }
 
-        Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
+        Command statusServiceCommand = manager.getCommands().getStatusCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( statusServiceCommand );
 
         if ( statusServiceCommand.hasSucceeded() )

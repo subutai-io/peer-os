@@ -502,7 +502,8 @@ public class PeerManagerImpl implements PeerManager
                     pc.setState( ContainerState.STARTED );
                     containers.add( pc );
                 }
-                peerCommandMessage.setResult( JsonUtil.toJson( containers ) );
+                String jsonObject = JsonUtil.toJson( containers );
+                peerCommandMessage.setResult( jsonObject );
                 peerCommandMessage.setSuccess( true );
                 break;
             case START:
@@ -569,10 +570,8 @@ public class PeerManagerImpl implements PeerManager
         Agent agent = agentManager.getAgentByUUID( ecm.getAgentId() );
         if ( agent == null )
         {
-            ecm.setStdErr( "Container is down." );
-            ecm.setStdOut( "Container is down." );
-            ecm.setExitCode( -1 );
-            ecm.setSuccess( true );
+            ecm.setExceptionMessage( "Container is not available.\n" );
+            ecm.setSuccess( false );
             return;
         }
         RequestBuilder requestBuilder = new RequestBuilder( ecm.getCommand() );
@@ -583,17 +582,20 @@ public class PeerManagerImpl implements PeerManager
             requestBuilder.withCwd( ecm.getCwd() );
         }
 
-        int timeout = ecm.getTimeout();
+        long timeout = ecm.getTimeout();
 
-        requestBuilder.withTimeout( timeout );
+        requestBuilder.withTimeout( ( int ) timeout );
         Command cmd = commandRunner.createCommand( "Remote command", requestBuilder, Sets.newHashSet( agent ) );
         try
         {
             cmd.execute();
             AgentResult result = cmd.getResults().get( ecm.getAgentId() );
-            ecm.setStdOut( result.getStdOut() );
-            ecm.setStdErr( result.getStdErr() );
-            ecm.setExitCode( result.getExitCode() );
+            ExecuteCommandMessage.ExecutionResult executionResult =
+                    ecm.createExecutionResult( result.getStdOut(), result.getStdErr(), result.getExitCode() );
+            ecm.setResult( executionResult );
+            //            ecm.setStdOut( result.getStdOut() );
+            //            ecm.setStdErr( result.getStdErr() );
+            //            ecm.setExitCode( result.getExitCode() );
             ecm.setSuccess( true );
         }
         catch ( CommandException e )

@@ -3,11 +3,11 @@ package org.safehaus.subutai.core.configuration.impl.command;
 
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.configuration.api.TextInjector;
 
 
@@ -30,6 +30,7 @@ public class TextInjectorImpl implements TextInjector
 
     public void setCommandRunner( final CommandRunner commandRunner )
     {
+
         this.commandRunner = commandRunner;
     }
 
@@ -51,7 +52,7 @@ public class TextInjectorImpl implements TextInjector
     {
         //TODO call echo command on given agent
         Agent agent = agentManager.getAgentByHostname( hostname );
-        Command command = Commands.getEchoCommand( agent, path, content );
+        Command command = new Commands( commandRunner ).getEchoCommand( agent, path, content );
         commandRunner.runCommand( command );
 
         if ( !command.hasSucceeded() )
@@ -68,7 +69,7 @@ public class TextInjectorImpl implements TextInjector
     {
         //TODO execute cat commat on given agent and path
         Agent agent = agentManager.getAgentByHostname( hostname );
-        Command catCommand = Commands.getCatCommand( agent, pathToFile );
+        Command catCommand = new Commands( commandRunner ).getCatCommand( agent, pathToFile );
         commandRunner.runCommand( catCommand );
 
         if ( catCommand.hasSucceeded() )

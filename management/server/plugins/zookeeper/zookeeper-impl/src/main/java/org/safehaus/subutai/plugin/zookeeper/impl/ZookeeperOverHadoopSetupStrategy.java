@@ -81,7 +81,8 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
         po.addLog( "Checking prerequisites..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( zookeeperClusterConfig.getNodes() );
+        Command checkInstalledCommand =
+                zookeeperManager.getCommands().getCheckInstalledCommand( zookeeperClusterConfig.getNodes() );
         zookeeperManager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -105,10 +106,10 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy
             }
         }
 
-        po.addLog( String.format( "Installing Zookeeper on %s...", zookeeperClusterConfig.getNodes() ) );
+        po.addLog( String.format( "Installing Zookeeper..." ) );
 
         //install
-        Command installCommand = Commands.getInstallCommand( zookeeperClusterConfig.getNodes() );
+        Command installCommand = zookeeperManager.getCommands().getInstallCommand( zookeeperClusterConfig.getNodes() );
         zookeeperManager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )

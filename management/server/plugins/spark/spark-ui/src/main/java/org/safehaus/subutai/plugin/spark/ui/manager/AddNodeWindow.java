@@ -72,6 +72,20 @@ public class AddNodeWindow extends Window
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
+
+        final Button ok = new Button( "Ok" );
+        ok.addStyleName( "default" );
+        ok.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                //close window
+                track = false;
+                close();
+            }
+        } );
+
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -81,9 +95,9 @@ public class AddNodeWindow extends Window
                 showProgress();
                 Agent agent = ( Agent ) hadoopNodes.getValue();
                 final UUID trackID = spark.addSlaveNode( config.getClusterName(), agent.getHostname() );
+                ok.setEnabled( false );
                 executor.execute( new Runnable()
                 {
-
                     @Override
                     public void run()
                     {
@@ -98,6 +112,7 @@ public class AddNodeWindow extends Window
                                 if ( po.getState() != ProductOperationState.RUNNING )
                                 {
                                     hideProgress();
+                                    ok.setEnabled( true );
                                     break;
                                 }
                             }
@@ -135,18 +150,6 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
-        ok.addStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                //close window
-                track = false;
-                close();
-            }
-        } );
 
         HorizontalLayout bottomContent = new HorizontalLayout();
         bottomContent.addComponent( indicator );

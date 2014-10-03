@@ -140,9 +140,9 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         } );
         GridLayout grid = new GridLayout( 1, 3 );
 
-        grid.addComponent( new Label( "Environments:" ) );
-        grid.addComponent( env );
-        grid.addComponent( tree );
+        grid.addComponent( new Label( "Environments:" ), 0, 0 );
+        grid.addComponent( env, 0, 1 );
+        grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
 
@@ -167,7 +167,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 Item item = container.addItem( itemId );
                 container.setChildrenAllowed( itemId, false );
 
-                tree.setItemCaption( item, "---> " + ec.getHostname() );
+                tree.setItemCaption( itemId, ec.getHostname() );
                 item.getItemProperty( "value" ).setValue( ec );
             }
         }
@@ -212,29 +212,26 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         List<String> agentIdList = new ArrayList<>();
         for ( EnvironmentContainer container : freshContainers )
         {
-            if ( peerId == null )
-            {
-                peerId = container.getPeerId().toString();
-            }
-            agentIdList.add( container.getAgentId().toString() );
+            //            if ( peerId == null )
+            //            {
+            //                peerId = container.getPeerId().toString();
+            //            }
+            agentIdList.add( String
+                    .format( "%s:%s", container.getPeerId().toString(), container.getAgentId().toString() ) );
         }
 
         for ( Object itemObj : container.getItemIds() )
         {
             String itemId = ( String ) itemObj;
-            String[] itemIds = itemId.split( ":" );
-            if ( itemIds[0].equals( peerId ) )
+            if ( agentIdList.contains( itemId ) )
             {
-                if ( agentIdList.contains( itemIds[1] ) )
-                {
-                    Item item = container.getItem( itemId );
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
-                }
-                else
-                {
-                    Item item = container.getItem( itemId );
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
-                }
+                Item item = container.getItem( itemId );
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+            }
+            else
+            {
+                Item item = container.getItem( itemId );
+                item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual-stopped.png" ) );
             }
         }
     }

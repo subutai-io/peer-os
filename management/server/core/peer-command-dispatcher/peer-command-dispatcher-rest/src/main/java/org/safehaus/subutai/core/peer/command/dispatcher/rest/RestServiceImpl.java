@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -188,6 +189,8 @@ public class RestServiceImpl implements RestService
         {
             case CLONE:
                 return CloneContainersMessage.class;
+            case EXECUTE:
+                return ExecuteCommandMessage.class;
             default:
                 return DefaultCommandMessage.class;
         }
@@ -211,9 +214,10 @@ public class RestServiceImpl implements RestService
 
     private Peer getSamplePeer()
     {
+        String localIp = getLocalIp();
         Peer peer = new Peer();
-        peer.setName( "Peer name 1" );
-        peer.setIp( getLocalIp() );
+        peer.setName( "Peer on " + localIp );
+        peer.setIp( localIp );
         peer.setId( peerManager.getSiteId() );
         peer.setStatus( PeerStatus.REQUESTED );
         return peer;

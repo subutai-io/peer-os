@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
-import org.safehaus.subutai.plugin.pig.impl.Commands;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
 
 import com.google.common.collect.Sets;
@@ -96,7 +95,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
         ProductOperation po = productOperation;
         po.addLog( "Uninstalling Pig..." );
 
-        Command cmd = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+        Command cmd = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

@@ -8,20 +8,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoDbSetupStrategy;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
-import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 
 import com.google.common.base.Strings;
 
@@ -124,7 +123,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
     private boolean addDataNode( ProductOperation po, final MongoClusterConfig config, Agent agent )
     {
-        List<Command> commands = Commands.getAddDataNodeCommands( config, agent );
+        List<Command> commands = manager.getCommands().getAddDataNodeCommands( config, agent );
 
         boolean additionOK = true;
         Command findPrimaryNodeCommand = null;
@@ -193,9 +192,11 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
                 if ( primaryNodeAgent != null )
                 {
-                    Command registerSecondaryNodeWithPrimaryCommand =
-                            Commands.getRegisterSecondaryNodeWithPrimaryCommand( agent, config.getDataNodePort(),
-                                    config.getDomainName(), primaryNodeAgent );
+                    Command registerSecondaryNodeWithPrimaryCommand = manager.getCommands()
+                                                                             .getRegisterSecondaryNodeWithPrimaryCommand(
+                                                                                     agent, config.getDataNodePort(),
+                                                                                     config.getDomainName(),
+                                                                                     primaryNodeAgent );
 
                     manager.getCommandRunner().runCommand( registerSecondaryNodeWithPrimaryCommand );
                     if ( registerSecondaryNodeWithPrimaryCommand.hasSucceeded() )
@@ -229,7 +230,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
     private boolean addRouter( ProductOperation po, final MongoClusterConfig config, Agent agent )
     {
-        List<Command> commands = Commands.getAddRouterCommands( config, agent );
+        List<Command> commands = manager.getCommands().getAddRouterCommands( config, agent );
 
         boolean additionOK = true;
 

@@ -28,12 +28,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.Container;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
@@ -46,6 +46,7 @@ import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
+import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -68,6 +69,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     private final Queue<ContainerEventListener> listeners = new ConcurrentLinkedQueue<>();
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
+    private final Commands commands;
 
 
     public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring,
@@ -81,6 +83,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         this.templateRegistry = templateRegistry;
         this.dbManager = dbManager;
         this.strategyManager = strategyManager;
+        this.commands = new Commands( commandRunner );
     }
 
 
@@ -92,7 +95,6 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
         sequences = new ConcurrentHashMap<>();
         executor = Executors.newCachedThreadPool();
-        Commands.init( commandRunner );
     }
 
 
@@ -324,7 +326,29 @@ public class ContainerManagerImpl extends ContainerManagerBase
         if ( !pAgents.isEmpty() )
         {
 
-            Command getLxcListCommand = Commands.getLxcListCommand( pAgents );
+            Command templateListCommand = commands.getTemplateListCommand( pAgents );
+
+            commandRunner.runCommand( templateListCommand );
+
+            Map<UUID, Set<String>> agentTemplates = new HashMap<>();
+            if ( templateListCommand.hasCompleted() )
+            {
+
+                for ( AgentResult result : templateListCommand.getResults().values() )
+                {
+                    Set<String> templates = new HashSet<>();
+                    UUID agentUuid = result.getAgentUUID();
+                    String stdOut = result.getStdOut();
+                    String[] outLines = result.getStdOut().split( "\\n" );
+
+                    for ( int i = 2; i < outLines.length; i++ )
+                    {
+                        templates.add( outLines[i] );
+                    }
+                    agentTemplates.put( agentUuid, templates );
+                }
+            }
+            Command getLxcListCommand = commands.getLxcListCommand( pAgents );
             commandRunner.runCommand( getLxcListCommand );
 
             if ( getLxcListCommand.hasCompleted() )
@@ -344,8 +368,11 @@ public class ContainerManagerImpl extends ContainerManagerBase
                         if ( lxcProperties.length > 1 )
                         {
                             String lxcHostname = lxcProperties[0];
-                            if ( !( Common.BASE_CONTAINER_NAME.equalsIgnoreCase( lxcHostname )
-                                    || Common.MASTER_TEMPLATE_NAME.equalsIgnoreCase( lxcHostname ) ) )
+                            if ( !agentTemplates.get( result.getAgentUUID() ).contains( lxcHostname ) )
+                            //                            if ( !( Common.BASE_CONTAINER_NAME.equalsIgnoreCase(
+                            // lxcHostname )
+                            //                                    || Common.MASTER_TEMPLATE_NAME.equalsIgnoreCase(
+                            // lxcHostname ) ) )
                             {
                                 String lxcStatus = lxcProperties[1];
 
@@ -393,7 +420,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
             return serverMetrics;
         }
 
-        Command getMetricsCommand = Commands.getMetricsCommand( agents );
+        Command getMetricsCommand = commands.getMetricsCommand( agents );
         commandRunner.runCommand( getMetricsCommand );
 
         if ( getMetricsCommand.hasCompleted() )
@@ -452,7 +479,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) )
         {
-            Command startLxcCommand = Commands.getLxcStartCommand( physicalAgent, lxcHostname );
+            Command startLxcCommand = commands.getLxcStartCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( startLxcCommand );
             try
             {
@@ -461,7 +488,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
             catch ( InterruptedException ignore )
             {
             }
-            Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
+            Command lxcInfoCommand = commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
 
             ContainerState state = ContainerState.UNKNOWN;
@@ -492,7 +519,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) )
         {
-            Command stopLxcCommand = Commands.getLxcStopCommand( physicalAgent, lxcHostname );
+            Command stopLxcCommand = commands.getLxcStopCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( stopLxcCommand );
 
             long thresholdTime = System.currentTimeMillis() + WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS;
@@ -506,7 +533,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
                 catch ( InterruptedException ignore )
                 {
                 }
-                Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
+                Command lxcInfoCommand = commands.getLxcInfoCommand( physicalAgent, lxcHostname );
                 commandRunner.runCommand( lxcInfoCommand );
                 if ( lxcInfoCommand.hasCompleted() )
                 {
@@ -845,5 +872,19 @@ public class ContainerManagerImpl extends ContainerManagerBase
                 }
             }
         }
+    }
+
+
+    @Override
+    public List<String> getTemplates()
+    {
+        List<Template> templates = templateRegistry.getAllTemplates();
+
+        List<String> result = new ArrayList<String>();
+        for ( Template template : templates )
+        {
+            result.add( template.getTemplateName() );
+        }
+        return result;
     }
 }

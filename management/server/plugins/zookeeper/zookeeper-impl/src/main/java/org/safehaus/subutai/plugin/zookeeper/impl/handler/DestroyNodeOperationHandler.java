@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ClusterConfiguration;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 import com.google.common.collect.Sets;
@@ -115,7 +114,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
             //just uninstall Zookeeper
             productOperation.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
-            Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+            Command uninstallCommand = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( uninstallCommand );
 
             if ( uninstallCommand.hasCompleted() )

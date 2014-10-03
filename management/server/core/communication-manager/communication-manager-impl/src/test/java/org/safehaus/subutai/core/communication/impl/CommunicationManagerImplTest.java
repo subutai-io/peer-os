@@ -26,9 +26,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.communication.api.CommandJson;
-import org.slf4j.LoggerFactory;
 
 import com.jayway.awaitility.Awaitility;
 
@@ -42,10 +40,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class CommunicationManagerImplTest
 {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger( CommunicationManagerImpl.class.getName() );
 
     private CommunicationManagerImpl communicationManagerImpl = null;
-    private static final String SERVICE_QUEUE_NAME = "SERVICE_QUEUE";
+    private static final String SERVICE_TOPIC = "SERVICE_TOPIC";
+    private static final String BROADCAST_TOPIC = "BROADCAST_TOPIC";
     private static final String VM_BROKER_URL = "vm://localhost?broker.persistent=false";
     private static final int amqMaxSenderPoolSize = 5;
     private static final int amqMaxMessageToAgentTtlSec = 30;
@@ -64,7 +62,8 @@ public class CommunicationManagerImplTest
         communicationManagerImpl.setPersistentMessages( isPersistentMessages );
         communicationManagerImpl.setAmqMaxSenderPoolSize( amqMaxSenderPoolSize );
         communicationManagerImpl.setAmqMaxPooledConnections( aqMaxPooledConnections );
-        communicationManagerImpl.setAmqServiceTopic( SERVICE_QUEUE_NAME );
+        communicationManagerImpl.setAmqServiceTopic( SERVICE_TOPIC );
+        communicationManagerImpl.setAmqBroadcastTopic( BROADCAST_TOPIC );
         communicationManagerImpl.init();
     }
 
@@ -74,6 +73,7 @@ public class CommunicationManagerImplTest
     {
         assertEquals( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec(), amqMaxMessageToAgentTtlSec );
         assertEquals( communicationManagerImpl.isPersistentMessages(), isPersistentMessages );
+        assertEquals( communicationManagerImpl.getAmqBroadcastTopic(), BROADCAST_TOPIC );
     }
 
 
@@ -140,11 +140,43 @@ public class CommunicationManagerImplTest
         Connection connection = communicationManagerImpl.createConnection();
         connection.start();
         final Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-        Destination topic = session.createTopic( SERVICE_QUEUE_NAME );
+        Destination topic = session.createTopic( SERVICE_TOPIC );
         final MessageProducer producer = session.createProducer( topic );
 
         BytesMessage message = session.createBytesMessage();
         message.writeBytes( CommandJson.getResponseCommandJson( response ).getBytes() );
+        producer.send( message );
+
+        Awaitility.await().atMost( 2, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
+                  .pollDelay( 100, TimeUnit.MILLISECONDS ).until( new Callable<Boolean>()
+        {
+
+            public Boolean call() throws Exception
+            {
+                responseListener.signal.acquire();
+                return true;
+            }
+        } );
+    }
+
+
+    @Test
+    public void testHeartbeat() throws JMSException
+    {
+        //setup listener
+        final TestResponseListener responseListener = new TestResponseListener();
+        communicationManagerImpl.addListener( responseListener );
+
+
+        Connection connection = communicationManagerImpl.createConnection();
+        connection.start();
+        final Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+        Destination topic = session.createTopic( SERVICE_TOPIC );
+        final MessageProducer producer = session.createProducer( topic );
+
+        BytesMessage message = session.createBytesMessage();
+        message.writeBytes( CommandJson.getResponseCommandJson(
+                CommandJson.getResponseFromCommandJson( "{response:{type:HEARTBEAT_RESPONSE}}" ) ).getBytes() );
         producer.send( message );
 
         Awaitility.await().atMost( 2, TimeUnit.SECONDS ).with().pollInterval( 50, TimeUnit.MILLISECONDS ).and()
@@ -167,7 +199,7 @@ public class CommunicationManagerImplTest
         Request request = TestUtils.getRequestTemplate( uuid );
         //setup listener
 
-        MessageConsumer consumer = createConsumer( Common.BROADCAST_TOPIC );
+        MessageConsumer consumer = createConsumer( communicationManagerImpl.getAmqBroadcastTopic() );
 
         communicationManagerImpl.sendBroadcastRequest( request );
 

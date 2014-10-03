@@ -52,16 +52,11 @@ class CommunicationMessageListener implements MessageListener
                 String jsonCmd = new String( msgBytes, "UTF-8" );
                 Response response = CommandJson.getResponseFromCommandJson( jsonCmd );
 
-
                 if ( response != null )
                 {
                     logResponse( response, jsonCmd );
                     response.setTransportId( ( ( ActiveMQMessage ) message ).getProducerId().toString() );
                     notifyListeners( response );
-                }
-                else
-                {
-                    LOG.warn( "Could not parse response {}", jsonCmd );
                 }
             }
             else if ( message instanceof ActiveMQMessage )
@@ -76,10 +71,6 @@ class CommunicationMessageListener implements MessageListener
                             .setTransportId( ( ( RemoveInfo ) aMsg.getDataStructure() ).getObjectId().toString() );
                     notifyListeners( agentDisconnect );
                 }
-            }
-            else
-            {
-                LOG.warn( message.toString() );
             }
         }
         catch ( Exception ex )

@@ -99,7 +99,7 @@ public class RemotePeerRestClient
     }
 
 
-    public PeerCommandMessage invoke( String ip, String port, PeerCommandMessage ccm ) throws RuntimeException
+    public void invoke( String ip, String port, PeerCommandMessage peerCommandMessage )
     {
         String path = "peer/invoke";
         try
@@ -110,8 +110,8 @@ public class RemotePeerRestClient
             WebClient client = WebClient.create( baseUrl );
 
             Form form = new Form();
-            form.set( "commandType", ccm.getType().toString() );
-            form.set( "command", ccm.toJson() );
+            form.set( "commandType", peerCommandMessage.getType().toString() );
+            form.set( "command", peerCommandMessage.toJson() );
 
 
             HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
@@ -126,26 +126,28 @@ public class RemotePeerRestClient
                                       .accept( MediaType.APPLICATION_JSON ).form( form );
 
             String jsonObject = response.readEntity( String.class );
-            PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
+            PeerCommandMessage result = JsonUtil.fromJson( jsonObject, peerCommandMessage.getClass() );
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                ccm.setResult( result.getResult() );
-                ccm.setSuccess( result.isSuccess() );
+                peerCommandMessage.setResult( result.getResult() );
+                peerCommandMessage.setSuccess( result.isSuccess() );
                 LOG.debug( String.format( "Remote command result: %s", result.toString() ) );
-                return ccm;
+//                return ccm;
             }
             else
             {
-                ccm.setSuccess( false );
-                ccm.setExceptionMessage( result.getExceptionMessage() );
-                return ccm;
+                peerCommandMessage.setSuccess( false );
+                peerCommandMessage.setExceptionMessage( result.getExceptionMessage() );
+//                return ccm;
             }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-            throw new RuntimeException( "Error while invoking REST Client" );
+            peerCommandMessage.setSuccess( false );
+            peerCommandMessage.setExceptionMessage( e.toString() );
+//            throw new RuntimeException( "Error while invoking REST Client" );
         }
 
         //return null;

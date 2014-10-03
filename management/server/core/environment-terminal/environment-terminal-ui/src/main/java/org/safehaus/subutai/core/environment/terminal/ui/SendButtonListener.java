@@ -73,15 +73,15 @@ public class SendButtonListener implements Button.ClickListener
         if ( checkRequest( requestBuilder ) )
         {
 
-            if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
-            {
-                requestBuilder.withPid( Integer.valueOf( form.programTxtFld.getValue() ) );
-                requestBuilder.withType( RequestType.TERMINATE_REQUEST );
-            }
-            else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
-            {
-                requestBuilder.withType( RequestType.PS_REQUEST );
-            }
+//            if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST )
+//            {
+//                requestBuilder.withPid( Integer.valueOf( form.programTxtFld.getValue() ) );
+//                requestBuilder.withType( RequestType.TERMINATE_REQUEST );
+//            }
+//            else if ( form.requestTypeCombo.getValue() == RequestType.PS_REQUEST )
+//            {
+//                requestBuilder.withType( RequestType.PS_REQUEST );
+//            }
 
             if ( form.workDirTxtFld.getValue() != null && !Strings.isNullOrEmpty( form.workDirTxtFld.getValue() ) )
             {
@@ -90,15 +90,13 @@ public class SendButtonListener implements Button.ClickListener
 
             int timeout = Integer.valueOf( form.timeoutTxtFld.getValue() );
             requestBuilder.withTimeout( timeout );
-            UUID taskUuid = UUIDUtil.generateTimeBasedUUID();
-            Request request = requestBuilder.build( container.getAgentId(), taskUuid );
 
             form.indicator.setVisible( true );
 
             ExecuteCommandMessage ecm =
                     new ExecuteCommandMessage( container.getEnvironment().getUuid(), container.getPeerId(),
-                            container.getAgentId(), form.programTxtFld.getValue(), RequestType.EXECUTE_REQUEST,
-                             timeout, form.workDirTxtFld.getValue() );
+                            container.getAgentId(), form.programTxtFld.getValue(), RequestType.EXECUTE_REQUEST, timeout,
+                            form.workDirTxtFld.getValue() );
             executor.execute( new ExecuteCommandTask( ecm, environmentManager, form ) );
         }
     }
@@ -106,14 +104,14 @@ public class SendButtonListener implements Button.ClickListener
 
     private boolean checkRequest( RequestBuilder requestBuilder )
     {
-        if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && !(
-                StringUtil.isNumeric( form.programTxtFld.getValue() )
-                        && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
-        {
-
-            form.show( "Please, enter numeric PID greater than 0 to kill" );
-            return false;
-        }
+//        if ( form.requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && !(
+//                StringUtil.isNumeric( form.programTxtFld.getValue() )
+//                        && Integer.valueOf( form.programTxtFld.getValue() ) > 0 ) )
+//        {
+//
+//            form.show( "Please, enter numeric PID greater than 0 to kill" );
+//            return false;
+//        }
 
         if ( !( StringUtil.isNumeric( form.timeoutTxtFld.getValue() ) && NumUtil
                 .isIntBetween( Integer.valueOf( form.timeoutTxtFld.getValue() ), Common.MIN_COMMAND_TIMEOUT_SEC,
@@ -150,13 +148,17 @@ public class SendButtonListener implements Button.ClickListener
 
         public void run()
         {
-            environmentManager.invoke( ecm );
+            environmentManager.invoke( ecm, ecm.getTimeout() * 1000 );
 
             if ( ecm.isSuccess() )
             {
-                form.addOutput( ecm.getStdOut() );
-                form.addOutput( ecm.getStdErr() );
-                //                form.addOutput( ecm.getExitCode().toString() );
+                ExecuteCommandMessage.ExecutionResult result =
+                        ( ExecuteCommandMessage.ExecutionResult ) ecm.getResult();
+                form.addOutput( result.getStdOut() );
+                form.addOutput( result.getStdErr() );
+                form.addOutput( "\n" );
+
+                //                form.addOutput( ecm.getExitCode() );
             }
             else
             {

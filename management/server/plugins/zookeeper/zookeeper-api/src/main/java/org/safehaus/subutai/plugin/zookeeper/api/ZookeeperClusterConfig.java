@@ -13,13 +13,10 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-/**
- * @author dilshat
- */
 public class ZookeeperClusterConfig implements ConfigBase
 {
 
-    public static final String PRODUCT_KEY = "Zookeeper2";
+    public static final String PRODUCT_KEY = "Zookeeper";
     public static final String PRODUCT_NAME = "zookeeper";
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";

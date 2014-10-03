@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 import com.google.common.collect.Sets;
@@ -77,7 +76,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         boolean install = !agent.equals( config.getMasterNode() );
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -111,7 +110,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         if ( install )
         {
             po.addLog( "Installing Spark..." );
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+            Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )
@@ -126,21 +125,22 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         }
 
         po.addLog( "Setting master IP on slave..." );
-        Command setMasterIPCommand = Commands.getSetMasterIPCommand( config.getMasterNode(), Sets.newHashSet( agent ) );
+        Command setMasterIPCommand =
+                manager.getCommands().getSetMasterIPCommand( config.getMasterNode(), Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( setMasterIPCommand );
 
         if ( setMasterIPCommand.hasSucceeded() )
         {
             po.addLog( "Master IP successfully set. Registering slave with master..." );
 
-            Command addSlaveCommand = Commands.getAddSlaveCommand( agent, config.getMasterNode() );
+            Command addSlaveCommand = manager.getCommands().getAddSlaveCommand( agent, config.getMasterNode() );
             manager.getCommandRunner().runCommand( addSlaveCommand );
 
             if ( addSlaveCommand.hasSucceeded() )
             {
                 po.addLog( "Registration succeeded. Restarting master..." );
 
-                Command restartMasterCommand = Commands.getRestartMasterCommand( config.getMasterNode() );
+                Command restartMasterCommand = manager.getCommands().getRestartMasterCommand( config.getMasterNode() );
                 final AtomicBoolean ok = new AtomicBoolean();
                 manager.getCommandRunner().runCommand( restartMasterCommand, new CommandCallback()
                 {
@@ -160,7 +160,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
                 {
                     po.addLog( "Master restarted successfully. Starting Spark on new node..." );
 
-                    Command startSlaveCommand = Commands.getStartSlaveCommand( agent );
+                    Command startSlaveCommand = manager.getCommands().getStartSlaveCommand( agent );
                     ok.set( false );
                     manager.getCommandRunner().runCommand( startSlaveCommand, new CommandCallback()
                     {

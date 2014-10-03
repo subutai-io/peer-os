@@ -4,12 +4,11 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
-import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
@@ -68,7 +67,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
                 servers.add( serverAgent );
 
-                Command uninstallServerCommand = Commands.getUninstallServerCommand( servers );
+                Command uninstallServerCommand = manager.getCommands().getUninstallServerCommand( servers );
                 manager.getCommandRunner().runCommand( uninstallServerCommand );
 
                 if ( uninstallServerCommand.hasSucceeded() )
@@ -88,7 +87,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                     Agent clientAgent = manager.getAgentManager().getAgentByHostname( clientHostname );
                     clientAgents.add( clientAgent );
                 }
-                Command uninstallClientsCommand = Commands.getUninstallClientsCommand( clientAgents );
+                Command uninstallClientsCommand = manager.getCommands().getUninstallClientsCommand( clientAgents );
                 manager.getCommandRunner().runCommand( uninstallClientsCommand );
 
                 if ( uninstallClientsCommand.hasSucceeded() )

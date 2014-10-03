@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
-import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 import com.google.common.collect.Sets;
 
@@ -56,7 +55,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
+        Command statusServiceCommand = manager.getCommands().getStatusCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( statusServiceCommand );
 
         if ( statusServiceCommand.hasSucceeded() )

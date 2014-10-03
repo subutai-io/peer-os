@@ -8,8 +8,8 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.base.Preconditions;
@@ -22,12 +22,13 @@ import com.google.common.collect.Sets;
 public class Commands
 {
 
-    private final CommandRunner commandRunner;
+    private final CommandRunnerBase commandRunner;
 
 
-    public Commands( final CommandRunner commandRunner )
+    public Commands( final CommandRunnerBase commandRunner )
     {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+
         this.commandRunner = commandRunner;
     }
 
@@ -44,7 +45,7 @@ public class Commands
     public Command getReadSSHCommand( List<Agent> agentList )
     {
         return commandRunner
-                .createCommand( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ), new HashSet<>( agentList ) );
+                .createCommand( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ), Sets.newHashSet( agentList ) );
     }
 
 
@@ -53,7 +54,7 @@ public class Commands
         return commandRunner.createCommand( new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' > /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) ), new HashSet<>( agentList ) );
+                "chmod 644 /root/.ssh/authorized_keys", key ) ), Sets.newHashSet( agentList ) );
     }
 
 

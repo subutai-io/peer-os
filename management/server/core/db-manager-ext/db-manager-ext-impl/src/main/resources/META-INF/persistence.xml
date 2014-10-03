@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+  <persistence-unit name="DbManagerH2" transaction-type="RESOURCE_LOCAL">
+
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>org.safehaus.subutai.core.db.ext.api.entity.User</class>
+    <class>org.safehaus.subutai.core.db.ext.api.entity.Environment</class>
+    <class>org.safehaus.subutai.core.db.ext.api.entity.CommandRequest</class>
+    <class>org.safehaus.subutai.core.db.ext.api.entity.CommandResponse</class>
+
+    <properties>
+        <property name="javax.persistence.jdbc.driver"   value="org.h2.Driver"/>
+        <property name="javax.persistence.jdbc.url"      value="jdbc:h2:~/DbData/subutai"/>
+        <property name="javax.persistence.jdbc.user"     value="sa"/>
+        <property name="javax.persistence.jdbc.password" value=""/>
+    </properties>
+
+	</persistence-unit>
+</persistence>

@@ -21,6 +21,8 @@ public interface Sqoop extends ApiBase<SqoopConfig>
 
     public UUID destroyNode( String clusterName, String hostname );
 
+    public UUID addNode( String clusterName, String hostname );
+
     public UUID exportData( ExportSetting settings );
 
     public UUID importData( ImportSetting settings );

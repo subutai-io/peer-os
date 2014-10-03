@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 
@@ -63,7 +62,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
         }
         productOperation.addLog( "Stopping node..." );
 
-        Command stopCommand = Commands.getStopCommand( node );
+        Command stopCommand = manager.getCommands().getStopCommand( node );
         manager.getCommandRunner().runCommand( stopCommand );
         NodeState state = NodeState.UNKNOWN;
         if ( stopCommand.hasCompleted() )

@@ -32,8 +32,8 @@ public class ClusterConfiguration
 
         // setting cluster name
         po.addLog( "Setting cluster name " + config.getClusterName() );
-        Command setClusterNameCommand =
-                Commands.getConfigureCommand( config.getNodes(), "cluster_name " + config.getClusterName() );
+        Command setClusterNameCommand = cassandraManager.getCommands().getConfigureCommand( config.getNodes(),
+                "cluster_name " + config.getClusterName() );
         cassandraManager.getCommandRunner().runCommand( setClusterNameCommand );
 
         if ( setClusterNameCommand.hasSucceeded() )
@@ -48,8 +48,8 @@ public class ClusterConfiguration
 
         // setting data directory name
         po.addLog( "Setting data directory: " + config.getDataDirectory() );
-        Command setDataDirCommand =
-                Commands.getConfigureCommand( config.getNodes(), "data_dir " + config.getDataDirectory() );
+        Command setDataDirCommand = cassandraManager.getCommands().getConfigureCommand( config.getNodes(),
+                "data_dir " + config.getDataDirectory() );
         cassandraManager.getCommandRunner().runCommand( setDataDirCommand );
 
         if ( setDataDirCommand.hasSucceeded() )
@@ -64,8 +64,8 @@ public class ClusterConfiguration
 
         // setting commit log directory
         po.addLog( "Setting commit directory: " + config.getCommitLogDirectory() );
-        Command setCommitDirCommand =
-                Commands.getConfigureCommand( config.getNodes(), "commitlog_dir " + config.getCommitLogDirectory() );
+        Command setCommitDirCommand = cassandraManager.getCommands().getConfigureCommand( config.getNodes(),
+                "commitlog_dir " + config.getCommitLogDirectory() );
         cassandraManager.getCommandRunner().runCommand( setCommitDirCommand );
 
         if ( setCommitDirCommand.hasSucceeded() )
@@ -80,7 +80,7 @@ public class ClusterConfiguration
 
         // setting saved cache directory
         po.addLog( "Setting saved cache directory: " + config.getSavedCachesDirectory() );
-        Command setSavedCacheDirCommand = Commands.getConfigureCommand( config.getNodes(),
+        Command setSavedCacheDirCommand = cassandraManager.getCommands().getConfigureCommand( config.getNodes(),
                 "saved_cache_dir " + config.getSavedCachesDirectory() );
         cassandraManager.getCommandRunner().runCommand( setSavedCacheDirCommand );
 
@@ -96,8 +96,9 @@ public class ClusterConfiguration
 
         // setting rpc address
         po.addLog( "Setting rpc address" );
-        Command setRpcAddressCommand =
-                Commands.getConfigureRpcAndListenAddressesCommand( config.getNodes(), "rpc_address" );
+        Command setRpcAddressCommand = cassandraManager.getCommands()
+                                                       .getConfigureRpcAndListenAddressesCommand( config.getNodes(),
+                                                               "rpc_address" );
         cassandraManager.getCommandRunner().runCommand( setRpcAddressCommand );
 
         if ( setRpcAddressCommand.hasSucceeded() )
@@ -112,8 +113,9 @@ public class ClusterConfiguration
 
         // setting listen address
         po.addLog( "Setting listen address" );
-        Command setListenAddressCommand =
-                Commands.getConfigureRpcAndListenAddressesCommand( config.getNodes(), "listen_address" );
+        Command setListenAddressCommand = cassandraManager.getCommands()
+                                                          .getConfigureRpcAndListenAddressesCommand( config.getNodes(),
+                                                                  "listen_address" );
         cassandraManager.getCommandRunner().runCommand( setListenAddressCommand );
 
         if ( setListenAddressCommand.hasSucceeded() )
@@ -137,7 +139,8 @@ public class ClusterConfiguration
         //                        sb.append('"');
         po.addLog( "Settings seeds " + sb.toString() );
 
-        Command setSeedsCommand = Commands.getConfigureCommand( config.getNodes(), "seeds " + sb.toString() );
+        Command setSeedsCommand =
+                cassandraManager.getCommands().getConfigureCommand( config.getNodes(), "seeds " + sb.toString() );
         cassandraManager.getCommandRunner().runCommand( setSeedsCommand );
 
         if ( setSeedsCommand.hasSucceeded() )

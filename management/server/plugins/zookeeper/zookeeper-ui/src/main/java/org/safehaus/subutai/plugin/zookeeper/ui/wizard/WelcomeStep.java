@@ -20,9 +20,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 
 
-/**
- * @author dilshat
- */
 public class WelcomeStep extends Panel
 {
 
@@ -50,15 +47,15 @@ public class WelcomeStep extends Panel
 
         Button startStandalone = new Button( "Start standalone installation" );
         startStandalone.addStyleName( "default" );
-        grid.addComponent( startStandalone, 6, 4, 6, 4 );
+        grid.addComponent( startStandalone, 4, 4, 4, 4 );
         grid.setComponentAlignment( startStandalone, Alignment.BOTTOM_RIGHT );
         Button startOverHadoop = new Button( "Start over-Hadoop installation" );
         startOverHadoop.addStyleName( "default" );
-        grid.addComponent( startOverHadoop, 7, 4, 7, 4 );
+        grid.addComponent( startOverHadoop, 5, 4, 5, 4 );
         grid.setComponentAlignment( startOverHadoop, Alignment.BOTTOM_RIGHT );
         Button startWithHadoop = new Button( "Start with-Hadoop installation" );
         startWithHadoop.addStyleName( "default" );
-        grid.addComponent( startWithHadoop, 8, 4, 8, 4 );
+        grid.addComponent( startWithHadoop, 6, 4, 6, 4 );
         grid.setComponentAlignment( startWithHadoop, Alignment.BOTTOM_RIGHT );
 
         startStandalone.addClickListener( new Button.ClickListener()

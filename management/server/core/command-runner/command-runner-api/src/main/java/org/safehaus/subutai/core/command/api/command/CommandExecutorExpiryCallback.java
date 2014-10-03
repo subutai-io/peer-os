@@ -10,29 +10,24 @@ public class CommandExecutorExpiryCallback implements EntryExpiryCallback<Comman
     @Override
     public void onEntryExpiry( final CommandExecutor entry )
     {
+
+        //obtain command lock
+        entry.getCommand().getUpdateLock();
         try
         {
-            //obtain command lock
-            entry.getCommand().getUpdateLock();
-            try
+            //set command status to TIMEOUT if it is not completed or interrupted yet
+            if ( !( entry.getCommand().hasCompleted() || entry.getCallback().isStopped() ) )
             {
-                //set command status to TIMEOUT if it is not completed or interrupted yet
-                if ( !( entry.getCommand().hasCompleted() || entry.getCallback().isStopped() ) )
-                {
-                    entry.getCommand().setCommandStatus( CommandStatus.TIMEOUT );
-                }
-                //call this to notify all waiting threads that command timed out
-                entry.getCommand().notifyWaitingThreads();
-                //shutdown command executor
-                entry.getExecutor().shutdown();
+                entry.getCommand().setCommandStatus( CommandStatus.TIMEOUT );
             }
-            finally
-            {
-                entry.getCommand().releaseUpdateLock();
-            }
+            //call this to notify all waiting threads that command timed out
+            entry.getCommand().notifyWaitingThreads();
+            //shutdown command executor
+            entry.getExecutor().shutdown();
         }
-        catch ( Exception e )
+        finally
         {
+            entry.getCommand().releaseUpdateLock();
         }
     }
 }

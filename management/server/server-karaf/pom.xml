@@ -287,6 +287,16 @@
       <artifactId>httpmime</artifactId>
       <version>${http.client.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>eclipselink</artifactId>
+      <version>${org.eclipse.eclipselink.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>javax.persistence</artifactId>
+      <version>${org.eclipse.persistence.version}</version>
+    </dependency>
 
   </dependencies>
   <build>
@@ -347,6 +357,7 @@
                 <feature>ssh</feature>
                 <feature>jndi</feature>
                 <feature>cxf</feature>
+
               </features>
               <repository>target/features-repo</repository>
             </configuration>
@@ -426,7 +437,6 @@
                   <artifactId>jsoup</artifactId>
                   <version>${org.jsoup.version}</version>
                 </artifactItem>
-
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-all</artifactId>
@@ -608,6 +618,18 @@
                   <artifactId>commons-codec</artifactId>
                   <version>${org.apache.commons.codec.version}</version>
                 </artifactItem>
+                <!-- Db Manager Ext-->
+
+                <artifactItem>
+                  <groupId>org.eclipse.persistence</groupId>
+                  <artifactId>eclipselink</artifactId>
+                  <version>${org.eclipse.eclipselink.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.eclipse.persistence</groupId>
+                  <artifactId>javax.persistence</artifactId>
+                  <version>${org.eclipse.persistence.version}</version>
+                </artifactItem>
 
                 <!-- Vaadin - START -->
                 <artifactItem>
@@ -634,12 +656,22 @@
                 <!-- Vaadin - END -->
 
                 <!-- Core Modules - START -->
+
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>db-manager-ext-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>db-manager-ext-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>subutai-common</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
-
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>plugin-common</artifactId>
@@ -875,23 +907,6 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>monitoring-ui</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-
-                <!-- Package Manager -->
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>package-manager-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>package-manager-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>package-manager-cli</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
