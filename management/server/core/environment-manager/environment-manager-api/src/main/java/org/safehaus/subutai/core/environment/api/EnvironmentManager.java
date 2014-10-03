@@ -50,6 +50,8 @@ public interface EnvironmentManager
 
     boolean deleteBlueprint( String name );
 
+    void saveEnvironment( final Environment environment );
+
     boolean saveBuildProcess( EnvironmentBuildProcess buildProgress );
 
     List<EnvironmentBuildProcess> getBuildProcesses();
