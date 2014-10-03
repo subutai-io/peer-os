@@ -56,6 +56,12 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                                   final DbManager dbManager, final PeerManager peerManager )
     {
         super();
+
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+        Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
+
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.dispatcherDAO = new DispatcherDAO( dbManager );
