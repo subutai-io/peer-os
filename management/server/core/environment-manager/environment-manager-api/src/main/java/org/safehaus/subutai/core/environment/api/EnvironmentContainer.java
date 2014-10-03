@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.environment.api;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
@@ -26,6 +28,13 @@ public class EnvironmentContainer extends Container
     public void setEnvironment( final Environment environment )
     {
         this.environment = environment;
+    }
+
+
+    @Override
+    public UUID getEnvironmentId()
+    {
+        return environment.getUuid();
     }
 
 

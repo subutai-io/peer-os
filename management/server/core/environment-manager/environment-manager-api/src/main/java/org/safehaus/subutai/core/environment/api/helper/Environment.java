@@ -94,6 +94,7 @@ public class Environment
                 "uuid=" + uuid +
                 ", nodes=" + nodes +
                 ", name='" + name + '\'' +
+                ", containers=" + containers +
                 '}';
     }
 }

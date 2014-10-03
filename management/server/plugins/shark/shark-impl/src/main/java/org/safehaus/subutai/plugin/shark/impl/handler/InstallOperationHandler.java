@@ -57,7 +57,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
             try
             {
                 EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
-                env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );
+                env = manager.getEnvironmentManager().buildEnvironment( eb );
 
                 css = manager.getHadoopManager().getClusterSetupStrategy( po, hadoopConfig, env );
                 css.setup();
