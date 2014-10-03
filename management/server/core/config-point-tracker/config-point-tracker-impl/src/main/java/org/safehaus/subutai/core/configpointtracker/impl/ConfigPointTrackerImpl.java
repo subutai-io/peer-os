@@ -17,7 +17,7 @@ public class ConfigPointTrackerImpl implements ConfigPointTracker
 
 
     @Override
-    public void add( String templateName, String... configPaths )
+    public boolean add( String templateName, String... configPaths )
     {
 
         Set<String> points = configPoints.get( templateName );
@@ -32,24 +32,26 @@ public class ConfigPointTrackerImpl implements ConfigPointTracker
         {
             points.add( path );
         }
+        return true;
     }
 
 
     @Override
-    public void remove( String templateName, String... configPaths )
+    public boolean remove( String templateName, String... configPaths )
     {
 
         Set<String> points = configPoints.get( templateName );
 
         if ( points == null )
         {
-            return;
+            return false;
         }
 
         for ( String path : configPaths )
         {
             points.remove( path );
         }
+        return true;
     }
 
 
