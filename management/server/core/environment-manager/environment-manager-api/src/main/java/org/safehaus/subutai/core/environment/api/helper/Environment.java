@@ -25,11 +25,12 @@ public class Environment
     private Set<EnvironmentContainer> containers;
 
 
-    public Environment( final String name )
+
+   public Environment( UUID envId, final String name )
     {
         this.nodes = new HashSet<>();
         this.name = name;
-        this.uuid = UUID.randomUUID();
+        this.uuid = envId;
         this.containers = new HashSet<>();
     }
 
