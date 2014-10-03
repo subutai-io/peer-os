@@ -34,7 +34,7 @@ import com.vaadin.ui.UI;
 
 
 /**
- * @author tjamakeev
+ * Container tree
  */
 @SuppressWarnings( "serial" )
 
@@ -42,7 +42,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
-    private final ComboBox env;
     private final Tree tree;
     private HierarchicalContainer container;
     private Set<EnvironmentContainer> selectedContainers = new HashSet<>();
@@ -71,9 +70,9 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         setSizeFull();
         setMargin( true );
 
-        BeanItemContainer<Environment> environments = new BeanItemContainer<Environment>( Environment.class );
+        BeanItemContainer<Environment> environments = new BeanItemContainer<>( Environment.class );
         environments.addAll( environmentManager.getEnvironments() );
-        env = new ComboBox( null, environments );
+        final ComboBox env = new ComboBox( null, environments );
         env.setItemCaptionPropertyId( "name" );
         env.setImmediate( true );
         env.setTextInputAllowed( false );

@@ -19,7 +19,6 @@ import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +34,14 @@ public class SendButtonListener implements Button.ClickListener
     private static final Logger LOG = LoggerFactory.getLogger( SendButtonListener.class.getName() );
 
     private final TerminalForm form;
-    private final EnvironmentManager environmentManager;
     private final ExecutorService executor;
     private final CommandDispatcher commandDispatcher;
 
 
     public SendButtonListener( final CommandDispatcher commandDispatcher, final TerminalForm form,
-                               final EnvironmentManager environmentManager, ExecutorService executor )
+                               ExecutorService executor )
     {
         this.form = form;
-        this.environmentManager = environmentManager;
         this.executor = executor;
         this.commandDispatcher = commandDispatcher;
     }
@@ -86,13 +83,6 @@ public class SendButtonListener implements Button.ClickListener
             requestBuilder.withTimeout( timeout );
 
             form.indicator.setVisible( true );
-
-            //            ExecuteCommandMessage ecm =
-            //                    new ExecuteCommandMessage( container.getEnvironment().getUuid(),
-            // container.getPeerId(),
-            //                            container.getAgentId(), form.programTxtFld.getValue(),
-            // RequestType.EXECUTE_REQUEST, timeout,
-            //                            form.workDirTxtFld.getValue() );
 
             Set<Container> containerSet = new HashSet<>();
             containerSet.addAll( containers );
@@ -137,25 +127,6 @@ public class SendButtonListener implements Button.ClickListener
 
         public void run()
         {
-            //            environmentManager.invoke( ecm, ecm.getTimeout() * 1000 );
-            //
-            //            if ( ecm.isSuccess() )
-            //            {
-            //                ExecuteCommandMessage.ExecutionResult result =
-            //                        ( ExecuteCommandMessage.ExecutionResult ) ecm.getResult();
-            //                form.addOutput( result.getStdOut() );
-            //                form.addOutput( result.getStdErr() );
-            //                form.addOutput( "\n" );
-            //
-            //                //                form.addOutput( ecm.getExitCode() );
-            //            }
-            //            else
-            //            {
-            //                form.addOutput( "Exception: " + ecm.getExceptionMessage() );
-            //
-            //                LOG.warn( String.format( "Execute Command Message Response is null %s", ecm ) );
-            //            }
-
             try
             {
 
