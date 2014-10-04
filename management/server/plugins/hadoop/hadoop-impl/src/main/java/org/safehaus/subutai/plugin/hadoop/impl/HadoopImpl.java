@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -593,7 +594,8 @@ public class HadoopImpl implements Hadoop
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint
+                .setName( String.format( "%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setExchangeSshKeys( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );

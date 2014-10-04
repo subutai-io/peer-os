@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
@@ -81,26 +82,27 @@ public class RestServiceImpl implements RestService
     }
 
 
-//    @Override
-//    public String createContainers( final String createContainersMsg )
-//    {
-//        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
-//        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
-////        peerManager.createContainers( ccm );
-//
-//        return JsonUtil.toJson( ccm.getResult() );
-//
-//    }
+    //    @Override
+    //    public String createContainers( final String createContainersMsg )
+    //    {
+    //        CloneContainersMessage ccm = GSON.fromJson( createContainersMsg, CloneContainersMessage.class );
+    //        LOG.info( "Message to clone container received for environment: " + ccm.getEnvId() );
+    ////        peerManager.createContainers( ccm );
+    //
+    //        return JsonUtil.toJson( ccm.getResult() );
+    //
+    //    }
 
 
     @Override
     public String getCreateContainersMsgJsonFormat()
     {
-        CloneContainersMessage ccm = new CloneContainersMessage(UUID.randomUUID(), UUID.randomUUID());
+        CloneContainersMessage ccm =
+                new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
         ccm.setStrategy( "ROUND_ROBIN" );
-//        ccm.setEnvId( UUID.randomUUID() );
+        //        ccm.setEnvId( UUID.randomUUID() );
         ccm.setNumberOfNodes( 2 );
-//        ccm.setPeerId( UUID.randomUUID() );
+        //        ccm.setPeerId( UUID.randomUUID() );
         ccm.setTemplate( "master" );
         return GSON.toJson( ccm );
     }
@@ -158,7 +160,7 @@ public class RestServiceImpl implements RestService
     public Response invoke( final String commandType, final String command )
     {
 
-        LOG.info(String.format( "Received a new command: " ) + commandType);
+        LOG.info( String.format( "Received a new command: " ) + commandType );
         PeerCommandType type = PeerCommandType.valueOf( commandType );
         Class clazz = getMessageClass( type );
         PeerCommandMessage commandMessage = ( PeerCommandMessage ) JsonUtil.fromJson( command, clazz );

@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerEvent;
 import org.safehaus.subutai.core.container.api.ContainerEventListener;
@@ -40,7 +41,7 @@ public class Clone extends OsgiCommandSupport implements ContainerEventListener
     protected Object doExecute() throws Exception
     {
         containerManager.addListener( this );
-        UUID envId = UUID.randomUUID();
+        UUID envId = UUIDUtil.generateTimeBasedUUID();;
         try
         {
             Agent a = containerManager.clone( envId, hostname, templateName, cloneName );

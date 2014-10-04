@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 //import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
 
@@ -39,7 +40,7 @@ public class EnvironmentBuildProcess
     public EnvironmentBuildProcess( final String name )
     {
         this.environmentName = name;
-        this.uuid = UUID.randomUUID();
+        this.uuid = UUIDUtil.generateTimeBasedUUID();;
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.messageMap = new HashMap<>();
     }
