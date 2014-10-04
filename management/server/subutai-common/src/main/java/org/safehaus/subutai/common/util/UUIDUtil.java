@@ -13,29 +13,6 @@ import com.fasterxml.uuid.Generators;
 public class UUIDUtil
 {
 
-    //    public static UUID generateTimeBasedUUID()
-    //    {
-    //        return Generators.timeBasedGenerator( EthernetAddress.fromInterface() ).generate();
-    //    }
-    //
-    //
-    //    public static UUID generateCassandraUUID()
-    //    {
-    //        return Generators.randomBasedGenerator().generate();
-    //    }
-    //
-    //
-    //    public static UUID generateStringUUID( String id )
-    //    {
-    //        return Generators.nameBasedGenerator().generate( id );
-    //    }
-    //
-    //
-    //    public static UUID generateMACBasedUUID()
-    //    {
-    //        return UUID.nameUUIDFromBytes( SysUtil.getMacAddress().getBytes() );
-    //    }
-
 
     public static UUID generateTimeBasedUUID()
     {
