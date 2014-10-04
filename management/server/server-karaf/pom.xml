@@ -171,14 +171,14 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>command-dispatcher-impl</artifactId>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-dispatcher-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-dispatcher-rest</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>command-dispatcher-cli</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>command-dispatcher-rest</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- command-runner -->
