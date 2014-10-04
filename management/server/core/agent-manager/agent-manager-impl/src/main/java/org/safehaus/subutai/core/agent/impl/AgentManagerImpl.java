@@ -378,7 +378,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     private void sendAck( UUID agentUUID )
     {
         Request ack = new Request( "AGENT-MANAGER", RequestType.REGISTRATION_REQUEST_DONE, agentUUID,
-                UUID.randomUUID(), null, null, null, null, null, null, null, null, null, null, null,
+                UUIDUtil.generateTimeBasedUUID(), null, null, null, null, null, null, null, null, null, null, null,
                 null );
         communicationService.sendRequest( ack );
     }
