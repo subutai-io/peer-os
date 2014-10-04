@@ -8,6 +8,7 @@ package org.safehaus.subutai.common.util;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.osgi.framework.BundleContext;
@@ -56,6 +57,26 @@ public class ServiceLocator
         }
 
         return null;
+    }
+
+
+    /**
+     * Returns service by Interface, bypasses cache
+     *
+     * @param clazz Service Interface class to look up for
+     *
+     * @return service reference
+     *
+     * @throws NamingException thrown if service is not found
+     */
+    public static <T> T getJNDIServiceNoCache( Class<T> clazz ) throws NamingException
+    {
+        Preconditions.checkNotNull( clazz, "Class is null" );
+
+        String serviceName = clazz.getName();
+        InitialContext ctx = new InitialContext();
+        String jndiName = "osgi:service/" + serviceName;
+        return clazz.cast( ctx.lookup( jndiName ) );
     }
 
 

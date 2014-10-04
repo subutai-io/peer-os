@@ -14,10 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-/**
- * Created by bahadyr on 10/2/14.
- */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class NodeTest
 {
     private static final String NODE_GROUP_NAME = "name";

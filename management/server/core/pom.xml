@@ -32,13 +32,11 @@
     <module>lxc-manager</module>
     <module>monitoring</module>
     <module>network-manager</module>
-    <module>package-manager</module>
     <module>peer-manager</module>
     <module>peer-command-dispatcher</module>
     <module>strategy-manager</module>
     <module>template-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
-    <!--<module>pet_core</module>-->
   </modules>
 </project>

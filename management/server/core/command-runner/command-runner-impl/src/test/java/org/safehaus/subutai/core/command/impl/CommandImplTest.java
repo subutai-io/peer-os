@@ -27,10 +27,10 @@ import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.jayway.awaitility.Awaitility;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.internal.matchers.StringContains.containsString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,21 +65,21 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullBuilder()
     {
         new CommandImpl( null, mock( Set.class ), mock( AbstractCommandRunner.class ) );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullBuilderBroadcast()
     {
         new CommandImpl( null, 1, mock( AbstractCommandRunner.class ) );
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailZeroRequestsCountBroadcast()
     {
         new CommandImpl( mock( RequestBuilder.class ), 0, mock( AbstractCommandRunner.class ) );
@@ -94,14 +94,14 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailNullAgentBuilder()
     {
         new CommandImpl( null, null, mock( AbstractCommandRunner.class ) );
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailEmptyAgentBuilder()
     {
         Set<AgentRequestBuilder> ag = new HashSet<>();
@@ -109,7 +109,7 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailNullAgents()
     {
         new CommandImpl( null, mock( RequestBuilder.class ), null, mock( AbstractCommandRunner.class ) );
@@ -144,7 +144,7 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = CommandException.class)
+    @Test( expected = CommandException.class )
     public void shouldThrowCommandException() throws CommandException
     {
 
@@ -154,7 +154,7 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = CommandException.class)
+    @Test( expected = CommandException.class )
     public void shouldThrowCommandException2() throws CommandException
     {
 
@@ -164,7 +164,7 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = CommandException.class)
+    @Test( expected = CommandException.class )
     public void shouldThrowCommandException3() throws CommandException
     {
 
@@ -174,7 +174,7 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = CommandException.class)
+    @Test( expected = CommandException.class )
     public void shouldThrowCommandException4() throws CommandException
     {
 
@@ -196,7 +196,7 @@ public class CommandImplTest
     }
 
 
-    @Test(expected = CommandException.class)
+    @Test( expected = CommandException.class )
     public void shouldThrowCommandCommand() throws CommandException
     {
 

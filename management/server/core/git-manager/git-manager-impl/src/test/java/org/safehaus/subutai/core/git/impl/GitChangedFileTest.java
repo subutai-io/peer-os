@@ -9,7 +9,7 @@ import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitFileStatus;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.internal.matchers.StringContains.containsString;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 

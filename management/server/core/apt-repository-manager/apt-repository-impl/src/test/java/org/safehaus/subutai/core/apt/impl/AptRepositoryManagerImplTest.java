@@ -3,7 +3,6 @@ package org.safehaus.subutai.core.apt.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,11 +15,12 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.internal.matchers.StringContains.containsString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 /**
  * Test for AptRepositoryManagerImpl
  */
-@SuppressWarnings("ResultOfMethodCallIgnored")
+@SuppressWarnings( "ResultOfMethodCallIgnored" )
 public class AptRepositoryManagerImplTest
 {
 
@@ -119,7 +119,7 @@ public class AptRepositoryManagerImplTest
     }
 
 
-    @Test(expected = AptRepoException.class)
+    @Test( expected = AptRepoException.class )
     public void shouldThrowAptException() throws AptRepoException
     {
         Agent agent = MockUtils.getAgent( UUID.randomUUID() );
@@ -168,7 +168,7 @@ public class AptRepositoryManagerImplTest
     {
         PackageInfo packageInfo = new PackageInfo( STATUS, NAME, DESCRIPTION );
 
-        Map<PackageInfo, PackageInfo> map = new HashMap();
+        Map<PackageInfo, PackageInfo> map = Maps.newHashMap();
 
         map.put( packageInfo, packageInfo );
 

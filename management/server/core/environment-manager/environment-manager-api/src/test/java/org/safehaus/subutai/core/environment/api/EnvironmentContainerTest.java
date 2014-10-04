@@ -13,9 +13,6 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 
-/**
- * Created by bahadyr on 10/2/14.
- */
 public class EnvironmentContainerTest
 {
 

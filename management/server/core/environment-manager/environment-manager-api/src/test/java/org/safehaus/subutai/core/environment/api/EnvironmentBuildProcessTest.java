@@ -14,9 +14,6 @@ import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import static org.junit.Assert.assertEquals;
 
 
-/**
- * Created by bahadyr on 10/2/14.
- */
 public class EnvironmentBuildProcessTest
 {
     private static final String NAME = "name";
