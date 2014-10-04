@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 
@@ -54,7 +55,7 @@ public class EnvironmentBuildProcessTest
     @Test
     public void testUuid() throws Exception
     {
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUIDUtil.generateTimeBasedUUID();
         process.setUuid( uuid );
         assertEquals( uuid, process.getUuid() );
     }

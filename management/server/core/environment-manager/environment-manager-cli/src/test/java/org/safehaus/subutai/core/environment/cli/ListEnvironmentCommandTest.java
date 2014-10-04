@@ -3,13 +3,13 @@ package org.safehaus.subutai.core.environment.cli;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
@@ -40,7 +40,7 @@ public class ListEnvironmentCommandTest
     public void test() throws Exception
     {
         List<Environment> l = new ArrayList<>();
-        l.add( new Environment( UUID.randomUUID(),NAME ) );
+        l.add( new Environment( UUIDUtil.generateTimeBasedUUID(),NAME ) );
         when( manager.getEnvironments() ).thenReturn( l );
         command.doExecute();
     }

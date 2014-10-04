@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.PackageInfo;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -45,7 +45,7 @@ public class AptRepositoryManagerImplTest
     @Test
     public void shouldListPackages() throws AptRepoException
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         Command command = MockUtils.getCommand( true, true, agent.getUuid(), PACKAGES, null, null );
         CommandRunner commandRunner = MockUtils.getCommandRunner( command );
         AptRepositoryManagerImpl aptRepositoryManager = new AptRepositoryManagerImpl( commandRunner );
@@ -63,7 +63,7 @@ public class AptRepositoryManagerImplTest
     @Test
     public void shouldAddPackageNBroadcast() throws AptRepoException, IOException
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         Command command = MockUtils.getCommand( true, true, agent.getUuid(), "added package", null, null );
         CommandRunner commandRunner = MockUtils.getCommandRunner( command );
         AptRepositoryManagerImpl aptRepositoryManager = new AptRepositoryManagerImpl( commandRunner );
@@ -84,7 +84,7 @@ public class AptRepositoryManagerImplTest
     @Test
     public void shouldRemovePackageNBroadcast() throws AptRepoException, IOException
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         Command command = MockUtils.getCommand( true, true, agent.getUuid(), null, null, null );
         CommandRunner commandRunner = MockUtils.getCommandRunner( command );
         AptRepositoryManagerImpl aptRepositoryManager = new AptRepositoryManagerImpl( commandRunner );
@@ -100,7 +100,7 @@ public class AptRepositoryManagerImplTest
     @Test
     public void shouldReadFileContents() throws AptRepoException, IOException
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         Command command = MockUtils.getCommand( true, true, agent.getUuid(), FILE_CONTENT, null, null );
         CommandRunner commandRunner = MockUtils.getCommandRunner( command );
         AptRepositoryManagerImpl aptRepositoryManager = new AptRepositoryManagerImpl( commandRunner );
@@ -122,7 +122,7 @@ public class AptRepositoryManagerImplTest
     @Test( expected = AptRepoException.class )
     public void shouldThrowAptException() throws AptRepoException
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         Command command = MockUtils.getCommand( true, false, agent.getUuid(), FILE_CONTENT, null, null );
         CommandRunner commandRunner = MockUtils.getCommandRunner( command );
         AptRepositoryManagerImpl aptRepositoryManager = new AptRepositoryManagerImpl( commandRunner );

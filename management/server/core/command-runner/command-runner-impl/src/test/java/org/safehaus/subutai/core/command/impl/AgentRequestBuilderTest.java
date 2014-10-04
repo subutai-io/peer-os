@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +37,7 @@ public class AgentRequestBuilderTest
     @Test
     public void shouldReturnAgent()
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         AgentRequestBuilder requestBuilder = new AgentRequestBuilder( agent, "cmd" );
 
         assertEquals( agent, requestBuilder.getAgent() );
@@ -46,8 +47,8 @@ public class AgentRequestBuilderTest
     @Test
     public void shouldBuildRequest()
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
-        UUID taskUUID = UUID.randomUUID();
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
+        UUID taskUUID = UUIDUtil.generateTimeBasedUUID();
         AgentRequestBuilder requestBuilder = new AgentRequestBuilder( agent, "cmd" );
 
         Request request = requestBuilder.build( taskUUID );
@@ -59,7 +60,7 @@ public class AgentRequestBuilderTest
     @Test
     public void testEquals()
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         AgentRequestBuilder requestBuilder1 = new AgentRequestBuilder( agent, "cmd" );
         AgentRequestBuilder requestBuilder2 = new AgentRequestBuilder( agent, "cmd" );
         AgentRequestBuilder requestBuilder3 = new AgentRequestBuilder( agent, "other cmd" );
@@ -72,7 +73,7 @@ public class AgentRequestBuilderTest
     @Test
     public void testHashCode()
     {
-        Agent agent = MockUtils.getAgent( UUID.randomUUID() );
+        Agent agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         AgentRequestBuilder requestBuilder1 = new AgentRequestBuilder( agent, "cmd" );
         AgentRequestBuilder requestBuilder2 = new AgentRequestBuilder( agent, "cmd" );
         Map<AgentRequestBuilder, AgentRequestBuilder> map = new HashMap<>();

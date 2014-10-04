@@ -100,9 +100,9 @@ public class RestServiceImpl implements RestService
         CloneContainersMessage ccm =
                 new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
         ccm.setStrategy( "ROUND_ROBIN" );
-        //        ccm.setEnvId( UUID.randomUUID() );
+        //        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
         ccm.setNumberOfNodes( 2 );
-        //        ccm.setPeerId( UUID.randomUUID() );
+        //        ccm.setPeerId( UUIDUtil.generateTimeBasedUUID() );
         ccm.setTemplate( "master" );
         return GSON.toJson( ccm );
     }

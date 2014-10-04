@@ -1,11 +1,10 @@
 package org.safehaus.subutai.core.network.impl;
 
 
-import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
@@ -34,7 +33,7 @@ public class CommandsTest
     {
         commandRunner = mock( CommandRunner.class );
         commands = new Commands( commandRunner );
-        agent = MockUtils.getAgent( UUID.randomUUID(), "hostname1", "127.0.0.1" );
+        agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID(), "hostname1", "127.0.0.1" );
     }
 
 

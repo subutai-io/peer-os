@@ -4,13 +4,13 @@ package org.safehaus.subutai.core.git.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandException;
@@ -70,7 +70,7 @@ public class GitManagerImplTest
     public void setUp()
     {
         verifyCommandExecution = true;
-        agent = MockUtils.getAgent( UUID.randomUUID() );
+        agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() );
         command = MockUtils.getCommand( true, true, agent.getUuid(), SOME_DUMMY_OUTPUT, null, null );
         commandRunner = MockUtils.getCommandRunner( command );
         gitManager = new GitManagerImpl( commandRunner );
