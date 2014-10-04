@@ -60,7 +60,7 @@ public class SetupHelper
     {
         po.addLog( "Configuring coordinator..." );
 
-        Command cmd = Commands.getSetCoordinatorCommand( agent );
+        Command cmd = manager.getCommands().getSetCoordinatorCommand( agent );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )
@@ -78,7 +78,7 @@ public class SetupHelper
     {
         po.addLog( "Configuring worker(s)..." );
 
-        Command cmd = Commands.getSetWorkerCommand( coordinator, set );
+        Command cmd = manager.getCommands().getSetWorkerCommand( coordinator, set );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )
@@ -95,7 +95,7 @@ public class SetupHelper
     public void startNodes( final Set<Agent> set ) throws ClusterSetupException
     {
         po.addLog( "Starting Presto node(s)..." );
-        Command cmd = Commands.getStartCommand( set );
+        Command cmd = manager.getCommands().getStartCommand( set );
         final AtomicInteger okCount = new AtomicInteger();
         manager.getCommandRunner().runCommand( cmd, new CommandCallback()
         {

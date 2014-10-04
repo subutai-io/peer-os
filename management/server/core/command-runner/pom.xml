@@ -17,7 +17,6 @@
   <modules>
     <module>command-runner-api</module>
     <module>command-runner-impl</module>
-    <!--<module>command-runner-ui</module>-->
     <module>command-runner-ui-old</module>
   </modules>
 </project>

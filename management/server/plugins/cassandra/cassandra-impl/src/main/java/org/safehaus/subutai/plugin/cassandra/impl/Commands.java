@@ -13,31 +13,34 @@ import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
     public static final String PACKAGE_NAME = "ksks-cassandra";
+    private final CommandRunnerBase commandRunner;
 
 
-    public Commands( CommandRunner commandRunner )
+    public Commands( CommandRunnerBase commandRunner )
     {
-        init( commandRunner );
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+
+        this.commandRunner = commandRunner;
     }
 
 
-    public static Command getInstallCommand( Set<Agent> agents )
+    public Command getInstallCommand( Set<Agent> agents )
     {
 
-        return createCommand(
+        return commandRunner.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 360 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
@@ -45,40 +48,41 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getStartCommand( Set<Agent> agents )
+    public Command getStartCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service cassandra start" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service cassandra start" ), agents );
     }
 
 
-    public static Command getStopCommand( Set<Agent> agents )
+    public Command getStopCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service cassandra stop" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service cassandra stop" ), agents );
     }
 
 
-    public static Command getStatusCommand( Set<Agent> agents )
+    public Command getStatusCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service cassandra status" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service cassandra status" ), agents );
     }
 
 
-    public static Command getStatusCommand( Agent agent )
+    public Command getStatusCommand( Agent agent )
     {
-        return createCommand( new RequestBuilder( "/etc/init.d/cassandra status" ), Sets.newHashSet( agent ) );
+        return commandRunner
+                .createCommand( new RequestBuilder( "/etc/init.d/cassandra status" ), Sets.newHashSet( agent ) );
     }
 
 
-    public static Command getConfigureCommand( Set<Agent> agents, String param )
+    public Command getConfigureCommand( Set<Agent> agents, String param )
     {
 
-        return createCommand( new RequestBuilder(
+        return commandRunner.createCommand( new RequestBuilder(
                         String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s", param ) ),
                 agents );
     }
 
 
-    public static Command getConfigureRpcAndListenAddressesCommand( Set<Agent> agents, String param )
+    public Command getConfigureRpcAndListenAddressesCommand( Set<Agent> agents, String param )
     {
         Set<AgentRequestBuilder> sarb = new HashSet<AgentRequestBuilder>();
         for ( Agent agent : agents )
@@ -88,6 +92,6 @@ public class Commands extends CommandsSingleton
                             AgentUtil.getAgentIpByMask( agent, Common.IP_MASK ) ) );
             sarb.add( arb );
         }
-        return createCommand( sarb );
+        return commandRunner.createCommand( sarb );
     }
 }

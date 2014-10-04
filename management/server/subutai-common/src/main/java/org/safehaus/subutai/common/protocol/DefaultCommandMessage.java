@@ -1,15 +1,18 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.lang.reflect.Type;
 import java.util.UUID;
+
+import com.google.gson.reflect.TypeToken;
 
 
 /**
  * Created by bahadyr on 9/26/14.
  */
 public class DefaultCommandMessage extends PeerCommandMessage
-
 {
+
     public DefaultCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
     {
         super( type, envId, peerId, agentId );
@@ -17,21 +20,10 @@ public class DefaultCommandMessage extends PeerCommandMessage
 
 
     @Override
-    public void setResult( final Object result )
+    public Type getResultObjectType()
     {
-
-        if ( !( result instanceof Boolean ) )
+        return new TypeToken<String>()
         {
-            throw new IllegalArgumentException( "Argument must be boolean." );
-        }
-
-        this.success = ( Boolean ) result;
-    }
-
-
-    @Override
-    public Boolean getResult()
-    {
-        return success;
+        }.getType();
     }
 }

@@ -20,14 +20,14 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
@@ -54,6 +54,7 @@ public class LxcManagerImpl implements LxcManager
     private AgentManager agentManager;
     private ExecutorService executor;
     private Monitoring monitoring;
+    private final Commands commands;
 
 
     public LxcManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring )
@@ -62,7 +63,7 @@ public class LxcManagerImpl implements LxcManager
         this.commandRunner = commandRunner;
         this.monitoring = monitoring;
 
-        Commands.init( commandRunner );
+        commands = new Commands( commandRunner );
     }
 
 
@@ -140,7 +141,7 @@ public class LxcManagerImpl implements LxcManager
         if ( !agents.isEmpty() )
         {
 
-            Command getMetricsCommand = Commands.getMetricsCommand( agents );
+            Command getMetricsCommand = commands.getMetricsCommand( agents );
             commandRunner.runCommand( getMetricsCommand );
 
             if ( getMetricsCommand.hasCompleted() )
@@ -333,7 +334,7 @@ public class LxcManagerImpl implements LxcManager
         if ( !pAgents.isEmpty() )
         {
 
-            Command getLxcListCommand = Commands.getLxcListCommand( pAgents );
+            Command getLxcListCommand = commands.getLxcListCommand( pAgents );
             commandRunner.runCommand( getLxcListCommand );
 
             if ( getLxcListCommand.hasCompleted() )
@@ -390,7 +391,7 @@ public class LxcManagerImpl implements LxcManager
     {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) )
         {
-            Command cloneLxcCommand = Commands.getCloneCommand( physicalAgent, lxcHostname );
+            Command cloneLxcCommand = commands.getCloneCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( cloneLxcCommand );
             return cloneLxcCommand.hasSucceeded();
         }
@@ -401,7 +402,7 @@ public class LxcManagerImpl implements LxcManager
     @Override
     public LxcState checkLxcOnHost( final Agent physicalAgent, final String lxcHostname )
     {
-        Command checkLxcCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
+        Command checkLxcCommand = commands.getLxcInfoCommand( physicalAgent, lxcHostname );
         commandRunner.runCommand( checkLxcCommand );
         if ( checkLxcCommand.hasCompleted() )
         {
@@ -431,7 +432,7 @@ public class LxcManagerImpl implements LxcManager
     {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) )
         {
-            Command startLxcCommand = Commands.getLxcStartCommand( physicalAgent, lxcHostname );
+            Command startLxcCommand = commands.getLxcStartCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( startLxcCommand );
             try
             {
@@ -441,7 +442,7 @@ public class LxcManagerImpl implements LxcManager
             {
                 LOGGER.info( "LxcManagerImpl@startLxcOnHost: " + ignore.getMessage(), ignore );
             }
-            Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
+            Command lxcInfoCommand = commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
 
             LxcState state = LxcState.UNKNOWN;
@@ -472,7 +473,7 @@ public class LxcManagerImpl implements LxcManager
     {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) )
         {
-            Command stopLxcCommand = Commands.getLxcStopCommand( physicalAgent, lxcHostname );
+            Command stopLxcCommand = commands.getLxcStopCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( stopLxcCommand );
             try
             {
@@ -482,7 +483,7 @@ public class LxcManagerImpl implements LxcManager
             {
                 LOGGER.info( "LxcManagerImpl@stopLxcOnHost: " + ignore.getMessage(), ignore );
             }
-            Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
+            Command lxcInfoCommand = commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
 
             LxcState state = LxcState.UNKNOWN;
@@ -513,7 +514,7 @@ public class LxcManagerImpl implements LxcManager
     {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) )
         {
-            Command destroyLxcCommand = Commands.getLxcDestroyCommand( physicalAgent, lxcHostname );
+            Command destroyLxcCommand = commands.getLxcDestroyCommand( physicalAgent, lxcHostname );
 
             commandRunner.runCommand( destroyLxcCommand );
             return destroyLxcCommand.hasCompleted();
@@ -534,7 +535,7 @@ public class LxcManagerImpl implements LxcManager
     {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) )
         {
-            Command cloneNStartCommand = Commands.getCloneNStartCommand( physicalAgent, lxcHostname );
+            Command cloneNStartCommand = commands.getCloneNStartCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( cloneNStartCommand );
 
             return cloneNStartCommand.hasSucceeded();

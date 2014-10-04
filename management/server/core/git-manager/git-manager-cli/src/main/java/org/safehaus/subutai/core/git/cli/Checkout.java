@@ -12,6 +12,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Checkouts a remote branch (or creates a local branch)
@@ -33,19 +35,30 @@ public class Checkout extends OsgiCommandSupport
     @Argument(index = 3, name = "create branch", required = false, multiValued = false,
             description = "create branch (true/false = default)")
     boolean create;
-    private AgentManager agentManager;
+
     private GitManager gitManager;
+    private AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public Checkout( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
+    }
+
+
+    public void setRepoPath( final String repoPath )
+    {
+        this.repoPath = repoPath;
     }
 
 
@@ -53,14 +66,21 @@ public class Checkout extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-            gitManager.checkout( agent, repoPath, branchName, create );
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+                gitManager.checkout( agent, repoPath, branchName, create );
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println( e.getMessage() );
+            }
         }
 
         return null;

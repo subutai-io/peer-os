@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;
@@ -52,7 +52,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
 
         productOperation.addLog( "Stopping cluster..." );
 
-        Command stopCommand = Commands.getStopCommand( accumuloClusterConfig.getMasterNode() );
+        Command stopCommand = manager.getCommands().getStopCommand( accumuloClusterConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( stopCommand );
 
         if ( stopCommand.hasSucceeded() )

@@ -10,6 +10,8 @@ import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * CLI for TemplateRegistryManager.ListTemplateTreeCommand command
@@ -38,7 +40,14 @@ public class ListTemplateTreeCommand extends OsgiCommandSupport
 
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
+        Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null." );
         this.templateRegistry = templateRegistry;
+    }
+
+
+    public TemplateRegistry getTemplateRegistry()
+    {
+        return templateRegistry;
     }
 
 

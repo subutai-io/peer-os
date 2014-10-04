@@ -10,6 +10,7 @@
     <cm:default-properties>
       <cm:property name="amqUrl" value="failover:tcp://localhost:61616" />
       <cm:property name="amqServiceTopic" value="SERVICE_TOPIC" />
+      <cm:property name="amqBroadcastTopic" value="BROADCAST_TOPIC" />
       <cm:property name="amqMaxMessageToAgentTtlSec" value="60" />
       <cm:property name="amqMaxPooledConnections" value="21" />
       <cm:property name="amqMaxSenderPoolSize" value="20" />
@@ -22,6 +23,7 @@
         init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
     <property name="amqUrl" value="${amqUrl}" />
     <property name="amqServiceTopic" value="${amqServiceTopic}" />
+    <property name="amqBroadcastTopic" value="${amqBroadcastTopic}" />
     <property name="amqMaxMessageToAgentTtlSec" value="${amqMaxMessageToAgentTtlSec}" />
     <property name="amqMaxPooledConnections" value="${amqMaxPooledConnections}" />
     <property name="amqMaxSenderPoolSize" value="${amqMaxSenderPoolSize}" />

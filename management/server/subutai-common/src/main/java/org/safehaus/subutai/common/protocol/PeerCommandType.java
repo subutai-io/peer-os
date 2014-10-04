@@ -6,6 +6,6 @@ package org.safehaus.subutai.common.protocol;
  */
 public enum PeerCommandType
 {
-    UNKNOWN, CLONE, DESTROY, START, STOP, ISCONNECTED, EXECUTE;
+    UNKNOWN, CLONE, DESTROY, START, STOP, IS_CONNECTED, EXECUTE, GET_PEER_ID, GET_CONNECTED_CONTAINERS;
 
 }

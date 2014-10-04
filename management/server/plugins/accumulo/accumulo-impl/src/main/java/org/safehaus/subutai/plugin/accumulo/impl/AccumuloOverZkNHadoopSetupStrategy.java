@@ -1,8 +1,6 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -10,6 +8,8 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -91,7 +91,7 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         po.addLog( "Checking prerequisites..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( accumuloClusterConfig.getAllNodes() );
+        Command checkInstalledCommand = accumuloManager.getCommands().getCheckInstalledCommand( accumuloClusterConfig.getAllNodes() );
         accumuloManager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -119,7 +119,7 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
         po.addLog( "Installing Accumulo..." );
 
         //install
-        Command installCommand = Commands.getInstallCommand( accumuloClusterConfig.getAllNodes() );
+        Command installCommand = accumuloManager.getCommands().getInstallCommand( accumuloClusterConfig.getAllNodes() );
         accumuloManager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )

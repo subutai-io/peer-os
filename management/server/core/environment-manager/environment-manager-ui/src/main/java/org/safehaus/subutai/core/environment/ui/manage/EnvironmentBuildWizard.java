@@ -11,10 +11,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.environment.ui.window.DetailsWindow;
 import org.safehaus.subutai.core.peer.api.Peer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -24,27 +21,33 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Runo;
+import com.vaadin.ui.Window;
 
 
 /**
  * Created by bahadyr on 9/10/14.
  */
-public class EnvironmentBuildWizard extends DetailsWindow
+public class EnvironmentBuildWizard extends Window
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentBuildWizard.class.getName() );
     private int step = 0;
     private EnvironmentBuildTask environmentBuildTask;
     private Table peersTable;
     private Table containerToPeerTable;
     private EnvironmentManagerPortalModule managerUI;
+    private Map<Object, NodeGroup> nodeGroupMap;
 
 
     public EnvironmentBuildWizard( final String caption, EnvironmentManagerPortalModule managerUI,
                                    EnvironmentBuildTask environmentBuildTask )
     {
         super( caption );
+        setCaption( caption );
+        setModal( true );
+        setClosable( true );
+        setVisible( false );
+        setWidth( 900, UNITS_PIXELS );
+        setHeight( 500, UNITS_PIXELS );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
         next();
@@ -72,12 +75,12 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 setContent( genContainerToPeersTable() );
                 break;
             }
-            case 3:
+            /*case 3:
             {
                 managerUI.getEnvironmentManager().buildEnvironment( environmentBuildTask );
                 close();
                 break;
-            }
+            }*/
             default:
             {
                 setContent( genPeersTable() );
@@ -99,7 +102,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    public EnvironmentBuildTask getEnvironmentBuildTask()
+    /*public EnvironmentBuildTask getEnvironmentBuildTask()
     {
         return environmentBuildTask;
     }
@@ -108,12 +111,18 @@ public class EnvironmentBuildWizard extends DetailsWindow
     public void setEnvironmentBuildTask( final EnvironmentBuildTask environmentBuildTask )
     {
         this.environmentBuildTask = environmentBuildTask;
-    }
+    }*/
 
 
     public void back()
     {
         step--;
+    }
+
+
+    public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
+    {
+        this.nodeGroupMap = nodeGroupMap;
     }
 
 
@@ -166,12 +175,9 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    private TabSheet genContainerToPeersTable()
+    private VerticalLayout genContainerToPeersTable()
     {
 
-        TabSheet sheet = new TabSheet();
-        sheet.setStyleName( Runo.TABSHEET_SMALL );
-        sheet.setSizeFull();
 
         VerticalLayout vl = new VerticalLayout();
 
@@ -185,6 +191,7 @@ public class EnvironmentBuildWizard extends DetailsWindow
         containerToPeerTable.setSizeFull();
 
 
+        nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
@@ -196,9 +203,10 @@ public class EnvironmentBuildWizard extends DetailsWindow
                 comboBox.setNullSelectionAllowed( false );
                 comboBox.setTextInputAllowed( false );
                 comboBox.setItemCaptionPropertyId( "name" );
-                containerToPeerTable.addItem( new Object[] {
+                Object itemId = containerToPeerTable.addItem( new Object[] {
                         ng.getTemplateName(), comboBox
-                }, ng.getTemplateName() );
+                }, null );
+                nodeGroupMap.put( itemId, ng );
             }
         }
         Button nextButton = new Button( "Build" );
@@ -207,11 +215,12 @@ public class EnvironmentBuildWizard extends DetailsWindow
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                Map<String, Peer> topology = topologySelection();
+                Map<Object, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
-                    managerUI.getEnvironmentManager().saveBuildProcess(
-                            createBackgroundEnvironmentBuildProcess( environmentBuildTask, topology ) );
+                    EnvironmentBuildProcess process = createEnvironmentBuildProcess( environmentBuildTask, topology );
+
+                    managerUI.getEnvironmentManager().saveBuildProcess( process );
                 }
                 else
                 {
@@ -224,20 +233,17 @@ public class EnvironmentBuildWizard extends DetailsWindow
 
         vl.addComponent( containerToPeerTable );
         vl.addComponent( nextButton );
-        sheet.addTab( vl, "Node to Peer" );
-        sheet.addTab( new Button( "test" ), "Blueprint to Peer group" );
-        sheet.addTab( new Button( "test" ), "Node group to Peer group" );
-        sheet.addTab( new Button( "test" ), "Node group to Peer" );
-        return sheet;
+
+        return vl;
     }
 
 
     private List<Peer> selectedPeers()
     {
         List<Peer> peers = new ArrayList<>();
-        for ( Object itemId : peersTable.getItemIds() )
+        for ( Object itemId : getPeersTable().getItemIds() )
         {
-            CheckBox selection = ( CheckBox ) peersTable.getItem( itemId ).getItemProperty( "Select" ).getValue();
+            CheckBox selection = ( CheckBox ) getPeersTable().getItem( itemId ).getItemProperty( "Select" ).getValue();
             if ( selection.getValue() )
             {
                 peers.add( ( Peer ) itemId );
@@ -247,22 +253,40 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    public EnvironmentBuildProcess createBackgroundEnvironmentBuildProcess( EnvironmentBuildTask ebt,
-                                                                            Map<String, Peer> topology )
+    public Table getPeersTable()
+    {
+        return peersTable;
+    }
+
+
+    public Table getContainerToPeerTable()
+    {
+        return containerToPeerTable;
+    }
+
+
+    public Map<Object, NodeGroup> getNodeGroupMap()
+    {
+        return nodeGroupMap;
+    }
+
+
+    public EnvironmentBuildProcess createEnvironmentBuildProcess( EnvironmentBuildTask ebt, Map<Object, Peer> topology )
     {
         EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint().getName() );
 
-        for ( NodeGroup ng : ebt.getEnvironmentBlueprint().getNodeGroups() )
+        Map<Object, NodeGroup> map = getNodeGroupMap();
+        for ( Object itemId : map.keySet() )
         {
-            Peer peer = topology.get( ng.getTemplateName() );
+            Peer peer = topology.get( itemId );
+            NodeGroup ng = map.get( itemId );
+
             String key = peer.getId().toString() + "-" + ng.getTemplateName();
 
             if ( !process.getMessageMap().containsKey( key ) )
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
-                ccm.setPeerId( peer.getId() );
-                ccm.setEnvId( ebt.getUuid() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
                 process.putCloneContainerMessage( key, ccm );
@@ -277,18 +301,16 @@ public class EnvironmentBuildWizard extends DetailsWindow
     }
 
 
-    private Map<String, Peer> topologySelection()
+    public Map<Object, Peer> topologySelection()
     {
-        Map<String, Peer> topology = new HashMap<>();
-        for ( Object itemId : containerToPeerTable.getItemIds() )
+        Map<Object, Peer> topology = new HashMap<>();
+        for ( Object itemId : getContainerToPeerTable().getItemIds() )
         {
-            String templateName =
-                    ( String ) containerToPeerTable.getItem( itemId ).getItemProperty( "Container" ).getValue();
             ComboBox selection =
-                    ( ComboBox ) containerToPeerTable.getItem( itemId ).getItemProperty( "Put" ).getValue();
+                    ( ComboBox ) getContainerToPeerTable().getItem( itemId ).getItemProperty( "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
 
-            topology.put( templateName, peer );
+            topology.put( itemId, peer );
         }
         return topology;
     }

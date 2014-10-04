@@ -1,13 +1,12 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class UnblockTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -49,22 +48,22 @@ public class UnblockTaskTrackerOperationHandler extends AbstractOperationHandler
             return;
         }
 
-        Command removeCommand = Commands.getSetTaskTrackerCommand( hadoopClusterConfig, node );
+        Command removeCommand = manager.getCommands().getSetTaskTrackerCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( removeCommand );
         logCommand( removeCommand, productOperation );
 
-        Command includeCommand = Commands.getExcludeTaskTrackerCommand( hadoopClusterConfig, node );
+        Command includeCommand = manager.getCommands().getExcludeTaskTrackerCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( includeCommand );
         logCommand( includeCommand, productOperation );
 
-        Command refreshCommand = Commands.getStartTaskTrackerCommand( node );
+        Command refreshCommand = manager.getCommands().getStartTaskTrackerCommand( node );
         manager.getCommandRunner().runCommand( refreshCommand );
         logCommand( refreshCommand, productOperation );
 
         hadoopClusterConfig.getBlockedAgents().remove( node );
         manager.getPluginDAO()
                .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
-        productOperation.addLog( "Cluster info saved to DB" );
+        productOperation.addLogDone( "Cluster info saved to DB" );
     }
 
 
@@ -72,7 +71,7 @@ public class UnblockTaskTrackerOperationHandler extends AbstractOperationHandler
     {
         if ( command.hasSucceeded() )
         {
-            po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
+            po.addLog( String.format( "Task's operation %s finished", command.getDescription() ) );
         }
         else if ( command.hasCompleted() )
         {

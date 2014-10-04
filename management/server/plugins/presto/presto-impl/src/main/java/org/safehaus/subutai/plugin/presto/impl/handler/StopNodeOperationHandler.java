@@ -6,7 +6,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
 import com.google.common.collect.Sets;
@@ -53,7 +52,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<PrestoImp
 
         po.addLog( String.format( "Stopping node %s...", node.getHostname() ) );
 
-        Command stopNodeCommand = Commands.getStopCommand( Sets.newHashSet( node ) );
+        Command stopNodeCommand = manager.getCommands().getStopCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( stopNodeCommand );
 
         if ( stopNodeCommand.hasSucceeded() )

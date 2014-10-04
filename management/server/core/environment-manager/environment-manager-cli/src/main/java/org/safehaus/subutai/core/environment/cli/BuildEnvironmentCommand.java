@@ -48,21 +48,11 @@ public class BuildEnvironmentCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+        EnvironmentBuildTask task = new EnvironmentBuildTask();
         Set<String> physicalServers = new HashSet<>();
-
-
         physicalServers.add( String.valueOf( physicalServers ) );
-        //        environmentBuildTask.setEnvironmentBlueprint( blueprintStr );
-        boolean buildResult = environmentManager.buildEnvironment( environmentBuildTask );
-        if ( buildResult )
-        {
-            System.out.println( "Environment build completed successfully." );
-        }
-        else
-        {
-            System.out.println( "Environment build failed." );
-        }
+
+
         return null;
     }
 }

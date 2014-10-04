@@ -14,6 +14,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Displays stashes
@@ -29,19 +31,23 @@ public class ListStashes extends OsgiCommandSupport
     @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
     String repoPath;
 
-    private AgentManager agentManager;
-    private GitManager gitManager;
+    private final GitManager gitManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public ListStashes( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
     }
 
 
@@ -49,18 +55,25 @@ public class ListStashes extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-            List<String> stashes = gitManager.listStashes( agent, repoPath );
-            for ( String stash : stashes )
-            {
-                System.out.println( stash.toString() );
-            }
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+                List<String> stashes = gitManager.listStashes( agent, repoPath );
+                for ( String stash : stashes )
+                {
+                    System.out.println( stash.toString() );
+                }
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println(e.getMessage());
+            }
         }
 
         return null;

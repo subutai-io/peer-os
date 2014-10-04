@@ -123,7 +123,7 @@ public class PeerRegisterForm extends CustomComponent
         servicePortTextField.setWidth( "-1px" );
         servicePortTextField.setHeight( "-1px" );
         servicePortTextField.setMaxLength( 256 );
-        absoluteLayout.addComponent( servicePortTextField, "top:36.0px;left:100.0px;" );
+        absoluteLayout.addComponent( servicePortTextField, "top:36.0px;left:150.0px;" );
 
         // IP
         final Label IP = new Label();
@@ -139,7 +139,7 @@ public class PeerRegisterForm extends CustomComponent
         ipTextField.setWidth( "-1px" );
         ipTextField.setHeight( "-1px" );
         ipTextField.setMaxLength( 15 );
-        absoluteLayout.addComponent( ipTextField, "top:80.0px;left:100.0px;" );
+        absoluteLayout.addComponent( ipTextField, "top:80.0px;left:150.0px;" );
 
         // registerRequestButton
         registerRequestButton = createRegisterButton();
@@ -154,7 +154,7 @@ public class PeerRegisterForm extends CustomComponent
         peersTable = new Table();
         peersTable.setCaption( "Peers" );
         peersTable.setImmediate( false );
-        peersTable.setWidth( "780px" );
+        peersTable.setWidth( "800px" );
         peersTable.setHeight( "283px" );
         absoluteLayout.addComponent( peersTable, "top:294.0px;left:20.0px;" );
 
@@ -188,7 +188,7 @@ public class PeerRegisterForm extends CustomComponent
     {
         List<Peer> peers = peerManagerPortalModule.getPeerManager().peers();
         peersTable.removeAllItems();
-        peersTable.addContainerProperty( "UUID", UUID.class, null );
+//        peersTable.addContainerProperty( "UUID", UUID.class, null );
         peersTable.addContainerProperty( "Name", String.class, null );
         peersTable.addContainerProperty( "IP", String.class, null );
         peersTable.addContainerProperty( "Status", PeerStatus.class, null );
@@ -235,7 +235,7 @@ public class PeerRegisterForm extends CustomComponent
                 }
             } );
             peersTable.addItem(
-                    new Object[] { peer.getId(), peer.getName(), peer.getIp(), peer.getStatus(), unregisterButton },
+                    new Object[] { peer.getName(), peer.getIp(), peer.getStatus(), unregisterButton },
                     null );
         }
     }
@@ -278,6 +278,7 @@ public class PeerRegisterForm extends CustomComponent
 
                                 Peer remotePeer = GSON.fromJson( remotePeerJson, Peer.class );
                                 remotePeer.setStatus( PeerStatus.REQUESTED );
+                                remotePeer.setName( remotePeer.getName() );
                                 peerManagerPortalModule.getPeerManager().register( remotePeer );
                             }
                             else

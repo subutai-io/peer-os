@@ -6,7 +6,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 import com.google.common.collect.Sets;
@@ -56,7 +55,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         productOperation.addLog( "Checking prerequisites..." );
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -84,7 +83,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
             productOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
             //install mahout
 
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+            Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )

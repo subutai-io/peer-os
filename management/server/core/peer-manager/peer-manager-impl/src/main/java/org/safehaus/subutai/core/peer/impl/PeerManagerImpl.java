@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -42,6 +43,7 @@ import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +67,7 @@ public class PeerManagerImpl implements PeerManager
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
     private CommandRunner commandRunner;
+    private TemplateRegistry templateRegistry;
 
     private Set<PeerContainer> containers = new HashSet<>();
 
@@ -95,6 +98,12 @@ public class PeerManagerImpl implements PeerManager
     public void setCommandRunner( final CommandRunner commandRunner )
     {
         this.commandRunner = commandRunner;
+    }
+
+
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    {
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -394,9 +403,23 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String strategy )
+    public Set<Agent> createContainers( UUID envId, UUID peerId, String template, int numberOfNodes, String strategy )
             throws ContainerCreateException
     {
+        if ( peerId == null )
+        {
+            throw new IllegalArgumentException( "Peer could not be null." );
+        }
+        if ( !peerId.equals( getSiteId() ) )
+        {
+            // Is the remote template exists in the local peer?
+            boolean isTemplateExists = templateRegistry.getTemplate( template ) != null;
+            if (! isTemplateExists) {
+                //TODO: download the remote template and register it in the local registry
+
+            }
+        }
+
 
         return containerManager.clone( envId, template, numberOfNodes, strategy, null );
     }
@@ -472,8 +495,8 @@ public class PeerManagerImpl implements PeerManager
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
                     try
                     {
-                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getTemplate(), ccm.getNumberOfNodes(),
-                                ccm.getStrategy() );
+                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getPeerId(), ccm.getTemplate(),
+                                ccm.getNumberOfNodes(), ccm.getStrategy() );
                         ccm.setResult( agents );
                         ccm.setSuccess( true );
                     }
@@ -483,6 +506,27 @@ public class PeerManagerImpl implements PeerManager
                         peerCommandMessage.setExceptionMessage( e.toString() );
                     }
                 }
+                break;
+            case GET_PEER_ID:
+                UUID peerId = getSiteId();
+                peerCommandMessage.setResult( peerId );
+                peerCommandMessage.setSuccess( true );
+                break;
+            case GET_CONNECTED_CONTAINERS:
+                Set<Agent> agents = agentManager.getAgents();
+
+                Set<PeerContainer> containers = new HashSet<>();
+                for ( Agent agent : agents )
+                {
+                    PeerContainer pc = new PeerContainer();
+                    pc.setAgentId( agent.getUuid() );
+                    pc.setPeerId( agent.getSiteId() );
+                    pc.setState( ContainerState.STARTED );
+                    containers.add( pc );
+                }
+                String jsonObject = JsonUtil.toJson( containers );
+                peerCommandMessage.setResult( jsonObject );
+                peerCommandMessage.setSuccess( true );
                 break;
             case START:
                 result = startContainer( peerContainer );
@@ -508,7 +552,7 @@ public class PeerManagerImpl implements PeerManager
                     peerCommandMessage.setExceptionMessage( "Could not stop container." );
                 }
                 break;
-            case ISCONNECTED:
+            case IS_CONNECTED:
 
                 result = isContainerConnected( peerContainer );
                 if ( result )
@@ -539,13 +583,19 @@ public class PeerManagerImpl implements PeerManager
         }
         peerCommandMessage.setProccessed( true );
 
-        LOG.info( String.format( "After =================[%s]", peerCommandMessage ) );
+        LOG.debug( String.format( "After =================[%s]", peerCommandMessage ) );
     }
 
 
     private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
     {
         Agent agent = agentManager.getAgentByUUID( ecm.getAgentId() );
+        if ( agent == null )
+        {
+            ecm.setExceptionMessage( "Container is not available.\n" );
+            ecm.setSuccess( false );
+            return;
+        }
         RequestBuilder requestBuilder = new RequestBuilder( ecm.getCommand() );
 
 
@@ -554,17 +604,20 @@ public class PeerManagerImpl implements PeerManager
             requestBuilder.withCwd( ecm.getCwd() );
         }
 
-        int timeout = ecm.getTimeout();
+        long timeout = ecm.getTimeout();
 
-        requestBuilder.withTimeout( timeout );
+        requestBuilder.withTimeout( ( int ) timeout );
         Command cmd = commandRunner.createCommand( "Remote command", requestBuilder, Sets.newHashSet( agent ) );
         try
         {
             cmd.execute();
             AgentResult result = cmd.getResults().get( ecm.getAgentId() );
-            ecm.setStdOut( result.getStdOut() );
-            ecm.setStdErr( result.getStdErr() );
-            ecm.setExitCode( result.getExitCode() );
+            ExecuteCommandMessage.ExecutionResult executionResult =
+                    ecm.createExecutionResult( result.getStdOut(), result.getStdErr(), result.getExitCode() );
+            ecm.setResult( executionResult );
+            //            ecm.setStdOut( result.getStdOut() );
+            //            ecm.setStdErr( result.getStdErr() );
+            //            ecm.setExitCode( result.getExitCode() );
             ecm.setSuccess( true );
         }
         catch ( CommandException e )

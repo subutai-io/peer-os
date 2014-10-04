@@ -3,12 +3,12 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
@@ -54,7 +54,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
     public void run()
     {
         //check of node type is allowed for addition
-        if ( !( nodeType == NodeType.TRACER || nodeType.isSlave() ) )
+        if ( !( nodeType == NodeType.Tracer || nodeType.isSlave() ) )
         {
             productOperation.addLogFailed( "Only tracer or slave node can be added" );
             return;
@@ -76,7 +76,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
 
         //check if node already belongs to specified role
-        if ( nodeType == NodeType.TRACER && accumuloClusterConfig.getTracers().contains( lxcAgent ) )
+        if ( nodeType == NodeType.Tracer && accumuloClusterConfig.getTracers().contains( lxcAgent ) )
         {
             productOperation.addLogFailed( String.format( "Agent %s already belongs to tracers", lxcHostname ) );
             return;
@@ -88,7 +88,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )

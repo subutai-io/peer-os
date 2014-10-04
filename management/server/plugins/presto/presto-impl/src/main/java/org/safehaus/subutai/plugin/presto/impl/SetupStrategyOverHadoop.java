@@ -58,7 +58,7 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
 
         //check installed packages
         Set<Agent> allNodes = config.getAllNodes();
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( allNodes );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -107,7 +107,7 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
         po.addLog( "Installing Presto..." );
         Set<Agent> installationSet = new HashSet<>( config.getAllNodes() );
         installationSet.removeAll( skipInstallation );
-        Command installCommand = Commands.getInstallCommand( installationSet );
+        Command installCommand = manager.getCommands().getInstallCommand( installationSet );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )

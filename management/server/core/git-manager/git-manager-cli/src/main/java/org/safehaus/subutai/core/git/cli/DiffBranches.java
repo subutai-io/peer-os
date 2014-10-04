@@ -15,6 +15,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Diffs branches
@@ -34,19 +36,29 @@ public class DiffBranches extends OsgiCommandSupport
     @Argument(index = 3, name = "branch name 2", required = false, multiValued = false,
             description = "branch name 2 (master = default)")
     String branchName2;
-    private AgentManager agentManager;
-    private GitManager gitManager;
+    private final GitManager gitManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public DiffBranches( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
+    }
+
+
+    public void setBranchName2( final String branchName2 )
+    {
+        this.branchName2 = branchName2;
     }
 
 
@@ -54,27 +66,34 @@ public class DiffBranches extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-            List<GitChangedFile> changedFileList = null;
-            if ( branchName2 != null )
-            {
-                changedFileList = gitManager.diffBranches( agent, repoPath, branchName1, branchName2 );
-            }
-            else
-            {
-                changedFileList = gitManager.diffBranches( agent, repoPath, branchName1 );
-            }
-
-            for ( GitChangedFile gf : changedFileList )
-            {
-                System.out.println( gf.toString() );
-            }
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+                List<GitChangedFile> changedFileList;
+                if ( branchName2 != null )
+                {
+                    changedFileList = gitManager.diffBranches( agent, repoPath, branchName1, branchName2 );
+                }
+                else
+                {
+                    changedFileList = gitManager.diffBranches( agent, repoPath, branchName1 );
+                }
+
+                for ( GitChangedFile gf : changedFileList )
+                {
+                    System.out.println( gf.toString() );
+                }
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println( e.getMessage() );
+            }
         }
 
         return null;

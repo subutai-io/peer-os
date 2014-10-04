@@ -19,9 +19,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 
 
-/**
- * @author dilshat
- */
 public class WelcomeStep extends Panel
 {
 
@@ -40,43 +37,47 @@ public class WelcomeStep extends Panel
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        // Image as a file resource
         logoImg.setIcon( new FileResource( FileUtil.getFile( MahoutPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
-        logoImg.setHeight( 56, Unit.PIXELS );
-        logoImg.setWidth( 220, Unit.PIXELS );
+        logoImg.setHeight( 206, Unit.PIXELS );
+        logoImg.setWidth( 100, Unit.PIXELS );
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
-        Button startOverHadoopNZK = new Button( "Start over Hadoop installation" );
-        startOverHadoopNZK.addStyleName( "default" );
-        grid.addComponent( startOverHadoopNZK, 7, 4, 7, 4 );
-        grid.setComponentAlignment( startOverHadoopNZK, Alignment.BOTTOM_RIGHT );
-        Button startWithHadoopNZK = new Button( "Start with Hadoop installation" );
-        startWithHadoopNZK.addStyleName( "default" );
-        grid.addComponent( startWithHadoopNZK, 8, 4, 8, 4 );
-        grid.setComponentAlignment( startWithHadoopNZK, Alignment.BOTTOM_RIGHT );
+        Button next = new Button( "Start over-Hadoop installation" );
+        next.addStyleName( "default" );
+        grid.addComponent( next, 4, 4, 4, 4 );
+        grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
-        startOverHadoopNZK.addClickListener( new Button.ClickListener()
+        next.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                clickHandler( wizard, SetupType.OVER_HADOOP );
+            }
+        } );
+
+        Button next2 = new Button( "Start with-Hadoop installation" );
+        next2.setStyleName( "default" );
+        next2.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
-                wizard.init();
-                wizard.getConfig().setSetupType( SetupType.OVER_HADOOP );
-                wizard.next();
+                clickHandler( wizard, SetupType.WITH_HADOOP );
             }
         } );
-        startWithHadoopNZK.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
-                wizard.init();
-                wizard.getConfig().setSetupType( SetupType.WITH_HADOOP );
-                wizard.next();
-            }
-        } );
+        grid.addComponent( next2, 5, 4, 5, 4 );
+        grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
 
         setContent( grid );
+    }
+
+
+    private void clickHandler( Wizard wizard, SetupType type )
+    {
+        wizard.init();
+        wizard.getConfig().setSetupType( type );
+        wizard.next();
     }
 }

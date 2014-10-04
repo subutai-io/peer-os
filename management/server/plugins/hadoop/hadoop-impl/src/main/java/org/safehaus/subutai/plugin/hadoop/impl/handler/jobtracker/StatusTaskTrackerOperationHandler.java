@@ -1,14 +1,13 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker;
 
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class StatusTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl>
@@ -49,7 +48,7 @@ public class StatusTaskTrackerOperationHandler extends AbstractOperationHandler<
             productOperation.addLogFailed( "TaskTracker is not connected" );
             return;
         }
-        Command statusCommand = Commands.getJobTrackerCommand( node, "status" );
+        Command statusCommand = manager.getCommands().getJobTrackerCommand( node, "status" );
         manager.getCommandRunner().runCommand( statusCommand );
 
         AgentResult result = statusCommand.getResults().get( node.getUuid() );

@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 
@@ -45,7 +44,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
         }
         //@todo may be we should always just uninstall ZK or check always it there are any other subutai packages
         // installed on the same nodes
-        //because environment supplied initially could contain other products or other products might've been
+        // because environment supplied initially could contain other products or other products might've been
         // installed later
         if ( config.getSetupType() == SetupType.STANDALONE )
         {
@@ -70,7 +69,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
             //just uninstall nodes
             productOperation.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
-            Command uninstallCommand = Commands.getUninstallCommand( config.getNodes() );
+            Command uninstallCommand = manager.getCommands().getUninstallCommand( config.getNodes() );
+            manager.getCommandRunner().runCommand( uninstallCommand );
 
             if ( uninstallCommand.hasCompleted() )
             {

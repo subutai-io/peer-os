@@ -12,6 +12,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Diffs file between branches
@@ -34,19 +36,30 @@ public class DiffFile extends OsgiCommandSupport
     @Argument(index = 4, name = "branch name 2", required = false, multiValued = false,
             description = "branch name 2 (master = default)")
     String branchName2;
-    private AgentManager agentManager;
-    private GitManager gitManager;
+
+    private final GitManager gitManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public DiffFile( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
+    }
+
+
+    public void setBranchName2( final String branchName2 )
+    {
+        this.branchName2 = branchName2;
     }
 
 
@@ -54,24 +67,31 @@ public class DiffFile extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-            String diff = null;
-            if ( branchName2 != null )
-            {
-                diff = gitManager.diffFile( agent, repoPath, branchName1, branchName2, filePath );
-            }
-            else
-            {
-                diff = gitManager.diffFile( agent, repoPath, branchName1, filePath );
-            }
-
-            System.out.println( diff );
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+                String diff;
+                if ( branchName2 != null )
+                {
+                    diff = gitManager.diffFile( agent, repoPath, branchName1, branchName2, filePath );
+                }
+                else
+                {
+                    diff = gitManager.diffFile( agent, repoPath, branchName1, filePath );
+                }
+
+                System.out.println( diff );
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println( e.getMessage() );
+            }
         }
 
         return null;

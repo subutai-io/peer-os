@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response;
 public interface RestService
 {
 
-    // should return Set<Agent> in Json format
 
     /**
      * Returns list of agents available in container in JSON format with HTTP response status 200
@@ -22,7 +21,6 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getAgents();
 
-    //should return Set<Agent> in Json format
 
     /**
      * Returns list of physical agents available in container in JSON format with HTTP response status 200
@@ -32,7 +30,6 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getPhysicalAgents();
 
-    //Set<Agent>
 
     /**
      * Returns list of lxc agents available in container in JSON format with HTTP response status 200
@@ -42,7 +39,6 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getLxcAgents();
 
-    //Agent
 
     /**
      * Returns list of agents available in container by hostname in JSON format this allows to differentiate remote and
@@ -53,7 +49,6 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getAgentByHostname( @PathParam("hostname") String hostname );
 
-    //Agent
 
     /**
      * Returns list of agents available in container by uuid in JSON format this allows to get specific agent with HTTP
@@ -64,7 +59,6 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getAgentByUUID( @PathParam("uuid") String uuid );
 
-    //Set<Agent>
 
     /**
      * Returns list of agents available in container by parentHostname in JSON format this allows to differentiate
@@ -75,6 +69,9 @@ public interface RestService
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getLxcAgentsByParentHostname( @PathParam("parentHostname") String parentHostname );
 
+    /**
+     * Returning set of agents belonging to an environment
+     */
     @GET
     @Path("agents/by-environment-id/{envId}")
     @Produces({ MediaType.APPLICATION_JSON })

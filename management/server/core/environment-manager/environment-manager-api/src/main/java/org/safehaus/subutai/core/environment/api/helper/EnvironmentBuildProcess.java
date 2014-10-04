@@ -20,9 +20,20 @@ public class EnvironmentBuildProcess
     private UUID uuid;
     private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
-    private int timestamp;
-    //    private List<CloneContainersMessage> cloneContainersMessages;
+    private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
+
+
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
+
+    public void setTimestamp( final long timestamp )
+    {
+        this.timestamp = timestamp;
+    }
 
 
     public EnvironmentBuildProcess( final String name )
@@ -30,7 +41,6 @@ public class EnvironmentBuildProcess
         this.environmentName = name;
         this.uuid = UUID.randomUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
-        //        this.cloneContainersMessages = new ArrayList<>();
         this.messageMap = new HashMap<>();
     }
 
@@ -39,12 +49,6 @@ public class EnvironmentBuildProcess
     {
         this.messageMap.put( peerId, cloneContainersMessage );
     }
-
-
-   /* public void setCloneContainersMessages( final List<CloneContainersMessage> cloneContainersMessages )
-    {
-        this.cloneContainersMessages = cloneContainersMessages;
-    }*/
 
 
     public Map<String, CloneContainersMessage> getMessageMap()
@@ -57,18 +61,6 @@ public class EnvironmentBuildProcess
     {
         this.messageMap = messageMap;
     }
-
-
-   /* public List<CloneContainersMessage> getCloneContainersMessages()
-    {
-        return cloneContainersMessages;
-    }
-
-
-    public void addCloneContainerMessage( CloneContainersMessage ccm )
-    {
-        this.cloneContainersMessages.add( ccm );
-    }*/
 
 
     public ProcessStatusEnum getProcessStatusEnum()
@@ -92,12 +84,6 @@ public class EnvironmentBuildProcess
     public void setUuid( final UUID uuid )
     {
         this.uuid = uuid;
-    }
-
-
-    public int getTimestamp()
-    {
-        return timestamp;
     }
 
 

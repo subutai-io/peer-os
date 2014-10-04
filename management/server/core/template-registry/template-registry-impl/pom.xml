@@ -12,7 +12,7 @@
   <artifactId>template-registry-impl</artifactId>
   <packaging>bundle</packaging>
   <name>Subutai Template Registry</name>
-  <description>Subutai Template Registry</description>
+  <description>Subutai Template Registry Impl</description>
 
   <dependencies>
     <dependency>
@@ -31,6 +31,20 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -46,8 +60,8 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.registry.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
-            </Export-Package>
+               {local-packages};version=${project.version};-noimport:=true
+             </Export-Package>
           </instructions>
         </configuration>
       </plugin>

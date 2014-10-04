@@ -12,6 +12,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Brings current branch to the state of the specified remote branch, effectively undoing all local changes
@@ -32,19 +34,30 @@ public class UndoHard extends OsgiCommandSupport
     @Argument(index = 2, name = "branch name", required = false, multiValued = false,
             description = "name of remote branch whose state to restore current branch to (master = default)")
     String branchName;
-    private AgentManager agentManager;
-    private GitManager gitManager;
+
+    private final GitManager gitManager;
+    private final AgentManager agentManager;
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public UndoHard( final GitManager gitManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( gitManager, "Git Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.gitManager = gitManager;
         this.agentManager = agentManager;
     }
 
 
-    public void setGitManager( final GitManager gitManager )
+    public void setHostname( final String hostname )
     {
-        this.gitManager = gitManager;
+        this.hostname = hostname;
+    }
+
+
+    public void setBranchName( final String branchName )
+    {
+        this.branchName = branchName;
     }
 
 
@@ -52,22 +65,29 @@ public class UndoHard extends OsgiCommandSupport
     {
 
         Agent agent = agentManager.getAgentByHostname( hostname );
-
-        try
+        if ( agent == null )
         {
-
-            if ( branchName != null )
-            {
-                gitManager.undoHard( agent, repoPath, branchName );
-            }
-            else
-            {
-                gitManager.undoHard( agent, repoPath );
-            }
+            System.out.println( "Agent not connected" );
         }
-        catch ( GitException e )
+        else
         {
-            LOG.error( "Error in doExecute", e );
+            try
+            {
+
+                if ( branchName != null )
+                {
+                    gitManager.undoHard( agent, repoPath, branchName );
+                }
+                else
+                {
+                    gitManager.undoHard( agent, repoPath );
+                }
+            }
+            catch ( GitException e )
+            {
+                LOG.error( "Error in doExecute", e );
+                System.out.println( e.getMessage() );
+            }
         }
 
         return null;

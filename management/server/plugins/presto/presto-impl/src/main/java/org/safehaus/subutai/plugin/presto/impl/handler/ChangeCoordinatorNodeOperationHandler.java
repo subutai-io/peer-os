@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
 
@@ -74,14 +73,14 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
         po.addLog( "Stopping all nodes..." );
         //stop all nodes
-        Command stopNodesCommand = Commands.getStopCommand( config.getAllNodes() );
+        Command stopNodesCommand = manager.getCommands().getStopCommand( config.getAllNodes() );
         manager.getCommandRunner().runCommand( stopNodesCommand );
 
         if ( stopNodesCommand.hasSucceeded() )
         {
             po.addLog( "All nodes stopped\nConfiguring coordinator..." );
 
-            Command configureCoordinatorCommand = Commands.getSetCoordinatorCommand( newCoordinator );
+            Command configureCoordinatorCommand = manager.getCommands().getSetCoordinatorCommand( newCoordinator );
             manager.getCommandRunner().runCommand( configureCoordinatorCommand );
 
             if ( configureCoordinatorCommand.hasSucceeded() )
@@ -101,14 +100,15 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
             po.addLog( "Configuring workers..." );
 
-            Command configureWorkersCommand = Commands.getSetWorkerCommand( newCoordinator, config.getWorkers() );
+            Command configureWorkersCommand =
+                    manager.getCommands().getSetWorkerCommand( newCoordinator, config.getWorkers() );
             manager.getCommandRunner().runCommand( configureWorkersCommand );
 
             if ( configureWorkersCommand.hasSucceeded() )
             {
                 po.addLog( "Workers configured successfully. Starting cluster..." );
 
-                Command startNodesCommand = Commands.getStartCommand( config.getAllNodes() );
+                Command startNodesCommand = manager.getCommands().getStartCommand( config.getAllNodes() );
                 final AtomicInteger okCount = new AtomicInteger();
                 manager.getCommandRunner().runCommand( startNodesCommand, new CommandCallback()
                 {

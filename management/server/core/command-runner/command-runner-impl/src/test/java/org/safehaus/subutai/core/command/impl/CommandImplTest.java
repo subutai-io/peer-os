@@ -14,11 +14,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
@@ -29,6 +32,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.internal.matchers.StringContains.containsString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -46,6 +50,8 @@ public class CommandImplTest
     private CommandImpl command;
     private static final int MAX_TIMEOUT = 100;
     private static final int REQUESTS_COUNT = 3;
+    private CommandRunnerBase commandRunner;
+    private CommandCallback commandCallback;
 
 
     @Before
@@ -53,7 +59,9 @@ public class CommandImplTest
     {
         Set<Agent> agents = MockUtils.getAgents( agentUUID );
         RequestBuilder requestBuilder = MockUtils.getRequestBuilder( "pwd", 1, agents );
-        command = new CommandImpl( DESCRIPTION, requestBuilder, agents, mock( AbstractCommandRunner.class ) );
+        commandRunner = mock( AbstractCommandRunner.class );
+        command = new CommandImpl( DESCRIPTION, requestBuilder, agents, commandRunner );
+        commandCallback = MockUtils.getCommandCallback();
     }
 
 
@@ -146,6 +154,69 @@ public class CommandImplTest
     }
 
 
+    @Test(expected = CommandException.class)
+    public void shouldThrowCommandException2() throws CommandException
+    {
+
+        command.setCommandStatus( CommandStatus.RUNNING );
+
+        command.executeAsync();
+    }
+
+
+    @Test(expected = CommandException.class)
+    public void shouldThrowCommandException3() throws CommandException
+    {
+
+        command.setCommandStatus( CommandStatus.RUNNING );
+
+        command.executeAsync( commandCallback );
+    }
+
+
+    @Test(expected = CommandException.class)
+    public void shouldThrowCommandException4() throws CommandException
+    {
+
+        command.setCommandStatus( CommandStatus.RUNNING );
+
+        command.execute( commandCallback );
+    }
+
+
+    @Test
+    public void shouldCallRunCommand() throws CommandException
+    {
+
+
+        command.executeCommand( commandCallback, false );
+
+
+        verify( commandRunner ).runCommand( command, commandCallback );
+    }
+
+
+    @Test(expected = CommandException.class)
+    public void shouldThrowCommandCommand() throws CommandException
+    {
+
+        Mockito.doThrow( new RuntimeException( "OOPS" ) ).when( commandRunner ).runCommand( command, commandCallback );
+
+        command.executeCommand( commandCallback, false );
+    }
+
+
+    @Test
+    public void shouldCallRunCommandAsync() throws CommandException
+    {
+
+        command.executeCommand( null, true );
+
+
+        verify( commandRunner ).runCommandAsync( command );
+    }
+
+
     @Test
     public void shouldSucceedCommandStatus()
     {
@@ -171,7 +242,7 @@ public class CommandImplTest
                     Thread.sleep( 500 );
                     command.notifyWaitingThreads();
                 }
-                catch ( InterruptedException e )
+                catch ( InterruptedException ignored )
                 {
                 }
             }
@@ -207,7 +278,7 @@ public class CommandImplTest
                     Thread.sleep( 500 );
                     command.releaseUpdateLock();
                 }
-                catch ( InterruptedException e )
+                catch ( InterruptedException ignore )
                 {
                 }
             }
@@ -263,9 +334,33 @@ public class CommandImplTest
     public void shouldReturnDescription()
     {
 
-        command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG ) );
-
         assertEquals( DESCRIPTION, command.getDescription() );
+    }
+
+
+    @Test
+    public void shouldIncrementCounters()
+    {
+
+        int reqCompleted = command.getRequestsCompleted();
+        int reqSucceeded = command.getRequestsSucceeded();
+
+        command.incrementCompletedRequestsCount();
+        command.incrementSucceededRequestsCount();
+
+        assertEquals( reqCompleted + 1, command.getRequestsCompleted() );
+        assertEquals( reqSucceeded + 1, command.getRequestsSucceeded() );
+    }
+
+
+    @Test
+    public void shouldBeBroadcast()
+    {
+
+        CommandImpl command1 =
+                new CommandImpl( mock( RequestBuilder.class ), REQUESTS_COUNT, mock( CommandRunnerBase.class ) );
+
+        assertTrue( command1.isBroadcastCommand() );
     }
 
 

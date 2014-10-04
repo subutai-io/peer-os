@@ -16,13 +16,12 @@ import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 
 
-/**
- * @author dilshat
- */
 public class CheckTask implements Runnable
 {
+
 
     private final CompleteEvent completeEvent;
     private final Hadoop hadoop;
@@ -30,31 +29,19 @@ public class CheckTask implements Runnable
     private UUID trackID;
     private HadoopClusterConfig hadoopClusterConfig;
     private Agent agent;
-    private Boolean isDataNode;
+    private NodeType nodeType;
 
 
-    public CheckTask( Hadoop hadoop, Tracker tracker, HadoopClusterConfig hadoopClusterConfig,
-                      CompleteEvent completeEvent, UUID trackID, Agent agent )
-    {
+
+    public CheckTask( Hadoop hadoop, Tracker tracker, NodeType nodeType, HadoopClusterConfig hadoopClusterConfig,
+                      CompleteEvent completeEvent, UUID trackID, Agent agent ) {
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.completeEvent = completeEvent;
         this.trackID = trackID;
         this.hadoopClusterConfig = hadoopClusterConfig;
         this.agent = agent;
-    }
-
-
-    public CheckTask( Hadoop hadoop, Tracker tracker, HadoopClusterConfig hadoopClusterConfig,
-                      CompleteEvent completeEvent, UUID trackID, Agent agent, boolean isDataNode )
-    {
-        this.hadoop = hadoop;
-        this.tracker = tracker;
-        this.completeEvent = completeEvent;
-        this.trackID = trackID;
-        this.hadoopClusterConfig = hadoopClusterConfig;
-        this.agent = agent;
-        this.isDataNode = isDataNode;
+        this.nodeType = nodeType;
     }
 
 
@@ -85,30 +72,21 @@ public class CheckTask implements Runnable
         }
 
         NodeState state = NodeState.UNKNOWN;
-        if ( agent != null )
-        {
-            if ( agent.equals( hadoopClusterConfig.getNameNode() ) )
-            {
+        if ( agent != null ) {
+            if ( nodeType.equals( NodeType.NAMENODE ) ) {
                 trackID = hadoop.statusNameNode( hadoopClusterConfig );
             }
-            else if ( agent.equals( hadoopClusterConfig.getJobTracker() ) )
-            {
+            else if ( nodeType.equals( NodeType.JOBTRACKER ) ) {
                 trackID = hadoop.statusJobTracker( hadoopClusterConfig );
             }
-            else if ( agent.equals( hadoopClusterConfig.getSecondaryNameNode() ) )
-            {
+            else if ( nodeType.equals( NodeType.SECONDARY_NAMENODE ) ) {
                 trackID = hadoop.statusSecondaryNameNode( hadoopClusterConfig );
             }
-            else if ( isDataNode != null )
-            {
-                if ( isDataNode )
-                {
-                    trackID = hadoop.statusDataNode( hadoopClusterConfig, agent );
-                }
-                else
-                {
-                    trackID = hadoop.statusTaskTracker( hadoopClusterConfig, agent );
-                }
+            if ( nodeType.equals( NodeType.DATANODE ) ) {
+                trackID = hadoop.statusDataNode( hadoopClusterConfig, agent );
+            }
+            else if ( nodeType.equals( NodeType.TASKTRACKER ) ){
+                trackID = hadoop.statusTaskTracker( hadoopClusterConfig, agent );
             }
 
 

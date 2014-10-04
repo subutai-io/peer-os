@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 
@@ -37,7 +36,8 @@ public class CheckClusterOperationHandler extends AbstractOperationHandler<Elast
             return;
         }
 
-        Command checkStatusCommand = Commands.getStatusCommand( elasticsearchClusterConfiguration.getNodes() );
+        Command checkStatusCommand =
+                manager.getCommands().getStatusCommand( elasticsearchClusterConfiguration.getNodes() );
         manager.getCommandRunner().runCommand( checkStatusCommand );
 
         if ( checkStatusCommand.hasSucceeded() )

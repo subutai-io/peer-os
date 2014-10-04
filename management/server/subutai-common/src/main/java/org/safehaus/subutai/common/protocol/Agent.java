@@ -34,8 +34,7 @@ public class Agent implements Serializable, Comparable<Agent>
         Preconditions.checkNotNull( uuid, "UUID is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Hostname is null or empty" );
         Preconditions.checkNotNull( siteId, "Site id is null" );
-        //TODO enable this check when agents starts supplying environmentId
-        //        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
         this.uuid = uuid;
         this.macAddress = macAddress;
@@ -125,9 +124,17 @@ public class Agent implements Serializable, Comparable<Agent>
     @Override
     public String toString()
     {
-        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP="
-                + listIP + ", isLXC=" + isLXC + ", parentHostName=" + parentHostName + ", transportId=" + transportId
-                + '}';
+        return "Agent{" +
+                "uuid=" + uuid +
+                ", macAddress='" + macAddress + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", listIP=" + listIP +
+                ", isLXC=" + isLXC +
+                ", parentHostName='" + parentHostName + '\'' +
+                ", transportId='" + transportId + '\'' +
+                ", siteId=" + siteId +
+                ", environmentId=" + environmentId +
+                '}';
     }
 
 

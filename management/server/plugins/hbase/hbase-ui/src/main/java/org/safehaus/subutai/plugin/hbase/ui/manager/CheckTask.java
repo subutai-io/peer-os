@@ -47,7 +47,6 @@ public class CheckTask implements Runnable
                     break;
                 }
             }
-
             try
             {
                 Thread.sleep( 1000 );

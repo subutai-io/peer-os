@@ -12,8 +12,8 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
+import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -168,18 +168,10 @@ public class AddNodeWindow extends Window
 
     private void setOutput( String output )
     {
-        try
+        if ( !Strings.isNullOrEmpty( output ) )
         {
-            VaadinSession.getCurrent().getLockInstance().lock();
-            if ( !com.google.gwt.thirdparty.guava.common.base.Strings.isNullOrEmpty( output ) )
-            {
-                outputTxtArea.setValue( output );
-                outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
-            }
-        }
-        finally
-        {
-            VaadinSession.getCurrent().getLockInstance().unlock();
+            outputTxtArea.setValue( output );
+            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
         }
     }
 

@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -18,12 +15,14 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
-import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -219,7 +218,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
 
         po.addLog( "Configuring cluster..." );
 
-        List<Command> installationCommands = Commands.getInstallationCommands( config );
+        List<Command> installationCommands = mongoManager.getCommands().getInstallationCommands( config );
 
         for ( Command command : installationCommands )
         {

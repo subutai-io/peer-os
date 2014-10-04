@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />
+             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.command.ui.old.CommandRunnerUI">
-    <property name="commandRunner" ref="commandRunner" />
-    <property name="agentManager" ref="agentManager" />
+    <argument ref="commandRunner" />
+    <argument ref="agentManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

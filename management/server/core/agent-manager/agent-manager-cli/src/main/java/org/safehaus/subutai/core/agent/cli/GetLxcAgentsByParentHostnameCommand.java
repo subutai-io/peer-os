@@ -10,30 +10,35 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
- * Displays the last log entries
+ * Displays list of lxc agents by host server hostname
  */
-@Command(scope = "agent", name = "get-lxc-agents-by-parent-hostname",
-        description = "get LXC agents by parent hostname")
+@Command( scope = "agent", name = "get-lxc-agents-by-parent-hostname",
+        description = "get list of lxc agents  by host server hostname" )
 public class GetLxcAgentsByParentHostnameCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "parentHostname", required = true, multiValued = false,
-            description = "Parent hostname")
+    @Argument( index = 0, name = "parentHostname", required = true, multiValued = false,
+            description = "parent hostname" )
     String parentHostname;
-    private AgentManager agentManager;
+
+    private final AgentManager agentManager;
 
 
-    public AgentManager getAgentManager()
+    public GetLxcAgentsByParentHostnameCommand( final AgentManager agentManager )
     {
-        return agentManager;
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
+        this.agentManager = agentManager;
     }
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public void setParentHostname( final String parentHostname )
     {
-        this.agentManager = agentManager;
+        this.parentHostname = parentHostname;
     }
 
 
@@ -44,12 +49,8 @@ public class GetLxcAgentsByParentHostnameCommand extends OsgiCommandSupport
         StringBuilder sb = new StringBuilder();
         for ( Agent agent : agentSet )
         {
-            sb.append( "Hostname: " ).append( agent.getHostname() ).append( " " ).append( "UUID: " )
-              .append( agent.getUuid() ).append( " " ).append( "Parent hostname: " ).append( agent.getParentHostName() )
-              .append( " " ).append( "MAC address: " ).append( agent.getMacAddress() ).append( " " ).append( "IPs: " )
-              .append( agent.getListIP() ).append( " " ).append( "\n" );
+            sb.append( agent.getHostname() ).append( "\n" );
         }
-
         System.out.println( sb.toString() );
 
         return null;

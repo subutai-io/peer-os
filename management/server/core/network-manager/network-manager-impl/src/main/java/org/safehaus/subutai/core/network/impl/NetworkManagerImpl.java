@@ -10,6 +10,9 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import com.google.common.base.Preconditions;
 
 
+/**
+ * Implementation of Network Manager
+ */
 public class NetworkManagerImpl implements NetworkManager
 {
     private final Commands commands;

@@ -27,20 +27,21 @@ public class WelcomeStep extends Panel
         grid.setMargin( true );
         grid.setSizeFull();
 
-        Label welcomeMsg = new Label( "<center><h2>Welcome to Lucene Installation Wizard!</h2>" );
+        Label welcomeMsg = new Label( "<center><h2>Welcome to Pig Installation Wizard!</h2>" );
         welcomeMsg.setContentMode( ContentMode.HTML );
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
         logoImg.setIcon( new FileResource( FileUtil.getFile( LucenePortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
-        logoImg.setHeight( 206, Unit.PIXELS );
-        logoImg.setWidth( 100, Unit.PIXELS );
+        logoImg.setHeight( 200, Unit.PIXELS );
+        logoImg.setWidth( 180, Unit.PIXELS );
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start over-Hadoop installation" );
         next.addStyleName( "default" );
-        grid.addComponent( next, 6, 4, 6, 4 );
+        //		next.setWidth(100, Unit.PIXELS);
+        grid.addComponent( next, 4, 4, 4, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
         next.addClickListener( new Button.ClickListener()
@@ -62,7 +63,7 @@ public class WelcomeStep extends Panel
                 clickHandler( wizard, SetupType.WITH_HADOOP );
             }
         } );
-        grid.addComponent( next2, 7, 4, 7, 4 );
+        grid.addComponent( next2, 5, 4, 5, 4 );
         grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
 
         setContent( grid );

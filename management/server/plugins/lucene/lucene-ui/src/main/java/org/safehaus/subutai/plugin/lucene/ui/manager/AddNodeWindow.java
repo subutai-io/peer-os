@@ -30,9 +30,6 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class AddNodeWindow extends Window
 {
 
@@ -80,6 +77,19 @@ public class AddNodeWindow extends Window
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
+        final Button ok = new Button( "Ok" );
+        ok.addStyleName( "default" );
+        ok.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                //close window
+                track = false;
+                close();
+            }
+        } );
+
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -89,6 +99,7 @@ public class AddNodeWindow extends Window
                 showProgress();
                 Agent agent = ( Agent ) hadoopNodes.getValue();
                 final UUID trackID = lucene.addNode( config.getClusterName(), agent.getHostname() );
+                ok.setEnabled( false );
                 executorService.execute( new Runnable()
                 {
 
@@ -104,6 +115,7 @@ public class AddNodeWindow extends Window
                                 if ( po.getState() != ProductOperationState.RUNNING )
                                 {
                                     hideProgress();
+                                    ok.setEnabled( true );
                                     break;
                                 }
                             }
@@ -141,18 +153,6 @@ public class AddNodeWindow extends Window
         indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
-        Button ok = new Button( "Ok" );
-        ok.addStyleName( "default" );
-        ok.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                //close window
-                track = false;
-                close();
-            }
-        } );
 
         HorizontalLayout bottomContent = new HorizontalLayout();
         bottomContent.addComponent( indicator );
@@ -161,7 +161,6 @@ public class AddNodeWindow extends Window
 
         content.addComponent( bottomContent );
         content.setComponentAlignment( bottomContent, Alignment.MIDDLE_RIGHT );
-
         setContent( content );
     }
 

@@ -5,7 +5,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 
 import com.google.common.collect.Sets;
@@ -45,7 +44,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
             return;
         }
 
-        Command checkCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
+        Command checkCommand = manager.getCommands().getStatusCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( checkCommand );
 
         if ( checkCommand.hasSucceeded() )

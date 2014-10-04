@@ -8,29 +8,34 @@ package org.safehaus.subutai.plugin.mahout.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+
+import com.google.common.base.Preconditions;
 
 
-/**
- * @author dilshat
- */
-public class Commands extends CommandsSingleton
+public class Commands
 {
-    public Commands( CommandRunner commandRunner )
+    public static final String PACKAGE_NAME = "ksks-mahout";
+
+    private final CommandRunnerBase commandRunnerBase;
+
+
+    public Commands( final CommandRunnerBase commandRunnerBase )
     {
-        init( commandRunner );
+        Preconditions.checkNotNull( commandRunnerBase, "Command Runner is null" );
+
+        this.commandRunnerBase = commandRunnerBase;
     }
 
 
-    public static Command getInstallCommand( Set<Agent> agents )
+    public Command getInstallCommand( Set<Agent> agents )
     {
-        return createCommand( "Install Mahout",
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-mahout" ).withTimeout( 90 )
+        return commandRunnerBase.createCommand( "Install Mahout",
+                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-mahout" ).withTimeout( 360 )
                                                                                             .withStdOutRedirection(
                                                                                                     OutputRedirection
                                                                                                             .NO ),
@@ -38,16 +43,16 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getUninstallCommand( Set<Agent> agents )
+    public Command getUninstallCommand( Set<Agent> agents )
     {
-        return createCommand( "Uninstall Mahout",
+        return commandRunnerBase.createCommand( "Uninstall Mahout",
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-mahout" ).withTimeout( 60 ), agents );
     }
 
 
-    public static Command getCheckInstalledCommand( Set<Agent> agents )
+    public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return createCommand( "Check installed ksks packages", new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ),
-                agents );
+        return commandRunnerBase.createCommand( "Check installed ksks packages",
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
     }
 }

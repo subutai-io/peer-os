@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;
@@ -52,14 +52,14 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
         productOperation.addLog( "Removing property..." );
 
         Command removePropertyCommand =
-                Commands.getRemovePropertyCommand( propertyName, accumuloClusterConfig.getAllNodes() );
+                manager.getCommands().getRemovePropertyCommand( propertyName, accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( removePropertyCommand );
 
         if ( removePropertyCommand.hasSucceeded() )
         {
             productOperation.addLog( "Property removed successfully\nRestarting cluster..." );
 
-            Command restartClusterCommand = Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
+            Command restartClusterCommand = manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {

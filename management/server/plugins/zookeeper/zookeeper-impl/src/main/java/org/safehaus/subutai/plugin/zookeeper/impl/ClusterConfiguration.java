@@ -42,7 +42,7 @@ public class ClusterConfiguration
         Command configureClusterCommand;
         try
         {
-            configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
+            configureClusterCommand = manager.getCommands().getConfigureClusterCommand( config.getNodes(),
                     ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
                     prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue() );
         }
@@ -57,7 +57,7 @@ public class ClusterConfiguration
         {
             po.addLog( "Cluster configured\nRestarting cluster..." );
             //restart all other nodes with new configuration
-            Command restartCommand = Commands.getRestartCommand( config.getNodes() );
+            Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
             final AtomicInteger count = new AtomicInteger();
             manager.getCommandRunner().runCommand( restartCommand, new CommandCallback()
             {

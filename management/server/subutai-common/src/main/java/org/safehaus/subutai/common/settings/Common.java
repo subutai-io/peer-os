@@ -5,7 +5,6 @@ public class Common
 {
 
     public static final String UNKNOWN_LXC_PARENT_NAME = "UNKNOWN";
-    public static final String BROADCAST_TOPIC = "BROADCAST_TOPIC";   //todo migrate to amqConfig
     public static final int REFRESH_UI_SEC = 3;
     public static final int LXC_AGENT_WAIT_TIMEOUT_SEC = 600;
     public static final int AGENT_FRESHNESS_MIN = 4;
@@ -17,7 +16,7 @@ public class Common
             "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,"
                     + "61}[a-zA-Z0-9]))*$";
 
-    //constant that can be converted into settings in the future
+    //constants that can be converted into settings in the future
     public static final String BASE_CONTAINER_NAME = "base-container";
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_AGENT_HOSTNAME = "management";

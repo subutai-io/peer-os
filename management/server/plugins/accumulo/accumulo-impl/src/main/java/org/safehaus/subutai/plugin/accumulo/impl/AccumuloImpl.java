@@ -73,7 +73,7 @@ public class AccumuloImpl implements Accumulo
         this.pluginDAO = new PluginDAO( dbManager );
         this.commands = new Commands( commandRunner );
 
-        Commands.init( commandRunner );
+        commands = new Commands( commandRunner );
     }
 
 
@@ -295,7 +295,6 @@ public class AccumuloImpl implements Accumulo
                                                          AccumuloClusterConfig accumuloClusterConfig,
                                                          ProductOperation po )
     {
-        Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );
 

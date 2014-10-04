@@ -6,40 +6,36 @@
 package org.safehaus.subutai.plugin.hadoop.ui.wizard;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 
-/**
- * @author dilshat
- */
 public class ConfigurationStep extends VerticalLayout
 {
 
-    public ConfigurationStep( final Wizard wizard )
-    {
+    private static final int MAX_NUMBER_OF_NODES_PER_SERVER = 5;
+    private static final String SUGGESTED_NUMBER_OF_NODES_CAPTION = " (Suggested)";
+    private AgentManager agentManager;
 
+
+    public ConfigurationStep( final Wizard wizard, AgentManager agentManager ) {
+        this.agentManager = agentManager;
         setSizeFull();
-
         GridLayout content = new GridLayout( 2, 7 );
         content.setSizeFull();
-        content.setSpacing( true );
+        content.setSpacing(true);
         content.setMargin( true );
 
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
-        clusterNameTxtFld.setInputPrompt( "Cluster name" );
-        clusterNameTxtFld.setRequired( true );
+        clusterNameTxtFld.setInputPrompt("Cluster name");
+        clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength( 20 );
         if ( !Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) )
         {
@@ -55,30 +51,43 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         //configuration servers number
-        List<Integer> s = new ArrayList<>();
-        for ( int i = 0; i < 50; i++ )
-        {
-            s.add( i );
+        List<String> slaveNodeCountList = new ArrayList<String>();
+        Set<Agent> agents = agentManager.getPhysicalAgents();
+        int connected_fai_count= agents.size() - 1;
+        for ( int i = 1; i <= ( connected_fai_count ) * MAX_NUMBER_OF_NODES_PER_SERVER; i++ ) {
+            if ( i == connected_fai_count )
+                slaveNodeCountList.add( i + SUGGESTED_NUMBER_OF_NODES_CAPTION );
+            else
+                slaveNodeCountList.add( i + "" );
         }
 
-        ComboBox slaveNodesComboBox = new ComboBox( "Choose number of slave nodes", s );
+        ComboBox slaveNodesComboBox = new ComboBox( "Choose number of slave nodes", slaveNodeCountList );
         //        slaveNodesComboBox.setMultiSelect(false);
-        slaveNodesComboBox.setImmediate( true );
-        slaveNodesComboBox.setTextInputAllowed( false );
+        slaveNodesComboBox.setImmediate(true);
+        slaveNodesComboBox.setTextInputAllowed(false);
         slaveNodesComboBox.setNullSelectionAllowed( false );
         slaveNodesComboBox.setValue( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() );
 
-        slaveNodesComboBox.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        // parse count of slave nodes input field
+        slaveNodesComboBox.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                wizard.getHadoopClusterConfig().setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
+            public void valueChange( Property.ValueChangeEvent event ) {
+                String slaveNodeComboBoxSelection = event.getProperty().getValue().toString();
+                int slaveNodeCount;
+                int suggestedNumberOfNodesCaptionStart = slaveNodeComboBoxSelection.indexOf( SUGGESTED_NUMBER_OF_NODES_CAPTION.charAt( 0 ) );
+                if ( suggestedNumberOfNodesCaptionStart < 0 )
+                    slaveNodeCount = Integer.parseInt( slaveNodeComboBoxSelection );
+                else
+                    slaveNodeCount = Integer.parseInt( slaveNodeComboBoxSelection.substring( 0, suggestedNumberOfNodesCaptionStart ) );
+                wizard.getHadoopClusterConfig().setCountOfSlaveNodes( slaveNodeCount );
+
             }
         } );
 
+        slaveNodeCountList.remove( connected_fai_count - 1 );
+        slaveNodeCountList.add( connected_fai_count - 1, connected_fai_count + "");
         //configuration replication factor
-        ComboBox replicationFactorComboBox = new ComboBox( "Choose replication factor for slave nodes", s );
+        ComboBox replicationFactorComboBox = new ComboBox( "Choose replication factor for slave nodes", slaveNodeCountList );
         //        replicationFactorComboBox.setMultiSelect(false);
         replicationFactorComboBox.setImmediate( true );
         replicationFactorComboBox.setTextInputAllowed( false );
@@ -90,7 +99,7 @@ public class ConfigurationStep extends VerticalLayout
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                wizard.getHadoopClusterConfig().setReplicationFactor( ( Integer ) event.getProperty().getValue() );
+                wizard.getHadoopClusterConfig().setReplicationFactor( Integer.parseInt( (String) event.getProperty().getValue() ) );
             }
         } );
 

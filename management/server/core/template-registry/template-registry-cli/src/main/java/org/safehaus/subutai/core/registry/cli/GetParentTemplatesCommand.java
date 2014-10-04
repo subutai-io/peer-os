@@ -10,6 +10,7 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
@@ -31,7 +32,14 @@ public class GetParentTemplatesCommand extends OsgiCommandSupport
 
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
+        Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is NULL." );
         this.templateRegistry = templateRegistry;
+    }
+
+
+    public TemplateRegistry getTemplateRegistry()
+    {
+        return templateRegistry;
     }
 
 

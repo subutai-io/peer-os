@@ -12,15 +12,15 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 6/21/14.
  */
-@Command(scope = "environment", name = "describe", description = "Command to describe environment",
-        detailedDescription = "Command to describe environment by name")
+@Command( scope = "environment", name = "describe", description = "Command to describe environment",
+        detailedDescription = "Command to describe environment by name" )
 public class DescribeEnvironmentCommand extends OsgiCommandSupport
 {
 
     EnvironmentManager environmentManager;
 
-    @Argument(name = "environmentName", index = 0, required = true, multiValued = false,
-            description = "Environment name", valueToShowInHelp = "Environment name")
+    @Argument( name = "environmentName", index = 0, required = true, multiValued = false,
+            description = "Environment name", valueToShowInHelp = "Environment name" )
     String environmentName;
 
 
@@ -39,8 +39,14 @@ public class DescribeEnvironmentCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Environment environment = environmentManager.getEnvironmentInfo( environmentName );
+        Environment environment = environmentManager.getEnvironment( environmentName );
         System.out.println( environment.toString() );
         return null;
+    }
+
+
+    public void setEnvironmentName( final String environmentName )
+    {
+        this.environmentName = environmentName;
     }
 }

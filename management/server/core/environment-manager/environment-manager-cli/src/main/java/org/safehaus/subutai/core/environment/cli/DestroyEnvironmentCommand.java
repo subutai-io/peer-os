@@ -11,15 +11,15 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 6/21/14.
  */
-@Command(scope = "environment", name = "destroy", description = "Command to destroy environment",
-        detailedDescription = "Command to destroy environment by name")
+@Command( scope = "environment", name = "destroy", description = "Command to destroy environment",
+        detailedDescription = "Command to destroy environment by name" )
 public class DestroyEnvironmentCommand extends OsgiCommandSupport
 {
 
     EnvironmentManager environmentManager;
 
-    @Argument(name = "environmentName", index = 0, required = true, multiValued = false,
-            description = "Environment name", valueToShowInHelp = "Environment name")
+    @Argument( name = "environmentName", index = 0, required = true, multiValued = false,
+            description = "Environment name", valueToShowInHelp = "Environment name" )
     String environmentName;
 
 
@@ -48,5 +48,17 @@ public class DestroyEnvironmentCommand extends OsgiCommandSupport
             System.out.println( "Environment destroy failed." );
         }
         return null;
+    }
+
+
+    public String getEnvironmentName()
+    {
+        return environmentName;
+    }
+
+
+    public void setEnvironmentName( final String environmentName )
+    {
+        this.environmentName = environmentName;
     }
 }

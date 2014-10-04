@@ -16,6 +16,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 @Command( scope = "apt", name = "read-files", description = "Read files inside deb package" )
 public class ReadFilesCommand extends OsgiCommandSupport
@@ -29,19 +31,29 @@ public class ReadFilesCommand extends OsgiCommandSupport
             description = "relative file path(s) to read" )
     Collection<String> filesPaths;
 
-    private AptRepositoryManager aptRepositoryManager;
-    private AgentManager agentManager;
+    private final AptRepositoryManager aptRepositoryManager;
+    private final AgentManager agentManager;
 
 
-    public void setAptRepositoryManager( final AptRepositoryManager aptRepositoryManager )
+    public ReadFilesCommand( final AptRepositoryManager aptRepositoryManager, final AgentManager agentManager )
     {
+        Preconditions.checkNotNull( aptRepositoryManager, "Apt Repo Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+
         this.aptRepositoryManager = aptRepositoryManager;
+        this.agentManager = agentManager;
     }
 
 
-    public void setAgentManager( final AgentManager agentManager )
+    public void setPackagePath( final String packagePath )
     {
-        this.agentManager = agentManager;
+        this.packagePath = packagePath;
+    }
+
+
+    public void setFilesPaths( final Collection<String> filesPaths )
+    {
+        this.filesPaths = filesPaths;
     }
 
 
@@ -63,7 +75,9 @@ public class ReadFilesCommand extends OsgiCommandSupport
         catch ( AptRepoException e )
         {
             LOG.error( "Error in doExecute", e );
+            System.out.println( e.getMessage() );
         }
+
         return null;
     }
 }

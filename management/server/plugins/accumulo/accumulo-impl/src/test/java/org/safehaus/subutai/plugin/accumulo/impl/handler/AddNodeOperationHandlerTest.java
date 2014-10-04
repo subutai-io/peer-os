@@ -18,7 +18,7 @@ public class AddNodeOperationHandlerTest
     public void testWithoutCluster()
     {
         AbstractOperationHandler operationHandler =
-                new AddNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node", NodeType.TRACER );
+                new AddNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node", NodeType.Tracer );
 
         operationHandler.run();
 

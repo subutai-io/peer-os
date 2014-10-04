@@ -28,8 +28,24 @@ public class RemotePeerRestClient
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
     private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
     private static final long CONNECTION_TIMEOUT = 1000 * 60 * 5;
+    private final long receiveTimeout;
+    private final long connectionTimeout;
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String baseUrl = "http://%s:%s/cxf";
+
+
+    public RemotePeerRestClient()
+    {
+        this.receiveTimeout = RECEIVE_TIMEOUT;
+        this.connectionTimeout = CONNECTION_TIMEOUT;
+    }
+
+
+    public RemotePeerRestClient( long timeout )
+    {
+        this.connectionTimeout = 1000 * 10; // 10 sec
+        this.receiveTimeout = timeout - this.connectionTimeout;
+    }
 
 
     public String getBaseUrl()
@@ -52,7 +68,7 @@ public class RemotePeerRestClient
     }
 
 
-    public boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
+    private boolean createRemoteContainers( String ip, String port, CloneContainersMessage ccm )
     {
         String path = "peer/containers";
         try
@@ -83,7 +99,7 @@ public class RemotePeerRestClient
     }
 
 
-    public PeerCommandMessage invoke( String ip, String port, PeerCommandMessage ccm ) throws RuntimeException
+    public void invoke( String ip, String port, PeerCommandMessage peerCommandMessage )
     {
         String path = "peer/invoke";
         try
@@ -94,15 +110,15 @@ public class RemotePeerRestClient
             WebClient client = WebClient.create( baseUrl );
 
             Form form = new Form();
-            form.set( "commandType", ccm.getType().toString() );
-            form.set( "command", ccm.toJson() );
+            form.set( "commandType", peerCommandMessage.getType().toString() );
+            form.set( "command", peerCommandMessage.toJson() );
 
 
             HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
             HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-            httpClientPolicy.setConnectionTimeout( CONNECTION_TIMEOUT );
-            httpClientPolicy.setReceiveTimeout( RECEIVE_TIMEOUT );
+            httpClientPolicy.setConnectionTimeout( connectionTimeout );
+            httpClientPolicy.setReceiveTimeout( receiveTimeout );
 
             httpConduit.setClient( httpClientPolicy );
 
@@ -110,30 +126,28 @@ public class RemotePeerRestClient
                                       .accept( MediaType.APPLICATION_JSON ).form( form );
 
             String jsonObject = response.readEntity( String.class );
-            PeerCommandMessage result = JsonUtil.fromJson( jsonObject, ccm.getClass() );
+            PeerCommandMessage result = JsonUtil.fromJson( jsonObject, peerCommandMessage.getClass() );
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
-                //                LOG.info( response.getEntity().toString() );
-                //                LOG.info( jsonObject );
-
-                ccm.setResult( result.getResult() );
-                ccm.setSuccess( result.isSuccess() );
-                //                LOG.info( String.format( "RESULT: %s", result.toString() ) );
-
-                return ccm;
+                peerCommandMessage.setResult( result.getResult() );
+                peerCommandMessage.setSuccess( result.isSuccess() );
+                LOG.debug( String.format( "Remote command result: %s", result.toString() ) );
+//                return ccm;
             }
             else
             {
-                ccm.setSuccess( false );
-                ccm.setExceptionMessage( result.getExceptionMessage() );
-                return ccm;
+                peerCommandMessage.setSuccess( false );
+                peerCommandMessage.setExceptionMessage( result.getExceptionMessage() );
+//                return ccm;
             }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-            throw new RuntimeException( "Error while invoking REST Client" );
+            peerCommandMessage.setSuccess( false );
+            peerCommandMessage.setExceptionMessage( e.toString() );
+//            throw new RuntimeException( "Error while invoking REST Client" );
         }
 
         //return null;

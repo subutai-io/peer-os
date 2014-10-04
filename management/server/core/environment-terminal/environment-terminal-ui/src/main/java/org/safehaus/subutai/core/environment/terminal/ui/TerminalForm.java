@@ -1,14 +1,12 @@
 package org.safehaus.subutai.core.environment.terminal.ui;
 
 
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 import com.google.common.base.Strings;
@@ -17,7 +15,6 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -29,7 +26,7 @@ import com.vaadin.ui.TextField;
 
 
 /**
- * Command Runner UI - Terminal
+ * Environment Terminal
  */
 public class TerminalForm extends CustomComponent implements Disposable
 {
@@ -37,14 +34,13 @@ public class TerminalForm extends CustomComponent implements Disposable
     protected final TextField programTxtFld;
     protected final TextField timeoutTxtFld;
     protected final TextField workDirTxtFld;
-    protected final ComboBox requestTypeCombo;
     protected final Label indicator;
     private final TextArea commandOutputTxtArea;
     protected AtomicInteger taskCount = new AtomicInteger();
     private ExecutorService executor;
 
 
-    public TerminalForm( final AgentManager agentManager, final EnvironmentManager environmentManager )
+    public TerminalForm( final CommandDispatcher commandDispatcher, final EnvironmentManager environmentManager )
     {
         setSizeFull();
 
@@ -52,7 +48,7 @@ public class TerminalForm extends CustomComponent implements Disposable
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        environmentTree = new EnvironmentTree( agentManager, environmentManager);
+        environmentTree = new EnvironmentTree( environmentManager );
         horizontalSplit.setFirstComponent( environmentTree );
 
         GridLayout grid = new GridLayout( 20, 10 );
@@ -84,16 +80,6 @@ public class TerminalForm extends CustomComponent implements Disposable
         timeoutTxtFld.setWidth( 30, Unit.PIXELS );
         controls.addComponent( timeoutLbl );
         controls.addComponent( timeoutTxtFld );
-        Label requestTypeLabel = new Label( "Req Type" );
-        controls.addComponent( requestTypeLabel );
-        requestTypeCombo = new ComboBox( null,
-                Arrays.asList( RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST, RequestType.PS_REQUEST ) );
-        requestTypeCombo.setImmediate( true );
-        requestTypeCombo.setTextInputAllowed( false );
-        requestTypeCombo.setNullSelectionAllowed( false );
-        requestTypeCombo.setValue( RequestType.EXECUTE_REQUEST );
-        requestTypeCombo.setWidth( 150, Unit.PIXELS );
-        controls.addComponent( requestTypeCombo );
         Button clearBtn = new Button( "Clear" );
         controls.addComponent( clearBtn );
         final Button sendBtn = new Button( "Send" );
@@ -121,7 +107,7 @@ public class TerminalForm extends CustomComponent implements Disposable
             }
         } );
 
-        sendBtn.addClickListener( new SendButtonListener( this, environmentManager, executor ) );
+        sendBtn.addClickListener( new SendButtonListener( commandDispatcher, this, executor ) );
 
         clearBtn.addClickListener( new Button.ClickListener()
         {

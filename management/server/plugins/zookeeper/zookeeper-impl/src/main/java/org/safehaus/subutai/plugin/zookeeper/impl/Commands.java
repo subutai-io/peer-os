@@ -11,39 +11,39 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.collect.Sets;
 
 
 /**
- * @author dilshat <p/> <p/> * @todo refactor addPropertyCommand & removePropertyCommand to not use custom scripts
+ * <p/> <p/> * @todo refactor addPropertyCommand & removePropertyCommand to not use custom scripts
  */
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
     public static final String PACKAGE_NAME = "ksks-zookeeper";
+    private final CommandRunnerBase commandRunnerBase;
 
 
-    public Commands( CommandRunner commandRunner )
+    public Commands( CommandRunnerBase commandRunnerBase )
     {
-        init( commandRunner );
+        this.commandRunnerBase = commandRunnerBase;
     }
 
 
-    public static Command getCheckInstalledCommand( Set<Agent> agents )
+    public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+        return commandRunnerBase.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
     }
 
 
-    public static Command getInstallCommand( Set<Agent> agents )
+    public Command getInstallCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 90 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
@@ -51,9 +51,9 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getUninstallCommand( Set<Agent> agents )
+    public Command getUninstallCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 90 )
                                                                                               .withStdOutRedirection(
                                                                                                       OutputRedirection.NO ),
@@ -61,32 +61,36 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getStartCommand( Set<Agent> agents )
+    public Command getStartCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service zookeeper start" ).withTimeout( 15 ), agents );
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( "service zookeeper start" ).withTimeout( 15 ), agents );
     }
 
 
-    public static Command getRestartCommand( Set<Agent> agents )
+    public Command getRestartCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service zookeeper restart" ).withTimeout( 15 ), agents );
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( "service zookeeper restart" ).withTimeout( 15 ), agents );
     }
 
 
-    public static Command getStopCommand( Agent agent )
+    public Command getStopCommand( Agent agent )
     {
-        return createCommand( new RequestBuilder( "service zookeeper stop" ), Sets.newHashSet( agent ) );
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( "service zookeeper stop" ), Sets.newHashSet( agent ) );
     }
 
 
-    public static Command getStatusCommand( Agent agent )
+    public Command getStatusCommand( Agent agent )
     {
-        return createCommand( new RequestBuilder( "service zookeeper status" ), Sets.newHashSet( agent ) );
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( "service zookeeper status" ), Sets.newHashSet( agent ) );
     }
 
 
-    public static Command getConfigureClusterCommand( Set<Agent> agents, String myIdFilePath, String zooCfgFileContents,
-                                                      String zooCfgFilePath )
+    public Command getConfigureClusterCommand( Set<Agent> agents, String myIdFilePath, String zooCfgFileContents,
+                                               String zooCfgFilePath )
     {
         Set<AgentRequestBuilder> requestBuilders = new HashSet<>();
 
@@ -98,22 +102,22 @@ public class Commands extends CommandsSingleton
                             zooCfgFileContents, zooCfgFilePath ) ) );
         }
 
-        return createCommand( requestBuilders );
+        return commandRunnerBase.createCommand( requestBuilders );
     }
 
 
-    public static Command getAddPropertyCommand( String fileName, String propertyName, String propertyValue,
-                                                 Set<Agent> agents )
+    public Command getAddPropertyCommand( String fileName, String propertyName, String propertyValue,
+                                          Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder(
+        return commandRunnerBase.createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && zookeeper-property.sh add %s %s %s", fileName, propertyName,
                         propertyValue ) ), agents );
     }
 
 
-    public static Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents )
+    public Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder(
+        return commandRunnerBase.createCommand( new RequestBuilder(
                         String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
                                 propertyName ) ), agents );
     }

@@ -17,20 +17,20 @@ public class InstallHadoopOperation
     private List<Command> commandList;
 
 
-    public InstallHadoopOperation( HadoopClusterConfig hadoopClusterConfig )
+    public InstallHadoopOperation( Commands commands, HadoopClusterConfig hadoopClusterConfig )
     {
 
         this.hadoopClusterConfig = hadoopClusterConfig;
         commandList = new ArrayList<>();
 
-        //		commandList.add(Commands.getInstallCommand(config));
-        commandList.add( Commands.getClearMastersCommand( hadoopClusterConfig ) );
-        commandList.add( Commands.getClearSlavesCommand( hadoopClusterConfig ) );
-        commandList.add( Commands.getSetMastersCommand( hadoopClusterConfig ) );
-        commandList.add( Commands.getAddSecondaryNamenodeCommand( hadoopClusterConfig ) );
-        commandList.add( Commands.getSetDataNodeCommand( hadoopClusterConfig ) );
-        commandList.add( Commands.getSetTaskTrackerCommand( hadoopClusterConfig ) );
-        commandList.add( Commands.getFormatNameNodeCommand( hadoopClusterConfig ) );
+        //		commandList.add(commands.getInstallCommand(config));
+        commandList.add( commands.getClearMastersCommand( hadoopClusterConfig ) );
+        commandList.add( commands.getClearSlavesCommand( hadoopClusterConfig ) );
+        commandList.add( commands.getSetMastersCommand( hadoopClusterConfig ) );
+        commandList.add( commands.getAddSecondaryNamenodeCommand( hadoopClusterConfig ) );
+        commandList.add( commands.getSetDataNodeCommand( hadoopClusterConfig ) );
+        commandList.add( commands.getSetTaskTrackerCommand( hadoopClusterConfig ) );
+        commandList.add( commands.getFormatNameNodeCommand( hadoopClusterConfig ) );
     }
 
 

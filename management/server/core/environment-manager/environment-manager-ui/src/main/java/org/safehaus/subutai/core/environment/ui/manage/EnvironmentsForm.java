@@ -24,6 +24,7 @@ public class EnvironmentsForm
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
+    private Button environmentsButton;
 
 
     public EnvironmentsForm( final EnvironmentManagerPortalModule managerUI )
@@ -36,9 +37,9 @@ public class EnvironmentsForm
 
         environmentsTable = createTable( "Environments", 300 );
 
-        Button getEnvironmentsButton = new Button( "View" );
+        environmentsButton = new Button( "View" );
 
-        getEnvironmentsButton.addClickListener( new Button.ClickListener()
+        environmentsButton.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
@@ -48,7 +49,7 @@ public class EnvironmentsForm
         } );
 
 
-        contentRoot.addComponent( getEnvironmentsButton );
+        contentRoot.addComponent( environmentsButton );
         contentRoot.addComponent( environmentsTable );
     }
 
@@ -58,6 +59,8 @@ public class EnvironmentsForm
         Table table = new Table( caption );
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Info", Button.class, null );
+        table.addContainerProperty( "Configure", Button.class, null );
+        table.addContainerProperty( "Manage", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -74,8 +77,8 @@ public class EnvironmentsForm
         List<Environment> environmentList = managerUI.getEnvironmentManager().getEnvironments();
         for ( final Environment environment : environmentList )
         {
-            Button viewEnvironmentInfoButton = new Button( "Info" );
-            viewEnvironmentInfoButton.addClickListener( new Button.ClickListener()
+            Button viewButton = new Button( "Info" );
+            viewButton.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
@@ -93,6 +96,9 @@ public class EnvironmentsForm
 
                     Table containersTable = new Table();
                     containersTable.addContainerProperty( "Name", String.class, null );
+                    containersTable.addContainerProperty( "Properties", Button.class, null );
+                    containersTable.addContainerProperty( "Start", Button.class, null );
+                    containersTable.addContainerProperty( "Stop", Button.class, null );
                     containersTable.addContainerProperty( "Destroy", Button.class, null );
                     containersTable.setPageLength( 10 );
                     containersTable.setSelectable( false );
@@ -106,7 +112,8 @@ public class EnvironmentsForm
                     {
 
                         containersTable.addItem( new Object[] {
-                                container.getName(), new Button( "Destroy" )
+                                container.getName(), propertiesButton( container ), startButton( container ),
+                                stopButton( container ), destroyButton( container )
                         }, null );
                     }
 
@@ -116,8 +123,8 @@ public class EnvironmentsForm
                 }
             } );
 
-            Button destroyEnvironment = new Button( "Destroy" );
-            destroyEnvironment.addClickListener( new Button.ClickListener()
+            Button destroyButton = new Button( "Destroy" );
+            destroyButton.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
@@ -125,6 +132,7 @@ public class EnvironmentsForm
                     try
                     {
                         managerUI.getEnvironmentManager().destroyEnvironment( environment.getUuid().toString() );
+                        environmentsButton.click();
                     }
                     catch ( EnvironmentDestroyException e )
                     {
@@ -132,11 +140,91 @@ public class EnvironmentsForm
                     }
                 }
             } );
+            Button configureButton = new Button( "Configure" );
+            configureButton.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent )
+                {
+                    Notification.show( "Configure" );
+                }
+            } );
+
+            Button manageButton = new Button( "Manage" );
+            manageButton.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent )
+                {
+                    Notification.show( "Backup/Move/Manage" );
+                }
+            } );
+
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), viewEnvironmentInfoButton, destroyEnvironment
+                    environment.getName(), viewButton, manageButton, configureButton, destroyButton
             }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private Object propertiesButton( final Container container )
+    {
+        Button button = new Button( "Properties" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Properties" );
+            }
+        } );
+        return button;
+    }
+
+
+    private Object startButton( final Container container )
+    {
+        Button button = new Button( "Start" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Start" );
+            }
+        } );
+        return button;
+    }
+
+
+    private Object stopButton( final Container container )
+    {
+        Button button = new Button( "Stop" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Stop" );
+            }
+        } );
+        return button;
+    }
+
+
+    private Object destroyButton( final Container container )
+    {
+        Button button = new Button( "Destroy" );
+        button.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Destory" );
+            }
+        } );
+        return button;
     }
 
 

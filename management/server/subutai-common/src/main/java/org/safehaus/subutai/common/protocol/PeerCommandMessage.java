@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.lang.reflect.Type;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -19,6 +20,27 @@ public abstract class PeerCommandMessage
     protected String exceptionMessage;
     protected boolean success = false;
     protected boolean proccessed = false;
+    protected String jsonResult;
+    protected long createTimestamp = System.currentTimeMillis();
+    protected long completeTimestamp;
+
+
+    public void setCompleteTimestamp( final long completeTimestamp )
+    {
+        this.completeTimestamp = completeTimestamp;
+    }
+
+
+    public long getCreateTimestamp()
+    {
+        return createTimestamp;
+    }
+
+
+    public long getCompleteTimestamp()
+    {
+        return completeTimestamp;
+    }
 
 
     private PeerCommandMessage()
@@ -114,9 +136,10 @@ public abstract class PeerCommandMessage
     }
 
 
-    abstract public void setResult( Object result );
-
-    abstract public Object getResult();
+    public void setResult( Object result )
+    {
+        this.jsonResult = JsonUtil.toJson( result, getResultObjectType() );
+    }
 
 
     public UUID getId()
@@ -135,6 +158,15 @@ public abstract class PeerCommandMessage
     {
         this.envId = envId;
     }
+
+
+    public Object getResult()
+    {
+        return JsonUtil.fromJson( this.jsonResult, getResultObjectType() );
+    }
+
+
+    abstract public Type getResultObjectType();
 
 
     @Override

@@ -11,7 +11,6 @@ import javax.jms.TextMessage;
 
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.communication.api.CommandJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,17 +48,14 @@ class CommandProducer implements Runnable
      */
     public void run()
     {
-        Connection connection = null;
-        Session session = null;
-        MessageProducer producer = null;
         try
         {
-            connection = communicationManagerImpl.createConnection();
+            Connection connection = communicationManagerImpl.createConnection();
             connection.start();
-            session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination destination =
-                    session.createTopic( isBroadcast ? Common.BROADCAST_TOPIC : command.getUuid().toString() );
-            producer = session.createProducer( destination );
+            Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+            Destination destination = session.createTopic(
+                    isBroadcast ? communicationManagerImpl.getAmqBroadcastTopic() : command.getUuid().toString() );
+            MessageProducer producer = session.createProducer( destination );
             producer.setDeliveryMode( communicationManagerImpl.isPersistentMessages() ? DeliveryMode.PERSISTENT :
                                       DeliveryMode.NON_PERSISTENT );
             producer.setTimeToLive( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec() * 1000 );
@@ -72,61 +68,14 @@ class CommandProducer implements Runnable
 
             TextMessage message = session.createTextMessage( json );
             producer.send( message );
+
+            producer.close();
+            session.close();
+            connection.close();
         }
         catch ( JMSException e )
         {
             LOG.error( "Error to send a message: ", e );
-        }
-        finally
-        {
-            closeSilently( producer );
-            closeSilently( session );
-            closeSilently( connection );
-        }
-    }
-
-
-    private void closeSilently( MessageProducer producer )
-    {
-        if ( producer != null )
-        {
-            try
-            {
-                producer.close();
-            }
-            catch ( Exception ignore )
-            {
-            }
-        }
-    }
-
-
-    private void closeSilently( Session session )
-    {
-        if ( session != null )
-        {
-            try
-            {
-                session.close();
-            }
-            catch ( Exception ignore )
-            {
-            }
-        }
-    }
-
-
-    private void closeSilently( Connection connection )
-    {
-        if ( connection != null )
-        {
-            try
-            {
-                connection.close();
-            }
-            catch ( Exception ignore )
-            {
-            }
         }
     }
 }

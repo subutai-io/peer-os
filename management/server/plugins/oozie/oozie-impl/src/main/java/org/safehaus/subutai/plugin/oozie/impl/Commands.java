@@ -3,29 +3,30 @@ package org.safehaus.subutai.plugin.oozie.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
-    public static final String PACKAGE_NAME = "ksks-oozie-*";
-    public static final String SERVER_PACKAGE_NAME = "ksks-oozie-server";
-    public static final String CLIENT_PACKAGE_NAME = "ksks-oozie-client";
+    public final String PACKAGE_NAME = "ksks-oozie-*";
+    public final String SERVER_PACKAGE_NAME = "ksks-oozie-server";
+    public final String CLIENT_PACKAGE_NAME = "ksks-oozie-client";
+
+    private final CommandRunnerBase commandRunnerBase;
 
 
-    public Commands( CommandRunner commandRunner )
+    public Commands( CommandRunnerBase commandRunnerBase )
     {
-        init( commandRunner );
+        this.commandRunnerBase = commandRunnerBase;
     }
 
 
-    public static String make( CommandType type )
+    public String make( CommandType type )
     {
         switch ( type )
         {
@@ -55,63 +56,63 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getInstallServerCommand( Set<Agent> agents )
+    public Command getInstallServerCommand( Set<Agent> agents )
     {
 
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-server" )
                         .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
-    public static Command getInstallClientCommand( Set<Agent> agents )
+    public Command getInstallClientCommand( Set<Agent> agents )
     {
 
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-client" )
                         .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
-    public static Command getStartServerCommand( Set<Agent> agents )
+    public Command getStartServerCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service oozie-server start &" ), agents );
+        return commandRunnerBase.createCommand( new RequestBuilder( "service oozie-server start &" ), agents );
     }
 
 
-    public static Command getStopServerCommand( Set<Agent> agents )
+    public Command getStopServerCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service oozie-server stop" ), agents );
+        return commandRunnerBase.createCommand( new RequestBuilder( "service oozie-server stop" ), agents );
     }
 
 
-    public static Command getStatusServerCommand( Set<Agent> agents )
+    public Command getStatusServerCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "service oozie-server status" ), agents );
+        return commandRunnerBase.createCommand( new RequestBuilder( "service oozie-server status" ), agents );
     }
 
 
-    public static Command getConfigureRootHostsCommand( Set<Agent> agents, String param )
+    public Command getConfigureRootHostsCommand( Set<Agent> agents, String param )
     {
 
-        return createCommand( new RequestBuilder( String.format(
+        return commandRunnerBase.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
                         + ".root.hosts %s", param ) ), agents );
     }
 
 
-    public static Command getConfigureRootGroupsCommand( Set<Agent> agents )
+    public Command getConfigureRootGroupsCommand( Set<Agent> agents )
     {
 
-        return createCommand( new RequestBuilder( String.format(
+        return commandRunnerBase.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
                         + ".root.groups '\\*' " ) ), agents );
     }
 
 
-    public static Command getUninstallServerCommand( Set<Agent> agents )
+    public Command getUninstallServerCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-oozie-server" ).withTimeout( 90 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
@@ -119,9 +120,9 @@ public class Commands extends CommandsSingleton
     }
 
 
-    public static Command getUninstallClientsCommand( Set<Agent> agents )
+    public Command getUninstallClientsCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-oozie-client" ).withTimeout( 90 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),

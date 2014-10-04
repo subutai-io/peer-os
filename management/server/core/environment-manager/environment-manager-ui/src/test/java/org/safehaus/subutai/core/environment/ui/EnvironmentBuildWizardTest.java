@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -20,6 +21,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class EnvironmentBuildWizardTest
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    EnvironmentBuildWizard sub;
+    private EnvironmentBuildWizard sut;
     private EnvironmentManagerPortalModule module;
     private PeerManager peerManager;
 
@@ -43,23 +45,7 @@ public class EnvironmentBuildWizardTest
         EnvironmentBuildTask task = getTask();
         when( module.getPeerManager() ).thenReturn( peerManager );
         when( peerManager.peers() ).thenReturn( Collections.<Peer>emptyList() );
-        sub = new EnvironmentBuildWizard( "Wizard", module, task );
-    }
-
-
-    @Test
-    public void testName() throws Exception
-    {
-        Map<String, Peer> topology = new HashMap<>();
-        Peer peer = new Peer();
-        peer.setId( UUID.randomUUID() );
-        for ( NodeGroup ng : getTask().getEnvironmentBlueprint().getNodeGroups() )
-        {
-            topology.put( ng.getTemplateName(), peer );
-        }
-
-        EnvironmentBuildProcess process = sub.createBackgroundEnvironmentBuildProcess( getTask(), topology );
-        System.out.println( GSON.toJson( process ) );
+        sut = new EnvironmentBuildWizard( "Wizard", module, task );
     }
 
 
@@ -69,7 +55,7 @@ public class EnvironmentBuildWizardTest
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
         eb.setName( "blueprint" );
 
-        NodeGroup one = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
+        NodeGroup one = genNodeGroup( "hadoop", 5, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         NodeGroup two = genNodeGroup( "cassandra", 2, "intra.lan", "name", true, true, PlacementStrategy.BEST_SERVER );
         eb.addNodeGroup( one );
         eb.addNodeGroup( two );
@@ -91,5 +77,44 @@ public class EnvironmentBuildWizardTest
         ng.setLinkHosts( lh );
         ng.setPlacementStrategy( ps );
         return ng;
+    }
+
+
+    @Test
+    public void shouldCreateBuildProcess() throws Exception
+    {
+
+        Peer peer1 = new Peer();
+        peer1.setId( UUID.randomUUID() );
+
+        Peer peer2 = new Peer();
+        peer2.setId( UUID.randomUUID() );
+        Peer[] peers = { peer1, peer2 };
+
+        Map<Object, Peer> topology = new HashMap<>();
+
+        EnvironmentBuildTask ebp = getTask();
+        Map<Object, NodeGroup> map = new HashMap<>();
+
+        int itemId = 0;
+        for ( NodeGroup ng : ebp.getEnvironmentBlueprint().getNodeGroups() )
+        {
+            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
+            {
+                map.put( itemId, ng );
+                topology.put( itemId++, peers[getRandom()] );
+            }
+        }
+
+        sut.setNodeGroupMap( map );
+        EnvironmentBuildProcess process = sut.createEnvironmentBuildProcess( ebp, topology );
+        assertNotNull(process);
+        System.out.println( GSON.toJson( process ) );
+    }
+
+
+    private int getRandom()
+    {
+        return ( int ) Math.floor( Math.random() * 2 );
     }
 }

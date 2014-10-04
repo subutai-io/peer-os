@@ -15,9 +15,6 @@ import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 
-/**
- * @author dilshat
- */
 public class CheckTask implements Runnable
 {
 
