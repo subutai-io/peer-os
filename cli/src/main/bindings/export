@@ -30,8 +30,16 @@ function export {
   fi
 
   local container="$1"
+   
+  ps aux | grep "subutai export $container" | grep -v $$ \
+         | grep -v "grep subutai" | grep -v "grep --color" > /dev/null 2>&1
+  if [ $? == 0 ]
+  then
+    msg_error "Container \"$container\" is being exported by other process!"
+    exit 1
+  fi
 
-  if [ "`are_containers_locked_write $container`" == "true" ]
+  if [ "`are_containers_readable $container`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1
@@ -136,7 +144,6 @@ function export {
   # Remove debian directory after debian package generation
   rm -rf $debian_dir
   unlock_container_write $container
-  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

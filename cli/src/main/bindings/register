@@ -31,7 +31,15 @@ function register {
 
   local container="$1"
 
-  if [ "`are_containers_locked_write $container`" == "true" ]
+  ps aux | grep "subutai register $container" | grep -v $$ \
+         | grep -v "grep subutai" | grep -v "grep --color" > /dev/null 2>&1
+  if [ $? == 0 ]
+  then
+    msg_error "Container \"$container\" is being registered by other process!"
+    exit 1
+  fi
+
+  if [ "`are_containers_readable $container`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1

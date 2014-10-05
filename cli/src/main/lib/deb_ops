@@ -35,7 +35,7 @@
 #
 
 # Set TMPDIR variable to enfore dpkg-deb to use the specified directory while building the debian package for its temporary files
-export TMPDIR="/var"
+export TMPDIR="$SUBUTAI_TMPDIR"
 
 function is_dpkg_locked {
   lsof /var/lib/dpkg/lock > /dev/null 2>&1
