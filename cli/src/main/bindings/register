@@ -23,6 +23,11 @@ function register_usage {
 # (3) generate the debian file deltas, and package info
 
 function register {
+  if [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    msg_error "Register cannot be used in SUBUTAI_OFFLINE_MODE! Aborting..."
+    exit 1
+  fi
+
   if [ "`is_system_locked`" == "true" ]
   then
      msg_error "System locked by a subutai process"
