@@ -17,7 +17,7 @@
   <modules>
     <module>tracker-api</module>
     <module>tracker-impl</module>
-    <module>tracker-ui</module>
     <module>tracker-rest</module>
+    <module>tracker-ui</module>
   </modules>
 </project>

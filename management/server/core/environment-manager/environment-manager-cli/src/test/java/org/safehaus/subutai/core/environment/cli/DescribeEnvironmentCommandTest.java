@@ -3,13 +3,13 @@ package org.safehaus.subutai.core.environment.cli;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -40,7 +40,7 @@ public class DescribeEnvironmentCommandTest
     public void test() throws Exception
     {
         String name = "name";
-        Environment environment = new Environment( UUID.randomUUID(), name );
+        Environment environment = new Environment( UUIDUtil.generateTimeBasedUUID(), name );
         final Set<EnvironmentContainer> set = new HashSet<>();
         environment.setContainers( set );
         describeEnvironmentCommand.setEnvironmentName( name );

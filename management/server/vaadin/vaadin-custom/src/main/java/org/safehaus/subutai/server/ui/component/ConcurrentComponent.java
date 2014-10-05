@@ -13,7 +13,7 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public abstract class ConcurrentComponent extends VerticalLayout
+public class ConcurrentComponent extends VerticalLayout
 {
 
     protected void executeUpdate( Runnable update )

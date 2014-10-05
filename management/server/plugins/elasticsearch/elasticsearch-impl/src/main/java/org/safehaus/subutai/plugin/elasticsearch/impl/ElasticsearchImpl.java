@@ -300,7 +300,7 @@ public class ElasticsearchImpl implements Elasticsearch
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
-                .setName( String.format( "%s-%s", ElasticsearchClusterConfiguration.PRODUCT_KEY, UUID.randomUUID() ) );
+                .setName( String.format( "%s-%s", ElasticsearchClusterConfiguration.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
 
         // Node group
         NodeGroup nodesGroup = new NodeGroup();

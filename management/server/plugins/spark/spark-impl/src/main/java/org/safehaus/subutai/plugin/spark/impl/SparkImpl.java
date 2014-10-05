@@ -208,7 +208,7 @@ public class SparkImpl extends SparkBase implements Spark
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
-        eb.setName( SparkClusterConfig.PRODUCT_KEY + UUID.randomUUID() );
+        eb.setName( SparkClusterConfig.PRODUCT_KEY + UUIDUtil.generateTimeBasedUUID() );
 
         NodeGroup ng = new NodeGroup();
         ng.setName( "Default" );

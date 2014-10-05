@@ -91,7 +91,7 @@ public class MainUI extends UI
     };
 
 
-    private static MainUI getInstance()
+    public static MainUI getInstance()
     {
         return threadLocal.get();
     }

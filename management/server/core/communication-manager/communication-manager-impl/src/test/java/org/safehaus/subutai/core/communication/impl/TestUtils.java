@@ -13,6 +13,7 @@ import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 
 /**
@@ -25,7 +26,7 @@ public class TestUtils
     {
         return new Request( "SOURCE", RequestType.EXECUTE_REQUEST, // type
                 uuid, //                        !! agent uuid
-                UUID.randomUUID(), //                        !! task uuid
+                UUIDUtil.generateTimeBasedUUID(), //                        !! task uuid
                 1, //                           !! request sequence number
                 "/", //                         cwd
                 "pwd", //                        program

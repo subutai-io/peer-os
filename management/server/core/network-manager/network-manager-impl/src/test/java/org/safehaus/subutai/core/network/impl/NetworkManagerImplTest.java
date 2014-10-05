@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -46,8 +47,8 @@ public class NetworkManagerImplTest
     public void setUp()
     {
 
-        agent1 = MockUtils.getAgent( UUID.randomUUID(), "hostname1", "127.0.0.1" );
-        agent2 = MockUtils.getAgent( UUID.randomUUID(), "hostname2", "127.0.0.2" );
+        agent1 = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID(), "hostname1", "127.0.0.1" );
+        agent2 = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID(), "hostname2", "127.0.0.2" );
         Map<UUID, AgentResult> results = new HashMap<>();
         AgentResult agentResult = mock( AgentResult.class );
         when( agentResult.getStdOut() ).thenReturn( KEY );

@@ -8,15 +8,13 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 
 import static org.junit.Assert.assertEquals;
 
 
-/**
- * Created by bahadyr on 10/2/14.
- */
 public class EnvironmentBuildProcessTest
 {
     private static final String NAME = "name";
@@ -57,7 +55,7 @@ public class EnvironmentBuildProcessTest
     @Test
     public void testUuid() throws Exception
     {
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUIDUtil.generateTimeBasedUUID();
         process.setUuid( uuid );
         assertEquals( uuid, process.getUuid() );
     }

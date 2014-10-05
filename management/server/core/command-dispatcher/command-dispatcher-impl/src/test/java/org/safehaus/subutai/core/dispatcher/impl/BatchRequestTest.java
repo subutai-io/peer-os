@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.Test;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,9 +19,9 @@ import static org.mockito.Mockito.when;
  */
 public class BatchRequestTest
 {
-    private static final UUID AGENT_ID = UUID.randomUUID();
-    private static final UUID COMMAND_ID = UUID.randomUUID();
-    private static final UUID ENV_ID = UUID.randomUUID();
+    private static final UUID AGENT_ID = UUIDUtil.generateTimeBasedUUID();
+    private static final UUID COMMAND_ID = UUIDUtil.generateTimeBasedUUID();
+    private static final UUID ENV_ID = UUIDUtil.generateTimeBasedUUID();
     private static final String SOURCE = "source";
 
 
@@ -72,7 +73,7 @@ public class BatchRequestTest
         when( request.getSource() ).thenReturn( SOURCE );
         BatchRequest batchRequest = new BatchRequest( request, AGENT_ID, ENV_ID );
 
-        batchRequest.addAgentId( UUID.randomUUID() );
+        batchRequest.addAgentId( UUIDUtil.generateTimeBasedUUID() );
 
         assertEquals( 2, batchRequest.getRequestsCount() );
         assertEquals( 2, batchRequest.getRequests().size() );

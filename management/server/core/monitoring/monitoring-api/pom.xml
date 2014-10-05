@@ -26,6 +26,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.monitor.api</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

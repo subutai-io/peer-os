@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.util.UUIDUtil;
+
 
 /**
  * Created by bahadyr on 9/9/14.
@@ -20,7 +22,7 @@ public class EnvironmentBuildTask
 
     public EnvironmentBuildTask()
     {
-        this.uuid = UUID.randomUUID();
+        this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.physicalNodes = new HashSet<>();
     }
 

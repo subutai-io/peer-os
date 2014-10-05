@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.base.Function;
@@ -24,8 +25,8 @@ import static org.junit.Assert.assertNotEquals;
 public class RequestBuilderTest
 {
 
-    private static final UUID AGENT_ID = UUID.randomUUID();
-    private static final UUID TASK_ID = UUID.randomUUID();
+    private static final UUID AGENT_ID = UUIDUtil.generateTimeBasedUUID();
+    private static final UUID TASK_ID = UUIDUtil.generateTimeBasedUUID();
     private static final String COMMAND = "cmd";
     private static final String CWD = "/";
     private static final String RUN_AS = "user";

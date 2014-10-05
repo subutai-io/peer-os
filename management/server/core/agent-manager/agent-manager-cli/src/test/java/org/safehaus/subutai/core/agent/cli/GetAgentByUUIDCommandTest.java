@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.when;
 public class GetAgentByUUIDCommandTest
 {
     private ByteArrayOutputStream myOut;
-    private static final UUID AGENT_ID = UUID.randomUUID();
+    private static final UUID AGENT_ID = UUIDUtil.generateTimeBasedUUID();
     private static final String AGENT_TO_STRING = "agent";
     private static final String AGENT_NOT_FOUND_MSG = "Agent not found";
 
@@ -77,7 +78,7 @@ public class GetAgentByUUIDCommandTest
         AgentManager agentManager = mock( AgentManager.class );
 
         GetAgentByUUIDCommand getAgentByUUIDCommand = new GetAgentByUUIDCommand( agentManager );
-        getAgentByUUIDCommand.setUuid( UUID.randomUUID().toString() );
+        getAgentByUUIDCommand.setUuid( UUIDUtil.generateTimeBasedUUID().toString() );
         getAgentByUUIDCommand.doExecute();
 
         assertEquals( AGENT_NOT_FOUND_MSG, getSysOut() );

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -79,7 +79,7 @@ public class EnvironmentManagerImplTest
     {
         EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
         when( process.getEnvironmentName() ).thenReturn( "name" );
-        when( process.getUuid() ).thenReturn( UUID.randomUUID());
+        when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID());
 
         Map<String, CloneContainersMessage> map = new HashMap<>();
         CloneContainersMessage ccm = mock( CloneContainersMessage.class );

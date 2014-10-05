@@ -1,6 +1,8 @@
-@mixin icons-fontello {
+@mixin icons-fontello
+{
 
-  @font-face {
+  @font-face
+  {
     font-family: 'fontello';
     src: url(fontello.eot);
     src: url(fontello.eot?#iefix) format('embedded-opentype'), url(fontello.woff) format('woff'), url(fontello.ttf) format('truetype'), url(fontello.svg#fontello) format('svg');
@@ -14,7 +16,8 @@
   [class*=" icon-"].v-nativebutton:before,
   [class^="icon-"].v-label:before,
   [class*=" icon-"].v-label:before,
-  [class*="-icon-"].v-menubar-menuitem:before {
+  [class*="-icon-"].v-menubar-menuitem:before
+  {
     font-family: 'fontello';
     font-style: normal;
     font-weight: normal;
@@ -30,7 +33,8 @@
   [class^="icon-"] > .v-button-wrap:before,
   [class*=" icon-"] > .v-button-wrap:before,
   [class^="icon-"].v-nativebutton:before,
-  [class*=" icon-"].v-nativebutton:before {
+  [class*=" icon-"].v-nativebutton:before
+  {
     margin: 0;
     margin-left: -.3em;
   }
@@ -38,7 +42,8 @@
   [class^="icon-"] > span > .v-button-caption,
   [class^="icon-"] > .v-nativebutton-caption,
   [class*=" icon-"] > span > .v-button-caption,
-  [class*=" icon-"] > .v-nativebutton-caption {
+  [class*=" icon-"] > .v-nativebutton-caption
+  {
     margin-left: .3em;
   }
 
