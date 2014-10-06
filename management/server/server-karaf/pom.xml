@@ -171,14 +171,6 @@
                   <groupId>${project.groupId}</groupId>
                   <artifactId>command-dispatcher-impl</artifactId>
                 </artifactItem>
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>command-dispatcher-cli</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>command-dispatcher-rest</artifactId>-->
-                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- command-runner -->
@@ -193,25 +185,6 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>command-runner-ui-old</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- container-runner -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-ui</artifactId>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -387,6 +360,21 @@
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- peer-command-dispatcher -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>peer-command-dispatcher-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>peer-command-dispatcher-impl</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>peer-command-dispatcher-rest</artifactId>
+                </artifactItem>
+
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- peer-manager -->
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
@@ -403,17 +391,6 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>peer-manager-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- peer-command-dispatcher -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-command-dispatcher-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-command-dispatcher-impl</artifactId>
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -490,38 +467,10 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- Vaadin -->
-                <!--<artifactItem>-->
-                <!--<groupId>com.vaadin</groupId>-->
-                <!--<artifactId>vaadin-server</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>com.vaadin</groupId>-->
-                <!--<artifactId>vaadin-client-compiled</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>com.vaadin</groupId>-->
-                <!--<artifactId>vaadin-client</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>com.vaadin</groupId>-->
-                <!--<artifactId>vaadin-themes</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>com.vaadin</groupId>-->
-                <!--<artifactId>vaadin-shared</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>com.vaadin</groupId>-->
-                <!--<artifactId>vaadin-shared-deps</artifactId>-->
-                <!--</artifactItem>-->
                 <artifactItem>
                   <groupId>org.jsoup</groupId>
                   <artifactId>jsoup</artifactId>
                 </artifactItem>
-                <!--<artifactItem>-->
-                <!--<groupId>com.vaadin.external.google</groupId>-->
-                <!--<artifactId>android-json</artifactId>-->
-                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
