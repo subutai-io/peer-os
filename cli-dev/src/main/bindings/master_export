@@ -96,7 +96,7 @@ function master_export {
   check_status "debian package $pkg generated" "$?"
 
   # Remove debian root directory after debian package generation
-  rm -rf $debian_root
+  rm -rf $debian_dir
   unlock_subutai_system
   if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
 
