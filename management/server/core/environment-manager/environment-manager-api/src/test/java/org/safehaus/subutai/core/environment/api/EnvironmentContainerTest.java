@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.ContainerState;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 import static org.junit.Assert.assertEquals;
@@ -13,17 +14,14 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 
-/**
- * Created by bahadyr on 10/2/14.
- */
 public class EnvironmentContainerTest
 {
 
     private static final String HOSTNAME = "hostname";
     private static final String NAME = "name";
-    private static final UUID AGENT_UUID = UUID.randomUUID();
+    private static final UUID AGENT_UUID = UUIDUtil.generateTimeBasedUUID();
     private static final String DESCRIPTION = "description";
-    private static final UUID PEER_ID = UUID.randomUUID();
+    private static final UUID PEER_ID = UUIDUtil.generateTimeBasedUUID();
     EnvironmentContainer container;
 
 

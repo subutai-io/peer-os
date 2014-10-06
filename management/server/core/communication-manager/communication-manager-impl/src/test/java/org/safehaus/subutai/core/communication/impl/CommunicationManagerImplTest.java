@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.communication.api.CommandJson;
 
 import com.jayway.awaitility.Awaitility;
@@ -111,7 +112,7 @@ public class CommunicationManagerImplTest
     @Test
     public void testSendRequest() throws JMSException
     {
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUIDUtil.generateTimeBasedUUID();
         Request request = TestUtils.getRequestTemplate( uuid );
         //setup listener
 
@@ -195,7 +196,7 @@ public class CommunicationManagerImplTest
     @Test
     public void testBroadcastMessage() throws JMSException
     {
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUIDUtil.generateTimeBasedUUID();
         Request request = TestUtils.getRequestTemplate( uuid );
         //setup listener
 

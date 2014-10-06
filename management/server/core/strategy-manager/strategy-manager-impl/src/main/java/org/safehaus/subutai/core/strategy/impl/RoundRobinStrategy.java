@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.strategy.impl;
 
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +11,8 @@ import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
+
+import com.google.common.collect.Lists;
 
 
 public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
@@ -46,7 +47,7 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
         List<Agent> ls = sortServers( serverMetrics );
 
         // distribute required nodes among servers in round-robin fashion
-        Map<Agent, Integer> slots = new HashMap<Agent, Integer>();
+        Map<Agent, Integer> slots = new HashMap<>();
         for ( int i = 0; i < nodesCount; i++ )
         {
             Agent best = ls.get( i % ls.size() );
@@ -69,7 +70,7 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy
 
     protected List<Agent> sortServers( Map<Agent, ServerMetric> serverMetrics ) throws StrategyException
     {
-        List<Agent> ls = new ArrayList( serverMetrics.keySet() );
+        List<Agent> ls = Lists.newArrayList( serverMetrics.keySet() );
         Collections.sort( ls );
         return ls;
     }

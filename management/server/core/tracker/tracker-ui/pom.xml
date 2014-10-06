@@ -16,22 +16,20 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>tracker-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${org.slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -39,17 +37,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>tracker-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>vaadin-api</artifactId>
-    </dependency>
+
   </dependencies>
 
   <build>

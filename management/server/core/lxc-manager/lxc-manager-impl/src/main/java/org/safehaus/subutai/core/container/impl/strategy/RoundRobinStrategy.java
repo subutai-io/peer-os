@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.container.impl.strategy;
 
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +10,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
+
+import com.google.common.collect.Lists;
 
 
 public class RoundRobinStrategy extends LxcPlacementStrategy
@@ -66,7 +67,7 @@ public class RoundRobinStrategy extends LxcPlacementStrategy
 
     protected List<Agent> sortServers( Map<Agent, ServerMetric> serverMetrics )
     {
-        List<Agent> ls = new ArrayList( serverMetrics.keySet() );
+        List<Agent> ls = Lists.newArrayList( serverMetrics.keySet() );
         Collections.sort( ls );
         return ls;
     }

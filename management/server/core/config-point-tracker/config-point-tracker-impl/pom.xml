@@ -10,15 +10,10 @@
   </parent>
 
   <artifactId>config-point-tracker-impl</artifactId>
-  <name>Subutai Config Point Tracker Impl</name>
+  <name>Subutai Config Point Tracker</name>
   <packaging>bundle</packaging>
 
   <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>config-point-tracker-api</artifactId>
@@ -40,7 +35,6 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

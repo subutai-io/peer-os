@@ -253,7 +253,7 @@ public class SolrImpl implements Solr
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", SolrClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setName( String.format( "%s-%s", SolrClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
 
         //1 node group
         NodeGroup solrGroup = new NodeGroup();

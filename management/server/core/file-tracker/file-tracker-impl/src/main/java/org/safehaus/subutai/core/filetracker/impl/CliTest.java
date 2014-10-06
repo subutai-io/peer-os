@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 

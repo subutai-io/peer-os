@@ -4,15 +4,14 @@ package org.safehaus.subutai.core.environment.ui;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.manage.EnvironmentBuildWizard;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -85,10 +84,10 @@ public class EnvironmentBuildWizardTest
     {
 
         Peer peer1 = new Peer();
-        peer1.setId( UUID.randomUUID() );
+        peer1.setId( UUIDUtil.generateTimeBasedUUID() );
 
         Peer peer2 = new Peer();
-        peer2.setId( UUID.randomUUID() );
+        peer2.setId( UUIDUtil.generateTimeBasedUUID() );
         Peer[] peers = { peer1, peer2 };
 
         Map<Object, Peer> topology = new HashMap<>();

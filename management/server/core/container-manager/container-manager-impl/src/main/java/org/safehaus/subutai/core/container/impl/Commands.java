@@ -17,7 +17,7 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Commands for containermanager management
+ * Commands for container-manager management
  */
 public class Commands
 {

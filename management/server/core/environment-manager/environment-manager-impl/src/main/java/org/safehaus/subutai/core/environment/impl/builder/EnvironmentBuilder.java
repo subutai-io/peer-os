@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
@@ -58,7 +58,7 @@ public class EnvironmentBuilder
         Set<String> physicalNodes = environmentBuildTask.getPhysicalNodes();
 
 
-        Environment environment = new Environment( UUID.randomUUID(), blueprint.getName() );
+        Environment environment = new Environment( UUIDUtil.generateTimeBasedUUID(), blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
         {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();

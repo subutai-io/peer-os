@@ -2,10 +2,10 @@ package org.safehaus.subutai.core.dispatcher.impl;
 
 
 import java.util.List;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,7 +20,7 @@ public class MockUtils
     {
         Response response = mock( Response.class );
 
-        when( response.getUuid() ).thenReturn( UUID.randomUUID() );
+        when( response.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID() );
         when( response.isLxc() ).thenReturn( true );
         when( response.getIps() ).thenReturn( mock( List.class ) );
         when( response.getHostname() ).thenReturn( "lxchostname" );

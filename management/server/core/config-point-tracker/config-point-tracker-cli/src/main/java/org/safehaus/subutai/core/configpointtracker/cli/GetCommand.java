@@ -10,12 +10,12 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "config-point-tracker", name = "get")
+@Command( scope = "config-point-tracker", name = "get" )
 public class GetCommand extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( GetCommand.class );
-    @Argument(index = 0, name = "templateName", required = true)
+    @Argument( index = 0, name = "templateName", required = true )
     private String templateName;
 
     private ConfigPointTracker configPointTracker;

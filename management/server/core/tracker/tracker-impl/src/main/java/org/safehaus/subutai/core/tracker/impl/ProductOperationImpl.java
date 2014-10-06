@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * This is an implementaion of ProductOperation
+ * This is an implementation of ProductOperation
  */
 public class ProductOperationImpl implements ProductOperation
 {
@@ -65,7 +65,7 @@ public class ProductOperationImpl implements ProductOperation
         this.tracker = tracker;
         log = new StringBuilder();
         state = ProductOperationState.RUNNING;
-        id = UUIDUtil.generateCassandraUUID();
+        id = UUIDUtil.generateTimeBasedUUID();
         createDate = new Date();
     }
 

@@ -11,6 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -45,9 +46,9 @@ public class CommandDispatcherImplTest
     PeerManager peerManager;
 
     CommandDispatcherImpl commandDispatcher;
-    private static final UUID agentId = UUID.randomUUID();
-    private static final UUID commandId = UUID.randomUUID();
-    private static final UUID peerId = UUID.randomUUID();
+    private static final UUID agentId = UUIDUtil.generateTimeBasedUUID();
+    private static final UUID commandId = UUIDUtil.generateTimeBasedUUID();
+    private static final UUID peerId = UUIDUtil.generateTimeBasedUUID();
     private static final Integer timeout = 30;
 
 
