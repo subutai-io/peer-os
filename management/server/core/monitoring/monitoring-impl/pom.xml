@@ -11,19 +11,21 @@
   </parent>
 
   <artifactId>monitoring-impl</artifactId>
-  <name>Subutai Monitoring Impl</name>
+  <name>Subutai Monitoring</name>
   <packaging>bundle</packaging>
 
   <dependencies>
+
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <version>${org.codehaus.jackson.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>monitoring-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-core</artifactId>
@@ -32,11 +34,11 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>${commons.io.version}</version>
     </dependency>
+
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>monitoring-api</artifactId>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -50,6 +52,12 @@
       <version>${org.mockito.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

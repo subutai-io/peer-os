@@ -122,7 +122,7 @@ public class BlueprintUploadForm
 
     private void uploadAndSaveBlueprint()
     {
-        String content = blueprintTxtArea.getValue().toString().trim();
+        String content = blueprintTxtArea.getValue().trim();
         if ( content.length() > 0 )
         {
             boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );

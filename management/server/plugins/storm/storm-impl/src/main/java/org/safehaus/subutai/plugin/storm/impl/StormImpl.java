@@ -120,7 +120,7 @@ public class StormImpl extends StormBase
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
-        eb.setName( StormConfig.PRODUCT_NAME + UUID.randomUUID() );
+        eb.setName( StormConfig.PRODUCT_NAME + UUIDUtil.generateTimeBasedUUID() );
         eb.setNodeGroups( new HashSet<NodeGroup>() );
 
         // no need to create new container for nimbus node if external Zookeeper

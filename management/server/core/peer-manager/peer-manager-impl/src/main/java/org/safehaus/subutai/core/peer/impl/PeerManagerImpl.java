@@ -414,7 +414,8 @@ public class PeerManagerImpl implements PeerManager
         {
             // Is the remote template exists in the local peer?
             boolean isTemplateExists = templateRegistry.getTemplate( template ) != null;
-            if (! isTemplateExists) {
+            if ( !isTemplateExists )
+            {
                 //TODO: download the remote template and register it in the local registry
 
             }

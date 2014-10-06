@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 
 /**
@@ -50,7 +51,7 @@ public abstract class PeerCommandMessage
 
     public PeerCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
     {
-        this.id = UUID.randomUUID();
+        this.id = UUIDUtil.generateTimeBasedUUID();
         this.peerId = peerId;
         this.agentId = agentId;
         this.envId = envId;

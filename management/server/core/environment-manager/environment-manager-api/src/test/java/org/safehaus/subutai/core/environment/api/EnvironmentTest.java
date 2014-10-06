@@ -6,8 +6,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 
@@ -16,9 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 
-/**
- * Created by bahadyr on 10/2/14.
- */
+@Ignore
 public class EnvironmentTest
 {
 
@@ -30,7 +30,7 @@ public class EnvironmentTest
     public void setUp() throws Exception
     {
 
-        this.environment = new Environment( NAME );
+        this.environment = new Environment( UUIDUtil.generateTimeBasedUUID(), NAME );
     }
 
 
@@ -73,6 +73,4 @@ public class EnvironmentTest
         PeerCommandMessage peerCommandMessage = mock( PeerCommandMessage.class );
         environment.invoke( peerCommandMessage );
     }
-
-
 }

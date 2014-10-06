@@ -7,8 +7,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 

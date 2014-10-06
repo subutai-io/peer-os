@@ -332,7 +332,7 @@ public class CassandraImpl implements Cassandra
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
-                .setName( String.format( "%s-%s", CassandraClusterConfig.getProductKey(), UUID.randomUUID() ) );
+                .setName( String.format( "%s-%s", CassandraClusterConfig.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
 
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );

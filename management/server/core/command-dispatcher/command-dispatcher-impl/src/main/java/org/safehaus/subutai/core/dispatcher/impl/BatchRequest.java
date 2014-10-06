@@ -14,7 +14,7 @@ import com.google.common.base.Preconditions;
 /**
  * Batch request
  */
-class BatchRequest
+public class BatchRequest
 {
 
     private final Request request;

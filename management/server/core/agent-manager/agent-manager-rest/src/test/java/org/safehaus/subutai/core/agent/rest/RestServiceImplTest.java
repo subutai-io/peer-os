@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
 import com.google.common.collect.Lists;
@@ -34,7 +35,7 @@ public class RestServiceImplTest
     private static final String HOSTNAME = "hostname";
     private static final String PARENT_NAME = "parent";
     private static final String MAC_ADDRESS = "MAC";
-    private static final UUID RANDOM_ID = UUID.randomUUID();
+    private static final UUID RANDOM_ID = UUIDUtil.generateTimeBasedUUID();;
     private static final List<String> IPS = Lists.newArrayList( "127.0.0.1" );
 
     private Agent agent =

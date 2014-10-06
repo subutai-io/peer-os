@@ -30,8 +30,8 @@ public class HiveImplMock extends HiveImpl
 
     public static Agent createAgent( String hostname )
     {
-        return new Agent( UUID.randomUUID(), hostname, "parent-host", "00:00:00:00",
-                Arrays.asList( "127.0.0.1", "127.0.0.1" ), true, "transportId", UUID.randomUUID(), UUID.randomUUID() );
+        return new Agent( UUIDUtil.generateTimeBasedUUID(), hostname, "parent-host", "00:00:00:00",
+                Arrays.asList( "127.0.0.1", "127.0.0.1" ), true, "transportId", UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
     }
 
 

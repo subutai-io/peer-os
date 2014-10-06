@@ -16,11 +16,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -41,23 +36,6 @@
       <artifactId>command-runner-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${org.mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${org.slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
     </dependency>
@@ -72,6 +50,16 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>db-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

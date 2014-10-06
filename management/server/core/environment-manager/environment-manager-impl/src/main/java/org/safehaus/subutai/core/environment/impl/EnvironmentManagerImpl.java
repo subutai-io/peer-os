@@ -300,12 +300,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
-        Environment environment = new Environment( process.getEnvironmentName() );
+        Environment environment = new Environment( process.getUuid(), process.getEnvironmentName() );
         int containerCount = 0;
         long timeout = 1000 * 60;
         for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
         {
             CloneContainersMessage ccm = process.getMessageMap().get( key );
+
             ccm.setType( PeerCommandType.CLONE );
             containerCount = containerCount + ccm.getNumberOfNodes();
             try

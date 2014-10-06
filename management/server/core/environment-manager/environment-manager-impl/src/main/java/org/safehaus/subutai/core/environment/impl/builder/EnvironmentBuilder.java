@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
@@ -44,13 +45,12 @@ public class EnvironmentBuilder
         this.templateRegistry = templateRegistry;
         this.agentManager = agentManager;
         this.networkManager = networkManager;
-        this.containerManager= containerManager;
+        this.containerManager = containerManager;
     }
 
 
     //@todo destroy all containers of all groups inside environment on any failure ???
-    public Environment build( final EnvironmentBuildTask environmentBuildTask )
-            throws EnvironmentBuildException
+    public Environment build( final EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException
     {
 
 
@@ -58,7 +58,7 @@ public class EnvironmentBuilder
         Set<String> physicalNodes = environmentBuildTask.getPhysicalNodes();
 
 
-        Environment environment = new Environment( blueprint.getName() );
+        Environment environment = new Environment( UUIDUtil.generateTimeBasedUUID(), blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
         {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();

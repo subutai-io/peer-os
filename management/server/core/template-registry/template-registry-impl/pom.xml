@@ -11,15 +11,10 @@
 
   <artifactId>template-registry-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Template Registry Impl</name>
+  <name>Subutai Template Registry</name>
   <description>Subutai Template Registry Impl</description>
 
   <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
@@ -33,30 +28,21 @@
       <artifactId>db-manager-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-      <version>${javax.annotation.version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>${com.google.guava.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${org.slf4j.version}</version>
     </dependency>
+    <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <version>${org.mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -73,6 +59,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.registry.impl</Bundle-SymbolicName>
+            <Export-Package>
+               {local-packages};version=${project.version};-noimport:=true
+             </Export-Package>
           </instructions>
         </configuration>
       </plugin>

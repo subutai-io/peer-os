@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.command.ui.old;
 
 import org.junit.Test;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,10 +17,10 @@ import static org.mockito.Mockito.mock;
 public class CommandRunnerUITest
 {
     private CommandRunnerUI commandRunnerUI =
-            new CommandRunnerUI( mock( CommandDispatcher.class ), mock( AgentManager.class ) );
+            new CommandRunnerUI( mock( CommandRunner.class ), mock( AgentManager.class ) );
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullCommandRunner()
     {
 
@@ -28,11 +28,11 @@ public class CommandRunnerUITest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullAgentManager()
     {
 
-        new CommandRunnerUI( mock( CommandDispatcher.class ), null );
+        new CommandRunnerUI( mock( CommandRunner.class ), null );
     }
 
 

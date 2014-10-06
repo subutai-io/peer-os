@@ -17,7 +17,6 @@ public class TrackerPortalModule implements PortalModule
 
     public static final String MODULE_IMAGE = "tracker.png";
     public static final String MODULE_NAME = "Tracker";
-    private TrackerComponent trackerComponent;
     private Tracker tracker;
     private ExecutorService executor;
 
@@ -65,7 +64,7 @@ public class TrackerPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        trackerComponent = new TrackerComponent( tracker, executor );
+        final TrackerComponent trackerComponent = new TrackerComponent( tracker, executor );
         trackerComponent.refreshSources();
         trackerComponent.startTracking();
         return trackerComponent;

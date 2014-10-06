@@ -17,6 +17,7 @@ import org.mockito.Matchers;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
@@ -147,7 +148,7 @@ public class AgentManagerImplTest
     public void shouldReturnAgentWithMissingHostnameByUUID()
     {
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();;
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
         when( response.getUuid() ).thenReturn( agentUUID );
         when( response.getHostname() ).thenReturn( null );
@@ -174,7 +175,7 @@ public class AgentManagerImplTest
     @Test
     public void shouldReturnAgentByEnvId()
     {
-        UUID id = UUID.randomUUID();
+        UUID id = UUIDUtil.generateTimeBasedUUID();;
         Response response = MockUtils.getRegistrationRequestFromLxcAgentWithEnvironmentId( id );
 
         agentManager.onResponse( response );
@@ -199,7 +200,7 @@ public class AgentManagerImplTest
     @Test
     public void shouldReturnAgentByUUID()
     {
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();;
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
         when( response.getUuid() ).thenReturn( agentUUID );
 

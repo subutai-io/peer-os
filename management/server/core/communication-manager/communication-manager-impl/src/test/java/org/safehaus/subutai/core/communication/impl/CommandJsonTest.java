@@ -3,11 +3,11 @@ package org.safehaus.subutai.core.communication.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.communication.api.Command;
 import org.safehaus.subutai.core.communication.api.CommandJson;
 
@@ -31,7 +31,7 @@ public class CommandJsonTest
     public void shouldReturnRequestCommandJson()
     {
 
-        String actual = CommandJson.getRequestCommandJson( TestUtils.getRequestTemplate( UUID.randomUUID() ) );
+        String actual = CommandJson.getRequestCommandJson( TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() ) );
         String expected = GSON.toJson( GSON.fromJson( actual, CommandJson.CommandImpl.class ) );
 
 
@@ -66,7 +66,7 @@ public class CommandJsonTest
     @Test
     public void shouldReturnCommandFromJson()
     {
-        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        Request request = TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() );
         Command expected = new CommandJson.CommandImpl( request );
         Command actual = CommandJson.getCommandFromJson( GSON.toJson( expected ) );
 
@@ -78,7 +78,7 @@ public class CommandJsonTest
     @Test
     public void shouldReturnRequestFromCommandJson()
     {
-        Request expected = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        Request expected = TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() );
         String cmdJson = GSON.toJson( new CommandJson.CommandImpl( expected ) );
         Request actual = CommandJson.getRequestFromCommandJson( cmdJson );
 
@@ -135,7 +135,7 @@ public class CommandJsonTest
     @Test
     public void shouldReturnNonNullRequest()
     {
-        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        Request request = TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() );
         CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
 
 
@@ -146,7 +146,7 @@ public class CommandJsonTest
     @Test
     public void checkEquals()
     {
-        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        Request request = TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() );
         CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
         String cmdJson = CommandJson.getRequestCommandJson( request );
         Command cmd2 = CommandJson.getCommandFromJson( cmdJson );
@@ -159,7 +159,7 @@ public class CommandJsonTest
     @Test
     public void checkHashCode()
     {
-        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        Request request = TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() );
         CommandJson.CommandImpl cmd = new CommandJson.CommandImpl( request );
         String cmdJson = CommandJson.getRequestCommandJson( request );
         Command cmd2 = CommandJson.getCommandFromJson( cmdJson );
@@ -174,7 +174,7 @@ public class CommandJsonTest
     @Test
     public void shouldReturnNullOnMalformedJson()
     {
-        Request request = TestUtils.getRequestTemplate( UUID.randomUUID() );
+        Request request = TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() );
         String cmdJson = CommandJson.getRequestCommandJson( request ) + "invalid";
 
 

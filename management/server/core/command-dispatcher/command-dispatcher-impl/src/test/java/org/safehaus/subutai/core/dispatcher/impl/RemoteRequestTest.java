@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.dispatcher.impl;
 import java.util.UUID;
 
 import org.junit.Test;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,8 +16,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class RemoteRequestTest
 {
-    private static final UUID PEER_ID = UUID.randomUUID();
-    private static final UUID COMMAND_ID = UUID.randomUUID();
+    private static final UUID PEER_ID = UUIDUtil.generateTimeBasedUUID();
+    private static final UUID COMMAND_ID = UUIDUtil.generateTimeBasedUUID();
     private static final int REQUESTS_COUNT = 1;
 
 

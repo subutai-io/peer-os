@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -24,7 +25,7 @@ public class RemoteResponseTest
 
     @Test
     public void shouldReturnProperties(){
-        UUID commandId = UUID.randomUUID();
+        UUID commandId = UUIDUtil.generateTimeBasedUUID();
         Response response = mock(Response.class);
         when( response.getTaskUuid() ).thenReturn( commandId );
 

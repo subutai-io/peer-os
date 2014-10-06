@@ -26,17 +26,14 @@ public class ContainerComponent extends CustomComponent implements Disposable
 
     private static final String MANAGER_TAB_CAPTION = "Manage";
     private final AgentTree agentTree;
-    private final ContainerManager containerManager;
-    private final StrategyManager strategyManager;
-    private final AgentManager agentManager;
 
 
     public ContainerComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
 
-        this.containerManager = serviceLocator.getService( ContainerManager.class );
-        this.agentManager = serviceLocator.getService( AgentManager.class );
-        this.strategyManager = serviceLocator.getService( StrategyManager.class );
+        final ContainerManager containerManager = serviceLocator.getService( ContainerManager.class );
+        final AgentManager agentManager = serviceLocator.getService( AgentManager.class );
+        final StrategyManager strategyManager = serviceLocator.getService( StrategyManager.class );
         setHeight( 100, Unit.PERCENTAGE );
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();

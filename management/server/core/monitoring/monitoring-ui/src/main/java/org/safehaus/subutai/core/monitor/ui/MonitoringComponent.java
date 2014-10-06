@@ -12,8 +12,8 @@ import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.monitor.ui.util.UIUtil;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;

@@ -49,7 +49,7 @@ class CommunicationMessageListener implements MessageListener
 
                 byte[] msgBytes = new byte[( int ) msg.getBodyLength()];
                 msg.readBytes( msgBytes );
-                String jsonCmd = new String( msgBytes, "UTF-8" );
+                String jsonCmd = new String( msgBytes, "UTF-8" ).replaceAll( "\"null\"", "null" );
                 Response response = CommandJson.getResponseFromCommandJson( jsonCmd );
 
                 if ( response != null )

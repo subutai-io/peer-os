@@ -17,14 +17,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.datastax.cassandra</groupId>
       <artifactId>cassandra-driver-core</artifactId>
-      <version>${com.datastax.cassandra.version}</version>
     </dependency>
   </dependencies>
 

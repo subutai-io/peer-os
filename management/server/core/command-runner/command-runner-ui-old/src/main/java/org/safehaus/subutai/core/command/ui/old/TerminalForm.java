@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.google.common.base.Preconditions;
@@ -52,7 +52,7 @@ public class TerminalForm extends CustomComponent implements Disposable
     private ExecutorService executor;
 
 
-    public TerminalForm( final CommandDispatcher commandRunner, final AgentManager agentManager )
+    public TerminalForm( final CommandRunner commandRunner, final AgentManager agentManager )
     {
 
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );

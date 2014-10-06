@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class DescribeEnvironmentCommandTest
 {
     DescribeEnvironmentCommand describeEnvironmentCommand;
@@ -39,7 +40,7 @@ public class DescribeEnvironmentCommandTest
     public void test() throws Exception
     {
         String name = "name";
-        Environment environment = new Environment( name );
+        Environment environment = new Environment( UUIDUtil.generateTimeBasedUUID(), name );
         final Set<EnvironmentContainer> set = new HashSet<>();
         environment.setContainers( set );
         describeEnvironmentCommand.setEnvironmentName( name );

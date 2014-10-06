@@ -15,8 +15,8 @@ import org.safehaus.subutai.common.protocol.Agent;
  */
 public abstract class AbstractContainerPlacementStrategy implements ContainerPlacementStrategy
 {
-    private final Map<Agent, Map<String, Integer>> placementInfoMap = new HashMap<Agent, Map<String, Integer>>();
-    private List<Criteria> criteria = new ArrayList<Criteria>();
+    private final Map<Agent, Map<String, Integer>> placementInfoMap = new HashMap<>();
+    private List<Criteria> criteria = new ArrayList<>();
 
 
     public final void addPlacementInfo( Agent physicalNode, String nodeType, int numberOfLxcsToCreate )
@@ -37,7 +37,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
         Map<String, Integer> placementInfo = placementInfoMap.get( physicalNode );
         if ( placementInfo == null )
         {
-            placementInfo = new HashMap<String, Integer>();
+            placementInfo = new HashMap<>();
             placementInfoMap.put( physicalNode, placementInfo );
         }
 
@@ -93,7 +93,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     @Override
     public Map<Agent, Integer> getPlacementDistribution()
     {
-        Map<Agent, Integer> res = new HashMap<Agent, Integer>();
+        Map<Agent, Integer> res = new HashMap<>();
         for ( Map.Entry<Agent, Map<String, Integer>> e : placementInfoMap.entrySet() )
         {
             int total = 0;
