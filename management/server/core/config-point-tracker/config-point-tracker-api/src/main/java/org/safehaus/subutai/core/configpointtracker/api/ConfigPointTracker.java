@@ -7,9 +7,9 @@ import java.util.Set;
 public interface ConfigPointTracker
 {
 
-    public void add( String templateName, String... configPaths );
+    public boolean add( String templateName, String... configPaths );
 
-    public void remove( String templateName, String... configPaths );
+    public boolean remove( String templateName, String... configPaths );
 
     public Set<String> get( String templateName );
 }
