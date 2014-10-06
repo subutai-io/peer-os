@@ -12,6 +12,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 @Command(scope = "monitor", name = "all-metrics")
 public class AllMetricsCommand extends OsgiCommandSupport
@@ -25,6 +27,7 @@ public class AllMetricsCommand extends OsgiCommandSupport
 
     public void setMonitoring( Monitoring monitoring )
     {
+        Preconditions.checkNotNull( monitoring, "Monitoring is null." );
         this.monitoring = monitoring;
     }
 

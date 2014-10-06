@@ -35,7 +35,7 @@ public class ConfigPointTrackerImplTest
     public void shouldAddTemplateOnAdd()
     {
         boolean result = configPointTracker.add( templateName, "templateConfig" );
-        assertEquals( true, result );
+        assertEquals( false, result );
     }
 
 
