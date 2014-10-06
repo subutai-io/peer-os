@@ -65,8 +65,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      */
     @Override
     public synchronized boolean registerTemplate( final String configFile, final String packagesFile,
-                                                  final String md5sum )
-            throws RegistryException
+                                                  final String md5sum ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
@@ -146,7 +145,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
                 template.setProducts( getPackagesDiff( parentTemplate, template ) );
             }
-
 
             return template;
         }
@@ -506,7 +504,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      */
     @Override
     public synchronized boolean updateTemplateUsage( final String faiHostname, final String templateName,
-                                                  final boolean inUse ) throws RegistryException
+                                                     final boolean inUse ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( faiHostname ), "FAI hostname is null or empty" );

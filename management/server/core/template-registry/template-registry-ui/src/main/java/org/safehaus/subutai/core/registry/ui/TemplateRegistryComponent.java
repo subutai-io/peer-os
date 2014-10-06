@@ -6,7 +6,9 @@
 package org.safehaus.subutai.core.registry.ui;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -26,8 +28,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
@@ -46,6 +48,65 @@ public class TemplateRegistryComponent extends CustomComponent
     private HierarchicalContainer container;
     private Tree templateTree;
 
+    private GridLayout grid;
+    private Table templateInfoTable;
+
+    private static final String TEMPLATE_PROPERTY = "Template Property";
+    private static final String TEMPLATE_VALUE = "Value";
+
+    private Map<String, TemplateValue> templatePropertiesMap = new HashMap<String, TemplateValue>()
+    {
+        {
+            put( "Template Name", new TemplateValue()
+            {
+                @Override
+                public String getTemplateProperty( final Template template )
+                {
+                    return template.getTemplateName();
+                }
+            } );
+            put( "Parent Name", new TemplateValue()
+            {
+                @Override
+                public String getTemplateProperty( final Template template )
+                {
+                    return template.getParentTemplateName();
+                }
+            } );
+            put( "Lxc Arch", new TemplateValue()
+            {
+                @Override
+                public String getTemplateProperty( final Template template )
+                {
+                    return template.getLxcArch();
+                }
+            } );
+            put( "Utsname", new TemplateValue()
+            {
+                @Override
+                public String getTemplateProperty( final Template template )
+                {
+                    return template.getLxcUtsname();
+                }
+            } );
+            put( "Config Path", new TemplateValue()
+            {
+                @Override
+                public String getTemplateProperty( final Template template )
+                {
+                    return template.getSubutaiConfigPath();
+                }
+            } );
+            //            put( "App Data Path", new TemplateValue()
+            //            {
+            //                @Override
+            //                public String getTemplateProperty( final Template template )
+            //                {
+            //                    return template.getPat;
+            //                }
+            //            } );
+        }
+    };
 
     public TemplateRegistryComponent( TemplateRegistry registryManager )
     {
@@ -93,9 +154,17 @@ public class TemplateRegistryComponent extends CustomComponent
 
                 if ( item != null )
                 {
-                    Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                    final Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
 
                     Notification.show( template.toString() );
+                    getUI().access( new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            showSelectedTemplateInfo( template );
+                        }
+                    } );
                 }
             }
         } );
@@ -108,30 +177,21 @@ public class TemplateRegistryComponent extends CustomComponent
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
 
-        GridLayout grid = new GridLayout( 4, 4 );
+        templateInfoTable = new Table( "Template Info" );
+        templateInfoTable.setWidth( "25%" );
+        templateInfoTable.setImmediate( true );
+        templateInfoTable.addContainerProperty( TEMPLATE_PROPERTY, String.class, null );
+        templateInfoTable.addContainerProperty( TEMPLATE_VALUE, String.class, null );
 
-        TextField templateNameTxt = new TextField( "Template name" );
-        templateNameTxt.setReadOnly( true );
-        grid.addComponent( templateNameTxt, 0, 0 );
-        TextField templateParentTxt = new TextField( "Parent name" );
-        templateParentTxt.setReadOnly( true );
-        grid.addComponent( templateParentTxt, 1, 0 );
-        TextField lxcArchTxt = new TextField( "Lxc arch" );
-        lxcArchTxt.setReadOnly( true );
-        grid.addComponent( lxcArchTxt, 2, 0 );
-        TextField lxcUtsnameTxt = new TextField( "Utsname" );
-        lxcUtsnameTxt.setReadOnly( true );
-        grid.addComponent( lxcUtsnameTxt, 0, 1 );
-        TextField cfgPathTxt = new TextField( "Config path" );
-        cfgPathTxt.setReadOnly( true );
-        grid.addComponent( cfgPathTxt, 1, 1 );
-        TextField appDataPathTxt = new TextField( "App Data path" );
-        appDataPathTxt.setReadOnly( true );
-        grid.addComponent( appDataPathTxt, 2, 1 );
-        verticalLayout.addComponent( grid );
+        for ( String key : templatePropertiesMap.keySet() )
+        {
+            templateInfoTable.addItem( new Object[] { key, "" }, key );
+        }
+
+        verticalLayout.addComponent( templateInfoTable );
 
         TextArea packagesInstalled = new TextArea( "Packages Installed" );
-        packagesInstalled.setValue( "package1\npackage2\npackage3" );
+        packagesInstalled.setValue( "package1\npackage2\npackage3\n" );
         packagesInstalled.setReadOnly( true );
 
         TextArea packagesChanged = new TextArea( "Packages Changed" );
@@ -153,6 +213,22 @@ public class TemplateRegistryComponent extends CustomComponent
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );
+    }
+
+
+    private interface TemplateValue
+    {
+        public String getTemplateProperty( Template template );
+    }
+
+
+    private void showSelectedTemplateInfo( Template template )
+    {
+        for ( String key : templatePropertiesMap.keySet() )
+        {
+            Property item = templateInfoTable.getItem( key ).getItemProperty( TEMPLATE_VALUE );
+            item.setValue( templatePropertiesMap.get( key ).getTemplateProperty( template ) );
+        }
     }
 
 
