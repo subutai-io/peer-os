@@ -10,6 +10,8 @@ import org.safehaus.subutai.core.filetracker.api.FileTracker;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Needed mostly for testing FileTracker
@@ -27,12 +29,14 @@ public class CliTest extends OsgiCommandSupport implements ResponseListener
 
     public void setAgentManager( AgentManager agentManager )
     {
+        Preconditions.checkNotNull( agentManager, "AgentManager is null." );
         this.agentManager = agentManager;
     }
 
 
     public void setFileTracker( FileTracker fileTracker )
     {
+        Preconditions.checkNotNull( fileTracker, "FileTracker is null." );
         this.fileTracker = fileTracker;
     }
 
