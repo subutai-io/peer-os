@@ -1,9 +1,7 @@
 package org.safehaus.subutai.core.monitor.cli;
 
 
-import java.lang.reflect.Type;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
@@ -11,13 +9,8 @@ import org.junit.Test;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 
-import org.apache.commons.lang3.time.DateUtils;
-
-import com.google.gson.reflect.TypeToken;
-
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +20,7 @@ import static org.mockito.Mockito.when;
  */
 public class AllMetricsCommandTest
 {
-    protected String hostname = null;
+    protected String hostname = "hostname";
     private Monitoring monitoring;
     private AllMetricsCommand allMetricsCommand;
 
@@ -51,28 +44,9 @@ public class AllMetricsCommandTest
     @Test
     public void shouldAccessMonitoringGetDataForAllMetricsOnDoExecute()
     {
-        Type mapType = new TypeToken<Map<Metric, Map<Date, Double>>>()
-        {
-        }.getType();
-
-        Map<Metric, Map<Date, Double>> data = new HashMap<>();
-        Map<Metric, Map<Date, Double>> spy = spy( data );
-        when( monitoring.getDataForAllMetrics( hostname, any( Date.class ), any( Date.class ) ) ).thenReturn( spy );
+        Map<Metric, Map<Date, Double>> data = any();
+        when( monitoring.getDataForAllMetrics( hostname, any( Date.class ), any( Date.class ) ) ).thenReturn( data );
         allMetricsCommand.doExecute();
-        verify( monitoring ).getDataForAllMetrics( hostname, any( Date.class ), any( Date.class ) );
-    }
-
-
-    protected Object doExecute()
-    {
-
-        Date endDate = new Date();
-        Date startDate = DateUtils.addDays( endDate, -1 );
-
-        Map<Metric, Map<Date, Double>> data = monitoring.getDataForAllMetrics( hostname, startDate, endDate );
-
-        System.out.println( "Data: " + data );
-
-        return null;
+        verify( monitoring ).getDataForAllMetrics( any( String.class ), any( Date.class ), any( Date.class ) );
     }
 }
