@@ -9,6 +9,7 @@ package org.safehaus.subutai.core.registry.ui;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -50,9 +51,18 @@ public class TemplateRegistryComponent extends CustomComponent
 
     private GridLayout grid;
     private Table templateInfoTable;
+    private TextArea packagesInstalled;
+    private TextArea packagesChanged;
 
     private static final String TEMPLATE_PROPERTY = "Template Property";
     private static final String TEMPLATE_VALUE = "Value";
+
+
+    private interface TemplateValue
+    {
+        public String getTemplateProperty( Template template );
+    }
+
 
     private Map<String, TemplateValue> templatePropertiesMap = new HashMap<String, TemplateValue>()
     {
@@ -107,6 +117,7 @@ public class TemplateRegistryComponent extends CustomComponent
             //            } );
         }
     };
+
 
     public TemplateRegistryComponent( TemplateRegistry registryManager )
     {
@@ -190,12 +201,12 @@ public class TemplateRegistryComponent extends CustomComponent
 
         verticalLayout.addComponent( templateInfoTable );
 
-        TextArea packagesInstalled = new TextArea( "Packages Installed" );
-        packagesInstalled.setValue( "package1\npackage2\npackage3\n" );
+        packagesInstalled = new TextArea( "Packages Installed" );
+        packagesInstalled.setValue( "" );
         packagesInstalled.setReadOnly( true );
 
-        TextArea packagesChanged = new TextArea( "Packages Changed" );
-        packagesChanged.setValue( "+package4\n+package5\n-package6\n-package7" );
+        packagesChanged = new TextArea( "Packages Changed" );
+        packagesChanged.setValue( "" );
         packagesChanged.setReadOnly( true );
 
         HorizontalLayout packagesLayout = new HorizontalLayout();
@@ -216,12 +227,6 @@ public class TemplateRegistryComponent extends CustomComponent
     }
 
 
-    private interface TemplateValue
-    {
-        public String getTemplateProperty( Template template );
-    }
-
-
     private void showSelectedTemplateInfo( Template template )
     {
         for ( String key : templatePropertiesMap.keySet() )
@@ -229,6 +234,24 @@ public class TemplateRegistryComponent extends CustomComponent
             Property item = templateInfoTable.getItem( key ).getItemProperty( TEMPLATE_VALUE );
             item.setValue( templatePropertiesMap.get( key ).getTemplateProperty( template ) );
         }
+        String products = "";
+        for ( String product : template.getProducts() )
+        {
+            products += product + "\n";
+        }
+        packagesInstalled.setReadOnly( false );
+        packagesInstalled.setValue( products );
+        packagesInstalled.setReadOnly( true );
+
+        String packages = "";
+        Set<String> diff = registryManager.getPackagesDiff( template );
+        for ( String templatePackage : diff )
+        {
+            packages += templatePackage + "\n";
+        }
+        packagesChanged.setReadOnly( false );
+        packagesChanged.setValue( packages );
+        packagesChanged.setReadOnly( true );
     }
 
 

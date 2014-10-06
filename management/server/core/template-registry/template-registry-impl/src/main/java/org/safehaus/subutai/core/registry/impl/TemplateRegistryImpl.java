@@ -156,6 +156,21 @@ public class TemplateRegistryImpl implements TemplateRegistry
     }
 
 
+    @Override
+    public Set<String> getPackagesDiff( Template template )
+    {
+        if ( template.getParentTemplateName() == null )
+        {
+            return getPackagesDiff( null, template );
+        }
+        else
+        {
+            Template parentTemplate = getTemplate( template.getParentTemplateName() );
+            return getPackagesDiff( parentTemplate, template );
+        }
+    }
+
+
     private Set<String> getPackagesDiff( Template parent, Template child )
     {
         if ( parent == null )
