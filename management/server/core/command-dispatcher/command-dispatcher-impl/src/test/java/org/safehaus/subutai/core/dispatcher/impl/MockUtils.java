@@ -6,6 +6,9 @@ import java.util.List;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandCallback;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,5 +31,18 @@ public class MockUtils
         when( response.getType() ).thenReturn( ResponseType.REGISTRATION_REQUEST );
 
         return response;
+    }
+
+
+    public static CommandCallback getDummyCallback()
+    {
+        return new CommandCallback()
+        {
+            @Override
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command )
+            {
+
+            }
+        };
     }
 }
