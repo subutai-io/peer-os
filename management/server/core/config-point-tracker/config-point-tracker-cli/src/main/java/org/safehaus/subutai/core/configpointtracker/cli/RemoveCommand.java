@@ -7,6 +7,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Preconditions;
+
 
 @Command( scope = "config-point-tracker", name = "remove" )
 public class RemoveCommand extends OsgiCommandSupport
@@ -23,6 +25,7 @@ public class RemoveCommand extends OsgiCommandSupport
 
     public void setConfigPointTracker( ConfigPointTracker configPointTracker )
     {
+        Preconditions.checkNotNull( configPointTracker, "ConfigPointTracker is null." );
         this.configPointTracker = configPointTracker;
     }
 
