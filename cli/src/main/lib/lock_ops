@@ -11,7 +11,9 @@ function lock_subutai_system {
 }
 
 function unlock_subutai_system {
-  rm $SUBUTAI_LOCK_PATH/system_lock
+  if [ -f "$SUBUTAI_LOCK_PATH/system_lock" ]; then
+    rm $SUBUTAI_LOCK_PATH/system_lock
+  fi
 }
 
 function is_system_locked {
@@ -46,15 +48,21 @@ function lock_container_read {
 }
 
 function unlock_container_write {
-  removing=`ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b"`
-  rm $SUBUTAI_LOCK_PATH/write/$removing  > /dev/null 2>&1
+  if [ -d "$SUBUTAI_LOCK_PATH/write" ]; then
+    removing=`ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b"`
+    rm $SUBUTAI_LOCK_PATH/write/$removing  > /dev/null 2>&1
+  fi
 }
 
 function unlock_container_read {
-  removing=`ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b"`
-  rm $SUBUTAI_LOCK_PATH/write/$removing > /dev/null 2>&1
-  removing=`ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b"`
-  rm $SUBUTAI_LOCK_PATH/read/$removing > /dev/null 2>&1
+  if [ -d "$SUBUTAI_LOCK_PATH/write" ]; then
+    removing=`ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b"`
+    rm $SUBUTAI_LOCK_PATH/write/$removing > /dev/null 2>&1
+  fi
+  if [ -d "$SUBUTAI_LOCK_PATH/read" ]; then
+    removing=`ls $SUBUTAI_LOCK_PATH/read/ | grep -e "\b$1\b"`
+    rm $SUBUTAI_LOCK_PATH/read/$removing > /dev/null 2>&1
+  fi
 }
 
 function are_containers_readable {
