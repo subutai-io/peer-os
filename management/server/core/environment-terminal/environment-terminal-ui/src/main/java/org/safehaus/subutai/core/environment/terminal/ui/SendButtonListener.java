@@ -127,6 +127,7 @@ public class SendButtonListener implements Button.ClickListener
 
         public void run()
         {
+
             try
             {
 
@@ -143,7 +144,7 @@ public class SendButtonListener implements Button.ClickListener
             catch ( CommandException e )
             {
                 LOG.error( "Error in ExecuteCommandTask", e );
-                form.show( e.getMessage() );
+                form.addOutput( e.getMessage() + "\n" );
             }
             finally
             {
