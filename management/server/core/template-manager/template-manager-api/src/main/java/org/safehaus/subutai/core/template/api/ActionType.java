@@ -1,7 +1,7 @@
-package org.safehaus.subutai.core.template.impl;
+package org.safehaus.subutai.core.template.api;
 
 
-enum ActionType
+public enum ActionType
 {
 
     SETUP( "setup" ),
@@ -19,7 +19,7 @@ enum ActionType
     // gets generated debian package name for template. TODO: find a better way
     GET_DEB_PACKAGE_NAME(
             ". /etc/subutai/config && . /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name", true ),
-    GET_PACKAGE_NAME( ". /usr/share/subutai-cli/subutai/lib/deb_ops && get_package_name", true );
+    GET_PACKAGE_NAME( ". /usr/share/subutai-cli/subutai/lib/deb_ops && get_package_name", true ), PREPARE( "install" );
 
     private static final String PARENT_DIR = "/usr/bin/subutai ";
     private final String script;
@@ -39,13 +39,13 @@ enum ActionType
     }
 
 
-    static String wrapInBash( String command )
+    public static String wrapInBash( String command )
     {
         return String.format( "bash -c '%s'", command );
     }
 
 
-    String buildCommand( String... args )
+    public String buildCommand( String... args )
     {
         StringBuilder sb = new StringBuilder();
         if ( !standAloneCommand )

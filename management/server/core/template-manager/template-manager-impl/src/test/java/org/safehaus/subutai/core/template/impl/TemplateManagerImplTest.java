@@ -6,13 +6,19 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl;
+import org.safehaus.subutai.core.template.api.ActionType;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -47,18 +53,26 @@ public class TemplateManagerImplTest
     }
 
 
-    @Test
-    public void testCloneOne()
+//    @Test
+    public void testCloneParentTemplateExists()
     {
 
         UUID envId = UUID.randomUUID();
-        CommandRunner commandRunner = mock( CommandRunner.class );
-        templateManager.setCommandRunner( MockUtils.getHardCodedCloneCommandRunner( true, true, 0, "", "" ) );
+        //        CommandRunner commandRunner = mock( CommandRunner.class );
+        //        templateManager.setCommandRunner( MockUtils.getHardCodedCloneCommandRunner( true, true, 0, "", "" ) );
 
-        TemplateRegistry templateRegistry = MockUtils.getHardCodedTemplateRegistry();
+        TemplateRegistry templateRegistry = mock( TemplateRegistryImpl.class );
+        when( templateRegistry.getParentTemplates( anyString() ) ).thenReturn( MockUtils.getParentTemplates() );
+
         templateManager.setTemplateRegistry( templateRegistry );
 
-        templateManager.init();
+
+        ScriptExecutor scriptExecutor = mock( ScriptExecutor.class );
+        when( scriptExecutor
+                .execute( any( Agent.class ), eq( ActionType.LIST_TEMPLATES ), eq( MockUtils.MASTER_TEMPLATE_NAME ) ) )
+                .thenReturn( true );
+
+        templateManager.setScriptExecutor( scriptExecutor );
 
         boolean result = templateManager
                 .clone( MockUtils.PHYSICAL_HOSTNAME, MockUtils.MASTER_TEMPLATE_NAME, MockUtils.LXC_HOSTNAME,
