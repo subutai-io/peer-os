@@ -329,6 +329,16 @@
                   <artifactId>lxc-manager-ui</artifactId>
                 </artifactItem>
 
+                <!--lxc-quota-manager-->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>lxc-quota-manager-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>lxc-quota-manager-impl</artifactId>
+                </artifactItem>
+
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- monitoring -->
                 <artifactItem>
