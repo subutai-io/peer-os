@@ -630,7 +630,7 @@
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
             <feature>standard</feature>
-            <feature>region</feature>
+            <!--<feature>region</feature>-->
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>jndi</feature>
