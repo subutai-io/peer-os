@@ -59,14 +59,14 @@ public class ResponseSenderTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullDAO()
     {
         new ResponseSender( null, peerManager );
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullPeerManager()
     {
         new ResponseSender( dispatcher, null );
@@ -82,8 +82,8 @@ public class ResponseSenderTest
 
         responseSender.send();
 
-        verify( dispatcher ).deleteRemoteRequest( any( UUID.class ) );
-        verify( dispatcher ).deleteRemoteResponses( any( UUID.class ) );
+        verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ) );
+        verify( dispatcher, atLeastOnce() ).deleteRemoteResponses( any( UUID.class ) );
     }
 
 
@@ -98,8 +98,8 @@ public class ResponseSenderTest
 
         responseSender.send();
 
-        verify( dispatcher ).saveRemoteRequest( any( RemoteRequest.class ) );
-        verify( dispatcher ).deleteRemoteRequest( any( UUID.class ), anyInt() );
+        verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
+        verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ), anyInt() );
     }
 
 
@@ -126,7 +126,7 @@ public class ResponseSenderTest
 
         responseSender.send();
 
-        verify( executorService ).invokeAll( anyCollection() );
+        verify( executorService, atLeastOnce() ).invokeAll( anyCollection() );
     }
 
 
@@ -154,7 +154,7 @@ public class ResponseSenderTest
 
         verify( peerManager, atLeastOnce() ).sendPeerMessage( any( Peer.class ), anyString(), anyString() );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( any( RemoteResponse.class ) );
-        verify( dispatcher , atLeastOnce()).saveRemoteRequest( any( RemoteRequest.class ) );
+        verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
     }
 
 
@@ -215,7 +215,7 @@ public class ResponseSenderTest
         responseSender.send();
 
         verify( request, atLeastOnce() ).incrementAttempts();
-        verify( dispatcher , atLeastOnce()).saveRemoteRequest( any( RemoteRequest.class ) );
+        verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
         verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ), eq( ATTEMPTS - 1 ) );
     }
 }

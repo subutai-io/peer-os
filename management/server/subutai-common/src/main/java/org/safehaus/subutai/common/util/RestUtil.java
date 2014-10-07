@@ -33,9 +33,16 @@ public class RestUtil
             response = client.get();
             if ( response.getStatus() != RESPONSE_OK )
             {
-                throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
+                if ( response.hasEntity() )
+                {
+                    throw new HTTPException( response.readEntity( String.class ) );
+                }
+                else
+                {
+                    throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
+                }
             }
-            else
+            else if ( response.hasEntity() )
             {
                 return response.readEntity( String.class );
             }
@@ -63,6 +70,8 @@ public class RestUtil
                 }
             }
         }
+
+        return null;
     }
 
 
@@ -84,9 +93,16 @@ public class RestUtil
             response = client.form( form );
             if ( response.getStatus() != RESPONSE_OK )
             {
-                throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
+                if ( response.hasEntity() )
+                {
+                    throw new HTTPException( response.readEntity( String.class ) );
+                }
+                else
+                {
+                    throw new HTTPException( String.format( "Http status code: %d", response.getStatus() ) );
+                }
             }
-            else
+            else if ( response.hasEntity() )
             {
                 return response.readEntity( String.class );
             }
@@ -114,5 +130,7 @@ public class RestUtil
                 }
             }
         }
+
+        return null;
     }
 }

@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
+import org.safehaus.subutai.core.registry.api.Template;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -146,6 +147,14 @@ public class TemplateRegistryImplTest
         //        TemplateRegistryImpl templateRegistry = new TemplateRegistryImpl( dbManager );
         templateRegistry.unregisterTemplate( templateName );
         verify( dbManager ).executeUpdate2( any( String.class ), anyVararg() );
+    }
+
+
+    @Test
+    public void shouldTestTemplateDifferenceFromParentOnPackagesDiff()
+    {
+        Template template = mock( Template.class );
+        templateRegistry.getPackagesDiff( template );
     }
 
 

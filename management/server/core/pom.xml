@@ -30,6 +30,7 @@
     <module>file-tracker</module>
     <module>git-manager</module>
     <module>lxc-manager</module>
+    <module>lxc-quota-manager</module>
     <module>monitoring</module>
     <module>network-manager</module>
     <module>peer-manager</module>

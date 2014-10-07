@@ -146,13 +146,27 @@ public class TemplateRegistryImpl implements TemplateRegistry
                 template.setProducts( getPackagesDiff( parentTemplate, template ) );
             }
 
-
             return template;
         }
         catch ( IOException | RuntimeException e )
         {
             LOG.error( "Error in parseTemplate", e );
             throw new RegistryException( String.format( "Error parsing template configuration %s", e ) );
+        }
+    }
+
+
+    @Override
+    public Set<String> getPackagesDiff( Template template )
+    {
+        if ( template.getParentTemplateName() == null )
+        {
+            return getPackagesDiff( null, template );
+        }
+        else
+        {
+            Template parentTemplate = getTemplate( template.getParentTemplateName() );
+            return getPackagesDiff( parentTemplate, template );
         }
     }
 
