@@ -1,9 +1,21 @@
 package org.safehaus.subutai.core.lxc.quota.impl;
 
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -11,20 +23,84 @@ import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
  */
 public class QuotaManagerImpl implements QuotaManager
 {
-    @Override
-    public void setQuota( final Container container, final QuotaEnum parameter, final String newValue )
+
+    private CommandRunner commandRunner;
+    private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
+
+
+    public QuotaManagerImpl( CommandRunner commandRunner )
     {
-        //TODO access class for executing linux command
-        // TODO then simply send
-        //TODO lxc-cgroup -n [container name] parameter.getKey() newValue
-        //to take changes effect
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        this.commandRunner = commandRunner;
     }
 
 
     @Override
-    public String getQuota( final Container container, final QuotaEnum parameter )
+    public void setQuota( final Container container, final QuotaEnum parameter, final String newValue,
+                          final Agent agent ) throws QuotaException
     {
-        //TODO the same thing about quotas, execute linux command and return result
-        return null;
+        Preconditions.checkNotNull( container, "Target container is null." );
+        Preconditions.checkNotNull( parameter, "Parameter is null." );
+        Preconditions.checkNotNull( newValue, "New value to set is null." );
+        Preconditions.checkNotNull( agent, "Host is null." );
+
+        String precomputedString =
+                String.format( "lxc-cgroup -n %s %s %s", container.getName(), parameter.getKey(), newValue );
+        Command command =
+                commandRunner.createCommand( new RequestBuilder( precomputedString ), Sets.newHashSet( agent ) );
+        runCommand( command, false, agent, parameter, container );
+    }
+
+
+    @Override
+    public String getQuota( final Container container, final QuotaEnum parameter, final Agent agent )
+            throws QuotaException
+    {
+        Preconditions.checkNotNull( container, "Target container is null." );
+        Preconditions.checkNotNull( parameter, "Parameter is null." );
+        Preconditions.checkNotNull( agent, "Host is null." );
+
+        String precomputedString = String.format( "lxc-cgroup -n %s %s", container.getName(), parameter.getKey() );
+        Command command =
+                commandRunner.createCommand( new RequestBuilder( precomputedString ), Sets.newHashSet( agent ) );
+        return runCommand( command, true, agent, parameter, container );
+    }
+
+
+    private String runCommand( Command command, boolean givesOutput, Agent host, QuotaEnum parameter,
+                               Container container ) throws QuotaException
+    {
+        try
+        {
+            command.execute();
+            if ( !command.hasSucceeded() )
+            {
+                if ( command.hasCompleted() )
+                {
+                    AgentResult agentResult = command.getResults().get( host.getUuid() );
+                    throw new QuotaException( String.format(
+                            "Error while performing [lxc-cgroup -n %1$s %2$s]: %3$s%n%4$s, exit code %5$s",
+                            container.getName(), parameter.getKey(), agentResult.getStdOut(), agentResult.getStdErr(),
+                            agentResult.getExitCode() ) );
+                }
+                else
+                {
+                    throw new QuotaException(
+                            String.format( "Error while performing [lxc-cgroup -n %1$s %2$s]: Command timed out",
+                                    container.getName(), parameter.getKey() ) );
+                }
+            }
+            else if ( givesOutput )
+            {
+                AgentResult agentResult = command.getResults().get( host.getUuid() );
+                LOGGER.info( agentResult.getStdOut() );
+                return agentResult.getStdOut();
+            }
+        }
+        catch ( CommandException e )
+        {
+            LOGGER.error( "Error executing lxc-cgroup command.", e.getMessage() );
+        }
+        return "";
     }
 }
