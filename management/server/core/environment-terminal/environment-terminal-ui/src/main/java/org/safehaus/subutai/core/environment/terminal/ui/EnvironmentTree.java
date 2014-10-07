@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -59,13 +58,13 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         {
             public void run()
             {
-                LOG.debug( "Refreshing containers state..." );
+                LOG.info( "Refreshing containers state..." );
                 if ( environment != null )
                 {
                     Set<EnvironmentContainer> containers = environmentManager.getConnectedContainers( environment );
                     refreshContainers( containers );
                 }
-                LOG.debug( "Refreshing done." );
+                LOG.info( "Refreshing done." );
             }
         }, 5, 60, TimeUnit.SECONDS );
         setSizeFull();
@@ -172,13 +171,13 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
             {
                 //TODO: remove next line when persistent API is JPA
                 ec.setEnvironment( environment );
-                UUID peerId = ec.getPeerId();
+                String peerId = ec.getPeerId().toString();
                 String itemId = peerId + ":" + ec.getAgentId();
 
                 Item peer = container.getItem( peerId );
                 if ( peer == null )
                 {
-                    peer = container.addItem( itemId );
+                    peer = container.addItem( peerId );
                     container.setChildrenAllowed( peerId, true );
                     tree.setItemCaption( itemId, peerId.toString() );
                     peer.getItemProperty( "value" ).setValue( null );
@@ -224,6 +223,10 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         for ( Object itemObj : container.getItemIds() )
         {
             String itemId = ( String ) itemObj;
+            if ( itemId.indexOf( ':' ) < 0 )
+            {
+                continue;    // peer
+            }
             if ( agentIdList.contains( itemId ) )
             {
                 Item item = container.getItem( itemId );
