@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * Service Locator allows to locate osgi services by interface and caches them locally
+ * Service Locator allows to locate OSGi services by interface and caches them locally
  */
 public class ServiceLocator
 {
@@ -45,6 +45,7 @@ public class ServiceLocator
     public static <T> T getServiceNoCache( Class<T> clazz ) throws NamingException
     {
         Preconditions.checkNotNull( clazz, "Class is null" );
+
         // get bundle instance via the OSGi Framework Util class
         BundleContext ctx = FrameworkUtil.getBundle( clazz ).getBundleContext();
         if ( ctx != null )
@@ -105,10 +106,10 @@ public class ServiceLocator
                 ServiceReference serviceReference = ctx.getServiceReference( clazz.getName() );
                 if ( serviceReference != null )
                 {
-                    cachedObj = clazz.cast( ctx.getService( serviceReference ) );
+                    cachedObj = ctx.getService( serviceReference );
+                    cache.put( serviceName, cachedObj );
                 }
             }
-            cache.put( serviceName, cachedObj );
         }
 
         return clazz.cast( cachedObj );

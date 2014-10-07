@@ -411,14 +411,14 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void saveResponse( Response response )
+    protected void saveResponse( Response response )
     {
         try
         {
             //save response to db
             dispatcherDAO.saveRemoteResponse( new RemoteResponse( response ) );
         }
-        catch ( DBException e )
+        catch ( NullPointerException | DBException e )
         {
             LOG.error( String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(), response ),
                     e );
