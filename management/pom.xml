@@ -307,7 +307,7 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- lxc-manager -->
+      <!-- lxc-quota-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-quota-manager-api</artifactId>
