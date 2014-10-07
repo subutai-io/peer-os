@@ -47,7 +47,8 @@
       <version>2.7.12</version>
       <classifier>features</classifier>
       <type>xml</type>
-      <scope>runtime</scope>
+      <scope>compile</scope>
+      <!--<scope>runtime</scope>-->
     </dependency>
   </dependencies>
 
@@ -629,6 +630,7 @@
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
             <feature>standard</feature>
+            <feature>region</feature>
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>jndi</feature>
