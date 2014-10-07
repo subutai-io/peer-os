@@ -69,6 +69,7 @@
             <Bundle-SymbolicName>${project.groupId}.common</Bundle-SymbolicName>
             <Export-Package>
               {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+              org.apache.http;org.apache.http.*
             </Export-Package>
           </instructions>
         </configuration>
