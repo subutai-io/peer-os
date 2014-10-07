@@ -5,14 +5,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.safehaus.subutai</groupId>
-    <artifactId>template-manager-parent</artifactId>
+    <artifactId>lxc-quota-manager-parent</artifactId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>template-manager-impl</artifactId>
+  <artifactId>lxc-quota-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Template Manager</name>
-  <description>Subutai Template Manager Impl</description>
+  <name>Subutai Lxc Quota Manager</name>
+  <description>Subutai Lxc Quota Manager Impl</description>
 
   <dependencies>
     <dependency>
@@ -21,23 +21,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>template-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>apt-repository-api</artifactId>
+      <artifactId>lxc-quota-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
@@ -47,11 +31,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>template-manager-impl</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -67,10 +46,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.template.impl</Bundle-SymbolicName>
-            <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
-            </Export-Package>
+            <Bundle-SymbolicName>${project.groupId}.core.lxc.quota.impl</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>
