@@ -7,6 +7,7 @@ package org.safehaus.subutai.core.registry.api;
 
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -22,6 +23,12 @@ public interface TemplateRegistry
      * @param packagesFile - template packages manifest file contents
      */
     public boolean registerTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException;
+
+
+    /**
+     * Returns packages difference for current template with its parent template.
+     */
+    public Set<String> getPackagesDiff( Template template );
 
     /**
      * Removes template entry from registry

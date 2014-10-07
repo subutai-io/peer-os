@@ -65,8 +65,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      */
     @Override
     public synchronized boolean registerTemplate( final String configFile, final String packagesFile,
-                                                  final String md5sum )
-            throws RegistryException
+                                                  final String md5sum ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
@@ -147,13 +146,27 @@ public class TemplateRegistryImpl implements TemplateRegistry
                 template.setProducts( getPackagesDiff( parentTemplate, template ) );
             }
 
-
             return template;
         }
         catch ( IOException | RuntimeException e )
         {
             LOG.error( "Error in parseTemplate", e );
             throw new RegistryException( String.format( "Error parsing template configuration %s", e ) );
+        }
+    }
+
+
+    @Override
+    public Set<String> getPackagesDiff( Template template )
+    {
+        if ( template.getParentTemplateName() == null )
+        {
+            return getPackagesDiff( null, template );
+        }
+        else
+        {
+            Template parentTemplate = getTemplate( template.getParentTemplateName() );
+            return getPackagesDiff( parentTemplate, template );
         }
     }
 
@@ -506,7 +519,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      */
     @Override
     public synchronized boolean updateTemplateUsage( final String faiHostname, final String templateName,
-                                                  final boolean inUse ) throws RegistryException
+                                                     final boolean inUse ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( faiHostname ), "FAI hostname is null or empty" );
