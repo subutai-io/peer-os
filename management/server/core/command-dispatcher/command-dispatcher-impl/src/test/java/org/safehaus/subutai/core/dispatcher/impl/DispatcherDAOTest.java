@@ -135,9 +135,9 @@ public class DispatcherDAOTest
     @Test
     public void testDeleteRemoteResponse() throws Exception
     {
+        RemoteResponse remoteResponse = new RemoteResponse( RESPONSE );
 
-
-        dispatcherDAO.deleteRemoteResponses( COMMAND_ID );
+        dispatcherDAO.deleteRemoteResponse( remoteResponse );
 
 
         verify( dbManager ).executeUpdate2( anyString(), anyVararg() );
