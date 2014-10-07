@@ -50,14 +50,14 @@
       <scope>compile</scope>
       <!--<scope>runtime</scope>-->
     </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-features</artifactId>
       <version>3.1.0</version>
       <scope>runtime</scope>
       <type>xml</type>
       <classifier>features</classifier>
-    </dependency>-->
+    </dependency>
 
   </dependencies>
 
@@ -496,11 +496,21 @@
                   <artifactId>javax.servlet-api</artifactId>
                   <version>3.1.0</version>
                 </artifactItem>
-                <!--<artifactItem>
-                  <groupId>net.oauth</groupId>
-                  <artifactId>oauth-parent</artifactId>
-                  <version>20090531</version>
-                </artifactItem>-->
+                <artifactItem>
+                  <groupId>org.eclipse.jetty</groupId>
+                  <artifactId>jetty-continuation</artifactId>
+                  <version>8.1.10.v20130312</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.geronimo.specs</groupId>
+                  <artifactId>geronimo-jms_1.1_spec</artifactId>
+                  <version>1.1.1</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>javax.transaction</groupId>
+                  <artifactId>jta</artifactId>
+                  <version>1.1</version>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
@@ -649,8 +659,8 @@
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
             <feature>standard</feature>
-            <!--<feature>jetty</feature>-->
-            <!--<feature>http</feature>-->
+            <feature>jetty</feature>
+            <feature>http</feature>
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>jndi</feature>
