@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,7 @@ import com.vaadin.ui.UI;
 /**
  * Container tree
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 
 public final class EnvironmentTree extends ConcurrentComponent implements Disposable
 {
@@ -58,15 +59,15 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         {
             public void run()
             {
-                LOG.info( "Refreshing containers state..." );
+                LOG.debug( "Refreshing containers state..." );
                 if ( environment != null )
                 {
                     Set<EnvironmentContainer> containers = environmentManager.getConnectedContainers( environment );
                     refreshContainers( containers );
                 }
-                LOG.info( "Refreshing done." );
+                LOG.debug( "Refreshing done." );
             }
-        }, 5, 30, TimeUnit.SECONDS );
+        }, 5, 60, TimeUnit.SECONDS );
         setSizeFull();
         setMargin( true );
 
@@ -160,14 +161,31 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         tree.removeAllItems();
         if ( environment != null )
         {
+            Set<String> peers = new HashSet<>();
+
+            for ( EnvironmentContainer ec : environment.getContainers() )
+            {
+                peers.add( ec.getPeerId().toString() );
+            }
+
             for ( EnvironmentContainer ec : environment.getContainers() )
             {
                 //TODO: remove next line when persistent API is JPA
                 ec.setEnvironment( environment );
-                String itemId = ec.getPeerId() + ":" + ec.getAgentId();
-                Item item = container.addItem( itemId );
-                container.setChildrenAllowed( itemId, false );
+                UUID peerId = ec.getPeerId();
+                String itemId = peerId + ":" + ec.getAgentId();
 
+                Item peer = container.getItem( peerId );
+                if ( peer == null )
+                {
+                    peer = container.addItem( itemId );
+                    container.setChildrenAllowed( peerId, true );
+                    tree.setItemCaption( itemId, peerId.toString() );
+                    peer.getItemProperty( "value" ).setValue( null );
+                }
+                Item item = container.addItem( itemId );
+                container.setParent( itemId, peerId );
+                container.setChildrenAllowed( itemId, false );
                 tree.setItemCaption( itemId, ec.getHostname() );
                 item.getItemProperty( "value" ).setValue( ec );
             }
