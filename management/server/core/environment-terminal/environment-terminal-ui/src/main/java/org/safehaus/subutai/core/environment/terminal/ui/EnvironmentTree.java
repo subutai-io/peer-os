@@ -36,7 +36,7 @@ import com.vaadin.ui.UI;
 /**
  * Container tree
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 
 public final class EnvironmentTree extends ConcurrentComponent implements Disposable
 {
@@ -66,7 +66,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 }
                 LOG.info( "Refreshing done." );
             }
-        }, 5, 30, TimeUnit.SECONDS );
+        }, 5, 60, TimeUnit.SECONDS );
         setSizeFull();
         setMargin( true );
 
@@ -160,14 +160,31 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         tree.removeAllItems();
         if ( environment != null )
         {
+            Set<String> peers = new HashSet<>();
+
+            for ( EnvironmentContainer ec : environment.getContainers() )
+            {
+                peers.add( ec.getPeerId().toString() );
+            }
+
             for ( EnvironmentContainer ec : environment.getContainers() )
             {
                 //TODO: remove next line when persistent API is JPA
                 ec.setEnvironment( environment );
-                String itemId = ec.getPeerId() + ":" + ec.getAgentId();
-                Item item = container.addItem( itemId );
-                container.setChildrenAllowed( itemId, false );
+                String peerId = ec.getPeerId().toString();
+                String itemId = peerId + ":" + ec.getAgentId();
 
+                Item peer = container.getItem( peerId );
+                if ( peer == null )
+                {
+                    peer = container.addItem( peerId );
+                    container.setChildrenAllowed( peerId, true );
+                    tree.setItemCaption( itemId, peerId.toString() );
+                    peer.getItemProperty( "value" ).setValue( null );
+                }
+                Item item = container.addItem( itemId );
+                container.setParent( itemId, peerId );
+                container.setChildrenAllowed( itemId, false );
                 tree.setItemCaption( itemId, ec.getHostname() );
                 item.getItemProperty( "value" ).setValue( ec );
             }
@@ -206,6 +223,10 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         for ( Object itemObj : container.getItemIds() )
         {
             String itemId = ( String ) itemObj;
+            if ( itemId.indexOf( ':' ) < 0 )
+            {
+                continue;    // peer
+            }
             if ( agentIdList.contains( itemId ) )
             {
                 Item item = container.getItem( itemId );
