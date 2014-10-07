@@ -4,8 +4,12 @@ package org.safehaus.subutai.core.lxc.quota.api;
 /**
  * Created by talas on 10/7/14.
  */
+
 public enum QuotaEnum
 {
+    /**
+     * Controls and reports block I/O operations.
+     */
     BLKIO_IO_MERGED( "blkio.io_merged" ),
     BLKIO_IO_QUEUED( "blkio.io_queued" ),
     BLKIO_IO_SERVICE_BYTES( "blkio.io_service_bytes" ),
@@ -24,10 +28,23 @@ public enum QuotaEnum
     BLKIO_WEIGHT( "blkio.weight" ),
     BLKIO_WEIGHT_DEVICE( "blkio.weight_device" ),
 
+    /**
+     * Controls access to CPU resources.
+     */
     CPU_RT_PERIOD_US( "cpu.rt_period_us" ),
     CPU_RT_RUNTIME_US( "cpu.rt_runtime.us" ),
     CPU_SHARES( "cpu.shares" ),
 
+    /**
+     * Reports usage of CPU resources.
+     */
+    CPUACCT_STAT( "cpuacct.stat" ),
+    CPUACCT_USAGE( "cpuacct.usage" ),
+    CPUACCT_USAGE_PERCPU( "cpuacct.usage_percpu" ),
+
+    /**
+     * Controls access to CPU cores and memory nodes.
+     */
     CPUSET_CPU_EXCLUSIVE( "cpuset.cpu_exclusive" ),
     CPUSET_CPUS( "cpuset.cpus" ),
     CPUSET_MEM_EXCLUSIVE( "cpuset.mem_exclusive" ),
@@ -41,12 +58,21 @@ public enum QuotaEnum
     CPUSET_SCHED_LOAD_BALANCE( "cpuset.sched_load_balance" ),
     CPUSET_SCHED_RELAX_DOMAIN_LEVEL( "cpuset.sched_relax_domain_level" ),
 
+    /**
+     * Controls access to system devices.
+     */
     DEVICES_ALLOW( "devices.allow" ),
     DEVICES_DENY( "devices.deny" ),
     DEVICES_LIST( "devices.list" ),
 
+    /**
+     * Suspends or resumes cgroup tasks.
+     */
     FREEZER_STATE( "freezer.state" ),
 
+    /**
+     * Controls access to memory resources, and reports on memory usage.
+     */
     MEMORY_FAILCNT( "memory.failcnt" ),
     MEMORY_FORCE_EMPTY( "memory.force_empty" ),
     MEMORY_LIMIT_IN_BYTES( "memory.limit_in_bytes" ),
@@ -63,6 +89,10 @@ public enum QuotaEnum
     MEMORY_SWAPPINESS( "memory.swappiness" ),
     MEMORY_USAGE_IN_BYTES( "memory.usage_in_bytes" ),
     MEMORY_USE_HIERARCHY( "memory.use_hierarchy" ),
+
+    /**
+     * Tags network packets for use by network traffic control.
+     */
     NET_CLS_CLASSID( "net_cls.classid" );
 
     private String key;

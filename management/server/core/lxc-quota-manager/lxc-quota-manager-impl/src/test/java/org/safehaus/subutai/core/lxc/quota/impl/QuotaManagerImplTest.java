@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -30,14 +29,12 @@ public class QuotaManagerImplTest
     QuotaManagerImpl quotaManager;
     CommandRunner commandRunner;
     String expectedValue = "200000000";
-    Container container;
     Agent agent;
 
     @Before
     public void setupClasses()
     {
         commandRunner = mock( CommandRunner.class );
-        container = mock( Container.class );
         agent = mock( Agent.class );
         AgentResult agentResult = mock( AgentResult.class );
         Command command = mock( Command.class );
@@ -61,8 +58,8 @@ public class QuotaManagerImplTest
     @Test
     public void testSetQuota() throws Exception
     {
-        quotaManager.setQuota( container, parameter, expectedValue, agent );
-        String value = quotaManager.getQuota( container, parameter, agent );
+        quotaManager.setQuota( "containerName", parameter, expectedValue, agent );
+        String value = quotaManager.getQuota( "containerName", parameter, agent );
         assertEquals( expectedValue, value );
     }
 
@@ -70,8 +67,8 @@ public class QuotaManagerImplTest
     @Test
     public void testGetQuota() throws Exception
     {
-        String value = quotaManager.getQuota( container, parameter, agent );
-        quotaManager.setQuota( container, parameter, "23423412342", agent );
+        String value = quotaManager.getQuota( "containerName", parameter, agent );
+        quotaManager.setQuota( "containerName", parameter, "23423412342", agent );
         assertNotEquals( value, "23423412342" );
     }
 }

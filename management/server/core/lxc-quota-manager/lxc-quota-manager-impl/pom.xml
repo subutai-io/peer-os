@@ -11,7 +11,7 @@
 
   <artifactId>lxc-quota-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Lxc Quota Manager</name>
+  <name>Subutai Lxc Quota Manager Impl</name>
   <description>Subutai Lxc Quota Manager Impl</description>
 
   <dependencies>
