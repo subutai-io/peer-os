@@ -145,11 +145,13 @@ public class SendButtonListener implements Button.ClickListener
                 LOG.error( "Error in ExecuteCommandTask", e );
                 form.show( e.getMessage() );
             }
-
-            form.taskCount.decrementAndGet();
-            if ( form.taskCount.get() == 0 )
+            finally
             {
-                form.indicator.setVisible( false );
+                form.taskCount.decrementAndGet();
+                if ( form.taskCount.get() == 0 )
+                {
+                    form.indicator.setVisible( false );
+                }
             }
         }
 
