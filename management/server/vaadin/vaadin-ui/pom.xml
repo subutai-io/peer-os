@@ -74,6 +74,14 @@
             <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
             <Import-Package>*;resolution:=optional</Import-Package>
             <Export-Package>
+              com.vaadin.ui.*;
+              com.vaadin.data.*;
+              com.vaadin.server.*;
+              com.vaadin.event.*;
+              com.vaadin.client.*;
+              com.vaadin.shared.*;
+              com.google.gwt.*;
+              org.json.*;
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
 
@@ -174,32 +182,26 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client-compiled</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-shared</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-shared-deps</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
