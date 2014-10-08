@@ -650,6 +650,7 @@
             <feature>framework</feature>
             <feature>jms</feature>
             <feature>cxf-core</feature>
+            <feature>cxf-jaxws</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -677,6 +678,7 @@
                 <feature>framework</feature>
                 <feature>jms</feature>
                 <feature>cxf-core</feature>
+                <feature>cxf-jaxws</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
