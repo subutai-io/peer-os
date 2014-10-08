@@ -663,7 +663,7 @@
             <feature>jms</feature>
             <feature>cxf</feature>
 
-            <feature>subutai-common</feature>
+            <feature>mgmt-features</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -694,7 +694,7 @@
                 <feature>jms</feature>
                 <feature>cxf</feature>
 
-                <feature>subutai-common</feature>
+                <feature>mgmt-features</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
