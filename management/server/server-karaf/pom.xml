@@ -98,14 +98,14 @@
               <descriptors>
                 <descriptor>mvn:org.apache.karaf.features/framework/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/3.0.1/xml/features</descriptor>
-                <descriptor>mvn:org.safehaus.subutai/subutai-mgmt/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.safehaus.subutai/subutai-application/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>standard</feature>
                 <feature>war</feature>
                 <feature>ssh</feature>
 
-                <feature>subutai-mgmt</feature>
+                <feature>subutai-application</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
