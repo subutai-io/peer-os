@@ -14,6 +14,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeType;
+import org.safehaus.subutai.plugin.common.ui.BaseManager;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -31,32 +32,7 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 
 
-public class Manager {
-
-    protected final static String CHECK_ALL_BUTTON_CAPTION = "Check All";
-    protected final static String START_ALL_BUTTON_CAPTION = "Start All";
-    protected final static String STOP_ALL_BUTTON_CAPTION = "Stop All";
-    protected final static String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
-    protected final static String ADD_NODE_BUTTON_CAPTION = "Add Node";
-    protected final static String CHECK_BUTTON_CAPTION = "Check";
-    protected final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
-    protected final static String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
-    protected final static String STOP_NAMENODE_BUTTON_CAPTION = "Stop Namenode";
-    protected final static  String STOP_JOBTRACKER_BUTTON_CAPTION = "Stop JobTracker";
-    protected final static String EXCLUDE_BUTTON_CAPTION = "Exclude";
-    protected final static String INCLUDE_BUTTON_CAPTION = "Include";
-    protected final static String DESTROY_BUTTON_CAPTION = "Destroy";
-    protected final static String URL_BUTTON_CAPTION = "URL";
-
-
-    protected final static String HOST_COLUMN_CAPTION = "Host";
-    protected final static String IP_COLUMN_CAPTION = "IP List";
-    protected final static String NODE_ROLE_COLUMN_CAPTION = "Node Role";
-    protected final static String STATUS_COLUMN_CAPTION = "Status";
-    protected final static String AVAILABLE_OPERATIONS_COLUMN_CAPTION = "AVAILABLE_OPERATIONS";
-    protected final static String DECOMMISSION_STATUS_CAPTION = "Decommission Status: ";
-    protected final static String START_STOP_BUTTON_DEFAULT_CAPTION = "Start/Stop";
-    protected final static  String EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION = "Exclude/Include";
+public class Manager extends BaseManager {
 
     private final GridLayout contentRoot;
     private final ComboBox clusterList;
@@ -758,5 +734,12 @@ public class Manager {
 
     public void setDecommissionStatus( String decommissionStatus ) {
         this.decommissionStatus = decommissionStatus;
+    }
+
+
+    @Override
+    public void refreshClustersInfo()
+    {
+        managerListener.refreshClusterList();
     }
 }

@@ -174,7 +174,7 @@ public class Manager extends BaseManager
         {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
+            Button checkBtn = ( Button ) ( row.getItemProperty( CHECK_BUTTON_CAPTION ).getValue() );
             checkBtn.click();
         }
     }
