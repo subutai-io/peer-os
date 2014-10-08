@@ -53,18 +53,21 @@ function master_create {
     echo "$SUBUTAI_APT_MIRROR security.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
   fi
   
+  lxc_wait_net master
+  local subutai_repo_file="/var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list"
+  echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
+      >> $subutai_repo_file
+  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" \
+      >> $subutai_repo_file
+
   # Configuration for apt-proxy
   if [ -n "$SUBUTAI_APT_PROXY" ]; then
     echo "deb $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       > /etc/apt/sources.list.d/subutai-repo.list
+       >> $subutai_repo_file
     echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       >> /etc/apt/sources.list.d/subutai-repo.list
+       >> $subutai_repo_file
   fi
-  lxc_wait_net master
-  echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
-      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list
-  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" \
-      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list 
+  
   lxc-attach -n master -- apt-get update
   lxc-attach -n master -- apt-get -y dist-upgrade
 
