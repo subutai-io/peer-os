@@ -38,6 +38,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -61,6 +62,7 @@ public class PeerManagerImpl implements PeerManager
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
+    private static final String PEER_GROUP = "PEER_GROUP";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
     private DbManager dbManager;
     private AgentManager agentManager;
@@ -585,6 +587,39 @@ public class PeerManagerImpl implements PeerManager
         peerCommandMessage.setProccessed( true );
 
         LOG.debug( String.format( "After =================[%s]", peerCommandMessage ) );
+    }
+
+
+    @Override
+    public List<PeerGroup> peersGroups()
+    {
+        List<PeerGroup> peerGroups = peerDAO.getInfo( PEER_GROUP, PeerGroup.class );
+        /*Set<PeerGroup> peerGroups = new HashSet<>();
+        for ( int i = 0; i < 10; i++ )
+        {
+            PeerGroup peerGroup = new PeerGroup();
+            peerGroup.setName( "Group " + i );
+            for ( int j = 0; j < 10; j++ )
+            {
+                peerGroup.addPeerUUID( UUID.randomUUID() );
+            }
+            peerGroups.add( peerGroup );
+        }*/
+        return peerGroups;
+    }
+
+
+    @Override
+    public void deletePeerGroup( final PeerGroup group )
+    {
+        peerDAO.deleteInfo( PEER_GROUP, group.getUUID().toString() );
+    }
+
+
+    @Override
+    public boolean savePeerGroup( final PeerGroup group )
+    {
+        return peerDAO.saveInfo( PEER_GROUP, group.getUuid().toString(), group );
     }
 
 

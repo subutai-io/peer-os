@@ -112,7 +112,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
     {
         if ( response == null || response.getType() != ResponseType.INOTIFY_ACTION_RESPONSE )
         {
-            System.out.println( "Listener is null." );
+            //System.out.println( "Listener is null." );
             return;
         }
 
