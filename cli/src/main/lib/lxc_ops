@@ -77,7 +77,12 @@ function lxc_assert_no {
   if [ $? == 0 ]; then
     msg_error "Container \"$lxc\" exists. Aborting ..."
     unlock_container_read $lxc
-    show_usage "$usage"
+    if [ $lxc == "master" ]; then
+      unlock_subutai_system
+    fi
+    if [ -n $usage  ]; then
+      show_usage "$usage"
+    fi
   else
     msg_info "    - check passed: container \"$lxc\" does NOT exist."
   fi

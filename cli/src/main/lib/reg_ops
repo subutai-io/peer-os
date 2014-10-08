@@ -8,9 +8,9 @@ function is_registered {
  
   local template=$1
   local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
-
-  if [ "$TEST_MODE" == "true" ]; then
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
     echo true
+    return
   fi
 
   resp=`curl -s -XGET $url`
@@ -28,10 +28,10 @@ function has_child_templates_registered {
   local template=$1
   local url=`build_rest_url "registry/templates/$template/children"`
 
-  if [ "$TEST_MODE" == "true" ]; then
-    echo "false"
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    echo false
+    return
   fi
-
   response=`curl -s -XGET $url`
   # response should contain quoted template name
   if [[ -n "$response" && "$response" == *\"*\"* ]]; then
@@ -56,15 +56,15 @@ function notify_template_destroy {
 
 function set_template_in_use {
 
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    return
+  fi
+
   local template=$1
   local in_use=$2
   local hostname=`hostname`
   local url=`build_rest_url "registry/templates/$template/fai/$hostname/is-used/$in_use"`
 
-  if [ "$TEST_MODE" == "true" ]; then
-    return
-  fi
-  
   response=$(curl --write-out %{http_code} -s --output /dev/null -XPUT $url)
   message="    - send $in_use for usage of template $template on host $hostname"
   if [ $response == "200"  ]; then
@@ -79,10 +79,10 @@ function is_template_in_use {
   template=$1
   local url=`build_rest_url "registry/templates/$template/is-used-on-fai"`
 
-  if [ "$TEST_MODE" == "true" ]; then
-    echo "false"
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    echo false
+    return
   fi
-
   response=`curl -s -XGET $url`
   # response should contain quoted template name
   if [[ -n "$response" && "$response" == *true* ]]; then
@@ -100,8 +100,9 @@ function are_md5sums_equal {
   local template=$1
   local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
 
-  if [ "$TEST_MODE" == "true" ]; then
-    echo "true"
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    echo true
+    return
   fi
 
   if [ "`is_registered $template`" == "false" ]; then
@@ -146,8 +147,8 @@ function send_n_register {
   local config_dir=$2
   local url=`build_rest_url $SUBUTAI_REST_REGISTER_PATH`
 
-  if [ "$TEST_MODE" == "true" ]; then
-    msg_info "${FUNCNAME[0]} called in TEST mode"
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    msg_info "${FUNCNAME[0]} called in TEST/OFFLINE mode"
     return
   fi
 
@@ -161,10 +162,10 @@ function delete_n_unregister {
   template=$1
   local url="`build_rest_url $SUBUTAI_REST_REGISTER_PATH`/$template"
 
-  if [ "$TEST_MODE" == "true" ]; then
-    msg_info "${FUNCNAME[0]} called in TEST mode"
+  if [ "$TEST_MODE" == "true" ] || [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    msg_info "${FUNCNAME[0]} called in TEST/OFFLINE mode"
     return
-  fi
+  fi 
   
   response=$(curl --write-out %{http_code} -s --output /dev/null -XDELETE $url)
   message="Unregister template $template from site registry"

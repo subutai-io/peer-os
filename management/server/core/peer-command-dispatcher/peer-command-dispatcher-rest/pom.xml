@@ -10,8 +10,8 @@
   </parent>
 
   <artifactId>peer-command-dispatcher-rest</artifactId>
-  <name>Subutai Peer Manager REST</name>
-  <description>Subutai Peer Manager REST</description>
+  <name>Subutai Peer Command Dispatcher REST</name>
+  <description>Subutai Peer Command Dispatcher REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>
