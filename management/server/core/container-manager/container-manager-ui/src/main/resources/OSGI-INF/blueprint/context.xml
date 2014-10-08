@@ -12,6 +12,9 @@
   <reference id="containerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.container.api.ContainerManager" />
 
+  <reference id="quotaManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.lxc.quota.api.QuotaManager" />
+
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.container.ui.ContainerManagerPortalModule"
         init-method="init" destroy-method="destroy">
   </bean>
