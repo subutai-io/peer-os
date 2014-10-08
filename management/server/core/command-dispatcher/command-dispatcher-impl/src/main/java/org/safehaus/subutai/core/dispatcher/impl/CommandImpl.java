@@ -31,6 +31,10 @@ public class CommandImpl extends AbstractCommand
 {
 
     private final Map<UUID, Set<BatchRequest>> remoteRequests = new HashMap<>();
+    private static final String COMMAND_RUNNER_IS_NULL_MSG = "Command runner is null";
+    private static final String PEER_MANAGER_IS_NULL_MSG = "Peer manager is null";
+    private static final String REQUEST_BUILDERS_R_NULL_MSG = "Request Builders are null or empty";
+    private static final String REQUEST_BUILDER_IS_NULL_MSG = "Request Builder is null";
 
 
     /**
@@ -44,10 +48,10 @@ public class CommandImpl extends AbstractCommand
                         CommandRunnerBase commandRunner )
     {
         super( commandRunner );
-        Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
+        Preconditions.checkNotNull( requestBuilder, REQUEST_BUILDER_IS_NULL_MSG );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ), "Containers are null or empty" );
-        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( commandRunner, "Command runner is null" );
+        Preconditions.checkNotNull( peerManager, PEER_MANAGER_IS_NULL_MSG );
+        Preconditions.checkNotNull( commandRunner, COMMAND_RUNNER_IS_NULL_MSG );
         this.commandUUID = UUIDUtil.generateTimeBasedUUID();
         this.requestsCount = containers.size();
         this.timeout = requestBuilder.getTimeout();
@@ -101,10 +105,10 @@ public class CommandImpl extends AbstractCommand
                         CommandRunnerBase commandRunner )
     {
         super( commandRunner );
-        Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
+        Preconditions.checkNotNull( requestBuilder, REQUEST_BUILDER_IS_NULL_MSG );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
-        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( commandRunner, "Command runner is null" );
+        Preconditions.checkNotNull( peerManager, PEER_MANAGER_IS_NULL_MSG );
+        Preconditions.checkNotNull( commandRunner, COMMAND_RUNNER_IS_NULL_MSG );
 
         this.description = description;
         this.commandUUID = UUIDUtil.generateTimeBasedUUID();
@@ -158,7 +162,7 @@ public class CommandImpl extends AbstractCommand
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( batchRequests ),
                 "Batch Requests are null or empty" );
-        Preconditions.checkNotNull( commandRunner, "Command runner is null" );
+        Preconditions.checkNotNull( commandRunner, COMMAND_RUNNER_IS_NULL_MSG );
 
         Set<Request> requests = new HashSet<>();
         for ( BatchRequest batchRequest : batchRequests )
@@ -190,7 +194,7 @@ public class CommandImpl extends AbstractCommand
     {
         super( commandRunner );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are null or empty" );
-        Preconditions.checkNotNull( commandRunner, "Command runner is null" );
+        Preconditions.checkNotNull( commandRunner, COMMAND_RUNNER_IS_NULL_MSG );
 
         this.requestsCount = requests.size();
         int timeout = 0;
@@ -219,10 +223,10 @@ public class CommandImpl extends AbstractCommand
                         CommandRunnerBase commandRunner )
     {
         super( commandRunner );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
-                "Request Builders are null or empty" );
-        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( commandRunner, "Command runner is null" );
+        Preconditions
+                .checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ), REQUEST_BUILDERS_R_NULL_MSG );
+        Preconditions.checkNotNull( peerManager, PEER_MANAGER_IS_NULL_MSG );
+        Preconditions.checkNotNull( commandRunner, COMMAND_RUNNER_IS_NULL_MSG );
 
         this.description = description;
         this.commandUUID = UUIDUtil.generateTimeBasedUUID();
@@ -278,10 +282,10 @@ public class CommandImpl extends AbstractCommand
                         CommandRunnerBase commandRunner )
     {
         super( commandRunner );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
-                "Request Builders are null or empty" );
-        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
-        Preconditions.checkNotNull( commandRunner, "Command runner is null" );
+        Preconditions
+                .checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ), REQUEST_BUILDERS_R_NULL_MSG );
+        Preconditions.checkNotNull( peerManager, PEER_MANAGER_IS_NULL_MSG );
+        Preconditions.checkNotNull( commandRunner, COMMAND_RUNNER_IS_NULL_MSG );
 
         this.commandUUID = UUIDUtil.generateTimeBasedUUID();
         this.requestsCount = requestBuilders.size();
