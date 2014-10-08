@@ -670,7 +670,7 @@
                 <!--<feature>jms</feature>-->
                 <!--<feature>cxf</feature>-->
               </features>
-              <repository>${assembly.directory}/system/subutai/</repository>
+              <repository>${assembly.directory}/system</repository>
             </configuration>
           </execution>
         </executions>
