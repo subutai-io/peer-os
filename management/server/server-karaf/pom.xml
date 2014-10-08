@@ -35,7 +35,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mgmt-features</artifactId>
+      <artifactId>subutai-application</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
