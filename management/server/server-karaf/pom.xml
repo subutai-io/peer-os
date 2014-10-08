@@ -664,10 +664,14 @@
               </descriptors>
               <features>
                 <feature>standard</feature>
+                <feature>obr</feature>
                 <feature>wrapper</feature>
                 <feature>war</feature>
+                <feature>kar</feature>
                 <feature>ssh</feature>
-                <!--<feature>jms</feature>-->
+                <feature>management</feature>
+                <feature>framework</feature>
+                <feature>jms</feature>
                 <!--<feature>cxf</feature>-->
               </features>
               <repository>${assembly.directory}/system</repository>
