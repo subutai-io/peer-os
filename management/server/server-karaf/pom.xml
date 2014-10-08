@@ -84,7 +84,7 @@
             <feature>war</feature>
             <feature>ssh</feature>
 
-            <feature>subutai-features</feature>
+            <feature>subutai-application</feature>
           </bootFeatures>
         </configuration>
         <executions>
