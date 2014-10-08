@@ -60,6 +60,12 @@ public class ResponseSender
     }
 
 
+    protected ExecutorService getHttpRequestsExecutor()
+    {
+        return httpRequestsExecutor;
+    }
+
+
     public void init()
     {
         mainLoopExecutor.scheduleWithFixedDelay( new Runnable()
