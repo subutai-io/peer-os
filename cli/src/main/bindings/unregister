@@ -22,6 +22,11 @@ function unregister_usage {
 # (2) Unregister the template
 
 function unregister {
+  if [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then
+    msg_error "Unregister cannot be used in SUBUTAI_OFFLINE_MODE! Aborting..."
+    exit 1
+  fi
+
   if [ "`is_system_locked`" == "true" ]
   then
      msg_error "System locked by a subutai process"
@@ -42,7 +47,7 @@ function unregister {
   lxc_assert_no $template
   zfs_assert_nods lxc/$template
 
-  if [ "`are_containers_locked_write $template`" == "true" ]
+  if [ "`are_containers_readable $template`" == "true" ]
   then
     msg_error "Template $template is being used by a subutai process"
     exit 1
