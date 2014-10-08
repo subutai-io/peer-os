@@ -74,14 +74,6 @@
             <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
             <Import-Package>*;resolution:=optional</Import-Package>
             <Export-Package>
-              com.vaadin.ui.*;
-              com.vaadin.data.*;
-              com.vaadin.server.*;
-              com.vaadin.event.*;
-              com.vaadin.client.*;
-              com.vaadin.shared.*;
-              com.google.gwt.*;
-              org.json.*;
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
 
@@ -166,17 +158,14 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-api</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
-      <scope>provided</scope>
     </dependency>
     <!-- Vaadin dependencies -->
     <dependency>
@@ -206,17 +195,14 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
