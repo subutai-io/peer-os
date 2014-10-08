@@ -150,7 +150,7 @@ public class PeerDAO
         }
         catch ( DBException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.error( e.getMessage(), e );
         }
 
         return false;

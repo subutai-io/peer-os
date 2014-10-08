@@ -24,8 +24,8 @@ public class BlueprintDetails extends Window
         setModal( true );
         setClosable( true );
         setVisible( false );
-        setWidth( 900, UNITS_PIXELS );
-        setHeight( 500, UNITS_PIXELS );
+        setWidth( "600px" );
+        setHeight( "400px" );
     }
 
 
