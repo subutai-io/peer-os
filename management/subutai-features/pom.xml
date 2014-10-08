@@ -10,8 +10,8 @@
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>mgmt-features</artifactId>
-  <name>Subutai Server Features</name>
+  <artifactId>subutai-mgmt</artifactId>
+  <name>Subutai Management System</name>
   <packaging>feature</packaging>
 
   <dependencies>
