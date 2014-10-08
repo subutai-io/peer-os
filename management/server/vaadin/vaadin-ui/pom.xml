@@ -187,10 +187,10 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-shared</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>com.vaadin</groupId>-->
-      <!--<artifactId>vaadin-shared-deps</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared-deps</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
