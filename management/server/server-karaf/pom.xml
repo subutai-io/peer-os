@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.apache.cxf.karaf</groupId>
       <artifactId>apache-cxf</artifactId>
-      <version>3.0.1</version>
+      <version>2.7.12</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -673,7 +673,7 @@
                 <descriptor>mvn:org.apache.karaf.features/standard/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/spring/3.0.1/xml/features</descriptor>
-                <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/3.0.1/xml/features</descriptor>
+                <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/2.7.12/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>standard</feature>
