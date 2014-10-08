@@ -42,6 +42,14 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>spring</artifactId>
+      <version>${karaf.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.cxf.karaf</groupId>
       <artifactId>apache-cxf</artifactId>
       <version>3.0.1</version>
@@ -525,12 +533,12 @@
                   <artifactId>commons-codec</artifactId>
                 </artifactItem>
                 <!--<artifactItem>-->
-                  <!--<groupId>org.apache.geronimo.specs</groupId>-->
-                  <!--<artifactId>geronimo-jta_1.1_spec</artifactId>-->
+                <!--<groupId>org.apache.geronimo.specs</groupId>-->
+                <!--<artifactId>geronimo-jta_1.1_spec</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
-                  <!--<groupId>org.apache.servicemix.specs</groupId>-->
-                  <!--<artifactId>org.apache.servicemix.specs.activation-api-1.1</artifactId>-->
+                <!--<groupId>org.apache.servicemix.specs</groupId>-->
+                <!--<artifactId>org.apache.servicemix.specs.activation-api-1.1</artifactId>-->
                 <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -649,7 +657,7 @@
             <feature>management</feature>
             <feature>framework</feature>
             <feature>jms</feature>
-            <feature>cxf-jaxrs</feature>
+            <feature>cxf</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -664,6 +672,7 @@
                 <descriptor>mvn:org.apache.karaf.features/framework/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/spring/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/3.0.1/xml/features</descriptor>
               </descriptors>
               <features>
@@ -676,7 +685,7 @@
                 <feature>management</feature>
                 <feature>framework</feature>
                 <feature>jms</feature>
-                <feature>cxf-jaxrs</feature>
+                <feature>cxf</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
