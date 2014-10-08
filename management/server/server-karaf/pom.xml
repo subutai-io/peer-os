@@ -83,6 +83,7 @@
             <feature>standard</feature>
             <feature>war</feature>
             <feature>ssh</feature>
+            <feature>webconsole</feature>
 
             <feature>subutai-application</feature>
           </bootFeatures>
@@ -104,6 +105,7 @@
                 <feature>standard</feature>
                 <feature>war</feature>
                 <feature>ssh</feature>
+                <feature>webconsole</feature>
 
                 <feature>subutai-application</feature>
               </features>
