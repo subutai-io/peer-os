@@ -50,7 +50,7 @@ function destroy {
 
   local clone="$1"
 
-  if [ "`are_containers_locked_read $clone`" == "true" ]
+  if [ "`are_containers_writable $clone`" == "true" ]
   then
      msg_error "Container locked by a subutai process"
      exit 1
