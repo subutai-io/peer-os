@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.ui.executor;
+package org.safehaus.subutai.core.environment.ui.executor.build;
 
 
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;

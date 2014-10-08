@@ -11,12 +11,12 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.environment.ui.executor.BuildCommandFactory;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEvent;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEventType;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionListener;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutor;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutorImpl;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildCommandFactory;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutionEvent;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutionEventType;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutionListener;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutor;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 
