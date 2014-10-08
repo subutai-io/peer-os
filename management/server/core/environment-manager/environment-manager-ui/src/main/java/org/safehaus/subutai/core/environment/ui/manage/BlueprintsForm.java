@@ -6,11 +6,13 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
+import org.safehaus.subutai.core.peer.api.PeerGroup;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 
 @SuppressWarnings("serial")
@@ -18,6 +20,7 @@ public class BlueprintsForm
 {
 
     private static final String NO_BLUEPRINTS = "No blueprints found";
+    private static final String BLUEPRINT_2_PEERGROUP = "Blueprint 2 Peer Group";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule module;
@@ -84,8 +87,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button buildButton = new Button( "Build" );
-                buildButton.addClickListener( new Button.ClickListener()
+                final Button node2Peer = new Button( "Node2Peer" );
+                node2Peer.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -94,6 +97,16 @@ public class BlueprintsForm
                                 new EnvironmentBuildWizard( "Wizard", module, task );
                         contentRoot.getUI().addWindow( environmentBuildWizard );
                         environmentBuildWizard.setVisible( true );
+                    }
+                } );
+
+                Button blueprint2PeerGroup = new Button( "Blueprint2PeerGroup" );
+                blueprint2PeerGroup.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        showBlueprint2PeerGroupWindow();
                     }
                 } );
 
@@ -109,7 +122,7 @@ public class BlueprintsForm
                 } );
 
                 environmentsTable.addItem( new Object[] {
-                        task.getEnvironmentBlueprint().getName(), viewButton, buildButton, deleteButton
+                        task.getEnvironmentBlueprint().getName(), viewButton, node2Peer, deleteButton
                 }, null );
             }
         }
@@ -118,6 +131,22 @@ public class BlueprintsForm
             Notification.show( NO_BLUEPRINTS );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private void showBlueprint2PeerGroupWindow()
+    {
+        Window window = createWindow( BLUEPRINT_2_PEERGROUP );
+        List<PeerGroup> list = module.getPeerManager().peersGroups();
+    }
+
+    private Window createWindow( String caption )
+    {
+        Window window = new Window();
+        window.setCaption( caption );
+        window.setModal( true );
+        window.setClosable( true );
+        return window;
     }
 
 
