@@ -6,11 +6,11 @@
 
   <parent>
     <groupId>org.safehaus.subutai</groupId>
-    <artifactId>mgmt-parent</artifactId>
+    <artifactId>mgmt-server-parent</artifactId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>subutai-mgmt</artifactId>
+  <artifactId>subutai-application</artifactId>
   <name>Subutai Management System</name>
   <packaging>feature</packaging>
 

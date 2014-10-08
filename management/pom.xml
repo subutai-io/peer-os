@@ -12,7 +12,6 @@
 
   <modules>
     <module>server</module>
-    <module>subutai-features</module>
   </modules>
 
   <description>Parent project for the Subutai Project Artifacts</description>
