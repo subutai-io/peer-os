@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.dispatcher.impl;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -74,13 +75,14 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend() throws DBException
+    public void testSend() throws DBException, InterruptedException
     {
 
         RemoteRequest request = mock( RemoteRequest.class );
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
 
         responseSender.send();
+        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
 
         verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ) );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponses( any( UUID.class ) );
@@ -88,7 +90,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend2() throws DBException
+    public void testSend2() throws DBException, InterruptedException
     {
 
         RemoteRequest request = mock( RemoteRequest.class );
@@ -97,6 +99,7 @@ public class ResponseSenderTest
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
 
         responseSender.send();
+        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
 
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
         verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ), anyInt() );
@@ -131,7 +134,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend4() throws DBException, PeerMessageException
+    public void testSend4() throws DBException, PeerMessageException, InterruptedException
     {
         RemoteRequest request = mock( RemoteRequest.class );
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
@@ -151,6 +154,7 @@ public class ResponseSenderTest
 
 
         responseSender.send();
+        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
 
         verify( peerManager, atLeastOnce() ).sendPeerMessage( any( Peer.class ), anyString(), anyString() );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( any( RemoteResponse.class ) );
@@ -159,7 +163,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend5() throws DBException, PeerMessageException
+    public void testSend5() throws DBException, PeerMessageException, InterruptedException
     {
         RemoteRequest request = mock( RemoteRequest.class );
         when( request.isCompleted() ).thenReturn( true );
@@ -180,6 +184,7 @@ public class ResponseSenderTest
 
 
         responseSender.send();
+        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
 
         verify( peerManager, atLeastOnce() ).sendPeerMessage( any( Peer.class ), anyString(), anyString() );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( any( RemoteResponse.class ) );
@@ -188,7 +193,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend6() throws DBException, PeerMessageException
+    public void testSend6() throws DBException, PeerMessageException, InterruptedException
     {
         RemoteRequest request = mock( RemoteRequest.class );
         when( request.getAttempts() ).thenReturn( ATTEMPTS );
@@ -213,6 +218,7 @@ public class ResponseSenderTest
 
 
         responseSender.send();
+        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
 
         verify( request, atLeastOnce() ).incrementAttempts();
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
