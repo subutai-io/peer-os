@@ -640,12 +640,12 @@
           <ignoreDependencyFlag>true</ignoreDependencyFlag>
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
-            <!--<feature>standard</feature>-->
-            <!--<feature>wrapper</feature>-->
-            <!--<feature>war</feature>-->
-            <!--<feature>ssh</feature>-->
-            <!--<feature>jms</feature>-->
-            <!--<feature>cxf</feature>-->
+            <feature>standard</feature>
+            <feature>wrapper</feature>
+            <feature>war</feature>
+            <feature>ssh</feature>
+            <feature>jms</feature>
+            <feature>cxf</feature>
           </bootFeatures>
         </configuration>
       </plugin>
