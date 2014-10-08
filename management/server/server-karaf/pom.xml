@@ -649,7 +649,7 @@
             <feature>management</feature>
             <feature>framework</feature>
             <feature>jms</feature>
-            <feature>cxf</feature>
+            <!--<feature>cxf</feature>-->
           </bootFeatures>
         </configuration>
         <executions>
@@ -676,7 +676,7 @@
                 <feature>management</feature>
                 <feature>framework</feature>
                 <feature>jms</feature>
-                <feature>cxf</feature>
+                <!--<feature>cxf</feature>-->
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
