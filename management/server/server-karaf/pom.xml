@@ -639,15 +639,35 @@
         <configuration>
           <ignoreDependencyFlag>true</ignoreDependencyFlag>
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
-          <bootFeatures>
-            <feature>standard</feature>
-            <feature>wrapper</feature>
-            <feature>war</feature>
-            <feature>ssh</feature>
-            <feature>jms</feature>
-            <feature>cxf</feature>
-          </bootFeatures>
+          <!--<bootFeatures>-->
+          <!--<feature>standard</feature>-->
+          <!--<feature>wrapper</feature>-->
+          <!--<feature>war</feature>-->
+          <!--<feature>ssh</feature>-->
+          <!--<feature>jms</feature>-->
+          <!--<feature>cxf</feature>-->
+          <!--</bootFeatures>-->
         </configuration>
+        <executions>
+          <execution>
+            <id>features-add-to-repo</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>features-add-to-repository</goal>
+            </goals>
+            <configuration>
+              <features>
+                <feature>standard</feature>
+                <feature>wrapper</feature>
+                <feature>war</feature>
+                <feature>ssh</feature>
+                <feature>jms</feature>
+                <feature>cxf</feature>
+              </features>
+              <repository>${assembly.directory}/system/subutai/</repository>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
