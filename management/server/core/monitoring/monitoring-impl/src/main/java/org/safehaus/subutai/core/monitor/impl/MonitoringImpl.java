@@ -133,7 +133,7 @@ public class MonitoringImpl implements Monitoring
         for ( JsonNode node : nodes )
         {
             Date date = strToDate( node.get( "@timestamp" ).asText() );
-            double value = node.get( "val" ).asDouble();
+            double value = node.get( "read" ).asDouble();
             values.put( date, value );
         }
 

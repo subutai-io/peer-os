@@ -9,6 +9,7 @@ public enum Metric
     CPU_IDLE( "CPU Idle", "%" ),
     CPU_WIO( "CPU wio", "%" ),
     MEM_FREE( "Free Memory", "KB" ),
+    DISK_OPS( "Disk operations", "KB" ),
     MEM_CACHED( "Cached Memory", "KB" ),
     MEM_BUFFERS( "Memory Buffers", "KB" ),
     SWAP_FREE( "Free Swap Space", "KB" ),
