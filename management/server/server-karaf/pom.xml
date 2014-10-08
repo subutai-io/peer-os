@@ -492,49 +492,45 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
+                <artifactItem>
+                  <groupId>com.google.code.gson</groupId>
+                  <artifactId>gson</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.google.guava</groupId>
+                  <artifactId>guava</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.fasterxml.uuid</groupId>
+                  <artifactId>java-uuid-generator</artifactId>
+                </artifactItem>
                 <!--<artifactItem>-->
-                  <!--<groupId>com.google.code.gson</groupId>-->
-                  <!--<artifactId>gson</artifactId>-->
+                <!--<groupId>org.apache.commons</groupId>-->
+                <!--<artifactId>commons-lang3</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
-                  <!--<groupId>com.google.guava</groupId>-->
-                  <!--<artifactId>guava</artifactId>-->
+                <!--<groupId>org.apache.httpcomponents</groupId>-->
+                <!--<artifactId>httpclient</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
-                  <!--<groupId>com.fasterxml.uuid</groupId>-->
-                  <!--<artifactId>java-uuid-generator</artifactId>-->
+                <!--<groupId>org.apache.httpcomponents</groupId>-->
+                <!--<artifactId>httpmime</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
-                  <!--<groupId>org.apache.commons</groupId>-->
-                  <!--<artifactId>commons-lang3</artifactId>-->
+                <!--<groupId>org.apache.httpcomponents</groupId>-->
+                <!--<artifactId>httpcore-osgi</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
-                  <!--<groupId>org.apache.httpcomponents</groupId>-->
-                  <!--<artifactId>httpclient</artifactId>-->
+                <!--<groupId>org.slf4j</groupId>-->
+                <!--<artifactId>slf4j-simple</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
-                  <!--<groupId>org.apache.httpcomponents</groupId>-->
-                  <!--<artifactId>httpmime</artifactId>-->
+                <!--<groupId>org.slf4j</groupId>-->
+                <!--<artifactId>slf4j-api</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
-                  <!--<groupId>org.apache.httpcomponents</groupId>-->
-                  <!--<artifactId>httpcore-osgi</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.slf4j</groupId>-->
-                  <!--<artifactId>slf4j-simple</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.slf4j</groupId>-->
-                  <!--<artifactId>slf4j-api</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>commons-codec</groupId>-->
-                  <!--<artifactId>commons-codec</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>org.apache.geronimo.specs</groupId>-->
-                <!--<artifactId>geronimo-jta_1.1_spec</artifactId>-->
+                <!--<groupId>commons-codec</groupId>-->
+                <!--<artifactId>commons-codec</artifactId>-->
                 <!--</artifactItem>-->
                 <!--<artifactItem>-->
                 <!--<groupId>org.apache.servicemix.specs</groupId>-->
