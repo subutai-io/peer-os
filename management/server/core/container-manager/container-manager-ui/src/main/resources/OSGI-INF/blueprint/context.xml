@@ -17,7 +17,6 @@
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.container.ui.ContainerManagerPortalModule"
         init-method="init" destroy-method="destroy">
-    <property name="quotaManager" ref="quotaManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

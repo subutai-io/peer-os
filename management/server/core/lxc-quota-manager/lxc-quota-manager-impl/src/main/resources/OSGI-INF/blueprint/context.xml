@@ -4,8 +4,7 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
 
-  <bean id="lxcQuotaManager" scope="singleton" class="org.safehaus.subutai.core.lxc.quota.impl.QuotaManagerImpl"
-        init-method="init" destroy-method="destroy">
+  <bean id="lxcQuotaManager" scope="singleton" class="org.safehaus.subutai.core.lxc.quota.impl.QuotaManagerImpl">
     <argument ref="commandRunner" />
   </bean>
 

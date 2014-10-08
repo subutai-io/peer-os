@@ -29,12 +29,12 @@ public class ContainerComponent extends CustomComponent implements Disposable
     private final AgentTree agentTree;
 
 
-    public ContainerComponent( ExecutorService executorService, ServiceLocator serviceLocator,
-                               final QuotaManager quotaManager ) throws NamingException
+    public ContainerComponent( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
 
         final ContainerManager containerManager = serviceLocator.getService( ContainerManager.class );
         final AgentManager agentManager = serviceLocator.getService( AgentManager.class );
+        final QuotaManager quotaManager = serviceLocator.getService( QuotaManager.class );
         final StrategyManager strategyManager = serviceLocator.getService( StrategyManager.class );
         setHeight( 100, Unit.PERCENTAGE );
 

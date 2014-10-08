@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.container.ui.manage;
 
 
-import java.awt.TextField;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.container.ui.common.Buttons;
+import org.safehaus.subutai.core.lxc.quota.api.MemoryUnit;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
@@ -31,6 +31,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
@@ -240,7 +241,7 @@ public class Manager extends VerticalLayout
         TreeTable table = new TreeTable( caption );
         table.addContainerProperty( HOST_NAME, String.class, null );
         table.addContainerProperty( LXC_STATUS, Label.class, null );
-        table.addContainerProperty( LXC_MEMORY, TextField.class, null );
+        table.addContainerProperty( LXC_MEMORY, QuotaMemoryComponent.class, null );
         table.addContainerProperty( LXC_CPU_LIST, TextField.class, null );
         table.addContainerProperty( LXC_UPDATE, Button.class, null );
 
@@ -424,33 +425,41 @@ public class Manager extends VerticalLayout
             {
                 for ( final String lxcHostname : lxcs.getValue() )
                 {
+                    //                    TextField memoryTextField = new TextField(  );
                     Label containerStatus = new Label();
+                    String containerMemory = "Memory metric";
+                    QuotaMemoryComponent containerMemoryTextField = new QuotaMemoryComponent();
+
+                    String containerCpu = "Cpu Shares";
+                    TextField containerCpuTextField = new TextField();
 
                     if ( lxcs.getKey() == ContainerState.RUNNING )
                     {
                         containerStatus.setValue( "RUNNING" );
+                        LOGGER.info( "This is quota manager: " + quotaManager.toString() );
+
+                        try
+                        {
+                            containerMemory = quotaManager.getQuota( lxcHostname, QuotaEnum.MEMORY_LIMIT_IN_BYTES,
+                                    agentManager.getAgentByHostname( parentHostname ) );
+                            containerCpu = quotaManager.getQuota( lxcHostname, QuotaEnum.CPUSET_CPUS,
+                                    agentManager.getAgentByHostname( parentHostname ) );
+                            containerCpuTextField.setValue( containerCpu );
+                            containerMemoryTextField.setValueForMemoryUnitComboBox( MemoryUnit.BYTES );
+                            containerMemoryTextField.setValueForMemoryTextField( containerMemory );
+                        }
+                        catch ( QuotaException e )
+                        {
+                            e.printStackTrace();
+                        }
+                        //                        memoryTextField.setText( containerMemory );
                     }
                     else if ( lxcs.getKey() == ContainerState.STOPPED )
                     {
                         containerStatus.setValue( "STOPPED" );
                     }
-
-                    String containerMemory = "Memory metric";
-                    try
-                    {
-                        containerMemory = quotaManager.getQuota( lxcHostname, QuotaEnum.MEMORY_LIMIT_IN_BYTES,
-                                agentManager.getAgentByHostname( lxcHostname ) );
-                    }
-                    catch ( QuotaException e )
-                    {
-                        e.printStackTrace();
-                    }
-
-                    TextField memoryTextField = new TextField( "Memory field" );
-                    memoryTextField.setText( containerMemory );
-
                     Object childId = lxcTable.addItem( new Object[] {
-                            lxcHostname, containerStatus, memoryTextField, null, null
+                            lxcHostname, containerStatus, containerMemoryTextField, containerCpuTextField, null
                     }, lxcHostname );
 
                     lxcTable.setParent( childId, parentId );

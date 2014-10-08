@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -25,7 +24,6 @@ public class ContainerManagerPortalModule implements PortalModule
     protected static final Logger LOG = Logger.getLogger( ContainerManagerPortalModule.class.getName() );
     private final ServiceLocator serviceLocator;
     private ExecutorService executor;
-    private QuotaManager quotaManager;
 
 
     public ContainerManagerPortalModule()
@@ -72,7 +70,7 @@ public class ContainerManagerPortalModule implements PortalModule
     {
         try
         {
-            return new ContainerComponent( executor, serviceLocator, quotaManager );
+            return new ContainerComponent( executor, serviceLocator );
         }
         catch ( NamingException e )
         {
