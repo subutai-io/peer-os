@@ -101,6 +101,8 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
+        nodesTable.setId("ZookeeperMngNodesTable");
+        contentRoot.setId("ZookeeperMngContentRoot");
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -110,6 +112,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
+        clusterCombo.setId("ZookeeperMngClusterCombo");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -126,26 +129,32 @@ public class Manager
         controlsContent.addComponent( clusterCombo );
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
+        refreshClustersBtn.setId("ZookeeperMngRefresh");
         addClickListener( refreshClustersBtn );
         controlsContent.addComponent( refreshClustersBtn );
 
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
+        checkAllBtn.setId("ZookeeperMngCheckAll");
         addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
 
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
+        startAllBtn.setId("ZookeeperMngStartAll");
         addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
 
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
+        stopAllBtn.setId("ZookeeperMngStopAll");
         addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
 
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.setId("ZookeeperMngDestroyCluster");
         addClickListenerToDestroyButton();
         controlsContent.addComponent( destroyClusterBtn );
 
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId("ZookeeperMngAddNode");
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
 
@@ -159,13 +168,16 @@ public class Manager
         Label fileLabel = new Label( "File" );
         customPropertyContent.addComponent( fileLabel );
         final TextField fileTextField = new TextField();
+        fileTextField.setId("ZookeeperMngFileName");
         customPropertyContent.addComponent( fileTextField );
         Label propertyNameLabel = new Label( "Property Name" );
         customPropertyContent.addComponent( propertyNameLabel );
         final TextField propertyNameTextField = new TextField();
+        propertyNameTextField.setId("ZookeeperMngPropertyName");
         customPropertyContent.addComponent( propertyNameTextField );
 
         Button removePropertyBtn = new Button( "Remove" );
+        removePropertyBtn.setId("ZookeeperMngRemove");
         removePropertyBtn.addStyleName( "default" );
         removePropertyBtn.addClickListener( new Button.ClickListener()
         {
@@ -211,8 +223,10 @@ public class Manager
         Label propertyValueLabel = new Label( "Property Value" );
         customPropertyContent.addComponent( propertyValueLabel );
         final TextField propertyValueTextField = new TextField();
+        propertyValueTextField.setId("ZookeeperMngPropertyValue");
         customPropertyContent.addComponent( propertyValueTextField );
         Button addPropertyBtn = new Button( "Add" );
+        addPropertyBtn.setId("ZookeeperMngAdd");
         addPropertyBtn.addStyleName( "default" );
         addPropertyBtn.addClickListener( new Button.ClickListener()
         {

@@ -44,6 +44,7 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Number of Replicas: ", "" + wizard.getConfig().getNumberOfReplicas() );
 
         Button installButton = new Button( "Install" );
+        installButton.setId("ElasticSearchInstInstall");
         installButton.addStyleName( "default" );
         installButton.addClickListener( new Button.ClickListener()
         {
@@ -66,6 +67,7 @@ public class VerificationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
+        back.setId("ElasticSearchInstBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
