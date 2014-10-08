@@ -57,6 +57,14 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mgmt-features</artifactId>
+      <version>${project.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -130,10 +138,10 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>subutai-common</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>subutai-common</artifactId>-->
+                <!--</artifactItem>-->
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- agent-manager -->
@@ -492,18 +500,18 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
-                <artifactItem>
-                  <groupId>com.google.code.gson</groupId>
-                  <artifactId>gson</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.google.guava</groupId>
-                  <artifactId>guava</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.fasterxml.uuid</groupId>
-                  <artifactId>java-uuid-generator</artifactId>
-                </artifactItem>
+                <!--<artifactItem>-->
+                <!--<groupId>com.google.code.gson</groupId>-->
+                <!--<artifactId>gson</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>com.google.guava</groupId>-->
+                <!--<artifactId>guava</artifactId>-->
+                <!--</artifactItem>-->
+                <!--<artifactItem>-->
+                <!--<groupId>com.fasterxml.uuid</groupId>-->
+                <!--<artifactId>java-uuid-generator</artifactId>-->
+                <!--</artifactItem>-->
                 <!--<artifactItem>-->
                 <!--<groupId>org.apache.commons</groupId>-->
                 <!--<artifactId>commons-lang3</artifactId>-->
@@ -654,6 +662,8 @@
             <feature>framework</feature>
             <feature>jms</feature>
             <feature>cxf</feature>
+
+            <feature>subutai-common</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -670,6 +680,7 @@
                 <descriptor>mvn:org.apache.karaf.features/enterprise/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/spring/3.0.1/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/2.7.12/xml/features</descriptor>
+                <descriptor>mvn:org.safehaus.subutai/mgmt-features/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>standard</feature>
@@ -682,6 +693,8 @@
                 <feature>framework</feature>
                 <feature>jms</feature>
                 <feature>cxf</feature>
+
+                <feature>subutai-common</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
