@@ -79,6 +79,7 @@ public class ResponseSenderTest
     {
 
         RemoteRequest request = mock( RemoteRequest.class );
+
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
 
         responseSender.send();
@@ -96,6 +97,7 @@ public class ResponseSenderTest
         RemoteRequest request = mock( RemoteRequest.class );
         when( request.getTimestamp() ).thenReturn(
                 System.currentTimeMillis() - ( ResponseSender.AGENT_CHUNK_SEND_INTERVAL_SEC + 5 ) * 1000L * 2 );
+
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
 
         responseSender.send();
@@ -124,6 +126,7 @@ public class ResponseSenderTest
 
         when( remoteResponse.getResponse() ).thenReturn( response );
         when( remoteResponse2.getResponse() ).thenReturn( response2 );
+
         when( dispatcher.getRemoteResponses( any( UUID.class ) ) )
                 .thenReturn( Sets.newHashSet( remoteResponse, remoteResponse2 ) );
 
@@ -149,6 +152,7 @@ public class ResponseSenderTest
 
         when( remoteResponse.getResponse() ).thenReturn( response );
         when( remoteResponse2.getResponse() ).thenReturn( response2 );
+
         when( dispatcher.getRemoteResponses( any( UUID.class ) ) )
                 .thenReturn( Sets.newHashSet( remoteResponse, remoteResponse2 ) );
 
@@ -179,6 +183,7 @@ public class ResponseSenderTest
 
         when( remoteResponse.getResponse() ).thenReturn( response );
         when( remoteResponse2.getResponse() ).thenReturn( response2 );
+
         when( dispatcher.getRemoteResponses( any( UUID.class ) ) )
                 .thenReturn( Sets.newHashSet( remoteResponse, remoteResponse2 ) );
 
@@ -210,6 +215,7 @@ public class ResponseSenderTest
 
         when( remoteResponse.getResponse() ).thenReturn( response );
         when( remoteResponse2.getResponse() ).thenReturn( response2 );
+
         when( dispatcher.getRemoteResponses( any( UUID.class ) ) )
                 .thenReturn( Sets.newHashSet( remoteResponse, remoteResponse2 ) );
 
