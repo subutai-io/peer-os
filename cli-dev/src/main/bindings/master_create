@@ -37,7 +37,7 @@ function master_create {
   echo subutai.parent = master >> $config
   echo subutai.git.branch = master >> $config
   sed -i '/lxc.network.link =.*/c\lxc.network.veth.pair = master' $config
-  echo "lxc.network.script.up = /usr/share/subutai-cli/subutai/lib/ovs-ops" >> $config
+  echo "lxc.network.script.up = /usr/share/subutai-cli/subutai/lib/ovs_ops" >> $config
   echo "lxc.network.type = veth" >> $config
   echo "lxc.network.flags = up" >> $config
   
