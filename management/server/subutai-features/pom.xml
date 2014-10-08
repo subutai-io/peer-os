@@ -396,11 +396,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-ui</artifactId>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-ui</artifactId>
       <classifier>classes</classifier>
     </dependency>
 
