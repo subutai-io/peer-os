@@ -49,14 +49,14 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.cxf.karaf</groupId>
-      <artifactId>apache-cxf</artifactId>
-      <version>2.7.12</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.cxf.karaf</groupId>-->
+      <!--<artifactId>apache-cxf</artifactId>-->
+      <!--<version>2.7.12</version>-->
+      <!--<classifier>features</classifier>-->
+      <!--<type>xml</type>-->
+      <!--<scope>runtime</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mgmt-features</artifactId>
@@ -105,15 +105,15 @@
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
             <feature>standard</feature>
-            <feature>obr</feature>
-            <feature>wrapper</feature>
+            <!--<feature>obr</feature>-->
+            <!--<feature>wrapper</feature>-->
             <feature>war</feature>
-            <feature>kar</feature>
+            <!--<feature>kar</feature>-->
             <feature>ssh</feature>
             <feature>management</feature>
             <feature>framework</feature>
-            <feature>jms</feature>
-            <feature>cxf</feature>
+            <!--<feature>jms</feature>-->
+            <!--<feature>cxf</feature>-->
 
             <feature>mgmt-features</feature>
           </bootFeatures>
@@ -136,15 +136,15 @@
               </descriptors>
               <features>
                 <feature>standard</feature>
-                <feature>obr</feature>
-                <feature>wrapper</feature>
+                <!--<feature>obr</feature>-->
+                <!--<feature>wrapper</feature>-->
                 <feature>war</feature>
-                <feature>kar</feature>
+                <!--<feature>kar</feature>-->
                 <feature>ssh</feature>
                 <feature>management</feature>
                 <feature>framework</feature>
-                <feature>jms</feature>
-                <feature>cxf</feature>
+                <!--<feature>jms</feature>-->
+                <!--<feature>cxf</feature>-->
 
                 <feature>mgmt-features</feature>
               </features>
