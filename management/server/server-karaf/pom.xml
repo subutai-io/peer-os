@@ -70,7 +70,6 @@
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
-      <!--<scope>runtime</scope>-->
     </dependency>
   </dependencies>
 
@@ -139,13 +138,9 @@
           <ignoreDependencyFlag>true</ignoreDependencyFlag>
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
-            <feature>standard</feature>
-            <feature>management</feature>
+            <feature>standard</feature>  
             <feature>war</feature>
             <feature>ssh</feature>
-            <feature>http</feature>
-            <feature>cxf</feature>
-
             <feature>subutai-application</feature>
           </bootFeatures>
         </configuration>
@@ -166,12 +161,9 @@
               </descriptors>
               <features>
                 <feature>standard</feature>
-                <feature>management</feature>
                 <feature>war</feature>
                 <feature>ssh</feature>
-                <feature>http</feature>
                 <feature>cxf</feature>
-
                 <feature>subutai-application</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
