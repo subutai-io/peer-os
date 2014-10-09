@@ -70,8 +70,8 @@
             <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
 
             <!-- Add Embed lib -->
-            <!--<Embed-Directory>WEB-INF/lib</Embed-Directory>-->
-            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+            <Embed-Directory>WEB-INF/lib</Embed-Directory>
+            <Embed-Dependency>com.vaadin.server.*;scope=compile|runtime</Embed-Dependency>
             <Import-Package>*;resolution:=optional</Import-Package>
             <Export-Package>
               <!--com.vaadin.ui.*;-->
