@@ -53,6 +53,12 @@
       <artifactId>org.osgi.core</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.specs</groupId>
+      <artifactId>org.apache.servicemix.specs.jsr339-api-m10</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
