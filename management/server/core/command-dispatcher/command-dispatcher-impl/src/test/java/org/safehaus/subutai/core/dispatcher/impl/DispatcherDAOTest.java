@@ -184,7 +184,7 @@ public class DispatcherDAOTest
     public void testDeleteRemoteRequest2() throws Exception
     {
 
-        dispatcherDAO.deleteRemoteRequest( COMMAND_ID, 1 );
+        dispatcherDAO.deleteRemoteRequestWithAttempts( COMMAND_ID, 1 );
 
 
         verify( dbManager ).executeUpdate2( anyString(), anyVararg() );

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -32,7 +31,6 @@ public class OozieClusterConfig implements ConfigBase
 
     public OozieClusterConfig()
     {
-        this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
     }
 
 

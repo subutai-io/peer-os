@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.ui.manage;
+package org.safehaus.subutai.core.environment.ui.wizard;
 
 
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -27,7 +26,7 @@ import com.vaadin.ui.Window;
 /**
  * Created by bahadyr on 9/10/14.
  */
-public class EnvironmentBuildWizard extends Window
+public class NodeGroup2PeerGroupWizard extends Window
 {
 
     private int step = 0;
@@ -38,16 +37,16 @@ public class EnvironmentBuildWizard extends Window
     private Map<Object, NodeGroup> nodeGroupMap;
 
 
-    public EnvironmentBuildWizard( final String caption, EnvironmentManagerPortalModule managerUI,
-                                   EnvironmentBuildTask environmentBuildTask )
+    public NodeGroup2PeerGroupWizard( final String caption, EnvironmentManagerPortalModule managerUI,
+                                      EnvironmentBuildTask environmentBuildTask )
     {
         super( caption );
         setCaption( caption );
         setModal( true );
         setClosable( true );
         setVisible( false );
-        setWidth( 900, UNITS_PIXELS );
-        setHeight( 500, UNITS_PIXELS );
+        setWidth( "800px" );
+        setHeight( "500px" );
         this.managerUI = managerUI;
         this.environmentBuildTask = environmentBuildTask;
         next();
@@ -75,12 +74,6 @@ public class EnvironmentBuildWizard extends Window
                 setContent( genContainerToPeersTable() );
                 break;
             }
-            /*case 3:
-            {
-                managerUI.getEnvironmentManager().buildEnvironment( environmentBuildTask );
-                close();
-                break;
-            }*/
             default:
             {
                 setContent( genPeersTable() );
@@ -101,28 +94,9 @@ public class EnvironmentBuildWizard extends Window
         this.managerUI = managerUI;
     }
 
-
-    /*public EnvironmentBuildTask getEnvironmentBuildTask()
-    {
-        return environmentBuildTask;
-    }
-
-
-    public void setEnvironmentBuildTask( final EnvironmentBuildTask environmentBuildTask )
-    {
-        this.environmentBuildTask = environmentBuildTask;
-    }*/
-
-
     public void back()
     {
         step--;
-    }
-
-
-    public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
-    {
-        this.nodeGroupMap = nodeGroupMap;
     }
 
 
@@ -177,8 +151,6 @@ public class EnvironmentBuildWizard extends Window
 
     private VerticalLayout genContainerToPeersTable()
     {
-
-
         VerticalLayout vl = new VerticalLayout();
 
         containerToPeerTable = new Table();
@@ -189,8 +161,6 @@ public class EnvironmentBuildWizard extends Window
         containerToPeerTable.setEnabled( true );
         containerToPeerTable.setImmediate( true );
         containerToPeerTable.setSizeFull();
-
-
         nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
         {
@@ -268,6 +238,12 @@ public class EnvironmentBuildWizard extends Window
     public Map<Object, NodeGroup> getNodeGroupMap()
     {
         return nodeGroupMap;
+    }
+
+
+    public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
+    {
+        this.nodeGroupMap = nodeGroupMap;
     }
 
 

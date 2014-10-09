@@ -16,11 +16,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -37,9 +32,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-runner-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -51,6 +47,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>tracker-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -61,6 +58,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-common</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-server</artifactId>
     </dependency>
   </dependencies>
 

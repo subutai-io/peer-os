@@ -14,7 +14,6 @@ import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.container.ui.common.Buttons;
-import org.safehaus.subutai.core.lxc.quota.api.MemoryUnit;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaException;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
@@ -36,7 +35,7 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class Manager extends VerticalLayout
 {
 
@@ -55,7 +54,6 @@ public class Manager extends VerticalLayout
     private final AgentManager agentManager;
     private final QuotaManager quotaManager;
     private final ExecutorService executorService;
-    private volatile boolean isDestroyAllButtonClicked = false;
 
     private static final AtomicInteger processPending = new AtomicInteger( 0 );
 
@@ -77,7 +75,6 @@ public class Manager extends VerticalLayout
         {
             if ( target != null )
             {
-                Item row = lxcTable.getItem( target );
                 if ( !lxcTable.areChildrenAllowed( target ) )
                 {
                     return new Action[] { START_CONTAINER, STOP_CONTAINER, DESTROY_CONTAINER };
@@ -103,7 +100,6 @@ public class Manager extends VerticalLayout
 
                 final String lxcHostname = ( String ) row.getItemProperty( HOST_NAME ).getValue();
                 final String physicalHostname = ( String ) parentRow.getItemProperty( HOST_NAME ).getValue();
-                final Property property = row.getItemProperty( LXC_STATUS );
 
 
                 if ( action == START_CONTAINER )
@@ -286,6 +282,9 @@ public class Manager extends VerticalLayout
                     }
                     catch ( ContainerDestroyException cde )
                     {
+                        //some nasty logs come here from destroying container
+                        //so just ignoring these files
+                        //                        LOGGER.error( "Error destroying container:", cde );
                     }
                 }
             } );
@@ -425,13 +424,14 @@ public class Manager extends VerticalLayout
             {
                 for ( final String lxcHostname : lxcs.getValue() )
                 {
-                    //                    TextField memoryTextField = new TextField(  );
                     Label containerStatus = new Label();
-                    String containerMemory = "Memory metric";
-                    QuotaMemoryComponent containerMemoryTextField = new QuotaMemoryComponent();
+                    Button updateQuota = new Button( "Update" );
+                    updateQuota.addStyleName( "default" );
+                    String containerMemory;
+                    final QuotaMemoryComponent memoryQuotaComponent = new QuotaMemoryComponent();
 
                     String containerCpu = "Cpu Shares";
-                    TextField containerCpuTextField = new TextField();
+                    final TextField containerCpuTextField = new TextField();
 
                     if ( lxcs.getKey() == ContainerState.RUNNING )
                     {
@@ -445,21 +445,42 @@ public class Manager extends VerticalLayout
                             containerCpu = quotaManager.getQuota( lxcHostname, QuotaEnum.CPUSET_CPUS,
                                     agentManager.getAgentByHostname( parentHostname ) );
                             containerCpuTextField.setValue( containerCpu );
-                            containerMemoryTextField.setValueForMemoryUnitComboBox( MemoryUnit.BYTES );
-                            containerMemoryTextField.setValueForMemoryTextField( containerMemory );
+
+                            memoryQuotaComponent.setValueForMemoryTextField( containerMemory );
+                            updateQuota.addClickListener( new Button.ClickListener()
+                            {
+                                @Override
+                                public void buttonClick( final Button.ClickEvent clickEvent )
+                                {
+                                    try
+                                    {
+                                        String memoryLimit = memoryQuotaComponent.getMemoryLimitValue();
+                                        String cpuLimit = containerCpuTextField.getValue().replaceAll( "\n", "" );
+
+                                        quotaManager
+                                                .setQuota( lxcHostname, QuotaEnum.MEMORY_LIMIT_IN_BYTES, memoryLimit,
+                                                        agentManager.getAgentByHostname( parentHostname ) );
+                                        quotaManager.setQuota( lxcHostname, QuotaEnum.CPUSET_CPUS, cpuLimit,
+                                                agentManager.getAgentByHostname( parentHostname ) );
+                                    }
+                                    catch ( QuotaException e )
+                                    {
+                                        LOGGER.error( "Error executing command lxc-cgroup -n:", e );
+                                    }
+                                }
+                            } );
                         }
                         catch ( QuotaException e )
                         {
-                            e.printStackTrace();
+                            LOGGER.error( "Error executing command lxc-cgroup -n: ", e );
                         }
-                        //                        memoryTextField.setText( containerMemory );
                     }
                     else if ( lxcs.getKey() == ContainerState.STOPPED )
                     {
                         containerStatus.setValue( "STOPPED" );
                     }
                     Object childId = lxcTable.addItem( new Object[] {
-                            lxcHostname, containerStatus, containerMemoryTextField, containerCpuTextField, null
+                            lxcHostname, containerStatus, memoryQuotaComponent, containerCpuTextField, updateQuota
                     }, lxcHostname );
 
                     lxcTable.setParent( childId, parentId );

@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>cassandra-plugin-parent</artifactId>
-  <name>Subutai Cassandra Plugin Parent</name>
-  <description>Subutai Cassandra Plugin Parent</description>
+  <name>Subutai Cassandra Parent</name>
+  <description>Subutai Cassandra Parent</description>
   <packaging>pom</packaging>
 
   <modules>

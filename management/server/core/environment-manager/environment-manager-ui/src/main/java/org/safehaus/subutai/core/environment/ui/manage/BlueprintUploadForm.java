@@ -11,6 +11,7 @@ import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.vaadin.event.MouseEvents;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
@@ -24,8 +25,10 @@ public class BlueprintUploadForm
     private static final String PLEASE_PROVIDE_A_BLUEPRINT = "Please provide a blueprint";
     private static final String ERROR_SAVING_BLUEPRINT = "Error saving blueprint. Please check format.";
     private static final String BLUEPRINT_SAVED = "Blueprint saved";
+    private static final String SAVE = "Save";
+    private static final String BLUEPRINT = "Blueprint";
     private final VerticalLayout contentRoot;
-    private TextArea blueprintTxtArea;
+    private TextArea textArea;
     private EnvironmentManagerPortalModule managerUI;
 
 
@@ -38,9 +41,9 @@ public class BlueprintUploadForm
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
 
-        blueprintTxtArea = getTextArea();
+        textArea = getTextArea();
 
-        Button loadBlueprintButton = new Button( "Save" );
+        Button loadBlueprintButton = new Button( SAVE );
 
         loadBlueprintButton.addClickListener( new Button.ClickListener()
         {
@@ -60,11 +63,11 @@ public class BlueprintUploadForm
 
 
                 String blueprintStr = GSON.toJson( getSampleBlueprint() );
-                blueprintTxtArea.setValue( blueprintStr );
+                textArea.setValue( blueprintStr );
             }
         } );
 
-        contentRoot.addComponent( blueprintTxtArea );
+        contentRoot.addComponent( textArea );
         contentRoot.addComponent( loadBlueprintButton );
         contentRoot.addComponent( putSampleBlueprint );
     }
@@ -111,18 +114,18 @@ public class BlueprintUploadForm
 
     private TextArea getTextArea()
     {
-        blueprintTxtArea = new TextArea( "Blueprint" );
-        blueprintTxtArea.setSizeFull();
-        blueprintTxtArea.setRows( 20 );
-        blueprintTxtArea.setImmediate( true );
-        blueprintTxtArea.setWordwrap( false );
-        return blueprintTxtArea;
+        textArea = new TextArea( BLUEPRINT );
+        textArea.setSizeFull();
+        textArea.setRows( 20 );
+        textArea.setImmediate( true );
+        textArea.setWordwrap( false );
+        return textArea;
     }
 
 
     private void uploadAndSaveBlueprint()
     {
-        String content = blueprintTxtArea.getValue().trim();
+        String content = textArea.getValue().trim();
         if ( content.length() > 0 )
         {
             boolean result = managerUI.getEnvironmentManager().saveBlueprint( content );
