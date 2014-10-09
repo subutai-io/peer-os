@@ -14,6 +14,20 @@
 
   <description>Subutai Server Custom Karaf Distribution</description>
 
+  <repositories>
+    <repository>
+      <id>com.springsource.repository.bundles.release</id>
+      <name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/release</url>
+    </repository>
+
+    <repository>
+      <id>com.springsource.repository.bundles.external</id>
+      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/external</url>
+    </repository>
+  </repositories>
+
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
   </properties>
@@ -34,8 +48,16 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-application</artifactId>
+      <version>${project.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.karaf.features</groupId>
-      <artifactId>enterprise</artifactId>
+      <artifactId>spring</artifactId>
       <version>${karaf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -44,11 +66,10 @@
     <dependency>
       <groupId>org.apache.cxf.karaf</groupId>
       <artifactId>apache-cxf</artifactId>
-      <version>2.7.12</version>
+      <version>${org.apache.cxf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
-      <scope>compile</scope>
-      <!--<scope>runtime</scope>-->
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 
@@ -92,22 +113,7 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>target/assembly/system/subutai</outputDirectory>
               <artifactItems>
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- vaadin -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>vaadin-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>vaadin-custom</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>vaadin-impl</artifactId>
-                </artifactItem>
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>vaadin-ui</artifactId>
@@ -117,506 +123,9 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
-                  <artifactId>vaadin-ui</artifactId>
-                  <classifier>classes</classifier>
+                  <artifactId>vaadin-custom</artifactId>
+                  <outputDirectory>target/assembly/system/</outputDirectory>
                 </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- subutai-common -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>subutai-common</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- agent-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>agent-manager-rest</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- apt-repository-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>apt-repository-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>apt-repository-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>apt-repository-cli</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- command-dispatcher -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-dispatcher-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-dispatcher-impl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- command-runner -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-runner-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-runner-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>command-runner-ui-old</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- communication-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>communication-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>communication-manager-impl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- config-point-tracker -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>config-point-tracker-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>config-point-tracker-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>config-point-tracker-cli</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- configuration-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>configuration-manager-api</artifactId>
-                </artifactItem>
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>configuration-manager-impl</artifactId>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                <!--<groupId>${project.groupId}</groupId>-->
-                <!--<artifactId>configuration-manager-cli</artifactId>-->
-                <!--</artifactItem>-->
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- container-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>container-manager-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- db-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>db-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>db-manager-impl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- environment-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>environment-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>environment-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>environment-manager-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>environment-manager-rest</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>environment-manager-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- environment-terminal -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>environment-terminal-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- file-tracker -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>file-tracker-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>file-tracker-impl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- git-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>git-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>git-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>git-manager-cli</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- lxc-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>lxc-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>lxc-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>lxc-manager-ui</artifactId>
-                </artifactItem>
-
-                <!--lxc-quota-manager-->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>lxc-quota-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>lxc-quota-manager-impl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- monitoring -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>monitoring-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>monitoring-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>monitoring-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>monitoring-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- network-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>network-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>network-manager-impl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- peer-command-dispatcher -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-command-dispatcher-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-command-dispatcher-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-command-dispatcher-rest</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- peer-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-manager-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>peer-manager-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- strategy-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>strategy-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>strategy-manager-impl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- template-manager -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-manager-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-manager-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-manager-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-manager-rest</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- template-registry -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-registry-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-registry-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-registry-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-registry-rest</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>template-registry-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- tracker -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>tracker-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>tracker-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>tracker-rest</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>tracker-ui</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- Vaadin -->
-                <artifactItem>
-                  <groupId>org.jsoup</groupId>
-                  <artifactId>jsoup</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- subutai-common -->
-                <artifactItem>
-                  <groupId>com.google.code.gson</groupId>
-                  <artifactId>gson</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.google.guava</groupId>
-                  <artifactId>guava</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.fasterxml.uuid</groupId>
-                  <artifactId>java-uuid-generator</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.commons</groupId>
-                  <artifactId>commons-lang3</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.httpcomponents</groupId>
-                  <artifactId>httpclient</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.httpcomponents</groupId>
-                  <artifactId>httpmime</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.httpcomponents</groupId>
-                  <artifactId>httpcore-osgi</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-simple</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-api</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- communication-manager -->
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-client</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-pool</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-jms-pool</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>javax.management.j2ee</groupId>
-                  <artifactId>management-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-pool</groupId>
-                  <artifactId>commons-pool</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.servicemix.bundles</groupId>
-                  <artifactId>org.apache.servicemix.bundles.junit</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- db-manager -->
-                <artifactItem>
-                  <groupId>com.datastax.cassandra</groupId>
-                  <artifactId>cassandra-driver-core</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.codahale.metrics</groupId>
-                  <artifactId>metrics-core</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>io.netty</groupId>
-                  <artifactId>netty</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xerial.snappy</groupId>
-                  <artifactId>snappy-java</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.jpountz.lz4</groupId>
-                  <artifactId>lz4</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- monitoring -->
-                <artifactItem>
-                  <groupId>commons-io</groupId>
-                  <artifactId>commons-io</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.codehaus.jackson</groupId>
-                  <artifactId>jackson-mapper-asl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.codehaus.jackson</groupId>
-                  <artifactId>jackson-core-asl</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- plugins -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>plugin-common</artifactId>
-                </artifactItem>
-
-                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-                <!-- hadoop -->
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>hadoop-plugin-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>hadoop-plugin-impl</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>hadoop-plugin-cli</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>hadoop-plugin-rest</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>hadoop-plugin-ui</artifactId>
-                </artifactItem>
-
               </artifactItems>
             </configuration>
           </execution>
@@ -629,14 +138,38 @@
           <ignoreDependencyFlag>true</ignoreDependencyFlag>
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
-            <feature>standard</feature>
+            <feature>standard</feature>  
             <feature>war</feature>
             <feature>ssh</feature>
-            <feature>jndi</feature>
-            <feature>jms</feature>
-            <feature>cxf</feature>
+            <feature>subutai-application</feature>
           </bootFeatures>
         </configuration>
+        <executions>
+          <execution>
+            <id>features-add-to-repo</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>features-add-to-repository</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.safehaus.subutai/subutai-application/${project.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <feature>standard</feature>
+                <feature>war</feature>
+                <feature>ssh</feature>
+                <feature>cxf</feature>
+                <feature>subutai-application</feature>
+              </features>
+              <repository>${assembly.directory}/system</repository>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

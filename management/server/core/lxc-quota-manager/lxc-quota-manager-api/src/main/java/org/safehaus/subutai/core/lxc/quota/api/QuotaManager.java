@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.lxc.quota.api;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 
 
 /**
@@ -15,10 +14,11 @@ public interface QuotaManager
      * value specified in enum key and newValue can be in any format for setting new value. host is a host with
      * collection of container we intend to modify
      */
-    public void setQuota( Container container, QuotaEnum parameter, String newValue, Agent host ) throws QuotaException;
+    public void setQuota( String containerName, QuotaEnum parameter, String newValue, Agent host )
+            throws QuotaException;
 
     /**
      * Set quota for a container in a host with parameter specified in QuotaEnum.getKey()
      */
-    public String getQuota( Container container, QuotaEnum parameter, Agent host ) throws QuotaException;
+    public String getQuota( String containerName, QuotaEnum parameter, Agent host ) throws QuotaException;
 }

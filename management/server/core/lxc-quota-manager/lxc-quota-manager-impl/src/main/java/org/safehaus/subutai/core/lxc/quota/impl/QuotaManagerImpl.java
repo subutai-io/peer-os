@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.lxc.quota.impl;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -36,39 +35,39 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public void setQuota( final Container container, final QuotaEnum parameter, final String newValue,
+    public void setQuota( final String containerName, final QuotaEnum parameter, final String newValue,
                           final Agent agent ) throws QuotaException
     {
-        Preconditions.checkNotNull( container, "Target container is null." );
+        Preconditions.checkNotNull( containerName, "Target containerName is null." );
         Preconditions.checkNotNull( parameter, "Parameter is null." );
         Preconditions.checkNotNull( newValue, "New value to set is null." );
         Preconditions.checkNotNull( agent, "Host is null." );
 
         String precomputedString =
-                String.format( "lxc-cgroup -n %s %s %s", container.getName(), parameter.getKey(), newValue );
+                String.format( "lxc-cgroup -n %s %s %s", containerName, parameter.getKey(), newValue );
         Command command =
                 commandRunner.createCommand( new RequestBuilder( precomputedString ), Sets.newHashSet( agent ) );
-        runCommand( command, false, agent, parameter, container );
+        runCommand( command, false, agent, parameter, containerName );
     }
 
 
     @Override
-    public String getQuota( final Container container, final QuotaEnum parameter, final Agent agent )
+    public String getQuota( final String containerName, final QuotaEnum parameter, final Agent agent )
             throws QuotaException
     {
-        Preconditions.checkNotNull( container, "Target container is null." );
+        Preconditions.checkNotNull( containerName, "Target containerName is null." );
         Preconditions.checkNotNull( parameter, "Parameter is null." );
         Preconditions.checkNotNull( agent, "Host is null." );
 
-        String precomputedString = String.format( "lxc-cgroup -n %s %s", container.getName(), parameter.getKey() );
+        String precomputedString = String.format( "lxc-cgroup -n %s %s", containerName, parameter.getKey() );
         Command command =
                 commandRunner.createCommand( new RequestBuilder( precomputedString ), Sets.newHashSet( agent ) );
-        return runCommand( command, true, agent, parameter, container );
+        return runCommand( command, true, agent, parameter, containerName );
     }
 
 
     private String runCommand( Command command, boolean givesOutput, Agent host, QuotaEnum parameter,
-                               Container container ) throws QuotaException
+                               String containerName ) throws QuotaException
     {
         try
         {
@@ -80,14 +79,14 @@ public class QuotaManagerImpl implements QuotaManager
                     AgentResult agentResult = command.getResults().get( host.getUuid() );
                     throw new QuotaException( String.format(
                             "Error while performing [lxc-cgroup -n %1$s %2$s]: %3$s%n%4$s, exit code %5$s",
-                            container.getName(), parameter.getKey(), agentResult.getStdOut(), agentResult.getStdErr(),
+                            containerName, parameter.getKey(), agentResult.getStdOut(), agentResult.getStdErr(),
                             agentResult.getExitCode() ) );
                 }
                 else
                 {
                     throw new QuotaException(
                             String.format( "Error while performing [lxc-cgroup -n %1$s %2$s]: Command timed out",
-                                    container.getName(), parameter.getKey() ) );
+                                    containerName, parameter.getKey() ) );
                 }
             }
             else if ( givesOutput )

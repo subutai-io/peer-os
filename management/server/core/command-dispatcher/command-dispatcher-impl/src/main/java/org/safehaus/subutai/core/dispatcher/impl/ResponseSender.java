@@ -60,6 +60,12 @@ public class ResponseSender
     }
 
 
+    protected ExecutorService getHttpRequestsExecutor()
+    {
+        return httpRequestsExecutor;
+    }
+
+
     public void init()
     {
         mainLoopExecutor.scheduleWithFixedDelay( new Runnable()
@@ -83,7 +89,6 @@ public class ResponseSender
 
     protected void send()
     {
-
         try
         {
             Set<RemoteRequest> requests =
@@ -150,7 +155,7 @@ public class ResponseSender
                     request.incrementAttempts();
                     dispatcherDAO.saveRemoteRequest( request );
                     //delete previous request (workaround until we change Cassandra to another DB)
-                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                    dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
                 }
             }
             else
@@ -249,7 +254,7 @@ public class ResponseSender
                 request.incrementAttempts();
                 dispatcherDAO.saveRemoteRequest( request );
                 //delete previous request (workaround until we change Cassandra to another DB)
-                dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
             }
         }
     }

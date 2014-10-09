@@ -232,15 +232,18 @@ public class TemplateRegistryComponent extends CustomComponent
         for ( String key : templatePropertiesMap.keySet() )
         {
             Property item = templateInfoTable.getItem( key ).getItemProperty( TEMPLATE_VALUE );
-            item.setValue( templatePropertiesMap.get( key ).getTemplateProperty( template ) );
+            String templateValue = ( String ) item.getValue();
+            templateValue = templatePropertiesMap.get( key ).getTemplateProperty( template );
+            //            item.setValue( templatePropertiesMap.get( key ).getTemplateProperty( template ) );
         }
-        String products = "";
+        StringBuilder products = new StringBuilder();
         for ( String product : template.getProducts() )
         {
-            products += product + "\n";
+            product = product + "\n";
+            products.append( product );
         }
         packagesInstalled.setReadOnly( false );
-        packagesInstalled.setValue( products );
+        packagesInstalled.setValue( products.toString() );
         packagesInstalled.setReadOnly( true );
 
         String packages = "";
