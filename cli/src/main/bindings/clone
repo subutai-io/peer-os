@@ -21,6 +21,7 @@ function clone {
 
   local parent="$1"
   local child="$2"
+  config=/var/lib/lxc/$child/config
   if [ "`are_containers_readable $parent $child`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
@@ -65,10 +66,15 @@ function clone {
   if [ -z "$environmentId" ]; then
      environmentId="null"
   fi
-
+  
+  #cloning operation is starting..
   lxc_clone $parent $child $environmentId "`usage`"
+  
+  #defining 2 veth pair for each lxc container
+  sed -i "/lxc.network.veth.pair =.*/c\lxc.network.veth.pair = $child" $config
+  echo "lxc.network.veth.pair = $child-2" >> $config
+  
   git_child_branch $child
-
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
