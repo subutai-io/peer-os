@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -49,7 +50,6 @@ public class ResponseSenderTest
         peerManager = mock( PeerManager.class );
         dispatcher = mock( DispatcherDAO.class );
         responseSender = new ResponseSender( dispatcher, peerManager );
-        responseSender.init();
     }
 
 
@@ -75,6 +75,18 @@ public class ResponseSenderTest
 
 
     @Test
+    public void testInit() throws DBException, InterruptedException
+    {
+
+        responseSender.init();
+
+        Thread.sleep( 100 );
+
+        verify( dispatcher, atLeastOnce() ).getRemoteRequests( anyInt(), anyInt() );
+    }
+
+
+    @Test
     public void testSend() throws DBException, InterruptedException
     {
 
@@ -82,8 +94,7 @@ public class ResponseSenderTest
 
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
 
-        responseSender.send();
-        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
+        act();
 
         verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ) );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponses( any( UUID.class ) );
@@ -100,11 +111,17 @@ public class ResponseSenderTest
 
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
 
-        responseSender.send();
-        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
+        act();
 
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
-        verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ), anyInt() );
+        verify( dispatcher, atLeastOnce() ).deleteRemoteRequestWithAttempts( any( UUID.class ), anyInt() );
+    }
+
+
+    private void act() throws InterruptedException
+    {
+        responseSender.send();
+        responseSender.getHttpRequestsExecutor().awaitTermination( 5, TimeUnit.SECONDS );
     }
 
 
@@ -157,11 +174,10 @@ public class ResponseSenderTest
                 .thenReturn( Sets.newHashSet( remoteResponse, remoteResponse2 ) );
 
 
-        responseSender.send();
-        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
+        act();
 
         verify( peerManager, atLeastOnce() ).sendPeerMessage( any( Peer.class ), anyString(), anyString() );
-        verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( any( RemoteResponse.class ) );
+        verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( Matchers.<RemoteResponse>anyObject() );
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
     }
 
@@ -188,8 +204,7 @@ public class ResponseSenderTest
                 .thenReturn( Sets.newHashSet( remoteResponse, remoteResponse2 ) );
 
 
-        responseSender.send();
-        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
+        act();
 
         verify( peerManager, atLeastOnce() ).sendPeerMessage( any( Peer.class ), anyString(), anyString() );
         verify( dispatcher, atLeastOnce() ).deleteRemoteResponse( any( RemoteResponse.class ) );
@@ -223,11 +238,10 @@ public class ResponseSenderTest
                 .thenThrow( new PeerMessageException( "" ) );
 
 
-        responseSender.send();
-        responseSender.getHttpRequestsExecutor().awaitTermination( 3, TimeUnit.SECONDS );
+        act();
 
         verify( request, atLeastOnce() ).incrementAttempts();
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
-        verify( dispatcher, atLeastOnce() ).deleteRemoteRequest( any( UUID.class ), eq( ATTEMPTS - 1 ) );
+        verify( dispatcher, atLeastOnce() ).deleteRemoteRequestWithAttempts( any( UUID.class ), eq( ATTEMPTS - 1 ) );
     }
 }
