@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 import org.safehaus.subutai.plugin.common.mock.DbManagerMock;

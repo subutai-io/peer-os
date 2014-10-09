@@ -35,7 +35,7 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -54,6 +54,13 @@
       <artifactId>hadoop-plugin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-server</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <build>

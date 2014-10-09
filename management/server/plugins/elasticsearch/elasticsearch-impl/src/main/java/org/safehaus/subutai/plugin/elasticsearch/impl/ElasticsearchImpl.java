@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -300,7 +301,8 @@ public class ElasticsearchImpl implements Elasticsearch
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
-                .setName( String.format( "%s-%s", ElasticsearchClusterConfiguration.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
+                .setName( String.format( "%s-%s", ElasticsearchClusterConfiguration.PRODUCT_KEY, UUIDUtil
+                        .generateTimeBasedUUID() ) );
 
         // Node group
         NodeGroup nodesGroup = new NodeGroup();
