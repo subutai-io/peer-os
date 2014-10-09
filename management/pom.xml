@@ -33,7 +33,7 @@
     <aries.proxy.version>1.0.1</aries.proxy.version>
     <aries.util.version>1.1.0</aries.util.version>
     <!-- REST -->
-    <vaadin-version>7.3.1</vaadin-version>
+    <vaadin-version>7.2.7</vaadin-version>
   </properties>
 
   <dependencyManagement>
@@ -603,7 +603,7 @@
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-shared-deps</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.2</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
