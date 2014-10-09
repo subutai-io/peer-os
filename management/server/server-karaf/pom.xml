@@ -58,7 +58,7 @@
     <dependency>
       <groupId>org.apache.karaf.features</groupId>
       <artifactId>spring</artifactId>
-      <version>3.0.1</version>
+      <version>${karaf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.apache.cxf.karaf</groupId>
       <artifactId>apache-cxf</artifactId>
-      <version>2.7.12</version>
+      <version>${org.apache.cxf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -143,7 +143,8 @@
             <feature>management</feature>
             <feature>war</feature>
             <feature>ssh</feature>
-            <!--<feature>cxf</feature>-->
+            <feature>http</feature>
+            <feature>cxf</feature>
 
             <feature>subutai-application</feature>
           </bootFeatures>
@@ -157,10 +158,10 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>mvn:org.apache.karaf.features/framework/3.0.1/xml/features</descriptor>
-                <descriptor>mvn:org.apache.karaf.features/standard/3.0.1/xml/features</descriptor>
-                <descriptor>mvn:org.apache.karaf.features/spring/3.0.1/xml/features</descriptor>
-                <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/2.7.12/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.safehaus.subutai/subutai-application/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -168,6 +169,7 @@
                 <feature>management</feature>
                 <feature>war</feature>
                 <feature>ssh</feature>
+                <feature>http</feature>
                 <feature>cxf</feature>
 
                 <feature>subutai-application</feature>
