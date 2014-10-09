@@ -10,8 +10,8 @@
   </parent>
 
   <artifactId>template-manager-rest</artifactId>
-  <name>Subutai Template Manager Rest</name>
-  <description>Subutai Template Manager Rest</description>
+  <name>Subutai Template Manager REST</name>
+  <description>Subutai Template Manager REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>

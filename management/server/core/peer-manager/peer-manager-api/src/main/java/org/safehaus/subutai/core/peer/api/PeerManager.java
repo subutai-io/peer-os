@@ -58,4 +58,10 @@ public interface PeerManager
     public void addContainer( PeerContainer peerContainer );
 
     public void invoke( PeerCommandMessage peerCommandMessage );
+
+    List<PeerGroup> peersGroups();
+
+    void deletePeerGroup( PeerGroup group );
+
+    boolean savePeerGroup( PeerGroup group );
 }

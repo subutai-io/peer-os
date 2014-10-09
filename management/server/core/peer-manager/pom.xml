@@ -20,4 +20,5 @@
     <module>peer-manager-cli</module>
     <module>peer-manager-ui</module>
   </modules>
+
 </project>

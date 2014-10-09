@@ -7,13 +7,16 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
-import org.safehaus.subutai.core.environment.ui.manage.EnvironmentBuildWizard;
+import org.safehaus.subutai.core.environment.ui.wizard.Node2PeerWizard;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -21,30 +24,30 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
 /**
  * Created by bahadyr on 9/29/14.
  */
-public class EnvironmentBuildWizardTest
+@RunWith( MockitoJUnitRunner.class )
+public class Node2PeerWizardTest
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private EnvironmentBuildWizard sut;
+    private Node2PeerWizard sut;
+    @Mock
     private EnvironmentManagerPortalModule module;
+    @Mock
     private PeerManager peerManager;
 
 
     @Before
     public void setUp() throws Exception
     {
-        module = mock( EnvironmentManagerPortalModule.class );
-        peerManager = mock( PeerManager.class );
         EnvironmentBuildTask task = getTask();
         when( module.getPeerManager() ).thenReturn( peerManager );
         when( peerManager.peers() ).thenReturn( Collections.<Peer>emptyList() );
-        sut = new EnvironmentBuildWizard( "Wizard", module, task );
+        sut = new Node2PeerWizard( "Wizard", module, task );
     }
 
 
@@ -107,7 +110,7 @@ public class EnvironmentBuildWizardTest
 
         sut.setNodeGroupMap( map );
         EnvironmentBuildProcess process = sut.createEnvironmentBuildProcess( ebp, topology );
-        assertNotNull(process);
+        assertNotNull( process );
         System.out.println( GSON.toJson( process ) );
     }
 
