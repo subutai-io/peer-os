@@ -297,7 +297,11 @@ int main(int argc,char *argv[],char *envp[])
 			{
 				//timeout occured!!
 				response.clear();
-				response.setIps(environment.getAgentIpValue());
+				/*
+                                 * Refresh new agent ip address set for each heartbeat message
+                                 */
+                                environment.getAgentIpAddress();
+           			response.setIps(environment.getAgentIpValue());
 				response.setHostname(environment.getAgentHostnameValue());
 				response.setMacAddress(environment.getAgentMacAddressValue());
 				string resp = response.createHeartBeatMessage(environment.getAgentUuidValue(),command.getRequestSequenceNumber(),
@@ -426,6 +430,10 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						logMain.writeLog(7,logMain.setLogData("<SubutaiAgent>","Heartbeat message has been taken.."));
 						response.clear();
+						/*
+						 * Refresh new agent ip address set for each heartbeat message
+						 */
+						environment.getAgentIpAddress();
 						response.setIps(environment.getAgentIpValue());
 						response.setHostname(environment.getAgentHostnameValue());
 						response.setParentHostname(environment.getAgentParentHostnameValue());
