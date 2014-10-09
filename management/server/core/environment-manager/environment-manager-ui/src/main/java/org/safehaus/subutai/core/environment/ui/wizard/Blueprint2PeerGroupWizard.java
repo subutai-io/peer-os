@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerGroup;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -94,6 +95,7 @@ public class Blueprint2PeerGroupWizard extends Window
         this.managerUI = managerUI;
     }
 
+
     public void back()
     {
         step--;
@@ -114,10 +116,10 @@ public class Blueprint2PeerGroupWizard extends Window
         peersTable.setSizeFull();
 
 
-        List<Peer> peers = managerUI.getPeerManager().peers();
+        List<PeerGroup> peers = managerUI.getPeerManager().peersGroups();
         if ( !peers.isEmpty() )
         {
-            for ( Peer peer : peers )
+            for ( PeerGroup peer : peers )
             {
                 CheckBox checkBox = new CheckBox();
                 peersTable.addItem( new Object[] {
@@ -137,7 +139,7 @@ public class Blueprint2PeerGroupWizard extends Window
                 }
                 else
                 {
-                    Notification.show( "Please select peers", Notification.Type.HUMANIZED_MESSAGE );
+                    Notification.show( "Please select peer group", Notification.Type.HUMANIZED_MESSAGE );
                 }
             }
         } );
