@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.oozie.api;
 
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -34,5 +30,5 @@ public interface Oozie extends ApiBase<OozieClusterConfig>
 
     UUID addNode( String clustername, String lxchostname, String nodetype );
 
-    UUID destroyNode( String clustername, String lxchostname, String nodetype );
+    UUID destroyNode( final String clusterName, final String lxcHostname );
 }

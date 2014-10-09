@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -194,5 +195,11 @@ public class OozieClusterConfig implements ConfigBase
         allAgents.addAll( clients );
         allAgents.add( server );
         return allAgents;
+    }
+
+
+    public void removeClient( final Agent node )
+    {
+        clients.remove( node );
     }
 }

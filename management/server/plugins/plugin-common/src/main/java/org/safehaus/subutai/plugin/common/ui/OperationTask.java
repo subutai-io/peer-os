@@ -13,6 +13,7 @@ import org.safehaus.subutai.plugin.common.api.OperationType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 
 import java.util.UUID;
@@ -119,8 +120,57 @@ public class OperationTask implements Runnable {
 
     private UUID startOozieOperation()
     {
-        // TODO implement Oozie product operations
-        return null;
+        Oozie oozie = (Oozie) product;
+        OozieClusterConfig oozieClusterConfig = (OozieClusterConfig) clusterConfig;
+
+        if ( nodeType.equals( NodeType.SERVER ) ) {
+            trackID = getOozieServerOperation( oozie, oozieClusterConfig );
+        }
+        else if ( nodeType.equals( NodeType.CLIENT ) ) {
+            trackID = getOozieClientOperation( oozie, oozieClusterConfig );
+        }
+
+        return trackID;
+    }
+
+
+    private UUID getOozieServerOperation( final Oozie oozie, final OozieClusterConfig oozieClusterConfig )
+    {
+        UUID trackID;
+        switch ( operationType )
+        {
+            case Start:
+                trackID = oozie.startServer( oozieClusterConfig );
+                break;
+            case Stop:
+                trackID = oozie.stopServer( oozieClusterConfig );
+                break;
+            case Status:
+                trackID = oozie.checkServerStatus( oozieClusterConfig );
+                break;
+            default:
+                trackID = null;
+                break;
+        }
+        return trackID;
+
+    }
+
+
+    private UUID getOozieClientOperation( final Oozie oozie, final OozieClusterConfig oozieClusterConfig )
+    {
+        UUID trackID;
+        switch ( operationType )
+        {
+            case Destroy:
+                trackID = oozie.destroyNode( oozieClusterConfig.getClusterName(), agent.getHostname() );
+                break;
+            default:
+                trackID = null;
+                break;
+        }
+        return trackID;
+
     }
 
 

@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -25,18 +26,23 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerHandler;
+import org.safehaus.subutai.plugin.oozie.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.InstallHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.StartServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.StopServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.UninstallHandler;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
-public class OozieImpl extends OozieBase
+public class OozieImpl implements Oozie
 {
 
     private PluginDAO pluginDAO;
@@ -224,14 +230,12 @@ public class OozieImpl extends OozieBase
     }
 
 
-    @Override
     public OozieClusterConfig getCluster( String clusterName )
     {
         return pluginDAO.getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
     }
 
 
-    @Override
     public UUID startServer( final OozieClusterConfig config )
     {
         AbstractOperationHandler operationHandler = new StartServerHandler( this, config.getClusterName() );
@@ -240,7 +244,6 @@ public class OozieImpl extends OozieBase
     }
 
 
-    @Override
     public UUID stopServer( final OozieClusterConfig config )
     {
         AbstractOperationHandler operationHandler = new StopServerHandler( this, config.getClusterName() );
@@ -249,7 +252,6 @@ public class OozieImpl extends OozieBase
     }
 
 
-    @Override
     public UUID checkServerStatus( final OozieClusterConfig config )
     {
         AbstractOperationHandler operationHandler = new CheckServerHandler( this, config.getClusterName() );
@@ -258,7 +260,6 @@ public class OozieImpl extends OozieBase
     }
 
 
-    @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final OozieClusterConfig config,
                                                          final ProductOperation po )
     {
@@ -279,7 +280,6 @@ public class OozieImpl extends OozieBase
     }
 
 
-    @Override
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final OozieClusterConfig config )
     {
 
@@ -319,8 +319,14 @@ public class OozieImpl extends OozieBase
 
 
     @Override
-    public UUID destroyNode( final String clustername, final String lxchostname, final String nodetype )
+    public UUID destroyNode( final String clusterName, final String lxcHostname )
     {
-        return null;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
+
+        AbstractOperationHandler operationHandler =
+                new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 }

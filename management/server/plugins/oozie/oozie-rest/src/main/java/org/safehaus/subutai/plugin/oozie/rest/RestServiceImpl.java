@@ -139,9 +139,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response destroyNode( final String clusterName, final String lxcHostname, final String nodeType )
+    public Response destroyNode( final String clusterName, final String lxcHostname )
     {
-        UUID uuid = oozieManager.destroyNode( clusterName, lxcHostname, nodeType );
+        UUID uuid = oozieManager.destroyNode( clusterName, lxcHostname );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }

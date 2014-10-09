@@ -34,7 +34,16 @@ import com.vaadin.ui.Table;
 
 public class Manager extends BaseManager {
 
-    private final GridLayout contentRoot;
+    protected final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
+    protected final static String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
+    protected final static String STOP_NAMENODE_BUTTON_CAPTION = "Stop Namenode";
+    protected final static String STOP_JOBTRACKER_BUTTON_CAPTION = "Stop JobTracker";
+    protected final static String EXCLUDE_BUTTON_CAPTION = "Exclude";
+    protected final static String INCLUDE_BUTTON_CAPTION = "Include";
+    protected final static String URL_BUTTON_CAPTION = "URL";
+    protected final static String DECOMMISSION_STATUS_CAPTION = "Decommission Status: ";
+    protected final static String EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION = "Exclude/Include";
+
     private final ComboBox clusterList;
     private final Table masterNodesTable;
     private final Table slaveNodesTable;
@@ -43,8 +52,6 @@ public class Manager extends BaseManager {
     private final Label slaveNodeCount;
     private Button checkAllButton;
     private HadoopClusterConfig hadoopCluster;
-    private ProgressBar progressBar;
-    private int processCount = 0;
     private String decommissionStatus;
     private ManagerListener managerListener;
     private final Hadoop hadoop;
@@ -55,6 +62,7 @@ public class Manager extends BaseManager {
 
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+        super();
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
@@ -62,13 +70,6 @@ public class Manager extends BaseManager {
         this.agentManager = serviceLocator.getService( AgentManager.class);
 
         managerListener = new ManagerListener( this );
-
-        contentRoot = new GridLayout();
-        contentRoot.setSpacing( true );
-        contentRoot.setMargin( true );
-        contentRoot.setSizeFull();
-        contentRoot.setRows( 40 );
-        contentRoot.setColumns( 1 );
 
         //tables go here
         masterNodesTable = createTableTemplate( "Master Nodes" );
@@ -140,9 +141,6 @@ public class Manager extends BaseManager {
         replicationFactor = new Label();
         domainName = new Label();
         slaveNodeCount = new Label();
-        progressBar = new ProgressBar();
-        progressBar.setIndeterminate( true );
-        progressBar.setVisible( false );
         configContent.addComponent( new Label( "Replication Factor:" ) );
         configContent.addComponent( replicationFactor );
         configContent.addComponent( new Label( "Domain:" ) );
@@ -160,7 +158,7 @@ public class Manager extends BaseManager {
     }
 
 
-    private Table createTableTemplate( String caption ) {
+    public Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
@@ -233,29 +231,6 @@ public class Manager extends BaseManager {
     }
 
 
-    protected HorizontalLayout getAvailableOperationsLayout( Item row ) {
-        if ( row == null )
-            return null;
-        return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-    }
-
-
-    protected Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
-            return null;
-        }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) ) {
-                    return ( Button ) component;
-                }
-            }
-            // If not found
-            return null;
-        }
-    }
-
-
     protected Button getExcludeIncludeButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
@@ -274,85 +249,17 @@ public class Manager extends BaseManager {
     }
 
 
-    protected Button getDestroyButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
-            return null;
-        }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( DESTROY_BUTTON_CAPTION ) ) {
-                    return ( Button ) component;
-                }
-            }
-            // If not found
-            return null;
-        }
-    }
-
-
-    protected Button getStartButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
-            return null;
-        }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( START_NAMENODE_BUTTON_CAPTION ) || component.getCaption().equals(
-                        START_JOBTRACKER_BUTTON_CAPTION ) ) {
-                    return ( Button ) component;
-                }
-            }
-            // If not found
-            return null;
-        }
-    }
-
-
-    protected Button getStopButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
-            return null;
-        }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( STOP_NAMENODE_BUTTON_CAPTION ) || component.getCaption().equals(
-                        STOP_JOBTRACKER_BUTTON_CAPTION ) ) {
-                    return ( Button ) component;
-                }
-            }
-            // If not found
-            return null;
-        }
-    }
-
-
     protected void show( String notification ) {
         Notification.show( notification );
     }
 
 
-    private void populateTable( final Table table, List<Agent> agents ) {
-
-        table.removeAllItems();
-
-        // Add UI components into relevant fields according to its role in cluster
-        for ( final Agent agent : agents ) {
-            addRowComponents( agent );
-        }
-    }
-
-
-    private void addRowComponents( final Agent agent ) {
+    @Override
+    public void addRowComponents( Table table, final Agent agent ) {
 
         final HadoopClusterConfig cluster =
-                hadoop.getCluster(hadoopCluster.getClusterName());
-        Table table;
+                hadoop.getCluster( hadoopCluster.getClusterName() );
 
-        if ( cluster.isMasterNode( agent ) ) {
-            table = masterNodesTable;
-        }
-        else {
-            table = slaveNodesTable;
-
-        }
         // Layouts to be added to table
         final HorizontalLayout availableOperations = new HorizontalLayout();
         final HorizontalLayout statusGroup = new HorizontalLayout();
@@ -386,6 +293,8 @@ public class Manager extends BaseManager {
         statusDatanode.addStyleName( "default" );
         statusTaskTracker.addStyleName( "default" );
         statusDecommission.addStyleName( "default" );
+        // Labels to be added to statusGroup
+
 
         if ( cluster.isMasterNode( agent ) ) {
             if ( cluster.isNameNode( agent ) ) {
@@ -419,15 +328,7 @@ public class Manager extends BaseManager {
         }, null );
 
 
-        int rowId = getAgentRowId( table, agent );
-        Item row = null;
-        if ( rowId >= 0 ) {
-            row = table.getItem( rowId );
-        }
-        if ( row == null ) {
-            show( "Agent rowId should have been found inside " + table.getCaption() + " but could not find! " );
-            return;
-        }
+        Item row = getAgentRow( table, agent );
 
         // Add listeners according to node type
 
@@ -483,27 +384,6 @@ public class Manager extends BaseManager {
     }
 
 
-    protected Button getStartStopButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
-            return null;
-        }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( START_NAMENODE_BUTTON_CAPTION )
-                        || component.getCaption().equals( START_JOBTRACKER_BUTTON_CAPTION )
-                        || component.getCaption().equals( STOP_JOBTRACKER_BUTTON_CAPTION )
-                        || component.getCaption().equals( STOP_NAMENODE_BUTTON_CAPTION )
-                        || component.getCaption().equals( START_STOP_BUTTON_DEFAULT_CAPTION )
-                        ) {
-                    return ( Button ) component;
-                }
-            }
-            // If not found
-            return null;
-        }
-    }
-
-
     private Button.ClickListener jobTrackerURLButtonListener( final Agent agent ) {
         return new Button.ClickListener() {
             @Override
@@ -512,22 +392,6 @@ public class Manager extends BaseManager {
                         "JobTracker", false );
             }
         } ;
-    }
-
-
-    private int getAgentRowId( final Table table, final Agent agent ) {
-        if ( table != null && agent != null ) {
-            for ( Object o : table.getItemIds() ) {
-                int rowId = ( Integer ) o;
-                Item row = table.getItem( rowId );
-                String hostName = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-                if ( hostName.equals( agent.getHostname() ) ) {
-                    return rowId;
-                }
-            }
-        }
-        return -1;
-
     }
 
 
@@ -546,7 +410,6 @@ public class Manager extends BaseManager {
         }
         return null;
     }
-
 
     protected HorizontalLayout getStatusGroupByRow( final Item row ) {
         if ( row == null )
@@ -620,24 +483,24 @@ public class Manager extends BaseManager {
     }
 
 
-    protected synchronized void enableProgressBar() {
-        processCount++;
-        progressBar.setVisible( true );
-    }
-
-
-    protected synchronized void disableProgressBar() {
-        if ( processCount > 0 ) {
-            processCount--;
-        }
-        if ( processCount == 0 ) {
-            progressBar.setVisible( false );
-        }
-    }
+//    protected synchronized void enableProgressBar() {
+//        processCount++;
+//        progressBar.setVisible( true );
+//    }
+//
+//
+//    protected synchronized void disableProgressBar() {
+//        if ( processCount > 0 ) {
+//            processCount--;
+//        }
+//        if ( processCount == 0 ) {
+//            progressBar.setVisible( false );
+//        }
+//    }
 
 
     protected void checkAllIfNoProcessRunning() {
-        if ( processCount == 0 ) {
+        if ( getProcessCount() == 0 ) {
             checkAllButton.click();
         }
     }
@@ -717,14 +580,6 @@ public class Manager extends BaseManager {
 
     public Button getCheckAllButton() {
         return checkAllButton;
-    }
-
-    public ProgressBar getProgressBar() {
-        return progressBar;
-    }
-
-    public int getProcessCount() {
-        return processCount;
     }
 
     public String getDecommissionStatus() {
