@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.template.cli;
 
 import org.safehaus.subutai.core.template.api.TemplateManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 

@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -52,6 +53,7 @@ public class ZookeeperImpl implements Zookeeper
     private final Hadoop hadoopManager;
     private ExecutorService executor;
     private PluginDAO pluginDAO;
+    private final Commands commands;
 
 
     public ZookeeperImpl( final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
@@ -75,7 +77,13 @@ public class ZookeeperImpl implements Zookeeper
         this.hadoopManager = hadoopManager;
         this.pluginDAO = new PluginDAO( dbManager );
 
-        Commands.init( commandRunner );
+        this.commands = new Commands( commandRunner );
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 
@@ -318,7 +326,8 @@ public class ZookeeperImpl implements Zookeeper
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUIDUtil
+                .generateTimeBasedUUID() ) );
 
         //node group
         NodeGroup nodesGroup = new NodeGroup();

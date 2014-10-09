@@ -23,8 +23,7 @@ public class CommandJson
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( CommandJson.class.getName() );
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().addDeserializationExclusionStrategy(
-            new SkipNullsExclusionStrategy() ).disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
     private CommandJson()
@@ -44,7 +43,7 @@ public class CommandJson
     {
 
         Command cmd = getCommandFromJson( json );
-        if ( cmd != null && cmd.getRequest() != null )
+        if ( cmd != null )
         {
             return cmd.getRequest();
         }
@@ -155,7 +154,7 @@ public class CommandJson
     {
 
         Command cmd = getCommandFromJson( json );
-        if ( cmd != null && cmd.getResponse() != null )
+        if ( cmd != null )
         {
             return cmd.getResponse();
         }

@@ -49,19 +49,14 @@ class CommunicationMessageListener implements MessageListener
 
                 byte[] msgBytes = new byte[( int ) msg.getBodyLength()];
                 msg.readBytes( msgBytes );
-                String jsonCmd = new String( msgBytes, "UTF-8" );
+                String jsonCmd = new String( msgBytes, "UTF-8" ).replaceAll( "\"null\"", "null" );
                 Response response = CommandJson.getResponseFromCommandJson( jsonCmd );
-
 
                 if ( response != null )
                 {
                     logResponse( response, jsonCmd );
                     response.setTransportId( ( ( ActiveMQMessage ) message ).getProducerId().toString() );
                     notifyListeners( response );
-                }
-                else
-                {
-                    LOG.warn( "Could not parse response {}", jsonCmd );
                 }
             }
             else if ( message instanceof ActiveMQMessage )

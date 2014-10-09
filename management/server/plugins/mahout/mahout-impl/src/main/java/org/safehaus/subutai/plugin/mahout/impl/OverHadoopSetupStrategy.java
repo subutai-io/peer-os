@@ -63,7 +63,7 @@ class OverHadoopSetupStrategy extends MahoutSetupStrategy
 
         // Check installed packages
 
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getNodes() );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -95,7 +95,7 @@ class OverHadoopSetupStrategy extends MahoutSetupStrategy
         // Save to db
         manager.getPluginDAO().saveInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
 
-        Command installCommand = Commands.getInstallCommand( config.getNodes() );
+        Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( installCommand );
         if ( installCommand.hasSucceeded() )
         {

@@ -3,7 +3,8 @@ package org.safehaus.subutai.common.util;
 
 import java.util.UUID;
 
-import org.doomdark.uuid.UUIDGenerator;
+import com.fasterxml.uuid.EthernetAddress;
+import com.fasterxml.uuid.Generators;
 
 
 /**
@@ -12,15 +13,10 @@ import org.doomdark.uuid.UUIDGenerator;
 public class UUIDUtil
 {
 
+
     public static UUID generateTimeBasedUUID()
     {
-        return java.util.UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
-    }
-
-
-    public static UUID generateCassandraUUID()
-    {
-        return UUID.fromString( new com.eaio.uuid.UUID().toString() );
+        return Generators.timeBasedGenerator( EthernetAddress.fromInterface() ).generate();
     }
 
 

@@ -145,29 +145,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
 
 
     /**
-     * Returns agent by its node's hostname or null if agent is not connected
-     *
-     * @param hostname - hostname of agent's node
-     *
-     * @return agent
-     */
-    public Agent getAgentByHostname( String hostname )
-    {
-        if ( !Strings.isNullOrEmpty( hostname ) )
-        {
-            for ( Agent agent : agents.asMap().values() )
-            {
-                if ( hostname.equalsIgnoreCase( agent.getHostname() ) )
-                {
-                    return agent;
-                }
-            }
-        }
-        return null;
-    }
-
-
-    /**
      * Returns agent by its UUID or null if agent is not connected
      *
      * @param uuid - UUID of agent
@@ -269,6 +246,29 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
             result = getAgentByHostname( hostname );
         }
         return result;
+    }
+
+
+    /**
+     * Returns agent by its node's hostname or null if agent is not connected
+     *
+     * @param hostname - hostname of agent's node
+     *
+     * @return agent
+     */
+    public Agent getAgentByHostname( String hostname )
+    {
+        if ( !Strings.isNullOrEmpty( hostname ) )
+        {
+            for ( Agent agent : agents.asMap().values() )
+            {
+                if ( hostname.equalsIgnoreCase( agent.getHostname() ) )
+                {
+                    return agent;
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -377,9 +377,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     private void sendAck( UUID agentUUID )
     {
-        Request ack =
-                new Request( "AGENT-MANAGER", RequestType.REGISTRATION_REQUEST_DONE, agentUUID, UUID.randomUUID(), null,
-                        null, null, null, null, null, null, null, null, null, null, null );
+        Request ack = new Request( "AGENT-MANAGER", RequestType.REGISTRATION_REQUEST_DONE, agentUUID,
+                UUIDUtil.generateTimeBasedUUID(), null, null, null, null, null, null, null, null, null, null, null,
+                null );
         communicationService.sendRequest( ack );
     }
 

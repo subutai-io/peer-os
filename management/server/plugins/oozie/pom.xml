@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>oozie-plugin-parent</artifactId>
-  <name>Subutai Oozie Plugin Parent</name>
-  <description>Subutai Oozie Plugin Parent</description>
+  <name>Subutai Oozie Parent</name>
+  <description>Subutai Oozie Parent</description>
   <packaging>pom</packaging>
 
   <modules>

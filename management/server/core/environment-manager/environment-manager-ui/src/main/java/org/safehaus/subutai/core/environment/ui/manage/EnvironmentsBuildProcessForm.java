@@ -11,12 +11,12 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.environment.ui.executor.BuildCommandFactory;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEvent;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionEventType;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutionListener;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutor;
-import org.safehaus.subutai.core.environment.ui.executor.BuildProcessExecutorImpl;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildCommandFactory;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutionEvent;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutionEventType;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutionListener;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutor;
+import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 
@@ -45,7 +45,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
-
+    private Button environmentsButton;
 
     public EnvironmentsBuildProcessForm( final EnvironmentManagerPortalModule managerUI )
     {
@@ -57,8 +57,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
         environmentsTable = createTable( "Environments Build Process", 300 );
 
-        Button getEnvironmentsButton = new Button( "View" );
-        getEnvironmentsButton.addClickListener( new Button.ClickListener()
+        environmentsButton = new Button( "View" );
+        environmentsButton.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
@@ -66,7 +66,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 updateTableData();
             }
         } );
-        contentRoot.addComponent( getEnvironmentsButton );
+        contentRoot.addComponent( environmentsButton );
         contentRoot.addComponent( environmentsTable );
     }
 
@@ -91,14 +91,14 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private void updateTableData()
     {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildProcess> environmentBuildProcessList =
+        List<EnvironmentBuildProcess> processList =
                 managerUI.getEnvironmentManager().getBuildProcesses();
-        if ( !environmentBuildProcessList.isEmpty() )
+        if ( !processList.isEmpty() )
         {
-            for ( final EnvironmentBuildProcess environmentBuildProcess : environmentBuildProcessList )
+            for ( final EnvironmentBuildProcess process : processList )
             {
-                Button viewEnvironmentInfoButton = new Button( "Info" );
-                viewEnvironmentInfoButton.addClickListener( new Button.ClickListener()
+                Button viewButton = new Button( "Info" );
+                viewButton.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -106,7 +106,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         EnvironmentBuildProcessDetails detailsWindow =
                                 new EnvironmentBuildProcessDetails( "Environment details" );
                         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-                        String json = gson.toJson( environmentBuildProcess, EnvironmentBuildProcess.class );
+                        String json = gson.toJson( process, EnvironmentBuildProcess.class );
                         detailsWindow.setContent( json );
                         contentRoot.getUI().addWindow( detailsWindow );
                         detailsWindow.setVisible( true );
@@ -117,7 +117,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 Button destroyButton = null;
                 Embedded icon = null;
 
-                switch ( environmentBuildProcess.getProcessStatusEnum() )
+                switch ( process.getProcessStatusEnum() )
                 {
                     case NEW_PROCESS:
                     {
@@ -128,7 +128,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                startBuildProcess( environmentBuildProcess );
+                                startBuildProcess( process );
                             }
                         } );
 
@@ -143,7 +143,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                             @Override
                             public void buttonClick( final Button.ClickEvent clickEvent )
                             {
-                                terminateBuildProcess( environmentBuildProcess );
+                                terminateBuildProcess( process );
                             }
                         } );
                         break;
@@ -174,13 +174,14 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        destroyBuildProcess( environmentBuildProcess );
+                        destroyBuildProcess( process );
+                        environmentsButton.click();
                     }
                 } );
                 environmentsTable.addItem( new Object[] {
-                        environmentBuildProcess.getEnvironmentName(), icon, viewEnvironmentInfoButton, processButton,
+                        process.getEnvironmentName(), icon, viewButton, processButton,
                         destroyButton
-                }, environmentBuildProcess.getUuid() );
+                }, process.getUuid() );
             }
         }
         else

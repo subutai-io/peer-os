@@ -5,14 +5,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
@@ -116,7 +115,7 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
 
         //check installed ksks packages
         Set<Agent> allNodes = config.getAllNodes();
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( allNodes );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -164,7 +163,7 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         manager.getPluginDAO().saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
         //install hbase
-        Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
+        Command installCommand = manager.getCommands().getInstallCommand( config.getAllNodes() );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )

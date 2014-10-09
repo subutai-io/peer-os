@@ -1,14 +1,19 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -19,14 +24,18 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class EnvironmentManagerImplTest
 {
 
+    private static final String HOSTNAME = "hostname";
     EnvironmentManagerImpl manager;
     @Mock
     ContainerManager containerManager;
@@ -49,8 +58,9 @@ public class EnvironmentManagerImplTest
 
 
     @Before
-    public void init()
+    public void setUp() throws Exception
     {
+
         manager = new EnvironmentManagerImpl();
         manager.setAgentManager( agentManager );
         manager.setContainerManager( containerManager );
@@ -65,26 +75,26 @@ public class EnvironmentManagerImplTest
 
 
     @Test
-    public void testName() throws Exception
+    public void shoudBuildEnvironment() throws Exception
     {
-        EnvironmentBuildProcess task = getEBT();
-        //        manager.buildEnvironment( task );
-    }
+        EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
+        when( process.getEnvironmentName() ).thenReturn( "name" );
+        when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID());
 
+        Map<String, CloneContainersMessage> map = new HashMap<>();
+        CloneContainersMessage ccm = mock( CloneContainersMessage.class );
+        when( ccm.isSuccess() ).thenReturn( true );
+        Set<Agent> agents = new HashSet<>();
 
-    String name = "name";
-    UUID envId;
-    UUID peerID;
+        Agent agent = mock( Agent.class );
+        agent.setHostname( HOSTNAME );
+        agents.add( agent );
 
+        when( ccm.getResult() ).thenReturn( agents );
+        map.put( "key", ccm );
 
-    private EnvironmentBuildProcess getEBT()
-    {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( name );
-
-        envId = UUID.randomUUID();
-        peerID = UUID.randomUUID();
-        CloneContainersMessage ccm = new CloneContainersMessage( envId, peerID );
-        process.putCloneContainerMessage( peerID.toString(), ccm );
-        return process;
+        when( ccm.getNumberOfNodes() ).thenReturn( agents.size() );
+        when( process.getMessageMap() ).thenReturn( map );
+        manager.buildEnvironment( process );
     }
 }

@@ -35,7 +35,7 @@
 #
 
 # Set TMPDIR variable to enfore dpkg-deb to use the specified directory while building the debian package for its temporary files
-export TMPDIR="/var"
+export TMPDIR="$SUBUTAI_TMPDIR"
 
 function is_dpkg_locked {
   lsof /var/lib/dpkg/lock > /dev/null 2>&1
@@ -156,15 +156,6 @@ function create_preinst_script {
   local preinst_file=$debian_dir/DEBIAN/preinst
   local archive_directory=/var/cache/apt/archives/
   echo "#!/bin/bash"  >> $preinst_file
-  if [ $lxc == "master" ]; then
-    echo "mkdir -p /lxc-data/tmpdir" >> $preinst_file
-    # Copy master debian package from archive_directory 
-    # under $SUBUTAI_TMPDIR directory
-    echo "if [ -f $archive_directory/$debian_package_name".deb" ]; then" >> $preinst_file
-    echo "  cp $archive_directory/$debian_package_name".deb" $SUBUTAI_TMPDIR"  >> $preinst_file
-    echo "fi" >> $preinst_file
-  fi
-  echo ""  >> $preinst_file
   chmod 755 $preinst_file
 }
 

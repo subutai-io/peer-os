@@ -6,7 +6,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
-import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
 import org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl;
 
 import com.google.common.collect.Sets;
@@ -53,7 +52,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Elasticse
         }
 
 
-        Command stopServiceCommand = Commands.getStopCommand( Sets.newHashSet( node ) );
+        Command stopServiceCommand = manager.getCommands().getStopCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( stopServiceCommand );
         if ( stopServiceCommand.hasSucceeded() )
         {

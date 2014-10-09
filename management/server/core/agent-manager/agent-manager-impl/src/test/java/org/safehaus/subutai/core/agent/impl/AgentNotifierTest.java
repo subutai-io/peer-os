@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 
 import static org.junit.Assert.assertFalse;
@@ -43,7 +44,7 @@ public class AgentNotifierTest
         agentListener = mock( AgentListener.class );
         agentListenerQueue = new ConcurrentLinkedQueue<>();
         agentListenerQueue.add( agentListener );
-        UUID agentId = UUID.randomUUID();
+        UUID agentId = UUIDUtil.generateTimeBasedUUID();;
         AgentManagerImpl agentManager = mock( AgentManagerImpl.class );
         when( agentManager.isNotifyAgentListeners() ).thenReturn( true );
         agents = MockUtils.getAgents( agentId );

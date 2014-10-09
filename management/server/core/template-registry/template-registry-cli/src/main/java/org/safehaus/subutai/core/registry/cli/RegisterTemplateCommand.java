@@ -6,9 +6,11 @@ import java.nio.charset.Charset;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+
+import com.google.common.base.Preconditions;
 
 
 /**
@@ -19,10 +21,10 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
 {
     @Argument(index = 0, name = "path to template config file", required = true, multiValued = false,
             description = "path to template config file")
-    String configFilePath;
+    String configFilePath = "";
     @Argument(index = 1, name = "path to template packages file", required = true, multiValued = false,
             description = "path to template packages file")
-    String packagesFilePath;
+    String packagesFilePath = "";
     @Argument(index = 2, name = "md5sum of packages file", required = true, multiValued = false,
             description = "md5sum of packages file")
     String md5sum;
@@ -32,6 +34,7 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
 
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
+        Preconditions.checkNotNull( templateRegistry );
         this.templateRegistry = templateRegistry;
     }
 
@@ -46,5 +49,11 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
         System.out.println( "Template registered successfully" );
 
         return null;
+    }
+
+
+    public TemplateRegistry getTemplateRegistry()
+    {
+        return templateRegistry;
     }
 }

@@ -45,7 +45,7 @@ public class InstallClusterHandler extends AbstractOperationHandler<CassandraImp
         try
         {
             Environment env = manager.getEnvironmentManager()
-                                     .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
+                                     .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
 
             ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
             clusterSetupStrategy.setup();

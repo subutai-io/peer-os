@@ -4,12 +4,12 @@ package org.safehaus.subutai.plugin.oozie.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -83,9 +83,8 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }
 
-        Command cmd = oozieManager.getCommandRunner()
-                                  .createCommand( new RequestBuilder( Commands.make( CommandType.STATUS ) ),
-                                          allOozieAgents );
+        Command cmd = oozieManager.getCommandRunner().createCommand(
+                new RequestBuilder( oozieManager.getCommands().make( CommandType.STATUS ) ), allOozieAgents );
         oozieManager.getCommandRunner().runCommand( cmd );
         if ( !cmd.hasSucceeded() )
         {
@@ -93,7 +92,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
         }
 
         po.addLog( "Installing Oozie server..." );
-        String sserver = Commands.make( CommandType.INSTALL_SERVER );
+        String sserver = oozieManager.getCommands().make( CommandType.INSTALL_SERVER );
         Agent serverAgent = oozieManager.getAgentManager().getAgentByHostname( config.getServer() );
         cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 180 ),
                 Sets.newHashSet( serverAgent ) );
@@ -109,7 +108,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
         }
 
         po.addLog( "Installing Oozie client..." );
-        String sclient = Commands.make( CommandType.INSTALL_SERVER );
+        String sclient = oozieManager.getCommands().make( CommandType.INSTALL_SERVER );
 
         Set<Agent> clients = new HashSet<>();
         for ( String clientHostname : config.getClients() )

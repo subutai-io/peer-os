@@ -124,9 +124,17 @@ public class Agent implements Serializable, Comparable<Agent>
     @Override
     public String toString()
     {
-        return "Agent{" + "uuid=" + uuid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", listIP="
-                + listIP + ", isLXC=" + isLXC + ", parentHostName=" + parentHostName + ", transportId=" + transportId
-                + '}';
+        return "Agent{" +
+                "uuid=" + uuid +
+                ", macAddress='" + macAddress + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", listIP=" + listIP +
+                ", isLXC=" + isLXC +
+                ", parentHostName='" + parentHostName + '\'' +
+                ", transportId='" + transportId + '\'' +
+                ", siteId=" + siteId +
+                ", environmentId=" + environmentId +
+                '}';
     }
 
 

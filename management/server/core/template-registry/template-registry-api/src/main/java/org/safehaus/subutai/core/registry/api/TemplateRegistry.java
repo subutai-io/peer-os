@@ -7,6 +7,7 @@ package org.safehaus.subutai.core.registry.api;
 
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -21,14 +22,20 @@ public interface TemplateRegistry
      * @param configFile - template configuration file contents
      * @param packagesFile - template packages manifest file contents
      */
-    public void registerTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException;
+    public boolean registerTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException;
+
+
+    /**
+     * Returns packages difference for current template with its parent template.
+     */
+    public Set<String> getPackagesDiff( Template template );
 
     /**
      * Removes template entry from registry
      *
      * @param templateName - name of template to remove
      */
-    public void unregisterTemplate( String templateName ) throws RegistryException;
+    public boolean unregisterTemplate( String templateName ) throws RegistryException;
 
     /**
      * Removes template entry from registry
@@ -146,7 +153,8 @@ public interface TemplateRegistry
      * @param templateName - target template
      * @param inUse - true - template is in use, false - template is out of use
      */
-    public void updateTemplateUsage( String faiHostname, String templateName, boolean inUse ) throws RegistryException;
+    public boolean updateTemplateUsage( String faiHostname, String templateName, boolean inUse )
+            throws RegistryException;
 
 
     /**

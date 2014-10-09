@@ -10,8 +10,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
-import com.google.common.base.Predicates;
-
 
 /**
  * Created by daralbaev on 02.04.14.
@@ -31,7 +29,9 @@ public class HadoopClusterConfig implements ConfigBase
     private Integer replicationFactor = 1, countOfSlaveNodes = 1;
     private Set<Agent> blockedAgents;
 
-    public HadoopClusterConfig() {
+
+    public HadoopClusterConfig()
+    {
         domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<>();
         taskTrackers = new ArrayList<>();
@@ -96,16 +96,21 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public void removeNode( Agent agent ) {
+    public void removeNode( Agent agent )
+    {
         if ( dataNodes.contains( agent ) )
+        {
             dataNodes.remove( agent );
+        }
         if ( taskTrackers.contains( agent ) )
+        {
             taskTrackers.remove( agent );
+        }
     }
 
 
-
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
@@ -231,65 +236,109 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isMasterNode( Agent agent ) {
-        if ( agent.equals( getNameNode() ) || agent.equals( getJobTracker() )  || agent.equals( getSecondaryNameNode() ) )
+    public boolean isMasterNode( Agent agent )
+    {
+        if ( agent.equals( getNameNode() ) || agent.equals( getJobTracker() ) || agent
+                .equals( getSecondaryNameNode() ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
-    public boolean isDataNode( Agent agent ) {
+    public boolean isDataNode( Agent agent )
+    {
         if ( getDataNodes().contains( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
-    public boolean isTaskTracker( Agent agent ) {
+    public boolean isTaskTracker( Agent agent )
+    {
         if ( getTaskTrackers().contains( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
-    public boolean isNameNode( Agent agent ) {
+    public boolean isNameNode( Agent agent )
+    {
         if ( getNameNode().equals( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
-    public boolean isJobTracker( Agent agent ) {
+
+    public boolean isJobTracker( Agent agent )
+    {
         if ( getJobTracker().equals( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
-    public boolean isSecondaryNameNode( Agent agent ) {
+
+    public boolean isSecondaryNameNode( Agent agent )
+    {
         if ( getSecondaryNameNode().equals( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
-    public List<NodeType> getNodeRoles( Agent agent) {
+    public List<NodeType> getNodeRoles( Agent agent )
+    {
         List<NodeType> nodeRoles = new ArrayList<>();
 
         if ( isNameNode( agent ) )
+        {
             nodeRoles.add( NodeType.NAMENODE );
+        }
         if ( isSecondaryNameNode( agent ) )
-                    nodeRoles.add( NodeType.SECONDARY_NAMENODE );
+        {
+            nodeRoles.add( NodeType.SECONDARY_NAMENODE );
+        }
         if ( isJobTracker( agent ) )
-                    nodeRoles.add( NodeType.JOBTRACKER );
+        {
+            nodeRoles.add( NodeType.JOBTRACKER );
+        }
         if ( isDataNode( agent ) )
-                    nodeRoles.add( NodeType.DATANODE );
+        {
+            nodeRoles.add( NodeType.DATANODE );
+        }
         if ( isTaskTracker( agent ) )
-                    nodeRoles.add( NodeType.TASKTRACKER );
+        {
+            nodeRoles.add( NodeType.TASKTRACKER );
+        }
 
         return nodeRoles;
     }
@@ -341,5 +390,4 @@ public class HadoopClusterConfig implements ConfigBase
                 ", countOfSlaveNodes=" + countOfSlaveNodes +
                 '}';
     }
-
 }

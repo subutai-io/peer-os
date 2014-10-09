@@ -11,6 +11,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
@@ -35,20 +36,21 @@ public class EnvironmentBuilder
     private final TemplateRegistry templateRegistry;
     private final AgentManager agentManager;
     private final NetworkManager networkManager;
+    private final ContainerManager containerManager;
 
 
     public EnvironmentBuilder( final TemplateRegistry templateRegistry, final AgentManager agentManager,
-                               NetworkManager networkManager )
+                               NetworkManager networkManager, ContainerManager containerManager )
     {
         this.templateRegistry = templateRegistry;
         this.agentManager = agentManager;
         this.networkManager = networkManager;
+        this.containerManager = containerManager;
     }
 
 
     //@todo destroy all containers of all groups inside environment on any failure ???
-    public Environment build( final EnvironmentBuildTask environmentBuildTask, ContainerManager containerManager )
-            throws EnvironmentBuildException
+    public Environment build( final EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException
     {
 
 
@@ -56,7 +58,7 @@ public class EnvironmentBuilder
         Set<String> physicalNodes = environmentBuildTask.getPhysicalNodes();
 
 
-        Environment environment = new Environment( blueprint.getName() );
+        Environment environment = new Environment( UUIDUtil.generateTimeBasedUUID(), blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
         {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
@@ -170,8 +172,5 @@ public class EnvironmentBuilder
     public void destroy( final Environment environment ) throws EnvironmentDestroyException
     {
         //TODO destroy environment code goes here
-        //        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
-        //            nodeGroupBuilder.destroy( nodeGroup );
-        //        }
     }
 }

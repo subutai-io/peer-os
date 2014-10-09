@@ -17,31 +17,20 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>${com.google.code.gson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>${com.google.guava.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.doomdark</groupId>
-      <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.eaio.uuid</groupId>
-      <artifactId>uuid</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -52,16 +41,24 @@
       <artifactId>httpmime</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${org.slf4j.version}</version>
-    </dependency>
-    <!--CXF-->
-    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-      <version>${org.apache.cxf.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.specs</groupId>
+      <artifactId>org.apache.servicemix.specs.jsr339-api-m10</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -77,9 +74,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.common</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};
-              {local-packages}.*;
-              version=${project.version};-noimport:=true
+              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
               org.apache.http;org.apache.http.*
             </Export-Package>
           </instructions>

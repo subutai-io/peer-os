@@ -63,7 +63,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
         for ( String cloneName : cloneNames )
         {
             result &= scriptExecutor
-                    .execute( a, ActionType.CLONE, templateName, cloneName, String.format( " %s &", environmentId ) );
+                    .execute( a, ActionType.CLONE, templateName, cloneName, String.format( " -e %s &", environmentId ) );
             // TODO: script does not return w/o redirecting outputs!!!
             // for now, script is run in background
         }

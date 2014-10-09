@@ -1,29 +1,50 @@
 package org.safehaus.subutai.core.environment.cli;
 
 
-import org.junit.Test;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.mockito.Mockito.mock;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+
+import static org.mockito.Mockito.when;
 
 
 /**
  * Created by bahadyr on 9/25/14.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class DescribeEnvironmentCommandTest
 {
     DescribeEnvironmentCommand describeEnvironmentCommand;
+    @Mock
+    EnvironmentManager manager;
 
 
-    //    @Before
-    public void init()
+    @Before
+    public void setUp() throws Exception
     {
-        describeEnvironmentCommand = mock( DescribeEnvironmentCommand.class );
+        describeEnvironmentCommand = new DescribeEnvironmentCommand();
+        describeEnvironmentCommand.setEnvironmentManager( manager );
     }
 
 
     @Test
-    public void test()
+    public void test() throws Exception
     {
-
+        String name = "name";
+        Environment environment = new Environment( UUIDUtil.generateTimeBasedUUID(), name );
+        final Set<EnvironmentContainer> set = new HashSet<>();
+        environment.setContainers( set );
+        describeEnvironmentCommand.setEnvironmentName( name );
+        when( manager.getEnvironment( name ) ).thenReturn( environment );
+        describeEnvironmentCommand.doExecute();
     }
 }

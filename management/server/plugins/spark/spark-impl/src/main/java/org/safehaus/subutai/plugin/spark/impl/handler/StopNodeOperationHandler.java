@@ -6,7 +6,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 
@@ -67,11 +66,11 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SparkImpl
         Command stopCommand;
         if ( master )
         {
-            stopCommand = Commands.getStopMasterCommand( node );
+            stopCommand = manager.getCommands().getStopMasterCommand( node );
         }
         else
         {
-            stopCommand = Commands.getStopSlaveCommand( node );
+            stopCommand = manager.getCommands().getStopSlaveCommand( node );
         }
         manager.getCommandRunner().runCommand( stopCommand );
 

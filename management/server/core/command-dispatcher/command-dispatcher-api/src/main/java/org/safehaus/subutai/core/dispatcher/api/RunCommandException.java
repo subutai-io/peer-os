@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.dispatcher.api;
 
 
 /**
- * Created by dilshat on 9/8/14.
+ * Exception that might be thrown by CommandDispatcher
  */
 public class RunCommandException extends RuntimeException
 {

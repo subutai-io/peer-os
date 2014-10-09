@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -35,8 +36,29 @@ import org.safehaus.subutai.plugin.hadoop.impl.common.HadoopSetupStrategy;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.AddOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.*;
-import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.*;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.BlockTaskTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.RestartJobTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StartJobTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StartTaskTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StatusJobTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StatusTaskTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StopJobTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.StopTaskTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.jobtracker.UnblockTaskTrackerOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.BlockDataNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.CheckDecommissionStatusOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.DestroyNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.ExcludeNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.IncludeNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.RestartNameNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StartDataNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StartNameNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StatusDataNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StatusNameNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StatusSecondaryNameNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StopDataNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StopNameNodeOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.UnblockDataNodeOperationHandler;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -55,6 +77,7 @@ public class HadoopImpl implements Hadoop
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
     private PluginDAO pluginDAO;
+    private Commands commands;
 
 
     public HadoopImpl( AgentManager agentManager, Tracker tracker, CommandRunner commandRunner, DbManager dbManager,
@@ -79,7 +102,13 @@ public class HadoopImpl implements Hadoop
         this.environmentManager = environmentManager;
 
         pluginDAO = new PluginDAO( dbManager );
-        Commands.init( commandRunner );
+        commands = new Commands( commandRunner );
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 
@@ -261,8 +290,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID startDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+    public UUID startDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -274,8 +305,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID stopDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+    public UUID stopDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -292,8 +325,8 @@ public class HadoopImpl implements Hadoop
     public UUID statusDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(hadoopClusterConfig.getClusterName()),
-                "Cluster name is null or empty");
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
+                "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( agent.getHostname() ), "Lxc hostname is null or empty" );
 
         AbstractOperationHandler operationHandler =
@@ -334,7 +367,7 @@ public class HadoopImpl implements Hadoop
     @Override
     public UUID restartJobTracker( HadoopClusterConfig hadoopClusterConfig )
     {
-        Preconditions.checkNotNull(hadoopClusterConfig, "Configuration is null");
+        Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
 
@@ -358,8 +391,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID startTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+    public UUID startTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -369,8 +404,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID stopTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+    public UUID stopTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -398,7 +435,8 @@ public class HadoopImpl implements Hadoop
 
 
     @Override
-    public UUID addNode( String clusterName, int nodeCount ) {
+    public UUID addNode( String clusterName, int nodeCount )
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
         AbstractOperationHandler operationHandler = new AddOperationHandler( this, clusterName, nodeCount );
@@ -406,8 +444,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID addNode(String clusterName) {
+    public UUID addNode( String clusterName )
+    {
         return addNode( clusterName, 1 );
     }
 
@@ -426,8 +466,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID destroyNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+    public UUID destroyNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -439,8 +481,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID checkDecomissionStatus(HadoopClusterConfig hadoopClusterConfig) {
+    public UUID checkDecomissionStatus( HadoopClusterConfig hadoopClusterConfig )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -451,8 +495,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID excludeNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+    public UUID excludeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -464,8 +510,10 @@ public class HadoopImpl implements Hadoop
         return operationHandler.getTrackerId();
     }
 
+
     @Override
-    public UUID includeNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+    public UUID includeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent )
+    {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ),
                 "Cluster name is null or empty" );
@@ -546,7 +594,8 @@ public class HadoopImpl implements Hadoop
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint
+                .setName( String.format( "%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setExchangeSshKeys( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );

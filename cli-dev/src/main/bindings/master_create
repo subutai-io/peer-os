@@ -36,7 +36,14 @@ function master_create {
   echo lxc.hook.pre-start = $subutai_script_base/pre_start_hook >> $config
   echo subutai.parent = master >> $config
   echo subutai.git.branch = master >> $config
-  sed -i '/lxc.network.link =.*/c\lxc.network.link = br0' $config
+  
+  #changing default network link to related veth pair name
+  sed -i '/lxc.network.link =.*/c\lxc.network.veth.pair = master' $config
+  #adding ovs_ops script for lxc startup
+  echo "lxc.network.script.up = /usr/share/subutai-cli/subutai/lib/ovs_ops" >> $config
+  #creating second network interface
+  echo "lxc.network.type = veth" >> $config
+  echo "lxc.network.flags = up" >> $config
   
   # (0) Start it up, update, dist-upgrade, shutdown
   # (1) Backup rootfs contents and delete contents
@@ -53,18 +60,21 @@ function master_create {
     echo "$SUBUTAI_APT_MIRROR security.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
   fi
   
+  lxc_wait_net master
+  local subutai_repo_file="/var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list"
+  echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
+      >> $subutai_repo_file
+  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" \
+      >> $subutai_repo_file
+
   # Configuration for apt-proxy
   if [ -n "$SUBUTAI_APT_PROXY" ]; then
     echo "deb $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       > /etc/apt/sources.list.d/subutai-repo.list
+       >> $subutai_repo_file
     echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       >> /etc/apt/sources.list.d/subutai-repo.list
+       >> $subutai_repo_file
   fi
-  lxc_wait_net master
-  echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
-      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list
-  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" \
-      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list 
+  
   lxc-attach -n master -- apt-get update
   lxc-attach -n master -- apt-get -y dist-upgrade
 

@@ -68,15 +68,15 @@ public class SshManager
         {
             command.execute();
             StringBuilder value = new StringBuilder();
-            if ( command.hasCompleted() )
+            if ( !command.hasCompleted() )
             {
-                for ( Agent agent : agentList )
+                return false;
+            }
+            for ( AgentResult result : command.getResults().values() )
+            {
+                if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
                 {
-                    AgentResult result = command.getResults().get( agent.getUuid() );
-                    if ( !Strings.isNullOrEmpty( result.getStdOut() ) )
-                    {
-                        value.append( result.getStdOut() );
-                    }
+                    value.append( result.getStdOut() );
                 }
             }
             keys = value.toString();

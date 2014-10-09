@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 import com.google.common.collect.Sets;
@@ -69,7 +68,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Zookeepe
 
         productOperation.addLog( "Starting node..." );
 
-        Command startCommand = Commands.getStartCommand( Sets.newHashSet( node ) );
+        Command startCommand = manager.getCommands().getStartCommand( Sets.newHashSet( node ) );
         final AtomicBoolean ok = new AtomicBoolean();
         manager.getCommandRunner().runCommand( startCommand, new CommandCallback()
         {

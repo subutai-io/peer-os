@@ -6,13 +6,14 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerEvent;
 import org.safehaus.subutai.core.container.api.ContainerEventListener;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
@@ -40,7 +41,7 @@ public class Clone extends OsgiCommandSupport implements ContainerEventListener
     protected Object doExecute() throws Exception
     {
         containerManager.addListener( this );
-        UUID envId = UUID.randomUUID();
+        UUID envId = UUIDUtil.generateTimeBasedUUID();;
         try
         {
             Agent a = containerManager.clone( envId, hostname, templateName, cloneName );

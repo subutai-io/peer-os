@@ -30,7 +30,7 @@ public class SetupHelper
     {
         po.addLog( "Setting master IP..." );
 
-        Command cmd = Commands.getSetMasterIPCommand( config.getMasterNode(), agents );
+        Command cmd = manager.getCommands().getSetMasterIPCommand( config.getMasterNode(), agents );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( !cmd.hasSucceeded() )
@@ -46,7 +46,7 @@ public class SetupHelper
     {
         po.addLog( "Registering slave(s)..." );
 
-        Command cmd = Commands.getAddSlavesCommand( config.getSlaveNodes(), config.getMasterNode() );
+        Command cmd = manager.getCommands().getAddSlavesCommand( config.getSlaveNodes(), config.getMasterNode() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( !cmd.hasSucceeded() )
@@ -62,7 +62,7 @@ public class SetupHelper
     {
         po.addLog( "Starting cluster..." );
 
-        Command cmd = Commands.getStartAllCommand( config.getMasterNode() );
+        Command cmd = manager.getCommands().getStartAllCommand( config.getMasterNode() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

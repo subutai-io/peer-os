@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.impl.handler.AddNodeHandler;
@@ -120,7 +121,7 @@ public class StormImpl extends StormBase
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
-        eb.setName( StormConfig.PRODUCT_NAME + UUID.randomUUID() );
+        eb.setName( StormConfig.PRODUCT_NAME + UUIDUtil.generateTimeBasedUUID() );
         eb.setNodeGroups( new HashSet<NodeGroup>() );
 
         // no need to create new container for nimbus node if external Zookeeper
