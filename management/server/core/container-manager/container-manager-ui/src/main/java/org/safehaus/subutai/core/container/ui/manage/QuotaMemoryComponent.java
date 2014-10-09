@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.container.ui.manage;
 
 
+import java.math.BigInteger;
+
 import org.safehaus.subutai.core.lxc.quota.api.MemoryUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +43,6 @@ public class QuotaMemoryComponent extends VerticalLayout
         addComponent( memoryTextField );
 
         unitComboBox = new ComboBox( "", getUnitsEnum() );
-        //        unitComboBox.setWidth( 50, Unit.PERCENTAGE );
-        //        unitComboBox.select( MemoryUnit.BYTES.getShortName() );
 
         unitComboBox.setItemCaptionPropertyId( UNIT_LONG_NAME );
         unitComboBox.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
@@ -65,7 +65,7 @@ public class QuotaMemoryComponent extends VerticalLayout
 
                 MemoryUnit newUnit = MemoryUnit.getMemoryUnit( unitId );
 
-                performConversion( defaultUnit, newUnit );
+                performConversion( newUnit );
             }
         } );
         unitComboBox.select( getUnitsEnum().getItem( MemoryUnit.BYTES.getShortName() ) );
@@ -81,9 +81,16 @@ public class QuotaMemoryComponent extends VerticalLayout
     }
 
 
-    public void setValueForMemoryUnitComboBox( MemoryUnit unit )
+    public String getMemoryLimitValue()
     {
-        //        unitComboBox.select( unit.getShortName() );
+        String value = memoryTextField.getValue().replaceAll( "\n", "" );
+        BigInteger memory = new BigInteger( value );
+        while ( defaultUnit.getValue() > 0 )
+        {
+            memory = convertToLess( memory );
+            defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getValue() - 1 );
+        }
+        return memory.toString();
     }
 
 
@@ -106,60 +113,44 @@ public class QuotaMemoryComponent extends VerticalLayout
     }
 
 
-    private void performConversion( MemoryUnit oldValue, MemoryUnit newValue )
+    private void performConversion( MemoryUnit newValue )
     {
         String conversionResult = "";
         String str = memoryTextField.getValue().replaceAll( "\n", "" );
         LOGGER.warn( str );
-        Long currentUnitValue = Long.parseLong( str );
-        if ( oldValue.getValue() < newValue.getValue() )
+        BigInteger value = new BigInteger( str );
+
+        BigInteger currentUnitValue = new BigInteger( str );
+        if ( defaultUnit.getValue() < newValue.getValue() )
         {
-            while ( oldValue.getValue() < newValue.getValue() )
+            while ( defaultUnit.getValue() < newValue.getValue() )
             {
-                switch ( oldValue.getValue() )
-                {
-                    case 0:
-                        conversionResult = String.valueOf( convertToBigger( currentUnitValue ) );
-                        break;
-                    case 1:
-                        conversionResult = String.valueOf( convertToBigger( currentUnitValue ) );
-                        break;
-                    case 2:
-                        conversionResult = String.valueOf( convertToBigger( currentUnitValue ) );
-                }
-                oldValue = MemoryUnit.getMemoryUnit( oldValue.getValue() + 1 );
+                currentUnitValue = convertToBigger( currentUnitValue );
+                conversionResult = String.valueOf( currentUnitValue );
+                defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getValue() + 1 );
             }
         }
-        else if ( oldValue.getValue() > newValue.getValue() )
+        else if ( defaultUnit.getValue() > newValue.getValue() )
         {
-            while ( oldValue.getValue() > newValue.getValue() )
+            while ( defaultUnit.getValue() > newValue.getValue() )
             {
-                switch ( oldValue.getValue() )
-                {
-                    case 0:
-                        conversionResult = String.valueOf( convertToLess( currentUnitValue ) );
-                        break;
-                    case 1:
-                        conversionResult = String.valueOf( convertToLess( currentUnitValue ) );
-                        break;
-                    case 2:
-                        conversionResult = String.valueOf( convertToLess( currentUnitValue ) );
-                }
-                oldValue = MemoryUnit.getMemoryUnit( oldValue.getValue() - 1 );
+                currentUnitValue = convertToLess( currentUnitValue );
+                conversionResult = String.valueOf( currentUnitValue );
+                defaultUnit = MemoryUnit.getMemoryUnit( defaultUnit.getValue() - 1 );
             }
         }
         memoryTextField.setValue( conversionResult );
     }
 
 
-    private long convertToBigger( long value )
+    private BigInteger convertToBigger( BigInteger value )
     {
-        return value / 1024;
+        return value.divide( new BigInteger( "1024" ) );
     }
 
 
-    private long convertToLess( long value )
+    private BigInteger convertToLess( BigInteger value )
     {
-        return value * 1024;
+        return value.multiply( new BigInteger( "1024" ) );
     }
 }
