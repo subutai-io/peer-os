@@ -33,7 +33,7 @@
     <aries.proxy.version>1.0.1</aries.proxy.version>
     <aries.util.version>1.1.0</aries.util.version>
     <!-- REST -->
-    <restlet-version>2.2.2</restlet-version>
+    <vaadin-version>7.3.2</vaadin-version>
   </properties>
 
   <dependencyManagement>
@@ -578,37 +578,32 @@
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-server</artifactId>
-        <version>7.3.1</version>
+        <version>${vaadin-version}</version>
       </dependency>
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-client-compiled</artifactId>
-        <version>7.3.1</version>
+        <version>${vaadin-version}</version>
       </dependency>
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-client</artifactId>
-        <version>7.3.1</version>
+        <version>${vaadin-version}</version>
       </dependency>
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-themes</artifactId>
-        <version>7.3.1</version>
+        <version>${vaadin-version}</version>
       </dependency>
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-shared</artifactId>
-        <version>7.3.1</version>
+        <version>${vaadin-version}</version>
       </dependency>
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-shared-deps</artifactId>
         <version>1.0.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jsoup</groupId>
-        <artifactId>jsoup</artifactId>
-        <version>1.7.3</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -639,18 +634,8 @@
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>1.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-all</artifactId>
         <version>1.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>1.9.5</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
@@ -683,7 +668,7 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.2.4</version>
+        <version>2.3</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -731,9 +716,29 @@
         <artifactId>slf4j-api</artifactId>
         <version>1.7.7</version>
       </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.9</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jta_1.1_spec</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.servicemix.specs</groupId>
+        <artifactId>org.apache.servicemix.specs.activation-api-1.1</artifactId>
+        <version>2.4.0</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- communication-manager -->
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-all</artifactId>
+        <version>5.10.0</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>

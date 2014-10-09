@@ -19,6 +19,7 @@
     <module>vaadin</module>
     <module>plugins</module>
 
+    <module>subutai-features</module>
     <module>server-karaf</module>
   </modules>
 
