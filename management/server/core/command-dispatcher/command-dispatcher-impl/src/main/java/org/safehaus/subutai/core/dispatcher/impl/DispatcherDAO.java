@@ -131,7 +131,7 @@ public class DispatcherDAO
 
 
     //workaround until we change Cassandra to another DB
-    public void deleteRemoteRequest( UUID commandId, int attempts ) throws DBException
+    public void deleteRemoteRequestWithAttempts( UUID commandId, int attempts ) throws DBException
     {
         Preconditions.checkArgument( attempts >= 0, "Attempts < 0" );
         Preconditions.checkNotNull( commandId, COMMAND_ID_IS_NULL_MSG );
