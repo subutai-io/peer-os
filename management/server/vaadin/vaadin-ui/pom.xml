@@ -70,18 +70,18 @@
             <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
 
             <!-- Add Embed lib -->
-            <Embed-Directory>WEB-INF/lib</Embed-Directory>
+            <!--<Embed-Directory>WEB-INF/lib</Embed-Directory>-->
             <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
             <Import-Package>*;resolution:=optional</Import-Package>
             <Export-Package>
-              com.vaadin.ui.*;
-              com.vaadin.data.*;
-              com.vaadin.server.*;
-              com.vaadin.event.*;
-              com.vaadin.client.*;
-              com.vaadin.shared.*;
-              com.google.gwt.*;
-              org.json.*;
+              <!--com.vaadin.ui.*;-->
+              <!--com.vaadin.data.*;-->
+              <!--com.vaadin.server.*;-->
+              <!--com.vaadin.event.*;-->
+              <!--com.vaadin.client.*;-->
+              <!--com.vaadin.shared.*;-->
+              <!--com.google.gwt.*;-->
+              <!--org.json.*;-->
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
 
@@ -218,5 +218,11 @@
       <artifactId>org.osgi.core</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20140107</version>
+    </dependency>
+
   </dependencies>
 </project>
