@@ -56,7 +56,7 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
                         hadoopClusterConfig.getAllNodes(), agent ) ) {
                     productOperation.addLog( "Cluster network configured for " + agent.getHostname() );
 
-                    AddNodeOperation addOperation = new AddNodeOperation( hadoopClusterConfig, agent );
+                    AddNodeOperation addOperation = new AddNodeOperation(manager.getCommands(), hadoopClusterConfig, agent );
                     for ( Command command : addOperation.getCommandList() ) {
                         productOperation.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
                         manager.getCommandRunner().runCommand( command );

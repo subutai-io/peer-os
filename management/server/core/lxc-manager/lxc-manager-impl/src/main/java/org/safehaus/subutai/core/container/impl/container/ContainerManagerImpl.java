@@ -24,11 +24,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
@@ -329,7 +330,8 @@ public class ContainerManagerImpl extends ContainerManagerBase
             throws LxcCreateException
     {
         //TODO: check envId
-        boolean result = templateManager.clone( hostName, templateName, cloneNames, "test" );
+        boolean result = templateManager
+                .clone( hostName, templateName, cloneNames, UUIDUtil.generateTimeBasedUUID().toString() );
         if ( !result )
         {
             throw new LxcCreateException(

@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 import java.io.File;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -17,12 +17,12 @@ public class EnvironmentTerminalPortalModule implements PortalModule
     public static final String MODULE_IMAGE = "terminal.png";
     public static final String MODULE_NAME = "Environment Terminal";
     private EnvironmentManager environmentManager;
-    private AgentManager agentManager;
+    private CommandDispatcher commandDispatcher;
 
 
-    public void setAgentManager( final AgentManager agentManager )
+    public void setCommandDispatcher( final CommandDispatcher commandDispatcher )
     {
-        this.agentManager = agentManager;
+        this.commandDispatcher = commandDispatcher;
     }
 
 
@@ -68,7 +68,7 @@ public class EnvironmentTerminalPortalModule implements PortalModule
     @Override
     public Component createComponent()
     {
-        return new TerminalForm( agentManager, environmentManager );
+        return new TerminalForm( commandDispatcher, environmentManager );
     }
 
 

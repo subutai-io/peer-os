@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -88,7 +88,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
             if ( this.environment == null )
             {
-                environment = hadoopManager.getEnvironmentManager().buildEnvironmentAndReturn(
+                environment = hadoopManager.getEnvironmentManager().buildEnvironment(
                         hadoopManager.getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
             }
 
@@ -119,7 +119,8 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
                 hadoopClusterConfig );
         po.addLog( "Cluster info saved to DB" );
 
-        InstallHadoopOperation installOperation = new InstallHadoopOperation( hadoopClusterConfig );
+        InstallHadoopOperation installOperation =
+                new InstallHadoopOperation( hadoopManager.getCommands(), hadoopClusterConfig );
         for ( Command command : installOperation.getCommandList() )
         {
             po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );

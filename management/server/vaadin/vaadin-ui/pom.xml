@@ -34,6 +34,30 @@
   <build>
     <finalName>vaadin-ui</finalName>
     <plugins>
+      <!--<plugin>-->
+      <!--<groupId>org.apache.maven.plugins</groupId>-->
+      <!--<artifactId>maven-jar-plugin</artifactId>-->
+      <!--<configuration>-->
+      <!--&lt;!&ndash;<finalName>${artifactId}-${project.version}</finalName>&ndash;&gt;-->
+      <!--<archive>-->
+      <!--<manifest>-->
+      <!--<addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+      <!--</manifest>-->
+      <!--<manifestEntries>-->
+      <!--<Implementation-Build>${parent.version}</Implementation-Build>-->
+      <!--</manifestEntries>-->
+      <!--</archive>-->
+      <!--</configuration>-->
+      <!--<executions>-->
+      <!--<execution>-->
+      <!--<id>make-a-jar</id>-->
+      <!--<phase>compile</phase>-->
+      <!--<goals>-->
+      <!--<goal>jar</goal>-->
+      <!--</goals>-->
+      <!--</execution>-->
+      <!--</executions>-->
+      <!--</plugin>-->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -42,7 +66,7 @@
             <supportedProjectType>war</supportedProjectType>
           </supportedProjectTypes>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.server.ui</Bundle-SymbolicName>
             <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
 
             <!-- Add Embed lib -->
@@ -55,8 +79,10 @@
               com.vaadin.server.*;
               com.vaadin.event.*;
               com.vaadin.client.*;
-              <!--com.vaadin.shared.*;-->
+              com.vaadin.shared.*;
               com.google.gwt.*;
+              org.json.*;
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
 
             <!-- Package format version - do not change -->
@@ -82,8 +108,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.2</version>
         <configuration>
+          <attachClasses>true</attachClasses>
           <webResources>
             <resource>
               <filtering>true</filtering>
@@ -118,7 +144,6 @@
           <plugin>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-maven-plugin</artifactId>
-            <version>7.4.0.alpha8</version>
             <configuration>
               <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets/</webappDirectory>
               <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
@@ -138,6 +163,21 @@
     </profile>
   </profiles>
   <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>agent-manager-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!-- Vaadin dependencies -->
     <dependency>
       <groupId>com.vaadin</groupId>
@@ -150,65 +190,33 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client</artifactId>
-      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared-deps</artifactId>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>${com.google.guava.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- OSGi dependencies -->
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>vaadin-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>subutai-common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>agent-manager-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>${com.google.code.gson.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
-      <version>6.8.15</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${org.slf4j.version}</version>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

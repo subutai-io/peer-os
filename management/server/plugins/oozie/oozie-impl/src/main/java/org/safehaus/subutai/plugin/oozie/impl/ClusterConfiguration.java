@@ -44,9 +44,9 @@ public class ClusterConfiguration
         //            hadoopNodes.add( hadoopNodeAgent );
         //        }
 
-        Command configureRootHostsCommand =
-                Commands.getConfigureRootHostsCommand( Sets.newHashSet( hadoopClusterConfig.getAllNodes() ),
-                        AgentUtil.getAgentIpByMask( server, Common.IP_MASK ) );
+        Command configureRootHostsCommand = manager.getCommands().getConfigureRootHostsCommand(
+                Sets.newHashSet( hadoopClusterConfig.getAllNodes() ),
+                AgentUtil.getAgentIpByMask( server, Common.IP_MASK ) );
         manager.getCommandRunner().runCommand( configureRootHostsCommand );
 
         if ( configureRootHostsCommand.hasSucceeded() )
@@ -60,8 +60,8 @@ public class ClusterConfiguration
         }
 
         po.addLog( "Configuring root groups..." );
-        Command configureRootGroupsCommand =
-                Commands.getConfigureRootGroupsCommand( Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
+        Command configureRootGroupsCommand = manager.getCommands().getConfigureRootGroupsCommand(
+                Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
         manager.getCommandRunner().runCommand( configureRootGroupsCommand );
 
         if ( configureRootGroupsCommand.hasSucceeded() )

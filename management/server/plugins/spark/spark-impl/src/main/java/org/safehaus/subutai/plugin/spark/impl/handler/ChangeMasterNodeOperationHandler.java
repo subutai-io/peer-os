@@ -12,7 +12,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 
@@ -77,13 +76,13 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
 
         po.addLog( "Stopping all nodes..." );
         //stop all nodes
-        Command stopNodesCommand = Commands.getStopAllCommand( config.getMasterNode() );
+        Command stopNodesCommand = manager.getCommands().getStopAllCommand( config.getMasterNode() );
         manager.getCommandRunner().runCommand( stopNodesCommand );
         if ( stopNodesCommand.hasSucceeded() )
         {
             po.addLog( "All nodes stopped\nClearing slaves on old master..." );
             //clear slaves from old master
-            Command clearSlavesCommand = Commands.getClearSlavesCommand( config.getMasterNode() );
+            Command clearSlavesCommand = manager.getCommands().getClearSlavesCommand( config.getMasterNode() );
             manager.getCommandRunner().runCommand( clearSlavesCommand );
             if ( clearSlavesCommand.hasSucceeded() )
             {
@@ -106,21 +105,22 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
                 config.getSlaveNodes().remove( newMaster );
             }
             po.addLog( "Adding nodes to new master..." );
-            Command addSlavesCommand = Commands.getAddSlavesCommand( config.getSlaveNodes(), config.getMasterNode() );
+            Command addSlavesCommand =
+                    manager.getCommands().getAddSlavesCommand( config.getSlaveNodes(), config.getMasterNode() );
             manager.getCommandRunner().runCommand( addSlavesCommand );
             if ( addSlavesCommand.hasSucceeded() )
             {
                 po.addLog( "Nodes added successfully\nSetting new master IP..." );
                 //modify master ip on all nodes
                 Command setMasterIPCommand =
-                        Commands.getSetMasterIPCommand( config.getMasterNode(), config.getAllNodes() );
+                        manager.getCommands().getSetMasterIPCommand( config.getMasterNode(), config.getAllNodes() );
                 manager.getCommandRunner().runCommand( setMasterIPCommand );
                 if ( setMasterIPCommand.hasSucceeded() )
                 {
                     po.addLog( "Master IP set successfully\nStarting cluster..." );
                     //start master & slaves
 
-                    Command startNodesCommand = Commands.getStartAllCommand( config.getMasterNode() );
+                    Command startNodesCommand = manager.getCommands().getStartAllCommand( config.getMasterNode() );
                     final AtomicInteger okCount = new AtomicInteger( 0 );
                     manager.getCommandRunner().runCommand( startNodesCommand, new CommandCallback()
                     {

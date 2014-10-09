@@ -13,13 +13,10 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-/**
- * @author dilshat
- */
 public class AccumuloClusterConfig implements ConfigBase
 {
 
-    public static final String PRODUCT_KEY = "Accumulo2";
+    public static final String PRODUCT_KEY = "Accumulo";
     public static final int DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY = 3;
     public static final String PRODUCT_NAME = "accumulo";
     private String clusterName = "";

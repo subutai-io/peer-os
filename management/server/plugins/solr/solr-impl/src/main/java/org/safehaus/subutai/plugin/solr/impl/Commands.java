@@ -3,31 +3,32 @@ package org.safehaus.subutai.plugin.solr.impl;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.collect.Sets;
 
 
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
     public static final String START = "service solr start";
     public static final String STOP = "service solr stop";
     public static final String STATUS = "service solr status";
 
+    private final CommandRunnerBase commandRunnerBase;
 
-    public Commands( CommandRunner commandRunner )
+
+    public Commands( CommandRunnerBase commandRunnerBase )
     {
-        init( commandRunner );
+        this.commandRunnerBase = commandRunnerBase;
     }
 
 
     public Command getStartCommand( Agent agent )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( START ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ),
                 Sets.newHashSet( agent ) );
     }
@@ -35,12 +36,14 @@ public class Commands extends CommandsSingleton
 
     public Command getStopCommand( Agent agent )
     {
-        return createCommand( new RequestBuilder( STOP ).withTimeout( 60 ), Sets.newHashSet( agent ) );
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( STOP ).withTimeout( 60 ), Sets.newHashSet( agent ) );
     }
 
 
     public Command getStatusCommand( Agent agent )
     {
-        return createCommand( new RequestBuilder( STATUS ).withTimeout( 60 ), Sets.newHashSet( agent ) );
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( STATUS ).withTimeout( 60 ), Sets.newHashSet( agent ) );
     }
 }

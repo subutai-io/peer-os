@@ -64,8 +64,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param md5sum - template file's md5 hash
      */
     @Override
-    public synchronized void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
-            throws RegistryException
+    public synchronized boolean registerTemplate( final String configFile, final String packagesFile,
+                                                  final String md5sum ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
@@ -86,6 +86,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             throw new RegistryException(
                     String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
         }
+        return true;
     }
 
 
@@ -145,13 +146,27 @@ public class TemplateRegistryImpl implements TemplateRegistry
                 template.setProducts( getPackagesDiff( parentTemplate, template ) );
             }
 
-
             return template;
         }
         catch ( IOException | RuntimeException e )
         {
             LOG.error( "Error in parseTemplate", e );
             throw new RegistryException( String.format( "Error parsing template configuration %s", e ) );
+        }
+    }
+
+
+    @Override
+    public Set<String> getPackagesDiff( Template template )
+    {
+        if ( template.getParentTemplateName() == null )
+        {
+            return getPackagesDiff( null, template );
+        }
+        else
+        {
+            Template parentTemplate = getTemplate( template.getParentTemplateName() );
+            return getPackagesDiff( parentTemplate, template );
         }
     }
 
@@ -204,9 +219,10 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param templateName - name of template to remove
      */
     @Override
-    public void unregisterTemplate( final String templateName ) throws RegistryException
+    public boolean unregisterTemplate( final String templateName ) throws RegistryException
     {
         unregisterTemplate( templateName, Common.DEFAULT_LXC_ARCH );
+        return true;
     }
 
 
@@ -291,7 +307,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), TEMPLATE_IS_NULL_MSG );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), LXC_ARCH_IS_NULL_MSG );
         //retrieve template from storage
-
         try
         {
             return templateDAO.getTemplateByName( templateName, lxcArch );
@@ -335,7 +350,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         //retrieve child templates from storage
         try
         {
-            return templateDAO.geChildTemplates( parentTemplateName, lxcArch );
+            return templateDAO.getChildTemplates( parentTemplateName, lxcArch );
         }
         catch ( DBException e )
         {
@@ -503,8 +518,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param inUse - true - template is in use, false - template is out of use
      */
     @Override
-    public synchronized void updateTemplateUsage( final String faiHostname, final String templateName,
-                                                  final boolean inUse ) throws RegistryException
+    public synchronized boolean updateTemplateUsage( final String faiHostname, final String templateName,
+                                                     final boolean inUse ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( faiHostname ), "FAI hostname is null or empty" );
@@ -528,6 +543,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
                 throw new RegistryException( String.format( "Error saving template information, %s", e.getMessage() ) );
             }
         }
+        return true;
     }
 
 

@@ -40,7 +40,7 @@ public class InstallHandler extends AbstractHandler
         try
         {
             productOperation.addLog( "Building environment..." );
-            env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );
+            env = manager.getEnvironmentManager().buildEnvironment( eb );
             productOperation.addLog( "Building environment completed" );
 
             productOperation.addLog( "Installing cluster..." );

@@ -4,14 +4,13 @@ package org.safehaus.subutai.core.git.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.safehaus.subutai.core.git.api.GitBranch;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 
@@ -24,7 +23,7 @@ public class GitBranchTest
     private static final String REMOTE_BRANCH_NAME = "origin/branch";
 
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailOnNullName()
     {
         new GitBranch( null, false );
@@ -95,6 +94,6 @@ public class GitBranchTest
         Map<GitBranch, GitBranch> map = new HashMap<>();
         map.put( gitBranch1, gitBranch1 );
 
-        assertEquals(map.get( gitBranch1 ), gitBranch1);
+        assertEquals( map.get( gitBranch1 ), gitBranch1 );
     }
 }

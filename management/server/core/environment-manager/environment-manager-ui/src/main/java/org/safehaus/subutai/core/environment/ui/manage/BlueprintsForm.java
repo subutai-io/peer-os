@@ -6,11 +6,13 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
+import org.safehaus.subutai.core.peer.api.PeerGroup;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 
 @SuppressWarnings("serial")
@@ -18,25 +20,22 @@ public class BlueprintsForm
 {
 
     private static final String NO_BLUEPRINTS = "No blueprints found";
+    private static final String BLUEPRINT_2_PEERGROUP = "Blueprint 2 Peer Group";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManagerPortalModule managerUI;
+    private EnvironmentManagerPortalModule module;
+    private Button environmentsButton;
 
-
-    public BlueprintsForm( EnvironmentManagerPortalModule managerUI )
+    public BlueprintsForm( EnvironmentManagerPortalModule module )
     {
-        this.managerUI = managerUI;
-
-
+        this.module = module;
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
-
         environmentsTable = createTable( "Blueprints", 300 );
 
-        Button getEnvironmentsButton = new Button( "View" );
-
-        getEnvironmentsButton.addClickListener( new Button.ClickListener()
+        environmentsButton = new Button( "View" );
+        environmentsButton.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
@@ -45,7 +44,7 @@ public class BlueprintsForm
             }
         } );
 
-        contentRoot.addComponent( getEnvironmentsButton );
+        contentRoot.addComponent( environmentsButton );
         contentRoot.addComponent( environmentsTable );
     }
 
@@ -69,10 +68,10 @@ public class BlueprintsForm
     private void updateTableData()
     {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildTask> environmentBuildTasks = managerUI.getEnvironmentManager().getBlueprints();
-        if ( !environmentBuildTasks.isEmpty() )
+        List<EnvironmentBuildTask> tasks = module.getEnvironmentManager().getBlueprints();
+        if ( !tasks.isEmpty() )
         {
-            for ( final EnvironmentBuildTask environmentBuildTask : environmentBuildTasks )
+            for ( final EnvironmentBuildTask task : tasks )
             {
 
                 final Button viewButton = new Button( "View" );
@@ -82,38 +81,48 @@ public class BlueprintsForm
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         BlueprintDetails details = new BlueprintDetails( "Blueprint details" );
-                        details.setContent( environmentBuildTask.getEnvironmentBlueprint() );
+                        details.setContent( task.getEnvironmentBlueprint() );
                         contentRoot.getUI().addWindow( details );
                         details.setVisible( true );
                     }
                 } );
 
-                final Button buildEnvironmentButton = new Button( "Build" );
-                buildEnvironmentButton.addClickListener( new Button.ClickListener()
+                final Button node2Peer = new Button( "Node2Peer" );
+                node2Peer.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         EnvironmentBuildWizard environmentBuildWizard =
-                                new EnvironmentBuildWizard( "Wizard", managerUI, environmentBuildTask );
+                                new EnvironmentBuildWizard( "Wizard", module, task );
                         contentRoot.getUI().addWindow( environmentBuildWizard );
                         environmentBuildWizard.setVisible( true );
                     }
                 } );
 
-                final Button deleteBlueprintButton = new Button( "Delete" );
-                deleteBlueprintButton.addClickListener( new Button.ClickListener()
+                Button blueprint2PeerGroup = new Button( "Blueprint2PeerGroup" );
+                blueprint2PeerGroup.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        managerUI.getEnvironmentManager().deleteBlueprint( environmentBuildTask.getUuid().toString() );
+                        showBlueprint2PeerGroupWindow();
+                    }
+                } );
+
+                final Button deleteButton = new Button( "Delete" );
+                deleteButton.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        module.getEnvironmentManager().deleteBlueprint( task.getUuid().toString() );
+                        environmentsButton.click();
                     }
                 } );
 
                 environmentsTable.addItem( new Object[] {
-                        environmentBuildTask.getEnvironmentBlueprint().getName(), viewButton, buildEnvironmentButton,
-                        deleteBlueprintButton
+                        task.getEnvironmentBlueprint().getName(), viewButton, node2Peer, deleteButton
                 }, null );
             }
         }
@@ -122,6 +131,22 @@ public class BlueprintsForm
             Notification.show( NO_BLUEPRINTS );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private void showBlueprint2PeerGroupWindow()
+    {
+        Window window = createWindow( BLUEPRINT_2_PEERGROUP );
+        List<PeerGroup> list = module.getPeerManager().peersGroups();
+    }
+
+    private Window createWindow( String caption )
+    {
+        Window window = new Window();
+        window.setCaption( caption );
+        window.setModal( true );
+        window.setClosable( true );
+        return window;
     }
 
 

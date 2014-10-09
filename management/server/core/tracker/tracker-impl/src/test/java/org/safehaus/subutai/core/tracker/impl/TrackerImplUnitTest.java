@@ -11,8 +11,8 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class TrackerImplUnitTest
 {
 
-    private final UUID poID = UUID.randomUUID();
+    private final UUID poID = UUIDUtil.generateTimeBasedUUID();
     private final String SOURCE = "source";
     private final String DESCRIPTION = "description";
 

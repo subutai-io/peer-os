@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
-import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 
 
@@ -74,9 +73,9 @@ public class UninstallOperationHandler extends AbstractOperationHandler<LuceneIm
     private boolean uninstall( LuceneConfig config )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Presto..." );
+        po.addLog( "Uninstalling Lucene..." );
 
-        Command cmd = Commands.getUninstallCommand( config.getNodes() );
+        Command cmd = manager.getCommands().getUninstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

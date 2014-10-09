@@ -9,6 +9,8 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -19,6 +21,7 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -30,11 +33,11 @@ public class ResponseSender
     private static final Logger LOG = LoggerFactory.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
+    protected static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
     private static final int RETRY_ATTEMPT_WIDENING_INTERVAL_SEC = 30;
     private static final int SELECT_RECORDS_LIMIT = 50;
-    private final ExecutorService mainLoopExecutor = Executors.newSingleThreadExecutor();
-    private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
+    private final ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
+    private ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
     private final PeerManager peerManager;
 
@@ -42,37 +45,49 @@ public class ResponseSender
     public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager )
     {
 
+        Preconditions.checkNotNull( dispatcherDAO, "Dispatcher DAO is null" );
+        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+
+
         this.dispatcherDAO = dispatcherDAO;
         this.peerManager = peerManager;
     }
 
 
+    protected void setHttpRequestsExecutor( final ExecutorService httpRequestsExecutor )
+    {
+        this.httpRequestsExecutor = httpRequestsExecutor;
+    }
+
+
+    protected ExecutorService getHttpRequestsExecutor()
+    {
+        return httpRequestsExecutor;
+    }
+
+
     public void init()
     {
-        mainLoopExecutor.submit( new Runnable()
+        mainLoopExecutor.scheduleWithFixedDelay( new Runnable()
         {
             @Override
             public void run()
             {
 
-                while ( !Thread.interrupted() )
+                try
                 {
-                    try
-                    {
-                        Thread.sleep( SLEEP_BETWEEN_ITERATIONS_SEC * 1000L );
-                    }
-                    catch ( InterruptedException e )
-                    {
-                        break;
-                    }
                     send();
                 }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in sender", e );
+                }
             }
-        } );
+        }, 0, SLEEP_BETWEEN_ITERATIONS_SEC, TimeUnit.SECONDS );
     }
 
 
-    private void send()
+    protected void send()
     {
 
         try

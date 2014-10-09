@@ -57,6 +57,7 @@ public class MongoImpl implements Mongo
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
     private PluginDAO pluginDAO;
+    private Commands commands;
 
 
     public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
@@ -76,8 +77,13 @@ public class MongoImpl implements Mongo
         this.containerManager = containerManager;
         this.environmentManager = environmentManager;
         this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
+    }
 
-        Commands.init( commandRunner );
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 
@@ -260,7 +266,7 @@ public class MongoImpl implements Mongo
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
 

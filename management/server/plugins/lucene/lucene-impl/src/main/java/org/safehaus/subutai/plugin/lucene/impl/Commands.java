@@ -5,13 +5,12 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 
-public class Commands extends CommandsSingleton
+public class Commands
 {
 
     public static final String PACKAGE_NAME = "ksks-lucene";
@@ -19,28 +18,30 @@ public class Commands extends CommandsSingleton
     public static final String UNINSTALL = "apt-get --force-yes --assume-yes purge ksks-lucene";
     public static final String CHECK = "dpkg -l | grep '^ii' | grep ksks";
 
+    private final CommandRunnerBase commandRunner;
 
-    public Commands( CommandRunner commandRunner )
+
+    public Commands( CommandRunnerBase commandRunner )
     {
-        init( commandRunner );
+        this.commandRunner = commandRunner;
     }
 
 
-    public static Command getUninstallCommand( Set<Agent> agents )
+    public Command getUninstallCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( UNINSTALL ).withTimeout( 60 ), agents );
+        return commandRunner.createCommand( new RequestBuilder( UNINSTALL ).withTimeout( 60 ), agents );
     }
 
 
-    public static Command getCheckInstalledCommand( Set<Agent> agents )
+    public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( CHECK ), agents );
+        return commandRunner.createCommand( new RequestBuilder( CHECK ), agents );
     }
 
 
-    public static Command getInstallCommand( Set<Agent> agents )
+    public Command getInstallCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunner.createCommand(
                 new RequestBuilder( INSTALL ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 }

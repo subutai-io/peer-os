@@ -41,13 +41,13 @@ public class WelcomeStep extends Panel
         Button next = new Button( "Start over-Spark installation" );
         next.addStyleName( "default" );
         next.addClickListener( new NextButtonClickHandler( wizard, SetupType.OVER_SPARK ) );
-        grid.addComponent( next, 6, 4, 6, 4 );
+        grid.addComponent( next, 4, 4, 4, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
         Button next2 = new Button( "Start with-Spark installation" );
         next2.addStyleName( "default" );
         next2.addClickListener( new NextButtonClickHandler( wizard, SetupType.WITH_HADOOP_SPARK ) );
-        grid.addComponent( next2, 7, 4, 7, 4 );
+        grid.addComponent( next2, 5, 4, 5, 4 );
         grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
 
         setContent( grid );

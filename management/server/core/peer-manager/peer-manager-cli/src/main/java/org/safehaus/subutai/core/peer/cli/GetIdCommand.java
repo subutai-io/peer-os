@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 

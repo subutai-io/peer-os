@@ -8,86 +8,101 @@ package org.safehaus.subutai.core.container.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
 import com.google.common.collect.Sets;
 
 
 /**
- * Commands for containermanager management
+ * Commands for container-manager management
  */
-public class Commands extends CommandsSingleton
+public class Commands
 {
-    public static final String CMD_SUBUTAI = "/usr/bin/subutai";
+    public final String CMD_SUBUTAI = "/usr/bin/subutai";
+    private final CommandRunnerBase commandRunnerBase;
 
 
-    public static Command getCloneCommand( Agent physicalAgent, String templateName, String containerName )
+    public Commands( final CommandRunnerBase commandRunnerBase )
     {
-        return createCommand(
+        this.commandRunnerBase = commandRunnerBase;
+    }
+
+
+    public Command getCloneCommand( Agent physicalAgent, String templateName, String containerName )
+    {
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( String.format( "%s clone %s %s", CMD_SUBUTAI, templateName, containerName ) )
                         .withTimeout( 360 ), Sets.newHashSet( physicalAgent ) );
     }
 
 
-    public static Command getPromoteCommand( Agent physicalAgent, String containerName )
+    public Command getPromoteCommand( Agent physicalAgent, String containerName )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( String.format( "%s promote %s", CMD_SUBUTAI, containerName ) ).withTimeout( 360 ),
                 Sets.newHashSet( physicalAgent ) );
     }
 
 
-    public static Command getCloneNStartCommand( Agent physicalAgent, String lxcHostName )
+    public Command getCloneNStartCommand( Agent physicalAgent, String lxcHostName )
     {
-        return createCommand( new RequestBuilder( String.format(
+        return commandRunnerBase.createCommand( new RequestBuilder( String.format(
                 "/usr/bin/lxc-clone -o base-containermanager -n %1$s && addhostlxc %1$s && /usr/bin/lxc-start -n %1$s"
                         + " -d &", lxcHostName ) ).withTimeout( 360 ), Sets.newHashSet( physicalAgent ) );
     }
 
 
-    public static Command getLxcListCommand( Set<Agent> agents )
+    public Command getLxcListCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "/usr/bin/lxc-ls -f" ).withTimeout( 60 ), agents );
+        return commandRunnerBase.createCommand( new RequestBuilder( "/usr/bin/lxc-ls -f" ).withTimeout( 60 ), agents );
     }
 
 
-    public static Command getLxcInfoCommand( Agent physicalAgent, String lxcHostName )
+    public Command getTemplateListCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase
+                .createCommand( new RequestBuilder( "/usr/bin/subutai list -t" ).withTimeout( 60 ), agents );
+    }
+
+
+    public Command getLxcInfoCommand( Agent physicalAgent, String lxcHostName )
+    {
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", lxcHostName ) ).withTimeout( 60 ),
                 Sets.newHashSet( physicalAgent ) );
     }
 
 
-    public static Command getLxcStartCommand( Agent physicalAgent, String lxcHostName )
+    public Command getLxcStartCommand( Agent physicalAgent, String lxcHostName )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d &", lxcHostName ) ).withTimeout( 180 ),
                 Sets.newHashSet( physicalAgent ) );
     }
 
 
-    public static Command getLxcStopCommand( Agent physicalAgent, String lxcHostName )
+    public Command getLxcStopCommand( Agent physicalAgent, String lxcHostName )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s &", lxcHostName ) ).withTimeout( 180 ),
                 Sets.newHashSet( physicalAgent ) );
     }
 
 
-    public static Command getLxcDestroyCommand( Agent physicalAgent, String lxcHostName )
+    public Command getLxcDestroyCommand( Agent physicalAgent, String lxcHostName )
     {
-        return createCommand( new RequestBuilder( String.format( "/usr/bin/lxc-destroy -n %1$s -f", lxcHostName ) )
-                .withTimeout( 180 ), Sets.newHashSet( physicalAgent ) );
+        return commandRunnerBase.createCommand(
+                new RequestBuilder( String.format( "/usr/bin/lxc-destroy -n %1$s -f", lxcHostName ) )
+                        .withTimeout( 180 ), Sets.newHashSet( physicalAgent ) );
     }
 
 
-    public static Command getMetricsCommand( Set<Agent> agents )
+    public Command getMetricsCommand( Set<Agent> agents )
     {
-        return createCommand(
+        return commandRunnerBase.createCommand(
                 new RequestBuilder( "free -m | grep buffers/cache ; df /lxc-data | grep /lxc-data ; uptime ; nproc" )
                         .withTimeout( 30 ), agents );
     }

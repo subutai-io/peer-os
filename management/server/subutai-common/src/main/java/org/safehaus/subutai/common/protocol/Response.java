@@ -8,8 +8,8 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.ResponseType;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -34,7 +34,6 @@ public class Response implements Serializable
     private List<String> ips;
     private Boolean isLxc;
     private String transportId;
-    @SkipNull
     private UUID environmentId;
 
 

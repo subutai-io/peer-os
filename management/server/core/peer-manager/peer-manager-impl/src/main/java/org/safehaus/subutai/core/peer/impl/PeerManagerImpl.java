@@ -38,11 +38,13 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
+import org.safehaus.subutai.core.peer.api.PeerGroup;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,12 +62,14 @@ public class PeerManagerImpl implements PeerManager
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
     private static final String SOURCE = "PEER_MANAGER";
+    private static final String PEER_GROUP = "PEER_GROUP";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
     private DbManager dbManager;
     private AgentManager agentManager;
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
     private CommandRunner commandRunner;
+    private TemplateRegistry templateRegistry;
 
     private Set<PeerContainer> containers = new HashSet<>();
 
@@ -96,6 +100,12 @@ public class PeerManagerImpl implements PeerManager
     public void setCommandRunner( final CommandRunner commandRunner )
     {
         this.commandRunner = commandRunner;
+    }
+
+
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    {
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -395,9 +405,24 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String strategy )
+    public Set<Agent> createContainers( UUID envId, UUID peerId, String template, int numberOfNodes, String strategy )
             throws ContainerCreateException
     {
+        if ( peerId == null )
+        {
+            throw new IllegalArgumentException( "Peer could not be null." );
+        }
+        if ( !peerId.equals( getSiteId() ) )
+        {
+            // Is the remote template exists in the local peer?
+            boolean isTemplateExists = templateRegistry.getTemplate( template ) != null;
+            if ( !isTemplateExists )
+            {
+                //TODO: download the remote template and register it in the local registry
+
+            }
+        }
+
 
         return containerManager.clone( envId, template, numberOfNodes, strategy, null );
     }
@@ -473,8 +498,8 @@ public class PeerManagerImpl implements PeerManager
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
                     try
                     {
-                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getTemplate(), ccm.getNumberOfNodes(),
-                                ccm.getStrategy() );
+                        Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getPeerId(), ccm.getTemplate(),
+                                ccm.getNumberOfNodes(), ccm.getStrategy() );
                         ccm.setResult( agents );
                         ccm.setSuccess( true );
                     }
@@ -530,7 +555,7 @@ public class PeerManagerImpl implements PeerManager
                     peerCommandMessage.setExceptionMessage( "Could not stop container." );
                 }
                 break;
-            case ISCONNECTED:
+            case IS_CONNECTED:
 
                 result = isContainerConnected( peerContainer );
                 if ( result )
@@ -562,6 +587,39 @@ public class PeerManagerImpl implements PeerManager
         peerCommandMessage.setProccessed( true );
 
         LOG.debug( String.format( "After =================[%s]", peerCommandMessage ) );
+    }
+
+
+    @Override
+    public List<PeerGroup> peersGroups()
+    {
+        List<PeerGroup> peerGroups = peerDAO.getInfo( PEER_GROUP, PeerGroup.class );
+        /*Set<PeerGroup> peerGroups = new HashSet<>();
+        for ( int i = 0; i < 10; i++ )
+        {
+            PeerGroup peerGroup = new PeerGroup();
+            peerGroup.setName( "Group " + i );
+            for ( int j = 0; j < 10; j++ )
+            {
+                peerGroup.addPeerUUID( UUID.randomUUID() );
+            }
+            peerGroups.add( peerGroup );
+        }*/
+        return peerGroups;
+    }
+
+
+    @Override
+    public void deletePeerGroup( final PeerGroup group )
+    {
+        peerDAO.deleteInfo( PEER_GROUP, group.getUUID().toString() );
+    }
+
+
+    @Override
+    public boolean savePeerGroup( final PeerGroup group )
+    {
+        return peerDAO.saveInfo( PEER_GROUP, group.getUuid().toString(), group );
     }
 
 

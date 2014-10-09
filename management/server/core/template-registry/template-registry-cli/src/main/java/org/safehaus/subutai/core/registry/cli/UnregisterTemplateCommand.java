@@ -3,9 +3,11 @@ package org.safehaus.subutai.core.registry.cli;
 
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+
+import com.google.common.base.Preconditions;
 
 
 /**
@@ -23,6 +25,7 @@ public class UnregisterTemplateCommand extends OsgiCommandSupport
 
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
+        Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null" );
         this.templateRegistry = templateRegistry;
     }
 
@@ -37,5 +40,11 @@ public class UnregisterTemplateCommand extends OsgiCommandSupport
 
 
         return null;
+    }
+
+
+    public TemplateRegistry getTemplateRegistry()
+    {
+        return templateRegistry;
     }
 }

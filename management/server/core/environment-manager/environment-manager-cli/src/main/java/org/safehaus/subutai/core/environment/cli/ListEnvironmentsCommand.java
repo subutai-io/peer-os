@@ -6,15 +6,15 @@ import java.util.List;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Created by bahadyr on 6/21/14.
  */
-@Command(scope = "environment", name = "ls", description = "Command to list environments",
-        detailedDescription = "Command to list environments")
+@Command( scope = "environment", name = "ls", description = "Command to list environments",
+        detailedDescription = "Command to list environments" )
 public class ListEnvironmentsCommand extends OsgiCommandSupport
 {
 

@@ -11,6 +11,8 @@ import org.safehaus.subutai.server.ui.api.PortalModuleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 
 public class PortalModuleServiceImpl implements PortalModuleService
 {
@@ -29,7 +31,9 @@ public class PortalModuleServiceImpl implements PortalModuleService
             LOG.info( "Registering module " + module.getId() );
             modules.add( module );
             for ( PortalModuleListener listener : listeners )
+            {
                 listener.moduleRegistered( module );
+            }
         }
         else
         {
@@ -55,11 +59,14 @@ public class PortalModuleServiceImpl implements PortalModuleService
     @Override
     public PortalModule getModule( String pModuleId )
     {
-        for ( PortalModule module : modules )
+        if ( !Strings.isNullOrEmpty( pModuleId ) )
         {
-            if ( pModuleId.equals( module.getId() ) )
+            for ( PortalModule module : modules )
             {
-                return module;
+                if ( pModuleId.equals( module.getId() ) )
+                {
+                    return module;
+                }
             }
         }
         throw new IllegalArgumentException( "Cannot find any module with the id given" );
@@ -97,8 +104,11 @@ public class PortalModuleServiceImpl implements PortalModuleService
 
     public synchronized void addListener( PortalModuleListener listener )
     {
-        LOG.info( "Adding listener " + listener );
-        listeners.add( listener );
+        if ( listener != null )
+        {
+            LOG.info( "Adding listener " + listener );
+            listeners.add( listener );
+        }
     }
 
 

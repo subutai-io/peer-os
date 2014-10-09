@@ -29,7 +29,9 @@ public class HadoopClusterConfig implements ConfigBase
     private Integer replicationFactor = 1, countOfSlaveNodes = 1;
     private Set<Agent> blockedAgents;
 
-    public HadoopClusterConfig() {
+
+    public HadoopClusterConfig()
+    {
         domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<>();
         taskTrackers = new ArrayList<>();
@@ -94,16 +96,21 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public void removeNode( Agent agent ) {
+    public void removeNode( Agent agent )
+    {
         if ( dataNodes.contains( agent ) )
+        {
             dataNodes.remove( agent );
+        }
         if ( taskTrackers.contains( agent ) )
+        {
             taskTrackers.remove( agent );
+        }
     }
 
 
-
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
@@ -235,49 +242,82 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
-    public boolean isMasterNode( Agent agent ) {
-        if ( agent.equals( getNameNode() ) || agent.equals( getJobTracker() )  || agent.equals( getSecondaryNameNode() ) )
+    public boolean isMasterNode( Agent agent )
+    {
+        if ( agent.equals( getNameNode() ) || agent.equals( getJobTracker() ) || agent
+                .equals( getSecondaryNameNode() ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
-    public boolean isDataNode( Agent agent ) {
+    public boolean isDataNode( Agent agent )
+    {
         if ( getDataNodes().contains( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
-    public boolean isTaskTracker( Agent agent ) {
+    public boolean isTaskTracker( Agent agent )
+    {
         if ( getTaskTrackers().contains( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
-    public boolean isNameNode( Agent agent ) {
+    public boolean isNameNode( Agent agent )
+    {
         if ( getNameNode().equals( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
-    public boolean isJobTracker( Agent agent ) {
+
+    public boolean isJobTracker( Agent agent )
+    {
         if ( getJobTracker().equals( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
-    public boolean isSecondaryNameNode( Agent agent ) {
+
+    public boolean isSecondaryNameNode( Agent agent )
+    {
         if ( getSecondaryNameNode().equals( agent ) )
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
 
 
@@ -327,5 +367,4 @@ public class HadoopClusterConfig implements ConfigBase
                 ", countOfSlaveNodes=" + countOfSlaveNodes +
                 '}';
     }
-
 }

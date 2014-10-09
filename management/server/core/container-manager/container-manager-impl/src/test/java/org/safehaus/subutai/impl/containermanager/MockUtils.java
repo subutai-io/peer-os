@@ -15,6 +15,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -30,9 +31,9 @@ import static org.mockito.Mockito.when;
  */
 public class MockUtils
 {
-    public static final UUID envUUID = UUID.randomUUID();
-    public static final UUID physicalUUID = UUID.randomUUID();
-    public static final UUID lxcUUID = UUID.randomUUID();
+    public static final UUID envUUID = UUIDUtil.generateTimeBasedUUID();
+    public static final UUID physicalUUID = UUIDUtil.generateTimeBasedUUID();
+    public static final UUID lxcUUID = UUIDUtil.generateTimeBasedUUID();
     public static final String PHYSICAL_HOSTNAME = "py111";
     public static final String LXC_HOSTNAME = "testContainerName";
     public static final String templateName = "master";
@@ -73,7 +74,7 @@ public class MockUtils
                     {
                         Object[] arguments = invocation.getArguments();
                         RequestBuilder requestBuilder = ( RequestBuilder ) arguments[0];
-                        Request request = requestBuilder.build( physicalUUID, UUID.randomUUID() );
+                        Request request = requestBuilder.build( physicalUUID, UUIDUtil.generateTimeBasedUUID() );
                         if ( request.getProgram().contains( "lxc-info" ) )
                         {
                             return MockUtils.getCommand( true, true, 0, "RUNNING", null );

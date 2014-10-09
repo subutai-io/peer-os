@@ -183,12 +183,17 @@ public class CassandraImpl implements Cassandra
     }
 
 
+    public Commands getCommands()
+    {
+        return commands;
+    }
+
+
     public void init()
     {
         this.pluginDAO = new PluginDAO( dbManager );
         this.commands = new Commands( commandRunner );
 
-        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
@@ -327,7 +332,7 @@ public class CassandraImpl implements Cassandra
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
-                .setName( String.format( "%s-%s", config.getProductKey(), UUID.randomUUID() ) );
+                .setName( String.format( "%s-%s", CassandraClusterConfig.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
 
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );

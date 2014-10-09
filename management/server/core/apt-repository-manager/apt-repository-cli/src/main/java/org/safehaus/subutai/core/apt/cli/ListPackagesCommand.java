@@ -18,13 +18,13 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
-@Command(scope = "apt", name = "list-packages", description = "List packages in apt repository by pattern")
+@Command( scope = "apt", name = "list-packages", description = "List packages in apt repository by pattern" )
 public class ListPackagesCommand extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( ListPackagesCommand.class.getName() );
 
 
-    @Argument(index = 0, name = "pattern", required = true, multiValued = false, description = "search pattern")
+    @Argument( index = 0, name = "pattern", required = true, multiValued = false, description = "search pattern" )
     String pattern;
 
     private final AptRepositoryManager aptRepositoryManager;

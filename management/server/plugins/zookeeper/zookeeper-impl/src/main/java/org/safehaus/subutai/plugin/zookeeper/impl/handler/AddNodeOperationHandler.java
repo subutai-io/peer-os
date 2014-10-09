@@ -15,7 +15,6 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ClusterConfiguration;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperStandaloneSetupStrategy;
 
@@ -83,6 +82,105 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
     }
 
 
+    private void addOverHadoop( final ZookeeperClusterConfig config )
+    {
+
+        //check if node agent is connected
+        Agent lxcAgent = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        if ( lxcAgent == null )
+        {
+            productOperation.addLogFailed( String.format( "Node %s is not connected", lxcHostname ) );
+            return;
+        }
+
+        if ( config.getNodes().contains( lxcAgent ) )
+        {
+            productOperation.addLogFailed(
+                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
+            return;
+        }
+
+
+        HadoopClusterConfig hadoopClusterConfig =
+                manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+
+        if ( hadoopClusterConfig == null )
+        {
+            productOperation
+                    .addLogFailed( String.format( "Hadoop cluster %s not found", config.getHadoopClusterName() ) );
+            return;
+        }
+
+        if ( !hadoopClusterConfig.getAllNodes().contains( lxcAgent ) )
+        {
+            productOperation.addLogFailed( String.format( "Specified node does not belong to Hadoop cluster %s",
+                    config.getHadoopClusterName() ) );
+            return;
+        }
+
+        productOperation.addLog( "Checking prerequisites..." );
+
+        //check installed subutai packages
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
+        manager.getCommandRunner().runCommand( checkInstalledCommand );
+
+        if ( !checkInstalledCommand.hasCompleted() )
+        {
+            productOperation.addLogFailed( "Failed to check presence of installed subutai packages" );
+            return;
+        }
+
+        AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
+
+        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
+        {
+            productOperation.addLogFailed( String.format( "Node %s already has Zookeeper installed", lxcHostname ) );
+            return;
+        }
+        else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+        {
+            productOperation.addLogFailed( String.format( "Node %s has no Hadoop installed", lxcHostname ) );
+            return;
+        }
+
+
+        config.getNodes().add( lxcAgent );
+        config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
+
+        productOperation.addLog( String.format( "Installing %s...", ZookeeperClusterConfig.PRODUCT_NAME ) );
+
+        //install
+        Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( lxcAgent ) );
+        manager.getCommandRunner().runCommand( installCommand );
+
+        if ( installCommand.hasCompleted() )
+        {
+            productOperation.addLog( "Installation succeeded\nReconfiguring cluster..." );
+
+            try
+            {
+                new ClusterConfiguration( manager, productOperation ).configureCluster( config );
+            }
+            catch ( ClusterConfigurationException e )
+            {
+                productOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
+                return;
+            }
+
+            //update db
+            productOperation.addLog( "Updating cluster information in database..." );
+
+            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            productOperation.addLogDone( "Cluster information updated in database" );
+        }
+        else
+        {
+            productOperation.addLogFailed( String.format( "Installation failed, %s\nUse Terminal Module to cleanup",
+                    installCommand.getAllErrors() ) );
+        }
+    }
+
+
     private void addWithHadoop( final ZookeeperClusterConfig config )
     {
 
@@ -97,7 +195,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         productOperation.addLog( "Preparing for node addition..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -168,104 +266,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         else
         {
             addOverHadoop( config );
-        }
-    }
-
-
-    private void addOverHadoop( final ZookeeperClusterConfig config )
-    {
-
-        //check if node agent is connected
-        Agent lxcAgent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( lxcAgent == null )
-        {
-            productOperation.addLogFailed( String.format( "Node %s is not connected", lxcHostname ) );
-            return;
-        }
-
-        if ( config.getNodes().contains( lxcAgent ) )
-        {
-            productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
-            return;
-        }
-
-        HadoopClusterConfig hadoopClusterConfig =
-                manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
-
-        if ( hadoopClusterConfig == null )
-        {
-            productOperation
-                    .addLogFailed( String.format( "Hadoop cluster %s not found", config.getHadoopClusterName() ) );
-            return;
-        }
-
-        if ( !hadoopClusterConfig.getAllNodes().contains( lxcAgent ) )
-        {
-            productOperation.addLogFailed( String.format( "Specified node does not belong to Hadoop cluster %s",
-                    config.getHadoopClusterName() ) );
-            return;
-        }
-
-        productOperation.addLog( "Checking prerequisites..." );
-
-        //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
-
-        if ( !checkInstalledCommand.hasCompleted() )
-        {
-            productOperation.addLogFailed( "Failed to check presence of installed subutai packages" );
-            return;
-        }
-
-        AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
-
-        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
-        {
-            productOperation.addLogFailed( String.format( "Node %s already has Zookeeper installed", lxcHostname ) );
-            return;
-        }
-        else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
-        {
-            productOperation.addLogFailed( String.format( "Node %s has no Hadoop installed", lxcHostname ) );
-            return;
-        }
-
-
-        config.getNodes().add( lxcAgent );
-        config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
-
-        productOperation.addLog( String.format( "Installing %s...", ZookeeperClusterConfig.PRODUCT_NAME ) );
-
-        //install
-        Command installCommand = Commands.getInstallCommand( Sets.newHashSet( lxcAgent ) );
-        manager.getCommandRunner().runCommand( installCommand );
-
-        if ( installCommand.hasCompleted() )
-        {
-            productOperation.addLog( "Installation succeeded\nReconfiguring cluster..." );
-
-            try
-            {
-                new ClusterConfiguration( manager, productOperation ).configureCluster( config );
-            }
-            catch ( ClusterConfigurationException e )
-            {
-                productOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
-                return;
-            }
-
-            //update db
-            productOperation.addLog( "Updating cluster information in database..." );
-
-            manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            productOperation.addLogDone( "Cluster information updated in database" );
-        }
-        else
-        {
-            productOperation.addLogFailed( String.format( "Installation failed, %s\nUse Terminal Module to cleanup",
-                    installCommand.getAllErrors() ) );
         }
     }
 

@@ -13,9 +13,6 @@ import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 
-/**
- * Created by bahadyr on 6/24/14.
- */
 public class Environment
 {
 
@@ -23,14 +20,16 @@ public class Environment
     private Set<Node> nodes;
     private String name;
     private Set<EnvironmentContainer> containers;
+    private final ServiceLocator serviceLocator;
 
 
-    public Environment( final String name )
+    public Environment( UUID envId, final String name )
     {
         this.nodes = new HashSet<>();
         this.name = name;
-        this.uuid = UUID.randomUUID();
+        this.uuid = envId;
         this.containers = new HashSet<>();
+        this.serviceLocator = new ServiceLocator();
     }
 
 
@@ -75,7 +74,7 @@ public class Environment
     {
         try
         {
-            EnvironmentManager environmentManager = ServiceLocator.getServiceNoCache( EnvironmentManager.class );
+            EnvironmentManager environmentManager = this.serviceLocator.getServiceNoCache( EnvironmentManager.class );
             environmentManager.invoke( commandMessage );
         }
         catch ( NamingException e )
@@ -94,6 +93,7 @@ public class Environment
                 "uuid=" + uuid +
                 ", nodes=" + nodes +
                 ", name='" + name + '\'' +
+                ", containers=" + containers +
                 '}';
     }
 }

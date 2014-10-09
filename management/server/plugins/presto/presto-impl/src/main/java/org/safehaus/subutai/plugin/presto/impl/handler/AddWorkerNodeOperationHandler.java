@@ -16,7 +16,6 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.SetupType;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 import org.safehaus.subutai.plugin.presto.impl.SetupHelper;
 
@@ -107,7 +106,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         po.addLog( "Checking prerequisites..." );
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -118,7 +117,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
         boolean skipInstall = false;
         String hadoopPack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME;
-        if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
+        if ( result.getStdOut().contains( manager.getCommands().PACKAGE_NAME ) )
         {
             skipInstall = true;
             po.addLog( "Node already has Presto installed" );
@@ -132,7 +131,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         if ( !skipInstall )
         {
             po.addLog( "Installing Presto..." );
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
+            Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )

@@ -15,7 +15,6 @@ public class RemoteResponse
 {
 
     private final UUID commandId;
-    private final UUID agentId;
     private final Response response;
 
 
@@ -24,14 +23,7 @@ public class RemoteResponse
         Preconditions.checkNotNull( response, "Response is null" );
 
         this.commandId = response.getTaskUuid();
-        this.agentId = response.getUuid();
         this.response = response;
-    }
-
-
-    public UUID getAgentId()
-    {
-        return agentId;
     }
 
 

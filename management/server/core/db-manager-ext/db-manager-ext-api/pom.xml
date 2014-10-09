@@ -2,38 +2,36 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
+    <artifactId>package-manager-parent</artifactId>
     <groupId>org.safehaus.subutai</groupId>
-    <artifactId>db-manager-ext-parent</artifactId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>db-manager-ext-api</artifactId>
-  <name>Subutai DB Manager-Ext Api</name>
-  <description>DB Manager-Ext Api</description>
+  <artifactId>package-manager-api</artifactId>
+  <name>Subutai Package Manager Api</name>
+  <description>Subutai Package Manager Api</description>
 
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-
-    <!--db-manager-ext-impl-->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>${com.h2database.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>eclipselink</artifactId>
-      <version>${org.eclipse.persistence.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
     </dependency>
     <!--db-manager-ext-impl-->
-
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>${com.h2database.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.persistence</groupId>
+          <artifactId>eclipselink</artifactId>
+          <version>${org.eclipse.eclipselink.version}</version>
+        </dependency>
+        <!--db-manager-ext-impl-->
   </dependencies>
 
   <build>
@@ -47,7 +45,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.db-ext.api</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.packge.api</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

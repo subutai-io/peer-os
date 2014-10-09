@@ -41,7 +41,7 @@ public class WelcomeStep extends Panel
         Button next = new Button( "Start over-Hadoop installation" );
         next.addStyleName( "default" );
         //		next.setWidth(100, Unit.PIXELS);
-        grid.addComponent( next, 6, 4, 6, 4 );
+        grid.addComponent( next, 4, 4, 4, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
         next.addClickListener( new Button.ClickListener()
@@ -63,7 +63,7 @@ public class WelcomeStep extends Panel
                 clickHandler( wizard, SetupType.WITH_HADOOP );
             }
         } );
-        grid.addComponent( next2, 7, 4, 7, 4 );
+        grid.addComponent( next2, 5, 4, 5, 4 );
         grid.setComponentAlignment( next2, Alignment.BOTTOM_RIGHT );
 
         setContent( grid );

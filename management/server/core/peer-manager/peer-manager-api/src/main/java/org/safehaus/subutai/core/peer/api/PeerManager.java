@@ -44,7 +44,7 @@ public interface PeerManager
 
     public Set<Agent> getConnectedAgents( Peer peer, String environmentId ) throws PeerException;
 
-    public Set<Agent> createContainers( UUID envId, String template, int numberOfNodes, String strategy )
+    public Set<Agent> createContainers( UUID envId, UUID peerId, String template, int numberOfNodes, String strategy )
             throws ContainerCreateException;
 
     public boolean startContainer( PeerContainer container );
@@ -58,4 +58,10 @@ public interface PeerManager
     public void addContainer( PeerContainer peerContainer );
 
     public void invoke( PeerCommandMessage peerCommandMessage );
+
+    List<PeerGroup> peersGroups();
+
+    void deletePeerGroup( PeerGroup group );
+
+    boolean savePeerGroup( PeerGroup group );
 }

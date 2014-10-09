@@ -52,6 +52,7 @@ public class ZookeeperImpl implements Zookeeper
     private final Hadoop hadoopManager;
     private ExecutorService executor;
     private PluginDAO pluginDAO;
+    private final Commands commands;
 
 
     public ZookeeperImpl( final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
@@ -75,7 +76,13 @@ public class ZookeeperImpl implements Zookeeper
         this.hadoopManager = hadoopManager;
         this.pluginDAO = new PluginDAO( dbManager );
 
-        Commands.init( commandRunner );
+        this.commands = new Commands( commandRunner );
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 
@@ -148,12 +155,8 @@ public class ZookeeperImpl implements Zookeeper
     public UUID uninstallCluster( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-
-
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
@@ -322,7 +325,7 @@ public class ZookeeperImpl implements Zookeeper
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
 
         //node group
         NodeGroup nodesGroup = new NodeGroup();

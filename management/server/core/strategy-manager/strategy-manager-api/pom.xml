@@ -16,19 +16,17 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>monitoring-api</artifactId>
     </dependency>
+
   </dependencies>
 
   <build>

@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.SetupType;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
 
@@ -75,7 +74,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
         ProductOperation po = productOperation;
         po.addLog( "Uninstalling Presto..." );
 
-        Command cmd = Commands.getUninstallCommand( config.getAllNodes() );
+        Command cmd = manager.getCommands().getUninstallCommand( config.getAllNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

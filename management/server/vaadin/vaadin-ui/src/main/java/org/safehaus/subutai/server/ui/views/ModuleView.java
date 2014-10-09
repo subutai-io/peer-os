@@ -3,6 +3,7 @@ package org.safehaus.subutai.server.ui.views;
 
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.event.LayoutEvents;
 import com.vaadin.server.FileResource;
 import com.vaadin.ui.CssLayout;
@@ -21,6 +22,8 @@ public class ModuleView extends CssLayout
 
     public ModuleView( PortalModule module, ModuleViewListener clickListener )
     {
+        Preconditions.checkNotNull( module, "Module is null" );
+
         this.mModule = module;
         this.mClickListener = clickListener;
 

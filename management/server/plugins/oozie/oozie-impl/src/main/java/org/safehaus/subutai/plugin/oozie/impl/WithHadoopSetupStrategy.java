@@ -83,9 +83,8 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
                     "Not all nodes belong to Hadoop cluster " + config.getHadoopClusterName() );
         }
 
-        Command cmd = oozieManager.getCommandRunner()
-                                  .createCommand( new RequestBuilder( Commands.make( CommandType.STATUS ) ),
-                                          allOozieAgents );
+        Command cmd = oozieManager.getCommandRunner().createCommand(
+                new RequestBuilder( oozieManager.getCommands().make( CommandType.STATUS ) ), allOozieAgents );
         oozieManager.getCommandRunner().runCommand( cmd );
         if ( !cmd.hasSucceeded() )
         {
@@ -93,7 +92,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
         }
 
         po.addLog( "Installing Oozie server..." );
-        String sserver = Commands.make( CommandType.INSTALL_SERVER );
+        String sserver = oozieManager.getCommands().make( CommandType.INSTALL_SERVER );
         Agent serverAgent = oozieManager.getAgentManager().getAgentByHostname( config.getServer() );
         cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 300 ),
                 Sets.newHashSet( serverAgent ) );

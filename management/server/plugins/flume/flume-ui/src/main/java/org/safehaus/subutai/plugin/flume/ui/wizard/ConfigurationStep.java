@@ -174,14 +174,15 @@ public class ConfigurationStep extends VerticalLayout
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                config.getNodes().clear();
                 if ( event.getProperty().getValue() != null )
                 {
                     Collection agentList = ( Collection ) event.getProperty().getValue();
+                    config.getNodes().clear();
                     config.getNodes().addAll( agentList );
                 }
             }
         } );
+
 
         parent.addComponent( hadoopClusters );
         parent.addComponent( select );

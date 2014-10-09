@@ -6,35 +6,51 @@
 package org.safehaus.subutai.core.configuration.impl.command;
 
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
 /**
  * @author dilshat
  */
-public class Commands extends CommandsSingleton
+public class Commands
 {
+    private final CommandRunnerBase commandRunner;
 
-    public static Command getCatCommand( Agent agent, String filePath )
+
+    public Commands( final CommandRunnerBase commandRunner )
     {
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
 
-        return createCommand( new RequestBuilder( "cat " + filePath ).withTimeout( 90 ).withStdOutRedirection(
-                OutputRedirection.CAPTURE_AND_RETURN ), Sets.newHashSet( agent ) );
+        this.commandRunner = commandRunner;
     }
 
 
-    public static Command getEchoCommand( Agent agent, String filePath, String content )
+    public Command getCatCommand( Agent agent, String filePath )
     {
 
-        return createCommand( new RequestBuilder( "echo " + " '" + content + "' > " + filePath ).withTimeout( 90 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.CAPTURE_AND_RETURN ),
+        return commandRunner.createCommand( new RequestBuilder( "cat " + filePath ).withTimeout( 90 )
+                                                                                   .withStdOutRedirection(
+                                                                                           OutputRedirection
+                                                                                                   .CAPTURE_AND_RETURN ),
+                Sets.newHashSet( agent ) );
+    }
+
+
+    public Command getEchoCommand( Agent agent, String filePath, String content )
+    {
+
+        return commandRunner.createCommand(
+                new RequestBuilder( "echo " + " '" + content + "' > " + filePath ).withTimeout( 90 )
+                                                                                  .withStdOutRedirection(
+                                                                                          OutputRedirection
+                                                                                                  .CAPTURE_AND_RETURN ),
                 Sets.newHashSet( agent ) );
     }
 }
