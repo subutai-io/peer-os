@@ -18,6 +18,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -137,10 +139,30 @@ public class PeerGroupComponent extends CustomComponent
     {
         VerticalLayout layout = new VerticalLayout();
         layout.setImmediate( false );
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setImmediate( false );
+
+        final Label label = new Label( "Peer group name" );
         final TextField groupName = new TextField();
-        layout.addComponent( groupName );
+        final Button checkCharacteristics = new Button( "Check" );
+        checkCharacteristics.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                Notification.show( "Checking characteristics" );
+            }
+        } );
+
+        horizontalLayout.addComponent( label );
+        horizontalLayout.addComponent( groupName );
+        horizontalLayout.addComponent( checkCharacteristics );
+
+        layout.addComponent( horizontalLayout );
+
         final Table info = createPeersTable();
-        layout.addComponent( info );
+
         Button button = new Button( "Save" );
         button.addClickListener( new Button.ClickListener()
         {
@@ -168,7 +190,10 @@ public class PeerGroupComponent extends CustomComponent
                 window.close();
             }
         } );
+
+        layout.addComponent( info );
         layout.addComponent( button );
+
         return layout;
     }
 
