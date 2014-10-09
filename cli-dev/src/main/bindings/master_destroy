@@ -68,6 +68,7 @@ function master_destroy {
   
   # Remove relevant directories under $SUBUTAI_TMPDIR if any
   rm -rf $debian_root
+  # Removing related master veth pair from ovs
   ovs-vsctl --if-exist del-port br-int $container
   unlock_subutai_system
   if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi

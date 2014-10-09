@@ -36,8 +36,12 @@ function master_create {
   echo lxc.hook.pre-start = $subutai_script_base/pre_start_hook >> $config
   echo subutai.parent = master >> $config
   echo subutai.git.branch = master >> $config
+  
+  #changing default network link to related veth pair name
   sed -i '/lxc.network.link =.*/c\lxc.network.veth.pair = master' $config
+  #adding ovs_ops script for lxc startup
   echo "lxc.network.script.up = /usr/share/subutai-cli/subutai/lib/ovs_ops" >> $config
+  #creating second network interface
   echo "lxc.network.type = veth" >> $config
   echo "lxc.network.flags = up" >> $config
   

@@ -161,7 +161,11 @@ function destroy {
   # (9) remove relevant directories under $SUBUTAI_TMPDIR if any
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
+  
+  #deleting related veth pair port from ovs
   ovs-vsctl --if-exist del-port br-int $clone
+  ovs-vsctl --if-exist del-port br-int $clone-2
+
   unlock_container_read $clone
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
   exit 0
