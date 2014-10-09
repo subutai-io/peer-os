@@ -11,15 +11,10 @@
 
   <artifactId>cassandra-plugin-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Cassandra Plugin Api</name>
-  <description>Subutai Cassandra Plugin Api</description>
+  <name>Subutai Cassandra Api</name>
+  <description>Subutai Cassandra Api</description>
 
   <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
@@ -27,6 +22,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
@@ -35,6 +31,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

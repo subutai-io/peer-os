@@ -9,8 +9,8 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 

@@ -16,11 +16,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -64,12 +59,6 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>
-              org.apache.felix.service.command,
-              org.apache.felix.gogo.commands,
-              org.apache.karaf.shell.console,
-              *
-            </Import-Package>
           </instructions>
         </configuration>
       </plugin>
