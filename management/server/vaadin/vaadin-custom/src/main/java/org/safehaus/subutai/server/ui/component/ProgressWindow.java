@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.server.ui.MainUI;
 
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
@@ -104,9 +105,9 @@ public class ProgressWindow
     {
 
         showProgress();
-        executor.execute( new Runnable()
+        //        executor.execute( );
+        MainUI.getInstance().access( new Runnable()
         {
-
             public void run()
             {
                 while ( track )
