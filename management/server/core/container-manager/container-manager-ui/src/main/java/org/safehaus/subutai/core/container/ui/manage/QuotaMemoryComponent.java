@@ -2,24 +2,29 @@ package org.safehaus.subutai.core.container.ui.manage;
 
 
 import org.safehaus.subutai.core.lxc.quota.api.MemoryUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
 
 /**
  * Created by talas on 10/8/14.
  */
-public class QuotaMemoryComponent extends CustomComponent
+public class QuotaMemoryComponent extends VerticalLayout
 {
-    private TextField memoryTextField = new TextField( "Memory limit" );
-    private ComboBox unitComboBox = new ComboBox( "Memory unit", getUnitsEnum() );
+
+    private static Logger LOGGER = LoggerFactory.getLogger( QuotaMemoryComponent.class );
+    private TextField memoryTextField;
+    private ComboBox unitComboBox;
+    private MemoryUnit defaultUnit = MemoryUnit.BYTES;
 
     private static final String UNIT_SHORT_NAME = "ShortName";
     private static final String UNIT_LONG_NAME = "LongName";
@@ -28,32 +33,44 @@ public class QuotaMemoryComponent extends CustomComponent
     public QuotaMemoryComponent()
     {
         setHeight( 100, Unit.PERCENTAGE );
-        memoryTextField = new TextField( "Memory limit" );
-        unitComboBox = new ComboBox( "Memory unit", getUnitsEnum() );
-        Layout layout = new HorizontalLayout();
+        setWidth( 100, Unit.PERCENTAGE );
 
-        unitComboBox.select( MemoryUnit.BYTES.getShortName() );
+        memoryTextField = new TextField();
+        memoryTextField.setWidth( 100, Unit.PERCENTAGE );
         memoryTextField.setValue( "0" );
-        layout.addComponent( memoryTextField );
-        layout.addComponent( unitComboBox );
+        addComponent( memoryTextField );
 
-        setCompositionRoot( layout );
-        setSizeFull();
-    }
+        unitComboBox = new ComboBox( "", getUnitsEnum() );
+        //        unitComboBox.setWidth( 50, Unit.PERCENTAGE );
+        //        unitComboBox.select( MemoryUnit.BYTES.getShortName() );
 
+        unitComboBox.setItemCaptionPropertyId( UNIT_LONG_NAME );
+        unitComboBox.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
 
-    public QuotaMemoryComponent( String memoryAvailable, MemoryUnit memoryUnit )
-    {
-        memoryTextField = new TextField( "Memory limit" );
-        unitComboBox = new ComboBox( "Memory unit", getUnitsEnum() );
-        Layout layout = new HorizontalLayout();
+        unitComboBox.select( defaultUnit.getShortName() );
 
-        unitComboBox.select( memoryUnit.getShortName() );
-        memoryTextField.setValue( memoryAvailable );
-        layout.addComponent( memoryTextField );
-        layout.addComponent( unitComboBox );
+        unitComboBox.setInputPrompt( "Select unit." );
+        unitComboBox.setNullSelectionAllowed( false );
 
-        setCompositionRoot( layout );
+        unitComboBox.setFilteringMode( FilteringMode.CONTAINS );
+        unitComboBox.setImmediate( true );
+        unitComboBox.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent valueChangeEvent )
+            {
+                Item item = unitComboBox.getItem( valueChangeEvent.getProperty().getValue() );
+                String unitId = String.valueOf( item.getItemProperty( UNIT_SHORT_NAME ).getValue() );
+                LOGGER.warn( String.valueOf( item.getItemProperty( UNIT_SHORT_NAME ).getValue() ) );
+
+                MemoryUnit newUnit = MemoryUnit.getMemoryUnit( unitId );
+
+                performConversion( defaultUnit, newUnit );
+            }
+        } );
+        unitComboBox.select( getUnitsEnum().getItem( MemoryUnit.BYTES.getShortName() ) );
+        addComponent( unitComboBox );
+
         setSizeFull();
     }
 
@@ -66,7 +83,7 @@ public class QuotaMemoryComponent extends CustomComponent
 
     public void setValueForMemoryUnitComboBox( MemoryUnit unit )
     {
-        unitComboBox.select( unit.getShortName() );
+        //        unitComboBox.select( unit.getShortName() );
     }
 
 
@@ -80,14 +97,69 @@ public class QuotaMemoryComponent extends CustomComponent
         {
             Item item = units.addItem( anEnum.getShortName() );
 
-            Property shortProp = item.getItemProperty( UNIT_SHORT_NAME );
-            String shortValue = ( String ) shortProp.getValue();
-            shortValue = anEnum.getShortName();
+            item.getItemProperty( UNIT_SHORT_NAME ).setValue( anEnum.getShortName() );
+            item.getItemProperty( UNIT_LONG_NAME ).setValue( anEnum.getLongName() );
 
-            Property longProp = item.getItemProperty( UNIT_LONG_NAME );
-            String longValue = ( String ) longProp.getValue();
-            longValue = anEnum.getLongName();
+            LOGGER.info( anEnum.getShortName() + "  " + anEnum.getLongName() );
         }
         return units;
+    }
+
+
+    private void performConversion( MemoryUnit oldValue, MemoryUnit newValue )
+    {
+        String conversionResult = "";
+        String str = memoryTextField.getValue().replaceAll( "\n", "" );
+        LOGGER.warn( str );
+        Long currentUnitValue = Long.parseLong( str );
+        if ( oldValue.getValue() < newValue.getValue() )
+        {
+            while ( oldValue.getValue() < newValue.getValue() )
+            {
+                switch ( oldValue.getValue() )
+                {
+                    case 0:
+                        conversionResult = String.valueOf( convertToBigger( currentUnitValue ) );
+                        break;
+                    case 1:
+                        conversionResult = String.valueOf( convertToBigger( currentUnitValue ) );
+                        break;
+                    case 2:
+                        conversionResult = String.valueOf( convertToBigger( currentUnitValue ) );
+                }
+                oldValue = MemoryUnit.getMemoryUnit( oldValue.getValue() + 1 );
+            }
+        }
+        else if ( oldValue.getValue() > newValue.getValue() )
+        {
+            while ( oldValue.getValue() > newValue.getValue() )
+            {
+                switch ( oldValue.getValue() )
+                {
+                    case 0:
+                        conversionResult = String.valueOf( convertToLess( currentUnitValue ) );
+                        break;
+                    case 1:
+                        conversionResult = String.valueOf( convertToLess( currentUnitValue ) );
+                        break;
+                    case 2:
+                        conversionResult = String.valueOf( convertToLess( currentUnitValue ) );
+                }
+                oldValue = MemoryUnit.getMemoryUnit( oldValue.getValue() - 1 );
+            }
+        }
+        memoryTextField.setValue( conversionResult );
+    }
+
+
+    private long convertToBigger( long value )
+    {
+        return value / 1024;
+    }
+
+
+    private long convertToLess( long value )
+    {
+        return value * 1024;
     }
 }
