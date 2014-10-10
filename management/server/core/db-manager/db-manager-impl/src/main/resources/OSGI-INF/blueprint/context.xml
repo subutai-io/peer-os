@@ -14,12 +14,16 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
+  <reference id="dataSource" interface="javax.sql.DataSource"/>
+
   <bean id="dbManager" class="org.safehaus.subutai.core.db.impl.DbManagerImpl"
         init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
     <property name="cassandraHost" value="${cassandraHost}" />
     <property name="cassandraPort" value="${cassandraPort}" />
     <property name="cassandraKeyspace" value="${cassandraKeyspace}" />
+    <property name="dataSource" ref="dataSource"/>
   </bean>
+
   <service ref="dbManager"
            interface="org.safehaus.subutai.core.db.api.DbManager">
     <service-properties>
