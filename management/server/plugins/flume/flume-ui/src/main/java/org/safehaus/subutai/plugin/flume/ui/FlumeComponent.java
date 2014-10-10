@@ -34,7 +34,9 @@ public class FlumeComponent extends CustomComponent
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
+        sheet.getTab(0).setId("FlumeInstallTab");
         sheet.addTab( manager.getContent(), "Manage" );
+        sheet.getTab(1).setId("FlumeManageTab");
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

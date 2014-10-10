@@ -32,8 +32,11 @@ public class SecondaryNameNode extends ClusterNode
         setHostname( cluster.getSecondaryNameNode().getHostname() );
 
         restartButton.setVisible( false );
+        restartButton.setId("secondaryRestart");
         startButton.setEnabled( false );
+        startButton.setId("secondaryStart");
         stopButton.setEnabled( false );
+        stopButton.setId("secondaryStop");
 
         getStatus( null );
     }
@@ -75,5 +78,6 @@ public class SecondaryNameNode extends ClusterNode
         startButton.setVisible( !isLoading );
         stopButton.setVisible( !isLoading );
         progressButton.setVisible( isLoading );
+        progressButton.setId("secondaryProgress");
     }
 }

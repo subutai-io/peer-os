@@ -50,6 +50,7 @@ public class ConfigurationStep extends VerticalLayout
         layout.addComponent( content );
 
         TextField txtClusterName = new TextField( "Flume installation name: " );
+        txtClusterName.setId("FlumeClusterName");
         txtClusterName.setRequired( true );
         txtClusterName.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -77,6 +78,7 @@ public class ConfigurationStep extends VerticalLayout
 
         // --- buttons ---
         Button next = new Button( "Next" );
+        next.setId("FluConfigNext");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -88,6 +90,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
+        back.setId("FluConfigBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -113,6 +116,7 @@ public class ConfigurationStep extends VerticalLayout
         final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
+        hadoopClusters.setId("FluHadoopClustersCb");
         hadoopClusters.setImmediate( true );
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );
@@ -196,6 +200,7 @@ public class ConfigurationStep extends VerticalLayout
         Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
 
         final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
+        txtHadoopClusterName.setId("FlumeHadoopClusterTxt");
         txtHadoopClusterName.setRequired( true );
         txtHadoopClusterName.setMaxLength( 20 );
         if ( hadoopConfig.getClusterName() != null )
@@ -214,6 +219,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
+        cmbSlaveNodes.setId("FlumeSlaveNodeCb");
         cmbSlaveNodes.setImmediate( true );
         cmbSlaveNodes.setTextInputAllowed( false );
         cmbSlaveNodes.setNullSelectionAllowed( false );
@@ -228,6 +234,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
+        cmbReplFactor.setId("FlumeReplFactor");
         cmbReplFactor.setImmediate( true );
         cmbReplFactor.setTextInputAllowed( false );
         cmbReplFactor.setNullSelectionAllowed( false );
@@ -242,6 +249,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
+        txtHadoopDomain.setId("FlumeHadoopDomain");
         txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
         txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
         txtHadoopDomain.setMaxLength( 20 );
