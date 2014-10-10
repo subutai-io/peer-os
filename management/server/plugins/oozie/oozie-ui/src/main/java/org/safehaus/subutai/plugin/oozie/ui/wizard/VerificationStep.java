@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -37,12 +38,12 @@ public class VerificationStep extends Panel
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "Server", wizard.getConfig().getServer() + "\n" );
+        cfgView.addStringCfg( "Server", wizard.getConfig().getServer().getHostname() + "\n" );
         if ( wizard.getConfig().getClients() != null )
         {
-            for ( String agent : wizard.getConfig().getClients() )
+            for ( Agent agent : wizard.getConfig().getClients() )
             {
-                cfgView.addStringCfg( "Clients", agent + "\n" );
+                cfgView.addStringCfg( "Clients", agent.getHostname() + "\n" );
             }
         }
 

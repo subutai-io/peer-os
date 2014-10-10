@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.oozie.impl;
 
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
@@ -17,9 +16,6 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import com.google.common.collect.Sets;
 
 
-/**
- * Created by bahadyr on 9/4/14.
- */
 public class WithHadoopSetupStrategy extends OozieSetupStrategy
 {
 
@@ -48,17 +44,19 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
     public ConfigBase setup() throws ClusterSetupException
     {
         //check if node agents are connected
-        for ( String hostname : config.getClients() )
+        for ( Agent agent : config.getClients() )
         {
+            String hostname = agent.getHostname();
             if ( oozieManager.getAgentManager().getAgentByHostname( hostname ) == null )
             {
                 throw new ClusterSetupException( String.format( "Node %s is not connected", hostname ) );
             }
         }
 
-        if ( oozieManager.getAgentManager().getAgentByHostname( config.getServer() ) == null )
+        String serverHostname = config.getServer().getHostname();
+        if ( oozieManager.getAgentManager().getAgentByHostname( serverHostname ) == null )
         {
-            throw new ClusterSetupException( String.format( "Node %s is not connected", config.getServer() ) );
+            throw new ClusterSetupException( String.format( "Node %s is not connected", serverHostname ) );
         }
 
         HadoopClusterConfig hc = oozieManager.getHadoopManager().getCluster( config.getHadoopClusterName() );
@@ -67,15 +65,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
         }
 
-        Set<String> allOozieHostnames = config.getAllOozieAgents();
-
-        Set<Agent> allOozieAgents = new HashSet<>();
-
-        for ( String agentHostname : allOozieHostnames )
-        {
-            Agent agent = oozieManager.getAgentManager().getAgentByHostname( agentHostname );
-            allOozieAgents.add( agent );
-        }
+        Set<Agent> allOozieAgents = config.getAllOozieAgents();
 
         if ( !hc.getAllNodes().containsAll( allOozieAgents ) )
         {
@@ -93,7 +83,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
 
         po.addLog( "Installing Oozie server..." );
         String sserver = oozieManager.getCommands().make( CommandType.INSTALL_SERVER );
-        Agent serverAgent = oozieManager.getAgentManager().getAgentByHostname( config.getServer() );
+        Agent serverAgent = config.getServer();
         cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 300 ),
                 Sets.newHashSet( serverAgent ) );
         oozieManager.getCommandRunner().runCommand( cmd );
@@ -112,12 +102,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
             po.addLog( "Installing Oozie client..." );
             String sclient = Commands.make( CommandType.INSTALL_CLIENT );
 
-            Set<Agent> clients = new HashSet<>();
-            for ( String clientHostname : config.getClients() )
-            {
-                Agent clientAgent = oozieManager.getAgentManager().getAgentByHostname( clientHostname );
-                clients.add( clientAgent );
-            }
+            Set<Agent> clients = config.getClients();
             cmd = oozieManager.getCommandRunner()
                               .createCommand( new RequestBuilder( sclient ).withTimeout( 180 ), clients );
             oozieManager.getCommandRunner().runCommand( cmd );

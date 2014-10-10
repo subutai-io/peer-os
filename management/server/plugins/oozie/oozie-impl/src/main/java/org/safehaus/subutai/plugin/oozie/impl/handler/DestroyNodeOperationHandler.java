@@ -3,9 +3,11 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -16,17 +18,24 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
 {
 
     private String lxcHostName;
+    private final ProductOperation productOperation;
 
 
     public DestroyNodeOperationHandler( OozieImpl manager, String clusterName, String lxcHostName )
     {
         super( manager, clusterName );
         this.lxcHostName = lxcHostName;
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Uninstalling oozie client from %s node and updating cluster information of %s", lxcHostName,
                         clusterName ) );
     }
 
+
+    @Override
+    public UUID getTrackerId()
+    {
+        return productOperation.getId();
+    }
 
     @Override
     public void run()

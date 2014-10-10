@@ -24,8 +24,8 @@ public class OozieClusterConfig implements ConfigBase
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private String hadoopClusterName;
     private UUID uuid;
-    private String server;
-    private Set<String> clients;
+    private Agent server;
+    private Set<Agent> clients;
     private String clusterName = "";
     private SetupType setupType;
 
@@ -103,25 +103,25 @@ public class OozieClusterConfig implements ConfigBase
     }
 
 
-    public String getServer()
+    public Agent getServer()
     {
         return server;
     }
 
 
-    public void setServer( String server )
+    public void setServer( Agent server )
     {
         this.server = server;
     }
 
 
-    public Set<String> getClients()
+    public Set<Agent> getClients()
     {
         return clients;
     }
 
 
-    public void setClients( Set<String> clients )
+    public void setClients( Set<Agent> clients )
     {
         this.clients = clients;
     }
@@ -189,9 +189,9 @@ public class OozieClusterConfig implements ConfigBase
     }
 
 
-    public Set<String> getAllOozieAgents()
+    public Set<Agent> getAllOozieAgents()
     {
-        Set<String> allAgents = new HashSet<>();
+        Set<Agent> allAgents = new HashSet<>();
         allAgents.addAll( clients );
         allAgents.add( server );
         return allAgents;

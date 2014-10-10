@@ -86,6 +86,13 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
+    public HorizontalLayout getStatusLayout( final Item row ) {
+        if ( row == null )
+            return null;
+        return (HorizontalLayout) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
+    }
+
+
     public Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
         if ( availableOperationsLayout == null ) {
             return null;
@@ -208,4 +215,9 @@ public abstract class BaseManager implements BaseManagerInterface
         return processCount;
     }
 
+
+    public ProgressBar getProgressBar()
+    {
+        return progressBar;
+    }
 }

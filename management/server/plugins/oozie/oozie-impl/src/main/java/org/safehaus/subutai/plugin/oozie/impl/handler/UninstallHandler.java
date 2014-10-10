@@ -55,8 +55,10 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 }
 
                 Set<String> nodes = new HashSet<String>();
-                nodes.addAll( config.getClients() );
-                nodes.add( config.getServer() );
+                for ( Agent agent : config.getAllOozieAgents() ) {
+                    nodes.add( agent.getHostname() );
+                }
+
                 for ( String node : nodes )
                 {
                     if ( manager.getAgentManager().getAgentByHostname( node ) == null )
@@ -67,7 +69,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 }
 
                 Set<Agent> servers = new HashSet<Agent>();
-                Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+                Agent serverAgent = config.getServer();
                 servers.add( serverAgent );
 
                 Command uninstallServerCommand = manager.getCommands().getUninstallServerCommand( servers );
@@ -85,9 +87,9 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 }
 
                 Set<Agent> clientAgents = new HashSet<Agent>();
-                for ( String clientHostname : config.getClients() )
+                for ( Agent clientNode : config.getClients() )
                 {
-                    Agent clientAgent = manager.getAgentManager().getAgentByHostname( clientHostname );
+                    Agent clientAgent = clientNode;
                     clientAgents.add( clientAgent );
                 }
                 if ( !clientAgents.isEmpty() ) {

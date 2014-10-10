@@ -51,7 +51,7 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                 config = manager.getPluginDAO()
                                 .getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
 
-                Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+                Agent serverAgent = config.getServer();
                 if ( serverAgent == null )
                 {
                     productOperation

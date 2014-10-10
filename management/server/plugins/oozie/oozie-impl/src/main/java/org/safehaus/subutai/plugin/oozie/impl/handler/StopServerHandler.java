@@ -50,7 +50,7 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                             String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
-                Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+                Agent serverAgent = config.getServer();
                 if ( serverAgent == null )
                 {
                     productOperation

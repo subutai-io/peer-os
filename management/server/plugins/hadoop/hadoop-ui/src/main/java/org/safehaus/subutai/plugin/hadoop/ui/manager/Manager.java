@@ -28,7 +28,6 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 
 
@@ -147,7 +146,7 @@ public class Manager extends BaseManager {
         configContent.addComponent( domainName );
         configContent.addComponent( new Label( "Slave Node Count:" ) );
         configContent.addComponent( slaveNodeCount );
-        configContent.addComponent( progressBar );
+        configContent.addComponent( getProgressBar() );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( configContent, 0, 1 );
@@ -184,7 +183,7 @@ public class Manager extends BaseManager {
 
     private void refreshUI() {
         if ( hadoopCluster != null ) {
-            //            refreshClusterList();
+//            refreshClustersInfo();
             populateTable( masterNodesTable, getMasterNodeList( hadoopCluster ) );
             populateTable( slaveNodesTable, hadoopCluster.getDataNodes() );
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
@@ -411,12 +410,6 @@ public class Manager extends BaseManager {
         return null;
     }
 
-    protected HorizontalLayout getStatusGroupByRow( final Item row ) {
-        if ( row == null )
-            return null;
-        return (HorizontalLayout) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
-    }
-
 
     protected Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout ) {
         if ( statusGroupLayout == null ) {
@@ -481,22 +474,6 @@ public class Manager extends BaseManager {
 
         return decommissionState;
     }
-
-
-//    protected synchronized void enableProgressBar() {
-//        processCount++;
-//        progressBar.setVisible( true );
-//    }
-//
-//
-//    protected synchronized void disableProgressBar() {
-//        if ( processCount > 0 ) {
-//            processCount--;
-//        }
-//        if ( processCount == 0 ) {
-//            progressBar.setVisible( false );
-//        }
-//    }
 
 
     protected void checkAllIfNoProcessRunning() {

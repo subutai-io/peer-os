@@ -68,8 +68,8 @@ public class StepSetConfig extends Panel
                 wizard.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
         for ( Agent agent : hcc.getAllNodes() )
         {
-            cbServers.addItem( agent.getHostname() );
-            cbServers.setItemCaption( agent.getHostname(), agent.getHostname() );
+            cbServers.addItem( agent );
+            cbServers.setItemCaption( agent, agent.getHostname() );
         }
 
         vl.addComponent( cbServers );
@@ -106,13 +106,13 @@ public class StepSetConfig extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                wizard.getConfig().setServer( ( String ) cbServers.getValue() );
-                Set<String> clientNodes = new HashSet<String>();
+                wizard.getConfig().setServer( ( Agent ) cbServers.getValue() );
+                Set<Agent> clientNodes = new HashSet<>();
                 if ( selectClients.getValue() != null )
                 {
                     for ( Agent node : ( Set<Agent> ) selectClients.getValue() )
                     {
-                        clientNodes.add( node.getHostname() );
+                        clientNodes.add( node );
                     }
                     wizard.getConfig().setClients( clientNodes );
                 }

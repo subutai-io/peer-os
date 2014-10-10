@@ -168,7 +168,7 @@ public class ManagerListener {
 
     protected Button.ClickListener slaveNodeDestroyButtonListener( final Item row ) {
         final Agent agent = hadoopManager.getAgentByRow( row );
-        final HorizontalLayout statusGroup = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroup = hadoopManager.getStatusLayout( row );
         final Label statusDecommission = hadoopManager.getStatusDecommissionLabel( statusGroup );
 
         return new Button.ClickListener() {
@@ -281,7 +281,7 @@ public class ManagerListener {
     protected Button.ClickListener secondaryNameNodeCheckButtonListener( final Item row ) {
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Label statusDatanode = hadoopManager.getStatusDatanodeLabel( statusGroupLayout );
 
@@ -381,7 +381,7 @@ public class ManagerListener {
 
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Label statusTaskTracker = hadoopManager.getStatusDatanodeLabel( statusGroupLayout );
@@ -425,7 +425,7 @@ public class ManagerListener {
 
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Label statusDatanode = hadoopManager.getStatusDatanodeLabel( statusGroupLayout );
@@ -529,7 +529,7 @@ public class ManagerListener {
 
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Button excludeIncludeNodeButton = hadoopManager.getExcludeIncludeButton( availableOperationsLayout );
         final Button destroyButton = hadoopManager.getDestroyButton( availableOperationsLayout );
@@ -624,8 +624,10 @@ public class ManagerListener {
         hadoopManager.getClusterList().removeAllItems();
         if ( hadoopClusterList != null && hadoopClusterList.size() > 0 ) {
             for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
-                hadoopManager.getClusterList().addItem( hadoopCluster );
-                hadoopManager.getClusterList().setItemCaption( hadoopCluster, hadoopCluster.getClusterName() );
+                if ( hadoopCluster.getNameNode() != null ) {
+                    hadoopManager.getClusterList().addItem( hadoopCluster );
+                    hadoopManager.getClusterList().setItemCaption( hadoopCluster, hadoopCluster.getClusterName() );
+                }
             }
             if ( clusterInfo != null ) {
                 for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
@@ -636,7 +638,12 @@ public class ManagerListener {
                 }
             }
             else {
-                hadoopManager.getClusterList().setValue( hadoopClusterList.iterator().next() );
+                for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
+                    if ( hadoopCluster.getNameNode() != null ) {
+                        hadoopManager.getClusterList().setValue( hadoopCluster );
+                        return;
+                    }
+                }
             }
         }
     }
@@ -645,7 +652,7 @@ public class ManagerListener {
     private void executeSlaveNodeCheckButtonFinishCommands( Item row, Button checkButton ) {
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button destroyButton = hadoopManager.getDestroyButton( availableOperationsLayout );
         final Label statusDecommission = hadoopManager.getStatusDecommissionLabel( statusGroupLayout );
         if ( agent != null ) {

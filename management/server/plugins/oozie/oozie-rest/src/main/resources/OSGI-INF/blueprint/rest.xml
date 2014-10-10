@@ -17,9 +17,12 @@
   <bean id="oozieRestServiceImpl" class="org.safehaus.subutai.plugin.oozie.rest.RestServiceImpl">
     <property name="oozieManager" ref="oozieManager" />
     <property name="hadoopManager" ref="hadoopManager" />
+    <property name="agentManager" ref="agentManager" />
   </bean>
   <reference id="oozieManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.oozie.api.Oozie" />
   <reference id="hadoopManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 </blueprint>

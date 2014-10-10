@@ -26,6 +26,7 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -128,7 +129,7 @@ public class Manager extends BaseManager
             }
         } );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -170,6 +171,7 @@ public class Manager extends BaseManager
         } );
 
         controlsContent.addComponent( destroyClusterBtn );
+        controlsContent.addComponent( getProgressBar() );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( serverTable, 0, 1, 0, 5 );
@@ -204,10 +206,10 @@ public class Manager extends BaseManager
     }
 
 
-    private void populateServerTable( final Table table, final String agentHostname )
+    private void populateServerTable( final Table table, final Agent agent )
     {
         List<Agent> agentList = new ArrayList<>();
-        agentList.add( agentManager.getAgentByHostname( agentHostname ) );
+        agentList.add( agent );
         populateTable( table, agentList );
     }
 
@@ -243,20 +245,12 @@ public class Manager extends BaseManager
     }
 
 
-    private void populateClientsTable( final Table table, Set<String> clientHostnames )
+    private void populateClientsTable( final Table table, Set<Agent> clientNodes )
     {
 
         table.removeAllItems();
         List<Agent> agentList = new ArrayList<>();
-
-        for ( final String agentHostname : clientHostnames )
-        {
-            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setVisible( false );
-
-            agentList.add( agentManager.getAgentByHostname( agentHostname ) );
-        }
-
+        agentList.addAll( clientNodes );
         populateTable( table, agentList );
     }
 
@@ -321,7 +315,8 @@ public class Manager extends BaseManager
     @Override
     public void addRowComponents( Table table, final Agent agent )
     {
-
+        Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
+        Preconditions.checkNotNull( agent, "Cannot add null agent to the table" );
         if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) ) {
             addServerRow( table, agent );
         }
@@ -366,7 +361,7 @@ public class Manager extends BaseManager
 
         Item row = getAgentRow( table, agent );
 
-        checkButton.addClickListener( checkButtonListener() );
+        checkButton.addClickListener( checkButtonListener( row ) );
         startStopButton.addClickListener( startStopButtonListener( row ) );
     }
 
@@ -375,11 +370,9 @@ public class Manager extends BaseManager
     {
         // Layouts to be added to table
         final HorizontalLayout availableOperations = new HorizontalLayout();
-        final HorizontalLayout statusGroup = new HorizontalLayout();
+        final HorizontalLayout statusLayout = new HorizontalLayout();
         availableOperations.addStyleName( "default" );
         availableOperations.setSpacing( true );
-        statusGroup.addStyleName( "default" );
-        statusGroup.setSpacing( true );
         // Layouts to be added to table
 
         // Buttons to be added to availableOperations
@@ -391,7 +384,7 @@ public class Manager extends BaseManager
         availableOperations.addComponent( destroyButton );
 
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(), statusGroup, availableOperations
+                agent.getHostname(), agent.getListIP().toString(),statusLayout, availableOperations
         }, null );
 
         Item row = getAgentRow( table, agent );
@@ -407,68 +400,66 @@ public class Manager extends BaseManager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                Button startStopButton = clickEvent.getButton();
+                final Button startStopButton = clickEvent.getButton();
+                HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
+                final Button checkButton = getCheckButton( availableOperationsLayout );
+                startStopButton.setEnabled( false );
                 boolean isRunning = startStopButton.getCaption().contains( STOP_BUTTON_CAPTION );
                 enableProgressBar();
                 startStopButton.setEnabled( false );
+                checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
+                OperationType operationType;
                 if ( !isRunning ) {
-                    executorService
-                            .execute( new OperationTask( oozieManager, tracker, OperationType.Start,
-                                    NodeType.SERVER, config, new CompleteEvent()
-                            {
-
-                                public void onComplete( NodeState state )
-                                {
-                                    if ( state == NodeState.RUNNING )
-                                    {
-                                        //                                        statusTaskTracker.setValue( "JobTracker Running" );
-                                        //                                        startStopButton.setCaption( Manager.STOP_JOBTRACKER_BUTTON_CAPTION );
-                                        //                                        startStopButton.setEnabled( true );
-                                    }
-                                    else if ( state == NodeState.STOPPED )
-                                    {
-                                        //                                        statusTaskTracker.setValue( "JobTracker Stopped" );
-                                        //                                        startStopButton.setCaption( Manager.START_JOBTRACKER_BUTTON_CAPTION );
-                                        //                                        startStopButton.setEnabled( true );
-                                    }
-                                    else
-                                    {
-                                        //                                        statusTaskTracker.setValue( "JobTracker Not Connected" );
-                                        //                                        startStopButton.setCaption( "Not connected" );
-                                    }
-
-                                    //                                    checkButton.setEnabled( true );
-                                    disableProgressBar();
-                                    if ( getProcessCount() == 0 )
-                                    {
-                                        //                                        hadoopManager.getCheckAllButton().setEnabled( true );
-                                    }
-                                }
-                            }, null, agent ) );
+                    operationType = OperationType.Start;
                 }
                 else {
-                    //                    trackID = oozieManager.stopServer( config );
+                    operationType = OperationType.Stop;
                 }
-
-
-
-
-                //                ProgressWindow window =
-                //                        new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
-                //                window.getWindow().addCloseListener( new Window.CloseListener()
-                //                {
-                //                    @Override
-                //                    public void windowClose( Window.CloseEvent closeEvent )
-                //                    {
-                //                        refreshClustersInfo();
-                //                        disableProgressBar();
-                //                    }
-                //                } );
-                //                contentRoot.getUI().addWindow( window.getWindow() );
+                executorService
+                        .execute( new OperationTask( oozieManager, tracker, operationType,
+                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
             }
         } ;
+    }
+
+
+    private CompleteEvent startStopCheckCompleteEvent( Item row )
+    {
+        HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
+        final Button checkButton = getCheckButton( availableOperationsLayout );
+        final Button startStopButton = getStartStopButton( availableOperationsLayout );
+        HorizontalLayout statusLayout = getStatusLayout( row );
+        final Label statusLabel = getStatusLabel( statusLayout );
+
+        return new CompleteEvent()
+        {
+
+            public void onComplete( NodeState state )
+            {
+                if ( state == NodeState.RUNNING )
+                {
+                    statusLabel.setValue( "Server is running" );
+                    startStopButton.setCaption( STOP_BUTTON_CAPTION );
+                    startStopButton.setEnabled( true );
+                }
+                else if ( state == NodeState.STOPPED )
+                {
+                    statusLabel.setValue( "Server is stopped" );
+                    startStopButton.setCaption( START_BUTTON_CAPTION );
+                    startStopButton.setEnabled( true );
+                }
+                else
+                {
+                    statusLabel.setValue( "Server is not connected" );
+                    startStopButton.setCaption( "Not connected" );
+                }
+
+                checkButton.setEnabled( true );
+                disableProgressBar();
+            }
+        };
     }
 
 
@@ -480,78 +471,26 @@ public class Manager extends BaseManager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 Button destroyButton = clickEvent.getButton();
-                boolean isRunning = destroyButton.getCaption().contains( STOP_BUTTON_CAPTION );
                 enableProgressBar();
                 destroyButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                if ( !isRunning ) {
-                    executorService
-                            .execute( new OperationTask( oozieManager, tracker, OperationType.Destroy,
-                                    NodeType.SERVER, config, new CompleteEvent()
-                            {
+                //                    executorService
+                //                            .execute( new OperationTask( oozieManager, tracker, OperationType.Destroy,
+                //                                    NodeType.SERVER, config, new CompleteEvent()
+                //                            {
+                //
+                //                                public void onComplete( NodeState state )
+                //                                {
+                //                                    refreshUI();
+                //                                }
+                //                            }, null, agent ) );
+                //                }
 
-                                public void onComplete( NodeState state )
-                                {
-                                    if ( state == NodeState.RUNNING )
-                                    {
-                                        //                                        statusTaskTracker.setValue( "JobTracker Running" );
-                                        //                                        destroyButton.setCaption( Manager.STOP_JOBTRACKER_BUTTON_CAPTION );
-                                        //                                        destroyButton.setEnabled( true );
-                                    }
-                                    else if ( state == NodeState.STOPPED )
-                                    {
-                                        //                                        statusTaskTracker.setValue( "JobTracker Stopped" );
-                                        //                                        destroyButton.setCaption( Manager.START_JOBTRACKER_BUTTON_CAPTION );
-                                        //                                        destroyButton.setEnabled( true );
-                                    }
-                                    else
-                                    {
-                                        //                                        statusTaskTracker.setValue( "JobTracker Not Connected" );
-                                        //                                        destroyButton.setCaption( "Not connected" );
-                                    }
-
-                                    //                                    checkButton.setEnabled( true );
-                                    disableProgressBar();
-                                    if ( getProcessCount() == 0 )
-                                    {
-                                        //                                        hadoopManager.getCheckAllButton().setEnabled( true );
-                                    }
-                                }
-                            }, null, agent ) );
-                }
-                else {
-                    //                    trackID = oozieManager.stopServer( config );
-                }
+                UUID trackID = oozieManager.destroyNode( config.getClusterName(), agent.getHostname() );
 
 
 
-
-                //                ProgressWindow window =
-                //                        new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
-                //                window.getWindow().addCloseListener( new Window.CloseListener()
-                //                {
-                //                    @Override
-                //                    public void windowClose( Window.CloseEvent closeEvent )
-                //                    {
-                //                        refreshClustersInfo();
-                //                        disableProgressBar();
-                //                    }
-                //                } );
-                //                contentRoot.getUI().addWindow( window.getWindow() );
-            }
-        } ;
-    }
-
-    private Button.ClickListener checkButtonListener()
-    {
-        return new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                enableProgressBar();
-                UUID trackID = oozieManager.checkServerStatus( config );
                 ProgressWindow window =
                         new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
@@ -559,11 +498,51 @@ public class Manager extends BaseManager
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent )
                     {
-                        refreshClustersInfo();
+                        refreshUI();
                         disableProgressBar();
                     }
                 } );
                 contentRoot.getUI().addWindow( window.getWindow() );
+            }
+        } ;
+    }
+
+    private Button.ClickListener checkButtonListener( final Item row )
+    {
+        return new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+
+                final Button startStopButton = clickEvent.getButton();
+                HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
+                final Button checkButton = getCheckButton( availableOperationsLayout );
+                startStopButton.setEnabled( false );
+                enableProgressBar();
+                startStopButton.setEnabled( false );
+                checkButton.setEnabled( false );
+                Agent agent = getAgentByRow( row );
+
+                OperationType operationType = OperationType.Status;
+                executorService
+                        .execute( new OperationTask( oozieManager, tracker, operationType,
+                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
+
+//                enableProgressBar();
+//                UUID trackID = oozieManager.checkServerStatus( config );
+//                ProgressWindow window =
+//                        new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
+//                window.getWindow().addCloseListener( new Window.CloseListener()
+//                {
+//                    @Override
+//                    public void windowClose( Window.CloseEvent closeEvent )
+//                    {
+//                        refreshClustersInfo();
+//                        disableProgressBar();
+//                    }
+//                } );
+//                contentRoot.getUI().addWindow( window.getWindow() );
             }
         };
     }
@@ -574,14 +553,22 @@ public class Manager extends BaseManager
             return null;
         }
 
-        Set<String> clusterNodeList = config.getAllOozieAgents();
+        Set<Agent> clusterNodeList = config.getAllOozieAgents();
         String lxcHostname= row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
 
-        for ( String agentHostname : clusterNodeList ) {
-            if ( agentHostname.equals( lxcHostname ) ) {
-                return agentManager.getAgentByHostname( agentHostname );
+        for ( Agent agent : clusterNodeList ) {
+            if ( agent.getHostname().equals( lxcHostname ) ) {
+                return agent;
             }
         }
         return null;
+    }
+
+
+    private Label getStatusLabel( final HorizontalLayout statusGroupLayout ) {
+        if ( statusGroupLayout == null ) {
+            return null;
+        }
+        return (Label) statusGroupLayout.getComponent( 0 );
     }
 }
