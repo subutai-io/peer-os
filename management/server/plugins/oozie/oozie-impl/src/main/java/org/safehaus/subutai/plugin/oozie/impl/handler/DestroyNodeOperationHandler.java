@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
@@ -72,7 +71,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
         oozieClusterConfig.removeClient( node );
 
         manager.getPluginDAO()
-               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, oozieClusterConfig.getClusterName(), oozieClusterConfig );
+               .saveInfo( OozieClusterConfig.PRODUCT_KEY, oozieClusterConfig.getClusterName(), oozieClusterConfig );
         productOperation.addLogDone( "Cluster info saved to DB" );
     }
 

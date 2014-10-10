@@ -438,6 +438,7 @@ public class Manager extends BaseManager
 
             public void onComplete( NodeState state )
             {
+                show( "Start/Stop/Check task is finished" );
                 if ( state == NodeState.RUNNING )
                 {
                     statusLabel.setValue( "Server is running" );
