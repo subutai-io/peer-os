@@ -113,6 +113,8 @@ public class Manager extends BaseManager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 refreshClustersInfo();
+                // TODO fix auto refresh of statuses of nodes
+                clickAllCheckButtons( serverTable );
             }
         } );
 
