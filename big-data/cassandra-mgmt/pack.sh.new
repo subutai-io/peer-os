@@ -35,8 +35,8 @@ else
 
 fi
 
-BRIDGE="br0"
-sed -i 's/lxcbr0/'"$BRIDGE"'/g' $LXCSOURCE/$pattern/config
+#BRIDGE="br0"
+#sed -i 's/lxcbr0/'"$BRIDGE"'/g' $LXCSOURCE/$pattern/config
 
 cp $BASE/repo/sources.list $LXCSOURCE/$pattern/rootfs/etc/apt/
 
