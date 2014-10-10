@@ -18,7 +18,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintsForm
 {
 
@@ -65,9 +65,9 @@ public class BlueprintsForm
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( VIEW, Button.class, null );
         table.addContainerProperty( N2P, Button.class, null );
+        table.addContainerProperty( NG2P, Button.class, null );
         table.addContainerProperty( B2PG, Button.class, null );
         table.addContainerProperty( NG2PG, Button.class, null );
-        table.addContainerProperty( NG2P, Button.class, null );
         table.addContainerProperty( DELETE, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -100,8 +100,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button N2PBTN = new Button( N2P );
-                N2PBTN.addClickListener( new Button.ClickListener()
+                final Button N2P_BTN = new Button( N2P );
+                N2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -112,8 +112,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button B2PGBTN = new Button( B2PG );
-                B2PGBTN.addClickListener( new Button.ClickListener()
+                final Button B2PG_BTN = new Button( B2PG );
+                B2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -124,8 +124,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button NG2PGBTN = new Button( NG2PG );
-                NG2PGBTN.addClickListener( new Button.ClickListener()
+                final Button NG2PG_BTN = new Button( NG2PG );
+                NG2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -137,8 +137,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button NG2PBTN = new Button( NG2P );
-                NG2PBTN.addClickListener( new Button.ClickListener()
+                final Button NG2P_BTN = new Button( NG2P );
+                NG2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -161,7 +161,7 @@ public class BlueprintsForm
                 } );
 
                 environmentsTable.addItem( new Object[] {
-                        task.getEnvironmentBlueprint().getName(), view, N2PBTN, B2PGBTN, NG2PGBTN, NG2PBTN, delete
+                        task.getEnvironmentBlueprint().getName(), view, N2P_BTN, NG2P_BTN, B2PG_BTN, NG2PG_BTN, delete
                 }, null );
             }
         }

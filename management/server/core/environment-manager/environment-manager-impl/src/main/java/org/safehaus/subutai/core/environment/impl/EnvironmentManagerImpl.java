@@ -302,7 +302,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = new Environment( process.getUuid(), process.getEnvironmentName() );
         int containerCount = 0;
-        long timeout = 1000 * 60;
+        long timeout = 1000 * 360;
         for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
         {
             CloneContainersMessage ccm = process.getMessageMap().get( key );

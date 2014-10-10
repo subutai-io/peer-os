@@ -164,8 +164,8 @@ public class NodeGroup2PeerWizard extends Window
         nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
         {
-            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
-            {
+//            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
+//            {
                 ComboBox comboBox = new ComboBox();
                 BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
                 bic.addAll( selectedPeers() );
@@ -177,7 +177,7 @@ public class NodeGroup2PeerWizard extends Window
                         ng.getTemplateName(), comboBox
                 }, null );
                 nodeGroupMap.put( itemId, ng );
-            }
+//            }
         }
         Button nextButton = new Button( "Build" );
         nextButton.addClickListener( new Button.ClickListener()
@@ -263,14 +263,14 @@ public class NodeGroup2PeerWizard extends Window
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
-                ccm.setNumberOfNodes( 1 );
+                ccm.setNumberOfNodes( ng.getNumberOfNodes() );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
                 process.putCloneContainerMessage( key, ccm );
             }
-            else
+            /*else
             {
                 process.getMessageMap().get( key ).incrementNumberOfNodes();
-            }
+            }*/
         }
 
         return process;

@@ -43,7 +43,7 @@ public class RemotePeerRestClient
 
     public RemotePeerRestClient( long timeout )
     {
-        this.connectionTimeout = 1000 * 10; // 10 sec
+        this.connectionTimeout = 1000 * 15; // 15 sec
         this.receiveTimeout = timeout - this.connectionTimeout;
     }
 
