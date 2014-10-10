@@ -49,11 +49,11 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>template-manager-impl</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+    <!--<groupId>org.safehaus.subutai</groupId>-->
+    <!--<artifactId>template-manager-impl</artifactId>-->
+    <!--<scope>test</scope>-->
+    <!--</dependency>-->
   </dependencies>
 
   <build>
