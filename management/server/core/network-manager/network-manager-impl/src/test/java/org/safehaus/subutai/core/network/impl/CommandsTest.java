@@ -1,12 +1,16 @@
 package org.safehaus.subutai.core.network.impl;
 
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -23,17 +27,23 @@ import static org.mockito.Mockito.verify;
  */
 public class CommandsTest
 {
-    private CommandRunner commandRunner;
+    private CommandDispatcher commandDispatcher;
     private Commands commands;
-    private Agent agent;
+    private List<Agent> agents;
+    private Set<Container> containers;
+    private static final UUID AGENT_ID = UUID.randomUUID();
+    private static final String HOSTNAME = "hostname";
+    private static final String DOMAIN_NAME = "intra.lan";
+    private static final String IP = "127.0.0.1";
 
 
     @Before
     public void setUp()
     {
-        commandRunner = mock( CommandRunner.class );
-        commands = new Commands( commandRunner );
-        agent = MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID(), "hostname1", "127.0.0.1" );
+        commandDispatcher = mock( CommandDispatcher.class );
+        commands = new Commands( commandDispatcher );
+        agents = Lists.newArrayList( MockUtils.getAgent( AGENT_ID, HOSTNAME, IP ) );
+        containers = Sets.newHashSet( MockUtils.getContainer( AGENT_ID, HOSTNAME, IP ) );
     }
 
 
@@ -48,10 +58,21 @@ public class CommandsTest
     public void testCreateSSHCommand()
     {
 
-        commands.getCreateSSHCommand( Lists.newArrayList( agent ) );
+        commands.getCreateSSHCommand( agents );
 
 
-        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySet() );
+        verify( commandDispatcher ).createCommand( any( RequestBuilder.class ), anySet() );
+    }
+
+
+    @Test
+    public void testCreateSSHCommand2()
+    {
+
+        commands.getCreateSSHCommand( containers );
+
+
+        verify( commandDispatcher ).createContainerCommand( any( RequestBuilder.class ), anySet() );
     }
 
 
@@ -59,10 +80,21 @@ public class CommandsTest
     public void testReadSSHCommand()
     {
 
-        commands.getReadSSHCommand( Lists.newArrayList( agent ) );
+        commands.getReadSSHCommand( agents );
 
 
-        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySet() );
+        verify( commandDispatcher ).createCommand( any( RequestBuilder.class ), anySet() );
+    }
+
+
+    @Test
+    public void testReadSSHCommand2()
+    {
+
+        commands.getReadSSHCommand( containers );
+
+
+        verify( commandDispatcher ).createContainerCommand( any( RequestBuilder.class ), anySet() );
     }
 
 
@@ -70,10 +102,21 @@ public class CommandsTest
     public void testWriteSSHCommand()
     {
 
-        commands.getWriteSSHCommand( Lists.newArrayList( agent ), "" );
+        commands.getWriteSSHCommand( agents, "" );
 
 
-        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySet() );
+        verify( commandDispatcher ).createCommand( any( RequestBuilder.class ), anySet() );
+    }
+
+
+    @Test
+    public void testWriteSSHCommand2()
+    {
+
+        commands.getWriteSSHCommand( containers, "" );
+
+
+        verify( commandDispatcher ).createContainerCommand( any( RequestBuilder.class ), anySet() );
     }
 
 
@@ -81,10 +124,21 @@ public class CommandsTest
     public void testConfigSSHCommand()
     {
 
-        commands.getConfigSSHCommand( Lists.newArrayList( agent ) );
+        commands.getConfigSSHCommand( agents );
 
 
-        verify( commandRunner ).createCommand( any( RequestBuilder.class ), anySet() );
+        verify( commandDispatcher ).createCommand( any( RequestBuilder.class ), anySet() );
+    }
+
+
+    @Test
+    public void testConfigSSHCommand2()
+    {
+
+        commands.getConfigSSHCommand( containers );
+
+
+        verify( commandDispatcher ).createContainerCommand( any( RequestBuilder.class ), anySet() );
     }
 
 
@@ -92,10 +146,21 @@ public class CommandsTest
     public void testEtcHostsCommand()
     {
 
-        commands.getAddIpHostToEtcHostsCommand( "intra.lan", Sets.newHashSet( agent ) );
+        commands.getAddIpHostToEtcHostsCommand( DOMAIN_NAME, Sets.newHashSet( agents ) );
 
 
-        verify( commandRunner )
+        verify( commandDispatcher )
                 .createCommand( eq( "Add ip-host pair to /etc/hosts" ), any( RequestBuilder.class ), anySet() );
+    }
+
+
+    @Test
+    public void testEtcHostsCommand2()
+    {
+
+        commands.getEtcHostsCommand( DOMAIN_NAME, containers );
+
+
+        verify( commandDispatcher ).createContainerCommand( any( RequestBuilder.class ), anySet() );
     }
 }
