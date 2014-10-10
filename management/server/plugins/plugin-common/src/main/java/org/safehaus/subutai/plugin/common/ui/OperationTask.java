@@ -77,13 +77,13 @@ public class OperationTask implements Runnable {
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() ) {
             ProductOperationView po =
-                    tracker.getProductOperation(HadoopClusterConfig.PRODUCT_KEY, trackID);
+                    tracker.getProductOperation(clusterConfig.getProductKey(), trackID);
             if ( po != null ) {
                 if ( po.getState() != ProductOperationState.RUNNING ) {
-                    if ( po.getLog().contains( NodeState.STOPPED.toString() ) ) {
+                    if ( po.getLog().toLowerCase().contains( getProductStoppedIdentifier( product ).toLowerCase() ) ) {
                         state = NodeState.STOPPED;
                     }
-                    else if ( po.getLog().contains( NodeState.RUNNING.toString() ) ) {
+                    else if ( po.getLog().toLowerCase().contains( getProductRunningIdentifier( product ).toLowerCase() ) ) {
                         state = NodeState.RUNNING;
                     }
                     break;
@@ -101,6 +101,27 @@ public class OperationTask implements Runnable {
             }
         }
         completeEvent.onComplete( state );
+    }
+
+
+    private String getProductRunningIdentifier( final ApiBase product )
+    {
+        // TODO add product's running identifier if it is different from the above default value
+
+        String runningIdentifier =  NodeState.RUNNING.toString();
+        return runningIdentifier;
+    }
+
+
+    private String getProductStoppedIdentifier( final ApiBase product )
+    {
+        String stoppedIdentifier = NodeState.STOPPED.toString();
+        if ( product instanceof  Oozie ) {
+            stoppedIdentifier = "not running";
+        }
+        // TODO add product's stopped identifier if it is different from the above default value
+        return stoppedIdentifier;
+
     }
 
 

@@ -48,6 +48,12 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
             return;
         }
 
+        if ( node == null )
+        {
+            productOperation.addLogFailed( "Node is not connected" );
+            return;
+        }
+
         if ( !oozieClusterConfig.getClients().contains( node ) )
         {
             productOperation
@@ -55,11 +61,6 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
             return;
         }
 
-        if ( node == null )
-        {
-            productOperation.addLogFailed( "Node is not connected" );
-            return;
-        }
 
         Set<Agent> clientNodesToBeRemoved = new HashSet<>();
         clientNodesToBeRemoved.add( node );

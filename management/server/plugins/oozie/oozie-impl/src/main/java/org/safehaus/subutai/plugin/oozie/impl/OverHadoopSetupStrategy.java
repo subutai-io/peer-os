@@ -68,7 +68,7 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Failed to check installed packages" );
         }
 
-        po.addLog( String.format( "Installing Oozie server on %s...", config.getServer() ) );
+        po.addLog( String.format( "Installing Oozie server on %s...", config.getServer().getHostname() ) );
         String sserver = Commands.make( CommandType.INSTALL_SERVER );
         Agent serverAgent = config.getServer();
         cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 1800 ),

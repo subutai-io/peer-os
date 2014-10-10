@@ -125,7 +125,7 @@ public class Manager extends BaseManager
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                checkNodesStatus( serverTable );
+                clickAllCheckButtons( serverTable );
             }
         } );
 
@@ -179,24 +179,13 @@ public class Manager extends BaseManager
     }
 
 
-    public static void checkNodesStatus( Table table )
-    {
-        for ( Object o : table.getItemIds() )
-        {
-            int rowId = ( Integer ) o;
-            Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( CHECK_BUTTON_CAPTION ).getValue() );
-            checkBtn.click();
-        }
-    }
-
-
     private void refreshUI()
     {
         if ( config != null )
         {
             populateServerTable( serverTable, config.getServer() );
             populateClientsTable( clientsTable, config.getClients() );
+            clickAllCheckButtons( serverTable );
         }
         else
         {
@@ -438,7 +427,6 @@ public class Manager extends BaseManager
 
             public void onComplete( NodeState state )
             {
-                show( "Start/Stop/Check task is finished" );
                 if ( state == NodeState.RUNNING )
                 {
                     statusLabel.setValue( "Server is running" );
@@ -454,7 +442,6 @@ public class Manager extends BaseManager
                 else
                 {
                     statusLabel.setValue( "Server is not connected" );
-                    startStopButton.setCaption( "Not connected" );
                 }
 
                 checkButton.setEnabled( true );
@@ -476,21 +463,7 @@ public class Manager extends BaseManager
                 destroyButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
-                //                    executorService
-                //                            .execute( new OperationTask( oozieManager, tracker, OperationType.Destroy,
-                //                                    NodeType.SERVER, config, new CompleteEvent()
-                //                            {
-                //
-                //                                public void onComplete( NodeState state )
-                //                                {
-                //                                    refreshUI();
-                //                                }
-                //                            }, null, agent ) );
-                //                }
-
                 UUID trackID = oozieManager.destroyNode( config.getClusterName(), agent.getHostname() );
-
-
 
                 ProgressWindow window =
                         new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
@@ -499,6 +472,7 @@ public class Manager extends BaseManager
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent )
                     {
+                        refreshClustersInfo();
                         refreshUI();
                         disableProgressBar();
                     }
@@ -516,10 +490,10 @@ public class Manager extends BaseManager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
 
-                final Button startStopButton = clickEvent.getButton();
+                final Button checkButton = clickEvent.getButton();
                 HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
-                final Button checkButton = getCheckButton( availableOperationsLayout );
-                startStopButton.setEnabled( false );
+                final Button startStopButton = getStartStopButton( availableOperationsLayout );
+                checkButton.setEnabled( false );
                 enableProgressBar();
                 startStopButton.setEnabled( false );
                 checkButton.setEnabled( false );
@@ -530,20 +504,6 @@ public class Manager extends BaseManager
                         .execute( new OperationTask( oozieManager, tracker, operationType,
                                 NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
 
-//                enableProgressBar();
-//                UUID trackID = oozieManager.checkServerStatus( config );
-//                ProgressWindow window =
-//                        new ProgressWindow( executorService, tracker, trackID, OozieClusterConfig.PRODUCT_KEY );
-//                window.getWindow().addCloseListener( new Window.CloseListener()
-//                {
-//                    @Override
-//                    public void windowClose( Window.CloseEvent closeEvent )
-//                    {
-//                        refreshClustersInfo();
-//                        disableProgressBar();
-//                    }
-//                } );
-//                contentRoot.getUI().addWindow( window.getWindow() );
             }
         };
     }

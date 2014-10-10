@@ -62,15 +62,40 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                 Command stopServiceCommand = manager.getCommands().getStopServerCommand( servers );
                 manager.getCommandRunner().runCommand( stopServiceCommand );
 
-                if ( stopServiceCommand.hasSucceeded() )
+
+                if ( stopServiceCommand.hasCompleted() )
                 {
-                    productOperation.addLogDone( "Stop succeeded" );
+                    productOperation.addLog( "Checking status..." );
+
+                    Command checkCommand = manager.getCommands().getStatusServerCommand( servers );
+                    manager.getCommandRunner().runCommand( checkCommand );
+
+                    if ( checkCommand.hasCompleted() )
+                    {
+                        productOperation
+                                .addLogDone( checkCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
+                    }
+                    else
+                    {
+                        productOperation.addLogFailed(
+                                String.format( "Failed to check status, %s", checkCommand.getAllErrors() ) );
+                    }
                 }
                 else
                 {
                     productOperation
                             .addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
                 }
+
+                //                if ( stopServiceCommand.hasSucceeded() )
+                //                {
+                //                    productOperation.addLogDone( "Stop succeeded" );
+                //                }
+                //                else
+                //                {
+                //                    productOperation
+                //                            .addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+                //                }
             }
         } );
     }

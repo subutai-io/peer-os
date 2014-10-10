@@ -211,6 +211,20 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
+
+    public void clickAllCheckButtons( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
+            int rowId = ( Integer ) o;
+            Item row = table.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( CHECK_BUTTON_CAPTION ).getValue() );
+            if ( checkBtn != null ) {
+                checkBtn.click();
+            }
+        }
+    }
+
     public synchronized int getProcessCount() {
         return processCount;
     }
