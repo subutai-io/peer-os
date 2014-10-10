@@ -431,7 +431,8 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean startContainer( final PeerContainer container )
     {
-        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
+        Agent a = agentManager.getAgentByUUID( container.getAgentId() );
+        Agent parentAgent = agentManager.getAgentByHostname( a.getParentHostName() );
         if ( parentAgent == null )
         {
             return false;
