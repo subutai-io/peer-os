@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.network.impl;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Container;
 
 import com.google.common.collect.Lists;
 
@@ -25,5 +26,16 @@ public class MockUtils
         when( agent.getListIP() ).thenReturn( Lists.newArrayList( ip ) );
 
         return agent;
+    }
+
+
+    public static Container getContainer( UUID agentUUID, String hostname, String ip )
+    {
+        Container container = mock( Container.class );
+        when( container.getAgentId() ).thenReturn( agentUUID );
+        when( container.getHostname() ).thenReturn( hostname );
+        when( container.getIps() ).thenReturn( Lists.newArrayList( ip ) );
+
+        return container;
     }
 }

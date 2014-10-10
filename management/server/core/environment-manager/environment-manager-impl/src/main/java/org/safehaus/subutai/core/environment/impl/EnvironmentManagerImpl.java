@@ -324,6 +324,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                             EnvironmentContainer container = new EnvironmentContainer();
                             container.setPeerId( agent.getSiteId() );
                             container.setAgentId( agent.getUuid() );
+                            container.setIps( agent.getListIP() );
                             container.setHostname( agent.getHostname() );
                             container.setDescription( ccm.getTemplate() );
                             container.setName( agent.getHostname() );
@@ -396,8 +397,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             Set<PeerContainer> containers =
                     JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-                    {
-                    }.getType() );
+                    {}.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {

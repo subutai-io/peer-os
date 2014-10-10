@@ -48,6 +48,14 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>enterprise</artifactId>
+      <version>${karaf.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-application</artifactId>
       <version>${project.version}</version>
@@ -138,7 +146,7 @@
           <ignoreDependencyFlag>true</ignoreDependencyFlag>
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
-            <feature>standard</feature>  
+            <feature>standard</feature>
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>subutai-application</feature>
@@ -155,6 +163,7 @@
               <descriptors>
                 <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/enterprise/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.safehaus.subutai/subutai-application/${project.version}/xml/features</descriptor>
@@ -164,6 +173,7 @@
                 <feature>war</feature>
                 <feature>ssh</feature>
                 <feature>cxf</feature>
+                <feature>jdbc</feature>
                 <feature>subutai-application</feature>
               </features>
               <repository>${assembly.directory}/system</repository>

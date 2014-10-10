@@ -23,15 +23,15 @@ expect "# " { send "apt-get --assume-yes --force-yes install openjdk-7-jre\r" }
 sleep 5
 #installing cassandra-mgmt package
 expect "# " { send "dpkg -i ksks-cassandra-mgmt-1.0.8-amd64.deb\r" }
-sleep 2
+sleep 10
 expect "# " { send "service cassandra stop\r"  }
-sleep 2
+sleep 5
 #removing /var/lib/cassandra folder 
 expect "# " { send "rm -rf /var/lib/cassandra\r" }
-sleep 3
+sleep 5
 #Starting cassandra
 expect "# " { send "service cassandra start\r" }
-sleep 5
+sleep 10
 #import cassandra keyspace
 expect "# " { send "/opt/cassandra-2.0.4/bin/cqlsh\r" }
 sleep 2
