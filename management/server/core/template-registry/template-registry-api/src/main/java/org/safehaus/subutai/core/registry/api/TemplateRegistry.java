@@ -170,5 +170,12 @@ public interface TemplateRegistry
      *
      * @return true - is registered, false - otherwise
      */
-    public boolean isTemplateRegistered( String temlateName );
+    public boolean isTemplateRegistered( String templateName );
+
+    /**
+     * Adds template entry to registry
+     *
+     * @param template - template
+     */
+    public boolean registerTemplate( Template template ) throws RegistryException;
 }

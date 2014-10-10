@@ -572,8 +572,27 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
 
     @Override
-    public boolean isTemplateRegistered( final String temlateName )
+    public boolean isTemplateRegistered( final String templateName )
     {
-        return getTemplate( temlateName ) != null;
+        return getTemplate( templateName ) != null;
+    }
+
+
+    @Override
+    public boolean registerTemplate( Template template ) throws RegistryException
+    {
+        //save template to storage
+        try
+        {
+
+            templateDAO.saveTemplate( template );
+        }
+        catch ( DBException e )
+        {
+            LOG.error( "Error in registerTemplate", e );
+            throw new RegistryException(
+                    String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
+        }
+        return true;
     }
 }

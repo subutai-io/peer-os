@@ -5,10 +5,8 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.registry.impl.TemplateRegistryImpl;
 import org.safehaus.subutai.core.template.api.ActionType;
 
 import static junit.framework.Assert.assertEquals;
@@ -61,7 +59,7 @@ public class TemplateManagerImplTest
         //        CommandRunner commandRunner = mock( CommandRunner.class );
         //        templateManager.setCommandRunner( MockUtils.getHardCodedCloneCommandRunner( true, true, 0, "", "" ) );
 
-        TemplateRegistry templateRegistry = mock( TemplateRegistryImpl.class );
+        TemplateRegistry templateRegistry = mock( TemplateRegistry.class );
         when( templateRegistry.getParentTemplates( anyString() ) ).thenReturn( MockUtils.getParentTemplates() );
 
         templateManager.setTemplateRegistry( templateRegistry );
