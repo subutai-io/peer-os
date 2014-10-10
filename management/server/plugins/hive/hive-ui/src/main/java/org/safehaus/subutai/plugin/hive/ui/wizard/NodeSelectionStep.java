@@ -64,6 +64,7 @@ public class NodeSelectionStep extends Panel
         nameTxt.setValue( wizard.getConfig().getClusterName() );
 
         Button next = new Button( "Next" );
+        next.setId("HiveNodeSelectionNext");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -75,6 +76,7 @@ public class NodeSelectionStep extends Panel
         } );
 
         Button back = new Button( "Back" );
+        back.setId("HiveNodeSelectionBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

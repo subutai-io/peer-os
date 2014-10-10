@@ -43,6 +43,7 @@ public class NameNode extends ClusterNode
                 getStatus( hadoop.startNameNode( cluster ) );
             }
         } );
+        startButton.setId("nameNodeStart");
 
         stopButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -53,6 +54,7 @@ public class NameNode extends ClusterNode
                 getStatus( hadoop.stopNameNode( cluster ) );
             }
         } );
+        stopButton.setId("nameNodeStop");
 
         restartButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -63,6 +65,7 @@ public class NameNode extends ClusterNode
                 getStatus( hadoop.restartNameNode( cluster ) );
             }
         } );
+        restartButton.setId("nameNodeRestart");
 
         getStatus( null );
     }
@@ -117,5 +120,6 @@ public class NameNode extends ClusterNode
         stopButton.setVisible( !isLoading );
         restartButton.setVisible( !isLoading );
         progressButton.setVisible( isLoading );
+        progressButton.setId("nameNodeProgress");
     }
 }

@@ -90,6 +90,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( SERVER_TABLE_CAPTION );
+        nodesTable.setId("HiveTable");
 
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -99,6 +100,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
+        clusterCombo.setId("HiveClusterCb");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -115,6 +117,7 @@ public class Manager
 
         /** Refresh Cluster Button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
+        refreshClustersBtn.setId("hiveRefreshClusterBtn");
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -127,11 +130,13 @@ public class Manager
 
         /** Destroy Cluster Button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.setId("HiveDestroyClusterBtn");
         addClickListenerToDestroyClusterButton();
 
 
         /** Add Node Button */
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId("HiveAddNodeBtn");
         addClickListenerToAddNodeButton();
 
 
@@ -149,6 +154,7 @@ public class Manager
 
 
         PROGRESS_ICON.setVisible( false );
+        PROGRESS_ICON.setId("HiveProgress");
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( tablesLayout, 0, 1, 0, 9 );
@@ -349,9 +355,13 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
+            checkBtn.setId(agent.getListIP().get(0)+"-hiveCheck");
             final Button startBtn = new Button( START_BUTTON_CAPTION );
+            startBtn.setId(agent.getListIP().get(0)+"-hiveStart");
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
+            stopBtn.setId(agent.getListIP().get(0)+"-hiveStop");
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            destroyBtn.setId(agent.getListIP().get(0)+"-hiveDestroy");
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );

@@ -91,6 +91,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Cluster nodes" );
+        nodesTable.setId("CassNodeTable");
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -105,6 +106,7 @@ public class Manager
         controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
 
         clusterCombo = new ComboBox();
+        clusterCombo.setId("CassClusterComboBox");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -123,6 +125,7 @@ public class Manager
 
         /** Refresh button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
+        refreshClustersBtn.setId("CassRefreshClustersBtn");
         addClickListener( refreshClustersBtn );
         controlsContent.addComponent( refreshClustersBtn );
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
@@ -130,6 +133,7 @@ public class Manager
 
         /** Check all button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
+        checkAllBtn.setId("CassCheckAllBtn");
         addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
@@ -137,6 +141,7 @@ public class Manager
 
         /** Start all button */
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
+        startAllBtn.setId("CassStartAllBtn");
         addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
@@ -144,6 +149,7 @@ public class Manager
 
         /** Stop all button */
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
+        stopAllBtn.setId("CassStopAllBtn");
         addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
@@ -151,6 +157,7 @@ public class Manager
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.setId("CassDestroyClusterBtn");
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
@@ -386,9 +393,13 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Label resultHolder = new Label();
+            resultHolder.setId(agent.getListIP().get(0)+"-cassandraResult");
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
+            checkButton.setId(agent.getListIP().get(0)+"-cassandraCheck");
             final Button startButton = new Button( START_BUTTON_CAPTION );
+            startButton.setId(agent.getListIP().get(0)+"-cassandraStart");
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
+            stopButton.setId(agent.getListIP().get(0)+"-cassandraStop");
 
             addStyleNameToButtons( checkButton, startButton, stopButton );
 

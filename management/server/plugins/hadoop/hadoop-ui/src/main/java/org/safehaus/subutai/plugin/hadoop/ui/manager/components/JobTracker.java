@@ -44,6 +44,7 @@ public class JobTracker extends ClusterNode
                 getStatus( hadoop.startJobTracker( cluster ) );
             }
         } );
+        startButton.setId("jobTrackerStart");
 
         stopButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -54,6 +55,7 @@ public class JobTracker extends ClusterNode
                 getStatus( hadoop.stopJobTracker( cluster ) );
             }
         } );
+        stopButton.setId("jobTrackerStop");
 
         restartButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -64,6 +66,7 @@ public class JobTracker extends ClusterNode
                 getStatus( hadoop.restartJobTracker( cluster ) );
             }
         } );
+        restartButton.setId("jobTrackerRestart");
 
         getStatus( null );
     }
@@ -117,5 +120,6 @@ public class JobTracker extends ClusterNode
         stopButton.setVisible( !isLoading );
         restartButton.setVisible( !isLoading );
         progressButton.setVisible( isLoading );
+        progressButton.setId("jobTrackerProgress");
     }
 }

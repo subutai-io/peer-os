@@ -39,6 +39,7 @@ public class WelcomeStep extends Panel
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start over-Hadoop installation" );
+        next.setId("LuceneWelStart");
         next.addStyleName( "default" );
         //		next.setWidth(100, Unit.PIXELS);
         grid.addComponent( next, 4, 4, 4, 4 );
