@@ -13,6 +13,8 @@ import org.safehaus.subutai.common.util.UUIDUtil;
  */
 public abstract class PeerCommandMessage
 {
+    //TODO: implement me
+    protected UUID sourcePeerId;
     protected UUID id;
     protected UUID agentId;
     protected UUID peerId;

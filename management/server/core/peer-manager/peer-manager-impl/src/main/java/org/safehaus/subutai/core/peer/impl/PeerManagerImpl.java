@@ -484,6 +484,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void invoke( PeerCommandMessage peerCommandMessage )
     {
+
         if ( !getSiteId().equals( peerCommandMessage.getPeerId() ) )
         {
             LOG.warn( String.format( "Orphan command message: %s", peerCommandMessage ) );
@@ -594,7 +595,9 @@ public class PeerManagerImpl implements PeerManager
 
                 break;
             case GET_TEMPLATE:
-                template = templateRegistry.getTemplate( peerCommandMessage.getInput().toString() );
+                String templateName = peerCommandMessage.getInput().toString();
+                LOG.info( String.format( "--------->%s %s", templateRegistry, templateName ) );
+                template = templateRegistry.getTemplate( templateName );
                 if ( template != null )
                 {
                     peerCommandMessage.setResult( JsonUtil.toJson( template ) );
