@@ -218,9 +218,10 @@ public abstract class BaseManager implements BaseManagerInterface
         {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( CHECK_BUTTON_CAPTION ).getValue() );
-            if ( checkBtn != null ) {
-                checkBtn.click();
+            HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
+            Button checkButton = getCheckButton( availableOperationsLayout );
+            if ( checkButton != null ) {
+                checkButton.click();
             }
         }
     }

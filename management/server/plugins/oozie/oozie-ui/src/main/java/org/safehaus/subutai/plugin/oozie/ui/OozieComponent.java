@@ -52,6 +52,5 @@ public class OozieComponent extends CustomComponent
         } );
         verticalLayout.addComponent( sheet );
         setCompositionRoot( verticalLayout );
-        manager.refreshClustersInfo();
     }
 }

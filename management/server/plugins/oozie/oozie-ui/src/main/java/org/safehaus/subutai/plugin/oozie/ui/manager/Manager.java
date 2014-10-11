@@ -32,11 +32,9 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -113,8 +111,6 @@ public class Manager extends BaseManager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 refreshClustersInfo();
-                // TODO fix auto refresh of statuses of nodes
-                clickAllCheckButtons( serverTable );
             }
         } );
 
