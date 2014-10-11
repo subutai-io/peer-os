@@ -16,6 +16,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -60,7 +61,7 @@ public class ProgressWindow
         content.setSpacing( true );
 
         outputTxtArea = new TextArea( "Operation output" );
-        outputTxtArea.setId("outputTxtArea");
+        outputTxtArea.setId( "outputTxtArea" );
         outputTxtArea.setRows( 13 );
         outputTxtArea.setColumns( 42 );
         outputTxtArea.setImmediate( true );
@@ -69,7 +70,7 @@ public class ProgressWindow
         content.addComponent( outputTxtArea );
 
         ok = new Button( "Ok" );
-        ok.setId("btnOk");
+        ok.setId( "btnOk" );
         ok.setStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
@@ -155,12 +156,18 @@ public class ProgressWindow
 
     private void setOutput( String output )
     {
-        if ( !Strings.isNullOrEmpty( output ) )
-        {
-            outputTxtArea.setValue( output );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+        try {
+            VaadinSession.getCurrent().getLockInstance().lock();
+            if ( !Strings.isNullOrEmpty( output ) ) {
+                outputTxtArea.setValue( output );
+                outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+            }
+        }
+        finally {
+            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
+
 
 
     private void hideProgress()
