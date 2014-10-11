@@ -18,9 +18,7 @@ public class CloneContainersMessage extends PeerCommandMessage
     private int numberOfNodes;
     private String Strategy;
     private List<String> criteria;
-    private boolean exchangeSshKey;
-    private boolean linkHosts;
-    private String domainName;
+//    private Set<Agent> agents;
 
 
     public CloneContainersMessage( UUID envId, UUID peerId )
@@ -81,6 +79,15 @@ public class CloneContainersMessage extends PeerCommandMessage
     public Type getResultObjectType()
     {
         return new TypeToken<Set<Agent>>()
+        {
+        }.getType();
+    }
+
+
+    @Override
+    public Type getInputObjectType()
+    {
+        return new TypeToken<String>()
         {
         }.getType();
     }

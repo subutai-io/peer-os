@@ -1,7 +1,9 @@
 package org.safehaus.subutai.core.template.impl;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -11,9 +13,12 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.core.template.api.ActionType;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -95,17 +100,20 @@ public class MockUtils
                                                                 String stdOut, String stdErr )
     {
         CommandRunner commandRunner = mock( CommandRunner.class );
-        Command command = MockUtils.getCommand( completed, succeeded, exitCode, stdOut, stdErr );
-        RequestBuilder rb;
-        when( commandRunner.createCommand( any( RequestBuilder.class ), any( Set.class ) ) ).thenReturn( command );
+        Command listCommand = MockUtils.getCommand( completed, succeeded, exitCode, stdOut, stdErr );
+        RequestBuilder requestBuilder = new RequestBuilder( ActionType.LIST_TEMPLATES.buildCommand( "master" ) );
+        //        requestBuilder.withTimeout( ( int ) TimeUnit.toSeconds( 1l) );
+        when( commandRunner.createCommand( eq( requestBuilder ), anySet() ) ).thenReturn( listCommand );
 
         return commandRunner;
     }
 
 
-    public static TemplateRegistry getHardCodedTemplateRegistry()
+    public static List<Template> getParentTemplates()
     {
-        TemplateRegistry templateRegistry = mock( TemplateRegistry.class );
-        return templateRegistry;
+        //        Template master = new Template( Template.ARCH_AMD64, "master", "/", "master", "", "", "", "" );
+        Template tmock = mock( Template.class );
+//        when( tmock.getTemplateName() ).thenReturn( "master" );
+        return Arrays.asList( tmock );
     }
 }

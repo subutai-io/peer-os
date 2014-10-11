@@ -83,7 +83,7 @@ public class Environment
         {
             commandMessage.setProccessed( true );
             commandMessage.setExceptionMessage( e.toString() );
-            commandMessage.setSuccess( false );
+//            commandMessage.setSuccess( false );
         }
     }
 

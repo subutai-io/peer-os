@@ -92,9 +92,9 @@ public class PeerCommandDispatcherImpl implements PeerCommandDispatcher
         }
         catch ( RuntimeException e )
         {
-            LOG.error( e.getMessage(), e );
-            peerCommand.setSuccess( false );
+//            peerCommand.setSuccess( false );
             peerCommand.setExceptionMessage( e.toString() );
+            LOG.error( e.getMessage(), e );
             throw new PeerCommandException( "Error invoking Peer command" );
         }
     }
