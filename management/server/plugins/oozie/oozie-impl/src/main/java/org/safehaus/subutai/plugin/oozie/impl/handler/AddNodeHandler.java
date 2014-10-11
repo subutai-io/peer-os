@@ -118,7 +118,7 @@ public class AddNodeHandler extends AbstractOperationHandler<OozieImpl>
         //install mahout
         if ( !skipInstall )
         {
-            po.addLog( "Installing Mahout..." );
+            po.addLog( "Installing Oozie Client..." );
             Command installCommand = manager.getCommands().getInstallClientCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
