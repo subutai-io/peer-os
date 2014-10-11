@@ -35,9 +35,11 @@ else
 
 fi
 
-BRIDGE="br0"
-sed -i 's/lxcbr0/'"$BRIDGE"'/g' $LXCSOURCE/$pattern/config
+#Setting source list for dummy lxc container
 
+IP=`ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+cp $BASE/repo/sources.list.org $BASE/repo/sources.list
+sed -i 's/localhost/'"$IP"'/g' $BASE/repo/sources.list
 cp $BASE/repo/sources.list $LXCSOURCE/$pattern/rootfs/etc/apt/
 
 #Copying logstash&jmxtrans deb files.
