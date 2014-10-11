@@ -104,4 +104,7 @@ public interface TemplateManager
      * @param templateName the template name
      */
     public String getDebianPackageName( String templateName );
+
+
+    public boolean prepareTemplates( Set<TemplatePackage> templatePackages );
 }

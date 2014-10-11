@@ -18,6 +18,8 @@ import com.google.gson.annotations.Expose;
 public class Template
 {
 
+    public static final String ARCH_AMD64 = "amd64";
+    public static final String ARCH_I386 = "i386";
     //name of template
     @Expose
     private String templateName;

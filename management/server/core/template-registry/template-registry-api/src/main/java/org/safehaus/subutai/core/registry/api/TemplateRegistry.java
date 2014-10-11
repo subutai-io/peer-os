@@ -163,4 +163,19 @@ public interface TemplateRegistry
      * @return true - in use, false - not in use
      */
     public boolean isTemplateInUse( String templateName ) throws RegistryException;
+
+
+    /**
+     * Checks is template registered
+     *
+     * @return true - is registered, false - otherwise
+     */
+    public boolean isTemplateRegistered( String templateName );
+
+    /**
+     * Adds template entry to registry
+     *
+     * @param template - template
+     */
+    public boolean registerTemplate( Template template ) throws RegistryException;
 }
