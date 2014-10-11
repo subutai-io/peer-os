@@ -336,8 +336,11 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button importBtn = new Button( "Import" );
+            importBtn.setId(agent.getListIP().get(0)+"-sqoopImport");
             final Button exportBtn = new Button( "Export" );
+            exportBtn.setId(agent.getListIP().get(0)+"-sqoopExport");
             final Button destroyBtn = new Button( "Destroy" );
+            destroyBtn.setId(agent.getListIP().get(0)+"-sqoopDestroy");
 
             addStyleNameToButtons( importBtn, exportBtn, destroyBtn );
 

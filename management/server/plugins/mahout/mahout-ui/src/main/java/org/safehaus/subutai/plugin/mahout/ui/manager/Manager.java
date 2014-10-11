@@ -340,6 +340,7 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            destroyBtn.setId(agent.getListIP().get(0) + "-mahoutDestroy");
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();

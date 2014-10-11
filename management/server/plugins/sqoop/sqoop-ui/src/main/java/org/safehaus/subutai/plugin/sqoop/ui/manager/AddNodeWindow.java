@@ -53,13 +53,14 @@ public class AddNodeWindow extends Window
         content.setSpacing( true );
 
         HorizontalLayout topContent = new HorizontalLayout();
-        topContent.setId("MahoutAddNodeTopContent");
+        topContent.setId("sqoopAddNodeTopContent");
         topContent.setSpacing( true );
 
         content.addComponent( topContent );
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox hadoopNodes = new ComboBox();
+        hadoopNodes.setId("sqoopAddHadoopNodes");
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
@@ -75,7 +76,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( hadoopNodes );
 
         final Button addNodeBtn = new Button( "Add" );
-        addNodeBtn.setId("MahoutAddNodesButton");
+        addNodeBtn.setId("sqoopAddNodesButton");
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
