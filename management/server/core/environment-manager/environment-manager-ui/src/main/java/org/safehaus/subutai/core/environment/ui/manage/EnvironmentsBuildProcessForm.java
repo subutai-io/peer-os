@@ -18,7 +18,6 @@ import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecu
 import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutor;
 import org.safehaus.subutai.core.environment.ui.executor.build.BuildProcessExecutorImpl;
 import org.safehaus.subutai.core.environment.ui.text.EnvAnswer;
-import org.safehaus.subutai.core.environment.ui.window.EnvironmentBuildProcessDetails;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,10 +28,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListener
 {
 
@@ -41,11 +42,13 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private static final String LOAD_ICON_SOURCE = "img/spinner.gif";
     private static final String STATUS = "Status";
     private static final String ACTION = "Action";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private Map<UUID, ExecutorService> executorServiceMap = new HashMap<>();
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
     private Button environmentsButton;
+
 
     public EnvironmentsBuildProcessForm( final EnvironmentManagerPortalModule managerUI )
     {
@@ -91,8 +94,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private void updateTableData()
     {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildProcess> processList =
-                managerUI.getEnvironmentManager().getBuildProcesses();
+        List<EnvironmentBuildProcess> processList = managerUI.getEnvironmentManager().getBuildProcesses();
         if ( !processList.isEmpty() )
         {
             for ( final EnvironmentBuildProcess process : processList )
@@ -103,13 +105,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        EnvironmentBuildProcessDetails detailsWindow =
-                                new EnvironmentBuildProcessDetails( "Environment details" );
-                        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-                        String json = gson.toJson( process, EnvironmentBuildProcess.class );
-                        detailsWindow.setContent( json );
-                        contentRoot.getUI().addWindow( detailsWindow );
-                        detailsWindow.setVisible( true );
+                        Window window = genProcessWindow( process );
                     }
                 } );
 
@@ -179,8 +175,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     }
                 } );
                 environmentsTable.addItem( new Object[] {
-                        process.getEnvironmentName(), icon, viewButton, processButton,
-                        destroyButton
+                        process.getEnvironmentName(), icon, viewButton, processButton, destroyButton
                 }, process.getUuid() );
             }
         }
@@ -192,9 +187,28 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     }
 
 
-    private void configureEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    private Window genProcessWindow( final EnvironmentBuildProcess process )
     {
-        //TODO: configure code
+        Window window = createWindow( "Environment details" );
+        TextArea area = new TextArea();
+        area.setSizeFull();
+        area.setValue( GSON.toJson( process ) );
+        window.setContent( area );
+        contentRoot.getUI().addWindow( window );
+        window.setVisible( true );
+        return window;
+    }
+
+
+    private Window createWindow( String caption )
+    {
+        Window window = new Window();
+        window.setCaption( caption );
+        window.setWidth( "800px" );
+        window.setHeight( "600px" );
+        window.setModal( true );
+        window.setClosable( true );
+        return window;
     }
 
 
@@ -241,6 +255,12 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         buildProcessExecutor.execute( executor,
                 new BuildCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
         executor.shutdown();
+    }
+
+
+    private void configureEnvironment( final EnvironmentBuildProcess environmentBuildProcess )
+    {
+        //TODO: configure code
     }
 
 

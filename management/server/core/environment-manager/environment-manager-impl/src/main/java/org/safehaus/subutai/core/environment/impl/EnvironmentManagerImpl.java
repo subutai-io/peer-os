@@ -230,12 +230,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = getEnvironment( uuid );
         int count = 0;
-        for ( EnvironmentContainer ec : environment.getContainers() )
+        for ( EnvironmentContainer container : environment.getContainers() )
         {
             DestroyContainersMessage dcm =
-                    new DestroyContainersMessage( PeerCommandType.DESTROY, environment.getUuid(), ec.getPeerId(),
-                            ec.getAgentId() );
-            dcm.setHostname( ec.getHostname() );
+                    new DestroyContainersMessage( PeerCommandType.DESTROY, environment.getUuid(), container.getPeerId(),
+                            container.getAgentId() );
+            dcm.setHostname( container.getHostname() );
             peerCommandDispatcher.invoke( dcm, 1000 * 60 );
             if ( dcm.isSuccess() )
             {

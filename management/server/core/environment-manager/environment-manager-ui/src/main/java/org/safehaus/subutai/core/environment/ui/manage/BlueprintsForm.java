@@ -5,15 +5,17 @@ import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
 import org.safehaus.subutai.core.environment.ui.wizard.Blueprint2PeerGroupWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.Node2PeerWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.NodeGroup2PeerGroupWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.NodeGroup2PeerWizard;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -30,6 +32,7 @@ public class BlueprintsForm
     private static final String DELETE = "Delete";
     private static final String VIEW = "View";
     private static final String NAME = "Name";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule module;
@@ -93,10 +96,7 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        BlueprintDetails details = new BlueprintDetails( "Blueprint details" );
-                        details.setContent( task.getEnvironmentBlueprint() );
-                        contentRoot.getUI().addWindow( details );
-                        details.setVisible( true );
+                        Window window = blueprintDetails( task );
                     }
                 } );
 
@@ -173,6 +173,19 @@ public class BlueprintsForm
     }
 
 
+    private Window blueprintDetails( final EnvironmentBuildTask task )
+    {
+        Window window = createWindow( "Blueprint details" );
+        TextArea area = new TextArea();
+        area.setSizeFull();
+        area.setValue( GSON.toJson( task.getEnvironmentBlueprint() ) );
+        window.setContent( area );
+        contentRoot.getUI().addWindow( window );
+        return window;
+    }
+
+
+
     /*private void showBlueprint2PeerGroupWindow()
     {
         Window window = createWindow( B2PG );
@@ -201,6 +214,8 @@ public class BlueprintsForm
     {
         Window window = new Window();
         window.setCaption( caption );
+        window.setWidth( "800px" );
+        window.setHeight( "600px" );
         window.setModal( true );
         window.setClosable( true );
         return window;

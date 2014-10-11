@@ -4,17 +4,18 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.environment.ui.window.EnvironmentDetails;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 
 @SuppressWarnings( "serial" )
@@ -94,43 +95,8 @@ public class EnvironmentsForm
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
-                    EnvironmentDetails detailsWindow = new EnvironmentDetails( ENV_DETAILS );
-                    detailsWindow.setContent( genContainersTable() );
-                    contentRoot.getUI().addWindow( detailsWindow );
-                    detailsWindow.setVisible( true );
-                }
-
-
-                private VerticalLayout genContainersTable()
-                {
-                    VerticalLayout vl = new VerticalLayout();
-
-                    Table containersTable = new Table();
-                    containersTable.addContainerProperty( NAME, String.class, null );
-                    containersTable.addContainerProperty( PROPERTIES, Button.class, null );
-                    containersTable.addContainerProperty( START, Button.class, null );
-                    containersTable.addContainerProperty( STOP, Button.class, null );
-                    containersTable.addContainerProperty( DESTROY, Button.class, null );
-                    containersTable.setPageLength( 10 );
-                    containersTable.setSelectable( false );
-                    containersTable.setEnabled( true );
-                    containersTable.setImmediate( true );
-                    containersTable.setSizeFull();
-
-
-                    Set<EnvironmentContainer> containers = environment.getContainers();
-                    for ( Container container : containers )
-                    {
-
-                        containersTable.addItem( new Object[] {
-                                container.getName(), propertiesButton( container ), startButton( container ),
-                                stopButton( container ), destroyButton( container )
-                        }, null );
-                    }
-
-
-                    vl.addComponent( containersTable );
-                    return vl;
+                    Window window = envWindow( environment );
+                    window.setVisible( true );
                 }
             } );
 
@@ -179,6 +145,58 @@ public class EnvironmentsForm
     }
 
 
+    private Window envWindow( Environment environment )
+    {
+        Window window = createWindow( ENV_DETAILS );
+        window.setContent( genContainersTable( environment.getContainers() ) );
+        contentRoot.getUI().addWindow( window );
+        return window;
+    }
+
+
+    private Window createWindow( String caption )
+    {
+        Window window = new Window();
+        window.setCaption( caption );
+        window.setWidth( "800px" );
+        window.setHeight( "600px" );
+        window.setModal( true );
+        window.setClosable( true );
+        return window;
+    }
+
+
+    private VerticalLayout genContainersTable( Set<EnvironmentContainer> containers )
+    {
+        VerticalLayout vl = new VerticalLayout();
+
+        Table containersTable = new Table();
+        containersTable.addContainerProperty( NAME, String.class, null );
+        containersTable.addContainerProperty( PROPERTIES, Button.class, null );
+        containersTable.addContainerProperty( START, Button.class, null );
+        containersTable.addContainerProperty( STOP, Button.class, null );
+        containersTable.addContainerProperty( DESTROY, Button.class, null );
+        containersTable.setPageLength( 10 );
+        containersTable.setSelectable( false );
+        containersTable.setEnabled( true );
+        containersTable.setImmediate( true );
+        containersTable.setSizeFull();
+
+        for ( Container container : containers )
+        {
+
+            containersTable.addItem( new Object[] {
+                    container.getName(), propertiesButton( container ), startButton( container ),
+                    stopButton( container ), destroyButton( container )
+            }, null );
+        }
+
+
+        vl.addComponent( containersTable );
+        return vl;
+    }
+
+
     private Object propertiesButton( final Container container )
     {
         Button button = new Button( PROPERTIES );
@@ -202,7 +220,22 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                Notification.show( START );
+                try
+                {
+
+                    if ( container.start() )
+                    {
+                        Notification.show( "Started" );
+                    }
+                    else
+                    {
+                        Notification.show( "Failed to start a container" );
+                    }
+                }
+                catch ( ContainerException e )
+                {
+                    Notification.show( e.getMessage() );
+                }
             }
         } );
         return button;
@@ -217,7 +250,22 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                Notification.show( STOP );
+                try
+                {
+
+                    if ( container.stop() )
+                    {
+                        Notification.show( "Stopped" );
+                    }
+                    else
+                    {
+                        Notification.show( "Failed to stop a container" );
+                    }
+                }
+                catch ( ContainerException e )
+                {
+                    Notification.show( e.getMessage() );
+                }
             }
         } );
         return button;
