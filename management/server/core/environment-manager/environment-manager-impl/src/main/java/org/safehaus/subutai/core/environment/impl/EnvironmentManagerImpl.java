@@ -56,6 +56,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final long TIMEOUT = 1000 * 15;
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private ContainerManager containerManager;
@@ -64,13 +65,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private DbManager dbManager;
     private PeerCommandDispatcher peerCommandDispatcher;
-    //    private List<Environment> environments;
-    //    private Set<EnvironmentContainer> containers = new HashSet<>();
-
-
-    public EnvironmentManagerImpl()
-    {
-    }
 
 
     public PeerCommandDispatcher getPeerCommandDispatcher()
@@ -89,8 +83,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager, containerManager );
-
-        //        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
@@ -190,17 +182,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    /*public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
-    {
-        LOG.info( "saved to " );
-        //        return build( environmentBuildTask );
-        //TODO build environment in background
-
-
-        return true;
-    }*/
-
-
     @Override
     public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
             throws EnvironmentBuildException
@@ -213,7 +194,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public List<Environment> getEnvironments()
     {
-        //        return environments;
         return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
@@ -242,11 +222,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 count++;
             }
         }
-        if ( count == environment.getContainers().size() )
+
+        //TODO: fix workaround
+        /*if ( count == environment.getContainers().size() )
         {
             return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
-        }
-        return false;
+        }*/
+        return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
     }
 
 
@@ -401,7 +383,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, environment.getUuid(), peerId,
                             null );
 
-            peerCommandDispatcher.invoke( cmd, 1000 * 15 );
+            peerCommandDispatcher.invoke( cmd, TIMEOUT );
 
             Set<PeerContainer> containers =
                     JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
