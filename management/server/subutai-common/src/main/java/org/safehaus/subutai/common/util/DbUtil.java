@@ -1,6 +1,9 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -8,6 +11,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.sun.rowset.CachedRowSetImpl;
 
 
@@ -18,17 +22,34 @@ public class DbUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( DbUtil.class.getName() );
 
+    private final DataSource dataSource;
 
-    private DbUtil()
+
+    public DbUtil( DataSource dataSource )
     {
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+
+        this.dataSource = dataSource;
     }
 
 
-    public static java.sql.ResultSet select( DataSource dataSource, String sql, Object... params ) throws SQLException
+    public ResultSet select( String sql, Object... params ) throws SQLException
     {
-        java.sql.Connection conn = null;
-        java.sql.PreparedStatement ps = null;
-        java.sql.ResultSet rs = null;
+        return select( dataSource, sql, params );
+    }
+
+
+    public Integer update( String sql, Object... params ) throws SQLException
+    {
+        return update( dataSource, sql, params );
+    }
+
+
+    public static ResultSet select( DataSource dataSource, String sql, Object... params ) throws SQLException
+    {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try
         {
             conn = dataSource.getConnection();
@@ -89,8 +110,8 @@ public class DbUtil
 
     public static Integer update( DataSource dataSource, String sql, Object... params ) throws SQLException
     {
-        java.sql.Connection conn = null;
-        java.sql.PreparedStatement ps = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
         try
         {
             conn = dataSource.getConnection();

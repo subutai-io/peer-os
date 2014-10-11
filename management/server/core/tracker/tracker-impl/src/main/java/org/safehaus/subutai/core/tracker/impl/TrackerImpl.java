@@ -47,14 +47,13 @@ public class TrackerImpl implements Tracker
     /**
      * reference to dataSource
      */
-    private DataSource dataSource;
+    private final DbUtil dbUtil;
 
 
     public TrackerImpl( final DataSource dataSource ) throws SQLException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
-
-        this.dataSource = dataSource;
+        this.dbUtil = new DbUtil( dataSource );
 
         setupDb();
     }
@@ -66,7 +65,7 @@ public class TrackerImpl implements Tracker
         String sql = "create table if not exists product_operation(source varchar(100), id uuid, ts timestamp, "
                 + "info clob, PRIMARY KEY (source, id));";
 
-        DbUtil.update( dataSource, sql );
+        dbUtil.update( sql );
     }
 
 
@@ -85,7 +84,7 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            ResultSet rs = DbUtil.select( dataSource, "select info from product_operation where source = ? and id = ?",
+            ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and id = ?",
                     source.toLowerCase(), operationTrackId );
 
             return constructProductOperation( rs );
@@ -129,8 +128,8 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            DbUtil.update( dataSource, "merge into product_operation(source,id,ts,info) values(?,?,?,?)",
-                    source.toLowerCase(), po.getId(), po.createDate(), GSON.toJson( po ) );
+            dbUtil.update( "merge into product_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
+                    po.getId(), po.createDate(), GSON.toJson( po ) );
             return true;
         }
         catch ( SQLException e )
@@ -184,9 +183,8 @@ public class TrackerImpl implements Tracker
         List<ProductOperationView> list = new ArrayList<>();
         try
         {
-            ResultSet rs = DbUtil.select( dataSource,
-                    "select info from product_operation where source = ? and ts between ? and ?"
-                            + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
+            ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and ts between ? and ?"
+                    + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
 
             ProductOperationViewImpl productOperationViewImpl = constructProductOperation( rs );
             while ( productOperationViewImpl != null )
@@ -213,7 +211,7 @@ public class TrackerImpl implements Tracker
         List<String> sources = new ArrayList<>();
         try
         {
-            ResultSet rs = DbUtil.select( dataSource, "select distinct source from product_operation" );
+            ResultSet rs = dbUtil.select( "select distinct source from product_operation" );
 
             while ( rs != null && rs.next() )
             {
