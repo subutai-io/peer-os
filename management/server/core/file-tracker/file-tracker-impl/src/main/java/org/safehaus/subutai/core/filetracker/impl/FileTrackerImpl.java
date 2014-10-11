@@ -4,17 +4,18 @@ package org.safehaus.subutai.core.filetracker.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
@@ -30,12 +31,14 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
     public void setCommandRunner( CommandRunner commandRunner )
     {
+        Preconditions.checkNotNull( commandRunner, "CommandRunner is null." );
         this.commandRunner = commandRunner;
     }
 
 
     public void setCommunicationManager( CommunicationManager communicationManager )
     {
+        Preconditions.checkNotNull( communicationManager, "CommunicationManager is null." );
         this.communicationManager = communicationManager;
     }
 
@@ -109,6 +112,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
     {
         if ( response == null || response.getType() != ResponseType.INOTIFY_ACTION_RESPONSE )
         {
+            //System.out.println( "Listener is null." );
             return;
         }
 

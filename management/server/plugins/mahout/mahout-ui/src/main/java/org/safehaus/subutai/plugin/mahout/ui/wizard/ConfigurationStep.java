@@ -55,6 +55,7 @@ public class ConfigurationStep extends Panel
         layout.addComponent( content );
 
         TextField txtClusterName = new TextField( "Mahout installation name: " );
+        txtClusterName.setId("MahoutInstallationName");
         txtClusterName.setRequired( true );
         txtClusterName.addValueChangeListener( new Property.ValueChangeListener()
         {

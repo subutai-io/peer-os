@@ -75,7 +75,7 @@ public class HadoopPortalModule implements PortalModule
         }
         catch ( NamingException e )
         {
-            LOG.severe( e.getMessage() );
+            LOG.severe( String.format( "Error creating HadoopPortalModule bundle:\n%s", e.getMessage() ) );
         }
 
         return null;

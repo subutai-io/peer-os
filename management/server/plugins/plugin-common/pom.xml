@@ -23,7 +23,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>db-manager-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -34,28 +33,25 @@
       <artifactId>agent-manager-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>lxc-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>${com.google.guava.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>${com.google.code.gson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.datastax.cassandra</groupId>
       <artifactId>cassandra-driver-core</artifactId>
-      <version>${com.datastax.cassandra.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <version>${org.mockito.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -72,9 +68,8 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.plugin.common</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
+              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

@@ -30,7 +30,7 @@ public class SetupHelper
     {
         po.addLog( "Setting master" );
         Agent hmaster = config.getHbaseMaster();
-        Command cmd = Commands.getConfigMasterCommand( config.getAllNodes(), config.getHadoopNameNode(),
+        Command cmd = manager.getCommands().getConfigMasterCommand( config.getAllNodes(), config.getHadoopNameNode(),
                 hmaster.getHostname() );
         manager.getCommandRunner().runCommand( cmd );
 
@@ -53,7 +53,7 @@ public class SetupHelper
             sb.append( " " );
         }
 
-        Command cmd = Commands.getConfigRegionCommand( config.getAllNodes(), sb.toString().trim() );
+        Command cmd = manager.getCommands().getConfigRegionCommand( config.getAllNodes(), sb.toString().trim() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( !cmd.hasSucceeded() )
@@ -75,7 +75,7 @@ public class SetupHelper
             sb.append( " " );
         }
 
-        Command cmd = Commands.getConfigQuorumCommand( config.getAllNodes(), sb.toString().trim() );
+        Command cmd = manager.getCommands().getConfigQuorumCommand( config.getAllNodes(), sb.toString().trim() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( !cmd.hasSucceeded() )
@@ -97,7 +97,7 @@ public class SetupHelper
             sb.append( " " );
         }
 
-        Command cmd = Commands.getConfigBackupMastersCommand( config.getAllNodes(), sb.toString().trim() );
+        Command cmd = manager.getCommands().getConfigBackupMastersCommand( config.getAllNodes(), sb.toString().trim() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( !cmd.hasSucceeded() )
@@ -113,7 +113,7 @@ public class SetupHelper
     {
         po.addLog( "Starting cluster..." );
 
-        Command cmd = Commands.getStartCommand( Sets.newHashSet( config.getHbaseMaster() ) );
+        Command cmd = manager.getCommands().getStartCommand( Sets.newHashSet( config.getHbaseMaster() ) );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

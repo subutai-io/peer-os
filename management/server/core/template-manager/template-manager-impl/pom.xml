@@ -16,11 +16,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -34,15 +29,30 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>command-runner-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>apt-repository-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>template-manager-impl</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -58,6 +68,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.template.impl</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

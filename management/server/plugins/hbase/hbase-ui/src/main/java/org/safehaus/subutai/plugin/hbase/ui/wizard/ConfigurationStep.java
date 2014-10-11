@@ -77,7 +77,7 @@ public class ConfigurationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        next.setId("HbaseBack");
+        back.setId("HbaseBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

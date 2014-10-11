@@ -27,13 +27,20 @@ public abstract class SparkBase
 
     ExecutorService executor;
     PluginDAO pluginDAO;
+    Commands commands;
 
 
     public void init()
     {
-        Commands.init( commandRunner );
+        commands = new Commands( commandRunner );
         pluginDAO = new PluginDAO( dbManager );
         executor = Executors.newCachedThreadPool();
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 

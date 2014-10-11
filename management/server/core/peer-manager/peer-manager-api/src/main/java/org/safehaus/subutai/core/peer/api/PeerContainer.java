@@ -36,6 +36,13 @@ public class PeerContainer extends Container
 
 
     @Override
+    public UUID getEnvironmentId()
+    {
+        return null;
+    }
+
+
+    @Override
     public boolean start() throws ContainerException
     {
         return peerManager.startContainer( this );

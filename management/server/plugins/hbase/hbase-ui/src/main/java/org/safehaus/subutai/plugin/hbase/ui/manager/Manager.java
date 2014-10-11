@@ -366,6 +366,7 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
+            checkBtn.setId(agent.getListIP().get(0) + "-hbaseCheck");
             checkBtn.addStyleName( BUTTON_STYLE_NAME );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
             startBtn.addStyleName( BUTTON_STYLE_NAME );

@@ -88,7 +88,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )

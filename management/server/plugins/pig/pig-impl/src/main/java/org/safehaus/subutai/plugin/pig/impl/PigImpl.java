@@ -140,9 +140,6 @@ public class PigImpl implements Pig
     }
 
 
-
-
-
     @Override
     public UUID uninstallCluster( final String clusterName )
     {

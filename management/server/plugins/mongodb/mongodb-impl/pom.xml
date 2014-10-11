@@ -21,10 +21,6 @@
       <version>${org.osgi.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -52,10 +48,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-runner-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>lxc-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

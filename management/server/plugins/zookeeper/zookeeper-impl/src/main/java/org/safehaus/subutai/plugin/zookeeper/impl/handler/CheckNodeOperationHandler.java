@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 
 
@@ -60,7 +59,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Zookeepe
             return;
         }
 
-        Command checkCommand = Commands.getStatusCommand( node );
+        Command checkCommand = manager.getCommands().getStatusCommand( node );
         manager.getCommandRunner().runCommand( checkCommand );
 
         if ( checkCommand.hasCompleted() )

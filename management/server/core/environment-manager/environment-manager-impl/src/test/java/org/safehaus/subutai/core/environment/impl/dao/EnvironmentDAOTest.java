@@ -9,22 +9,23 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
 
 
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class EnvironmentDAOTest
 {
+    private static final String SOURCE = "source";
+    private static final String KEY = "key";
     EnvironmentDAO environmentDAO;
     @Mock
     DbManager dbManager;
 
 
     @Before
-    public void init()
+    public void setUp() throws Exception
     {
         environmentDAO = new EnvironmentDAO( dbManager );
     }
@@ -33,20 +34,26 @@ public class EnvironmentDAOTest
     @Test
     public void shoudSaveInfo()
     {
-        assertTrue( environmentDAO.saveInfo( "SOURCE", "KEY", new Object() ) );
+        assertTrue( environmentDAO.saveInfo( SOURCE, KEY, new DummyClass() ) );
     }
 
 
     @Test
     public void shoudDeleteInfo()
     {
-        assertTrue( environmentDAO.deleteInfo( "SOURCE", "KEY" ) );
+        assertTrue( environmentDAO.deleteInfo( SOURCE, KEY ) );
     }
 
 
     @Test
     public void shoudGetInfo()
     {
-        environmentDAO.getInfo( "KEY", Object.class );
+        environmentDAO.getInfo( KEY, DummyClass.class );
     }
+}
+
+
+class DummyClass
+{
+    String dummyText = "text";
 }

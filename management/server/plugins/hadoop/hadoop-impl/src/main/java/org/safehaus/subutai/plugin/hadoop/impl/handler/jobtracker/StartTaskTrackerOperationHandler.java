@@ -8,7 +8,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl> {
@@ -44,9 +43,9 @@ public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<H
             return;
         }
 
-        Command startCommand = Commands.getStartTaskTrackerCommand( node );
+        Command startCommand = manager.getCommands().getStartTaskTrackerCommand( node );
         manager.getCommandRunner().runCommand( startCommand );
-        Command statusCommand = Commands.getJobTrackerCommand( node, "status" );
+        Command statusCommand = manager.getCommands().getJobTrackerCommand( node, "status" );
         manager.getCommandRunner().runCommand( statusCommand );
 
         AgentResult result = statusCommand.getResults().get( node.getUuid() );

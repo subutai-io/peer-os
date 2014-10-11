@@ -11,6 +11,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.lxc.quota.api.QuotaManager;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
@@ -22,6 +23,7 @@ public abstract class ContainerManagerBase implements ContainerManager
 {
 
     AgentManager agentManager;
+    QuotaManager quotaManager;
     CommandRunner commandRunner;
     TemplateManager templateManager;
     TemplateRegistry templateRegistry;
@@ -35,6 +37,12 @@ public abstract class ContainerManagerBase implements ContainerManager
     public AgentManager getAgentManager()
     {
         return agentManager;
+    }
+
+
+    public QuotaManager getQuotaManager()
+    {
+        return quotaManager;
     }
 
 

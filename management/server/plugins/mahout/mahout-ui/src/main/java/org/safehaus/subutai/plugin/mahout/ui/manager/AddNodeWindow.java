@@ -55,6 +55,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox hadoopNodes = new ComboBox();
+        hadoopNodes.setId("mahoutAddHadoopNodes");
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );

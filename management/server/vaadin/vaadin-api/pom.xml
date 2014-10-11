@@ -18,12 +18,11 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>${com.google.guava.version}</version>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 

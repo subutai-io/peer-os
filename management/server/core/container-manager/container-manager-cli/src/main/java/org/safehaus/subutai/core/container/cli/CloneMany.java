@@ -9,13 +9,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerEvent;
 import org.safehaus.subutai.core.container.api.ContainerEventListener;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
@@ -45,7 +46,7 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
     protected Object doExecute() throws Exception
     {
         containerManager.addListener( this );
-        UUID envId = UUID.randomUUID();
+        UUID envId = UUIDUtil.generateTimeBasedUUID();;
         List<Criteria> criteria = getCriteria();
         Set<Agent> set = containerManager.clone( envId, template, nodesCount, strategyId, criteria );
         if ( set.isEmpty() )

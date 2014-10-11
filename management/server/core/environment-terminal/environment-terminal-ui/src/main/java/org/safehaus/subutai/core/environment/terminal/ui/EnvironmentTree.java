@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.environment.terminal.ui;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,9 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -35,31 +34,23 @@ import com.vaadin.ui.UI;
 
 
 /**
- * @author tjamakeev
+ * Container tree
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 
 public final class EnvironmentTree extends ConcurrentComponent implements Disposable
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( UI.getCurrent().getClass().getName() );
-    private final AgentManager agentManager;
-    private final EnvironmentManager environmentManager;
-    private final ComboBox env;
     private final Tree tree;
     private HierarchicalContainer container;
-    private Set<Agent> currentAgents = new HashSet<>();
-    private EnvironmentContainer selectedContainer;
+    private Set<EnvironmentContainer> selectedContainers = new HashSet<>();
     private Environment environment;
-    private String peerId;
     private final ScheduledExecutorService scheduler;
 
 
-    public EnvironmentTree( AgentManager agentManager, final EnvironmentManager environmentManager )
+    public EnvironmentTree( final EnvironmentManager environmentManager )
     {
-        this.agentManager = agentManager;
-
-        this.environmentManager = environmentManager;
 
         scheduler = Executors.newScheduledThreadPool( 1 );
 
@@ -75,15 +66,14 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 }
                 LOG.info( "Refreshing done." );
             }
-        }, 5, 30, TimeUnit.SECONDS );
+        }, 5, 60, TimeUnit.SECONDS );
         setSizeFull();
         setMargin( true );
 
-        BeanItemContainer<Environment> environments = new BeanItemContainer<Environment>( Environment.class );
+        BeanItemContainer<Environment> environments = new BeanItemContainer<>( Environment.class );
         environments.addAll( environmentManager.getEnvironments() );
-        env = new ComboBox( null, environments );
+        final ComboBox env = new ComboBox( null, environments );
         env.setItemCaptionPropertyId( "name" );
-        //        env.setWidth( 200, Unit.PIXELS );
         env.setImmediate( true );
         env.setTextInputAllowed( false );
         env.setNullSelectionAllowed( false );
@@ -123,18 +113,31 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 return description;
             }
         } );
-        tree.setMultiSelect( false );
+        tree.setMultiSelect( true );
         tree.setImmediate( true );
         tree.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                LOG.info( event.getProperty().toString() );
-                Item item = container.getItem( event.getProperty().getValue() );
-                if ( item != null && item.getItemProperty( "value" ).getValue() instanceof EnvironmentContainer )
+
+                if ( event.getProperty().getValue() instanceof Set )
                 {
-                    selectedContainer = ( EnvironmentContainer ) item.getItemProperty( "value" ).getValue();
+                    Tree t = ( Tree ) event.getProperty();
+
+                    Set<EnvironmentContainer> selectedList = new HashSet<>();
+
+                    for ( Object o : ( Iterable<?> ) t.getValue() )
+                    {
+                        if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
+                        {
+                            EnvironmentContainer environmentContainer =
+                                    ( EnvironmentContainer ) tree.getItem( o ).getItemProperty( "value" ).getValue();
+                            selectedList.add( environmentContainer );
+                        }
+                    }
+
+                    selectedContainers = selectedList;
                 }
             }
         } );
@@ -145,8 +148,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         grid.addComponent( tree, 0, 2 );
 
         addComponent( grid );
-
-        //        agentManager.addListener( this );
     }
 
 
@@ -159,14 +160,31 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         tree.removeAllItems();
         if ( environment != null )
         {
+            Set<String> peers = new HashSet<>();
+
+            for ( EnvironmentContainer ec : environment.getContainers() )
+            {
+                peers.add( ec.getPeerId().toString() );
+            }
+
             for ( EnvironmentContainer ec : environment.getContainers() )
             {
                 //TODO: remove next line when persistent API is JPA
                 ec.setEnvironment( environment );
-                String itemId = ec.getPeerId() + ":" + ec.getAgentId();
-                Item item = container.addItem( itemId );
-                container.setChildrenAllowed( itemId, false );
+                String peerId = ec.getPeerId().toString();
+                String itemId = peerId + ":" + ec.getAgentId();
 
+                Item peer = container.getItem( peerId );
+                if ( peer == null )
+                {
+                    peer = container.addItem( peerId );
+                    container.setChildrenAllowed( peerId, true );
+                    tree.setItemCaption( itemId, peerId.toString() );
+                    peer.getItemProperty( "value" ).setValue( null );
+                }
+                Item item = container.addItem( itemId );
+                container.setParent( itemId, peerId );
+                container.setChildrenAllowed( itemId, false );
                 tree.setItemCaption( itemId, ec.getHostname() );
                 item.getItemProperty( "value" ).setValue( ec );
             }
@@ -175,30 +193,15 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         {
             LOG.info( "Environment is null" );
         }
-        //        refreshAgents( agentManager.getAgents() );
 
         return container;
     }
 
 
-    public EnvironmentContainer getSelectedContainer()
+    public Set<EnvironmentContainer> getSelectedContainers()
     {
-        return selectedContainer;
+        return Collections.unmodifiableSet( selectedContainers );
     }
-
-
-    //    @Override
-    //    public void onAgent( final Set<Agent> freshAgents )
-    //    {
-    //        executeUpdate( new Runnable()
-    //        {
-    //            @Override
-    //            public void run()
-    //            {
-    //                refreshContainers( getRemoteFreshAgents( environment ) );
-    //            }
-    //        } );
-    //    }
 
 
     private void refreshContainers( final Set<EnvironmentContainer> freshContainers )
@@ -212,10 +215,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         List<String> agentIdList = new ArrayList<>();
         for ( EnvironmentContainer container : freshContainers )
         {
-            //            if ( peerId == null )
-            //            {
-            //                peerId = container.getPeerId().toString();
-            //            }
+
             agentIdList.add( String
                     .format( "%s:%s", container.getPeerId().toString(), container.getAgentId().toString() ) );
         }
@@ -223,6 +223,10 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         for ( Object itemObj : container.getItemIds() )
         {
             String itemId = ( String ) itemObj;
+            if ( itemId.indexOf( ':' ) < 0 )
+            {
+                continue;    // peer
+            }
             if ( agentIdList.contains( itemId ) )
             {
                 Item item = container.getItem( itemId );
@@ -239,7 +243,6 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
 
     public void dispose()
     {
-        //        agentManager.removeListener( this );
         scheduler.shutdown();
     }
 }

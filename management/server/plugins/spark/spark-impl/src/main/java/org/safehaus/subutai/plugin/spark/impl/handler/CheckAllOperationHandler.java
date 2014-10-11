@@ -5,7 +5,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
 
@@ -30,7 +29,7 @@ public class CheckAllOperationHandler extends AbstractOperationHandler<SparkImpl
             return;
         }
 
-        Command checkStatusCommand = Commands.getStatusAllCommand( ( Agent ) config.getAllNodes() );
+        Command checkStatusCommand = manager.getCommands().getStatusAllCommand( ( Agent ) config.getAllNodes() );
         manager.getCommandRunner().runCommand( checkStatusCommand );
 
         if ( checkStatusCommand.hasSucceeded() )

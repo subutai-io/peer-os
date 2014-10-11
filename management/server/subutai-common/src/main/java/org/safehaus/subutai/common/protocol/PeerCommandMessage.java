@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 
 /**
@@ -21,6 +22,26 @@ public abstract class PeerCommandMessage
     protected boolean success = false;
     protected boolean proccessed = false;
     protected String jsonResult;
+    protected long createTimestamp = System.currentTimeMillis();
+    protected long completeTimestamp;
+
+
+    public void setCompleteTimestamp( final long completeTimestamp )
+    {
+        this.completeTimestamp = completeTimestamp;
+    }
+
+
+    public long getCreateTimestamp()
+    {
+        return createTimestamp;
+    }
+
+
+    public long getCompleteTimestamp()
+    {
+        return completeTimestamp;
+    }
 
 
     private PeerCommandMessage()
@@ -30,7 +51,7 @@ public abstract class PeerCommandMessage
 
     public PeerCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
     {
-        this.id = UUID.randomUUID();
+        this.id = UUIDUtil.generateTimeBasedUUID();
         this.peerId = peerId;
         this.agentId = agentId;
         this.envId = envId;

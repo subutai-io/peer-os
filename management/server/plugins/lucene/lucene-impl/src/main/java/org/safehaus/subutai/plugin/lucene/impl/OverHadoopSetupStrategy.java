@@ -64,7 +64,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
         // Check installed packages
         productOperation.addLog( "Installing Lucene..." );
 
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getNodes() );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -92,7 +92,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
         }
 
 
-        Command installCommand = Commands.getInstallCommand( config.getNodes() );
+        Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( installCommand );
         if ( installCommand.hasSucceeded() )
         {

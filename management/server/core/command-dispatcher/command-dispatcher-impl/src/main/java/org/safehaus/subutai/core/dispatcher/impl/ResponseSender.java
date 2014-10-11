@@ -21,6 +21,7 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -32,11 +33,11 @@ public class ResponseSender
     private static final Logger LOG = LoggerFactory.getLogger( ResponseSender.class.getName() );
 
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
-    private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
+    protected static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 20;
     private static final int RETRY_ATTEMPT_WIDENING_INTERVAL_SEC = 30;
     private static final int SELECT_RECORDS_LIMIT = 50;
     private final ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
-    private final ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
+    private ExecutorService httpRequestsExecutor = Executors.newCachedThreadPool();
     private final DispatcherDAO dispatcherDAO;
     private final PeerManager peerManager;
 
@@ -44,8 +45,24 @@ public class ResponseSender
     public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager )
     {
 
+        Preconditions.checkNotNull( dispatcherDAO, "Dispatcher DAO is null" );
+        Preconditions.checkNotNull( peerManager, "Peer manager is null" );
+
+
         this.dispatcherDAO = dispatcherDAO;
         this.peerManager = peerManager;
+    }
+
+
+    protected void setHttpRequestsExecutor( final ExecutorService httpRequestsExecutor )
+    {
+        this.httpRequestsExecutor = httpRequestsExecutor;
+    }
+
+
+    protected ExecutorService getHttpRequestsExecutor()
+    {
+        return httpRequestsExecutor;
     }
 
 
@@ -70,9 +87,8 @@ public class ResponseSender
     }
 
 
-    private void send()
+    protected void send()
     {
-
         try
         {
             Set<RemoteRequest> requests =
@@ -139,7 +155,7 @@ public class ResponseSender
                     request.incrementAttempts();
                     dispatcherDAO.saveRemoteRequest( request );
                     //delete previous request (workaround until we change Cassandra to another DB)
-                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                    dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
                 }
             }
             else
@@ -238,7 +254,7 @@ public class ResponseSender
                 request.incrementAttempts();
                 dispatcherDAO.saveRemoteRequest( request );
                 //delete previous request (workaround until we change Cassandra to another DB)
-                dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
+                dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
             }
         }
     }

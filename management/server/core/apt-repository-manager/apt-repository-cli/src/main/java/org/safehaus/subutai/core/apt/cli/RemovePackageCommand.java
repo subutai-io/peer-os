@@ -15,12 +15,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import com.google.common.base.Preconditions;
 
 
-@Command(scope = "apt", name = "remove-package", description = "Remove package from apt repository by name")
+@Command( scope = "apt", name = "remove-package", description = "Remove package from apt repository by name" )
 public class RemovePackageCommand extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemovePackageCommand.class.getName() );
 
-    @Argument(index = 0, name = "package name", required = true, multiValued = false, description = "name of package")
+    @Argument( index = 0, name = "package name", required = true, multiValued = false, description = "name of package" )
     String packageName;
 
     private final AptRepositoryManager aptRepositoryManager;

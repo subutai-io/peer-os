@@ -26,17 +26,17 @@ public class CommandsTest
     @Test
     public void testInstallCommand()
     {
-        Command command = Commands.getInstallCommand( null );
+        Command command = commands.getInstallCommand( null );
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes install " + commands.PACKAGE_NAME, command.getDescription() );
     }
 
 
     @Test
     public void getStartCommand()
     {
-        Command command = Commands.getStartCommand( null );
+        Command command = commands.getStartCommand( null );
 
         assertNotNull( command );
         assertEquals( "service presto start", command.getDescription() );
@@ -46,7 +46,7 @@ public class CommandsTest
     @Test
     public void getRestartCommand()
     {
-        Command command = Commands.getRestartCommand( null );
+        Command command = commands.getRestartCommand( null );
 
         assertNotNull( command );
         assertEquals( "service presto restart", command.getDescription() );
@@ -56,7 +56,7 @@ public class CommandsTest
     @Test
     public void getStatusCommand()
     {
-        Command command = Commands.getStatusCommand( null );
+        Command command = commands.getStatusCommand( null );
 
         assertNotNull( command );
         assertEquals( "service presto status", command.getDescription() );
@@ -66,7 +66,7 @@ public class CommandsTest
     @Test
     public void getStopCommand()
     {
-        Command command = Commands.getStopCommand( null );
+        Command command = commands.getStopCommand( null );
 
         assertNotNull( command );
         assertEquals( "service presto stop", command.getDescription() );
@@ -76,17 +76,17 @@ public class CommandsTest
     @Test
     public void testUninstallCommand()
     {
-        Command command = Commands.getUninstallCommand( null );
+        Command command = commands.getUninstallCommand( null );
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes purge " + commands.PACKAGE_NAME, command.getDescription() );
     }
 
 
     @Test
     public void testCheckCommand()
     {
-        Command command = Commands.getCheckInstalledCommand( null );
+        Command command = commands.getCheckInstalledCommand( null );
 
         assertNotNull( command );
         assertEquals( "dpkg -l | grep '^ii' | grep ksks", command.getDescription() );

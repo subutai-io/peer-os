@@ -10,11 +10,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.git.api.GitChangedFile;
 import org.safehaus.subutai.core.git.api.GitException;
 import org.safehaus.subutai.core.git.api.GitManager;
-
-import com.google.common.collect.Lists;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;

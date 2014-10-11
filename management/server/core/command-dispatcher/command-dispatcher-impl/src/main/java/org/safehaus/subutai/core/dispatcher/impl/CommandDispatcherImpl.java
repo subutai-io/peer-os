@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -28,6 +29,7 @@ import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -56,6 +58,12 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                                   final DbManager dbManager, final PeerManager peerManager )
     {
         super();
+
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+        Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
+
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.dispatcherDAO = new DispatcherDAO( dbManager );
@@ -264,6 +272,20 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     @Override
+    public Command createContainerCommand( final RequestBuilder requestBuilder, final Set<Container> containers )
+    {
+        return new CommandImpl( requestBuilder, containers, peerManager, this );
+    }
+
+
+    @Override
+    public Command createContainerCommand( final Set<ContainerRequestBuilder> requestBuilders )
+    {
+        return new CommandImpl( requestBuilders, peerManager, this );
+    }
+
+
+    @Override
     public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents )
     {
         return createCommand( null, requestBuilder, agents );
@@ -389,14 +411,14 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
     }
 
 
-    private void saveResponse( Response response )
+    protected void saveResponse( Response response )
     {
         try
         {
             //save response to db
             dispatcherDAO.saveRemoteResponse( new RemoteResponse( response ) );
         }
-        catch ( DBException e )
+        catch ( NullPointerException | DBException e )
         {
             LOG.error( String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(), response ),
                     e );

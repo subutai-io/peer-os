@@ -34,7 +34,7 @@ function rename {
   local src="$1"
   local dst="$2"
 
-  if [ "`are_containers_locked_read $src $dst`" == "true" ]
+  if [ "`are_containers_writable $src $dst`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1

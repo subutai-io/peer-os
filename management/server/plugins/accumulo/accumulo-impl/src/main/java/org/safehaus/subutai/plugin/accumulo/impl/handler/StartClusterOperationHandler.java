@@ -51,7 +51,7 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Accum
 
         productOperation.addLog( "Starting cluster..." );
 
-        Command startCommand = Commands.getStartCommand( accumuloClusterConfig.getMasterNode() );
+        Command startCommand =manager.getCommands().getStartCommand( accumuloClusterConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( startCommand );
 
         if ( startCommand.hasSucceeded() )

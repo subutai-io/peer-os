@@ -9,9 +9,9 @@ package org.safehaus.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.util.UUIDUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 public class ProductOperationImplTest
 {
 
-    private final UUID ID = UUID.randomUUID();
+    private final UUID ID = UUIDUtil.generateTimeBasedUUID();
     private final String SOURCE = "source";
     private final String DUMMY_LOG = "log";
     private final String DESCRIPTION = "description";

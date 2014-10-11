@@ -16,11 +16,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>${org.osgi.version}</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
@@ -31,7 +26,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -46,45 +40,37 @@
       <artifactId>command-runner-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${com.google.guava.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>db-manager-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.safehaus.subutai</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>peer-command-dispatcher-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${org.slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${org.mockito.version}</version>
-      <scope>test</scope>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -101,6 +87,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.environment.impl</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

@@ -17,9 +17,9 @@ import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 
 import com.google.common.collect.Lists;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
@@ -106,8 +106,7 @@ public class ReadFilesCommandTest
         Mockito.doThrow( new AptRepoException( ERR_MSG ) ).when( aptRepositoryManager )
                .readFileContents( any( Agent.class ), anyString(), anyList() );
 
-        ReadFilesCommand readFilesCommand =
-                new ReadFilesCommand( aptRepositoryManager, mock( AgentManager.class ) );
+        ReadFilesCommand readFilesCommand = new ReadFilesCommand( aptRepositoryManager, mock( AgentManager.class ) );
         readFilesCommand.setFilesPaths( FILE_PATHS );
         readFilesCommand.doExecute();
 

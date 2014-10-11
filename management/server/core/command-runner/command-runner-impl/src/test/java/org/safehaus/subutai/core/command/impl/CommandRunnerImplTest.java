@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
@@ -57,7 +58,7 @@ public class CommandRunnerImplTest
     private CommunicationManager communicationManager;
     private CommandRunnerImpl commandRunner;
     private final static String ERR_MSG = "some error message";
-    private static final Set<Agent> TWO_AGENTS = MockUtils.getAgents( UUID.randomUUID(), UUID.randomUUID() );
+    private static final Set<Agent> TWO_AGENTS = MockUtils.getAgents( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
 
 
     @BeforeClass
@@ -167,7 +168,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        Command command = MockUtils.getCommand( "ls", commandRunner, UUID.randomUUID(), 1 );
+        Command command = MockUtils.getCommand( "ls", commandRunner, UUIDUtil.generateTimeBasedUUID(), 1 );
 
         commandRunner.runCommandAsync( command );
 
@@ -180,7 +181,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        Command command = MockUtils.getCommand( "ls", commandRunner, UUID.randomUUID(), 1 );
+        Command command = MockUtils.getCommand( "ls", commandRunner, UUIDUtil.generateTimeBasedUUID(), 1 );
         ( ( CommandRunnerImpl ) commandRunner ).setInactiveCommandDropTimeout( 1 );
 
         commandRunner.runCommand( command );
@@ -194,7 +195,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        Command command = MockUtils.getCommand( "ls", commandRunner, UUID.randomUUID(), 1 );
+        Command command = MockUtils.getCommand( "ls", commandRunner, UUIDUtil.generateTimeBasedUUID(), 1 );
 
         ( ( CommandRunnerImpl ) commandRunner ).setInactiveCommandDropTimeout( 1 );
 
@@ -210,7 +211,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
         final Response response = MockUtils.getSucceededResponse( agentUUID, command.getCommandUUID() );
 
@@ -234,7 +235,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
         final Response response = MockUtils.getSucceededResponse( agentUUID, command.getCommandUUID() );
 
@@ -264,7 +265,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
         final Response response = MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG );
 
@@ -288,7 +289,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
         final Response response = MockUtils.getFailedResponse( agentUUID, command.getCommandUUID(), ERR_MSG );
 
@@ -319,7 +320,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
         final Response response = MockUtils.getIntermediateResponse( agentUUID, command.getCommandUUID() );
 
@@ -361,7 +362,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
         final Response response = MockUtils.getIntermediateResponse( agentUUID, command.getCommandUUID() );
 
@@ -402,7 +403,7 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        UUID agentUUID = UUID.randomUUID();
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Command command = MockUtils.getCommand( "ls", commandRunner, agentUUID, 1 );
         final Response response = MockUtils.getIntermediateResponse( agentUUID, command.getCommandUUID() );
 

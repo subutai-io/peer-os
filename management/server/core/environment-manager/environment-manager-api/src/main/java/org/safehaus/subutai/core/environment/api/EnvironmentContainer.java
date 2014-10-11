@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.environment.api;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
@@ -30,6 +32,13 @@ public class EnvironmentContainer extends Container
 
 
     @Override
+    public UUID getEnvironmentId()
+    {
+        return environment.getUuid();
+    }
+
+
+    @Override
     public boolean start() throws ContainerException
     {
         DefaultCommandMessage cmd =
@@ -55,7 +64,7 @@ public class EnvironmentContainer extends Container
     public boolean isConnected() throws ContainerException
     {
         DefaultCommandMessage cmd =
-                new DefaultCommandMessage( PeerCommandType.ISCONNECTED, getEnvironment().getUuid(), getPeerId(),
+                new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, getEnvironment().getUuid(), getPeerId(),
                         getAgentId() );
         environment.invoke( cmd );
         return cmd.isSuccess();

@@ -4,11 +4,10 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
-import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
@@ -54,14 +53,14 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
                 }
                 Set<Agent> servers = new HashSet<Agent>();
                 servers.add( serverAgent );
-                Command startServiceCommand = Commands.getStartServerCommand( servers );
+                Command startServiceCommand = manager.getCommands().getStartServerCommand( servers );
                 manager.getCommandRunner().runCommand( startServiceCommand );
 
                 if ( startServiceCommand.hasCompleted() )
                 {
                     productOperation.addLog( "Checking status..." );
 
-                    Command checkCommand = Commands.getStatusServerCommand( servers );
+                    Command checkCommand = manager.getCommands().getStatusServerCommand( servers );
                     manager.getCommandRunner().runCommand( checkCommand );
 
                     if ( checkCommand.hasCompleted() )

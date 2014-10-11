@@ -124,7 +124,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         {
             //create environment
             Environment env = manager.getEnvironmentManager()
-                                     .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
+                                     .buildEnvironment( manager.getDefaultEnvironmentBlueprint( config ) );
 
             //setup ZK cluster
             ClusterSetupStrategy zkClusterSetupStrategy =
@@ -153,7 +153,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
             final String COMBO_TEMPLATE_NAME = "hadoopnzk";
             hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
             //create environment
-            Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(
+            Environment env = manager.getEnvironmentManager().buildEnvironment(
                     manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
 
             //setup Hadoop cluster

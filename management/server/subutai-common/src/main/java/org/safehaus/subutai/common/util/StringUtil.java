@@ -38,23 +38,13 @@ public class StringUtil
         }
         catch ( NumberFormatException e )
         {
+            return false;
         }
-
-        return false;
     }
 
 
     public static boolean areStringsEqual( String str1, String str2 )
     {
-        if ( str1 == null )
-        {
-            return false;
-        }
-        if ( str2 == null )
-        {
-            return false;
-        }
-
-        return str2.equals( str1 );
+        return str1 != null && str2 != null && str2.equals( str1 );
     }
 }

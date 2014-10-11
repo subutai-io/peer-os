@@ -31,7 +31,7 @@ public class EnvironmentManagerComponent extends CustomComponent implements Disp
 
     public EnvironmentManagerComponent( EnvironmentManagerPortalModule managerUI )
     {
-        setHeight( 100, UNITS_PERCENTAGE );
+        setHeight( 100, Unit.PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
