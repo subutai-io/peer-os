@@ -219,6 +219,13 @@ public class HadoopImpl implements Hadoop
 
 
     @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
+    @Override
     public UUID startNameNode( HadoopClusterConfig hadoopClusterConfig )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Configuration is null" );

@@ -148,17 +148,11 @@ public class StepSetConfig extends Panel
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                String selectedServerNode = event.getProperty().getValue().toString();
+                Agent selectedServerNode = ( Agent ) event.getProperty().getValue();
                 List<Agent> hadoopNodes = hcc.getAllNodes();
                 List<Agent> availableOozieClientNodes = new ArrayList<Agent>();
                 availableOozieClientNodes.addAll( hadoopNodes );
-                for ( Agent node : hadoopNodes )
-                {
-                    if ( selectedServerNode.equals( node.getHostname() ) )
-                    {
-                        availableOozieClientNodes.remove( node );
-                    }
-                }
+                availableOozieClientNodes.remove( selectedServerNode );
                 selectClients
                         .setContainerDataSource( new BeanItemContainer<>( Agent.class, availableOozieClientNodes ) );
                 selectClients.markAsDirty();

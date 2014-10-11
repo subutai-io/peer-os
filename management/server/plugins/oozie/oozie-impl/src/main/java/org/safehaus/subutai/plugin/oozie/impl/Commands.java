@@ -136,4 +136,11 @@ public class Commands
                 agents
                             );
     }
+
+
+    public Command getCheckInstalledCommand( Set<Agent> agents )
+    {
+        return commandRunnerBase.createCommand( "Check installed ksks packages",
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+    }
 }

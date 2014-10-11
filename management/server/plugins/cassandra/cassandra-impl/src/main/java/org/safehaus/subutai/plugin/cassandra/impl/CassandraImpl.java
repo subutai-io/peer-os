@@ -238,6 +238,13 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
+    @Override
     public UUID startCluster( final String clusterName )
     {
         AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );

@@ -28,6 +28,7 @@ import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
+import org.safehaus.subutai.plugin.oozie.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.InstallHandler;
@@ -231,6 +232,15 @@ public class OozieImpl implements Oozie
     public OozieClusterConfig getCluster( String clusterName )
     {
         return pluginDAO.getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
+    }
+
+
+    @Override
+    public UUID addNode( final String clusterName, final String lxcHostname )
+    {
+        AbstractOperationHandler operationHandler = new AddNodeHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

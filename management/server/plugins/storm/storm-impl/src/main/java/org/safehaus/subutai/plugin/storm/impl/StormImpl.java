@@ -61,6 +61,13 @@ public class StormImpl extends StormBase
 
 
     @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
+    @Override
     public UUID statusCheck( String clusterName, String hostname )
     {
         AbstractOperationHandler h = new StatusHandler( this, clusterName, hostname );

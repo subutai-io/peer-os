@@ -73,6 +73,13 @@ public class PrestoImpl extends PrestoBase implements Presto
 
 
     @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
+    @Override
     public UUID installCluster( PrestoClusterConfig config, HadoopClusterConfig hadoopConfig )
     {
         InstallOperationHandler h = new InstallOperationHandler( this, config );

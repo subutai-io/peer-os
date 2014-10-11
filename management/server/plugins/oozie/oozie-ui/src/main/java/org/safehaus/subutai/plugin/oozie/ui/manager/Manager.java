@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.oozie.ui.manager;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -18,10 +19,14 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
+import org.safehaus.subutai.plugin.common.ui.AddNodeWindow;
 import org.safehaus.subutai.plugin.common.ui.BaseManager;
 import org.safehaus.subutai.plugin.common.ui.OperationTask;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
+import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -53,6 +58,7 @@ public class Manager extends BaseManager
     private final Table serverTable;
     private final Table clientsTable;
     private final Oozie oozieManager;
+    private final Hadoop hadoopManager;
     private final Tracker tracker;
     private final ExecutorService executorService;
     private final CommandRunner commandRunner;
@@ -65,6 +71,7 @@ public class Manager extends BaseManager
         super();
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
+        this.hadoopManager = serviceLocator.getService( Hadoop.class );
         this.oozieManager = serviceLocator.getService( Oozie.class );
         this.commandRunner = serviceLocator.getService( CommandRunner.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
@@ -168,12 +175,91 @@ public class Manager extends BaseManager
             }
         } );
 
+
+        Button addNodeButton = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeButton.addStyleName( "default" );
+        addNodeButton.addClickListener( addNodeButtonListener() );
+
+        controlsContent.addComponent( addNodeButton );
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.addComponent( getProgressBar() );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( serverTable, 0, 1, 0, 5 );
         contentRoot.addComponent( clientsTable, 0, 6, 0, 10 );
+    }
+
+
+    public Button.ClickListener addNodeButtonListener()
+    {
+        return new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                if ( config == null )
+                {
+                    show( "Please, select cluster" );
+                }
+                else
+                {
+                    if ( config.getSetupType() == SetupType.OVER_HADOOP )
+                    {
+                        String hadoopClusterName = config.getHadoopClusterName();
+                        if ( hadoopClusterName == null || hadoopClusterName.isEmpty() )
+                        {
+                            show( "Undefined Hadoop cluster name" );
+                            return;
+                        }
+                        HadoopClusterConfig info = hadoopManager.getCluster( hadoopClusterName );
+                        if ( info != null )
+                        {
+                            HashSet<Agent> nodes = new HashSet<>( info.getAllNodes() );
+                            nodes.removeAll( config.getAllOozieAgents() );
+                            if ( !nodes.isEmpty() )
+                            {
+                                AddNodeWindow addNodeWindow =
+                                        new AddNodeWindow( oozieManager, executorService, tracker, config, nodes );
+                                contentRoot.getUI().addWindow( addNodeWindow );
+                                addNodeWindow.addCloseListener( new Window.CloseListener()
+                                {
+                                    @Override
+                                    public void windowClose( Window.CloseEvent closeEvent )
+                                    {
+                                        refreshClustersInfo();
+                                    }
+                                } );
+                            }
+                            else
+                            {
+                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
+                            }
+                        }
+                        else
+                        {
+                            show( "Hadoop cluster info not found" );
+                        }
+                    }
+                    else if ( config.getSetupType() == SetupType.WITH_HADOOP )
+                    {
+                        ConfirmationDialog d = new ConfirmationDialog( "Add node to cluster", "OK", "Cancel" );
+                        d.getOk().addClickListener( new Button.ClickListener()
+                        {
+
+                            @Override
+                            public void buttonClick( Button.ClickEvent event )
+                            {
+                                UUID trackId = oozieManager.addNode( config.getClusterName(), null );
+                                ProgressWindow w = new ProgressWindow( executorService, tracker, trackId,
+                                        config.getProductKey() );
+                                contentRoot.getUI().addWindow( w.getWindow() );
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( d.getAlert() );
+                    }
+                }
+            }
+        };
     }
 
 
