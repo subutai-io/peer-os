@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +44,7 @@ public class DispatcherDAOTest
     PreparedStatement preparedStatement;
     @Mock
     ResultSet resultSet;
+
     DispatcherDAO dispatcherDAO;
     private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final UUID PEER_ID = UUID.randomUUID();
@@ -62,6 +64,7 @@ public class DispatcherDAOTest
         ResultSetMetaData metadata = mock( ResultSetMetaData.class );
         when( metadata.getColumnCount() ).thenReturn( 1 );
         when( metadata.getColumnName( 1 ) ).thenReturn( "info" );
+        when( metadata.getColumnType( 1 ) ).thenReturn( java.sql.Types.CLOB );
         when( resultSet.getMetaData() ).thenReturn( metadata );
         when( resultSet.next() ).thenReturn( true ).thenReturn( false );
 
@@ -69,7 +72,7 @@ public class DispatcherDAOTest
     }
 
 
-    private void returnInvalidJson() throws SQLException
+    private void returnInvalidJson() throws SQLException, UnsupportedEncodingException
     {
         when( resultSet.getObject( 1 ) ).thenReturn( INVALID_JSON );
     }
@@ -87,7 +90,7 @@ public class DispatcherDAOTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testConstructor() throws Exception
     {
         new DispatcherDAO( null );
@@ -106,7 +109,7 @@ public class DispatcherDAOTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testGetRemoteResponses2() throws Exception
     {
         returnInvalidJson();
@@ -191,7 +194,7 @@ public class DispatcherDAOTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testGetRemoteRequests2() throws Exception
     {
 
@@ -218,7 +221,7 @@ public class DispatcherDAOTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testGetRemoteRequest2() throws Exception
     {
         returnInvalidJson();

@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
-import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
@@ -49,9 +48,9 @@ public class DispatcherDAO
     {
 
         String sql = "create table if not exists remote_responses(commandid varchar(36), responsenumber smallint, " +
-                "info clob, PRIMARY KEY (commandid, responsenumber));"
+                "info varchar(2000), PRIMARY KEY (commandid, responsenumber));"
                 + "create table if not exists remote_requests(commandid varchar(36), attempts smallint, " +
-                "info clob, PRIMARY KEY (commandid));";
+                "info varchar(1000), PRIMARY KEY (commandid));";
         try
         {
             DbUtil.update( dataSource, sql );
@@ -96,7 +95,7 @@ public class DispatcherDAO
 
         try
         {
-            DbUtil.update( dataSource, "insert into remote_responses(commandId, responseNumber, info) values (?,?,?)",
+            DbUtil.update( dataSource, "merge into remote_responses(commandId, responseNumber, info) values (?,?,?)",
                     remoteResponse.getCommandId().toString(),
                     String.format( "%s_%s", remoteResponse.getResponse().getUuid(),
                             remoteResponse.getResponse().getResponseSequenceNumber() ), GSON.toJson( remoteResponse ) );
@@ -229,12 +228,7 @@ public class DispatcherDAO
     {
         if ( rs != null && rs.next() )
         {
-            Clob infoClob = rs.getClob( "info" );
-            if ( infoClob != null && infoClob.length() > 0 )
-            {
-                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                return GSON.fromJson( info, RemoteResponse.class );
-            }
+            return GSON.fromJson( rs.getString( "info" ), RemoteResponse.class );
         }
         return null;
     }
@@ -244,12 +238,7 @@ public class DispatcherDAO
     {
         if ( rs != null && rs.next() )
         {
-            Clob infoClob = rs.getClob( "info" );
-            if ( infoClob != null && infoClob.length() > 0 )
-            {
-                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                return GSON.fromJson( info, RemoteRequest.class );
-            }
+            return GSON.fromJson( rs.getString( "info" ), RemoteRequest.class );
         }
         return null;
     }
