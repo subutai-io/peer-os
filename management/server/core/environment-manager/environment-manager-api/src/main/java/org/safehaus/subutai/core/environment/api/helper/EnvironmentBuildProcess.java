@@ -29,7 +29,6 @@ public class EnvironmentBuildProcess
     {
         this.environmentName = name;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
-        ;
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.messageMap = new HashMap<>();
     }

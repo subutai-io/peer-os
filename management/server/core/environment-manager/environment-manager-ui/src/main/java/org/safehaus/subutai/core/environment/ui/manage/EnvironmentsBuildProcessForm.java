@@ -46,13 +46,13 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private Map<UUID, ExecutorService> executorServiceMap = new HashMap<>();
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManagerPortalModule managerUI;
+    private EnvironmentManagerPortalModule module;
     private Button environmentsButton;
 
 
-    public EnvironmentsBuildProcessForm( final EnvironmentManagerPortalModule managerUI )
+    public EnvironmentsBuildProcessForm( final EnvironmentManagerPortalModule module )
     {
-        this.managerUI = managerUI;
+        this.module = module;
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
@@ -94,7 +94,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private void updateTableData()
     {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildProcess> processList = managerUI.getEnvironmentManager().getBuildProcesses();
+        List<EnvironmentBuildProcess> processList = module.getEnvironmentManager().getBuildProcesses();
         if ( !processList.isEmpty() )
         {
             for ( final EnvironmentBuildProcess process : processList )
@@ -106,6 +106,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         Window window = genProcessWindow( process );
+                        window.setVisible( true );
                     }
                 } );
 
@@ -195,7 +196,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         area.setValue( GSON.toJson( process ) );
         window.setContent( area );
         contentRoot.getUI().addWindow( window );
-        window.setVisible( true );
         return window;
     }
 
@@ -224,10 +224,10 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                 executorServiceMap.remove( environmentBuildProcess.getUuid() );
 
                 //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+                module.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
                 environmentBuildProcess.setCompleteStatus( true );
                 environmentBuildProcess.setProcessStatusEnum( ProcessStatusEnum.TERMINATED );
-                managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
+                module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
         }
         else
@@ -239,7 +239,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
     private void destroyBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
-        managerUI.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
+        module.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
     }
 
 
@@ -253,7 +253,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
 
         buildProcessExecutor.execute( executor,
-                new BuildCommandFactory( managerUI.getEnvironmentManager(), environmentBuildProcess ) );
+                new BuildCommandFactory( module.getEnvironmentManager(), environmentBuildProcess ) );
         executor.shutdown();
     }
 
@@ -290,11 +290,11 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         Notification.show( EnvAnswer.START.getAnswer() );
 
                         //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                        managerUI.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
+                        module.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
                         EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                         ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
-                        managerUI.getEnvironmentManager().saveBuildProcess( ebp );
+                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
@@ -302,11 +302,11 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         Notification.show( EnvAnswer.SUCCESS.getAnswer() );
 
                         //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                        managerUI.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
+                        module.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
                         EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                         ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
-                        managerUI.getEnvironmentManager().saveBuildProcess( ebp );
+                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
@@ -314,11 +314,11 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         Notification.show( EnvAnswer.FAIL.getAnswer() );
 
                         //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                        managerUI.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
+                        module.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
                         EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                         ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
-                        managerUI.getEnvironmentManager().saveBuildProcess( ebp );
+                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                 }
             }

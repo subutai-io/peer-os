@@ -39,6 +39,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -332,6 +333,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         if ( !environment.getContainers().isEmpty() )
         {
+
+            Set<Container> containers = Sets.newHashSet();
+            containers.addAll( environment.getContainers() );
+            networkManager.configSsh( containers );
+
             saveEnvironment( environment );
             if ( environment.getContainers().size() != containerCount )
             {

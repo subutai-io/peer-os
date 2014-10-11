@@ -26,13 +26,12 @@ public class EnvironmentsForm
     private static final String VIEW = "View";
     private static final String MANAGE = "Manage";
     private static final String CONFIGURE = "Configure";
-    private static final String INFO = "Info";
     private static final String NAME = "Name";
     private static final String ENVIRONMENTS = "Environments";
     private static final String PROPERTIES = "Properties";
     private static final String START = "Start";
     private static final String STOP = "Stop";
-    private static final String ENV_DETAILS = "Environment details";
+    private static final String MANAGE_TITLE = "Manage environment containers";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -70,9 +69,8 @@ public class EnvironmentsForm
     {
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
-        table.addContainerProperty( INFO, Button.class, null );
-        table.addContainerProperty( CONFIGURE, Button.class, null );
         table.addContainerProperty( MANAGE, Button.class, null );
+        table.addContainerProperty( CONFIGURE, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -89,8 +87,8 @@ public class EnvironmentsForm
         List<Environment> environmentList = managerUI.getEnvironmentManager().getEnvironments();
         for ( final Environment environment : environmentList )
         {
-            Button viewButton = new Button( INFO );
-            viewButton.addClickListener( new Button.ClickListener()
+            Button manageButton = new Button( MANAGE );
+            manageButton.addClickListener( new Button.ClickListener()
             {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
@@ -127,18 +125,8 @@ public class EnvironmentsForm
                 }
             } );
 
-            Button manageButton = new Button( MANAGE );
-            manageButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( final Button.ClickEvent clickEvent )
-                {
-                    Notification.show( "Backup/Move/Manage" );
-                }
-            } );
-
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), viewButton, manageButton, configureButton, destroyButton
+                    environment.getName(), manageButton, configureButton, destroyButton
             }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
@@ -147,7 +135,7 @@ public class EnvironmentsForm
 
     private Window envWindow( Environment environment )
     {
-        Window window = createWindow( ENV_DETAILS );
+        Window window = createWindow( MANAGE_TITLE );
         window.setContent( genContainersTable( environment.getContainers() ) );
         contentRoot.getUI().addWindow( window );
         return window;
@@ -205,10 +193,32 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                Notification.show( PROPERTIES );
+                Window window = createWindow( PROPERTIES );
+                window.setContent( getContainerDetails( container ) );
+                window.setWidth( "500px" );
+                window.setHeight( "300px" );
+                contentRoot.getUI().addWindow( window );
+                window.setVisible( true );
+//                Notification.show( PROPERTIES );
             }
         } );
         return button;
+    }
+
+    private Table getContainerDetails(Container container) {
+        Table table = new Table();
+        table.setSizeFull();
+        table.addContainerProperty( "Property", String.class, null );
+        table.addContainerProperty( "Value", String.class, null );
+//        table.addContainerProperty( "Prop", String.class, container.getDescription() );
+//        table.addContainerProperty( "Environment ID", String.class, container.getEnvironmentId() );
+//        table.addContainerProperty( "Prop", String.class, container.getHostname() );
+//        table.addContainerProperty( "Prop", String.class, container.getIps().toString() );
+//        table.addContainerProperty( "Prop", String.class, container.getState());
+        table.addItem( new Object[]{"Peer", container.getPeerId().toString()}, null );
+        table.addItem( new Object[]{"Agent", container.getAgentId().toString()}, null );
+        table.addItem( new Object[]{"IP", container.getIps().toString()}, null );
+        return table;
     }
 
 

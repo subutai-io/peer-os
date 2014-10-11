@@ -18,8 +18,6 @@ public class CloneContainersMessage extends PeerCommandMessage
     private int numberOfNodes;
     private String Strategy;
     private List<String> criteria;
-//    private Set<Agent> agents;
-
 
     public CloneContainersMessage( UUID envId, UUID peerId )
     {
