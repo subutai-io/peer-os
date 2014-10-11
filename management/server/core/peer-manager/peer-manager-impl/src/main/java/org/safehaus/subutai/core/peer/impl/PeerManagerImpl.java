@@ -596,7 +596,6 @@ public class PeerManagerImpl implements PeerManager
                 break;
             case GET_TEMPLATE:
                 String templateName = peerCommandMessage.getInput().toString();
-                LOG.info( String.format( "--------->%s %s", templateRegistry, templateName ) );
                 template = templateRegistry.getTemplate( templateName );
                 if ( template != null )
                 {
