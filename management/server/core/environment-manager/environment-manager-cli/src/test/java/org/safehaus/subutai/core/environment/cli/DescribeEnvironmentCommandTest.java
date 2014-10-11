@@ -40,7 +40,7 @@ public class DescribeEnvironmentCommandTest
     public void test() throws Exception
     {
         String name = "name";
-        Environment environment = new Environment( UUIDUtil.generateTimeBasedUUID(), name );
+        Environment environment = new Environment( name );
         final Set<EnvironmentContainer> set = new HashSet<>();
         environment.setContainers( set );
         describeEnvironmentCommand.setEnvironmentName( name );

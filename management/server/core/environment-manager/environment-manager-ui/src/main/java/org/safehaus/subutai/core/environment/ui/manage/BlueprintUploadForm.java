@@ -92,17 +92,8 @@ public class BlueprintUploadForm
         nodeGroup1.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
         nodeGroup1.setTemplateName( "master" );
 
-        NodeGroup nodeGroup2 = new NodeGroup();
-        nodeGroup2.setDomainName( "intra.lan" );
-        nodeGroup2.setName( "Some name" );
-        nodeGroup2.setLinkHosts( true );
-        nodeGroup2.setExchangeSshKeys( true );
-        nodeGroup2.setNumberOfNodes( 2 );
-        nodeGroup2.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
-        nodeGroup2.setTemplateName( "master" );
-
         groups.add( nodeGroup1 );
-        groups.add( nodeGroup2 );
+        groups.add( nodeGroup1 );
 
         environmentBlueprint.setNodeGroups( groups );
         return environmentBlueprint;

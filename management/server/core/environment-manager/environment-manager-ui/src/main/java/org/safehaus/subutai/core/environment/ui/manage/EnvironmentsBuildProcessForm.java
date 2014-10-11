@@ -176,7 +176,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     }
                 } );
                 environmentsTable.addItem( new Object[] {
-                        process.getEnvironmentName(), icon, viewButton, processButton, destroyButton
+                        process.getEnvironmentBlueprint().getName(), icon, viewButton, processButton, destroyButton
                 }, process.getUuid() );
             }
         }

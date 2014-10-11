@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
@@ -40,7 +39,7 @@ public class ListEnvironmentCommandTest
     public void test() throws Exception
     {
         List<Environment> l = new ArrayList<>();
-        l.add( new Environment( UUIDUtil.generateTimeBasedUUID(), NAME ) );
+        l.add( new Environment( NAME ) );
         when( manager.getEnvironments() ).thenReturn( l );
         command.doExecute();
     }

@@ -7,8 +7,10 @@ import java.util.UUID;
 
 import javax.naming.NamingException;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
@@ -23,11 +25,11 @@ public class Environment
     private Set<EnvironmentContainer> containers;
 
 
-    public Environment( UUID envId, final String name )
+    public Environment( String name )
     {
         this.nodes = new HashSet<>();
         this.name = name;
-        this.uuid = envId;
+        this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
         this.serviceLocator = new ServiceLocator();
     }

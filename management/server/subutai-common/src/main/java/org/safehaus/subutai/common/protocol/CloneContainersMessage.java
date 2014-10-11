@@ -18,6 +18,10 @@ public class CloneContainersMessage extends PeerCommandMessage
     private int numberOfNodes;
     private String Strategy;
     private List<String> criteria;
+    private boolean exchangeSshKey;
+    private boolean linkHosts;
+    private String domainName;
+
 
     public CloneContainersMessage( UUID envId, UUID peerId )
     {

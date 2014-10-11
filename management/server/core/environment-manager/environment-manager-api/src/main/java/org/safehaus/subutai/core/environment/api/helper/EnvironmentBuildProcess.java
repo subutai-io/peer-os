@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
 //import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
@@ -16,21 +17,32 @@ import org.safehaus.subutai.common.util.UUIDUtil;
  */
 public class EnvironmentBuildProcess
 {
-
-    private String environmentName;
     private UUID uuid;
     private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
     private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
+    private EnvironmentBlueprint environmentBlueprint;
 
 
-    public EnvironmentBuildProcess( final String name )
+    public EnvironmentBuildProcess( EnvironmentBlueprint environmentBlueprint )
     {
-        this.environmentName = name;
+        this.environmentBlueprint = environmentBlueprint;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.messageMap = new HashMap<>();
+    }
+
+
+    public EnvironmentBlueprint getEnvironmentBlueprint()
+    {
+        return environmentBlueprint;
+    }
+
+
+    public void setEnvironmentBlueprint( final EnvironmentBlueprint environmentBlueprint )
+    {
+        this.environmentBlueprint = environmentBlueprint;
     }
 
 
@@ -52,9 +64,9 @@ public class EnvironmentBuildProcess
     }
 
 
-    public void putCloneContainerMessage( String peerId, CloneContainersMessage cloneContainersMessage )
+    public void putCloneContainerMessage( String key, CloneContainersMessage cloneContainersMessage )
     {
-        this.messageMap.put( peerId, cloneContainersMessage );
+        this.messageMap.put( key, cloneContainersMessage );
     }
 
 
@@ -103,17 +115,5 @@ public class EnvironmentBuildProcess
     public void setCompleteStatus( final boolean completeStatus )
     {
         this.completeStatus = completeStatus;
-    }
-
-
-    public String getEnvironmentName()
-    {
-        return environmentName;
-    }
-
-
-    public void setEnvironmentName( final String environmentName )
-    {
-        this.environmentName = environmentName;
     }
 }

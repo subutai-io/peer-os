@@ -291,7 +291,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
-        Environment environment = new Environment( process.getUuid(), process.getEnvironmentName() );
+        Environment environment = new Environment( process.getEnvironmentBlueprint().getName() );
         int containerCount = 0;
         long timeout = 1000 * 360;
         for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
@@ -333,10 +333,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         if ( !environment.getContainers().isEmpty() )
         {
-
             Set<Container> containers = Sets.newHashSet();
             containers.addAll( environment.getContainers() );
-            networkManager.configSsh( containers );
+
+            if ( process.getEnvironmentBlueprint().isExchangeSshKeys() )
+            {
+                networkManager.configSsh( containers );
+            }
+            if ( process.getEnvironmentBlueprint().isLinkHosts() )
+            {
+                networkManager.configHosts( process.getEnvironmentBlueprint().getDomainName(), containers );
+            }
 
             saveEnvironment( environment );
             if ( environment.getContainers().size() != containerCount )
