@@ -40,7 +40,7 @@ public class ListEnvironmentCommandTest
     public void test() throws Exception
     {
         List<Environment> l = new ArrayList<>();
-        l.add( new Environment( UUIDUtil.generateTimeBasedUUID(),NAME ) );
+        l.add( new Environment( UUIDUtil.generateTimeBasedUUID(), NAME ) );
         when( manager.getEnvironments() ).thenReturn( l );
         command.doExecute();
     }

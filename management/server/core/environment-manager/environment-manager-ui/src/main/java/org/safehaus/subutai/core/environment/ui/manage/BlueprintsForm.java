@@ -185,31 +185,6 @@ public class BlueprintsForm
     }
 
 
-
-    /*private void showBlueprint2PeerGroupWindow()
-    {
-        Window window = createWindow( B2PG );
-        List<PeerGroup> peerGroups = module.getPeerManager().peersGroups();
-        Table table = new Table();
-        table.setHeight( "500px" );
-        table.setWidth( "800px" );
-        table.addContainerProperty( "Name", String.class, null );
-        table.addContainerProperty( "Select", CheckBox.class, null );
-        for ( PeerGroup peerGroup : peerGroups )
-        {
-            CheckBox checkBox = new CheckBox();
-            table.addItem( new Object[] { peerGroup.getName(), checkBox }, peerGroup );
-        }
-        VerticalLayout layout = new VerticalLayout();
-        layout.addComponent( table );
-        Button next = new Button("Next");
-        layout.addComponent( next );
-        window.setContent( layout );
-        getContentRoot().getUI().addWindow( window );
-        window.setVisible( true );
-    }*/
-
-
     private Window createWindow( String caption )
     {
         Window window = new Window();

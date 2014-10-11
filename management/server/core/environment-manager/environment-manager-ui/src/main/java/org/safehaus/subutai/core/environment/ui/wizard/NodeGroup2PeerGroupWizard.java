@@ -94,6 +94,7 @@ public class NodeGroup2PeerGroupWizard extends Window
         this.managerUI = managerUI;
     }
 
+
     public void back()
     {
         step--;

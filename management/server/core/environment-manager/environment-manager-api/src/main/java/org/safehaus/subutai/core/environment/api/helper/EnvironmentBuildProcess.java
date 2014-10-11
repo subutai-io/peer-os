@@ -25,24 +25,31 @@ public class EnvironmentBuildProcess
     private Map<String, CloneContainersMessage> messageMap;
 
 
+    public EnvironmentBuildProcess( final String name )
+    {
+        this.environmentName = name;
+        this.uuid = UUIDUtil.generateTimeBasedUUID();
+        ;
+        this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
+        this.messageMap = new HashMap<>();
+    }
+
+
     public long getTimestamp()
     {
         return timestamp;
     }
 
 
-    public void setTimestamp( final long timestamp )
+    public void setTimestamp( final int timestamp )
     {
         this.timestamp = timestamp;
     }
 
 
-    public EnvironmentBuildProcess( final String name )
+    public void setTimestamp( final long timestamp )
     {
-        this.environmentName = name;
-        this.uuid = UUIDUtil.generateTimeBasedUUID();;
-        this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
-        this.messageMap = new HashMap<>();
+        this.timestamp = timestamp;
     }
 
 
@@ -85,12 +92,6 @@ public class EnvironmentBuildProcess
     public void setUuid( final UUID uuid )
     {
         this.uuid = uuid;
-    }
-
-
-    public void setTimestamp( final int timestamp )
-    {
-        this.timestamp = timestamp;
     }
 
 

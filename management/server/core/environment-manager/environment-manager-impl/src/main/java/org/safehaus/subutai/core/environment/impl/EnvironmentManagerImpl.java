@@ -405,7 +405,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             Set<PeerContainer> containers =
                     JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-                    {}.getType() );
+                    {
+                    }.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {

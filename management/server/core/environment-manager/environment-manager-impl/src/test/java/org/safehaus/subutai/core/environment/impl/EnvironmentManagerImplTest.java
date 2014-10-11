@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class EnvironmentManagerImplTest
 {
 
@@ -79,7 +79,7 @@ public class EnvironmentManagerImplTest
     {
         EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
         when( process.getEnvironmentName() ).thenReturn( "name" );
-        when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID());
+        when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID() );
 
         Map<String, CloneContainersMessage> map = new HashMap<>();
         CloneContainersMessage ccm = mock( CloneContainersMessage.class );

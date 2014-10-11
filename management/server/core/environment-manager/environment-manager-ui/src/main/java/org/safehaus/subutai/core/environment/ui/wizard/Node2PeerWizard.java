@@ -94,6 +94,7 @@ public class Node2PeerWizard extends Window
         this.managerUI = managerUI;
     }
 
+
     public void back()
     {
         step--;

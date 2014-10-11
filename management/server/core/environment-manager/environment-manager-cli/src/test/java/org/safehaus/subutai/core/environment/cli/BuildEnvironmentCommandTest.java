@@ -12,7 +12,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class BuildEnvironmentCommandTest
 {
     BuildEnvironmentCommand buildEnvironmentCommand;

@@ -11,7 +11,6 @@ import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.vaadin.event.MouseEvents;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
@@ -27,6 +26,7 @@ public class BlueprintUploadForm
     private static final String BLUEPRINT_SAVED = "Blueprint saved";
     private static final String SAVE = "Save";
     private static final String BLUEPRINT = "Blueprint";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final VerticalLayout contentRoot;
     private TextArea textArea;
     private EnvironmentManagerPortalModule managerUI;
@@ -107,9 +107,6 @@ public class BlueprintUploadForm
         environmentBlueprint.setNodeGroups( groups );
         return environmentBlueprint;
     }
-
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
     private TextArea getTextArea()

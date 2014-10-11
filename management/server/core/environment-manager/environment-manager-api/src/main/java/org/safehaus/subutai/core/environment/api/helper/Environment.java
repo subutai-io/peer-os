@@ -16,11 +16,11 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 public class Environment
 {
 
+    private final ServiceLocator serviceLocator;
     private UUID uuid;
     private Set<Node> nodes;
     private String name;
     private Set<EnvironmentContainer> containers;
-    private final ServiceLocator serviceLocator;
 
 
     public Environment( UUID envId, final String name )

@@ -94,6 +94,7 @@ public class NodeGroup2PeerWizard extends Window
         this.managerUI = managerUI;
     }
 
+
     public void back()
     {
         step--;
@@ -164,20 +165,20 @@ public class NodeGroup2PeerWizard extends Window
         nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
         {
-//            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
-//            {
-                ComboBox comboBox = new ComboBox();
-                BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
-                bic.addAll( selectedPeers() );
-                comboBox.setContainerDataSource( bic );
-                comboBox.setNullSelectionAllowed( false );
-                comboBox.setTextInputAllowed( false );
-                comboBox.setItemCaptionPropertyId( "name" );
-                Object itemId = containerToPeerTable.addItem( new Object[] {
-                        ng.getTemplateName(), comboBox
-                }, null );
-                nodeGroupMap.put( itemId, ng );
-//            }
+            //            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
+            //            {
+            ComboBox comboBox = new ComboBox();
+            BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
+            bic.addAll( selectedPeers() );
+            comboBox.setContainerDataSource( bic );
+            comboBox.setNullSelectionAllowed( false );
+            comboBox.setTextInputAllowed( false );
+            comboBox.setItemCaptionPropertyId( "name" );
+            Object itemId = containerToPeerTable.addItem( new Object[] {
+                    ng.getTemplateName(), comboBox
+            }, null );
+            nodeGroupMap.put( itemId, ng );
+            //            }
         }
         Button nextButton = new Button( "Build" );
         nextButton.addClickListener( new Button.ClickListener()
