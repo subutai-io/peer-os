@@ -17,5 +17,6 @@
   <modules>
     <module>command-dispatcher-api</module>
     <module>command-dispatcher-impl</module>
+    <module>command-dispatcher-datasource</module>
   </modules>
 </project>

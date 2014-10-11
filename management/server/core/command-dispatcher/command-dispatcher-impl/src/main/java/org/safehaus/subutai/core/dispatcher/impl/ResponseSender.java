@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -109,7 +108,7 @@ public class ResponseSender
                 }
             }
         }
-        catch ( InterruptedException | DBException e )
+        catch ( InterruptedException | DaoException e )
         {
             LOG.error( "Error in send", e );
         }
@@ -171,7 +170,7 @@ public class ResponseSender
                 } ) );
             }
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in sendRequest", e );
         }
@@ -202,7 +201,7 @@ public class ResponseSender
 
             sendResponse( request, responses, sortedResponses );
         }
-        catch ( JsonSyntaxException | DBException e )
+        catch ( JsonSyntaxException | DaoException e )
         {
             LOG.error( "Error in sendResponses", e );
         }
@@ -210,7 +209,7 @@ public class ResponseSender
 
 
     private void sendResponse( RemoteRequest request, Set<RemoteResponse> responses, Set<Response> sortedResponses )
-            throws DBException
+            throws DaoException
     {
         try
         {

@@ -113,15 +113,9 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-cli</artifactId>
+        <artifactId>command-dispatcher-datasource</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- command-runner -->
       <dependency>

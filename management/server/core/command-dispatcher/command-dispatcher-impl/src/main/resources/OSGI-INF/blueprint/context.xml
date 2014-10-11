@@ -6,18 +6,18 @@
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="dbManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.db.api.DbManager" />
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+  <reference id="dataSource" interface="javax.sql.DataSource"
+             filter="(osgi.jndi.service.name=jdbc/dispatcher)" />
 
   <bean id="module" scope="singleton"
         class="org.safehaus.subutai.core.dispatcher.impl.CommandDispatcherImpl"
         init-method="init" destroy-method="destroy" activation="eager">
     <argument ref="agentManager" />
     <argument ref="commandRunner" />
-    <argument ref="dbManager" />
     <argument ref="peerManager" />
+    <argument ref="dataSource" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />

@@ -12,7 +12,6 @@ import org.mockito.Matchers;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -75,7 +74,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testInit() throws DBException, InterruptedException
+    public void testInit() throws DaoException, InterruptedException
     {
 
         responseSender.init();
@@ -87,7 +86,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend() throws DBException, InterruptedException
+    public void testSend() throws DaoException, InterruptedException
     {
 
         RemoteRequest request = mock( RemoteRequest.class );
@@ -102,7 +101,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend2() throws DBException, InterruptedException
+    public void testSend2() throws DaoException, InterruptedException
     {
 
         RemoteRequest request = mock( RemoteRequest.class );
@@ -126,7 +125,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend3() throws DBException, InterruptedException
+    public void testSend3() throws DaoException, InterruptedException
     {
         ExecutorService executorService = mock( ExecutorService.class );
         responseSender.setHttpRequestsExecutor( executorService );
@@ -154,7 +153,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend4() throws DBException, PeerMessageException, InterruptedException
+    public void testSend4() throws DaoException, PeerMessageException, InterruptedException
     {
         RemoteRequest request = mock( RemoteRequest.class );
         when( dispatcher.getRemoteRequests( anyInt(), anyInt() ) ).thenReturn( Sets.newHashSet( request ) );
@@ -183,7 +182,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend5() throws DBException, PeerMessageException, InterruptedException
+    public void testSend5() throws DaoException, PeerMessageException, InterruptedException
     {
         RemoteRequest request = mock( RemoteRequest.class );
         when( request.isCompleted() ).thenReturn( true );
@@ -213,7 +212,7 @@ public class ResponseSenderTest
 
 
     @Test
-    public void testSend6() throws DBException, PeerMessageException, InterruptedException
+    public void testSend6() throws DaoException, PeerMessageException, InterruptedException
     {
         RemoteRequest request = mock( RemoteRequest.class );
         when( request.getAttempts() ).thenReturn( ATTEMPTS );

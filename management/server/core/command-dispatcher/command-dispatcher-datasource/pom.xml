@@ -9,9 +9,9 @@
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>db-manager-source</artifactId>
-  <name>Subutai DB Manager Source</name>
-  <description>db manager data source</description>
+  <artifactId>command-dispatcher-datasource</artifactId>
+  <name>Command Dispatcher Datasource</name>
+  <description>command dispatcher datasource</description>
 
   <packaging>bundle</packaging>
 

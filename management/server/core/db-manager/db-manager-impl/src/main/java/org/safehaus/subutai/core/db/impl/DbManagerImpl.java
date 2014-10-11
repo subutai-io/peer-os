@@ -6,17 +6,11 @@
 package org.safehaus.subutai.core.db.impl;
 
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.db.api.DBException;
@@ -86,64 +80,6 @@ public class DbManagerImpl implements DbManager
     }
 
 
-    DataSource dataSource;
-
-
-    public void setDataSource( DataSource dataSource )
-    {
-        this.dataSource = dataSource;
-    }
-
-
-    public void test() throws Exception
-    {
-        Connection con = dataSource.getConnection();
-        Statement stmt = null;
-        DatabaseMetaData dbMeta = con.getMetaData();
-        System.out.println( "Using datasource " + dbMeta.getDatabaseProductName() + ", URL " + dbMeta.getURL() );
-        try
-        {
-            stmt = con.createStatement();
-            try
-            {
-                stmt.execute( "drop table person" );
-            }
-            catch ( Exception e )
-            {
-                // Ignore as it will fail the first time
-            }
-            stmt.execute( "create table person (name varchar(100), twittername varchar(100))" );
-            stmt.execute( "insert into person (name, twittername) values ('Christian Schneider', '@schneider_chris')" );
-            java.sql.ResultSet rs = stmt.executeQuery( "select * from person" );
-            ResultSetMetaData meta = rs.getMetaData();
-            while ( rs.next() )
-            {
-                for ( int c = 1; c <= meta.getColumnCount(); c++ )
-                {
-                    System.out.print( rs.getString( c ) + ", " );
-                }
-                System.out.println();
-            }
-        }
-        catch ( Exception e )
-        {
-            System.out.println( e.getMessage() );
-            throw e;
-        }
-        finally
-        {
-            if ( stmt != null )
-            {
-                stmt.close();
-            }
-            if ( con != null )
-            {
-                con.close();
-            }
-        }
-    }
-
-
     /**
      * Initializes db manager
      */
@@ -165,15 +101,6 @@ public class DbManagerImpl implements DbManager
         catch ( Exception ex )
         {
             LOG.error( "Error in init", ex );
-        }
-
-        try
-        {
-            test();
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
         }
     }
 
