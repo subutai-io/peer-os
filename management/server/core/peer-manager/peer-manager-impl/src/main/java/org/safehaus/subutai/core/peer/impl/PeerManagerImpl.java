@@ -21,6 +21,7 @@ import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.ContainerState;
+import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -33,6 +34,7 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -574,6 +576,29 @@ public class PeerManagerImpl implements PeerManager
                 {
                     ExecuteCommandMessage ecm = ( ExecuteCommandMessage ) peerCommandMessage;
                     executeCommand( peerContainer, ecm );
+                }
+                else
+                {
+                    peerCommandMessage.setSuccess( false );
+                }
+                break;
+            case DESTROY:
+                if ( peerCommandMessage instanceof DestroyContainersMessage )
+                {
+                    DestroyContainersMessage dcm = ( DestroyContainersMessage ) peerCommandMessage;
+                    try
+                    {
+                        Agent agent = agentManager.getAgentByHostname( dcm.getHostname() );
+                        Agent parentAgent = agentManager.getAgentByHostname( agent.getParentHostName() );
+                        containerManager.destroy( parentAgent.getHostname(), agent.getHostname() );
+
+                        peerCommandMessage.setSuccess( true );
+                    }
+                    catch ( ContainerDestroyException e )
+                    {
+                        LOG.error( e.getMessage(), e );
+                        peerCommandMessage.setSuccess( false );
+                    }
                 }
                 else
                 {

@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
@@ -26,7 +27,6 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
@@ -229,14 +229,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean destroyEnvironment( final String uuid )
     {
         Environment environment = getEnvironment( uuid );
-        try
+        int count = 0;
+        for ( EnvironmentContainer ec : environment.getContainers() )
         {
-            environmentBuilder.destroy( environment );
-            return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
+            DestroyContainersMessage dcm =
+                    new DestroyContainersMessage( PeerCommandType.DESTROY, environment.getUuid(), ec.getPeerId(),
+                            ec.getAgentId() );
+            dcm.setHostname( ec.getHostname() );
+            peerCommandDispatcher.invoke( dcm, 1000 * 60 );
+            if ( dcm.isSuccess() )
+            {
+                count++;
+            }
         }
-        catch ( EnvironmentDestroyException e )
+        if ( count == environment.getContainers().size() )
         {
-            LOG.error( e.getMessage(), e );
+            return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
         }
         return false;
     }
@@ -277,6 +285,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public void saveEnvironment( final Environment environment )
+    {
+        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+    }
+
+
+    @Override
     public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress )
     {
         return environmentDAO.saveInfo( PROCESS, buildProgress.getUuid().toString(), buildProgress );
@@ -287,13 +302,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public List<EnvironmentBuildProcess> getBuildProcesses()
     {
         return environmentDAO.getInfo( PROCESS, EnvironmentBuildProcess.class );
-    }
-
-
-    @Override
-    public void saveEnvironment( final Environment environment )
-    {
-        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
     }
 
 
