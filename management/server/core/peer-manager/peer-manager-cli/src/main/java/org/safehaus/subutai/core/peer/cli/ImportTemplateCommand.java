@@ -20,7 +20,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  *
  */
-@Command( scope = "peer", name = "import-template" )
+@Command(scope = "peer", name = "import-template")
 public class ImportTemplateCommand extends OsgiCommandSupport
 {
 
@@ -30,10 +30,10 @@ public class ImportTemplateCommand extends OsgiCommandSupport
 
     private TemplateRegistry templateRegistry;
 
-    @Argument( index = 0, name = "peerId", multiValued = false, description = "Remote Peer UUID" )
+    @Argument(index = 0, name = "peerId", multiValued = false, description = "Remote Peer UUID")
     private String peerId;
 
-    @Argument( index = 1, name = "templateName", multiValued = false, description = "Remote template name" )
+    @Argument(index = 1, name = "templateName", multiValued = false, description = "Remote template name")
     private String templateName;
 
 
@@ -64,7 +64,7 @@ public class ImportTemplateCommand extends OsgiCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        System.out.println("Start...");
+        //System.out.println( "Start..." );
         Template template = templateRegistry.getTemplate( templateName );
         if ( template != null )
         {
@@ -72,7 +72,7 @@ public class ImportTemplateCommand extends OsgiCommandSupport
             return -1;
         }
 
-//        peerManager.peers();
+        //        peerManager.peers();
         PeerCommandMessage getTemplateCommand =
                 new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, UUID.fromString( peerId ), null );
 
@@ -88,6 +88,17 @@ public class ImportTemplateCommand extends OsgiCommandSupport
             System.out.println( getTemplateCommand.getExceptionMessage() );
         }
 
-        return 0;
+
+        System.out.println( "Registering template : " + template );
+        boolean result = templateRegistry.registerTemplate( template );
+        if ( result )
+        {
+            System.out.println( "Template registered." );
+        }
+        else
+        {
+            System.out.println( "Template registeration failed." );
+        }
+        return null;
     }
 }
