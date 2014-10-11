@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
@@ -22,7 +23,7 @@ import com.google.gson.JsonSyntaxException;
 /**
  * DAO for Command Dispatcher
  *
- * TODO - optimize table structure to use indexes
+ * TODO - optimize table structure to use indexes  , introduce updateRequest method
  */
 
 public class DispatcherDAO
@@ -50,7 +51,7 @@ public class DispatcherDAO
         String sql = "create table if not exists remote_responses(commandid varchar(36), responsenumber smallint, " +
                 "info clob, PRIMARY KEY (commandid, responsenumber));"
                 + "create table if not exists remote_requests(commandid varchar(36), attempts smallint, " +
-                "info clob, PRIMARY KEY (commandid, attempts));";
+                "info clob, PRIMARY KEY (commandid));";
         try
         {
             DbUtil.update( dataSource, sql );
@@ -60,19 +61,6 @@ public class DispatcherDAO
             throw new DaoException( e );
         }
     }
-
-
-    /*
-     * table remote_responses
-     *
-     CREATE TABLE remote_responses (
-       commandid text,
-       responsenumber int,
-       info text,
-       PRIMARY KEY (commandid, responsenumber)
-     )
-     *
-     */
 
 
     public Set<RemoteResponse> getRemoteResponses( UUID commandId ) throws DaoException
@@ -85,13 +73,11 @@ public class DispatcherDAO
         {
             ResultSet rs = DbUtil.select( dataSource, "select info from remote_responses where commandId = ?",
                     commandId.toString() );
-            if ( rs != null )
+            RemoteResponse response = getResponse( rs );
+            while ( response != null )
             {
-                while ( rs.next() )
-                {
-                    String info = rs.getString( "info" );
-                    responses.add( GSON.fromJson( info, RemoteResponse.class ) );
-                }
+                responses.add( response );
+                response = getResponse( rs );
             }
         }
         catch ( SQLException | JsonSyntaxException ex )
@@ -155,45 +141,15 @@ public class DispatcherDAO
     }
 
 
-    /* table remote_requests
-     *
-     CREATE TABLE remote_requests (
-       commandid text,
-       attempts int,
-       info text,
-       PRIMARY KEY (commandid, attempts)
-     )
-     *
-     */
-
-
     public void saveRemoteRequest( RemoteRequest remoteRequest ) throws DaoException
     {
         Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
 
         try
         {
-            DbUtil.update( dataSource, "insert into remote_requests(commandId,attempts,info) values (?,?,?)",
+            DbUtil.update( dataSource, "merge into remote_requests(commandId,attempts,info) values (?,?,?)",
                     remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(),
                     GSON.toJson( remoteRequest ) );
-        }
-        catch ( SQLException e )
-        {
-            throw new DaoException( e );
-        }
-    }
-
-
-    //workaround until we change Cassandra to another DB
-    public void deleteRemoteRequestWithAttempts( UUID commandId, int attempts ) throws DaoException
-    {
-        Preconditions.checkArgument( attempts >= 0, "Attempts < 0" );
-        Preconditions.checkNotNull( commandId, COMMAND_ID_IS_NULL_MSG );
-
-        try
-        {
-            DbUtil.update( dataSource, "delete from remote_requests where commandId = ? and attempts = ?",
-                    commandId.toString(), attempts );
         }
         catch ( SQLException e )
         {
@@ -226,12 +182,8 @@ public class DispatcherDAO
         {
             ResultSet rs = DbUtil.select( dataSource, "select info from remote_requests where commandId = ?",
                     commandId.toString() );
-            if ( rs != null && rs.next() )
-            {
 
-                String info = rs.getString( "info" );
-                return GSON.fromJson( info, RemoteRequest.class );
-            }
+            return getRequest( rs );
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
@@ -239,8 +191,6 @@ public class DispatcherDAO
 
             throw new DaoException( ex );
         }
-
-        return null;
     }
 
 
@@ -253,15 +203,15 @@ public class DispatcherDAO
 
         try
         {
-            ResultSet rs = DbUtil.select( dataSource,
-                    "select info from remote_requests where attempts < ? limit ? allow filtering", attempts, limit );
-            if ( rs != null )
+            ResultSet rs =
+                    DbUtil.select( dataSource, "select info from remote_requests where attempts < ? limit ?", attempts,
+                            limit );
+
+            RemoteRequest remoteRequest = getRequest( rs );
+            while ( remoteRequest != null )
             {
-                while ( rs.next() )
-                {
-                    String info = rs.getString( "info" );
-                    remoteRequests.add( GSON.fromJson( info, RemoteRequest.class ) );
-                }
+                remoteRequests.add( remoteRequest );
+                remoteRequest = getRequest( rs );
             }
         }
         catch ( SQLException | JsonSyntaxException ex )
@@ -272,5 +222,35 @@ public class DispatcherDAO
         }
 
         return remoteRequests;
+    }
+
+
+    private RemoteResponse getResponse( ResultSet rs ) throws SQLException
+    {
+        if ( rs != null && rs.next() )
+        {
+            Clob infoClob = rs.getClob( "info" );
+            if ( infoClob != null && infoClob.length() > 0 )
+            {
+                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                return GSON.fromJson( info, RemoteResponse.class );
+            }
+        }
+        return null;
+    }
+
+
+    private RemoteRequest getRequest( ResultSet rs ) throws SQLException
+    {
+        if ( rs != null && rs.next() )
+        {
+            Clob infoClob = rs.getClob( "info" );
+            if ( infoClob != null && infoClob.length() > 0 )
+            {
+                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                return GSON.fromJson( info, RemoteRequest.class );
+            }
+        }
+        return null;
     }
 }

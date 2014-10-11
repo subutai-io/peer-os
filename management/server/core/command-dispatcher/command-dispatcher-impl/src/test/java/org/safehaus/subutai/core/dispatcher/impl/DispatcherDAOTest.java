@@ -138,7 +138,6 @@ public class DispatcherDAOTest
 
 
         verify( preparedStatement, times( 2 ) ).executeUpdate();
-
     }
 
 
@@ -151,7 +150,6 @@ public class DispatcherDAOTest
 
 
         verify( preparedStatement, times( 2 ) ).executeUpdate();
-
     }
 
 
@@ -165,7 +163,6 @@ public class DispatcherDAOTest
 
 
         verify( preparedStatement, times( 2 ) ).executeUpdate();
-
     }
 
 
@@ -177,19 +174,6 @@ public class DispatcherDAOTest
 
 
         verify( preparedStatement, times( 2 ) ).executeUpdate();
-
-    }
-
-
-    @Test
-    public void testDeleteRemoteRequest2() throws Exception
-    {
-
-        dispatcherDAO.deleteRemoteRequestWithAttempts( COMMAND_ID, 1 );
-
-
-        verify( preparedStatement, times( 2 ) ).executeUpdate();
-
     }
 
 

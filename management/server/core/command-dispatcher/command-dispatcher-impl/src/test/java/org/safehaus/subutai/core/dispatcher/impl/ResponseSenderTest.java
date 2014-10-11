@@ -22,7 +22,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -59,14 +58,14 @@ public class ResponseSenderTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullDAO()
     {
         new ResponseSender( null, peerManager );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullPeerManager()
     {
         new ResponseSender( dispatcher, null );
@@ -113,7 +112,6 @@ public class ResponseSenderTest
         act();
 
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
-        verify( dispatcher, atLeastOnce() ).deleteRemoteRequestWithAttempts( any( UUID.class ), anyInt() );
     }
 
 
@@ -241,6 +239,5 @@ public class ResponseSenderTest
 
         verify( request, atLeastOnce() ).incrementAttempts();
         verify( dispatcher, atLeastOnce() ).saveRemoteRequest( any( RemoteRequest.class ) );
-        verify( dispatcher, atLeastOnce() ).deleteRemoteRequestWithAttempts( any( UUID.class ), eq( ATTEMPTS - 1 ) );
     }
 }
