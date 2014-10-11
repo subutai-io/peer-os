@@ -26,4 +26,13 @@ public class DefaultCommandMessage extends PeerCommandMessage
         {
         }.getType();
     }
+
+
+    @Override
+    public Type getInputObjectType()
+    {
+        return new TypeToken<String>()
+        {
+        }.getType();
+    }
 }

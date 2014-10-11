@@ -277,7 +277,8 @@ bool SubutaiEnvironment::isAgentLxc()
 bool SubutaiEnvironment::getAgentIpAddress()
 {
 	try
-	{
+	{	
+		ipAddress.clear();
 		FILE * fp = popen("ifconfig", "r");
 		if (fp)
 		{

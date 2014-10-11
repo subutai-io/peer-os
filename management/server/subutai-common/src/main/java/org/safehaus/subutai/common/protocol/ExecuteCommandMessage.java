@@ -14,9 +14,9 @@ import com.google.gson.reflect.TypeToken;
  */
 public class ExecuteCommandMessage extends PeerCommandMessage
 {
-//    private Integer exitCode;
-//    private String stdOut;
-//    private String stdErr;
+    //    private Integer exitCode;
+    //    private String stdOut;
+    //    private String stdErr;
     private String command;
     private RequestType requestType;
     private long timeout;
@@ -33,41 +33,41 @@ public class ExecuteCommandMessage extends PeerCommandMessage
         this.cwd = cwd;
     }
 
-//
-//    public Integer getExitCode()
-//    {
-//        return exitCode;
-//    }
-//
-//
-//    public void setExitCode( final Integer exitCode )
-//    {
-//        this.exitCode = exitCode;
-//    }
-//
-//
-//    public String getStdOut()
-//    {
-//        return stdOut;
-//    }
-//
-//
-//    public void setStdOut( final String stdOut )
-//    {
-//        this.stdOut = stdOut;
-//    }
-//
-//
-//    public String getStdErr()
-//    {
-//        return stdErr;
-//    }
-//
-//
-//    public void setStdErr( final String stdErr )
-//    {
-//        this.stdErr = stdErr;
-//    }
+    //
+    //    public Integer getExitCode()
+    //    {
+    //        return exitCode;
+    //    }
+    //
+    //
+    //    public void setExitCode( final Integer exitCode )
+    //    {
+    //        this.exitCode = exitCode;
+    //    }
+    //
+    //
+    //    public String getStdOut()
+    //    {
+    //        return stdOut;
+    //    }
+    //
+    //
+    //    public void setStdOut( final String stdOut )
+    //    {
+    //        this.stdOut = stdOut;
+    //    }
+    //
+    //
+    //    public String getStdErr()
+    //    {
+    //        return stdErr;
+    //    }
+    //
+    //
+    //    public void setStdErr( final String stdErr )
+    //    {
+    //        this.stdErr = stdErr;
+    //    }
 
 
     public String getCommand()
@@ -98,6 +98,15 @@ public class ExecuteCommandMessage extends PeerCommandMessage
     public Type getResultObjectType()
     {
         return new TypeToken<ExecutionResult>()
+        {
+        }.getType();
+    }
+
+
+    @Override
+    public Type getInputObjectType()
+    {
+        return new TypeToken<String>()
         {
         }.getType();
     }

@@ -13,6 +13,8 @@ import org.safehaus.subutai.common.util.UUIDUtil;
  */
 public abstract class PeerCommandMessage
 {
+    //TODO: implement me
+    protected UUID sourcePeerId;
     protected UUID id;
     protected UUID agentId;
     protected UUID peerId;
@@ -22,6 +24,7 @@ public abstract class PeerCommandMessage
     protected boolean success = false;
     protected boolean proccessed = false;
     protected String jsonResult;
+    protected String jsonInput;
     protected long createTimestamp = System.currentTimeMillis();
     protected long completeTimestamp;
 
@@ -104,6 +107,7 @@ public abstract class PeerCommandMessage
     public void setExceptionMessage( final String exceptionMessage )
     {
         this.exceptionMessage = exceptionMessage;
+        this.success = false;
     }
 
 
@@ -117,12 +121,12 @@ public abstract class PeerCommandMessage
     {
         return success;
     }
-
-
-    public void setSuccess( final boolean success )
-    {
-        this.success = success;
-    }
+    //
+    //
+    //    public void setSuccess( final boolean success )
+    //    {
+    //        this.success = success;
+    //    }
 
 
     public boolean isProccessed()
@@ -140,6 +144,7 @@ public abstract class PeerCommandMessage
     public void setResult( Object result )
     {
         this.jsonResult = JsonUtil.toJson( result, getResultObjectType() );
+        this.success = true;
     }
 
 
@@ -167,7 +172,21 @@ public abstract class PeerCommandMessage
     }
 
 
+    public Object getInput()
+    {
+        return JsonUtil.fromJson( this.jsonInput, getInputObjectType() );
+    }
+
+
+    public void setInput( final String input )
+    {
+        this.jsonInput = JsonUtil.toJson( input, getInputObjectType() );
+    }
+
+
     abstract public Type getResultObjectType();
+
+    abstract public Type getInputObjectType();
 
 
     @Override
