@@ -1,6 +1,10 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.sql.DataSource;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -55,7 +58,6 @@ import static org.mockito.Mockito.when;
 /**
  * Test for CommandDispatcherImpl
  */
-@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class CommandDispatcherImplTest
 {
@@ -81,8 +83,17 @@ public class CommandDispatcherImplTest
 
 
     @Before
-    public void setUp() throws DaoException
+    public void setUp() throws DaoException, SQLException
     {
+        Connection connection = mock( Connection.class );
+        PreparedStatement preparedStatement = mock( PreparedStatement.class );
+        when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
+        when( dataSource.getConnection() ).thenReturn( connection );
+        ResultSet resultSet = mock( ResultSet.class );
+        when(preparedStatement.executeQuery()).thenReturn( resultSet );
+        ResultSetMetaData metadata = mock( ResultSetMetaData.class);
+        when(metadata.getColumnCount()).thenReturn( 1 );
+        when(resultSet.getMetaData()).thenReturn( metadata);
         commandDispatcher = new CommandDispatcherImpl( agentManager, commandRunner, peerManager, dataSource );
     }
 
@@ -331,8 +342,7 @@ public class CommandDispatcherImplTest
         BatchRequest batchRequest = new BatchRequest( request, agentId, commandId );
         DispatcherMessage message =
                 new DispatcherMessage( DispatcherMessageType.REQUEST, Sets.newHashSet( batchRequest ) );
-        //        when( dataSource.get( anyString(), anyVararg() ) ).thenThrow( new DBException( "" ) );
-        Mockito.doThrow( new DaoException( new Throwable() ) ).when( dataSource ).getConnection();
+        Mockito.doThrow( new SQLException( new Throwable() ) ).when( dataSource ).getConnection();
 
 
         commandDispatcher.onMessage( peer, JsonUtil.toJson( message ) );
@@ -426,8 +436,6 @@ public class CommandDispatcherImplTest
         when( peer.getId() ).thenReturn( remotePeerId );
         when( peerManager.getPeerByUUID( remotePeerId ) ).thenReturn( peer );
         Mockito.doThrow( new PeerException( "" ) ).when( peerManager ).isPeerReachable( peer );
-        //        when( peerManager.getConnectedAgents( peer, environmentId.toString() ) ).thenReturn( Sets
-        // .newHashSet( agent ) );
 
         commandDispatcher.runCommandAsync( command, MockUtils.getDummyCallback() );
     }

@@ -26,6 +26,8 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * Sends responses produced by remote requests back to owner
+ *
+ * TODO - remove requests and responses with attempts exceeding limit
  */
 public class ResponseSender
 {

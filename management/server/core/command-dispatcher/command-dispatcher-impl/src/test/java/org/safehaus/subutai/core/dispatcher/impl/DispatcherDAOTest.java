@@ -1,83 +1,89 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Iterator;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.sql.DataSource;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
 
-import com.sun.rowset.internal.Row;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
  * Test for DispatcherDAO
  */
-@Ignore
+@RunWith( MockitoJUnitRunner.class )
 public class DispatcherDAOTest
 {
+
+    @Mock
     DataSource dataSource;
+    @Mock
+    Connection connection;
+    @Mock
+    PreparedStatement preparedStatement;
+    @Mock
+    ResultSet resultSet;
     DispatcherDAO dispatcherDAO;
     private static final UUID COMMAND_ID = UUID.randomUUID();
     private static final UUID PEER_ID = UUID.randomUUID();
     private static final String INVALID_JSON = "invalid json here";
     private static final Response RESPONSE =
             JsonUtil.fromJson( String.format( "{taskUuid:%s}", COMMAND_ID ), Response.class );
+    private static final RemoteRequest remoteRequest = new RemoteRequest( PEER_ID, COMMAND_ID, 1 );
+    private static final RemoteResponse remoteResponse = new RemoteResponse( RESPONSE );
 
 
     @Before
-    public void setupMethod() throws DaoException
+    public void setupMethod() throws DaoException, SQLException
     {
-        dataSource = mock( DataSource.class );
+        when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
+        when( dataSource.getConnection() ).thenReturn( connection );
+        when( preparedStatement.executeQuery() ).thenReturn( resultSet );
+        ResultSetMetaData metadata = mock( ResultSetMetaData.class );
+        when( metadata.getColumnCount() ).thenReturn( 1 );
+        when( metadata.getColumnName( 1 ) ).thenReturn( "info" );
+        when( resultSet.getMetaData() ).thenReturn( metadata );
+        when( resultSet.next() ).thenReturn( true ).thenReturn( false );
+
         dispatcherDAO = new DispatcherDAO( dataSource );
     }
 
 
-    private static class CustomIterator implements Iterator
+    private void returnInvalidJson() throws SQLException
     {
-        Row row;
-        AtomicBoolean atomicBoolean;
+        when( resultSet.getObject( 1 ) ).thenReturn( INVALID_JSON );
+    }
 
 
-        public CustomIterator( String info )
-        {
-            atomicBoolean = new AtomicBoolean( true );
-            row = mock( Row.class );
-            //            when( row.getString( "info" ) ).thenReturn( info );
-        }
+    private void returnRequest() throws SQLException
+    {
+        when( resultSet.getObject( 1 ) ).thenReturn( JsonUtil.toJson( remoteRequest ) );
+    }
 
 
-        @Override
-        public boolean hasNext()
-        {
-            return atomicBoolean.getAndSet( false );
-        }
-
-
-        @Override
-        public Object next()
-        {
-            return row;
-        }
-
-
-        @Override
-        public void remove()
-        {
-
-        }
+    private void returnResponse() throws SQLException
+    {
+        when( resultSet.getObject( 1 ) ).thenReturn( JsonUtil.toJson( remoteResponse ) );
     }
 
 
@@ -91,12 +97,8 @@ public class DispatcherDAOTest
     @Test
     public void testGetRemoteResponses() throws Exception
     {
-        ResultSet rsQuery = mock( ResultSet.class );
-        RemoteResponse remoteResponse = new RemoteResponse( RESPONSE );
-        CustomIterator itQuery = new CustomIterator( JsonUtil.toJson( remoteResponse ) );
-        //        when( rsQuery.iterator() ).thenReturn( itQuery );
-        //        when( dataSource.executeQuery2( anyString(), anyVararg() ) ).thenReturn( rsQuery );
 
+        returnResponse();
 
         Set<RemoteResponse> remoteResponseSet = dispatcherDAO.getRemoteResponses( COMMAND_ID );
 
@@ -107,10 +109,7 @@ public class DispatcherDAOTest
     @Test(expected = DaoException.class)
     public void testGetRemoteResponses2() throws Exception
     {
-        ResultSet rsQuery = mock( ResultSet.class );
-        CustomIterator itQuery = new CustomIterator( INVALID_JSON );
-        //        when( rsQuery.iterator() ).thenReturn( itQuery );
-        //        when( dataSource.executeQuery2( anyString(), anyVararg() ) ).thenReturn( rsQuery );
+        returnInvalidJson();
 
 
         dispatcherDAO.getRemoteResponses( COMMAND_ID );
@@ -126,7 +125,7 @@ public class DispatcherDAOTest
         dispatcherDAO.saveRemoteResponse( remoteResponse );
 
 
-        //        verify( dataSource ).executeUpdate2( anyString(), anyVararg() );
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
     }
 
 
@@ -138,7 +137,8 @@ public class DispatcherDAOTest
         dispatcherDAO.deleteRemoteResponse( remoteResponse );
 
 
-        //        verify( dataSource ).executeUpdate2( anyString(), anyVararg() );
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
+
     }
 
 
@@ -150,7 +150,8 @@ public class DispatcherDAOTest
         dispatcherDAO.deleteRemoteResponses( COMMAND_ID );
 
 
-        //        verify( dataSource ).executeUpdate2( anyString(), anyVararg() );
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
+
     }
 
 
@@ -163,7 +164,8 @@ public class DispatcherDAOTest
         dispatcherDAO.saveRemoteRequest( remoteRequest );
 
 
-        //        verify( dataSource ).executeUpdate2( anyString(), anyVararg() );
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
+
     }
 
 
@@ -174,7 +176,8 @@ public class DispatcherDAOTest
         dispatcherDAO.deleteRemoteRequest( COMMAND_ID );
 
 
-        //        verify( dataSource ).executeUpdate2( anyString(), anyVararg() );
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
+
     }
 
 
@@ -185,7 +188,8 @@ public class DispatcherDAOTest
         dispatcherDAO.deleteRemoteRequestWithAttempts( COMMAND_ID, 1 );
 
 
-        //        verify( dataSource ).executeUpdate2( anyString(), anyVararg() );
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
+
     }
 
 
@@ -193,11 +197,7 @@ public class DispatcherDAOTest
     public void testGetRemoteRequests() throws Exception
     {
 
-        ResultSet rsQuery = mock( ResultSet.class );
-        RemoteRequest remoteRequest = new RemoteRequest( PEER_ID, COMMAND_ID, 1 );
-        CustomIterator itQuery = new CustomIterator( JsonUtil.toJson( remoteRequest ) );
-        //        when( rsQuery.iterator() ).thenReturn( itQuery );
-        //        when( dataSource.executeQuery2( anyString(), anyVararg() ) ).thenReturn( rsQuery );
+        returnRequest();
 
 
         Set<RemoteRequest> remoteRequests = dispatcherDAO.getRemoteRequests( 1, 1 );
@@ -211,11 +211,7 @@ public class DispatcherDAOTest
     public void testGetRemoteRequests2() throws Exception
     {
 
-        ResultSet rsQuery = mock( ResultSet.class );
-        RemoteRequest remoteRequest = new RemoteRequest( PEER_ID, COMMAND_ID, 1 );
-        CustomIterator itQuery = new CustomIterator( INVALID_JSON );
-        //        when( rsQuery.iterator() ).thenReturn( itQuery );
-        //        when( dataSource.executeQuery2( anyString(), anyVararg() ) ).thenReturn( rsQuery );
+        returnInvalidJson();
 
 
         Set<RemoteRequest> remoteRequests = dispatcherDAO.getRemoteRequests( 1, 1 );
@@ -229,13 +225,7 @@ public class DispatcherDAOTest
     public void testGetRemoteRequest() throws Exception
     {
 
-        ResultSet rsQuery = mock( ResultSet.class );
-        RemoteRequest remoteRequest = new RemoteRequest( PEER_ID, COMMAND_ID, 1 );
-        CustomIterator itQuery = new CustomIterator( JsonUtil.toJson( remoteRequest ) );
-        //        when( rsQuery.iterator() ).thenReturn( itQuery );
-        //        when( rsQuery.one() ).thenReturn( ( Row ) itQuery.next() );
-        //        when( dataSource.executeQuery2( anyString(), anyVararg() ) ).thenReturn( rsQuery );
-
+        returnRequest();
 
         RemoteRequest remoteRequest1 = dispatcherDAO.getRemoteRequest( COMMAND_ID );
 
@@ -247,13 +237,7 @@ public class DispatcherDAOTest
     @Test(expected = DaoException.class)
     public void testGetRemoteRequest2() throws Exception
     {
-
-        ResultSet rsQuery = mock( ResultSet.class );
-        RemoteRequest remoteRequest = new RemoteRequest( PEER_ID, COMMAND_ID, 1 );
-        CustomIterator itQuery = new CustomIterator( INVALID_JSON );
-        //        when( rsQuery.iterator() ).thenReturn( itQuery );
-        //        when( rsQuery.one() ).thenReturn( ( Row ) itQuery.next() );
-        //        when( dataSource.executeQuery2( anyString(), anyVararg() ) ).thenReturn( rsQuery );
+        returnInvalidJson();
 
 
         RemoteRequest remoteRequest1 = dispatcherDAO.getRemoteRequest( COMMAND_ID );
