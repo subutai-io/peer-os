@@ -89,6 +89,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
+        nodesTable.setId("SlrNodeTbl");
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
