@@ -14,8 +14,22 @@ import org.safehaus.subutai.core.command.api.command.RequestBuilder;
  */
 public interface CommandDispatcher extends CommandRunnerBase
 {
-
+    /**
+     * Creates command based on supplied RequestBuilder and target containers on which to run the command.
+     *
+     * @param requestBuilder - request builder
+     * @param containers - set of target containers
+     *
+     * @return - command
+     */
     public Command createContainerCommand( final RequestBuilder requestBuilder, final Set<Container> containers );
 
+    /**
+     * Creates command based on supplied set of ContainerRequestBuilders.
+     *
+     * @param requestBuilders - container request builders
+     *
+     * @return - command
+     */
     public Command createContainerCommand( final Set<ContainerRequestBuilder> requestBuilders );
 }

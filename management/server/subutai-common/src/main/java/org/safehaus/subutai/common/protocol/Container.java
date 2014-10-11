@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.protocol;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ContainerException;
@@ -17,6 +18,9 @@ public abstract class Container
     protected String name;
     protected String description;
     protected ContainerState state;
+    private List<String> ips;
+
+
     public abstract UUID getEnvironmentId();
 
 
@@ -97,4 +101,16 @@ public abstract class Container
     public abstract boolean stop() throws ContainerException;
 
     public abstract boolean isConnected() throws ContainerException;
+
+
+    public void setIps( final List<String> ips )
+    {
+        this.ips = ips;
+    }
+
+
+    public List<String> getIps()
+    {
+        return ips;
+    }
 }
