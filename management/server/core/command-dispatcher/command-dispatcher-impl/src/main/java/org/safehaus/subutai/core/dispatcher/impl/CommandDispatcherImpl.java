@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
@@ -26,8 +28,6 @@ import org.safehaus.subutai.core.command.api.command.CommandExecutor;
 import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
@@ -55,18 +55,18 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
 
 
     public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
-                                  final DbManager dbManager, final PeerManager peerManager )
+                                  final PeerManager peerManager, final DataSource dataSource ) throws DaoException
     {
         super();
 
         Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
         Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
 
+        this.dispatcherDAO = new DispatcherDAO( dataSource );
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
-        this.dispatcherDAO = new DispatcherDAO( dbManager );
         this.peerManager = peerManager;
         this.responseSender = new ResponseSender( dispatcherDAO, peerManager );
     }
@@ -403,7 +403,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
                         String.format( "Command %s is already queued for processing", commandId ) );
             }
         }
-        catch ( CommandException | DBException e )
+        catch ( CommandException | DaoException e )
         {
             LOG.error( String.format( "Error in executeRequests: [%s]", e.getMessage() ), e );
             throw new PeerMessageException( e.getMessage() );
@@ -418,7 +418,7 @@ public class CommandDispatcherImpl extends AbstractCommandRunner implements Comm
             //save response to db
             dispatcherDAO.saveRemoteResponse( new RemoteResponse( response ) );
         }
-        catch ( NullPointerException | DBException e )
+        catch ( NullPointerException | DaoException e )
         {
             LOG.error( String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(), response ),
                     e );

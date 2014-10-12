@@ -44,10 +44,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>db-manager-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -62,6 +58,7 @@
       <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>

@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
@@ -27,6 +26,8 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * Sends responses produced by remote requests back to owner
+ *
+ * TODO - remove requests and responses with attempts exceeding limit
  */
 public class ResponseSender
 {
@@ -109,7 +110,7 @@ public class ResponseSender
                 }
             }
         }
-        catch ( InterruptedException | DBException e )
+        catch ( InterruptedException | DaoException e )
         {
             LOG.error( "Error in send", e );
         }
@@ -155,7 +156,7 @@ public class ResponseSender
                     request.incrementAttempts();
                     dispatcherDAO.saveRemoteRequest( request );
                     //delete previous request (workaround until we change Cassandra to another DB)
-                    dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
+//                    dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
                 }
             }
             else
@@ -171,7 +172,7 @@ public class ResponseSender
                 } ) );
             }
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in sendRequest", e );
         }
@@ -202,7 +203,7 @@ public class ResponseSender
 
             sendResponse( request, responses, sortedResponses );
         }
-        catch ( JsonSyntaxException | DBException e )
+        catch ( JsonSyntaxException | DaoException e )
         {
             LOG.error( "Error in sendResponses", e );
         }
@@ -210,7 +211,7 @@ public class ResponseSender
 
 
     private void sendResponse( RemoteRequest request, Set<RemoteResponse> responses, Set<Response> sortedResponses )
-            throws DBException
+            throws DaoException
     {
         try
         {
@@ -238,6 +239,7 @@ public class ResponseSender
             }
             else
             {
+//                dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
                 request.updateTimestamp();
                 dispatcherDAO.saveRemoteRequest( request );
             }
@@ -254,7 +256,7 @@ public class ResponseSender
                 request.incrementAttempts();
                 dispatcherDAO.saveRemoteRequest( request );
                 //delete previous request (workaround until we change Cassandra to another DB)
-                dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
+//                dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
             }
         }
     }

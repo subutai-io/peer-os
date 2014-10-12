@@ -113,15 +113,9 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-cli</artifactId>
+        <artifactId>command-dispatcher-datasource</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- command-runner -->
       <dependency>
@@ -227,6 +221,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>db-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>db-manager-source</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -509,6 +508,11 @@
         <artifactId>tracker-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>tracker-datasource</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- Vaadin -->
@@ -638,7 +642,6 @@
         <artifactId>el-api</artifactId>
         <version>2.2</version>
       </dependency>
-
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Testing dependencies-->
