@@ -43,4 +43,11 @@ public class DestroyContainersMessage extends PeerCommandMessage
         {
         }.getType();
     }
+
+
+    @Override
+    public Type getInputObjectType()
+    {
+        return null;
+    }
 }

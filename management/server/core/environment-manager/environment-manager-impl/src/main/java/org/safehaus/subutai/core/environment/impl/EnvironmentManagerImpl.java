@@ -302,6 +302,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             containerCount = containerCount + ccm.getNumberOfNodes();
             try
             {
+                ccm.setEnvId( environment.getUuid() );
                 peerCommandDispatcher.invoke( ccm, timeout );
 
                 boolean result = ccm.isSuccess();

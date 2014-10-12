@@ -619,17 +619,17 @@ public class PeerManagerImpl implements PeerManager
                         Agent parentAgent = agentManager.getAgentByHostname( agent.getParentHostName() );
                         containerManager.destroy( parentAgent.getHostname(), agent.getHostname() );
 
-                        peerCommandMessage.setSuccess( true );
+//                        peerCommandMessage.setSuccess( true );
                     }
                     catch ( ContainerDestroyException e )
                     {
                         LOG.error( e.getMessage(), e );
-                        peerCommandMessage.setSuccess( false );
+//                        peerCommandMessage.setSuccess( false );
                     }
                 }
                 else
                 {
-                    peerCommandMessage.setSuccess( false );
+//                    peerCommandMessage.setSuccess( false );
                 }
                 break;
             default:
