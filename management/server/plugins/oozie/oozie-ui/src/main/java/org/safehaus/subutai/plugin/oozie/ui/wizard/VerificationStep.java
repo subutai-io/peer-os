@@ -1,14 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -20,9 +19,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel
 {
 
@@ -42,10 +38,13 @@ public class VerificationStep extends Panel
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "Server", wizard.getConfig().getServer() + "\n" );
-        for ( String agent : wizard.getConfig().getClients() )
+        cfgView.addStringCfg( "Server", wizard.getConfig().getServer().getHostname() + "\n" );
+        if ( wizard.getConfig().getClients() != null )
         {
-            cfgView.addStringCfg( "Clients", agent + "\n" );
+            for ( Agent agent : wizard.getConfig().getClients() )
+            {
+                cfgView.addStringCfg( "Clients", agent.getHostname() + "\n" );
+            }
         }
 
         Button install = new Button( "Install" );
@@ -55,15 +54,47 @@ public class VerificationStep extends Panel
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = wizard.getOoziePortalModule().getOozieManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( wizard.getOoziePortalModule().getExecutor(),
-                        wizard.getOoziePortalModule().getTracker(), trackID, OozieClusterConfig.PRODUCT_KEY );
+                UUID trackID = wizard.getOozieManager().installCluster( wizard.getConfig() );
+                final ProgressWindow window = new ProgressWindow( wizard.getExecutor(), wizard.getTracker(), trackID,
+                        OozieClusterConfig.PRODUCT_KEY );
+                final ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to restart the %s hadoop cluster for changes to take effect?",
+                                wizard.getConfig().getHadoopClusterName() ), "Yes", "No"
+                );
+
+                alert.getOk().addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( Button.ClickEvent event )
+                    {
+                        Hadoop hadoopManager = wizard.getHadoopManager();
+                        String hadoopClusterName = wizard.getConfig().getHadoopClusterName();
+                        HadoopClusterConfig cluster = hadoopManager.getCluster( hadoopClusterName );
+                        UUID trackID =
+                                hadoopManager.restartNameNode( cluster );
+                        ProgressWindow window =
+                                new ProgressWindow( wizard.getExecutor(), wizard.getTracker(), trackID,
+                                        HadoopClusterConfig.PRODUCT_KEY );
+                        getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+
+                alert.getAlert().addCloseListener( new Window.CloseListener()
+                {
+                    @Override
+                    public void windowClose( final Window.CloseEvent e )
+                    {
+                        wizard.init();
+                    }
+                } );
+
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent )
                     {
-                        wizard.init();
+                        getUI().addWindow( alert.getAlert() );
                     }
                 } );
                 getUI().addWindow( window.getWindow() );
@@ -93,4 +124,5 @@ public class VerificationStep extends Panel
 
         setContent( grid );
     }
+
 }

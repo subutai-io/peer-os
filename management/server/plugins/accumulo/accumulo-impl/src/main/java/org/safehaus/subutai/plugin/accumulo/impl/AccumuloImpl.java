@@ -176,6 +176,13 @@ public class AccumuloImpl implements Accumulo
     }
 
 
+    @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig,
                                 final HadoopClusterConfig hadoopClusterConfig,
                                 final ZookeeperClusterConfig zookeeperClusterConfig )

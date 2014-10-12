@@ -28,8 +28,8 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckDecommissionStatusTask;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.CheckTask;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.StartTask;
@@ -168,7 +168,7 @@ public class ManagerListener {
 
     protected Button.ClickListener slaveNodeDestroyButtonListener( final Item row ) {
         final Agent agent = hadoopManager.getAgentByRow( row );
-        final HorizontalLayout statusGroup = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroup = hadoopManager.getStatusLayout( row );
         final Label statusDecommission = hadoopManager.getStatusDecommissionLabel( statusGroup );
 
         return new Button.ClickListener() {
@@ -281,7 +281,7 @@ public class ManagerListener {
     protected Button.ClickListener secondaryNameNodeCheckButtonListener( final Item row ) {
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Label statusDatanode = hadoopManager.getStatusDatanodeLabel( statusGroupLayout );
 
@@ -306,13 +306,11 @@ public class ManagerListener {
 
                                 checkButton.setEnabled(true);
                                 hadoopManager.disableProgressBar();
-                                if (hadoopManager.getProcessCount() == 0) {
-                                    hadoopManager.getCheckAllButton().setEnabled(true);
-                                }
+                                enableCheckAllButton();
                             }
                         }, null, agent
                         )
-                );
+                                                          );
             }
         };
     }
@@ -358,7 +356,7 @@ public class ManagerListener {
                                     startStopButton.setEnabled(true);
                                 }
                             }, null, agent)
-                    );
+                                                              );
                 }
                 else {
                     startStopButton.setEnabled( false );
@@ -372,7 +370,7 @@ public class ManagerListener {
                                     startStopButton.setEnabled(true);
                                 }
                             }, null, agent)
-                    );
+                                                              );
                 }
             }
         } ;
@@ -383,7 +381,7 @@ public class ManagerListener {
 
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Label statusTaskTracker = hadoopManager.getStatusDatanodeLabel( statusGroupLayout );
@@ -395,30 +393,28 @@ public class ManagerListener {
                 startStopButton.setEnabled( false );
                 checkButton.setEnabled( false );
                 hadoopManager.getExecutorService()
-                        .execute(new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
-                                NodeType.JOBTRACKER, hadoopManager.getHadoopCluster(), new CompleteEvent() {
+                             .execute( new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
+                                     NodeType.JOBTRACKER, hadoopManager.getHadoopCluster(), new CompleteEvent() {
 
-                            public void onComplete(NodeState state) {
-                                if (state == NodeState.RUNNING) {
-                                    statusTaskTracker.setValue("JobTracker Running");
-                                    startStopButton.setCaption(Manager.STOP_JOBTRACKER_BUTTON_CAPTION);
-                                    startStopButton.setEnabled(true);
-                                } else if (state == NodeState.STOPPED) {
-                                    statusTaskTracker.setValue("JobTracker Stopped");
-                                    startStopButton.setCaption(Manager.START_JOBTRACKER_BUTTON_CAPTION);
-                                    startStopButton.setEnabled(true);
-                                } else {
-                                    statusTaskTracker.setValue("JobTracker Not Connected");
-                                    startStopButton.setCaption("Not connected");
-                                }
+                                 public void onComplete(NodeState state) {
+                                     if (state == NodeState.RUNNING) {
+                                         statusTaskTracker.setValue("JobTracker Running");
+                                         startStopButton.setCaption(Manager.STOP_JOBTRACKER_BUTTON_CAPTION);
+                                         startStopButton.setEnabled(true);
+                                     } else if (state == NodeState.STOPPED) {
+                                         statusTaskTracker.setValue("JobTracker Stopped");
+                                         startStopButton.setCaption(Manager.START_JOBTRACKER_BUTTON_CAPTION);
+                                         startStopButton.setEnabled(true);
+                                     } else {
+                                         statusTaskTracker.setValue("JobTracker Not Connected");
+                                         startStopButton.setCaption("Not connected");
+                                     }
 
-                                checkButton.setEnabled(true);
-                                hadoopManager.disableProgressBar();
-                                if (hadoopManager.getProcessCount() == 0) {
-                                    hadoopManager.getCheckAllButton().setEnabled(true);
-                                }
-                            }
-                        }, null, agent));
+                                     checkButton.setEnabled(true);
+                                     hadoopManager.disableProgressBar();
+                                     enableCheckAllButton();
+                                 }
+                             }, null, agent ) );
             }
         };
 
@@ -429,7 +425,7 @@ public class ManagerListener {
 
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button startStopButton = hadoopManager.getStartStopButton( availableOperationsLayout );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Label statusDatanode = hadoopManager.getStatusDatanodeLabel( statusGroupLayout );
@@ -441,29 +437,27 @@ public class ManagerListener {
                 checkButton.setEnabled( false );
                 startStopButton.setEnabled( false );
                 hadoopManager.getExecutorService()
-                        .execute(new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
-                                NodeType.NAMENODE, hadoopManager.getHadoopCluster(), new CompleteEvent() {
+                             .execute(new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
+                                     NodeType.NAMENODE, hadoopManager.getHadoopCluster(), new CompleteEvent() {
 
-                            public void onComplete(NodeState state) {
-                                if (state == NodeState.RUNNING) {
-                                    statusDatanode.setValue("Namenode Running");
-                                    startStopButton.setCaption(Manager.STOP_NAMENODE_BUTTON_CAPTION);
-                                    startStopButton.setEnabled(true);
-                                } else if (state == NodeState.STOPPED) {
-                                    statusDatanode.setValue("Namenode Stopped");
-                                    startStopButton.setCaption(Manager.START_NAMENODE_BUTTON_CAPTION);
-                                    startStopButton.setEnabled(true);
-                                } else {
-                                    statusDatanode.setValue("Namenode Not Connected");
-                                    startStopButton.setCaption("Not connected");
-                                }
-                                checkButton.setEnabled(true);
-                                hadoopManager.disableProgressBar();
-                                if (hadoopManager.getProcessCount() == 0) {
-                                    hadoopManager.getCheckAllButton().setEnabled(true);
-                                }
-                            }
-                        }, null, agent));
+                                 public void onComplete(NodeState state) {
+                                     if (state == NodeState.RUNNING) {
+                                         statusDatanode.setValue("Namenode Running");
+                                         startStopButton.setCaption(Manager.STOP_NAMENODE_BUTTON_CAPTION);
+                                         startStopButton.setEnabled(true);
+                                     } else if (state == NodeState.STOPPED) {
+                                         statusDatanode.setValue("Namenode Stopped");
+                                         startStopButton.setCaption(Manager.START_NAMENODE_BUTTON_CAPTION);
+                                         startStopButton.setEnabled(true);
+                                     } else {
+                                         statusDatanode.setValue("Namenode Not Connected");
+                                         startStopButton.setCaption("Not connected");
+                                     }
+                                     checkButton.setEnabled(true);
+                                     hadoopManager.disableProgressBar();
+                                     enableCheckAllButton();
+                                 }
+                             }, null, agent));
             }
         };
     }
@@ -498,7 +492,7 @@ public class ManagerListener {
                                     startStopButton.setEnabled(true);
                                 }
                             }, null, agent)
-                    );
+                                                              );
                 }
                 else {
                     hadoopManager.getExecutorService().execute(
@@ -513,7 +507,7 @@ public class ManagerListener {
                                     startStopButton.setEnabled(true);
                                 }
                             }, null, agent)
-                    );
+                                                              );
                 }
             }
         } ;
@@ -535,7 +529,7 @@ public class ManagerListener {
 
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button checkButton = hadoopManager.getCheckButton( availableOperationsLayout );
         final Button excludeIncludeNodeButton = hadoopManager.getExcludeIncludeButton( availableOperationsLayout );
         final Button destroyButton = hadoopManager.getDestroyButton( availableOperationsLayout );
@@ -547,7 +541,7 @@ public class ManagerListener {
             public void buttonClick( final Button.ClickEvent clickEvent ) {
 
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() )
-                        .getBlockedAgents().contains( agent ) ) {
+                                  .getBlockedAgents().contains( agent ) ) {
                     excludeIncludeNodeButton.setCaption( Manager.INCLUDE_BUTTON_CAPTION );
                 }
                 else {
@@ -560,59 +554,65 @@ public class ManagerListener {
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() ).isDataNode( agent ) ) {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService()
-                            .execute(new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
-                                    NodeType.DATANODE, hadoopManager.getHadoopCluster(), new CompleteEvent() {
+                                 .execute(new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
+                                         NodeType.DATANODE, hadoopManager.getHadoopCluster(), new CompleteEvent() {
 
 
-                                public void onComplete(NodeState state) {
-                                    if (state == NodeState.RUNNING) {
-                                        statusDatanode.setValue("Datanode Running");
-                                        excludeIncludeNodeButton.setEnabled(true);
-                                    } else if (state == NodeState.STOPPED) {
-                                        statusDatanode.setValue("Datanode Stopped");
-                                        excludeIncludeNodeButton.setEnabled(true);
-                                    } else {
-                                        statusDatanode.setValue("Not connected");
-                                        excludeIncludeNodeButton.setCaption("Not connected");
-                                        excludeIncludeNodeButton.setEnabled(false);
-                                    }
+                                     public void onComplete(NodeState state) {
+                                         if (state == NodeState.RUNNING) {
+                                             statusDatanode.setValue("Datanode Running");
+                                             excludeIncludeNodeButton.setEnabled(true);
+                                         } else if (state == NodeState.STOPPED) {
+                                             statusDatanode.setValue("Datanode Stopped");
+                                             excludeIncludeNodeButton.setEnabled(true);
+                                         } else {
+                                             statusDatanode.setValue("Not connected");
+                                             excludeIncludeNodeButton.setCaption("Not connected");
+                                             excludeIncludeNodeButton.setEnabled(false);
+                                         }
 
-                                    if (hadoopManager.getCheckAllButton().isEnabled()) {
-                                        checkDecommissioningStatus(row, checkButton);
-                                    } else {
-                                        executeSlaveNodeCheckButtonFinishCommands(row, checkButton);
-                                    }
-                                }
-                            }, null, agent));
+                                         if (hadoopManager.getCheckAllButton().isEnabled()) {
+                                             checkDecommissioningStatus(row, checkButton);
+                                         } else {
+                                             executeSlaveNodeCheckButtonFinishCommands(row, checkButton);
+                                         }
+                                     }
+                                 }, null, agent));
                 }
                 if ( hadoopManager.getHadoop().getCluster( hadoopManager.getHadoopCluster().getClusterName() ).isTaskTracker( agent ) ) {
                     hadoopManager.enableProgressBar();
                     hadoopManager.getExecutorService()
-                            .execute(new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
-                                    NodeType.TASKTRACKER, hadoopManager.getHadoopCluster(), new CompleteEvent() {
+                                 .execute(new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
+                                         NodeType.TASKTRACKER, hadoopManager.getHadoopCluster(), new CompleteEvent() {
 
-                                public void onComplete(NodeState state) {
-                                    if (state == NodeState.RUNNING) {
-                                        statusTaskTracker.setValue("Tasktracker Running");
-                                        excludeIncludeNodeButton.setEnabled(true);
-                                    } else if (state == NodeState.STOPPED) {
-                                        statusTaskTracker.setValue("Tasktracker Stopped");
-                                        excludeIncludeNodeButton.setEnabled(true);
-                                    } else {
-                                        statusTaskTracker.setValue("Not connected");
-                                        excludeIncludeNodeButton.setCaption("Not connected");
-                                        excludeIncludeNodeButton.setEnabled(false);
-                                    }
-                                    checkButton.setEnabled(true);
-                                    hadoopManager.disableProgressBar();
-                                    if (hadoopManager.getProcessCount() == 0) {
-                                        hadoopManager.getCheckAllButton().setEnabled(true);
-                                    }
-                                }
-                            }, null, agent));
+                                     public void onComplete(NodeState state) {
+                                         if (state == NodeState.RUNNING) {
+                                             statusTaskTracker.setValue("Tasktracker Running");
+                                             excludeIncludeNodeButton.setEnabled(true);
+                                         } else if (state == NodeState.STOPPED) {
+                                             statusTaskTracker.setValue("Tasktracker Stopped");
+                                             excludeIncludeNodeButton.setEnabled(true);
+                                         } else {
+                                             statusTaskTracker.setValue("Not connected");
+                                             excludeIncludeNodeButton.setCaption("Not connected");
+                                             excludeIncludeNodeButton.setEnabled(false);
+                                         }
+                                         checkButton.setEnabled(true);
+                                         hadoopManager.disableProgressBar();
+                                         enableCheckAllButton();
+                                     }
+                                 }, null, agent));
                 }
             }
         };
+    }
+
+
+    private void enableCheckAllButton()
+    {
+        if (hadoopManager.getProcessCount() == 0) {
+            hadoopManager.getCheckAllButton().setEnabled(true);
+        }
     }
 
 
@@ -624,8 +624,10 @@ public class ManagerListener {
         hadoopManager.getClusterList().removeAllItems();
         if ( hadoopClusterList != null && hadoopClusterList.size() > 0 ) {
             for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
-                hadoopManager.getClusterList().addItem( hadoopCluster );
-                hadoopManager.getClusterList().setItemCaption( hadoopCluster, hadoopCluster.getClusterName() );
+                if ( hadoopCluster.getNameNode() != null ) {
+                    hadoopManager.getClusterList().addItem( hadoopCluster );
+                    hadoopManager.getClusterList().setItemCaption( hadoopCluster, hadoopCluster.getClusterName() );
+                }
             }
             if ( clusterInfo != null ) {
                 for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
@@ -636,7 +638,12 @@ public class ManagerListener {
                 }
             }
             else {
-                hadoopManager.getClusterList().setValue( hadoopClusterList.iterator().next() );
+                for ( HadoopClusterConfig hadoopCluster : hadoopClusterList ) {
+                    if ( hadoopCluster.getNameNode() != null ) {
+                        hadoopManager.getClusterList().setValue( hadoopCluster );
+                        return;
+                    }
+                }
             }
         }
     }
@@ -645,18 +652,18 @@ public class ManagerListener {
     private void executeSlaveNodeCheckButtonFinishCommands( Item row, Button checkButton ) {
         final Agent agent = hadoopManager.getAgentByRow( row );
         final HorizontalLayout availableOperationsLayout = hadoopManager.getAvailableOperationsLayout( row );
-        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusGroupByRow( row );
+        final HorizontalLayout statusGroupLayout = hadoopManager.getStatusLayout( row );
         final Button destroyButton = hadoopManager.getDestroyButton( availableOperationsLayout );
         final Label statusDecommission = hadoopManager.getStatusDecommissionLabel( statusGroupLayout );
         if ( agent != null ) {
             statusDecommission.setValue( Manager.DECOMMISSION_STATUS_CAPTION + hadoopManager
                             .getDecommissionStatus( hadoopManager.getDecommissionStatus(), agent )
-            );
+                                       );
             checkButton.setEnabled( true );
             destroyButton.setEnabled( true );
             hadoopManager.disableProgressBar();
             if ( hadoopManager.getProcessCount() == 0 ) {
-                hadoopManager.getCheckAllButton().setEnabled( true );
+                enableCheckAllButton();
                 checkButton.setEnabled( true );
             }
         }
@@ -666,7 +673,7 @@ public class ManagerListener {
             destroyButton.setEnabled( true );
             hadoopManager.disableProgressBar();
             if ( hadoopManager.getProcessCount() == 0 ) {
-                hadoopManager.getCheckAllButton().setEnabled( true );
+                enableCheckAllButton();
                 checkButton.setEnabled( true );
             }
         }
@@ -675,16 +682,16 @@ public class ManagerListener {
 
     private void checkDecommissioningStatus( final Item row, final Button checkButton) {
         hadoopManager.getExecutorService()
-                .execute(new CheckDecommissionStatusTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
-                        hadoopManager.getHadoopCluster(),
-                        new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent() {
+                     .execute(new CheckDecommissionStatusTask( hadoopManager.getHadoop(), hadoopManager.getTracker(),
+                             hadoopManager.getHadoopCluster(),
+                             new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent() {
 
-                            public void onComplete(String operationLog) {
-                                hadoopManager.setDecommissionStatus( operationLog );
-                                executeSlaveNodeCheckButtonFinishCommands(row, checkButton);
-                            }
-                        }, null
-                ));
+                                 public void onComplete(String operationLog) {
+                                     hadoopManager.setDecommissionStatus( operationLog );
+                                     executeSlaveNodeCheckButtonFinishCommands(row, checkButton);
+                                 }
+                             }, null
+                     ));
 
     }
 
@@ -692,18 +699,18 @@ public class ManagerListener {
     private void checkAllStatuses() {
         hadoopManager.enableProgressBar();
         hadoopManager.getExecutorService()
-                .execute( new CheckDecommissionStatusTask(
-                        hadoopManager.getHadoop(), hadoopManager.getTracker(), hadoopManager.getHadoopCluster(),
-                        new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent() {
+                     .execute( new CheckDecommissionStatusTask(
+                             hadoopManager.getHadoop(), hadoopManager.getTracker(), hadoopManager.getHadoopCluster(),
+                             new org.safehaus.subutai.plugin.hadoop.ui.manager.components.CompleteEvent() {
 
-                            public void onComplete( String operationLog ) {
-                                hadoopManager.setDecommissionStatus( operationLog );
-                                checkNodesStatus( hadoopManager.getMasterNodesTable() );
-                                checkNodesStatus( hadoopManager.getSlaveNodesTable() );
-                                hadoopManager.disableProgressBar();
-                                hadoopManager.getCheckAllButton().setEnabled( true );
-                            }
-                        }, null ) );
+                                 public void onComplete( String operationLog ) {
+                                     hadoopManager.setDecommissionStatus( operationLog );
+                                     checkNodesStatus( hadoopManager.getMasterNodesTable() );
+                                     checkNodesStatus( hadoopManager.getSlaveNodesTable() );
+                                     hadoopManager.disableProgressBar();
+                                     enableCheckAllButton();
+                                 }
+                             }, null ) );
     }
 
 

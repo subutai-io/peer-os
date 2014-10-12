@@ -3,19 +3,20 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
 {
+
+    private final ProductOperation productOperation;
 
 
     public StopServerHandler( final OozieImpl manager, final String clusterName )
@@ -27,6 +28,13 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
 
 
     @Override
+    public UUID getTrackerId()
+    {
+        return productOperation.getId();
+    }
+
+
+    @Override
     public void run()
     {
         manager.getExecutor().execute( new Runnable()
@@ -34,7 +42,7 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
 
             public void run()
             {
-                OozieClusterConfig config = manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
+                OozieClusterConfig config = manager.getPluginDAO().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
                         OozieClusterConfig.class );
                 if ( config == null )
                 {
@@ -42,7 +50,7 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                             String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
-                Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+                Agent serverAgent = config.getServer();
                 if ( serverAgent == null )
                 {
                     productOperation
@@ -54,15 +62,40 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                 Command stopServiceCommand = manager.getCommands().getStopServerCommand( servers );
                 manager.getCommandRunner().runCommand( stopServiceCommand );
 
-                if ( stopServiceCommand.hasSucceeded() )
+
+                if ( stopServiceCommand.hasCompleted() )
                 {
-                    productOperation.addLogDone( "Stop succeeded" );
+                    productOperation.addLog( "Checking status..." );
+
+                    Command checkCommand = manager.getCommands().getStatusServerCommand( servers );
+                    manager.getCommandRunner().runCommand( checkCommand );
+
+                    if ( checkCommand.hasCompleted() )
+                    {
+                        productOperation
+                                .addLogDone( checkCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
+                    }
+                    else
+                    {
+                        productOperation.addLogFailed(
+                                String.format( "Failed to check status, %s", checkCommand.getAllErrors() ) );
+                    }
                 }
                 else
                 {
                     productOperation
                             .addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
                 }
+
+                //                if ( stopServiceCommand.hasSucceeded() )
+                //                {
+                //                    productOperation.addLogDone( "Stop succeeded" );
+                //                }
+                //                else
+                //                {
+                //                    productOperation
+                //                            .addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+                //                }
             }
         } );
     }

@@ -37,6 +37,11 @@ public class StormConfig implements ConfigBase
         return PRODUCT_NAME;
     }
 
+    @Override
+    public String getProductKey() {
+        return PRODUCT_NAME;
+    }
+
 
     public void setClusterName( String clusterName )
     {

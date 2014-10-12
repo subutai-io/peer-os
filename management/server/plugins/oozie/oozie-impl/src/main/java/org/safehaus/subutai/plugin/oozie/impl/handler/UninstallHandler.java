@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -12,13 +13,10 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
 {
 
-    private ProductOperation po;
+    private final ProductOperation productOperation;
     //    private OozieConfig config;
     private String clusterName;
 
@@ -27,44 +25,51 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Unistalling %s cluster...", clusterName ) );
+    }
+
+
+    @Override
+    public UUID getTrackerId()
+    {
+        return productOperation.getId();
     }
 
 
     @Override
     public void run()
     {
-        final ProductOperation po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable()
         {
 
             public void run()
             {
-                OozieClusterConfig config = manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
+                OozieClusterConfig config = manager.getPluginDAO().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
                         OozieClusterConfig.class );
                 if ( config == null )
                 {
-                    po.addLogFailed(
+                    productOperation.addLogFailed(
                             String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
 
                 Set<String> nodes = new HashSet<String>();
-                nodes.addAll( config.getClients() );
-                nodes.add( config.getServer() );
+                for ( Agent agent : config.getAllOozieAgents() ) {
+                    nodes.add( agent.getHostname() );
+                }
+
                 for ( String node : nodes )
                 {
                     if ( manager.getAgentManager().getAgentByHostname( node ) == null )
                     {
-                        po.addLogFailed( String.format( "Node %s not connected. Aborted", node ) );
+                        productOperation.addLogFailed( String.format( "Node %s not connected. Aborted", node ) );
                         return;
                     }
                 }
 
                 Set<Agent> servers = new HashSet<Agent>();
-                Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+                Agent serverAgent = config.getServer();
                 servers.add( serverAgent );
 
                 Command uninstallServerCommand = manager.getCommands().getUninstallServerCommand( servers );
@@ -72,44 +77,42 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
 
                 if ( uninstallServerCommand.hasSucceeded() )
                 {
-                    po.addLog( "Uninstall server succeeded" );
+                    productOperation.addLog( "Uninstall server succeeded" );
                 }
                 else
                 {
-                    po.addLogFailed(
+                    productOperation.addLogFailed(
                             String.format( "Uninstall server failed, %s", uninstallServerCommand.getAllErrors() ) );
                     return;
                 }
 
                 Set<Agent> clientAgents = new HashSet<Agent>();
-                for ( String clientHostname : config.getClients() )
+                for ( Agent clientNode : config.getClients() )
                 {
-                    Agent clientAgent = manager.getAgentManager().getAgentByHostname( clientHostname );
+                    Agent clientAgent = clientNode;
                     clientAgents.add( clientAgent );
                 }
-                Command uninstallClientsCommand = manager.getCommands().getUninstallClientsCommand( clientAgents );
-                manager.getCommandRunner().runCommand( uninstallClientsCommand );
+                if ( !clientAgents.isEmpty() ) {
+                    Command uninstallClientsCommand = manager.getCommands().getUninstallClientsCommand( clientAgents );
+                    manager.getCommandRunner().runCommand( uninstallClientsCommand );
 
-                if ( uninstallClientsCommand.hasSucceeded() )
-                {
-                    po.addLog( "Uninstall clients succeeded" );
-                }
-                else
-                {
-                    po.addLogFailed(
-                            String.format( "Uninstall clients failed, %s", uninstallClientsCommand.getAllErrors() ) );
-                    return;
+                    if ( uninstallClientsCommand.hasSucceeded() )
+                    {
+                        productOperation.addLog( "Uninstall clients succeeded" );
+                    }
+                    else
+                    {
+                        productOperation.addLogFailed(
+                                String.format( "Uninstall clients failed, %s", uninstallClientsCommand.getAllErrors() ) );
+                        return;
+                    }
                 }
 
-                po.addLog( "Updating db..." );
-                if ( manager.getDbManager().deleteInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName() ) )
-                {
-                    po.addLogDone( "Cluster info deleted from DB\nDone" );
-                }
-                else
-                {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs. Failed" );
-                }
+
+                productOperation.addLog( "Updating db..." );
+                manager.getPluginDAO().deleteInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                // TODO check if delete is succesful
+                productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
             }
         } );
     }

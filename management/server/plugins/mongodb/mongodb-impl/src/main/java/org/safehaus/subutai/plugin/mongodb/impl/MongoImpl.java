@@ -178,6 +178,13 @@ public class MongoImpl implements Mongo
     }
 
 
+    @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
     public UUID addNode( final String clusterName, final NodeType nodeType )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );

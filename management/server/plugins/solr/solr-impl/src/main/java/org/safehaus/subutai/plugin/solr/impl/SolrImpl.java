@@ -165,6 +165,13 @@ public class SolrImpl implements Solr
     }
 
 
+    @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
     public UUID startNode( final String clusterName, final String lxcHostName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );

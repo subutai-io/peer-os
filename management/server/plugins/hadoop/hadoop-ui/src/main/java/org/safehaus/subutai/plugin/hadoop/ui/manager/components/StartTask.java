@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.api.NodeType;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 
 import java.util.UUID;
 

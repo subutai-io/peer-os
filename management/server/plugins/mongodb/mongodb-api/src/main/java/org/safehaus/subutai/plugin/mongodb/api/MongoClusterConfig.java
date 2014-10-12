@@ -148,6 +148,11 @@ public class MongoClusterConfig implements ConfigBase
         return PRODUCT_NAME;
     }
 
+    @Override
+    public String getProductKey() {
+        return PRODUCT_KEY;
+    }
+
 
     public NodeType getNodeType( Agent node )
     {

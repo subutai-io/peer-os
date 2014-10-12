@@ -41,6 +41,11 @@ public class SqoopConfig implements ConfigBase
         return PRODUCT_KEY;
     }
 
+    @Override
+    public String getProductKey() {
+        return PRODUCT_KEY;
+    }
+
 
     public SetupType getSetupType()
     {

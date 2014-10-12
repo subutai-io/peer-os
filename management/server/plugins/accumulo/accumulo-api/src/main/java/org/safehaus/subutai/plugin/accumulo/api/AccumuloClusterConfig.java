@@ -214,6 +214,11 @@ public class AccumuloClusterConfig implements ConfigBase
         return PRODUCT_NAME;
     }
 
+    @Override
+    public String getProductKey() {
+        return PRODUCT_KEY;
+    }
+
 
     public String getInstanceName()
     {
