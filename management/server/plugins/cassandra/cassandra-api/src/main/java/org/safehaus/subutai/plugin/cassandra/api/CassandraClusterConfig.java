@@ -25,11 +25,10 @@ public class CassandraClusterConfig implements ConfigBase
     private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
 
 
-    public static String getProductKey()
-    {
+    @Override
+    public String getProductKey() {
         return PRODUCT_KEY;
     }
-
 
     public String getTemplateName()
     {

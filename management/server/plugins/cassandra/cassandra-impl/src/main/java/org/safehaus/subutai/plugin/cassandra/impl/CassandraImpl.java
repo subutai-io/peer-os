@@ -238,6 +238,13 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
+    @Override
     public UUID startCluster( final String clusterName )
     {
         AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
@@ -333,7 +340,7 @@ public class CassandraImpl implements Cassandra
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint
-                .setName( String.format( "%s-%s", CassandraClusterConfig.getProductKey(), UUIDUtil
+                .setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil
                         .generateTimeBasedUUID() ) );
 
         environmentBlueprint.setLinkHosts( true );

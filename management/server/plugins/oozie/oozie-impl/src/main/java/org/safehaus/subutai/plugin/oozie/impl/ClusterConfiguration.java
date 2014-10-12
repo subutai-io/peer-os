@@ -35,7 +35,7 @@ public class ClusterConfiguration
     {
 
         po.addLog( "Configuring root hosts..." );
-        Agent server = manager.getAgentManager().getAgentByHostname( config.getServer() );
+        Agent server = config.getServer();
         HadoopClusterConfig hadoopClusterConfig =
                 manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
         //        Set<Agent> hadoopNodes = new HashSet<Agent>();

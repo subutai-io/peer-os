@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -13,14 +14,11 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
 {
 
     private static final Logger logger = Logger.getLogger( CheckServerHandler.class.getName() );
-    private ProductOperation po;
+    private final ProductOperation productOperation;
     private String clusterName;
 
 
@@ -28,16 +26,21 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
-                String.format( "Starting server on %s cluster...", clusterName ) );
+        productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
+                String.format( "Checking status of cluster %s", clusterName ) );
+    }
+
+
+    @Override
+    public UUID getTrackerId()
+    {
+        return productOperation.getId();
     }
 
 
     @Override
     public void run()
     {
-        final ProductOperation po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
-                String.format( "Checking status of cluster %s", clusterName ) );
 
         manager.getExecutor().execute( new Runnable()
         {
@@ -48,10 +51,11 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                 config = manager.getPluginDAO()
                                 .getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
 
-                Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+                Agent serverAgent = config.getServer();
                 if ( serverAgent == null )
                 {
-                    po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
+                    productOperation
+                            .addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
                 Set<Agent> servers = new HashSet<Agent>();
@@ -62,11 +66,12 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                 if ( statusServiceCommand.hasCompleted() )
                 {
 
-                    po.addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
+                    productOperation
+                            .addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                 }
                 else
                 {
-                    po.addLogFailed(
+                    productOperation.addLogFailed(
                             String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
                 }
             }

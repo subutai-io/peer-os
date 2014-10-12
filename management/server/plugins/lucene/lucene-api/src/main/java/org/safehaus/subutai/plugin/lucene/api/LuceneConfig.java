@@ -41,6 +41,11 @@ public class LuceneConfig implements ConfigBase
         return PRODUCT_KEY;
     }
 
+    @Override
+    public String getProductKey() {
+        return PRODUCT_KEY;
+    }
+
 
     public Set<Agent> getNodes()
     {

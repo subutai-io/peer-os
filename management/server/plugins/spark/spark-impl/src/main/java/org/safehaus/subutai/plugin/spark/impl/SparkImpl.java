@@ -79,6 +79,13 @@ public class SparkImpl extends SparkBase implements Spark
 
 
     @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
+
+
+    @Override
     public UUID installCluster( SparkClusterConfig config, HadoopClusterConfig hadoopConfig )
     {
         InstallOperationHandler h = new InstallOperationHandler( this, config );

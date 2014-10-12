@@ -20,4 +20,12 @@ public interface ConfigBase
      * @return - product name
      */
     public String getProductName();
+
+    /**
+     * Returns product key
+     *
+     * @return - product key
+     */
+    public String getProductKey();
+
 }
