@@ -5,42 +5,21 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.safehaus.subutai</groupId>
-    <artifactId>db-manager-parent</artifactId>
+    <artifactId>tracker-parent</artifactId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>db-manager-impl</artifactId>
-  <name>Subutai DB Manager</name>
-  <description>db manager impl</description>
+  <artifactId>tracker-datasource</artifactId>
+  <name>Tracker Datasource</name>
+  <description>tracker datasource</description>
 
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>db-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.datastax.cassandra</groupId>
-      <artifactId>cassandra-driver-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.cassandraunit</groupId>
-      <artifactId>cassandra-unit</artifactId>
-      <scope>test</scope>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.181</version>
     </dependency>
 
   </dependencies>
@@ -56,7 +35,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.db.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.tracker.datasource</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
