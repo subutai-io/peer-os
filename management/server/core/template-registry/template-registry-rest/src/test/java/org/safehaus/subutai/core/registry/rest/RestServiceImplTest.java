@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -90,7 +91,7 @@ public class RestServiceImplTest
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
         template =
                 new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
-                        packagesFile, md5sum );
+                        packagesFile, md5sum, UUID.randomUUID() );
         return template;
     }
 

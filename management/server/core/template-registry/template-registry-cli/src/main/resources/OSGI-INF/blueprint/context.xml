@@ -3,6 +3,9 @@
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/get-template">
       <action class="org.safehaus.subutai.core.registry.cli.GetTemplateCommand">
@@ -15,6 +18,7 @@
     <command name="registry/register-template">
       <action class="org.safehaus.subutai.core.registry.cli.RegisterTemplateCommand">
         <property name="templateRegistry" ref="templateRegistry" />
+        <property name="peerManager" ref="peerManager" />
       </action>
     </command>
   </command-bundle>

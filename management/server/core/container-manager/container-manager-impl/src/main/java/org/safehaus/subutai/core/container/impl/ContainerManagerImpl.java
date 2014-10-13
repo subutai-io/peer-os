@@ -52,6 +52,7 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
+import org.safehaus.subutai.core.template.api.TemplateException;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -237,26 +238,28 @@ public class ContainerManagerImpl extends ContainerManagerBase
             throws ContainerCreateException
     {
         fireEvent( new ContainerEvent( ContainerEventType.CLONING_STARTED, envId, hostName, cloneName ) );
-        if ( !templateManager.clone( hostName, templateName, cloneName, envId.toString() ) )
+        try
+        {
+            templateManager.clone( hostName, templateName, cloneName, envId.toString() );
+        }
+        catch ( TemplateException te )
         {
             fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
             throw new ContainerCreateException(
-                    String.format( "Couldn't create container %s : %s.", hostName, cloneName ) );
+                    String.format( "Couldn't create container %s : %s. %s", hostName, cloneName, te.toString() ) );
+        }
+        Agent agent = agentManager.waitForRegistration( cloneName, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 );
+        if ( agent == null )
+        {
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
+            throw new ContainerCreateException(
+                    String.format( "Couldn't create container %s : %s. Could not get response from container.",
+                            hostName, cloneName ) );
         }
         else
         {
-            Agent agent = agentManager.waitForRegistration( cloneName, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 );
-            if ( agent == null )
-            {
-                fireEvent( new ContainerEvent( ContainerEventType.CLONING_FAILED, envId, hostName, cloneName ) );
-                throw new ContainerCreateException(
-                        String.format( "Couldn't create container %s : %s.", hostName, cloneName ) );
-            }
-            else
-            {
-                fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, envId, hostName, cloneName ) );
-                return agent;
-            }
+            fireEvent( new ContainerEvent( ContainerEventType.CLONING_SUCCEED, envId, hostName, cloneName ) );
+            return agent;
         }
     }
 

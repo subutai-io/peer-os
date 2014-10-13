@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,8 +17,7 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.template.api.ActionType;
-import org.safehaus.subutai.core.template.api.SubutaiPackage;
-import org.safehaus.subutai.core.template.api.TemplatePackage;
+import org.safehaus.subutai.core.template.api.TemplateException;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -49,6 +47,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
 
     @Override
     public boolean clone( String hostName, String templateName, String cloneName, String environmentId )
+            throws TemplateException
     {
         return clone( hostName, templateName, Sets.newHashSet( cloneName ), environmentId );
     }
@@ -56,18 +55,15 @@ public class TemplateManagerImpl extends TemplateManagerBase
 
     @Override
     public boolean clone( String hostName, String templateName, Set<String> cloneNames, String environmentId )
+            throws TemplateException
     {
         Agent a = agentManager.getAgentByHostname( hostName );
-        if ( !prepareTemplates( a, templateName ) )
-        {
-            return false;
-        }
+        prepareTemplates( a, templateName );
 
         boolean result = true;
         for ( String cloneName : cloneNames )
         {
-            result &= scriptExecutor.execute( a, ActionType.CLONE, templateName, cloneName,
-                    String.format( " -e %s &", environmentId ) );
+            result &= scriptExecutor.execute( a, ActionType.CLONE, templateName, cloneName, environmentId );
             // TODO: script does not return w/o redirecting outputs!!!
             // for now, script is run in background
         }
@@ -262,71 +258,107 @@ public class TemplateManagerImpl extends TemplateManagerBase
     }
 
 
-    private boolean prepareTemplates( Agent a, String templateName )
+    protected void prepareTemplates( Agent a, String templateName ) throws TemplateException
     {
         // check parents first
         List<Template> parents = templateRegistry.getParentTemplates( templateName );
         for ( Template p : parents )
         {
-            boolean exists = scriptExecutor.execute( a, ActionType.LIST_TEMPLATES, p.getTemplateName() );
-            if ( !exists )
-            {
-                String pack = getPackageName( p.getTemplateName() );
-                boolean b = scriptExecutor.execute( a, ActionType.INSTALL, pack );
-                if ( !b )
-                {
-                    logger.log( Level.SEVERE, "Failed to install parent templates: {0}", p.getTemplateName() );
-                    return false;
-                }
-            }
+            checkTemplate( a, p );
         }
-        // check template itself
-        if ( !scriptExecutor.execute( a, ActionType.LIST_TEMPLATES, templateName ) )
-        {
-            String pack = getPackageName( templateName );
-            if ( !scriptExecutor.execute( a, ActionType.INSTALL, pack ) )
-            {
-                logger.log( Level.SEVERE, "Failed to install template: {0}", templateName );
-                return false;
-            }
-        }
-        return true;
+
+        Template p = templateRegistry.getTemplate( templateName );
+        checkTemplate( a, p );
     }
 
 
-    @Override
-    public boolean prepareTemplates( final Set<TemplatePackage> templatePackages )
+    private void checkTemplate( final Agent a, final Template p ) throws TemplateException
     {
-        for ( TemplatePackage templatePackage : templatePackages )
+
+        if ( isTemplateReady( a, p ) )
         {
-            for ( SubutaiPackage subutaiPackage : templatePackage.getSubutaiPackages() )
-            {
-                if ( !isTemplateExists( templatePackage.getAgentId(), subutaiPackage.getName() ) )
-                {
-                    install( templatePackage.getAgentId(), subutaiPackage );
-                }
-            }
+            return;
         }
-        return false;
-    }
 
-
-    protected boolean install( final UUID agentId, final SubutaiPackage subutaiPackage )
-    {
-        Agent agent = agentManager.getAgentByUUID( agentId );
-
-        return scriptExecutor
-                .execute( agent, ActionType.PREPARE, 60 * 24, TimeUnit.MINUTES, subutaiPackage.getUrl().toString() );
-    }
-
-
-    protected boolean isTemplateExists( UUID agentId, String templateName )
-    {
-        Agent agent = agentManager.getAgentByUUID( agentId );
-        if ( agent == null )
+        importTemplate( a, p );
+        if ( isTemplateReady( a, p ) )
         {
-            return false;
+            return;
         }
-        return scriptExecutor.execute( agent, ActionType.LIST_TEMPLATES, templateName );
+        // trying add repository
+        updateRepository( a, p );
+        importTemplate( a, p );
+        if ( !isTemplateReady( a, p ) )
+        {
+            throw new TemplateException(
+                    String.format( "Could not prepare template %s on %s", p.getTemplateName(), a.getHostname() ) );
+        }
     }
+
+
+    protected boolean isTemplateReady( final Agent a, final Template p )
+    {
+        return scriptExecutor.execute( a, ActionType.LIST_TEMPLATES, p.getTemplateName() );
+    }
+
+
+    protected void importTemplate( Agent agent, Template template ) throws TemplateException
+    {
+        scriptExecutor.execute( agent, ActionType.IMPORT, template.getTemplateName() );
+    }
+
+
+//    private String getPackageName( final Template template )
+//    {
+//        return String.format( "%s-subutai-template", template.getTemplateName() );
+//    }
+
+
+    protected void updateRepository( Agent agent, Template template )
+    {
+        if ( template.isRemote() )
+        {
+            scriptExecutor.execute( agent, ActionType.ADD_SOURCE, template.getPeerId().toString() );
+            scriptExecutor.execute( agent, ActionType.APT_GET_UPDATE );
+        }
+    }
+
+
+    //
+    //    @Override
+    //    public boolean prepareTemplates( final Set<TemplatePackage> templatePackages )
+    //    {
+    //        for ( TemplatePackage templatePackage : templatePackages )
+    //        {
+    //            for ( SubutaiPackage subutaiPackage : templatePackage.getSubutaiPackages() )
+    //            {
+    //                if ( !isTemplateExists( templatePackage.getAgentId(), subutaiPackage.getName() ) )
+    //                {
+    //                    install( templatePackage.getAgentId(), subutaiPackage );
+    //                }
+    //            }
+    //        }
+    //        return false;
+    //    }
+    //
+    //
+    //    protected boolean install( final UUID agentId, final SubutaiPackage subutaiPackage )
+    //    {
+    //        Agent agent = agentManager.getAgentByUUID( agentId );
+    //
+    //        return scriptExecutor
+    //                .execute( agent, ActionType.PREPARE, 60 * 24, TimeUnit.MINUTES,
+    // subutaiPackage.getUrl().toString() );
+    //    }
+    //
+    //
+    //    protected boolean isTemplateExists( UUID agentId, String templateName )
+    //    {
+    //        Agent agent = agentManager.getAgentByUUID( agentId );
+    //        if ( agent == null )
+    //        {
+    //            return false;
+    //        }
+    //        return scriptExecutor.execute( agent, ActionType.LIST_TEMPLATES, templateName );
+    //    }
 }

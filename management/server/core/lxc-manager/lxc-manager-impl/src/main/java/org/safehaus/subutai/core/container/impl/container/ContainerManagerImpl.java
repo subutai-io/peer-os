@@ -38,6 +38,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcState;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.core.template.api.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -330,9 +331,11 @@ public class ContainerManagerImpl extends ContainerManagerBase
             throws LxcCreateException
     {
         //TODO: check envId
-        boolean result = templateManager
-                .clone( hostName, templateName, cloneNames, UUIDUtil.generateTimeBasedUUID().toString() );
-        if ( !result )
+        try
+        {
+            templateManager.clone( hostName, templateName, cloneNames, UUIDUtil.generateTimeBasedUUID().toString() );
+        }
+        catch ( TemplateException e )
         {
             throw new LxcCreateException(
                     String.format( "Not all containers from %s : %s are created. Use LXC module to cleanup", hostName,

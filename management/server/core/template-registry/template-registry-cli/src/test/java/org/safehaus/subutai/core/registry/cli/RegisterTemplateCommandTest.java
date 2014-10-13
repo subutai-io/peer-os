@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.registry.cli;
 
 
 import java.nio.charset.Charset;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +64,7 @@ public class RegisterTemplateCommandTest
     {
 
         templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
-                FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
+                FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum, UUID.randomUUID() );
 
         System.out.println( "Template registered successfully" );
 

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -72,10 +73,17 @@ public class Template
     @Expose
     private Set<String> faisUsingThisTemplate = new HashSet<>();
 
+    //indicates where template is generated
+    @Expose
+    private UUID peerId;
+
+    @Expose
+    private boolean remote = false;
+
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
                      final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
-                     final String packagesManifest, final String md5sum )
+                     final String packagesManifest, final String md5sum, UUID peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
@@ -240,6 +248,30 @@ public class Template
     }
 
 
+    public UUID getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final UUID peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    public boolean isRemote()
+    {
+        return remote;
+    }
+
+
+    public void setRemote( final boolean remote )
+    {
+        this.remote = remote;
+    }
+
+
     @Override
     public String toString()
     {
@@ -252,7 +284,13 @@ public class Template
                 ", subutaiParent='" + subutaiParent + '\'' +
                 ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
+                ", packagesManifest='" + packagesManifest + '\'' +
+                ", children=" + children +
                 ", products=" + products +
+                ", md5sum='" + md5sum + '\'' +
+                ", faisUsingThisTemplate=" + faisUsingThisTemplate +
+                ", peerId=" + peerId +
+                ", remote=" + remote +
                 '}';
     }
 }

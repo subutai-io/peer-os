@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,14 +66,14 @@ public class TemplateRegistryImpl implements TemplateRegistry
      */
     @Override
     public synchronized boolean registerTemplate( final String configFile, final String packagesFile,
-                                                  final String md5sum ) throws RegistryException
+                                                  final String md5sum, UUID peerId ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( packagesFile ), "Packages file contents is null or empty" );
 
-        Template template = parseTemplate( configFile, packagesFile, md5sum );
+        Template template = parseTemplate( configFile, packagesFile, md5sum, peerId );
 
         //save template to storage
         try
@@ -99,7 +100,8 @@ public class TemplateRegistryImpl implements TemplateRegistry
      *
      * @return {@code Template}
      */
-    private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException
+    private Template parseTemplate( String configFile, String packagesFile, String md5sum, UUID peerId )
+            throws RegistryException
     {
         Properties properties = new Properties();
         try
@@ -113,7 +115,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
             Template template = new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
-                    subutaiGitUuid, packagesFile, md5sum );
+                    subutaiGitUuid, packagesFile, md5sum, peerId );
 
             //check if template with such name already exists
             if ( getTemplate( template.getTemplateName() ) != null )

@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.registry.impl;
 
 
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
@@ -131,7 +132,7 @@ public class TemplateRegistryImplTest
     public void shouldCallDbManagerExecuteQueryOnRegisterTemplate() throws RegistryException, DBException
     {
         //        templateRegistry.registerTemplate( mock(String.class), mock(String.class), mock(String.class) );
-        templateRegistry.registerTemplate( configFile, "packagesFile", "md5sum" );
+        templateRegistry.registerTemplate( configFile, "packagesFile", "md5sum", UUID.randomUUID() );
         verify( dbManager ).executeUpdate2( any( String.class ), anyVararg() );
     }
 

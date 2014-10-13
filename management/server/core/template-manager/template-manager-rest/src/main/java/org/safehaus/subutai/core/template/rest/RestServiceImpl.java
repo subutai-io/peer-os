@@ -26,6 +26,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.api.TemplateManager;
@@ -43,6 +44,7 @@ public class RestServiceImpl implements RestService
     AptRepositoryManager aptRepoManager;
     AgentManager agentManager;
     CommandRunner commandRunner;
+    PeerManager peerManager;
     private String managementHostName = "management";
 
 
@@ -73,6 +75,12 @@ public class RestServiceImpl implements RestService
     public void setCommandRunner( CommandRunner commandRunner )
     {
         this.commandRunner = commandRunner;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 
 
@@ -136,7 +144,7 @@ public class RestServiceImpl implements RestService
             }
 
             aptRepoManager.addPackageByPath( mgmt, path.toString(), false );
-            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum );
+            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum, peerManager.getSiteId() );
         }
         catch ( AptRepoException ex )
         {

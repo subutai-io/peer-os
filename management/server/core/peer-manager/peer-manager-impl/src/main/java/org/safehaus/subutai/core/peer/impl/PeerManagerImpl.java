@@ -21,8 +21,10 @@ import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.ContainerState;
+import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -43,6 +45,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
+import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
@@ -74,6 +77,7 @@ public class PeerManagerImpl implements PeerManager
     private TemplateRegistry templateRegistry;
 
     private Set<PeerContainer> containers = new HashSet<>();
+    private PeerCommandDispatcher peerCommandDispatcher;
 
 
     public void init()
@@ -108,6 +112,12 @@ public class PeerManagerImpl implements PeerManager
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
+    }
+
+
+    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
+    {
+        this.peerCommandDispatcher = peerCommandDispatcher;
     }
 
 
@@ -414,19 +424,37 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new IllegalArgumentException( "Peer could not be null." );
         }
-        if ( !peerId.equals( getSiteId() ) )
-        {
-            // Is the remote template exists in the local peer?
-            boolean isTemplateExists = templateRegistry.getTemplate( template ) != null;
-            if ( !isTemplateExists )
-            {
-                //TODO: download the remote template and register it in the local registry
-
-            }
-        }
-
 
         return containerManager.clone( envId, template, numberOfNodes, strategy, null );
+    }
+
+
+    protected boolean isRemotePeer( final UUID peerId )
+    {
+        return getSiteId().equals( peerId );
+    }
+
+
+    private void registerTemplate( final Template template ) throws RegistryException
+    {
+        templateRegistry.registerTemplate( template );
+    }
+
+
+    protected Template getRemoteTemplate( final String template, UUID remotePeerId ) throws ContainerCreateException
+    {
+        PeerCommandMessage getTemplateCommand =
+                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, remotePeerId, null );
+        getTemplateCommand.setInput( template );
+        peerCommandDispatcher.invoke( getTemplateCommand );
+        if ( getTemplateCommand.isSuccess() )
+        {
+            return JsonUtil.fromJson( getTemplateCommand.getResult().toString(), Template.class );
+        }
+        else
+        {
+            throw new ContainerCreateException( "Could not get remote template." );
+        }
     }
 
 
@@ -505,11 +533,9 @@ public class PeerManagerImpl implements PeerManager
                         Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getPeerId(), ccm.getTemplate(),
                                 ccm.getNumberOfNodes(), ccm.getStrategy() );
                         ccm.setResult( agents );
-                        //                        ccm.setSuccess( true );
                     }
                     catch ( ContainerCreateException e )
                     {
-                        //                        peerCommandMessage.setSuccess( false );
                         peerCommandMessage.setExceptionMessage( e.toString() );
                     }
                 }
@@ -517,7 +543,6 @@ public class PeerManagerImpl implements PeerManager
             case GET_PEER_ID:
                 UUID peerId = getSiteId();
                 peerCommandMessage.setResult( peerId );
-                //                peerCommandMessage.setSuccess( true );
                 break;
             case GET_CONNECTED_CONTAINERS:
                 Set<Agent> agents = agentManager.getAgents();
