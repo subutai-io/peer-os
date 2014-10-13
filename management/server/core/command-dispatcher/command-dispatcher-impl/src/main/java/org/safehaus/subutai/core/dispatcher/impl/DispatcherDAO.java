@@ -47,7 +47,7 @@ public class DispatcherDAO
     private void setupDb() throws DaoException
     {
 
-        String sql = "create table if not exists remote_responses(commandid varchar(36), responsenumber smallint, " +
+        String sql = "create table if not exists remote_responses(commandid varchar(36), responsenumber varchar(50), " +
                 "info varchar(2000), PRIMARY KEY (commandid, responsenumber));"
                 + "create table if not exists remote_requests(commandid varchar(36), attempts smallint, " +
                 "info varchar(1000), PRIMARY KEY (commandid));";
