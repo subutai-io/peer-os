@@ -19,6 +19,5 @@
     <module>tracker-impl</module>
     <module>tracker-rest</module>
     <module>tracker-ui</module>
-    <module>tracker-datasource</module>
   </modules>
 </project>
