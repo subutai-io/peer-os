@@ -8,8 +8,11 @@
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
-  <reference id="dataSource" interface="javax.sql.DataSource"
-             filter="(osgi.jndi.service.name=jdbc/dispatcher)" />
+  <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="URL" value="jdbc:h2:~/dispatcher" />
+    <property name="user" value="sa" />
+    <property name="password" value="" />
+  </bean>
 
   <bean id="module" scope="singleton"
         class="org.safehaus.subutai.core.dispatcher.impl.CommandDispatcherImpl"
