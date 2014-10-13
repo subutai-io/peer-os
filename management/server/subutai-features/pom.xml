@@ -382,10 +382,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>tracker-ui</artifactId>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>tracker-datasource</artifactId>
-    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- Vaadin -->
@@ -393,10 +389,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-api</artifactId>
     </dependency>
-    <!--<dependency>-->
-    <!--<groupId>${project.groupId}</groupId>-->
-    <!--<artifactId>vaadin-custom</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-custom</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-impl</artifactId>

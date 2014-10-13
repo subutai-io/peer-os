@@ -7,6 +7,8 @@ package org.safehaus.subutai.core.tracker.impl;
 
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -14,6 +16,7 @@ import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -71,8 +74,9 @@ public class ProductOperationImplTest
         ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
 
         poi.addLog( DUMMY_LOG );
+        poi.addLog( DUMMY_LOG );
 
-        assertEquals( DUMMY_LOG, poi.getLog() );
+        assertEquals( DUMMY_LOG + "\n" + DUMMY_LOG, poi.getLog() );
     }
 
 
@@ -114,6 +118,33 @@ public class ProductOperationImplTest
     }
 
 
+    @Test
+    public void testHashCodeNEquals() throws Exception
+    {
+
+        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        Map<ProductOperationImpl, ProductOperationImpl> map = new HashMap<>();
+        map.put( poi, poi );
+
+        assertEquals( map.get( poi ), poi );
+    }
+
+
+    @Test
+    public void testHashCodeNEquals2() throws Exception
+    {
+        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        ProductOperationViewImpl povi = new ProductOperationViewImpl( poi );
+        Map<ProductOperationViewImpl, ProductOperationViewImpl> map = new HashMap<>();
+        map.put( povi, povi );
+
+        assertEquals( map.get( povi ), povi );
+        assertEquals( poi.getId(), povi.getId() );
+        assertFalse( povi.equals( null ) );
+        assertFalse( povi.equals( poi ) );
+    }
+
+
     @Test(expected = NullPointerException.class)
     public void poViewConstructorShouldFailNullPO()
     {
@@ -129,7 +160,7 @@ public class ProductOperationImplTest
         when( poi.getDescription() ).thenReturn( DESCRIPTION );
         when( poi.getState() ).thenReturn( ProductOperationState.RUNNING );
         when( poi.getLog() ).thenReturn( DUMMY_LOG );
-        when( poi.createDate() ).thenReturn(new Date(  ));
+        when( poi.createDate() ).thenReturn( new Date() );
 
         ProductOperationViewImpl povi = new ProductOperationViewImpl( poi );
 
