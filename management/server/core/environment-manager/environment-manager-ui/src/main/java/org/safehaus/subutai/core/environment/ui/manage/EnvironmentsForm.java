@@ -126,7 +126,7 @@ public class EnvironmentsForm
             } );
 
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), manageButton, configureButton, destroyButton
+                    environment.getName() + " " + environment.getUuid(), manageButton, configureButton, destroyButton
             }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
@@ -174,7 +174,7 @@ public class EnvironmentsForm
         {
 
             containersTable.addItem( new Object[] {
-                    container.getName(), propertiesButton( container ), startButton( container ),
+                    container.getName() + " on " + container.getPeerId(), propertiesButton( container ), startButton( container ),
                     stopButton( container ), destroyButton( container )
             }, null );
         }
