@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -55,6 +56,8 @@ public class EnvironmentManagerImplTest
     TemplateRegistry registry;
     @Mock
     PeerCommandDispatcher peerCommandDispatcher;
+    @Mock
+    EnvironmentBlueprint environmentBlueprint;
 
 
     @Before
@@ -78,8 +81,8 @@ public class EnvironmentManagerImplTest
     public void shoudBuildEnvironment() throws Exception
     {
         EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
-        when( process.getEnvironmentName() ).thenReturn( "name" );
-        when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID());
+        when( process.getEnvironmentBlueprint()).thenReturn( environmentBlueprint );
+        when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID() );
 
         Map<String, CloneContainersMessage> map = new HashMap<>();
         CloneContainersMessage ccm = mock( CloneContainersMessage.class );
