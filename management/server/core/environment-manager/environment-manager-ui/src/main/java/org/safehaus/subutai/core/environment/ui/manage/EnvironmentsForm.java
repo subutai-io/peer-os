@@ -213,11 +213,6 @@ public class EnvironmentsForm
         table.setSizeFull();
         table.addContainerProperty( "Property", String.class, null );
         table.addContainerProperty( "Value", String.class, null );
-        //        table.addContainerProperty( "Prop", String.class, container.getDescription() );
-        //        table.addContainerProperty( "Environment ID", String.class, container.getEnvironmentId() );
-        //        table.addContainerProperty( "Prop", String.class, container.getHostname() );
-        //        table.addContainerProperty( "Prop", String.class, container.getIps().toString() );
-        //        table.addContainerProperty( "Prop", String.class, container.getState());
         table.addItem( new Object[] { "Peer", container.getPeerId().toString() }, null );
         table.addItem( new Object[] { "Agent", container.getAgentId().toString() }, null );
         table.addItem( new Object[] { "IP", container.getIps().toString() }, null );
