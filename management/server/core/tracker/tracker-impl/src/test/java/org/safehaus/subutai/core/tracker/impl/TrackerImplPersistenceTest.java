@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
  * Test for TrackerImpl class
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TrackerImplUnitTest
+public class TrackerImplPersistenceTest
 {
 
     private final UUID poID = UUIDUtil.generateTimeBasedUUID();
