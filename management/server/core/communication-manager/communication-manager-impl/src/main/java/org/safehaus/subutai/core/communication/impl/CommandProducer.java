@@ -63,7 +63,7 @@ class CommandProducer implements Runnable
 
             if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) )
             {
-                LOG.info( "\nSending: {}", json );
+                LOG.info( String.format( "Sending: {%s}", json ) );
             }
 
             TextMessage message = session.createTextMessage( json );

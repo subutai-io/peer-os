@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by bahadyr on 9/29/14.
  */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class Node2PeerWizardTest
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
