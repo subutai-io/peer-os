@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
+import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 
 
 /**
@@ -43,22 +45,25 @@ public class PeerContainer extends Container
 
 
     @Override
-    public boolean start() throws ContainerException
+    public DefaultCommandMessage start() throws ContainerException
     {
-        return peerManager.startContainer( this );
+        peerManager.startContainer( this );
+        return new DefaultCommandMessage( PeerCommandType.START, null, null, null );
     }
 
 
     @Override
-    public boolean stop() throws ContainerException
+    public DefaultCommandMessage stop() throws ContainerException
     {
-        return peerManager.stopContainer( this );
+        peerManager.stopContainer( this );
+        return new DefaultCommandMessage( PeerCommandType.STOP, null, null, null );
     }
 
 
     @Override
-    public boolean isConnected() throws ContainerException
+    public DefaultCommandMessage isConnected() throws ContainerException
     {
-        return peerManager.isContainerConnected( this );
+        peerManager.isContainerConnected( this );
+        return new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, null, null, null );
     }
 }

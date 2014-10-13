@@ -314,12 +314,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         for ( Agent agent : agents )
                         {
                             EnvironmentContainer container = new EnvironmentContainer();
+
                             container.setPeerId( agent.getSiteId() );
                             container.setAgentId( agent.getUuid() );
                             container.setIps( agent.getListIP() );
                             container.setHostname( agent.getHostname() );
-                            container.setDescription( ccm.getTemplate() );
+                            container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
                             container.setName( agent.getHostname() );
+
                             environment.addContainer( container );
                         }
                     }
@@ -409,7 +411,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 for ( Container c : containers )
                 {
                     EnvironmentContainer ec = new EnvironmentContainer();
-                    ec.setEnvironment( environment );
+                    ec.setEnvironmentId( environment.getUuid() );
                     ec.setAgentId( c.getAgentId() );
                     ec.setPeerId( c.getPeerId() );
                     freshContainers.add( ec );
