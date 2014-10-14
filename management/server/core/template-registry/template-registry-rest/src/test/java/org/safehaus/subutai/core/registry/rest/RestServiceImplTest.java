@@ -134,7 +134,7 @@ public class RestServiceImplTest
     }
 
 
-    @Ignore
+//    @Ignore
     @Test
     public void shouldReturnBadRequestStatusForRegisterTemplate()
     {
