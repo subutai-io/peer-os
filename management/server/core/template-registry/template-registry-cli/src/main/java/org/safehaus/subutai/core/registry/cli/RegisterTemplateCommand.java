@@ -29,12 +29,12 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
             description = "md5sum of packages file")
     String md5sum;
 
-    private TemplateRegistry templateRegistry;
+    private final TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    public RegisterTemplateCommand( final TemplateRegistry templateRegistry )
     {
-        Preconditions.checkNotNull( templateRegistry );
+        Preconditions.checkNotNull( templateRegistry, "Template Registry is null" );
         this.templateRegistry = templateRegistry;
     }
 
@@ -49,11 +49,5 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
         System.out.println( "Template registered successfully" );
 
         return null;
-    }
-
-
-    public TemplateRegistry getTemplateRegistry()
-    {
-        return templateRegistry;
     }
 }

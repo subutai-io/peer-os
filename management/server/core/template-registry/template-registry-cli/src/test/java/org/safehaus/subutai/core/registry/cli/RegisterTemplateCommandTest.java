@@ -1,72 +1,92 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 
 /**
- * Created by talas on 10/2/14.
+ * Test for RegisterTemplateCommand
  */
-public class RegisterTemplateCommandTest
+public class RegisterTemplateCommandTest extends TestParent
 {
-    String configFilePath;
-    String packagesFilePath;
-    String md5sum;
 
+
+    private static final String FILE_PATH = "test-file";
     private TemplateRegistry templateRegistry;
-    private RegisterTemplateCommand registerTemplateCommand;
+    private RegisterTemplateCommandExt registerTemplateCommand;
+    private final File file = new File( FILE_PATH );
+
+
+    static class RegisterTemplateCommandExt extends RegisterTemplateCommand
+    {
+        RegisterTemplateCommandExt( final TemplateRegistry templateRegistry )
+        {
+            super( templateRegistry );
+        }
+
+
+        public void setConfigFilePath( String configFilePath )
+        {
+            this.configFilePath = configFilePath;
+        }
+
+
+        public void setPackagesFilePath( String packagesFilePath )
+        {
+            this.packagesFilePath = packagesFilePath;
+        }
+
+
+        public void setMd5sum( String md5sum )
+        {
+            this.md5sum = md5sum;
+        }
+    }
 
 
     @Before
-    public void setupClasses()
+    public void setUp() throws IOException
     {
         templateRegistry = mock( TemplateRegistry.class );
-        registerTemplateCommand = new RegisterTemplateCommand();
-        registerTemplateCommand.setTemplateRegistry( templateRegistry );
+        registerTemplateCommand = new RegisterTemplateCommandExt( templateRegistry );
+        registerTemplateCommand.setConfigFilePath( FILE_PATH );
+        registerTemplateCommand.setPackagesFilePath( FILE_PATH );
+        file.createNewFile();
+    }
+
+
+    @After
+    public void tearDown()
+    {
+
+        file.delete();
     }
 
 
     @Test( expected = NullPointerException.class )
-    public void shouldThrowNullPointerExceptionOnSettingNullObject()
+    public void testConstructorShouldFailOnNullRegistry()
     {
-        registerTemplateCommand.setTemplateRegistry( null );
+        new RegisterTemplateCommand( null );
     }
 
 
     @Test
-    public void shouldSetNewTemplateRegistry()
+    public void testRegisterTemplate() throws Exception
     {
-        TemplateRegistry registry = mock( TemplateRegistry.class );
-        registerTemplateCommand.setTemplateRegistry( registry );
-        assertNotSame( templateRegistry, registerTemplateCommand.getTemplateRegistry() );
-    }
+        registerTemplateCommand.doExecute();
 
-    //    @Ignore
-    //    @Test
-    //    public void shouldAccessTemplateRegistryAndCallRegisterTemplateMethod() throws Exception
-    //    {
-    //        when( templateRegistry.registerTemplate( configFilePath, packagesFilePath, md5sum ) ).thenReturn( true );
-    //        registerTemplateCommand.doExecute();
-    //        verify( templateRegistry ).registerTemplate( configFilePath, packagesFilePath, md5sum );
-    //    }
-
-
-    protected Object doExecute() throws Exception
-    {
-
-        templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
-                FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
-
-        System.out.println( "Template registered successfully" );
-
-        return null;
+        verify( templateRegistry ).registerTemplate( anyString(), anyString(), anyString() );
+        assertTrue( getSysOut().contains( "success" ) );
     }
 }

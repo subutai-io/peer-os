@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,15 +38,15 @@ public class GetParentTemplateCommandTest extends TestParent
 
 
     @Before
-    public void setupClasses()
+    public void setUp()
     {
         templateRegistry = mock( TemplateRegistry.class );
         parentTemplateCommand = new GetParentTemplateCommandExt( templateRegistry );
         parentTemplateCommand.setLxcArch( MockUtils.LXC_ARCH );
         parentTemplateCommand.setChildTemplateName( MockUtils.CHILD_ONE_TEMPLATE_NAME );
         Template parentTemplate = MockUtils.PARENT_TEMPLATE;
-        when( templateRegistry.getParentTemplate( MockUtils.PARENT_TEMPLATE_NAME ) ).thenReturn( parentTemplate );
-        when( templateRegistry.getParentTemplate( MockUtils.PARENT_TEMPLATE_NAME, MockUtils.LXC_ARCH ) )
+        when( templateRegistry.getParentTemplate( MockUtils.CHILD_ONE_TEMPLATE_NAME ) ).thenReturn( parentTemplate );
+        when( templateRegistry.getParentTemplate( MockUtils.CHILD_ONE_TEMPLATE_NAME, MockUtils.LXC_ARCH ) )
                 .thenReturn( parentTemplate );
     }
 
@@ -54,5 +55,39 @@ public class GetParentTemplateCommandTest extends TestParent
     public void testConstructorShouldFailOnNullRegistry() throws Exception
     {
         new GetParentTemplateCommand( null );
+    }
+
+
+    @Test
+    public void testPrint() throws Exception
+    {
+        parentTemplateCommand.doExecute();
+
+        assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
+    }
+
+
+    @Test
+    public void testNullLxcArch() throws Exception
+    {
+        parentTemplateCommand.setLxcArch( null );
+
+        parentTemplateCommand.doExecute();
+
+        assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
+    }
+
+
+    @Test
+    public void shouldPrint2SysOut() throws Exception
+    {
+        when( templateRegistry.getParentTemplate( MockUtils.CHILD_ONE_TEMPLATE_NAME ) ).thenReturn( null );
+        when( templateRegistry.getParentTemplate( MockUtils.CHILD_ONE_TEMPLATE_NAME, MockUtils.LXC_ARCH ) )
+                .thenReturn( null );
+
+        parentTemplateCommand.doExecute();
+
+
+        assertTrue( getSysOut().contains( MockUtils.CHILD_ONE_TEMPLATE_NAME ) );
     }
 }

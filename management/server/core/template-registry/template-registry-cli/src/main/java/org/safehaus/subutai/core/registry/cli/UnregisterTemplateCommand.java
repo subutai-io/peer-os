@@ -20,12 +20,13 @@ public class UnregisterTemplateCommand extends OsgiCommandSupport
             description = "template name")
     String templateName;
 
-    private TemplateRegistry templateRegistry;
+    private final TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    public UnregisterTemplateCommand( final TemplateRegistry templateRegistry )
     {
         Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null" );
+
         this.templateRegistry = templateRegistry;
     }
 
@@ -40,11 +41,5 @@ public class UnregisterTemplateCommand extends OsgiCommandSupport
 
 
         return null;
-    }
-
-
-    public TemplateRegistry getTemplateRegistry()
-    {
-        return templateRegistry;
     }
 }

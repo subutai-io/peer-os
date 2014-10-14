@@ -19,7 +19,7 @@ public abstract class TestParent
 
 
     @Before
-    public void setUp() throws Exception
+    public final void before() throws Exception
     {
         myOut = new ByteArrayOutputStream();
         System.setOut( new PrintStream( myOut ) );
@@ -27,13 +27,13 @@ public abstract class TestParent
 
 
     @After
-    public void tearDown() throws Exception
+    public final void after() throws Exception
     {
         System.setOut( System.out );
     }
 
 
-    private String getSysOut()
+    protected String getSysOut()
     {
         return myOut.toString().trim();
     }
