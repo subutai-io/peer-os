@@ -47,7 +47,7 @@ public class TrackerImpl implements Tracker
     /**
      * reference to dataSource
      */
-    private final DbUtil dbUtil;
+    protected DbUtil dbUtil;
 
 
     public TrackerImpl( final DataSource dataSource ) throws SQLException
@@ -59,7 +59,7 @@ public class TrackerImpl implements Tracker
     }
 
 
-    private void setupDb() throws SQLException
+    protected void setupDb() throws SQLException
     {
 
         String sql = "create table if not exists product_operation(source varchar(100), id uuid, ts timestamp, "
@@ -255,8 +255,8 @@ public class TrackerImpl implements Tracker
                 }
                 //return if operation is completed
                 //or if time limit is reached
-                if ( po.getState() != ProductOperationState.RUNNING
-                        || System.currentTimeMillis() - startedTs > maxOperationDurationMs )
+                long ts = System.currentTimeMillis() - startedTs;
+                if ( po.getState() != ProductOperationState.RUNNING || ts > maxOperationDurationMs )
                 {
                     return;
                 }

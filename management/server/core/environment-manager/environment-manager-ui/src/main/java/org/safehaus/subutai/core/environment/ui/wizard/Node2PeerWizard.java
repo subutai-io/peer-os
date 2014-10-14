@@ -94,6 +94,7 @@ public class Node2PeerWizard extends Window
         this.managerUI = managerUI;
     }
 
+
     public void back()
     {
         step--;
@@ -249,7 +250,7 @@ public class Node2PeerWizard extends Window
 
     public EnvironmentBuildProcess createEnvironmentBuildProcess( EnvironmentBuildTask ebt, Map<Object, Peer> topology )
     {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint().getName() );
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint() );
 
         Map<Object, NodeGroup> map = getNodeGroupMap();
         for ( Object itemId : map.keySet() )
@@ -257,19 +258,21 @@ public class Node2PeerWizard extends Window
             Peer peer = topology.get( itemId );
             NodeGroup ng = map.get( itemId );
 
-            String key = peer.getId().toString() + "-" + ng.getTemplateName();
+            StringBuilder key = new StringBuilder();
+            key.append( peer.getId().toString() );
+            key.append( ng.getTemplateName() );
 
-            if ( !process.getMessageMap().containsKey( key ) )
+            if ( !process.getMessageMap().containsKey( key.toString() ) )
             {
                 CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
-                process.putCloneContainerMessage( key, ccm );
+                process.putCloneContainerMessage( key.toString(), ccm );
             }
             else
             {
-                process.getMessageMap().get( key ).incrementNumberOfNodes();
+                process.getMessageMap().get( key.toString() ).incrementNumberOfNodes();
             }
         }
 

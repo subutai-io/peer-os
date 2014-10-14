@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class EnvironmentBuilderTest
 {
     EnvironmentBuilder environmentBuilder;

@@ -111,11 +111,7 @@
         <artifactId>command-dispatcher-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-datasource</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- command-runner -->
       <dependency>
@@ -506,11 +502,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>tracker-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>tracker-datasource</artifactId>
         <version>${project.version}</version>
       </dependency>
 

@@ -21,11 +21,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.db.api.DBException;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,8 +32,8 @@ import static org.mockito.Mockito.when;
 /**
  * Test for TrackerImpl class
  */
-@RunWith(MockitoJUnitRunner.class)
-public class TrackerImplUnitTest
+@RunWith( MockitoJUnitRunner.class )
+public class TrackerImplPersistenceTest
 {
 
     private final UUID poID = UUIDUtil.generateTimeBasedUUID();
@@ -55,7 +52,7 @@ public class TrackerImplUnitTest
 
 
     @Before
-    public void setupMethod() throws DBException, SQLException
+    public void setupMethod() throws SQLException
     {
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( dataSource.getConnection() ).thenReturn( connection );
@@ -71,7 +68,7 @@ public class TrackerImplUnitTest
 
 
     @Test
-    public void shouldCallDbManagerExecuteUpdateWhenCreatePO() throws DBException, SQLException
+    public void shouldCallDbManagerExecuteUpdateWhenCreatePO() throws SQLException
     {
 
         ti.createProductOperation( SOURCE, DESCRIPTION );
@@ -81,19 +78,19 @@ public class TrackerImplUnitTest
 
 
     @Test
-    public void shouldCallDbManagerExecuteUpdateWhenSavePO() throws DBException, SQLException
+    public void shouldCallDbManagerExecuteUpdateWhenSavePO() throws SQLException
     {
 
         ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, ti );
 
         ti.saveProductOperation( SOURCE, poi );
 
-        verify( preparedStatement , times( 2 )).executeUpdate();
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
     }
 
 
     @Test
-    public void shouldCallDbManagerExecuteQueryWhenGetPO() throws DBException, SQLException
+    public void shouldCallDbManagerExecuteQueryWhenGetPO() throws SQLException
     {
 
         ti.getProductOperation( SOURCE, poID );
@@ -103,7 +100,7 @@ public class TrackerImplUnitTest
 
 
     @Test
-    public void shouldCallDbManagerExecuteQueryWhenGetPOs() throws DBException, SQLException
+    public void shouldCallDbManagerExecuteQueryWhenGetPOs() throws SQLException
     {
 
         ti.getProductOperations( SOURCE, mock( Date.class ), mock( Date.class ), 1 );
@@ -113,7 +110,7 @@ public class TrackerImplUnitTest
 
 
     @Test
-    public void shouldCallDbManagerExecuteQueryWhenGetPOSources() throws DBException, SQLException
+    public void shouldCallDbManagerExecuteQueryWhenGetPOSources() throws SQLException
     {
 
         ti.getProductOperationSources();
@@ -123,7 +120,7 @@ public class TrackerImplUnitTest
 
 
     @Test
-    public void shouldCallDbManagerExecuteQueryWhenPrintOperationLog() throws DBException, SQLException
+    public void shouldCallDbManagerExecuteQueryWhenPrintOperationLog() throws SQLException
     {
 
         ti.printOperationLog( SOURCE, poID, 100 );

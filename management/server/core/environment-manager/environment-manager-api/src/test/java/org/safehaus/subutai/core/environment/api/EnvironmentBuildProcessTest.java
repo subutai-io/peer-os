@@ -7,7 +7,11 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
@@ -15,16 +19,19 @@ import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import static org.junit.Assert.assertEquals;
 
 
+@RunWith( MockitoJUnitRunner.class )
 public class EnvironmentBuildProcessTest
 {
     private static final String NAME = "name";
     EnvironmentBuildProcess process;
+    @Mock
+    EnvironmentBlueprint environmentBlueprint;
 
 
     @Before
     public void setUp() throws Exception
     {
-        process = new EnvironmentBuildProcess( NAME );
+        process = new EnvironmentBuildProcess( environmentBlueprint );
     }
 
 
@@ -66,14 +73,6 @@ public class EnvironmentBuildProcessTest
     {
         process.setProcessStatusEnum( ProcessStatusEnum.NEW_PROCESS );
         assertEquals( ProcessStatusEnum.NEW_PROCESS, process.getProcessStatusEnum() );
-    }
-
-
-    @Test
-    public void testSetGetEnvironmentName() throws Exception
-    {
-        process.setEnvironmentName( NAME );
-        assertEquals( NAME, process.getEnvironmentName() );
     }
 }
 

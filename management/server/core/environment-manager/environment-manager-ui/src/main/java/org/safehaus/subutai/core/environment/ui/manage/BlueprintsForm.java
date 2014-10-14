@@ -5,20 +5,22 @@ import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
 import org.safehaus.subutai.core.environment.ui.wizard.Blueprint2PeerGroupWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.Node2PeerWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.NodeGroup2PeerGroupWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.NodeGroup2PeerWizard;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintsForm
 {
 
@@ -30,6 +32,7 @@ public class BlueprintsForm
     private static final String DELETE = "Delete";
     private static final String VIEW = "View";
     private static final String NAME = "Name";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule module;
@@ -65,9 +68,9 @@ public class BlueprintsForm
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( VIEW, Button.class, null );
         table.addContainerProperty( N2P, Button.class, null );
+        table.addContainerProperty( NG2P, Button.class, null );
         table.addContainerProperty( B2PG, Button.class, null );
         table.addContainerProperty( NG2PG, Button.class, null );
-        table.addContainerProperty( NG2P, Button.class, null );
         table.addContainerProperty( DELETE, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -93,15 +96,12 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        BlueprintDetails details = new BlueprintDetails( "Blueprint details" );
-                        details.setContent( task.getEnvironmentBlueprint() );
-                        contentRoot.getUI().addWindow( details );
-                        details.setVisible( true );
+                        Window window = blueprintDetails( task );
                     }
                 } );
 
-                final Button N2PBTN = new Button( N2P );
-                N2PBTN.addClickListener( new Button.ClickListener()
+                final Button N2P_BTN = new Button( N2P );
+                N2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -112,8 +112,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button B2PGBTN = new Button( B2PG );
-                B2PGBTN.addClickListener( new Button.ClickListener()
+                final Button B2PG_BTN = new Button( B2PG );
+                B2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -124,8 +124,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button NG2PGBTN = new Button( NG2PG );
-                NG2PGBTN.addClickListener( new Button.ClickListener()
+                final Button NG2PG_BTN = new Button( NG2PG );
+                NG2PG_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -137,8 +137,8 @@ public class BlueprintsForm
                     }
                 } );
 
-                final Button NG2PBTN = new Button( NG2P );
-                NG2PBTN.addClickListener( new Button.ClickListener()
+                final Button NG2P_BTN = new Button( NG2P );
+                NG2P_BTN.addClickListener( new Button.ClickListener()
                 {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
@@ -161,7 +161,7 @@ public class BlueprintsForm
                 } );
 
                 environmentsTable.addItem( new Object[] {
-                        task.getEnvironmentBlueprint().getName(), view, N2PBTN, B2PGBTN, NG2PGBTN, NG2PBTN, delete
+                        task.getEnvironmentBlueprint().getName(), view, N2P_BTN, NG2P_BTN, B2PG_BTN, NG2PG_BTN, delete
                 }, null );
             }
         }
@@ -173,34 +173,24 @@ public class BlueprintsForm
     }
 
 
-    /*private void showBlueprint2PeerGroupWindow()
+    private Window blueprintDetails( final EnvironmentBuildTask task )
     {
-        Window window = createWindow( B2PG );
-        List<PeerGroup> peerGroups = module.getPeerManager().peersGroups();
-        Table table = new Table();
-        table.setHeight( "500px" );
-        table.setWidth( "800px" );
-        table.addContainerProperty( "Name", String.class, null );
-        table.addContainerProperty( "Select", CheckBox.class, null );
-        for ( PeerGroup peerGroup : peerGroups )
-        {
-            CheckBox checkBox = new CheckBox();
-            table.addItem( new Object[] { peerGroup.getName(), checkBox }, peerGroup );
-        }
-        VerticalLayout layout = new VerticalLayout();
-        layout.addComponent( table );
-        Button next = new Button("Next");
-        layout.addComponent( next );
-        window.setContent( layout );
-        getContentRoot().getUI().addWindow( window );
-        window.setVisible( true );
-    }*/
+        Window window = createWindow( "Blueprint details" );
+        TextArea area = new TextArea();
+        area.setSizeFull();
+        area.setValue( GSON.toJson( task.getEnvironmentBlueprint() ) );
+        window.setContent( area );
+        contentRoot.getUI().addWindow( window );
+        return window;
+    }
 
 
     private Window createWindow( String caption )
     {
         Window window = new Window();
         window.setCaption( caption );
+        window.setWidth( "800px" );
+        window.setHeight( "600px" );
         window.setModal( true );
         window.setClosable( true );
         return window;

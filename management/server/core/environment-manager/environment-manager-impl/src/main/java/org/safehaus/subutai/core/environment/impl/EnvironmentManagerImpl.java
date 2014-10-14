@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
@@ -26,7 +27,6 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
-import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
@@ -39,6 +39,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -56,6 +57,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String PROCESS = "PROCESS";
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final long TIMEOUT = 1000 * 15;
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private ContainerManager containerManager;
@@ -64,13 +66,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private NetworkManager networkManager;
     private DbManager dbManager;
     private PeerCommandDispatcher peerCommandDispatcher;
-    //    private List<Environment> environments;
-    //    private Set<EnvironmentContainer> containers = new HashSet<>();
-
-
-    public EnvironmentManagerImpl()
-    {
-    }
 
 
     public PeerCommandDispatcher getPeerCommandDispatcher()
@@ -89,8 +84,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager, containerManager );
-
-        //        this.environments = environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
@@ -190,17 +183,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    /*public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask )
-    {
-        LOG.info( "saved to " );
-        //        return build( environmentBuildTask );
-        //TODO build environment in background
-
-
-        return true;
-    }*/
-
-
     @Override
     public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
             throws EnvironmentBuildException
@@ -213,7 +195,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public List<Environment> getEnvironments()
     {
-        //        return environments;
         return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
@@ -229,16 +210,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public boolean destroyEnvironment( final String uuid )
     {
         Environment environment = getEnvironment( uuid );
-        try
+        int count = 0;
+        for ( EnvironmentContainer container : environment.getContainers() )
         {
-            environmentBuilder.destroy( environment );
+            DestroyContainersMessage dcm =
+                    new DestroyContainersMessage( PeerCommandType.DESTROY, environment.getUuid(), container.getPeerId(),
+                            container.getAgentId() );
+            dcm.setHostname( container.getHostname() );
+            peerCommandDispatcher.invoke( dcm, 1000 * 60 );
+            if ( dcm.isSuccess() )
+            {
+                count++;
+            }
+        }
+
+        //TODO: fix workaround
+        /*if ( count == environment.getContainers().size() )
+        {
             return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
-        }
-        catch ( EnvironmentDestroyException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        return false;
+        }*/
+        return environmentDAO.deleteInfo( ENVIRONMENT, uuid );
     }
 
 
@@ -277,6 +268,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public void saveEnvironment( final Environment environment )
+    {
+        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+    }
+
+
+    @Override
     public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress )
     {
         return environmentDAO.saveInfo( PROCESS, buildProgress.getUuid().toString(), buildProgress );
@@ -291,18 +289,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void saveEnvironment( final Environment environment )
-    {
-        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-    }
-
-
-    @Override
     public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
-        Environment environment = new Environment( process.getUuid(), process.getEnvironmentName() );
+        Environment environment = new Environment( process.getEnvironmentBlueprint().getName() );
         int containerCount = 0;
-        long timeout = 1000 * 60;
+        long timeout = 1000 * 360;
         for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
         {
             CloneContainersMessage ccm = process.getMessageMap().get( key );
@@ -311,6 +302,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             containerCount = containerCount + ccm.getNumberOfNodes();
             try
             {
+                ccm.setEnvId( environment.getUuid() );
                 peerCommandDispatcher.invoke( ccm, timeout );
 
                 boolean result = ccm.isSuccess();
@@ -342,6 +334,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         if ( !environment.getContainers().isEmpty() )
         {
+            Set<Container> containers = Sets.newHashSet();
+            containers.addAll( environment.getContainers() );
+
+            if ( process.getEnvironmentBlueprint().isExchangeSshKeys() )
+            {
+                networkManager.configSsh( containers );
+            }
+            if ( process.getEnvironmentBlueprint().isLinkHosts() )
+            {
+                networkManager.configHosts( process.getEnvironmentBlueprint().getDomainName(), containers );
+            }
+
             saveEnvironment( environment );
             if ( environment.getContainers().size() != containerCount )
             {
@@ -393,11 +397,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, environment.getUuid(), peerId,
                             null );
 
-            peerCommandDispatcher.invoke( cmd, 1000 * 15 );
+            peerCommandDispatcher.invoke( cmd, TIMEOUT );
 
             Set<PeerContainer> containers =
                     JsonUtil.fromJson( ( String ) cmd.getResult(), new TypeToken<Set<PeerContainer>>()
-                    {}.getType() );
+                    {
+                    }.getType() );
 
             if ( cmd.isSuccess() && containers != null )
             {
