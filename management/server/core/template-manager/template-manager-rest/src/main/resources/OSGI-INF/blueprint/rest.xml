@@ -21,8 +21,6 @@
              interface="org.safehaus.subutai.core.apt.api.AptRepositoryManager" />
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
-  <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.core.template.rest.RestServiceImpl">
     <property name="templateManager" ref="templateManager" />
@@ -30,7 +28,6 @@
     <property name="aptRepoManager" ref="repoManager" />
     <property name="agentManager" ref="agentManager" />
     <property name="commandRunner" ref="commandRunner" />
-    <property name="peerManager" ref="peerManager" />
   </bean>
 
   <jaxrs:server address="/template" id="templateManagerRestService">

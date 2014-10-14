@@ -36,10 +36,6 @@
       <artifactId>template-registry-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>peer-command-dispatcher-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>

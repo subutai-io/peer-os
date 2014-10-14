@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +27,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.api.TemplateManager;
@@ -44,7 +44,6 @@ public class RestServiceImpl implements RestService
     AptRepositoryManager aptRepoManager;
     AgentManager agentManager;
     CommandRunner commandRunner;
-    PeerManager peerManager;
     private String managementHostName = "management";
 
 
@@ -78,12 +77,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
-
-
     @Override
     public String getManagementHostName()
     {
@@ -99,7 +92,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response importTemplate( InputStream in, String configDir )
+    public Response importTemplate( InputStream in, String configDir, String peerId )
     {
         Path path;
         try
@@ -144,7 +137,7 @@ public class RestServiceImpl implements RestService
             }
 
             aptRepoManager.addPackageByPath( mgmt, path.toString(), false );
-            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum, peerManager.getSiteId() );
+            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum, UUID.fromString( peerId ) );
         }
         catch ( AptRepoException ex )
         {

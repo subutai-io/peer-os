@@ -16,9 +16,6 @@
 
   <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
-  <reference id="peerCommandDispatcher"
-             interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />
-
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="dbManager" ref="dbManager" />
@@ -26,7 +23,6 @@
     <property name="containerManager" ref="containerManager" />
     <property name="commandRunner" ref="commandRunner" />
     <property name="templateRegistry" ref="templateRegistry" />
-    <property name="peerCommandDispatcher" ref="peerCommandDispatcher" />
   </bean>
 
 </blueprint>

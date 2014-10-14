@@ -21,10 +21,9 @@ import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.ContainerState;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -35,6 +34,7 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -45,7 +45,6 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
-import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
@@ -77,7 +76,6 @@ public class PeerManagerImpl implements PeerManager
     private TemplateRegistry templateRegistry;
 
     private Set<PeerContainer> containers = new HashSet<>();
-    private PeerCommandDispatcher peerCommandDispatcher;
 
 
     public void init()
@@ -112,12 +110,6 @@ public class PeerManagerImpl implements PeerManager
     public void setTemplateRegistry( final TemplateRegistry templateRegistry )
     {
         this.templateRegistry = templateRegistry;
-    }
-
-
-    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
-    {
-        this.peerCommandDispatcher = peerCommandDispatcher;
     }
 
 
@@ -440,22 +432,23 @@ public class PeerManagerImpl implements PeerManager
         templateRegistry.registerTemplate( template );
     }
 
-
-    protected Template getRemoteTemplate( final String template, UUID remotePeerId ) throws ContainerCreateException
-    {
-        PeerCommandMessage getTemplateCommand =
-                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, remotePeerId, null );
-        getTemplateCommand.setInput( template );
-        peerCommandDispatcher.invoke( getTemplateCommand );
-        if ( getTemplateCommand.isSuccess() )
-        {
-            return JsonUtil.fromJson( getTemplateCommand.getResult().toString(), Template.class );
-        }
-        else
-        {
-            throw new ContainerCreateException( "Could not get remote template." );
-        }
-    }
+    //
+    //    protected Template getRemoteTemplate( final String template,
+    // UUID remotePeerId ) throws ContainerCreateException
+    //    {
+    //        PeerCommandMessage getTemplateCommand =
+    //                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, remotePeerId, null );
+    //        getTemplateCommand.setInput( template );
+    //        peerCommandDispatcher.invoke( getTemplateCommand );
+    //        if ( getTemplateCommand.isSuccess() )
+    //        {
+    //            return JsonUtil.fromJson( getTemplateCommand.getResult().toString(), Template.class );
+    //        }
+    //        else
+    //        {
+    //            throw new ContainerCreateException( "Could not get remote template." );
+    //        }
+    //    }
 
 
     @Override
@@ -629,6 +622,29 @@ public class PeerManagerImpl implements PeerManager
                 else
                 {
                     peerCommandMessage.setExceptionMessage( "Template not found." );
+                }
+                break;
+            case DESTROY:
+                if ( peerCommandMessage instanceof DestroyContainersMessage )
+                {
+                    DestroyContainersMessage dcm = ( DestroyContainersMessage ) peerCommandMessage;
+                    try
+                    {
+                        Agent agent = agentManager.getAgentByHostname( dcm.getHostname() );
+                        Agent parentAgent = agentManager.getAgentByHostname( agent.getParentHostName() );
+                        containerManager.destroy( parentAgent.getHostname(), agent.getHostname() );
+
+                        //                        peerCommandMessage.setSuccess( true );
+                    }
+                    catch ( ContainerDestroyException e )
+                    {
+                        LOG.error( e.getMessage(), e );
+                        //                        peerCommandMessage.setSuccess( false );
+                    }
+                }
+                else
+                {
+                    //                    peerCommandMessage.setSuccess( false );
                 }
                 break;
             default:

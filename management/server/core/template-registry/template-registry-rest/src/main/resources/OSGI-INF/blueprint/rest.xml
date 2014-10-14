@@ -14,12 +14,8 @@
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
-  <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
-
   <bean id="templateRegistryRestImpl" class="org.safehaus.subutai.core.registry.rest.RestServiceImpl">
     <property name="templateRegistry" ref="templateRegistry" />
-    <property name="peerManager" ref="peerManager" />
   </bean>
 
   <jaxrs:server address="/registry" id="registryRestService">

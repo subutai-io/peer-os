@@ -25,7 +25,8 @@ public interface RestService
     @Path("templates")
     public Response registerTemplate( @FormParam("config") String configFilePath,
                                       @FormParam("packages") String packagesFilePath,
-                                      @FormParam("md5sum") String md5sum );
+                                      @FormParam("md5sum") String md5sum,
+                                      @FormParam("peerId") String peerId);
 
     @DELETE
     @Path("templates/{templateName}")

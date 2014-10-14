@@ -33,7 +33,7 @@ public interface RestService
     @Path("/")
     @Consumes({ MediaType.MULTIPART_FORM_DATA })
     @Produces({ MediaType.TEXT_PLAIN })
-    public Response importTemplate( @Multipart("file") InputStream in, @Multipart("config_dir") String configDir );
+    public Response importTemplate( @Multipart("file") InputStream in, @Multipart("config_dir") String configDir, @Multipart("peerId") String peerId);
 
     @GET
     @Path("{template}")

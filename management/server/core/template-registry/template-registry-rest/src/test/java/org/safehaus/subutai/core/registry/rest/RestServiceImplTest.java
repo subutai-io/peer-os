@@ -134,11 +134,11 @@ public class RestServiceImplTest
     }
 
 
-//    @Ignore
+    //    @Ignore
     @Test
     public void shouldReturnBadRequestStatusForRegisterTemplate()
     {
-        Response response = restService.registerTemplate( "", "", "" );
+        Response response = restService.registerTemplate( "", "", "", null );
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
 
@@ -148,7 +148,7 @@ public class RestServiceImplTest
     public void shouldReturnOkStatusForRegisterTemplate()
     {
 
-        Response response = restService.registerTemplate( "", "", "" );
+        Response response = restService.registerTemplate( "", "", "", null );
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
 
