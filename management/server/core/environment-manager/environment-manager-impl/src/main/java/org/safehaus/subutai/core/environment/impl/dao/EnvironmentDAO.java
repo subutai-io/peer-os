@@ -20,9 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-//import com.datastax.driver.core.ResultSet;
-//import com.datastax.driver.core.Row;
-
 
 /**
  * PluginDAO is used to manage cluster configuration information in database
