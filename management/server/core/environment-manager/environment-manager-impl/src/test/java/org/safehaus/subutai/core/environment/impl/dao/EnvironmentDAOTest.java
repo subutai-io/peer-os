@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.core.db.api.DbManager;
 
 import static org.junit.Assert.assertTrue;
 
@@ -25,15 +24,13 @@ public class EnvironmentDAOTest
     private static final String KEY = "key";
     EnvironmentDAO environmentDAO;
     @Mock
-    DbManager dbManager;
-    @Mock
     DataSource dataSource;
 
 
     @Before
     public void setUp() throws Exception
     {
-        environmentDAO = new EnvironmentDAO( dbManager, dataSource);
+        environmentDAO = new EnvironmentDAO( dataSource);
     }
 
 
