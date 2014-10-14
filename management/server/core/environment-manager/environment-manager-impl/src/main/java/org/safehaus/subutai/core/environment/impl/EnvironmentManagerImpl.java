@@ -216,7 +216,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = getEnvironment( uuid );
         int count = 0;
-        for ( EnvironmentContainer container : environment.getContainers() )
+        /*for ( EnvironmentContainer container : environment.getContainers() )
         {
             DestroyContainersMessage dcm =
                     new DestroyContainersMessage( PeerCommandType.DESTROY, environment.getUuid(), container.getPeerId(),
@@ -227,7 +227,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 count++;
             }
-        }
+        }*/
 
         //TODO: fix workaround
         /*if ( count == environment.getContainers().size() )
