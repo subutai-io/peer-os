@@ -264,7 +264,8 @@ public class PeerRegisterForm extends CustomComponent
                             {
                                 case REJECTED:
                                 case BLOCKED:
-
+                                    peerManagerPortalModule.getPeerManager().unregister( peer.getIp().toString() );
+                                    peersTable.removeItem( peer.getId() );
                                     break;
                                 case REQUESTED:
                                     peer.setStatus( PeerStatus.REJECTED );
@@ -276,7 +277,7 @@ public class PeerRegisterForm extends CustomComponent
             PeerManageActionsComponent component = new PeerManageActionsComponent( peer, listener );
             peersTable.addItem(
                     new Object[] { peer.getName(), peer.getIp(), peer.getStatus(), unregisterButton, component },
-                    null );
+                    peer.getId() );
         }
     }
 
