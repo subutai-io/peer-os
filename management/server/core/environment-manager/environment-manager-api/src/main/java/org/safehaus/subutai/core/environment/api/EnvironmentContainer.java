@@ -19,18 +19,6 @@ public class EnvironmentContainer extends Container
     private transient Environment environment;
 
 
-    public Environment getEnvironment()
-    {
-        return environment;
-    }
-
-
-    public void setEnvironment( final Environment environment )
-    {
-        this.environment = environment;
-    }
-
-
     @Override
     public UUID getEnvironmentId()
     {
@@ -46,6 +34,18 @@ public class EnvironmentContainer extends Container
                         getAgentId() );
         environment.invoke( cmd );
         return cmd.isSuccess();
+    }
+
+
+    public Environment getEnvironment()
+    {
+        return environment;
+    }
+
+
+    public void setEnvironment( final Environment environment )
+    {
+        this.environment = environment;
     }
 
 

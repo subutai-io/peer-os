@@ -85,6 +85,15 @@ public class CloneContainersMessage extends PeerCommandMessage
 
 
     @Override
+    public Type getInputObjectType()
+    {
+        return new TypeToken<String>()
+        {
+        }.getType();
+    }
+
+
+    @Override
     public String toString()
     {
         return "CloneContainersMessage{" +

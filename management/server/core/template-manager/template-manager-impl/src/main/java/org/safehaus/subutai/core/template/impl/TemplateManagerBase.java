@@ -73,6 +73,10 @@ public abstract class TemplateManagerBase implements TemplateManager
     }
 
 
+    public void setScriptExecutor(ScriptExecutor scriptExecutor) {
+        this.scriptExecutor = scriptExecutor;
+    }
+
     public void destroy()
     {
 

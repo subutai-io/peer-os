@@ -44,4 +44,15 @@ public interface ApiBase<T extends ConfigBase>
      * @return - configuration object of installed cluster
      */
     public T getCluster( String clusterName );
+
+    /**
+     * Add specified node to specified cluster
+     *
+     * @param clusterName - name of cluster
+     *
+     * @param agentHostName - name of node to be added to cluster
+     *
+     * @return - UUID of operation to track
+     */
+    public UUID addNode( String clusterName, String agentHostName );
 }

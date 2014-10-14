@@ -43,7 +43,7 @@ public class RemotePeerRestClient
 
     public RemotePeerRestClient( long timeout )
     {
-        this.connectionTimeout = 1000 * 10; // 10 sec
+        this.connectionTimeout = 1000 * 60; // 15 sec
         this.receiveTimeout = timeout - this.connectionTimeout;
     }
 
@@ -131,13 +131,13 @@ public class RemotePeerRestClient
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
                 peerCommandMessage.setResult( result.getResult() );
-                peerCommandMessage.setSuccess( result.isSuccess() );
+//                peerCommandMessage.setSuccess( result.isSuccess() );
                 LOG.debug( String.format( "Remote command result: %s", result.toString() ) );
 //                return ccm;
             }
             else
             {
-                peerCommandMessage.setSuccess( false );
+//                peerCommandMessage.setSuccess( false );
                 peerCommandMessage.setExceptionMessage( result.getExceptionMessage() );
 //                return ccm;
             }
@@ -145,7 +145,7 @@ public class RemotePeerRestClient
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-            peerCommandMessage.setSuccess( false );
+//            peerCommandMessage.setSuccess( false );
             peerCommandMessage.setExceptionMessage( e.toString() );
 //            throw new RuntimeException( "Error while invoking REST Client" );
         }

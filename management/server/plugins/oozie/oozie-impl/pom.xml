@@ -60,6 +60,15 @@
       <artifactId>hadoop-plugin-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>environment-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.collections</groupId>
+      <artifactId>google-collections</artifactId>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
 
   <build>

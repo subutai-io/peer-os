@@ -30,7 +30,7 @@ public class EnvironmentTest
     public void setUp() throws Exception
     {
 
-        this.environment = new Environment( UUIDUtil.generateTimeBasedUUID(), NAME );
+        this.environment = new Environment( NAME );
     }
 
 

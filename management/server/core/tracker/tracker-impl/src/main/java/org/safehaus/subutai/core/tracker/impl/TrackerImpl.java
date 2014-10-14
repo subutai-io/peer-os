@@ -6,22 +6,24 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
+import java.sql.Clob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
@@ -43,16 +45,27 @@ public class TrackerImpl implements Tracker
     private static final String SOURCE_IS_EMPTY_MSG = "Source is null or empty";
 
     /**
-     * reference to dbmanager
+     * reference to dataSource
      */
-    private DbManager dbManager;
+    protected DbUtil dbUtil;
 
 
-    public void setDbManager( DbManager dbManager )
+    public TrackerImpl( final DataSource dataSource ) throws SQLException
     {
-        Preconditions.checkNotNull( dbManager, "Db manager is null" );
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        this.dbUtil = new DbUtil( dataSource );
 
-        this.dbManager = dbManager;
+        setupDb();
+    }
+
+
+    protected void setupDb() throws SQLException
+    {
+
+        String sql = "create table if not exists product_operation(source varchar(100), id uuid, ts timestamp, "
+                + "info clob, PRIMARY KEY (source, id));";
+
+        dbUtil.update( sql );
     }
 
 
@@ -71,12 +84,12 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            ResultSet rs = dbManager.executeQuery2( "select info from product_operation where source = ? and id = ?",
+            ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and id = ?",
                     source.toLowerCase(), operationTrackId );
 
-            return constructProductOperation( rs.one() );
+            return constructProductOperation( rs );
         }
-        catch ( DBException | JsonSyntaxException ex )
+        catch ( SQLException | JsonSyntaxException ex )
         {
             LOG.error( "Error in getProductOperation", ex );
         }
@@ -84,13 +97,17 @@ public class TrackerImpl implements Tracker
     }
 
 
-    private ProductOperationViewImpl constructProductOperation( Row row )
+    private ProductOperationViewImpl constructProductOperation( ResultSet rs ) throws SQLException
     {
-        if ( row != null )
+        if ( rs != null && rs.next() )
         {
-            String info = row.getString( "info" );
-            ProductOperationImpl po = GSON.fromJson( info, ProductOperationImpl.class );
-            return new ProductOperationViewImpl( po );
+            Clob infoClob = rs.getClob( "info" );
+            if ( infoClob != null && infoClob.length() > 0 )
+            {
+                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                ProductOperationImpl po = GSON.fromJson( info, ProductOperationImpl.class );
+                return new ProductOperationViewImpl( po );
+            }
         }
         return null;
     }
@@ -111,11 +128,11 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            dbManager.executeUpdate2( "insert into product_operation(source,id,info) values(?,?,?)",
-                    source.toLowerCase(), po.getId(), GSON.toJson( po ) );
+            dbUtil.update( "merge into product_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
+                    po.getId(), po.createDate(), GSON.toJson( po ) );
             return true;
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( "Error in saveProductOperation", e );
         }
@@ -166,21 +183,17 @@ public class TrackerImpl implements Tracker
         List<ProductOperationView> list = new ArrayList<>();
         try
         {
-            ResultSet rs = dbManager.executeQuery2(
-                    "select info from product_operation where source = ?" + " and id >= maxTimeuuid(?)"
-                            + " and id <= minTimeuuid(?)" + " order by id desc limit ?", source.toLowerCase(), fromDate,
-                    toDate, limit );
+            ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and ts between ? and ?"
+                    + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
 
-            for ( Row row : rs )
+            ProductOperationViewImpl productOperationViewImpl = constructProductOperation( rs );
+            while ( productOperationViewImpl != null )
             {
-                ProductOperationViewImpl productOperationViewImpl = constructProductOperation( row );
-                if ( row != null )
-                {
-                    list.add( productOperationViewImpl );
-                }
+                list.add( productOperationViewImpl );
+                productOperationViewImpl = constructProductOperation( rs );
             }
         }
-        catch ( DBException | JsonSyntaxException ex )
+        catch ( SQLException | JsonSyntaxException ex )
         {
             LOG.error( "Error in getProductOperations", ex );
         }
@@ -198,18 +211,18 @@ public class TrackerImpl implements Tracker
         List<String> sources = new ArrayList<>();
         try
         {
-            ResultSet rs = dbManager.executeQuery2( "select distinct source from product_operation" );
+            ResultSet rs = dbUtil.select( "select distinct source from product_operation" );
 
-            for ( Row row : rs )
+            while ( rs != null && rs.next() )
             {
-                String source = row.getString( "source" );
+                String source = rs.getString( "source" );
                 if ( !Strings.isNullOrEmpty( source ) )
                 {
                     sources.add( source.toLowerCase() );
                 }
             }
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( "Error in getProductOperationSources", e );
         }
@@ -242,8 +255,8 @@ public class TrackerImpl implements Tracker
                 }
                 //return if operation is completed
                 //or if time limit is reached
-                if ( po.getState() != ProductOperationState.RUNNING
-                        || System.currentTimeMillis() - startedTs > maxOperationDurationMs )
+                long ts = System.currentTimeMillis() - startedTs;
+                if ( po.getState() != ProductOperationState.RUNNING || ts > maxOperationDurationMs )
                 {
                     return;
                 }

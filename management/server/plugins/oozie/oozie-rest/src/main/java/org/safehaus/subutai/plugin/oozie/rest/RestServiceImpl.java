@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
@@ -24,6 +25,7 @@ public class RestServiceImpl implements RestService
 
     private Oozie oozieManager;
     private Hadoop hadoopManager;
+    private AgentManager agentManager;
 
 
     public Oozie getOozieManager()
@@ -47,6 +49,18 @@ public class RestServiceImpl implements RestService
     public void setHadoopManager( final Hadoop hadoopManager )
     {
         this.hadoopManager = hadoopManager;
+    }
+
+
+    public AgentManager getAgentManager()
+    {
+        return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
     }
 
 
@@ -81,12 +95,13 @@ public class RestServiceImpl implements RestService
 
         OozieClusterConfig occ = new OozieClusterConfig();
         occ.setClusterName( tocc.getClusterName() );
-        occ.setServer( tocc.getServerHostname() );
-        Set<String> clients = new HashSet<>();
+        Agent serverHostname = agentManager.getAgentByHostname( tocc.getServerHostname() );
+        occ.setServer( serverHostname );
+        Set<Agent> clients = new HashSet<>();
         //        Set<String> hadoopNodes = new HashSet<String>();
         for ( Agent agent : hadoopConfig.getAllNodes() )
         {
-            clients.add( agent.getHostname() );
+            clients.add( agent );
             //            hadoopNodes.add( agent.getHostname() );
         }
         clients.remove( tocc.getServerHostname() );
@@ -139,9 +154,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response destroyNode( final String clusterName, final String lxcHostname, final String nodeType )
+    public Response destroyNode( final String clusterName, final String lxcHostname )
     {
-        UUID uuid = oozieManager.destroyNode( clusterName, lxcHostname, nodeType );
+        UUID uuid = oozieManager.destroyNode( clusterName, lxcHostname );
         String operationId = wrapUUID( uuid );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
     }

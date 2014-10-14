@@ -9,6 +9,7 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.template.api.ActionType;
 
 
 class ScriptExecutor

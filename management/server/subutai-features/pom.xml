@@ -70,7 +70,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-dispatcher-impl</artifactId>
     </dependency>
-
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- command-runner -->
     <dependency>
@@ -385,10 +384,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-api</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>vaadin-custom</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vaadin-custom</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>vaadin-impl</artifactId>
@@ -470,7 +469,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>accumulo-plugin-ui</artifactId>
     </dependency>
-
 
     <dependency>
       <groupId>${project.groupId}</groupId>

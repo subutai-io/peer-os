@@ -1,9 +1,11 @@
 package org.safehaus.subutai.plugin.oozie.api;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -22,8 +24,8 @@ public class OozieClusterConfig implements ConfigBase
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private String hadoopClusterName;
     private UUID uuid;
-    private String server;
-    private Set<String> clients;
+    private Agent server;
+    private Set<Agent> clients;
     private String clusterName = "";
     private SetupType setupType;
 
@@ -101,25 +103,25 @@ public class OozieClusterConfig implements ConfigBase
     }
 
 
-    public String getServer()
+    public Agent getServer()
     {
         return server;
     }
 
 
-    public void setServer( String server )
+    public void setServer( Agent server )
     {
         this.server = server;
     }
 
 
-    public Set<String> getClients()
+    public Set<Agent> getClients()
     {
         return clients;
     }
 
 
-    public void setClients( Set<String> clients )
+    public void setClients( Set<Agent> clients )
     {
         this.clients = clients;
     }
@@ -139,6 +141,13 @@ public class OozieClusterConfig implements ConfigBase
 
     @Override
     public String getProductName()
+    {
+        return PRODUCT_KEY;
+    }
+
+
+    @Override
+    public String getProductKey()
     {
         return PRODUCT_KEY;
     }
@@ -180,9 +189,17 @@ public class OozieClusterConfig implements ConfigBase
     }
 
 
-    public Set<String> getAllOozieAgents()
+    public Set<Agent> getAllOozieAgents()
     {
-        clients.add( server );
-        return clients;
+        Set<Agent> allAgents = new HashSet<>();
+        allAgents.addAll( clients );
+        allAgents.add( server );
+        return allAgents;
+    }
+
+
+    public void removeClient( final Agent node )
+    {
+        clients.remove( node );
     }
 }

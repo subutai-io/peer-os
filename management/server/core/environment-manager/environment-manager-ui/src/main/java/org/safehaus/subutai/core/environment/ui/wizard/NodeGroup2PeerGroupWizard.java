@@ -94,6 +94,7 @@ public class NodeGroup2PeerGroupWizard extends Window
         this.managerUI = managerUI;
     }
 
+
     public void back()
     {
         step--;
@@ -249,7 +250,7 @@ public class NodeGroup2PeerGroupWizard extends Window
 
     public EnvironmentBuildProcess createEnvironmentBuildProcess( EnvironmentBuildTask ebt, Map<Object, Peer> topology )
     {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint().getName() );
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint() );
 
         Map<Object, NodeGroup> map = getNodeGroupMap();
         for ( Object itemId : map.keySet() )

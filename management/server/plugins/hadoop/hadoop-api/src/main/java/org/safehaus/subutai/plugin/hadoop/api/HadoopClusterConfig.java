@@ -128,6 +128,12 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
+    @Override
+    public String getProductKey() {
+        return PRODUCT_KEY;
+    }
+
+
     public String getDomainName()
     {
         return domainName;
@@ -312,35 +318,6 @@ public class HadoopClusterConfig implements ConfigBase
         {
             return false;
         }
-    }
-
-
-    public List<NodeType> getNodeRoles( Agent agent )
-    {
-        List<NodeType> nodeRoles = new ArrayList<>();
-
-        if ( isNameNode( agent ) )
-        {
-            nodeRoles.add( NodeType.NAMENODE );
-        }
-        if ( isSecondaryNameNode( agent ) )
-        {
-            nodeRoles.add( NodeType.SECONDARY_NAMENODE );
-        }
-        if ( isJobTracker( agent ) )
-        {
-            nodeRoles.add( NodeType.JOBTRACKER );
-        }
-        if ( isDataNode( agent ) )
-        {
-            nodeRoles.add( NodeType.DATANODE );
-        }
-        if ( isTaskTracker( agent ) )
-        {
-            nodeRoles.add( NodeType.TASKTRACKER );
-        }
-
-        return nodeRoles;
     }
 
 

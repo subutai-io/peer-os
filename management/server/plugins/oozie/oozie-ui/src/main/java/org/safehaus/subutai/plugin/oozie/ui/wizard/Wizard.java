@@ -1,37 +1,42 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- *//*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
+import java.util.concurrent.ExecutorService;
+
+import javax.naming.NamingException;
+
+import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
-import org.safehaus.subutai.plugin.oozie.ui.OoziePortalModule;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class Wizard
 {
 
     private final VerticalLayout vlayout;
+    private final ExecutorService executor;
+    private final Oozie oozieManager;
+    private final Tracker tracker;
     private int step = 1;
     private OozieClusterConfig config = new OozieClusterConfig();
-    private OoziePortalModule ooziePortalModule;
+    private Hadoop hadoopManager;
+    private AgentManager agentManager;
 
 
-    public Wizard( OoziePortalModule ooziePortalModule )
+    public Wizard( final ExecutorService executorService, final ServiceLocator serviceLocator ) throws NamingException
     {
-        this.ooziePortalModule = ooziePortalModule;
+
+        tracker = serviceLocator.getService( Tracker.class );
+        hadoopManager = serviceLocator.getService( Hadoop.class );
+        agentManager = serviceLocator.getService( AgentManager.class );
+        oozieManager = serviceLocator.getService( Oozie.class );
+        executor = executorService;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin( true );
@@ -115,14 +120,32 @@ public class Wizard
     }
 
 
-    public OoziePortalModule getOoziePortalModule()
+    public Hadoop getHadoopManager()
     {
-        return ooziePortalModule;
+        return hadoopManager;
     }
 
 
-    public void setOoziePortalModule( final OoziePortalModule ooziePortalModule )
+    public ExecutorService getExecutor()
     {
-        this.ooziePortalModule = ooziePortalModule;
+        return executor;
+    }
+
+
+    public Tracker getTracker()
+    {
+        return tracker;
+    }
+
+
+    public Oozie getOozieManager()
+    {
+        return oozieManager;
+    }
+
+
+    public AgentManager getAgentManager()
+    {
+        return agentManager;
     }
 }

@@ -14,11 +14,6 @@
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.oozie.ui.OoziePortalModule"
         init-method="init" destroy-method="destroy">
-    <property name="agentManager" ref="agentManager" />
-    <property name="tracker" ref="tracker" />
-    <property name="hadoopManager" ref="hadoopManager" />
-    <property name="oozieManager" ref="oozieManager" />
-    <property name="commandRunner" ref="commandRunner" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

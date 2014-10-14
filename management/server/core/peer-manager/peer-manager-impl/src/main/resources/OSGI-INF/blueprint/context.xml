@@ -14,12 +14,15 @@
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="containerManager" interface="org.safehaus.subutai.core.container.api.ContainerManager" />
 
+  <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
+
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="dbManager" ref="dbManager" />
     <property name="agentManager" ref="agentManager" />
     <property name="containerManager" ref="containerManager" />
     <property name="commandRunner" ref="commandRunner" />
+    <property name="templateRegistry" ref="templateRegistry" />
   </bean>
 
 </blueprint>

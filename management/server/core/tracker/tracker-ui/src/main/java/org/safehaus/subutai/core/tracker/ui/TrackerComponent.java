@@ -341,10 +341,13 @@ public class TrackerComponent extends CustomComponent
 
             sortNeeded = true;
         }
-        else if ( item.getItemProperty( STATUS_PROPERTY ) != null && !( ( Embedded ) item
-                .getItemProperty( STATUS_PROPERTY ).getValue() ).getSource().equals( progressIcon.getSource() ) )
+        else if ( item.getItemProperty( STATUS_PROPERTY ) != null )
         {
-            item.getItemProperty( STATUS_PROPERTY ).setValue( progressIcon );
+            Embedded embedded = ( Embedded ) item.getItemProperty( STATUS_PROPERTY ).getValue();
+            if ( embedded != null && !( embedded.getSource().equals( progressIcon.getSource() ) ) )
+            {
+                item.getItemProperty( STATUS_PROPERTY ).setValue( progressIcon );
+            }
         }
         return sortNeeded;
     }

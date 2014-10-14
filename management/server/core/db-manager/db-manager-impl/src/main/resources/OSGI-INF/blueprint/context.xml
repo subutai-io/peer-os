@@ -20,6 +20,7 @@
     <property name="cassandraPort" value="${cassandraPort}" />
     <property name="cassandraKeyspace" value="${cassandraKeyspace}" />
   </bean>
+
   <service ref="dbManager"
            interface="org.safehaus.subutai.core.db.api.DbManager">
     <service-properties>

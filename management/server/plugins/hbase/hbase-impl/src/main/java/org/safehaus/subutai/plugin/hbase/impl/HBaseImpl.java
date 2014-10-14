@@ -290,4 +290,11 @@ public class HBaseImpl implements HBase
     {
         return pluginDAO.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
     }
+
+
+    @Override
+    public UUID addNode( final String clusterName, final String agentHostName )
+    {
+        return null;
+    }
 }

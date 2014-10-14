@@ -16,9 +16,6 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import com.google.common.collect.Sets;
 
 
-/**
- * Created by bahadyr on 9/4/14.
- */
 public class OverHadoopSetupStrategy extends OozieSetupStrategy
 {
 
@@ -34,17 +31,18 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy
     {
 
         //check if node agents are connected
-        for ( String hostname : config.getClients() )
+        for ( Agent agent : config.getClients() )
         {
+            String hostname = agent.getHostname();
             if ( oozieManager.getAgentManager().getAgentByHostname( hostname ) == null )
             {
                 throw new ClusterSetupException( String.format( "Node %s is not connected", hostname ) );
             }
         }
-
-        if ( oozieManager.getAgentManager().getAgentByHostname( config.getServer() ) == null )
+        String serverHostName = config.getServer().getHostname();
+        if ( oozieManager.getAgentManager().getAgentByHostname( serverHostName ) == null )
         {
-            throw new ClusterSetupException( String.format( "Node %s is not connected", config.getServer() ) );
+            throw new ClusterSetupException( String.format( "Node %s is not connected", serverHostName ) );
         }
 
         HadoopClusterConfig hc = oozieManager.getHadoopManager().getCluster( config.getHadoopClusterName() );
@@ -53,16 +51,8 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );
         }
 
-        Set<String> allOozieHostnames = config.getAllOozieAgents();
 
-        Set<Agent> allOozieAgents = new HashSet<>();
-
-        for ( String agentHostname : allOozieHostnames )
-        {
-            Agent agent = oozieManager.getAgentManager().getAgentByHostname( agentHostname );
-            allOozieAgents.add( agent );
-        }
-
+        Set<Agent> allOozieAgents = config.getAllOozieAgents();
 
         if ( !hc.getAllNodes().containsAll( allOozieAgents ) )
         {
@@ -78,10 +68,10 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Failed to check installed packages" );
         }
 
-        po.addLog( "Installing Oozie server..." );
-        String sserver = oozieManager.getCommands().make( CommandType.INSTALL_SERVER );
-        Agent serverAgent = oozieManager.getAgentManager().getAgentByHostname( config.getServer() );
-        cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 180 ),
+        po.addLog( String.format( "Installing Oozie server on %s...", config.getServer().getHostname() ) );
+        String sserver = Commands.make( CommandType.INSTALL_SERVER );
+        Agent serverAgent = config.getServer();
+        cmd = oozieManager.getCommandRunner().createCommand( new RequestBuilder( sserver ).withTimeout( 1800 ),
                 Sets.newHashSet( serverAgent ) );
         oozieManager.getCommandRunner().runCommand( cmd );
 
@@ -94,30 +84,34 @@ public class OverHadoopSetupStrategy extends OozieSetupStrategy
             throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
         }
 
-        po.addLog( "Installing Oozie client..." );
-        String sclient = oozieManager.getCommands().make( CommandType.INSTALL_SERVER );
 
-        Set<Agent> clients = new HashSet<>();
-        for ( String clientHostname : config.getClients() )
+        if ( !config.getClients().isEmpty() )
         {
-            Agent clientAgent = oozieManager.getAgentManager().getAgentByHostname( clientHostname );
-            clients.add( clientAgent );
-        }
-        cmd = oozieManager.getCommandRunner()
-                          .createCommand( new RequestBuilder( sclient ).withTimeout( 180 ), clients );
-        oozieManager.getCommandRunner().runCommand( cmd );
+            po.addLog( "Installing Oozie client ..." );
+            String sclient = Commands.make( CommandType.INSTALL_CLIENT );
 
-        if ( cmd.hasSucceeded() )
-        {
-            po.addLog( "Installation of clients succeeded" );
-            po.addLog( "Saving to db..." );
-            oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLog( "Cluster info successfully saved" );
+            Set<Agent> clients = config.getClients();
+            cmd = oozieManager.getCommandRunner()
+                              .createCommand( new RequestBuilder( sclient ).withTimeout( 1800 ), clients );
+            oozieManager.getCommandRunner().runCommand( cmd );
+
+            if ( cmd.hasSucceeded() )
+            {
+                po.addLog( "Installation of clients succeeded" );
+            }
+            else
+            {
+                throw new ClusterSetupException( "Installation of clients failed: " + cmd.getAllErrors() );
+            }
         }
         else
         {
-            throw new ClusterSetupException( "Installation failed: " + cmd.getAllErrors() );
+            po.addLog( "No client is selected, continuing" );
         }
+
+        po.addLog( "Saving to db..." );
+        oozieManager.getPluginDAO().saveInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+        po.addLog( "Cluster info successfully saved" );
 
         return config;
     }

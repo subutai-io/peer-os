@@ -111,16 +111,6 @@
         <artifactId>command-dispatcher-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>command-dispatcher-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- command-runner -->
@@ -227,6 +217,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>db-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>db-manager-source</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -638,7 +633,6 @@
         <artifactId>el-api</artifactId>
         <version>2.2</version>
       </dependency>
-
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Testing dependencies-->
