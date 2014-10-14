@@ -97,6 +97,8 @@ public class BlueprintsForm
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         Window window = blueprintDetails( task );
+                        contentRoot.getUI().addWindow( window );
+                        window.setVisible( true );
                     }
                 } );
 
@@ -180,7 +182,6 @@ public class BlueprintsForm
         area.setSizeFull();
         area.setValue( GSON.toJson( task.getEnvironmentBlueprint() ) );
         window.setContent( area );
-        contentRoot.getUI().addWindow( window );
         return window;
     }
 

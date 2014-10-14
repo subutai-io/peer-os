@@ -6,10 +6,13 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
@@ -23,7 +26,6 @@ import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -39,6 +41,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,14 +61,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private static final String BLUEPRINT = "BLUEPRINT";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final long TIMEOUT = 1000 * 15;
+
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private ContainerManager containerManager;
     private TemplateRegistry templateRegistry;
     private AgentManager agentManager;
     private NetworkManager networkManager;
-    private DbManager dbManager;
     private PeerCommandDispatcher peerCommandDispatcher;
+    private DataSource dataSource;
+
+
+    public EnvironmentManagerImpl( final DataSource dataSource ) throws SQLException
+    {
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        this.dataSource = dataSource;
+    }
 
 
     public PeerCommandDispatcher getPeerCommandDispatcher()
@@ -82,7 +93,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void init()
     {
-        this.environmentDAO = new EnvironmentDAO( dbManager );
+        try
+        {
+            this.environmentDAO = new EnvironmentDAO( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            e.printStackTrace();
+        }
         environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager, containerManager );
     }
 
@@ -95,7 +113,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         this.templateRegistry = null;
         this.agentManager = null;
         this.networkManager = null;
-        this.dbManager = null;
     }
 
 
@@ -168,18 +185,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setNetworkManager( final NetworkManager networkManager )
     {
         this.networkManager = networkManager;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 
@@ -314,12 +319,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                         for ( Agent agent : agents )
                         {
                             EnvironmentContainer container = new EnvironmentContainer();
+
                             container.setPeerId( agent.getSiteId() );
                             container.setAgentId( agent.getUuid() );
                             container.setIps( agent.getListIP() );
                             container.setHostname( agent.getHostname() );
-                            container.setDescription( ccm.getTemplate() );
+                            container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
                             container.setName( agent.getHostname() );
+
                             environment.addContainer( container );
                         }
                     }
@@ -409,7 +416,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 for ( Container c : containers )
                 {
                     EnvironmentContainer ec = new EnvironmentContainer();
-                    ec.setEnvironment( environment );
+                    ec.setEnvironmentId( environment.getUuid() );
                     ec.setAgentId( c.getAgentId() );
                     ec.setPeerId( c.getPeerId() );
                     freshContainers.add( ec );
