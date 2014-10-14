@@ -5,63 +5,44 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 
 /**
- * Created by talas on 10/2/14.
+ * Test or UnregisterTemplateCommand
  */
-public class UnregisterTemplateCommandTest
+public class UnregisterTemplateCommandTest extends TestParent
 {
-    String templateName;
 
     private TemplateRegistry templateRegistry;
     private UnregisterTemplateCommand unregisterTemplateCommand;
 
 
     @Before
-    public void setupClasses()
+    public void setUp()
     {
         templateRegistry = mock( TemplateRegistry.class );
-        unregisterTemplateCommand = new UnregisterTemplateCommand();
-        unregisterTemplateCommand.setTemplateRegistry( templateRegistry );
-    }
-
-
-    @Test
-    public void shouldSetNewTemplateRegistryValue()
-    {
-        TemplateRegistry registry = mock( TemplateRegistry.class );
-        unregisterTemplateCommand.setTemplateRegistry( registry );
-        assertNotSame( templateRegistry, unregisterTemplateCommand.getTemplateRegistry() );
+        unregisterTemplateCommand = new UnregisterTemplateCommand( templateRegistry );
     }
 
 
     @Test( expected = NullPointerException.class )
-    public void shouldThrowExceptionOnSettingNullTemplateRegistry()
+    public void testConstructorShouldFailOnNullRegistry()
     {
-        unregisterTemplateCommand.setTemplateRegistry( null );
+        new UnregisterTemplateCommand( null );
     }
 
 
     @Test
-    public void shouldAccessTemplateRegistryAndCallUnregisteredTemplateMethod() throws Exception
+    public void testUnregisterTemplate() throws Exception
     {
+
         unregisterTemplateCommand.doExecute();
-        verify( templateRegistry ).unregisterTemplate( templateName );
-    }
 
-
-    protected Object doExecute() throws Exception
-    {
-
-        templateRegistry.unregisterTemplate( templateName );
-
-        System.out.println( String.format( "Template %s unregistered successfully", templateName ) );
-
-
-        return null;
+        verify( templateRegistry ).unregisterTemplate( anyString() );
+        assertTrue( getSysOut().contains( "success" ) );
     }
 }
