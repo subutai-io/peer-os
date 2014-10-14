@@ -32,6 +32,21 @@
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>tracker-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 

@@ -14,6 +14,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -28,11 +29,13 @@ public class RestServiceImpl implements RestService
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private Tracker tracker;
+    private final Tracker tracker;
 
 
-    public void setTracker( Tracker tracker )
+    public RestServiceImpl( final Tracker tracker )
     {
+        Preconditions.checkNotNull( tracker, "Tracker is null" );
+
         this.tracker = tracker;
     }
 
@@ -50,9 +53,12 @@ public class RestServiceImpl implements RestService
             {
                 return Response.ok().entity( GSON.toJson( productOperationView ) ).build();
             }
-            return null;
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException | IllegalArgumentException e )
         {
             LOG.error( "Error in getProductOperation", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();

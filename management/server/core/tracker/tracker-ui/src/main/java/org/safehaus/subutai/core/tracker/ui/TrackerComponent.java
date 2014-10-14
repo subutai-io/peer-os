@@ -236,7 +236,7 @@ public class TrackerComponent extends CustomComponent
 
     public synchronized void startTracking()
     {
-        if ( !track )
+        if ( !isTrack() )
         {
             track = true;
             executor.execute( new Runnable()
@@ -263,7 +263,13 @@ public class TrackerComponent extends CustomComponent
     }
 
 
-    private void populateOperations()
+    public boolean isTrack()
+    {
+        return track;
+    }
+
+
+    protected void populateOperations()
     {
         if ( !Strings.isNullOrEmpty( source ) )
         {
@@ -297,6 +303,12 @@ public class TrackerComponent extends CustomComponent
 
             currentOperations = operations;
         }
+    }
+
+
+    protected void setTrackID( final UUID trackID )
+    {
+        this.trackID = trackID;
     }
 
 
@@ -353,7 +365,7 @@ public class TrackerComponent extends CustomComponent
     }
 
 
-    private void populateLogs()
+    protected void populateLogs()
     {
         if ( trackID != null && !Strings.isNullOrEmpty( source ) )
         {
