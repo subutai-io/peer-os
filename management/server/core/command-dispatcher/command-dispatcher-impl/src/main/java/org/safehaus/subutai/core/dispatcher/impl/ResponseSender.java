@@ -158,9 +158,6 @@ public class ResponseSender
                 {
                     request.incrementAttempts();
                     dispatcherDAO.saveRemoteRequest( request );
-                    //delete previous request (workaround until we change Cassandra to another DB)
-                    //                    dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(),
-                    // request.getAttempts() - 1 );
                 }
             }
             else
@@ -243,7 +240,6 @@ public class ResponseSender
             }
             else
             {
-                //                dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
                 request.updateTimestamp();
                 dispatcherDAO.saveRemoteRequest( request );
             }
@@ -259,9 +255,6 @@ public class ResponseSender
             {
                 request.incrementAttempts();
                 dispatcherDAO.saveRemoteRequest( request );
-                //delete previous request (workaround until we change Cassandra to another DB)
-                //                dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(),
-                // request.getAttempts() - 1 );
             }
         }
     }
