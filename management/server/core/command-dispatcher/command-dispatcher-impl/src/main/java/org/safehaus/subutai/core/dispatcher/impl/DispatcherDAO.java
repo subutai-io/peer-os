@@ -21,9 +21,6 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * DAO for Command Dispatcher
- *
- * TODO - optimize table structure to use indexes
- * TODO - use nonstatic dbutil
  */
 
 public class DispatcherDAO
@@ -32,14 +29,14 @@ public class DispatcherDAO
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final String COMMAND_ID_IS_NULL_MSG = "Command id is null";
-    private final DataSource dataSource;
+    protected DbUtil dbUtil;
 
 
     public DispatcherDAO( final DataSource dataSource ) throws DaoException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
 
-        this.dataSource = dataSource;
+        this.dbUtil = new DbUtil( dataSource );
 
         setupDb();
     }
@@ -48,13 +45,14 @@ public class DispatcherDAO
     private void setupDb() throws DaoException
     {
 
-        String sql = "create table if not exists remote_responses(commandid varchar(36), responsenumber varchar(50), " +
-                "info varchar(2000), PRIMARY KEY (commandid, responsenumber));"
-                + "create table if not exists remote_requests(commandid varchar(36), attempts smallint, " +
-                "info varchar(1000), PRIMARY KEY (commandid));";
+        String sql =
+                "create table if not exists remote_responses(commandId uuid, agentId uuid, responseNumber smallint, " +
+                        "info varchar(2000), PRIMARY KEY (commandId, agentId, responseNumber));"
+                        + "create table if not exists remote_requests(commandId uuid, attempts smallint, " +
+                        "info varchar(1000), PRIMARY KEY (commandId));";
         try
         {
-            DbUtil.update( dataSource, sql );
+            dbUtil.update( sql );
         }
         catch ( SQLException e )
         {
@@ -71,8 +69,7 @@ public class DispatcherDAO
 
         try
         {
-            ResultSet rs = DbUtil.select( dataSource, "select info from remote_responses where commandId = ?",
-                    commandId.toString() );
+            ResultSet rs = dbUtil.select( "select info from remote_responses where commandId = ?", commandId );
             RemoteResponse response = getResponse( rs );
             while ( response != null )
             {
@@ -96,10 +93,9 @@ public class DispatcherDAO
 
         try
         {
-            DbUtil.update( dataSource, "merge into remote_responses(commandId, responseNumber, info) values (?,?,?)",
-                    remoteResponse.getCommandId().toString(),
-                    String.format( "%s_%s", remoteResponse.getResponse().getUuid(),
-                            remoteResponse.getResponse().getResponseSequenceNumber() ), GSON.toJson( remoteResponse ) );
+            dbUtil.update( "merge into remote_responses(commandId, agentId, responseNumber, info) values (?,?,?,?)",
+                    remoteResponse.getCommandId(), remoteResponse.getResponse().getUuid(),
+                    remoteResponse.getResponse().getResponseSequenceNumber(), GSON.toJson( remoteResponse ) );
         }
         catch ( SQLException e )
         {
@@ -114,7 +110,7 @@ public class DispatcherDAO
 
         try
         {
-            DbUtil.update( dataSource, "delete from remote_responses where commandId = ?", commandId.toString() );
+            dbUtil.update( "delete from remote_responses where commandId = ?", commandId );
         }
         catch ( SQLException e )
         {
@@ -129,10 +125,9 @@ public class DispatcherDAO
 
         try
         {
-            DbUtil.update( dataSource, "delete from remote_responses where commandId = ? and responseNumber = ?",
-                    remoteResponse.getCommandId().toString(),
-                    String.format( "%s_%s", remoteResponse.getResponse().getUuid(),
-                            remoteResponse.getResponse().getResponseSequenceNumber() ) );
+            dbUtil.update( "delete from remote_responses where commandId = ? and agentId = ? and responseNumber = ?",
+                    remoteResponse.getCommandId(), remoteResponse.getResponse().getUuid(),
+                    remoteResponse.getResponse().getResponseSequenceNumber() );
         }
         catch ( SQLException e )
         {
@@ -147,7 +142,7 @@ public class DispatcherDAO
 
         try
         {
-            DbUtil.update( dataSource, "merge into remote_requests(commandId,attempts,info) values (?,?,?)",
+            dbUtil.update( "merge into remote_requests(commandId,attempts,info) values (?,?,?)",
                     remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(),
                     GSON.toJson( remoteRequest ) );
         }
@@ -164,7 +159,7 @@ public class DispatcherDAO
 
         try
         {
-            DbUtil.update( dataSource, "delete from remote_requests where commandId = ?", commandId.toString() );
+            dbUtil.update( "delete from remote_requests where commandId = ?", commandId.toString() );
         }
         catch ( SQLException e )
         {
@@ -180,8 +175,8 @@ public class DispatcherDAO
 
         try
         {
-            ResultSet rs = DbUtil.select( dataSource, "select info from remote_requests where commandId = ?",
-                    commandId.toString() );
+            ResultSet rs =
+                    dbUtil.select( "select info from remote_requests where commandId = ?", commandId.toString() );
 
             return getRequest( rs );
         }
@@ -204,8 +199,7 @@ public class DispatcherDAO
         try
         {
             ResultSet rs =
-                    DbUtil.select( dataSource, "select info from remote_requests where attempts < ? limit ?", attempts,
-                            limit );
+                    dbUtil.select( "select info from remote_requests where attempts < ? limit ?", attempts, limit );
 
             RemoteRequest remoteRequest = getRequest( rs );
             while ( remoteRequest != null )
