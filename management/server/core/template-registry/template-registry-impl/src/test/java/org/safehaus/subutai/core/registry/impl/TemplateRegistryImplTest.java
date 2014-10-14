@@ -5,15 +5,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
 
+import com.google.common.collect.Lists;
+
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -81,6 +86,56 @@ public class TemplateRegistryImplTest
         templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
 
         verify( templateDAO ).saveTemplate( TestUtils.getDefaultTemplate() );
+    }
+
+
+    @Test( expected = RegistryException.class )
+    public void testRegisterTemplateRuntimeException() throws Exception
+    {
+
+        Mockito.doThrow( new RuntimeException() ).when( templateDAO )
+               .getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH );
+
+
+        templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
+    }
+
+
+    @Test
+    public void testRegisterChildTemplate() throws Exception
+    {
+        when( templateDAO.getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
+                .thenReturn( TestUtils.getDefaultTemplate() );
+
+        templateRegistry
+                .registerTemplate( TestUtils.CHILD_CONFIG_FILE, TestUtils.CHILD_PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
+
+        ArgumentCaptor<Template> templateArgumentCaptor = ArgumentCaptor.forClass( Template.class );
+
+        verify( templateDAO ).saveTemplate( templateArgumentCaptor.capture() );
+
+        assertTrue( templateArgumentCaptor.getValue().getProducts().contains( TestUtils.TEST_PACKAGE ) );
+    }
+
+
+    @Test( expected = RegistryException.class )
+    public void testRegisterTemplateDuplicate() throws Exception
+    {
+
+        when( templateDAO.getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
+                .thenReturn( TestUtils.getDefaultTemplate() );
+
+        templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
+    }
+
+
+    @Test( expected = RegistryException.class )
+    public void testRegisterTemplateDuplicateByMd5Sum() throws Exception
+    {
+        List<Template> allTemplates = Lists.newArrayList( TestUtils.getDefaultTemplate() );
+        when( templateDAO.getAllTemplates() ).thenReturn( allTemplates );
+
+        templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
     }
 
 
