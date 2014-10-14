@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * Provides Data Access API for templates
  *
- * TODO add proper indexes
+ * TODO - optimize table structure to use indexes
  */
 public class TemplateDAO
 {
@@ -40,8 +40,8 @@ public class TemplateDAO
     public TemplateDAO( final DataSource dataSource ) throws DaoException
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
-        this.dbUtil = new DbUtil( dataSource );
 
+        this.dbUtil = new DbUtil( dataSource );
         setupDb();
     }
 
