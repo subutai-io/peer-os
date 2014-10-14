@@ -38,7 +38,7 @@ public class ListTemplatesCommandTest extends TestParent
 
 
     @Before
-    public void setupClasses()
+    public void setUp()
     {
         templateRegistry = mock( TemplateRegistry.class );
         listTemplatesCommand = new ListTemplatesCommandExt( templateRegistry );
@@ -50,7 +50,7 @@ public class ListTemplatesCommandTest extends TestParent
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullRegistry() throws Exception
     {
         new ListTemplatesCommand( null );
@@ -79,15 +79,16 @@ public class ListTemplatesCommandTest extends TestParent
         assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
     }
 
+
     @Test
-     public void shouldPrint2SysOut() throws Exception
-     {
-         when( templateRegistry.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
-         when( templateRegistry.getAllTemplates( MockUtils.LXC_ARCH ) ).thenReturn(  Collections.<Template>emptyList() );
+    public void shouldPrint2SysOut() throws Exception
+    {
+        when( templateRegistry.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
+        when( templateRegistry.getAllTemplates( MockUtils.LXC_ARCH ) ).thenReturn( Collections.<Template>emptyList() );
 
-         listTemplatesCommand.doExecute();
+        listTemplatesCommand.doExecute();
 
 
-         assertTrue( getSysOut().isEmpty() );
-     }
+        assertTrue( getSysOut().isEmpty() );
+    }
 }
