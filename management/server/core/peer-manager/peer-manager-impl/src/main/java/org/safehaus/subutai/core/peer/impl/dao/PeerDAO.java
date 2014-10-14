@@ -46,7 +46,7 @@ public class PeerDAO
 
         String sql1 = "create table if not exists peer (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
                 + "id));";
-        String sql2 = "create table if not peer_group (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
+        String sql2 = "create table if not exist peer_group (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
                 + "id));";
 
         dbUtil.update( sql1 );
@@ -62,7 +62,7 @@ public class PeerDAO
 
         try
         {
-            dbUtil.update( "merge into peer_info (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
+            dbUtil.update( "merge into peer (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
                     GSON.toJson( info ) );
             return true;
         }
