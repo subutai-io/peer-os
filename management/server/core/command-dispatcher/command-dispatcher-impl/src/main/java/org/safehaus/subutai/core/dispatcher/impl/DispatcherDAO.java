@@ -21,6 +21,8 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * DAO for Command Dispatcher
+ *
+ * TODO - delete requests & responses with exceeded attempts
  */
 
 public class DispatcherDAO
@@ -143,8 +145,7 @@ public class DispatcherDAO
         try
         {
             dbUtil.update( "merge into remote_requests(commandId,attempts,info) values (?,?,?)",
-                    remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(),
-                    GSON.toJson( remoteRequest ) );
+                    remoteRequest.getCommandId(), remoteRequest.getAttempts(), GSON.toJson( remoteRequest ) );
         }
         catch ( SQLException e )
         {
@@ -159,7 +160,34 @@ public class DispatcherDAO
 
         try
         {
-            dbUtil.update( "delete from remote_requests where commandId = ?", commandId.toString() );
+            dbUtil.update( "delete from remote_requests where commandId = ?", commandId );
+        }
+        catch ( SQLException e )
+        {
+            throw new DaoException( e );
+        }
+    }
+
+
+    public void deleteRequestsWithExceededAttempts( int attempts ) throws DaoException
+    {
+        try
+        {
+            dbUtil.update( "delete from remote_requests where attempts >= ?", attempts );
+        }
+        catch ( SQLException e )
+        {
+            throw new DaoException( e );
+        }
+    }
+
+
+    public void deleteOrphanResponses() throws DaoException
+    {
+        try
+        {
+            dbUtil.update( "delete from remote_responses res where not exists "
+                    + "(select 1 from remote_requests req where req.commandId = res.commandId)" );
         }
         catch ( SQLException e )
         {
@@ -175,8 +203,7 @@ public class DispatcherDAO
 
         try
         {
-            ResultSet rs =
-                    dbUtil.select( "select info from remote_requests where commandId = ?", commandId.toString() );
+            ResultSet rs = dbUtil.select( "select info from remote_requests where commandId = ?", commandId );
 
             return getRequest( rs );
         }

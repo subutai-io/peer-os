@@ -26,8 +26,6 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * Sends responses produced by remote requests back to owner
- *
- * TODO - remove requests and responses with attempts exceeding limit
  */
 public class ResponseSender
 {
@@ -42,6 +40,8 @@ public class ResponseSender
     private final DispatcherDAO dispatcherDAO;
     private final PeerManager peerManager;
 
+    private final int numOfAttempts;
+
 
     public ResponseSender( final DispatcherDAO dispatcherDAO, final PeerManager peerManager )
     {
@@ -52,6 +52,7 @@ public class ResponseSender
 
         this.dispatcherDAO = dispatcherDAO;
         this.peerManager = peerManager;
+        numOfAttempts = calculateOfAttempts();
     }
 
 
@@ -92,8 +93,7 @@ public class ResponseSender
     {
         try
         {
-            Set<RemoteRequest> requests =
-                    dispatcherDAO.getRemoteRequests( calculateOfAttempts(), SELECT_RECORDS_LIMIT );
+            Set<RemoteRequest> requests = dispatcherDAO.getRemoteRequests( numOfAttempts, SELECT_RECORDS_LIMIT );
 
             if ( !requests.isEmpty() )
             {
@@ -109,6 +109,9 @@ public class ResponseSender
                     httpRequestsExecutor.invokeAll( todo );
                 }
             }
+
+            dispatcherDAO.deleteRequestsWithExceededAttempts( numOfAttempts );
+            dispatcherDAO.deleteOrphanResponses();
         }
         catch ( InterruptedException | DaoException e )
         {
@@ -156,7 +159,8 @@ public class ResponseSender
                     request.incrementAttempts();
                     dispatcherDAO.saveRemoteRequest( request );
                     //delete previous request (workaround until we change Cassandra to another DB)
-//                    dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
+                    //                    dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(),
+                    // request.getAttempts() - 1 );
                 }
             }
             else
@@ -239,7 +243,7 @@ public class ResponseSender
             }
             else
             {
-//                dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
+                //                dispatcherDAO.deleteRemoteRequest( request.getCommandId() );
                 request.updateTimestamp();
                 dispatcherDAO.saveRemoteRequest( request );
             }
@@ -256,7 +260,8 @@ public class ResponseSender
                 request.incrementAttempts();
                 dispatcherDAO.saveRemoteRequest( request );
                 //delete previous request (workaround until we change Cassandra to another DB)
-//                dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(), request.getAttempts() - 1 );
+                //                dispatcherDAO.deleteRemoteRequestWithAttempts( request.getCommandId(),
+                // request.getAttempts() - 1 );
             }
         }
     }
