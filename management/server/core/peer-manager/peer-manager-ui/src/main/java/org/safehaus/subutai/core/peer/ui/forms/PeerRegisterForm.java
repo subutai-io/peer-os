@@ -253,6 +253,7 @@ public class PeerRegisterForm extends CustomComponent
                                     peer.setStatus( PeerStatus.REGISTERED );
                                     break;
                             }
+                            peerManagerPortalModule.getPeerManager().register( peer );
                         }
 
 
@@ -264,6 +265,10 @@ public class PeerRegisterForm extends CustomComponent
                                 case REJECTED:
                                 case BLOCKED:
 
+                                    break;
+                                case REQUESTED:
+                                    peer.setStatus( PeerStatus.REJECTED );
+                                    peerManagerPortalModule.getPeerManager().register( peer );
                                     break;
                             }
                         }
