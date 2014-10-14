@@ -46,7 +46,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
 
-    private final TemplateDAO templateDAO;
+    protected TemplateDAO templateDAO;
 
 
     public TemplateRegistryImpl( final DataSource dataSource ) throws DaoException
