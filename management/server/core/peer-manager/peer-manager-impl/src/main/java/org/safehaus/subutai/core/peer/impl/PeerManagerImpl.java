@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.peer.impl;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -16,6 +17,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -36,7 +39,6 @@ import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -52,6 +54,7 @@ import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
@@ -68,30 +71,37 @@ public class PeerManagerImpl implements PeerManager
     private static final String SOURCE = "PEER_MANAGER";
     private static final String PEER_GROUP = "PEER_GROUP";
     private final Queue<PeerMessageListener> peerMessageListeners = new ConcurrentLinkedQueue<>();
-    private DbManager dbManager;
     private AgentManager agentManager;
     private PeerDAO peerDAO;
     private ContainerManager containerManager;
     private CommandRunner commandRunner;
     private TemplateRegistry templateRegistry;
-
+    private DataSource dataSource;
     private Set<PeerContainer> containers = new HashSet<>();
+
+
+    public PeerManagerImpl( final DataSource dataSource )
+    {
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        this.dataSource = dataSource;
+    }
 
 
     public void init()
     {
-        peerDAO = new PeerDAO( dbManager );
+        try
+        {
+            this.peerDAO = new PeerDAO( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            e.printStackTrace();
+        }
     }
 
 
     public void destroy()
     {
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 
@@ -619,17 +629,17 @@ public class PeerManagerImpl implements PeerManager
                         Agent parentAgent = agentManager.getAgentByHostname( agent.getParentHostName() );
                         containerManager.destroy( parentAgent.getHostname(), agent.getHostname() );
 
-//                        peerCommandMessage.setSuccess( true );
+                        //                        peerCommandMessage.setSuccess( true );
                     }
                     catch ( ContainerDestroyException e )
                     {
                         LOG.error( e.getMessage(), e );
-//                        peerCommandMessage.setSuccess( false );
+                        //                        peerCommandMessage.setSuccess( false );
                     }
                 }
                 else
                 {
-//                    peerCommandMessage.setSuccess( false );
+                    //                    peerCommandMessage.setSuccess( false );
                 }
                 break;
             default:

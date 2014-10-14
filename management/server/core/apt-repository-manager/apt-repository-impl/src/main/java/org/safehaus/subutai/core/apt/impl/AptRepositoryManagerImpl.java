@@ -13,16 +13,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.safehaus.subutai.core.command.api.command.AgentResult;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.apt.api.AptCommand;
 import org.safehaus.subutai.core.apt.api.AptRepoException;
 import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 import org.safehaus.subutai.core.apt.api.PackageInfo;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.command.AgentResult;
+import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,7 +194,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
         File packageFile = new File( pathToPackageFile );
         Preconditions.checkArgument( packageFile.exists(), "Package file does not exist" );
         Preconditions.checkArgument( !packageFile.isDirectory(), "Package file is directory" );
-        Preconditions.checkArgument( pathsToFilesInsidePackage != null && !pathsToFilesInsidePackage.isEmpty(),
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( pathsToFilesInsidePackage ),
                 "PathsToFilesInsidePackage is null or empty" );
         StringBuilder filesSB = new StringBuilder();
         long nano = System.nanoTime();
@@ -247,7 +248,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager
     }
 
 
-    //sends broadcase command to all currently connected agents
+    //sends broadcast command to all currently connected agents
     private void broadcastAptGetUpdateCommand()
     {
         Command command =

@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.ui.Component;
 
 
@@ -17,12 +18,14 @@ public class TrackerPortalModule implements PortalModule
 
     public static final String MODULE_IMAGE = "tracker.png";
     public static final String MODULE_NAME = "Tracker";
-    private Tracker tracker;
+    private final Tracker tracker;
     private ExecutorService executor;
 
 
-    public void setTracker( Tracker tracker )
+    public TrackerPortalModule( final Tracker tracker )
     {
+        Preconditions.checkNotNull( tracker, "Tracker is null" );
+
         this.tracker = tracker;
     }
 
@@ -35,7 +38,6 @@ public class TrackerPortalModule implements PortalModule
 
     public void destroy()
     {
-        tracker = null;
         executor.shutdown();
     }
 

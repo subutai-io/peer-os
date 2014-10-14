@@ -205,7 +205,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         Window window = new Window();
         window.setCaption( caption );
         window.setWidth( "800px" );
-        window.setHeight( "600px" );
+        window.setHeight( "500px" );
         window.setModal( true );
         window.setClosable( true );
         return window;
@@ -218,13 +218,10 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         if ( executorServiceMap.containsKey( environmentBuildProcess.getUuid() ) )
         {
             ExecutorService executorService = executorServiceMap.get( environmentBuildProcess.getUuid() );
-            if ( executorService.isTerminated() )
+            if ( !executorService.isTerminated() )
             {
                 executorService.shutdown();
                 executorServiceMap.remove( environmentBuildProcess.getUuid() );
-
-                //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                module.getEnvironmentManager().deleteBuildProcess( environmentBuildProcess );
                 environmentBuildProcess.setCompleteStatus( true );
                 environmentBuildProcess.setProcessStatusEnum( ProcessStatusEnum.TERMINATED );
                 module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
@@ -289,8 +286,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
                         Notification.show( EnvAnswer.START.getAnswer() );
 
-                        //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                        module.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
                         EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                         ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
@@ -301,8 +296,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
                         Notification.show( EnvAnswer.SUCCESS.getAnswer() );
 
-                        //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                        module.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
                         EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                         ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
@@ -313,8 +306,6 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                         p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
                         Notification.show( EnvAnswer.FAIL.getAnswer() );
 
-                        //TODO: need to use JPA to update entity properties instead of deleting and saving into C*
-                        module.getEnvironmentManager().deleteBuildProcess( event.getEnvironmentBuildProcess() );
                         EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                         ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );

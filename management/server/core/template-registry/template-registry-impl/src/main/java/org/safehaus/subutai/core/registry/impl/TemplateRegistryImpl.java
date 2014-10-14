@@ -19,10 +19,10 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -49,10 +49,10 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private final TemplateDAO templateDAO;
 
 
-    public TemplateRegistryImpl( final DbManager dbManager )
+    public TemplateRegistryImpl( final DataSource dataSource ) throws DaoException
     {
-        Preconditions.checkNotNull( dbManager, "DB Manager is null" );
-        templateDAO = new TemplateDAO( dbManager );
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+        templateDAO = new TemplateDAO( dataSource );
     }
 
 
@@ -79,14 +79,14 @@ public class TemplateRegistryImpl implements TemplateRegistry
         {
 
             templateDAO.saveTemplate( template );
+            return true;
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in registerTemplate", e );
             throw new RegistryException(
                     String.format( "Error saving template %s, %s", template.getTemplateName(), e.getMessage() ) );
         }
-        return true;
     }
 
 
@@ -265,7 +265,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             {
                 templateDAO.removeTemplate( template );
             }
-            catch ( DBException e )
+            catch ( DaoException e )
             {
                 LOG.error( "Error in unregisterTemplate", e );
                 throw new RegistryException(
@@ -311,7 +311,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         {
             return templateDAO.getTemplateByName( templateName, lxcArch );
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in getTemplate", e );
             return null;
@@ -352,7 +352,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
         {
             return templateDAO.getChildTemplates( parentTemplateName, lxcArch );
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in getChildTemplates", e );
             return Collections.emptyList();
@@ -418,7 +418,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
                 templateTree.addTemplate( template );
             }
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in getTemplateTree", e );
         }
@@ -501,7 +501,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             }
             return result;
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in getAllTemplates", e );
         }
@@ -537,7 +537,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             {
                 templateDAO.saveTemplate( template );
             }
-            catch ( DBException e )
+            catch ( DaoException e )
             {
                 LOG.error( "Error in updateTemplateUsage", e );
                 throw new RegistryException( String.format( "Error saving template information, %s", e.getMessage() ) );
@@ -587,7 +587,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
 
             templateDAO.saveTemplate( template );
         }
-        catch ( DBException e )
+        catch ( DaoException e )
         {
             LOG.error( "Error in registerTemplate", e );
             throw new RegistryException(

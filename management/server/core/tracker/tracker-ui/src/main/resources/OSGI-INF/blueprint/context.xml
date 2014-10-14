@@ -8,7 +8,7 @@
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.tracker.ui.TrackerPortalModule"
         init-method="init" destroy-method="destroy">
-    <property name="tracker" ref="tracker" />
+    <argument ref="tracker" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
