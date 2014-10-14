@@ -210,6 +210,7 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         Peer p = GSON.fromJson( peer, Peer.class );
+        peerManager.register( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
 

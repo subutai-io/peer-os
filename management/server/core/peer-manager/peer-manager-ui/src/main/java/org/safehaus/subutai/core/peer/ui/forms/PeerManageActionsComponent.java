@@ -42,6 +42,7 @@ public class PeerManageActionsComponent extends HorizontalLayout
                 if ( listener != null )
                 {
                     listener.OnPositiveButtonTrigger( peer );
+                    updateView();
                 }
             }
         } );
@@ -54,6 +55,7 @@ public class PeerManageActionsComponent extends HorizontalLayout
                 if ( listener != null )
                 {
                     listener.OnNegativeButtonTrigger( peer );
+                    updateView();
                 }
             }
         } );
@@ -86,6 +88,14 @@ public class PeerManageActionsComponent extends HorizontalLayout
                 break;
             case REJECTED:
                 negativeButton.setCaption( "Delete" );
+                addComponent( negativeButton );
+                break;
+            case APPROVED:
+                negativeButton.setCaption( "Unregister" );
+                addComponent( negativeButton );
+                break;
+            case REQUEST_SENT:
+                negativeButton.setCaption( "Cancel request" );
                 addComponent( negativeButton );
                 break;
         }

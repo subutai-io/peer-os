@@ -201,17 +201,17 @@ public class PeerRegisterForm extends CustomComponent
             {
                 continue;
             }
-            switch ( peer.getStatus() )
-            {
-                case REQUESTED:
-                    unregisterButton.setCaption( "Register" );
-                    break;
-                case REGISTERED:
-                    unregisterButton.setCaption( "Unregister" );
-                    break;
-                case REJECTED:
-                    continue;
-            }
+            //            switch ( peer.getStatus() )
+            //            {
+            //                case REQUESTED:
+            //                    unregisterButton.setCaption( "Register" );
+            //                    break;
+            //                case REGISTERED:
+            //                    unregisterButton.setCaption( "Unregister" );
+            //                    break;
+            //                case REJECTED:
+            //                    continue;
+            //            }
             unregisterButton.addClickListener( new Button.ClickListener()
             {
                 @Override
@@ -263,8 +263,10 @@ public class PeerRegisterForm extends CustomComponent
                             switch ( peer.getStatus() )
                             {
                                 case REJECTED:
+                                case APPROVED:
+                                case REQUEST_SENT:
                                 case BLOCKED:
-                                    peerManagerPortalModule.getPeerManager().unregister( peer.getIp().toString() );
+                                    peerManagerPortalModule.getPeerManager().unregister( peer.getIp() );
                                     peersTable.removeItem( peer.getId() );
                                     break;
                                 case REQUESTED:
@@ -335,7 +337,7 @@ public class PeerRegisterForm extends CustomComponent
                                     local.path( "peer/json" ).accept( MediaType.APPLICATION_JSON ).get( String.class );
 
                             Peer selfPeer = GSON.fromJson( localhostPeer, Peer.class );
-                            selfPeer.setStatus( PeerStatus.REQUESTED );
+                            selfPeer.setStatus( PeerStatus.REQUEST_SENT );
 
                             client = WebClient.create( baseUrl );
                             Response response = client.path( "peer/register" ).type( MediaType.TEXT_PLAIN )
