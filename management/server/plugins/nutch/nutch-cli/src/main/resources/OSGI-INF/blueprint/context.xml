@@ -2,19 +2,19 @@
     >
 
   <reference id="nutchManager" availability="mandatory"
-             interface="org.safehaus.subutai.plugin.lucene.api.Lucene" />
+             interface="org.safehaus.subutai.plugin.nutch.api.Nutch" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="lucene/list-clusters">
-      <action class="org.safehaus.subutai.plugin.lucene.cli.ListClustersCommand">
+    <command name="nutch/list-clusters">
+      <action class="org.safehaus.subutai.plugin.nutch.cli.ListClustersCommand">
         <property name="nutchManager" ref="nutchManager" />
       </action>
     </command>
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="lucene/uninstall-cluster">
-      <action class="org.safehaus.subutai.plugin.lucene.cli.UninstallClusterCommand">
+    <command name="nutch/uninstall-cluster">
+      <action class="org.safehaus.subutai.plugin.nutch.cli.UninstallClusterCommand">
         <property name="nutchManager" ref="nutchManager" />
       </action>
     </command>
