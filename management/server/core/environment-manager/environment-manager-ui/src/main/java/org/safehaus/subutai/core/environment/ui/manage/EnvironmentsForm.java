@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
@@ -15,6 +16,7 @@ import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -95,6 +97,7 @@ public class EnvironmentsForm
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
                     Window window = envWindow( environment );
+                    contentRoot.getUI().addWindow( window );
                     window.setVisible( true );
                 }
             } );
@@ -122,6 +125,9 @@ public class EnvironmentsForm
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent )
                 {
+                    Window window = configWindow( environment );
+                    contentRoot.getUI().addWindow( window );
+                    window.setVisible( true );
                     Notification.show( CONFIGURE );
                 }
             } );
@@ -134,11 +140,49 @@ public class EnvironmentsForm
     }
 
 
+    private Window configWindow( final Environment environment )
+    {
+        Window window = createWindow( MANAGE_TITLE );
+        window.setContent( genConfigureContainersTable( environment, environment.getContainers() ) );
+        return window;
+    }
+
+
+    private VerticalLayout genConfigureContainersTable( Environment environment, Set<EnvironmentContainer> containers )
+    {
+        VerticalLayout vl = new VerticalLayout();
+
+        Table containersTable = new Table();
+        containersTable.addContainerProperty( NAME, String.class, null );
+        containersTable.addContainerProperty( "Peer", String.class, null );
+        containersTable.addContainerProperty( "IP", TextField.class, null );
+        containersTable.setPageLength( 10 );
+        containersTable.setSelectable( false );
+        containersTable.setEnabled( true );
+        containersTable.setImmediate( true );
+        containersTable.setSizeFull();
+
+        for ( Container container : containers )
+        {
+            TextField field = new TextField();
+            field.setWidth( "200px" );
+            field.setValue( container.getIps().get( 0 ) );
+            containersTable.addItem( new Object[] {
+                    container.getName(), container.getPeerId().toString(), field
+            }, null );
+        }
+
+
+        vl.addComponent( containersTable );
+        vl.addComponent( new Button( "Apply" ) );
+        return vl;
+    }
+
+
     private Window envWindow( Environment environment )
     {
         Window window = createWindow( MANAGE_TITLE );
-        window.setContent( genContainersTable(environment,  environment.getContainers() ) );
-        contentRoot.getUI().addWindow( window );
+        window.setContent( genContainersTable( environment, environment.getContainers() ) );
         return window;
     }
 
@@ -148,7 +192,7 @@ public class EnvironmentsForm
         Window window = new Window();
         window.setCaption( caption );
         window.setWidth( "800px" );
-        window.setHeight( "600px" );
+        window.setHeight( "500px" );
         window.setModal( true );
         window.setClosable( true );
         return window;
@@ -176,7 +220,8 @@ public class EnvironmentsForm
 
             containersTable.addItem( new Object[] {
                     container.getName() + " on " + container.getPeerId(), propertiesButton( container ),
-                    startButton( environment, container ), stopButton( environment, container ), destroyButton( environment, container )
+                    startButton( environment, container ), stopButton( environment, container ),
+                    destroyButton( environment, container )
             }, null );
         }
 
@@ -278,8 +323,8 @@ public class EnvironmentsForm
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
                 //TODO: destroy functionality
-//                DefaultCommandMessage commandMessage = container.start();
-//                environment.invoke( commandMessage );
+                //                DefaultCommandMessage commandMessage = container.start();
+                //                environment.invoke( commandMessage );
                 Notification.show( DESTROY );
             }
         } );

@@ -1,16 +1,19 @@
 package org.safehaus.subutai.core.peer.impl.dao;
 
 
+import java.sql.Clob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
+import javax.sql.DataSource;
+
+import org.safehaus.subutai.common.util.DbUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
@@ -25,14 +28,29 @@ public class PeerDAO
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private final DbManager dbManager;
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    protected DbUtil dbUtil;
 
 
-    public PeerDAO( final DbManager dbManager )
+    public PeerDAO( final DataSource dataSource ) throws SQLException
     {
-        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
-        this.dbManager = dbManager;
+        Preconditions.checkNotNull( dataSource, "DataSource is null" );
+        this.dbUtil = new DbUtil( dataSource );
+
+        setupDb();
+    }
+
+
+    protected void setupDb() throws SQLException
+    {
+
+        String sql1 = "create table if not exists peer (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
+                + "id));";
+        String sql2 = "create table if not peer_group (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
+                + "id));";
+
+        dbUtil.update( sql1 );
+        dbUtil.update( sql2 );
     }
 
 
@@ -44,11 +62,11 @@ public class PeerDAO
 
         try
         {
-            dbManager.executeUpdate2( "insert into peer_info(source,key,info) values (?,?,?)", source.toLowerCase(),
-                    key.toLowerCase(), gson.toJson( info ) );
+            dbUtil.update( "merge into peer_info (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
+                    GSON.toJson( info ) );
             return true;
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( e.getMessage() );
         }
@@ -72,18 +90,18 @@ public class PeerDAO
         List<T> list = new ArrayList<>();
         try
         {
-            ResultSet rs =
-                    dbManager.executeQuery2( "select info from peer_info where source = ?", source.toLowerCase() );
-            if ( rs != null )
+            ResultSet rs = dbUtil.select( "select info from peer where source = ?", source );
+            while ( rs != null && rs.next() )
             {
-                for ( Row row : rs )
+                Clob infoClob = rs.getClob( "info" );
+                if ( infoClob != null && infoClob.length() > 0 )
                 {
-                    String info = row.getString( "info" );
-                    list.add( gson.fromJson( info, clazz ) );
+                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                    list.add( GSON.fromJson( info, clazz ) );
                 }
             }
         }
-        catch ( JsonSyntaxException | DBException e )
+        catch ( JsonSyntaxException | SQLException e )
         {
             LOG.error( e.getMessage() );
         }
@@ -109,21 +127,19 @@ public class PeerDAO
         try
         {
 
-            ResultSet rs = dbManager
-                    .executeQuery2( "select info from peer_info where source = ? and key = ?", source.toLowerCase(),
-                            key.toLowerCase() );
-            if ( rs != null )
+            ResultSet rs = dbUtil.select( "select info from peer where source = ? and key = ?", source,
+                    UUID.fromString( key ) );
+            if ( rs != null && rs.next() )
             {
-                Row row = rs.one();
-                if ( row != null )
+                Clob infoClob = rs.getClob( "info" );
+                if ( infoClob != null && infoClob.length() > 0 )
                 {
-
-                    String info = row.getString( "info" );
-                    return gson.fromJson( info, clazz );
+                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                    return GSON.fromJson( info, clazz );
                 }
             }
         }
-        catch ( JsonSyntaxException | DBException e )
+        catch ( JsonSyntaxException | SQLException e )
         {
             LOG.error( e.getMessage() );
         }
@@ -144,11 +160,10 @@ public class PeerDAO
 
         try
         {
-            dbManager.executeUpdate2( "delete from peer_info where source = ? and key = ?", source.toLowerCase(),
-                    key.toLowerCase() );
+            dbUtil.update( "delete from peer where source = ? and key = ?", source, UUID.fromString( key ) );
             return true;
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
