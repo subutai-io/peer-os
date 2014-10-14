@@ -1,117 +1,25 @@
-
 {
+  "fields":["log_host", "name", "val", "units"], 
   "query": {
     "filtered": {
-
       "filter": {
         "and": [
           {
             "range": {
               "@timestamp": {
-                "from": "2014-09-08T00:00:00",
-                "to": "2014-10-08T23:59:59"
+                "from": "2014-10-12T14:31:04",
+                "to": "2014-10-13T15:31:04"
               }
             }
           },
           {
             "terms": {
-              "host": [ "py627967291","py627967291", "master5"]
-            }
-          }
-        ]
-      }
-    }
-  },
-    "sort": {
-        "@timestamp": {
-            "order": "desc",
-            "ignore_unmapped": true
-        }
-    },
-  "size": 10
-}
-
-{
-  "query": {
-    "filtered": {
-      "query": {
-        "match": {
-          "collectd_type": "disk_ops"
-        }
-      },
-      "filter": {
-        "and": [
-          {
-            "range": {
-              "@timestamp": {
-                "from": "2014-09-07T14:31:04",
-                "to": "2014-10-07T15:31:04"
-              }
+              "log_host": ["py627967291", "py420202276"]
             }
           },
           {
-            "term": {
-              "host": "master2"
-            }
-          }
-        ]
-      }
-    }
-  },
-    "sort": {
-        "@timestamp": {
-            "order": "desc",
-            "ignore_unmapped": true
-        }
-    },
-  "size": 10
-}
-
-
-{
-  "query": {
-    "filtered": {
-      "query": {
-        "match": {
-          "collectd_type": "disk_ops"
-        }
-      },
-      "filter": {
-        "and": [
-          {
-            "range": {
-              "@timestamp": {
-                "from": "2014-09-07T14:31:04",
-                "to": "2014-10-07T15:31:04"
-              }
-            }
-          }
-        ]
-      }
-    }
-  },
-    "sort": {
-        "@timestamp": {
-            "order": "desc",
-            "ignore_unmapped": true
-        }
-    },
-  "size": 100
-}
-
-
-{
-  "query": {
-    "filtered": {
-
-      "filter": {
-        "and": [
-          {
-            "range": {
-              "@timestamp": {
-                "from": "2014-09-07T14:31:04",
-                "to": "2014-10-07T15:31:04"
-              }
+            "terms": {
+              "name": ["mem_free", "load_fifteen"]
             }
           }
         ]
