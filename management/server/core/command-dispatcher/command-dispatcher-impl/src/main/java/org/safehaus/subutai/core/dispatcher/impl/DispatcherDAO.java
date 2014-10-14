@@ -21,8 +21,6 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * DAO for Command Dispatcher
- *
- * TODO - delete requests & responses with exceeded attempts
  */
 
 public class DispatcherDAO
