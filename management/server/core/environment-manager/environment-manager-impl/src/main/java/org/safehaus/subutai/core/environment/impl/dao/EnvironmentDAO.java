@@ -1,21 +1,27 @@
 package org.safehaus.subutai.core.environment.impl.dao;
 
 
+import java.sql.Clob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
+import javax.sql.DataSource;
+
+import org.safehaus.subutai.common.util.DbUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+
+//import com.datastax.driver.core.ResultSet;
+//import com.datastax.driver.core.Row;
 
 
 /**
@@ -26,13 +32,34 @@ public class EnvironmentDAO
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private final DbManager dbManager;
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    protected DbUtil dbUtil;
 
 
-    public EnvironmentDAO( final DbManager dbManager )
+    public EnvironmentDAO( DataSource dataSource ) throws SQLException
     {
-        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
-        this.dbManager = dbManager;
+        Preconditions.checkNotNull( dataSource, "DataSource is null" );
+        this.dbUtil = new DbUtil( dataSource );
+
+        setupDb();
+    }
+
+
+    protected void setupDb() throws SQLException
+    {
+
+        String sql1 =
+                "create table if not exists blueprint (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
+                        + "id));";
+        String sql2 =
+                "create table if not exists process (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
+                        + "id));";
+        String sql3 = "create table if not exists environment (source varchar(100), id uuid, info clob, "
+                + "PRIMARY KEY (source, id));";
+
+        dbUtil.update( sql1 );
+        dbUtil.update( sql2 );
+        dbUtil.update( sql3 );
     }
 
 
@@ -44,11 +71,14 @@ public class EnvironmentDAO
 
         try
         {
-            dbManager.executeUpdate2( "insert into environment_info(source,key,info) values (?,?,?)",
-                    source.toLowerCase(), key.toLowerCase(), gson.toJson( info ) );
+            dbUtil.update( "merge into environment (source, id, info) values (? , ?, ?)", source,
+                    UUID.fromString( key ), gson.toJson( info ) );
+
+            //            dbManager.executeUpdate2( "insert into environment_info(source,key,info) values (?,?,?)",
+            //                    source.toLowerCase(), key.toLowerCase(), gson.toJson( info ) );
             return true;
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -72,14 +102,14 @@ public class EnvironmentDAO
         List<T> list = new ArrayList<>();
         try
         {
-            ResultSet rs = dbManager
-                    .executeQuery2( "select info from environment_info where source = ?", source.toLowerCase() );
-            if ( rs != null )
+            ResultSet rs = dbUtil.select( "select info from environment where source = ?", source );
+            while ( rs != null && rs.next() )
             {
-                for ( Row row : rs )
+                Clob infoClob = rs.getClob( "info" );
+                if ( infoClob != null && infoClob.length() > 0 )
                 {
-                    String info = row.getString( "info" );
-                    list.add( gson.fromJson( info, clazz ) );
+                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                    list.add( GSON.fromJson( info, clazz ) );
                 }
             }
         }
@@ -87,7 +117,7 @@ public class EnvironmentDAO
         {
             LOG.error( e.getMessage(), e );
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -113,16 +143,16 @@ public class EnvironmentDAO
         try
         {
 
-            ResultSet rs = dbManager.executeQuery2( "select info from environment_info where source = ? and key = ?",
-                    source.toLowerCase(), key.toLowerCase() );
-            if ( rs != null )
+            ResultSet rs =
+                    dbUtil.select( "select info from environment where source = ? and id = ?", source.toLowerCase(),
+                            key.toLowerCase() );
+            if ( rs != null && rs.next() )
             {
-                Row row = rs.one();
-                if ( row != null )
+                Clob infoClob = rs.getClob( "info" );
+                if ( infoClob != null && infoClob.length() > 0 )
                 {
-
-                    String info = row.getString( "info" );
-                    return gson.fromJson( info, clazz );
+                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                    return GSON.fromJson( info, clazz );
                 }
             }
         }
@@ -130,7 +160,7 @@ public class EnvironmentDAO
         {
             LOG.error( e.getMessage(), e );
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -151,11 +181,10 @@ public class EnvironmentDAO
 
         try
         {
-            dbManager.executeUpdate2( "delete from environment_info where source = ? and key = ?", source.toLowerCase(),
-                    key.toLowerCase() );
+            dbUtil.update( "delete from environment where source = ? and id = ?", source, UUID.fromString( key ) );
             return true;
         }
-        catch ( DBException e )
+        catch ( SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
