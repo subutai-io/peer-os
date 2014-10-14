@@ -26,14 +26,11 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * Provides Data Access API for templates
- *
- * TODO - optimize table structure to use indexes
  */
 public class TemplateDAO
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateDAO.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final String TEMPLATE_ARCH_FORMAT = "%s-%s";
     protected DbUtil dbUtil;
 
 
@@ -48,9 +45,8 @@ public class TemplateDAO
 
     private void setupDb() throws DaoException
     {
-
-        String sql = "create table if not exists template_registry_info ( template varchar(100), parent varchar(100), "
-                + "info clob, PRIMARY KEY (template) );";
+        String sql = "create table if not exists template_registry_info ( template varchar(100), arch varchar(10), "
+                + "parent varchar(100), info clob, PRIMARY KEY (template, arch) );";
         try
         {
             dbUtil.update( sql );
@@ -69,7 +65,6 @@ public class TemplateDAO
      */
     public List<Template> getAllTemplates() throws DaoException
     {
-
         try
         {
             ResultSet rs = dbUtil.select( "select info from template_registry_info" );
@@ -90,7 +85,6 @@ public class TemplateDAO
 
         while ( rs != null && rs.next() )
         {
-
             Clob infoClob = rs.getClob( "info" );
             if ( infoClob != null && infoClob.length() > 0 )
             {
@@ -121,9 +115,8 @@ public class TemplateDAO
         {
             try
             {
-                ResultSet rs = dbUtil.select( "select info from template_registry_info where parent = ?",
-                        String.format( TEMPLATE_ARCH_FORMAT, parentTemplateName.toLowerCase(),
-                                lxcArch.toLowerCase() ) );
+                ResultSet rs = dbUtil.select( "select info from template_registry_info where parent = ? and arch = ?",
+                        parentTemplateName.toLowerCase(), lxcArch.toLowerCase() );
 
                 return getTemplatesFromResultSet( rs );
             }
@@ -151,8 +144,8 @@ public class TemplateDAO
         {
             try
             {
-                ResultSet rs = dbUtil.select( "select info from template_registry_info where template = ?",
-                        String.format( TEMPLATE_ARCH_FORMAT, templateName.toLowerCase(), lxcArch.toLowerCase() ) );
+                ResultSet rs = dbUtil.select( "select info from template_registry_info where template = ? and arch = ?",
+                        templateName.toLowerCase(), lxcArch.toLowerCase() );
                 List<Template> list = getTemplatesFromResultSet( rs );
                 if ( !list.isEmpty() )
                 {
@@ -180,12 +173,10 @@ public class TemplateDAO
         {}.getType();
         try
         {
-            dbUtil.update( "insert into template_registry_info(template, parent, info) values(?,?,?)",
-                    String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
-                            template.getLxcArch().toLowerCase() ),
+            dbUtil.update( "insert into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
+                    template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase(),
                     Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
-                    String.format( TEMPLATE_ARCH_FORMAT, template.getParentTemplateName().toLowerCase(),
-                            template.getLxcArch().toLowerCase() ), GSON.toJson( template, templateType ) );
+                    template.getParentTemplateName().toLowerCase(), GSON.toJson( template, templateType ) );
         }
         catch ( SQLException e )
         {
@@ -202,12 +193,10 @@ public class TemplateDAO
      */
     public void removeTemplate( Template template ) throws DaoException
     {
-
         try
         {
-            dbUtil.update( "delete from template_registry_info where template = ?",
-                    String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
-                            template.getLxcArch().toLowerCase() ) );
+            dbUtil.update( "delete from template_registry_info where template = ? and arch = ?",
+                    template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() );
         }
         catch ( SQLException e )
         {

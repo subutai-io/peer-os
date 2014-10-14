@@ -232,4 +232,41 @@ public class DispatcherDAOTest
 
         assertEquals( remoteRequest.getCommandId(), remoteRequest1.getCommandId() );
     }
+
+
+    @Test
+    public void testDeleteRequestsWithExceededAttempts() throws Exception
+    {
+        dispatcherDAO.deleteRequestsWithExceededAttempts( 1 );
+
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
+    }
+
+
+    @Test( expected = DaoException.class )
+    public void testDeleteRequestsWithExceededAttemptsException() throws Exception
+    {
+        when( dataSource.getConnection() ).thenThrow( new SQLException() );
+
+        dispatcherDAO.deleteRequestsWithExceededAttempts( 1 );
+    }
+
+
+    @Test
+    public void testDeleteOrphanResponses() throws Exception
+    {
+        dispatcherDAO.deleteOrphanResponses();
+
+        verify( preparedStatement, times( 2 ) ).executeUpdate();
+    }
+
+
+    @Test( expected = DaoException.class )
+    public void testDeleteOrphanResponsesException() throws Exception
+    {
+
+        when( dataSource.getConnection() ).thenThrow( new SQLException() );
+
+        dispatcherDAO.deleteOrphanResponses();
+    }
 }
