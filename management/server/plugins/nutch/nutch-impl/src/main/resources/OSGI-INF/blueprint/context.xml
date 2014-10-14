@@ -24,6 +24,13 @@
 
   <bean id="nutch-impl" scope="singleton" class="org.safehaus.subutai.plugin.nutch.impl.NutchImpl"
         init-method="init" destroy-method="destroy">
+    <argument ref="commandRunner" />
+    <argument ref="agentManager" />
+    <argument ref="dbManager" />
+    <argument ref="tracker" />
+    <argument ref="hadoopManager" />
+    <argument ref="environmentManager" />
+    <argument ref="containerManager" />
   </bean>
 
   <service ref="nutch-impl" interface="org.safehaus.subutai.plugin.nutch.api.Nutch" />
