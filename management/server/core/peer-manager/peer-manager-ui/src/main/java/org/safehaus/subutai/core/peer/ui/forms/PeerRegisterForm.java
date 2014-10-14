@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.peer.ui.forms;
 
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -188,11 +187,12 @@ public class PeerRegisterForm extends CustomComponent
     {
         List<Peer> peers = peerManagerPortalModule.getPeerManager().peers();
         peersTable.removeAllItems();
-//        peersTable.addContainerProperty( "UUID", UUID.class, null );
+        //        peersTable.addContainerProperty( "UUID", UUID.class, null );
         peersTable.addContainerProperty( "Name", String.class, null );
         peersTable.addContainerProperty( "IP", String.class, null );
         peersTable.addContainerProperty( "Status", PeerStatus.class, null );
         peersTable.addContainerProperty( "Actions", Button.class, null );
+        peersTable.addContainerProperty( "ActionsAdvanced", PeerManageActionsComponent.class, null );
 
         for ( final Peer peer : peers )
         {
@@ -206,7 +206,7 @@ public class PeerRegisterForm extends CustomComponent
                 case REQUESTED:
                     unregisterButton.setCaption( "Register" );
                     break;
-                case APPROVED:
+                case REGISTERED:
                     unregisterButton.setCaption( "Unregister" );
                     break;
                 case REJECTED:
@@ -221,12 +221,12 @@ public class PeerRegisterForm extends CustomComponent
                     {
                         case REQUESTED:
                         {
-                            peer.setStatus( PeerStatus.APPROVED );
+                            peer.setStatus( PeerStatus.REGISTERED );
                             peerManagerPortalModule.getPeerManager().register( peer );
                             clickEvent.getButton().setCaption( "Unregister" );
                             break;
                         }
-                        case APPROVED:
+                        case REGISTERED:
                         {
                             peerManagerPortalModule.getPeerManager().unregister( peer.getId().toString() );
                             break;
@@ -234,8 +234,43 @@ public class PeerRegisterForm extends CustomComponent
                     }
                 }
             } );
+            PeerManageActionsComponent.PeerManagerActionsListener listener =
+                    new PeerManageActionsComponent.PeerManagerActionsListener()
+
+                    {
+                        @Override
+                        public void OnPositiveButtonTrigger( final Peer peer )
+                        {
+                            switch ( peer.getStatus() )
+                            {
+                                case REQUESTED:
+                                    peer.setStatus( PeerStatus.REGISTERED );
+                                    break;
+                                case REGISTERED:
+                                    peer.setStatus( PeerStatus.BLOCKED );
+                                    break;
+                                case BLOCKED:
+                                    peer.setStatus( PeerStatus.REGISTERED );
+                                    break;
+                            }
+                        }
+
+
+                        @Override
+                        public void OnNegativeButtonTrigger( final Peer peer )
+                        {
+                            switch ( peer.getStatus() )
+                            {
+                                case REJECTED:
+                                case BLOCKED:
+
+                                    break;
+                            }
+                        }
+                    };
+            PeerManageActionsComponent component = new PeerManageActionsComponent( peer, listener );
             peersTable.addItem(
-                    new Object[] { peer.getName(), peer.getIp(), peer.getStatus(), unregisterButton },
+                    new Object[] { peer.getName(), peer.getIp(), peer.getStatus(), unregisterButton, component },
                     null );
         }
     }
