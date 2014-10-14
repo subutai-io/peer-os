@@ -15,7 +15,7 @@
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
   <bean id="trackerImpl" class="org.safehaus.subutai.core.tracker.rest.RestServiceImpl">
-    <property name="tracker" ref="tracker" />
+    <argument ref="tracker" />
   </bean>
 
   <jaxrs:server address="/tracker" id="trackerRestService">
