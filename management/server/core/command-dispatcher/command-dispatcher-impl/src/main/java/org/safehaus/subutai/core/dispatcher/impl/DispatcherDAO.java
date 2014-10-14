@@ -22,7 +22,8 @@ import com.google.gson.JsonSyntaxException;
 /**
  * DAO for Command Dispatcher
  *
- * TODO - optimize table structure to use indexes  , introduce updateRequest method
+ * TODO - optimize table structure to use indexes
+ * TODO - use nonstatic dbutil
  */
 
 public class DispatcherDAO
