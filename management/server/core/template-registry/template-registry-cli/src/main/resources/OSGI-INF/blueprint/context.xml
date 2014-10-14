@@ -30,7 +30,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/get-parent-template">
       <action class="org.safehaus.subutai.core.registry.cli.GetParentTemplateCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
