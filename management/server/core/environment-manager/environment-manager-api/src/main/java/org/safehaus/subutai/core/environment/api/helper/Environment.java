@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import javax.naming.NamingException;
 
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -37,7 +36,7 @@ public class Environment
 
     public void addContainer( EnvironmentContainer container )
     {
-        container.setEnvironment( this );
+        container.setEnvironmentId( uuid );
         this.containers.add( container );
     }
 
@@ -83,7 +82,7 @@ public class Environment
         {
             commandMessage.setProccessed( true );
             commandMessage.setExceptionMessage( e.toString() );
-//            commandMessage.setSuccess( false );
+            //            commandMessage.setSuccess( false );
         }
     }
 
