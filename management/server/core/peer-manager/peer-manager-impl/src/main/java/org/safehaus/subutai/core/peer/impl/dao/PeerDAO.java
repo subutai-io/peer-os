@@ -46,7 +46,7 @@ public class PeerDAO
 
         String sql1 = "create table if not exists peer (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
                 + "id));";
-        String sql2 = "create table if not exist peer_group (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
+        String sql2 = "create table if not exists peer_group (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
                 + "id));";
 
         dbUtil.update( sql1 );
