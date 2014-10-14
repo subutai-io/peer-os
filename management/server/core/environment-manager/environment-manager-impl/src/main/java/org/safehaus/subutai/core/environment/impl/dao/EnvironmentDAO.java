@@ -74,8 +74,6 @@ public class EnvironmentDAO
             dbUtil.update( "merge into environment (source, id, info) values (? , ?, ?)", source,
                     UUID.fromString( key ), gson.toJson( info ) );
 
-            //            dbManager.executeUpdate2( "insert into environment_info(source,key,info) values (?,?,?)",
-            //                    source.toLowerCase(), key.toLowerCase(), gson.toJson( info ) );
             return true;
         }
         catch ( SQLException e )

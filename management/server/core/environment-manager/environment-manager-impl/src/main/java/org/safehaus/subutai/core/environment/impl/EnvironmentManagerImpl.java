@@ -26,7 +26,6 @@ import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -108,13 +107,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     public void destroy()
     {
-        //        this.environmentDAO = null;
+        this.environmentDAO = null;
         this.environmentBuilder = null;
         this.containerManager = null;
         this.templateRegistry = null;
         this.agentManager = null;
         this.networkManager = null;
-        //        this.dbManager = null;
     }
 
 
@@ -188,9 +186,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         this.networkManager = networkManager;
     }
-
-
-
 
 
     @Override
