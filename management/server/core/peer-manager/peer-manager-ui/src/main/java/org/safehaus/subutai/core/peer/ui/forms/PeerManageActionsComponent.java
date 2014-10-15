@@ -86,6 +86,10 @@ public class PeerManageActionsComponent extends HorizontalLayout
                 addComponent( positiveButton );
                 addComponent( negativeButton );
                 break;
+            case BLOCKED_PEER:
+                negativeButton.setCaption( "Delete" );
+                addComponent( negativeButton );
+                break;
             case REJECTED:
                 negativeButton.setCaption( "Delete" );
                 addComponent( negativeButton );

@@ -218,7 +218,8 @@ public class RestServiceImpl implements RestService
     @Override
     public Response unregisterPeer( String peerId )
     {
-        boolean result = peerManager.unregister( peerId );
+        UUID id = GSON.fromJson( peerId, UUID.class );
+        boolean result = peerManager.unregister( id.toString() );
         if ( result )
         {
             return Response.ok( "Successfully unregistered peer: " + peerId ).build();

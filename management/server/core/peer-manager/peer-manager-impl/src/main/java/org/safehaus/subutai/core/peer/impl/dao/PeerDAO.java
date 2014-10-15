@@ -160,6 +160,7 @@ public class PeerDAO
 
         try
         {
+            LOG.warn( "###########################: " + key );
             dbUtil.update( "delete from peer where source = ? and id = ?", source, UUID.fromString( key ) );
             return true;
         }

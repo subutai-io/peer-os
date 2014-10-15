@@ -188,42 +188,17 @@ public class PeerRegisterForm extends CustomComponent
     {
         List<Peer> peers = peerManagerPortalModule.getPeerManager().peers();
         peersTable.removeAllItems();
-        //        peersTable.addContainerProperty( "UUID", UUID.class, null );
         peersTable.addContainerProperty( "Name", String.class, null );
         peersTable.addContainerProperty( "IP", String.class, null );
         peersTable.addContainerProperty( "Status", PeerStatus.class, null );
-        peersTable.addContainerProperty( "Actions", Button.class, null );
         peersTable.addContainerProperty( "ActionsAdvanced", PeerManageActionsComponent.class, null );
 
         for ( final Peer peer : peers )
         {
-            Button unregisterButton = new Button( "Unregister" );
             if ( peer == null || peer.getStatus() == null )
             {
                 continue;
             }
-            unregisterButton.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( final Button.ClickEvent clickEvent )
-                {
-                    switch ( peer.getStatus() )
-                    {
-                        case REQUESTED:
-                        {
-                            peer.setStatus( PeerStatus.REGISTERED );
-                            peerManagerPortalModule.getPeerManager().register( peer );
-                            clickEvent.getButton().setCaption( "Unregister" );
-                            break;
-                        }
-                        case REGISTERED:
-                        {
-                            peerManagerPortalModule.getPeerManager().unregister( peer.getId().toString() );
-                            break;
-                        }
-                    }
-                }
-            } );
             PeerManageActionsComponent.PeerManagerActionsListener listener =
                     new PeerManageActionsComponent.PeerManagerActionsListener()
 
@@ -234,49 +209,54 @@ public class PeerRegisterForm extends CustomComponent
                             switch ( peer.getStatus() )
                             {
                                 case REQUESTED:
-                                    peer.setStatus( PeerStatus.REGISTERED );
-                                    //                                    update( peer, peer.getIp(), "8181" );
+                                    peer.setStatus( PeerStatus.APPROVED );
+                                    Peer selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
+                                    selfPeer.setStatus( PeerStatus.APPROVED );
+                                    updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
                                     break;
                                 case REGISTERED:
                                     peer.setStatus( PeerStatus.BLOCKED );
+                                    updatePeerOnAnother( peer, peer.getIp(), "8181" );
                                     break;
                                 case BLOCKED:
                                     peer.setStatus( PeerStatus.REGISTERED );
+                                    updatePeerOnAnother( peer, peer.getIp(), "8181" );
                                     break;
                             }
                             Property property = peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
                             property.setValue( peer.getStatus() );
-                            peerManagerPortalModule.getPeerManager().register( peer );
-
-                            updatePeerOnAnother( peer, peer.getIp(), "8181" );
+                            peerManagerPortalModule.getPeerManager().update( peer );
                         }
 
 
                         @Override
                         public void OnNegativeButtonTrigger( final Peer peer )
                         {
+                            Peer selfPeer = getPeerJsonRepresentation( "127.0.0.1", "8181" );
                             switch ( peer.getStatus() )
                             {
                                 case REJECTED:
                                 case APPROVED:
-                                case REQUEST_SENT:
                                 case BLOCKED:
+                                case BLOCKED_PEER:
+                                case REQUEST_SENT:
                                     peerManagerPortalModule.getPeerManager().unregister( peer.getId().toString() );
                                     peersTable.removeItem( peer.getId() );
+                                    unregisterPeerFromAnother( selfPeer, peer.getIp(), "8181" );
                                     break;
                                 case REQUESTED:
                                     peer.setStatus( PeerStatus.REJECTED );
-                                    peerManagerPortalModule.getPeerManager().register( peer );
+                                    peerManagerPortalModule.getPeerManager().update( peer );
                                     Property property = peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
                                     property.setValue( peer.getStatus() );
-                                    updatePeerOnAnother( peer, peer.getIp(), "8181" );
+                                    selfPeer.setStatus( PeerStatus.BLOCKED_PEER );
+                                    updatePeerOnAnother( selfPeer, peer.getIp(), "8181" );
                                     break;
                             }
                         }
                     };
             PeerManageActionsComponent component = new PeerManageActionsComponent( peer, listener );
-            peersTable.addItem(
-                    new Object[] { peer.getName(), peer.getIp(), peer.getStatus(), unregisterButton, component },
+            peersTable.addItem( new Object[] { peer.getName(), peer.getIp(), peer.getStatus(), component },
                     peer.getId() );
         }
     }

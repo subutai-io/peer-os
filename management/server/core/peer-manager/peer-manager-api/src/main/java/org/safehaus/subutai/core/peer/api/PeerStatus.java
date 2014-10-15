@@ -6,7 +6,7 @@ package org.safehaus.subutai.core.peer.api;
  */
 public enum PeerStatus
 {
-    REQUESTED, REGISTERED, REJECTED, BLOCKED, APPROVED, REQUEST_SENT;
+    REQUESTED, REGISTERED, REJECTED, BLOCKED, BLOCKED_PEER, APPROVED, REQUEST_SENT;
 
 
     public PeerStatus setRegistered()
