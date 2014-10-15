@@ -46,7 +46,7 @@ public class Commands
     public Command getUninstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-accumulo" ).withTimeout( 60 ),
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-accumulo" ).withTimeout( 600 ),
                 agents );
     }
 

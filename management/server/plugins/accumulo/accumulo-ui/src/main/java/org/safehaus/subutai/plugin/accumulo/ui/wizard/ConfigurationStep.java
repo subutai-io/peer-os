@@ -59,19 +59,27 @@ public class ConfigurationStep extends Panel
         {
             //hadoop combo
             final ComboBox hadoopClustersCombo = getCombo( "Hadoop cluster" );
+            hadoopClustersCombo.setId("hadoopClusterscb");
 
             //zookeeper combo
             final ComboBox zkClustersCombo = getCombo( "Zookeeper cluster" );
+            zkClustersCombo.setId("zkClustersCombo");
 
             //master nodes
             final ComboBox masterNodeCombo = getCombo( "Master node" );
+            masterNodeCombo.setId("masterNodeCombo");
             final ComboBox gcNodeCombo = getCombo( "GC node" );
+            gcNodeCombo.setId("gcNodeCombo");
             final ComboBox monitorNodeCombo = getCombo( "Monitor node" );
+            monitorNodeCombo.setId("monitorNodeCombo");
 
             //accumulo init controls
             TextField clusterNameTxtFld = getTextField( "Cluster name", "Cluster name", 20 );
+            clusterNameTxtFld.setId("clusterNameTxtFld");
             TextField instanceNameTxtFld = getTextField( "Instance name", "Instance name", 20 );
+            instanceNameTxtFld.setId("instanceNameTxtFld");
             TextField passwordTxtFld = getTextField( "Password", "Password", 20 );
+            passwordTxtFld.setId("passwordTxtFld");
 
             //tracers
             final TwinColSelect tracersSelect =
@@ -355,6 +363,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button next = new Button( "Next" );
+            next.setId("confNext2");
             next.addStyleName( "default" );
             //check valid configuration
             next.addClickListener( new Button.ClickListener()
@@ -412,6 +421,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button back = new Button( "Back" );
+            back.setId("confBack2");
             back.addStyleName( "default" );
             back.addClickListener( new Button.ClickListener()
             {
@@ -470,6 +480,7 @@ public class ConfigurationStep extends Panel
             //Hadoop settings
 
             final TextField hadoopClusterNameTxtFld = new TextField( "Enter Hadoop cluster name" );
+            hadoopClusterNameTxtFld.setId("hadoopClusterNameTxtFld");
             hadoopClusterNameTxtFld.setInputPrompt( "Hadoop cluster name" );
             hadoopClusterNameTxtFld.setRequired( true );
             hadoopClusterNameTxtFld.setMaxLength( 20 );
@@ -487,6 +498,7 @@ public class ConfigurationStep extends Panel
             } );
 
             ComboBox hadoopSlaveNodesComboBox = new ComboBox( "Choose number of Hadoop slave nodes", nodesCountRange );
+            hadoopSlaveNodesComboBox.setId("hadoopSlaveNodesComboBox");
             hadoopSlaveNodesComboBox.setImmediate( true );
             hadoopSlaveNodesComboBox.setTextInputAllowed( false );
             hadoopSlaveNodesComboBox.setNullSelectionAllowed( false );
@@ -504,6 +516,7 @@ public class ConfigurationStep extends Panel
             //configuration replication factor
             ComboBox hadoopReplicationFactorComboBox =
                     new ComboBox( "Choose replication factor for Hadoop slave nodes", nodesCountRange );
+            hadoopReplicationFactorComboBox.setId("hadoopReplicationFactorComboBox");
             hadoopReplicationFactorComboBox.setImmediate( true );
             hadoopReplicationFactorComboBox.setTextInputAllowed( false );
             hadoopReplicationFactorComboBox.setNullSelectionAllowed( false );
@@ -519,6 +532,7 @@ public class ConfigurationStep extends Panel
             } );
 
             TextField HadoopDomainTxtFld = new TextField( "Enter Hadoop cluster domain name" );
+            HadoopDomainTxtFld.setId("HadoopDomainTxtFld");
             HadoopDomainTxtFld.setInputPrompt( wizard.getHadoopClusterConfig().getDomainName() );
             HadoopDomainTxtFld.setValue( wizard.getHadoopClusterConfig().getDomainName() );
             HadoopDomainTxtFld.setMaxLength( 20 );
@@ -537,6 +551,7 @@ public class ConfigurationStep extends Panel
 
 
             final TextField zkClusterNameTxtFld = new TextField( "Enter Zookeeper cluster name" );
+            zkClusterNameTxtFld.setId("zkClusterNameTxtFld");
             zkClusterNameTxtFld.setInputPrompt( "Zookeeper cluster name" );
             zkClusterNameTxtFld.setRequired( true );
             zkClusterNameTxtFld.setMaxLength( 20 );
@@ -554,6 +569,7 @@ public class ConfigurationStep extends Panel
             //number of nodes
             ComboBox zkNodesCountCombo =
                     new ComboBox( "Choose number of Zookeeper nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+            zkNodesCountCombo.setId("zkNodesCountCombo");
             zkNodesCountCombo.setImmediate( true );
             zkNodesCountCombo.setTextInputAllowed( false );
             zkNodesCountCombo.setNullSelectionAllowed( false );
@@ -571,6 +587,7 @@ public class ConfigurationStep extends Panel
             //Accumulo settings
 
             final TextField accumuloClusterNameTxtFld = new TextField( "Enter Accumulo cluster name" );
+            accumuloClusterNameTxtFld.setId("accumuloClusterNameTxtFld");
             accumuloClusterNameTxtFld.setInputPrompt( "Accumulo cluster name" );
             accumuloClusterNameTxtFld.setRequired( true );
             accumuloClusterNameTxtFld.setMaxLength( 20 );
@@ -585,6 +602,7 @@ public class ConfigurationStep extends Panel
             } );
 
             final TextField accumuloInstanceNameTxtFld = new TextField( "Enter instance name" );
+            accumuloInstanceNameTxtFld.setId("accumuloInstanceNameTxtFld");
             accumuloInstanceNameTxtFld.setInputPrompt( "Instance name" );
             accumuloInstanceNameTxtFld.setRequired( true );
             accumuloInstanceNameTxtFld.setMaxLength( 20 );
@@ -599,6 +617,7 @@ public class ConfigurationStep extends Panel
             } );
 
             final TextField accumuloPasswordTxtFld = new TextField( "Enter password" );
+            accumuloPasswordTxtFld.setId("accumuloPasswordTxtFld");
             accumuloPasswordTxtFld.setInputPrompt( "Password" );
             accumuloPasswordTxtFld.setRequired( true );
             accumuloPasswordTxtFld.setMaxLength( 20 );
@@ -615,6 +634,7 @@ public class ConfigurationStep extends Panel
 
             //number of tracers
             ComboBox accumuloTracersCountCombo = new ComboBox( "Choose number of Accumulo tracers", nodesCountRange );
+            accumuloTracersCountCombo.setId("accumuloTracersCountCombo");
             accumuloTracersCountCombo.setImmediate( true );
             accumuloTracersCountCombo.setTextInputAllowed( false );
             accumuloTracersCountCombo.setNullSelectionAllowed( false );
@@ -630,6 +650,7 @@ public class ConfigurationStep extends Panel
 
             //number of slaves
             ComboBox accumuloSlavesCountCombo = new ComboBox( "Choose number of Accumulo slaves", nodesCountRange );
+            accumuloSlavesCountCombo.setId("accumuloSlavesCountCombo");
             accumuloSlavesCountCombo.setImmediate( true );
             accumuloSlavesCountCombo.setTextInputAllowed( false );
             accumuloSlavesCountCombo.setNullSelectionAllowed( false );
@@ -645,6 +666,8 @@ public class ConfigurationStep extends Panel
 
 
             Button back = new Button( "Back" );
+            back.setId("confBack3");
+            back.setId("ConfBack");
             back.addStyleName( "default" );
             back.addClickListener( new Button.ClickListener()
             {
@@ -657,6 +680,8 @@ public class ConfigurationStep extends Panel
 
 
             Button next = new Button( "Next" );
+            next.setId("confNext3");
+            next.setId("ConfNext");
             next.addStyleName( "default" );
             next.addClickListener( new Button.ClickListener()
             {

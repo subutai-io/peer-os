@@ -49,6 +49,7 @@ public abstract class BaseManager implements BaseManagerInterface
         contentRoot.setColumns( 1 );
 
         progressBar = new ProgressBar();
+        progressBar.setId("indicator");
         progressBar.setIndeterminate( true );
         progressBar.setVisible( false );
     }

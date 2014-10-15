@@ -104,6 +104,7 @@ public class ConfigurationStep extends VerticalLayout
         nodesCountCombo.setId("CassNodesCountCombo");
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setImmediate( true );
+        nodesCountCombo.setTextInputAllowed( false );
         nodesCountCombo.setNullSelectionAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
 
@@ -121,6 +122,7 @@ public class ConfigurationStep extends VerticalLayout
         seedsCountCombo.setId("CassSeedsCountCombo");
         seedsCountCombo.setImmediate( true );
         seedsCountCombo.setImmediate( true );
+        seedsCountCombo.setTextInputAllowed( false );
         seedsCountCombo.setNullSelectionAllowed( false );
         seedsCountCombo.setValue( wizard.getConfig() );
 
