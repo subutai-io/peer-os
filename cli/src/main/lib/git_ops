@@ -75,7 +75,7 @@ function git_remote_push {
   local lxc="$1"
 
   pushd /var/lib/lxc/$lxc/rootfs > /dev/null
-  git push -u $SUBUTAI_SITE_GIT $lxc 2>&1 > /dev/null
+  git push -u $SUBUTAI_SITE_GIT $lxc > /dev/null 2>&1
   status=$?
   message="    - branch \"$lxc\" pushed to site git repository"
   if [ "$status" == "0" ]
