@@ -154,7 +154,7 @@ public class Manager
 
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("HiveProgress");
+        PROGRESS_ICON.setId("indicator");
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( tablesLayout, 0, 1, 0, 9 );
