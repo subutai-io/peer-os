@@ -116,7 +116,6 @@ public class DbUtil
         try
         {
             conn = dataSource.getConnection();
-            //            conn.setAutoCommit( false );
             ps = conn.prepareStatement( sql );
             short i = 0;
             for ( Object par : params )
@@ -132,20 +131,10 @@ public class DbUtil
             }
 
             return ps.executeUpdate();
-
-            //            int res = ps.executeUpdate();
-
-            //            conn.commit();
-            //
-            //            return res;
         }
         catch ( SQLException ex )
         {
             LOG.error( "Error in update", ex );
-            //            if ( conn != null )
-            //            {
-            //                conn.rollback();
-            //            }
             throw ex;
         }
         finally
