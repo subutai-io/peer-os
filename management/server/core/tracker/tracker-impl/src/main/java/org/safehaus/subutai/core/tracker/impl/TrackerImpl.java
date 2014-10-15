@@ -6,6 +6,7 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
+import java.io.StringReader;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -129,7 +130,7 @@ public class TrackerImpl implements Tracker
         try
         {
             dbUtil.update( "merge into product_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
-                    po.getId(), po.createDate(), GSON.toJson( po ) );
+                    po.getId(), po.createDate(), new StringReader( GSON.toJson( po ) ) );
             return true;
         }
         catch ( SQLException e )
