@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -145,5 +146,14 @@ public class TemplateRegistryImplTest
         Mockito.doThrow( new DaoException( null ) ).when( templateDAO ).saveTemplate( any( Template.class ) );
 
         templateRegistry.registerTemplate( TestUtils.CONFIG_FILE, TestUtils.PACKAGES_MANIFEST, TestUtils.MD_5_SUM );
+    }
+
+
+    @Test
+    public void testGetPackagesDiff() throws Exception
+    {
+        Set<String> diff = templateRegistry.getPackagesDiff( TestUtils.getDefaultTemplate() );
+
+        System.out.println(diff);
     }
 }
