@@ -447,8 +447,12 @@ public class Manager extends BaseManager
             addServerRow( table, agent );
         }
         else {*/
+        if ( config.getServer().equals( agent ) ) {
             addServerRow(table,agent);
+        }
+        else {
             addClientRow( table, agent );
+        }
         //}
     }
 
