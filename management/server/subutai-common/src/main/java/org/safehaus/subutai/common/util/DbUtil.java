@@ -122,7 +122,7 @@ public class DbUtil
             {
                 if ( par instanceof Reader )
                 {
-                    ps.setCharacterStream( 1, ( Reader ) par );
+                    ps.setCharacterStream( ++i, ( Reader ) par );
                 }
                 else
                 {
