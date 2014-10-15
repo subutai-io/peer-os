@@ -138,6 +138,19 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean register( final Peer peer )
     {
+        Agent management = agentManager.getAgentByHostname( "management" );
+        String cmd = String.format( "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
+                        + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
+                peer.getId().toString(),
+                ( "http://" + peer.getIp() + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) );
+
+        LOG.info( cmd );
+        RequestBuilder rb = new RequestBuilder( cmd );
+        rb.withCwd( "/etc/apt-cacher/" );
+        Command command = commandRunner.createCommand( rb, Sets.newHashSet( management ) );
+        commandRunner.runCommand( command );
+        boolean r = command.hasSucceeded();
+        LOG.info( "Apt-cacher mapping result: " + r );
         return peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
     }
 
@@ -533,21 +546,14 @@ public class PeerManagerImpl implements PeerManager
             case CLONE:
                 if ( peerCommandMessage instanceof CloneContainersMessage )
                 {
-                    Agent mAgent = agentManager.getAgentByHostname( "management" );
-                    RequestBuilder rb = new RequestBuilder( "" );
-                    Command command = commandRunner.createCommand( rb, Sets.newHashSet(mAgent) );
-                    commandRunner.runCommand( command );
-                    boolean r = command.hasSucceeded();
 
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
                     try
                     {
-                        if ( isRemotePeer( ccm.getPeerId() ) )
+                        for ( Template t : ccm.getTemplates() )
                         {
-                            for ( Template t : ccm.getTemplates() )
+                            if ( t.isRemote() )
                             {
-                                t.setRemote( true );
-                                t.setPeerId( ccm.getPeerId() );
                                 registerTemplate( t );
                             }
                         }

@@ -11,9 +11,9 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.registry.api.Template;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

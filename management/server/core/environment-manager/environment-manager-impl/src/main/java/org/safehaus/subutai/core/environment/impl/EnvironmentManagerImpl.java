@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.Agent;
@@ -25,6 +26,7 @@ import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
@@ -36,6 +38,7 @@ import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -310,13 +313,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 ccm.setEnvId( environment.getUuid() );
 
+
                 //TODO: move template addition on create ccm
-                List<Template> parentTemplates = templateRegistry.getParentTemplates( ccm.getTemplate() );
-                for ( Template t : parentTemplates )
+                List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
+                templates.add( templateRegistry.getTemplate( ccm.getTemplate() ) );
+                UUID peerId = getPeerId();
+                for ( Template t : templates )
                 {
+                    t.setPeerId( peerId );
+                    t.setRemote( true );
                     ccm.addTemplate( t );
                 }
-                ccm.addTemplate( templateRegistry.getTemplate( ccm.getTemplate() ) );
                 //
                 peerCommandDispatcher.invoke( ccm, timeout );
 
@@ -372,6 +379,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         else
         {
             throw new EnvironmentBuildException( "No containers assigned to the Environment" );
+        }
+    }
+
+
+    // TODO: Implement it via PCD
+    private UUID getPeerId()
+    {
+
+        try
+        {
+            PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+            return peerManager.getSiteId();
+        }
+        catch ( NamingException e )
+        {
+            e.printStackTrace();
+            return null;
         }
     }
 

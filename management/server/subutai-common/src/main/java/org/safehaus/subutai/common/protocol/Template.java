@@ -149,7 +149,7 @@ public class Template
     }
 
 
-    protected List<Template> getChildren()
+    public List<Template> getChildren()
     {
         return Collections.unmodifiableList( children );
     }
