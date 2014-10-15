@@ -57,7 +57,7 @@ public class TrackerComponent extends CustomComponent
     private volatile UUID trackID;
     private volatile boolean track = false;
     private List<ProductOperationView> currentOperations = new ArrayList<>();
-    private String source;
+    private volatile String source;
     private int limit = 10;
 
 
@@ -244,7 +244,7 @@ public class TrackerComponent extends CustomComponent
                 @Override
                 public void run()
                 {
-                    while ( track )
+                    while ( isTrack() )
                     {
                         try
                         {
