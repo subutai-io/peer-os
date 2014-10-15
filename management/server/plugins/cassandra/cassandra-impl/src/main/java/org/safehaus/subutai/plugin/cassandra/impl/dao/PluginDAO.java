@@ -129,9 +129,8 @@ public class PluginDAO
         try
         {
 
-            ResultSet rs =
-                    dbUtil.select( "select info from cluster_data where source = ? and id = ?", source.toLowerCase(),
-                            key.toLowerCase() );
+            ResultSet rs = dbUtil.select( "select info from cluster_data where source = ? and id = ?", source,
+                    UUID.fromString( key ) );
             if ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
