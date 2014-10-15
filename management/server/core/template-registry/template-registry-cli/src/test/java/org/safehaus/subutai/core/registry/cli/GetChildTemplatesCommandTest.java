@@ -1,12 +1,9 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.core.registry.api.Template;
@@ -20,10 +17,9 @@ import static org.mockito.Mockito.when;
 /**
  * Test for GetChildTemplatesCommand
  */
-public class GetChildTemplatesCommandTest
+public class GetChildTemplatesCommandTest extends TestParent
 {
 
-    private ByteArrayOutputStream myOut;
 
     private GetChildTemplatesCommandExt templatesCommand;
     private TemplateRegistry templateRegistry;
@@ -48,8 +44,7 @@ public class GetChildTemplatesCommandTest
     @Before
     public void setUp()
     {
-        myOut = new ByteArrayOutputStream();
-        System.setOut( new PrintStream( myOut ) );
+
 
         templateRegistry = mock( TemplateRegistry.class );
 
@@ -62,19 +57,6 @@ public class GetChildTemplatesCommandTest
         when( templateRegistry.getChildTemplates( MockUtils.PARENT_TEMPLATE_NAME ) ).thenReturn( childTemplates );
         when( templateRegistry.getChildTemplates( MockUtils.PARENT_TEMPLATE_NAME, MockUtils.LXC_ARCH ) )
                 .thenReturn( childTemplates );
-    }
-
-
-    @After
-    public void tearDown() throws Exception
-    {
-        System.setOut( System.out );
-    }
-
-
-    private String getSysOut()
-    {
-        return myOut.toString().trim();
     }
 
 

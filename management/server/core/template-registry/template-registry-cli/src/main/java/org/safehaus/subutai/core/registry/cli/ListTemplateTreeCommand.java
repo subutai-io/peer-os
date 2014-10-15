@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 public class ListTemplateTreeCommand extends OsgiCommandSupport
 {
 
-    private TemplateRegistry templateRegistry;
+    private final TemplateRegistry templateRegistry;
 
 
     private void listFamily( int level, TemplateTree tree, Template currentTemplate )
@@ -38,16 +38,11 @@ public class ListTemplateTreeCommand extends OsgiCommandSupport
     }
 
 
-    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    public ListTemplateTreeCommand( final TemplateRegistry templateRegistry )
     {
         Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null." );
+
         this.templateRegistry = templateRegistry;
-    }
-
-
-    public TemplateRegistry getTemplateRegistry()
-    {
-        return templateRegistry;
     }
 
 
