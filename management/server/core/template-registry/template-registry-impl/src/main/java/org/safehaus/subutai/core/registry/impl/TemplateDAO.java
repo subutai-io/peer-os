@@ -173,7 +173,7 @@ public class TemplateDAO
         {}.getType();
         try
         {
-            dbUtil.update( "insert into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
+            dbUtil.update( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
                     template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase(),
                     Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
                     template.getParentTemplateName().toLowerCase(), GSON.toJson( template, templateType ) );

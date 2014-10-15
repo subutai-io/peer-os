@@ -210,7 +210,7 @@ public class TemplateDaoTest
         verify( dbUtil ).update( sqlCaptor.capture(), sqlCaptor2.capture(), sqlCaptor3.capture(), sqlCaptor4.capture(),
                 sqlCaptor5.capture() );
 
-        assertEquals( "insert into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
+        assertEquals( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
                 sqlCaptor.getValue() );
         assertEquals( TestUtils.TEMPLATE_NAME.toLowerCase(), sqlCaptor2.getValue() );
         assertEquals( TestUtils.LXC_ARCH.toLowerCase(), sqlCaptor3.getValue() );
