@@ -6,10 +6,13 @@
 package org.safehaus.subutai.core.container.api;
 
 
+import org.safehaus.subutai.common.exception.SubutaiException;
+
+
 /**
  * Exception which can be thrown while destroying containers
  */
-public class ContainerException extends Exception
+public class ContainerException extends SubutaiException
 {
 
     public ContainerException( String message )

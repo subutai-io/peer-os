@@ -30,9 +30,11 @@ public interface TemplateManager
      *
      * @return <tt>true</tt> if successfully cloned, <tt>false</tt> otherwise
      */
-    public boolean clone( String hostName, String templateName, String cloneName, String environmentId );
+    public boolean clone( String hostName, String templateName, String cloneName, String environmentId )
+            throws TemplateException;
 
-    public boolean clone( String hostName, String templateName, Set<String> cloneNames, String environmentId );
+    public boolean clone( String hostName, String templateName, Set<String> cloneNames, String environmentId )
+            throws TemplateException;
 
     /**
      * Destroys a clone with given name.
@@ -106,5 +108,5 @@ public interface TemplateManager
     public String getDebianPackageName( String templateName );
 
 
-    public boolean prepareTemplates( Set<TemplatePackage> templatePackages );
+    //    public boolean prepareTemplates( Set<TemplatePackage> templatePackages );
 }

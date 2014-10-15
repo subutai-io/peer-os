@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 
