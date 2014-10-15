@@ -424,6 +424,14 @@ public class TrackerComponent extends CustomComponent
     }
 
 
+    @Override
+    public void attach()
+    {
+        super.attach();
+        startTracking();
+    }
+
+
     private void stopTracking()
     {
         track = false;
