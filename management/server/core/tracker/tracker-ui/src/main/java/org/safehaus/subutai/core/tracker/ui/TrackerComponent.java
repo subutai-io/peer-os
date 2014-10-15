@@ -56,8 +56,8 @@ public class TrackerComponent extends CustomComponent
     private Date fromDateValue, toDateValue;
     private volatile UUID trackID;
     private volatile boolean track = false;
-    private List<ProductOperationView> currentOperations = new ArrayList<>();
     private volatile String source;
+    private List<ProductOperationView> currentOperations = new ArrayList<>();
     private int limit = 10;
 
 
