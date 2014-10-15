@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.impl.dao;
+package org.safehaus.subutai.plugin.cassandra.impl.dao;
 
 
 import java.sql.Clob;
@@ -24,16 +24,16 @@ import com.google.gson.JsonSyntaxException;
 /**
  * PluginDAO is used to manage cluster configuration information in database
  */
-public class EnvironmentDAO
+public class PluginDAO
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PluginDAO.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     protected DbUtil dbUtil;
 
 
-    public EnvironmentDAO( DataSource dataSource ) throws SQLException
+    public PluginDAO( DataSource dataSource ) throws SQLException
     {
         Preconditions.checkNotNull( dataSource, "DataSource is null" );
         this.dbUtil = new DbUtil( dataSource );
@@ -45,18 +45,9 @@ public class EnvironmentDAO
     protected void setupDb() throws SQLException
     {
 
-        String sql1 =
-                "create table if not exists blueprint (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
-                        + "id));";
-        String sql2 =
-                "create table if not exists process (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
-                        + "id));";
-        String sql3 = "create table if not exists environment (source varchar(100), id uuid, info clob, "
-                + "PRIMARY KEY (source, id));";
-
+        String sql1 = "create table if not exists cluster_data (source varchar(100), id uuid, info clob, " +
+                "PRIMARY KEY (source, " + "id));";
         dbUtil.update( sql1 );
-        dbUtil.update( sql2 );
-        dbUtil.update( sql3 );
     }
 
 
@@ -68,7 +59,7 @@ public class EnvironmentDAO
 
         try
         {
-            dbUtil.update( "merge into environment (source, id, info) values (? , ?, ?)", source,
+            dbUtil.update( "merge into cluster_data (source, id, info) values (? , ?, ?)", source,
                     UUID.fromString( key ), gson.toJson( info ) );
 
             return true;
@@ -97,7 +88,7 @@ public class EnvironmentDAO
         List<T> list = new ArrayList<>();
         try
         {
-            ResultSet rs = dbUtil.select( "select info from environment where source = ?", source );
+            ResultSet rs = dbUtil.select( "select info from cluster_data where source = ?", source );
             while ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
@@ -138,8 +129,9 @@ public class EnvironmentDAO
         try
         {
 
-            ResultSet rs = dbUtil.select( "select info from environment where source = ? and id = ?", source,
-                    UUID.fromString( key ) );
+            ResultSet rs =
+                    dbUtil.select( "select info from cluster_data where source = ? and id = ?", source.toLowerCase(),
+                            key.toLowerCase() );
             if ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
@@ -175,7 +167,7 @@ public class EnvironmentDAO
 
         try
         {
-            dbUtil.update( "delete from environment where source = ? and id = ?", source, UUID.fromString( key ) );
+            dbUtil.update( "delete from cluster_data where source = ? and id = ?", source, UUID.fromString( key ) );
             return true;
         }
         catch ( SQLException e )
