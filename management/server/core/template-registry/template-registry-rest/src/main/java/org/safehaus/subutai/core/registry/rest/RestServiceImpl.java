@@ -221,8 +221,7 @@ public class RestServiceImpl implements RestService
         catch ( RegistryException e )
         {
             LOG.error( "Error in isTemplateInUse", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).header( EXCEPTION_HEADER, e.getMessage() )
-                           .build();
+            return Response.status( Response.Status.NOT_FOUND ).header( EXCEPTION_HEADER, e.getMessage() ).build();
         }
     }
 

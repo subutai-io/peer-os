@@ -28,10 +28,29 @@ public class TestUtils
                     + "lxc.mount.entry = /lxc-data/master-home home none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/master-var var none bind,rw 0 0";
 
-    public static final String PACKAGES_MANIFEST = "ii  kmod                             15-0ubuntu6                   " +
-            "amd64        tools for managing Linux kernel modules\n"
-            + "ii  ksks-logstash                    1.0.1                         amd64        This is a logstash " +
-            "package of kiskis distribution.";
+    public static final String CHILD_CONFIG_FILE =
+            "# Common configuration\n" + "lxc.include = /usr/share/lxc/config/ubuntu.common.conf\n" + "\n"
+                    + "# Container specific configuration\n" + "lxc.rootfs = /var/lib/lxc/cassandra/rootfs\n"
+                    + "lxc.mount = /var/lib/lxc/cassandra/fstab\n" + "lxc.utsname = cassandra\n" + "lxc.arch = amd64\n"
+                    + "\n" + "# Network configuration\n" + "lxc.network.type = veth\n" + "lxc.network.flags = up\n"
+                    + "lxc.network.link = br0\n" + "lxc.network.hwaddr = 00:16:3e:82:6e:f0\n"
+                    + "subutai.config.path = /etc\n" + "lxc.hook.pre-start = /usr/bin/pre_start_hook\n"
+                    + "subutai.parent = master\n" + "subutai.git.branch = cassandra\n"
+                    + "lxc.mount.entry = /lxc/cassandra-opt opt none bind,rw 0 0\n"
+                    + "lxc.mount.entry = /lxc-data/cassandra-home home none bind,rw 0 0\n"
+                    + "lxc.mount.entry = /lxc-data/cassandra-var var none bind,rw 0 0\n"
+                    + "subutai.git.uuid = 8c3e8fea6bbc4817831ded7d9dc2d71c818bd1f4\n"
+                    + "subutai.template.package = /lxc-data/tmpdir/cassandra-subutai-template_2.1.0_amd64.deb";
+
+    public static final String PACKAGES_MANIFEST =
+            "ii  kmod                             15-0ubuntu6                   " +
+                    "amd64        tools for managing Linux kernel modules\n"
+                    + "ii  ksks-logstash                    1.0.1                         amd64        This is a " +
+                    "logstash " +
+                    "package of kiskis distribution.";
+    public static final String CHILD_PACKAGES_MANIFEST =
+            "ii  ksks-test                    1.0.1                         amd64        This is a test package";
+    public static final String TEST_PACKAGE = "ksks-test";
 
     public static final String MD_5_SUM = "ec6c39f0aed6b6a1256321d2e927a392";
     public static final String TEMPLATE_NAME = "master";
