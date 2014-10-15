@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
@@ -568,13 +568,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
         {
             return template.isInUseOnFAIs();
         }
-    }
-
-
-    @Override
-    public boolean isTemplateRegistered( final String templateName )
-    {
-        return getTemplate( templateName ) != null;
     }
 
 
