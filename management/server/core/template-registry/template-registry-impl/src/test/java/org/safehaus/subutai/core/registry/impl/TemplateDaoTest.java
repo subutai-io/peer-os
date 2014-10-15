@@ -11,9 +11,9 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.registry.api.Template;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -210,7 +210,7 @@ public class TemplateDaoTest
         verify( dbUtil ).update( sqlCaptor.capture(), sqlCaptor2.capture(), sqlCaptor3.capture(), sqlCaptor4.capture(),
                 sqlCaptor5.capture() );
 
-        assertEquals( "insert into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
+        assertEquals( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
                 sqlCaptor.getValue() );
         assertEquals( TestUtils.TEMPLATE_NAME.toLowerCase(), sqlCaptor2.getValue() );
         assertEquals( TestUtils.LXC_ARCH.toLowerCase(), sqlCaptor3.getValue() );

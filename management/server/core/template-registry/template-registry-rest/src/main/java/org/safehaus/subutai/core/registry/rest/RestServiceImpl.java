@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
@@ -154,7 +154,15 @@ public class RestServiceImpl implements RestService
         {
             parents.add( template.getTemplateName() );
         }
-        return Response.ok().entity( GSON.toJson( parents ) ).build();
+
+        if ( !parents.isEmpty() )
+        {
+            return Response.ok().entity( GSON.toJson( parents ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
 
@@ -166,7 +174,14 @@ public class RestServiceImpl implements RestService
         {
             parents.add( template.getTemplateName() );
         }
-        return Response.ok().entity( GSON.toJson( parents ) ).build();
+        if ( !parents.isEmpty() )
+        {
+            return Response.ok().entity( GSON.toJson( parents ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
 
@@ -178,7 +193,14 @@ public class RestServiceImpl implements RestService
         {
             children.add( template.getTemplateName() );
         }
-        return Response.ok().entity( GSON.toJson( children ) ).build();
+        if ( !children.isEmpty() )
+        {
+            return Response.ok().entity( GSON.toJson( children ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
 
@@ -190,7 +212,14 @@ public class RestServiceImpl implements RestService
         {
             children.add( template.getTemplateName() );
         }
-        return Response.ok().entity( GSON.toJson( children ) ).build();
+        if ( !children.isEmpty() )
+        {
+            return Response.ok().entity( GSON.toJson( children ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
 
@@ -205,8 +234,10 @@ public class RestServiceImpl implements RestService
             {
                 addChildren( tree, template );
             }
+            return Response.ok().entity( GSON.toJson( uberTemplates ) ).build();
         }
-        return Response.ok().entity( GSON.toJson( uberTemplates ) ).build();
+
+        return Response.status( Response.Status.NOT_FOUND ).build();
     }
 
 
@@ -253,7 +284,14 @@ public class RestServiceImpl implements RestService
         {
             templates.add( template.getTemplateName() );
         }
-        return Response.ok().entity( GSON.toJson( templates ) ).build();
+        if ( !templates.isEmpty() )
+        {
+            return Response.ok().entity( GSON.toJson( templates ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
 
@@ -265,7 +303,14 @@ public class RestServiceImpl implements RestService
         {
             templates.add( template.getTemplateName() );
         }
-        return Response.ok().entity( GSON.toJson( templates ) ).build();
+        if ( !templates.isEmpty() )
+        {
+            return Response.ok().entity( GSON.toJson( templates ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
 
@@ -282,14 +327,21 @@ public class RestServiceImpl implements RestService
         StringBuilder output = new StringBuilder();
         List<Template> templates = templateRegistry.getAllTemplates( lxcArch );
 
-        for ( final Template template : templates )
+        if ( !templates.isEmpty() )
         {
-            output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
-                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() )
-                  .append( TEMPLATES_DELIMITER );
-        }
+            for ( final Template template : templates )
+            {
+                output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
+                        Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" :
+                        template.getParentTemplateName() ).append( TEMPLATES_DELIMITER );
+            }
 
-        return Response.ok().entity( GSON.toJson( output.toString() ) ).build();
+            return Response.ok().entity( GSON.toJson( output.toString() ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
 
