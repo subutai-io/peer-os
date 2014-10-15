@@ -127,7 +127,7 @@ public class PeerDAO
         try
         {
 
-            ResultSet rs = dbUtil.select( "select info from peer where source = ? and key = ?", source,
+            ResultSet rs = dbUtil.select( "select info from peer where source = ? and id = ?", source,
                     UUID.fromString( key ) );
             if ( rs != null && rs.next() )
             {
@@ -160,7 +160,7 @@ public class PeerDAO
 
         try
         {
-            dbUtil.update( "delete from peer where source = ? and key = ?", source, UUID.fromString( key ) );
+            dbUtil.update( "delete from peer where source = ? and id = ?", source, UUID.fromString( key ) );
             return true;
         }
         catch ( SQLException e )

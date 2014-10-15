@@ -46,7 +46,7 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
     {
 
         templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
-                FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum, peerManager.getSiteId() );
+                FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
 
         System.out.println( "Template registered successfully" );
 

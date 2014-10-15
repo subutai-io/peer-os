@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -13,7 +12,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
@@ -66,15 +65,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response registerTemplate( final String configFilePath, final String packagesFilePath, final String md5sum,
-                                      final String peerId )
+    public Response registerTemplate( final String configFilePath, final String packagesFilePath, final String md5sum )
     {
         try
         {
 
             templateRegistry.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
-                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum,
-                    UUID.fromString( peerId ) );
+                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
 
             return Response.ok().build();
         }

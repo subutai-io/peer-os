@@ -12,7 +12,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.util.DbUtil;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

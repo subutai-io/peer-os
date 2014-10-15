@@ -21,7 +21,7 @@ public enum ActionType
             ". /etc/subutai/config && . /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name  %s",
             true ),
     GET_PACKAGE_NAME( ". /usr/share/subutai-cli/subutai/lib/deb_ops && get_package_name  %s", true ),
-    ADD_SOURCE( "echo \"%s\" > /etc/apt/sources.list.d/%s.list ", true ),
+    ADD_SOURCE( "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list.d/%1$s.list ", true ),
     IS_PACKAGE_ACCESSIBLE( "apt-cache show " + "%1$s | grep \"Package: %1$s\"", true ),
     APT_GET_UPDATE( "apt-get update", true );
 
@@ -64,7 +64,8 @@ public enum ActionType
         //                sb.append( " " ).append( arg );
         //            }
         //        }
-        return ( standAloneCommand ? "" : PARENT_DIR ) + String.format( this.script, args );
+        String s = String.format( this.script, args );
+        return ( standAloneCommand ? "" : PARENT_DIR ) + s;
     }
 
 

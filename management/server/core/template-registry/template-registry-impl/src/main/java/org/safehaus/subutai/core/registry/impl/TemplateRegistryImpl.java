@@ -16,7 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +24,7 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
@@ -66,14 +65,14 @@ public class TemplateRegistryImpl implements TemplateRegistry
      */
     @Override
     public synchronized boolean registerTemplate( final String configFile, final String packagesFile,
-                                                  final String md5sum, UUID peerId ) throws RegistryException
+                                                  final String md5sum ) throws RegistryException
     {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( packagesFile ), "Packages file contents is null or empty" );
 
-        Template template = parseTemplate( configFile, packagesFile, md5sum, peerId );
+        Template template = parseTemplate( configFile, packagesFile, md5sum );
 
         //save template to storage
         try
@@ -100,8 +99,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      *
      * @return {@code Template}
      */
-    private Template parseTemplate( String configFile, String packagesFile, String md5sum, UUID peerId )
-            throws RegistryException
+    private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException
     {
         Properties properties = new Properties();
         try
@@ -115,7 +113,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
             Template template = new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
-                    subutaiGitUuid, packagesFile, md5sum, peerId );
+                    subutaiGitUuid, packagesFile, md5sum );
 
             //check if template with such name already exists
             if ( getTemplate( template.getTemplateName() ) != null )

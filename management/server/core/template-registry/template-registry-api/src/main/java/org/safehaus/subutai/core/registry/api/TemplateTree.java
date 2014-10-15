@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.safehaus.subutai.common.protocol.Template;
+
 import com.google.common.base.Strings;
 
 

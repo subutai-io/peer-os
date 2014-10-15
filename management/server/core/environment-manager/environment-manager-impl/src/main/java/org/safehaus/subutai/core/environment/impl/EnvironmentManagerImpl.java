@@ -23,6 +23,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -308,6 +309,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             try
             {
                 ccm.setEnvId( environment.getUuid() );
+
+                //TODO: move template addition on create ccm
+                List<Template> parentTemplates = templateRegistry.getParentTemplates( ccm.getTemplate() );
+                for ( Template t : parentTemplates )
+                {
+                    ccm.addTemplate( t );
+                }
+                ccm.addTemplate( templateRegistry.getTemplate( ccm.getTemplate() ) );
+                //
                 peerCommandDispatcher.invoke( ccm, timeout );
 
                 boolean result = ccm.isSuccess();

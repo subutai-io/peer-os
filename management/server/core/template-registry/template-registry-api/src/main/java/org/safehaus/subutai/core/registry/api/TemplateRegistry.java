@@ -8,7 +8,8 @@ package org.safehaus.subutai.core.registry.api;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Template;
 
 
 /**
@@ -23,7 +24,7 @@ public interface TemplateRegistry
      * @param configFile - template configuration file contents
      * @param packagesFile - template packages manifest file contents
      */
-    public boolean registerTemplate( String configFile, String packagesFile, String md5sum, UUID peerId ) throws RegistryException;
+    public boolean registerTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException;
 
 
     /**

@@ -14,7 +14,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,7 +91,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response importTemplate( InputStream in, String configDir, String peerId )
+    public Response importTemplate( InputStream in, String configDir )
     {
         Path path;
         try
@@ -137,7 +136,7 @@ public class RestServiceImpl implements RestService
             }
 
             aptRepoManager.addPackageByPath( mgmt, path.toString(), false );
-            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum, UUID.fromString( peerId ) );
+            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum );
         }
         catch ( AptRepoException ex )
         {

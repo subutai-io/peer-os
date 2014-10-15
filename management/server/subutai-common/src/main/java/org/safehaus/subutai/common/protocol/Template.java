@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.registry.api;
+package org.safehaus.subutai.common.protocol;
 
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class Template
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
                      final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
-                     final String packagesManifest, final String md5sum, UUID peerId )
+                     final String packagesManifest, final String md5sum )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );

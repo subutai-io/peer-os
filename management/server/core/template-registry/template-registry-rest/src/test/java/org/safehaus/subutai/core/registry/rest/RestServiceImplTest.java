@@ -7,7 +7,6 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -16,7 +15,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;
@@ -91,7 +90,7 @@ public class RestServiceImplTest
         String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
         template =
                 new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch, subutaiGitUuid,
-                        packagesFile, md5sum, UUID.randomUUID() );
+                        packagesFile, md5sum );
         return template;
     }
 
@@ -138,7 +137,7 @@ public class RestServiceImplTest
     @Test
     public void shouldReturnBadRequestStatusForRegisterTemplate()
     {
-        Response response = restService.registerTemplate( "", "", "", null );
+        Response response = restService.registerTemplate( "", "", "" );
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
 
@@ -148,7 +147,7 @@ public class RestServiceImplTest
     public void shouldReturnOkStatusForRegisterTemplate()
     {
 
-        Response response = restService.registerTemplate( "", "", "", null );
+        Response response = restService.registerTemplate( "", "", "" );
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
 

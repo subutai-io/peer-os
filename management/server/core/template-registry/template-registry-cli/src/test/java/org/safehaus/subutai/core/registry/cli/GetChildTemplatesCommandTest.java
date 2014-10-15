@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import static org.junit.Assert.assertNotSame;

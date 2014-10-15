@@ -27,6 +27,7 @@ import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -49,7 +50,6 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -439,7 +439,10 @@ public class PeerManagerImpl implements PeerManager
 
     private void registerTemplate( final Template template ) throws RegistryException
     {
-        templateRegistry.registerTemplate( template );
+        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
+        {
+            templateRegistry.registerTemplate( template );
+        }
     }
 
     //
@@ -530,14 +533,29 @@ public class PeerManagerImpl implements PeerManager
             case CLONE:
                 if ( peerCommandMessage instanceof CloneContainersMessage )
                 {
+                    Agent mAgent = agentManager.getAgentByHostname( "management" );
+                    RequestBuilder rb = new RequestBuilder( "" );
+                    Command command = commandRunner.createCommand( rb, Sets.newHashSet(mAgent) );
+                    commandRunner.runCommand( command );
+                    boolean r = command.hasSucceeded();
+
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
                     try
                     {
+                        if ( isRemotePeer( ccm.getPeerId() ) )
+                        {
+                            for ( Template t : ccm.getTemplates() )
+                            {
+                                t.setRemote( true );
+                                t.setPeerId( ccm.getPeerId() );
+                                registerTemplate( t );
+                            }
+                        }
                         Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getPeerId(), ccm.getTemplate(),
                                 ccm.getNumberOfNodes(), ccm.getStrategy() );
                         ccm.setResult( agents );
                     }
-                    catch ( ContainerCreateException e )
+                    catch ( Exception e )
                     {
                         peerCommandMessage.setExceptionMessage( e.toString() );
                     }

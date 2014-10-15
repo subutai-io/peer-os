@@ -37,7 +37,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcState;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.strategy.PlacementStrategyFactory;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.template.api.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
