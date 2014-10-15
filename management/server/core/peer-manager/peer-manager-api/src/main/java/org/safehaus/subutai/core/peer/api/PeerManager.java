@@ -20,6 +20,8 @@ public interface PeerManager
 
     boolean register( Peer peer );
 
+    boolean update( Peer peer );
+
     public UUID getSiteId();
 
     public List<Peer> peers();

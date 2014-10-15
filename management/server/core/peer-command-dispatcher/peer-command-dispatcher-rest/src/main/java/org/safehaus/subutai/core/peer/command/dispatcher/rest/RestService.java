@@ -2,9 +2,11 @@ package org.safehaus.subutai.core.peer.command.dispatcher.rest;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -72,4 +74,14 @@ public interface RestService
     @Path("register")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response processRegisterRequest( @QueryParam("peer") String peer );
+
+    @DELETE
+    @Path( "unregister" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
+
+    @PUT
+    @Path( "update" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response updatePeer( @QueryParam( "peer" ) String peer );
 }
