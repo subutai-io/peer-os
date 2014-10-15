@@ -1358,30 +1358,54 @@
         <version>${project.version}</version>
       </dependency>
 
+<<<<<<< HEAD
       <!-- hipi -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>hipi-plugin-api</artifactId>
+=======
+
+      <!-- nutch -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>nutch-plugin-api</artifactId>
+>>>>>>> origin/nutch
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+<<<<<<< HEAD
         <artifactId>hipi-plugin-impl</artifactId>
+=======
+        <artifactId>nutch-plugin-impl</artifactId>
+>>>>>>> origin/nutch
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+<<<<<<< HEAD
         <artifactId>hipi-plugin-cli</artifactId>
+=======
+        <artifactId>nutch-plugin-cli</artifactId>
+>>>>>>> origin/nutch
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+<<<<<<< HEAD
         <artifactId>hipi-plugin-rest</artifactId>
+=======
+        <artifactId>nutch-plugin-rest</artifactId>
+>>>>>>> origin/nutch
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+<<<<<<< HEAD
         <artifactId>hipi-plugin-ui</artifactId>
+=======
+        <artifactId>nutch-plugin-ui</artifactId>
+>>>>>>> origin/nutch
         <version>${project.version}</version>
       </dependency>
     </dependencies>

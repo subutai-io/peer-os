@@ -1,9 +1,9 @@
-package org.safehaus.subutai.plugin.lucene.ui.wizard;
+package org.safehaus.subutai.plugin.nutch.ui.wizard;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.plugin.lucene.api.SetupType;
-import org.safehaus.subutai.plugin.lucene.ui.LucenePortalModule;
+import org.safehaus.subutai.plugin.nutch.api.SetupType;
+import org.safehaus.subutai.plugin.nutch.ui.NutchPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -27,12 +27,12 @@ public class WelcomeStep extends Panel
         grid.setMargin( true );
         grid.setSizeFull();
 
-        Label welcomeMsg = new Label( "<center><h2>Welcome to Lucene Installation Wizard!</h2>" );
+        Label welcomeMsg = new Label( "<center><h2>Welcome to Nutch Installation Wizard!</h2>" );
         welcomeMsg.setContentMode( ContentMode.HTML );
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( LucenePortalModule.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( NutchPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 200, Unit.PIXELS );
         logoImg.setWidth( 180, Unit.PIXELS );
