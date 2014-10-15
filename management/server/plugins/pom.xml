@@ -34,6 +34,7 @@
     <module>mahout</module>
     <module>cassandra</module>
     <module>oozie</module>
+    <module>hipi</module>
     <module>plugin-common</module>
   </modules>
 
