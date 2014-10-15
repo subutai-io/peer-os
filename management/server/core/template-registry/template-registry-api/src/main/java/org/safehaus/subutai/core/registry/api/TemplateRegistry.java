@@ -168,13 +168,6 @@ public interface TemplateRegistry
 
 
     /**
-     * Checks is template registered
-     *
-     * @return true - is registered, false - otherwise
-     */
-    public boolean isTemplateRegistered( String templateName );
-
-    /**
      * Adds template entry to registry
      *
      * @param template - template

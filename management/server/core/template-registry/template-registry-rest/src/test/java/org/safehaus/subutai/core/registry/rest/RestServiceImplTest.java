@@ -345,7 +345,7 @@ public class RestServiceImplTest
         when( templateRegistry.isTemplateInUse( TEMPLATE_NAME ) ).thenThrow( new RegistryException( "" ) );
         Response response = restService.isTemplateInUse( TEMPLATE_NAME );
 
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
+        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
     }
 
 
