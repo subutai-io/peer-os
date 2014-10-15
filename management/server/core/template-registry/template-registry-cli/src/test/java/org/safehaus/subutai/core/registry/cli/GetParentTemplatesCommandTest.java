@@ -1,56 +1,100 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import static org.junit.Assert.assertNotSame;
+import com.google.common.collect.Lists;
+
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
- * Created by talas on 10/2/14.
+ * Test for GetParentTemplatesCommand
  */
-public class GetParentTemplatesCommandTest
+public class GetParentTemplatesCommandTest extends TestParent
 {
-    String childTemplateName;
-    String lxcArch;
+
 
     private TemplateRegistry templateRegistry;
-    private GetParentTemplatesCommand parentTemplatesCommand;
+    private GetParentTemplatesCommandExt parentTemplatesCommand;
 
 
-    @Before
-    public void setupClasses()
+    static class GetParentTemplatesCommandExt extends GetParentTemplatesCommand
     {
-        templateRegistry = mock( TemplateRegistry.class );
-        parentTemplatesCommand = new GetParentTemplatesCommand();
-        parentTemplatesCommand.setTemplateRegistry( templateRegistry );
+
+        GetParentTemplatesCommandExt( final TemplateRegistry templateRegistry )
+        {
+            super( templateRegistry );
+        }
+
+
+        public void setLxcArch( String lxcArch ) {this.lxcArch = lxcArch;}
+
+
+        public void setChildTemplateName( String childTemplateName ) {this.childTemplateName = childTemplateName;}
     }
 
 
-    @Test
-    public void shouldSetNewTemplateRegistry()
+    @Before
+    public void setUp()
     {
-        TemplateRegistry registry = mock( TemplateRegistry.class );
-        parentTemplatesCommand.setTemplateRegistry( registry );
-        assertNotSame( templateRegistry, parentTemplatesCommand.getTemplateRegistry() );
+        templateRegistry = mock( TemplateRegistry.class );
+        parentTemplatesCommand = new GetParentTemplatesCommandExt( templateRegistry );
+        parentTemplatesCommand.setLxcArch( MockUtils.LXC_ARCH );
+        parentTemplatesCommand.setChildTemplateName( MockUtils.CHILD_ONE_TEMPLATE_NAME );
+        List<Template> parentTemplates = Lists.newArrayList( MockUtils.PARENT_TEMPLATE );
+        when( templateRegistry.getParentTemplates( MockUtils.CHILD_ONE_TEMPLATE_NAME ) ).thenReturn( parentTemplates );
+        when( templateRegistry.getParentTemplates( MockUtils.CHILD_ONE_TEMPLATE_NAME, MockUtils.LXC_ARCH ) )
+                .thenReturn( parentTemplates );
     }
 
 
     @Test( expected = NullPointerException.class )
-    public void shouldFailOnSettingNullTemplateRegistry()
+    public void testConstructorShouldFailOnNullRegistry() throws Exception
     {
-        parentTemplatesCommand.setTemplateRegistry( null );
+        new GetParentTemplatesCommand( null );
     }
 
 
     @Test
-    public void shouldAccessTemplateRegistryAndGetParentTemplates() throws Exception
+    public void testPrint() throws Exception
     {
         parentTemplatesCommand.doExecute();
-        verify( templateRegistry ).getParentTemplates( childTemplateName );
+
+        assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
+    }
+
+
+    @Test
+    public void testNullLxcArch() throws Exception
+    {
+        parentTemplatesCommand.setLxcArch( null );
+
+        parentTemplatesCommand.doExecute();
+
+        assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
+    }
+
+
+    @Test
+    public void shouldPrint2SysOut() throws Exception
+    {
+        when( templateRegistry.getParentTemplates( MockUtils.CHILD_ONE_TEMPLATE_NAME ) )
+                .thenReturn( Collections.<Template>emptyList() );
+        when( templateRegistry.getParentTemplates( MockUtils.CHILD_ONE_TEMPLATE_NAME, MockUtils.LXC_ARCH ) )
+                .thenReturn( Collections.<Template>emptyList() );
+
+        parentTemplatesCommand.doExecute();
+
+
+        assertTrue( getSysOut().contains( MockUtils.CHILD_ONE_TEMPLATE_NAME ) );
     }
 }

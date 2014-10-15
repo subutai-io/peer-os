@@ -2,6 +2,7 @@ package org.safehaus.subutai.common.protocol;
 
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +19,8 @@ public class CloneContainersMessage extends PeerCommandMessage
     private int numberOfNodes;
     private String Strategy;
     private List<String> criteria;
-//    private Set<Agent> agents;
+    private List<Template> templates = new ArrayList();
+    //    private Set<Agent> agents;
 
 
     public CloneContainersMessage( UUID envId, UUID peerId )
@@ -110,5 +112,21 @@ public class CloneContainersMessage extends PeerCommandMessage
     public void incrementNumberOfNodes()
     {
         numberOfNodes++;
+    }
+
+
+    public List<Template> getTemplates()
+    {
+        return templates;
+    }
+
+
+    public void addTemplate( Template t )
+    {
+        if ( t == null )
+        {
+            throw new IllegalArgumentException( "Template could not be null." );
+        }
+        this.templates.add( t );
     }
 }

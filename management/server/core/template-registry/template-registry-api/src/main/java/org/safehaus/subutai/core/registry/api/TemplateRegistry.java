@@ -9,6 +9,8 @@ package org.safehaus.subutai.core.registry.api;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Template;
+
 
 /**
  * Class to work with templates registry, templates metadata
@@ -164,13 +166,6 @@ public interface TemplateRegistry
      */
     public boolean isTemplateInUse( String templateName ) throws RegistryException;
 
-
-    /**
-     * Checks is template registered
-     *
-     * @return true - is registered, false - otherwise
-     */
-    public boolean isTemplateRegistered( String templateName );
 
     /**
      * Adds template entry to registry

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.registry.api;
+package org.safehaus.subutai.common.protocol;
 
 
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -71,6 +72,13 @@ public class Template
     //indicates whether this template is in use on any of FAIs connected to Subutai
     @Expose
     private Set<String> faisUsingThisTemplate = new HashSet<>();
+
+    //indicates where template is generated
+    @Expose
+    private UUID peerId;
+
+    @Expose
+    private boolean remote = false;
 
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
@@ -138,6 +146,12 @@ public class Template
             this.children = new ArrayList<>();
         }
         this.children.addAll( children );
+    }
+
+
+    public List<Template> getChildren()
+    {
+        return Collections.unmodifiableList( children );
     }
 
 
@@ -240,6 +254,30 @@ public class Template
     }
 
 
+    public UUID getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final UUID peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    public boolean isRemote()
+    {
+        return remote;
+    }
+
+
+    public void setRemote( final boolean remote )
+    {
+        this.remote = remote;
+    }
+
+
     @Override
     public String toString()
     {
@@ -252,7 +290,13 @@ public class Template
                 ", subutaiParent='" + subutaiParent + '\'' +
                 ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
+                ", packagesManifest='" + packagesManifest + '\'' +
+                ", children=" + children +
                 ", products=" + products +
+                ", md5sum='" + md5sum + '\'' +
+                ", faisUsingThisTemplate=" + faisUsingThisTemplate +
+                ", peerId=" + peerId +
+                ", remote=" + remote +
                 '}';
     }
 }

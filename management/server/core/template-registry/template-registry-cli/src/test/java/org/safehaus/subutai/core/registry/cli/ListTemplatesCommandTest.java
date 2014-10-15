@@ -1,54 +1,94 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
-import static org.junit.Assert.assertNotSame;
+import com.google.common.collect.Lists;
+
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
- * Created by talas on 10/2/14.
+ * Test for ListTemplatesCommand
  */
-public class ListTemplatesCommandTest
+public class ListTemplatesCommandTest extends TestParent
 {
-    String lxcArch;
     private TemplateRegistry templateRegistry;
-    private ListTemplatesCommand listTemplatesCommand;
+    private ListTemplatesCommandExt listTemplatesCommand;
+
+
+    static class ListTemplatesCommandExt extends ListTemplatesCommand
+    {
+        ListTemplatesCommandExt( final TemplateRegistry templateRegistry )
+        {
+            super( templateRegistry );
+        }
+
+
+        public void setLxcArch( String lxcArch ) {this.lxcArch = lxcArch;}
+    }
 
 
     @Before
-    public void setupClasses()
+    public void setUp()
     {
         templateRegistry = mock( TemplateRegistry.class );
-        listTemplatesCommand = new ListTemplatesCommand();
-        listTemplatesCommand.setTemplateRegistry( templateRegistry );
+        listTemplatesCommand = new ListTemplatesCommandExt( templateRegistry );
+        listTemplatesCommand.setLxcArch( MockUtils.LXC_ARCH );
+        List<Template> allTemplates = Lists.newArrayList( MockUtils.CHILD_TEMPLATE_ONE, MockUtils.CHILD_TEMPLATE_TWO,
+                MockUtils.PARENT_TEMPLATE );
+        when( templateRegistry.getAllTemplates() ).thenReturn( allTemplates );
+        when( templateRegistry.getAllTemplates( MockUtils.LXC_ARCH ) ).thenReturn( allTemplates );
     }
 
 
     @Test( expected = NullPointerException.class )
-    public void shouldThrowExceptionOnSettingNull()
+    public void testConstructorShouldFailOnNullRegistry() throws Exception
     {
-        listTemplatesCommand.setTemplateRegistry( null );
+        new ListTemplatesCommand( null );
     }
 
 
     @Test
-    public void shouldSetNewTemplateRegistry()
-    {
-        TemplateRegistry registry = mock( TemplateRegistry.class );
-        listTemplatesCommand.setTemplateRegistry( registry );
-        assertNotSame( templateRegistry, registry );
-    }
-
-
-    @Test
-    public void shouldAccessTemplateRegistryAndCallGetAllTemplatesMethod() throws Exception
+    public void testPrint() throws Exception
     {
         listTemplatesCommand.doExecute();
-        verify( templateRegistry ).getAllTemplates();
+
+        assertTrue( getSysOut().contains( MockUtils.CHILD_TWO_TEMPLATE_NAME ) );
+        assertTrue( getSysOut().contains( MockUtils.CHILD_ONE_TEMPLATE_NAME ) );
+        assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
+    }
+
+
+    @Test
+    public void testPrintNullArch() throws Exception
+    {
+        listTemplatesCommand.setLxcArch( null );
+        listTemplatesCommand.doExecute();
+
+        assertTrue( getSysOut().contains( MockUtils.CHILD_TWO_TEMPLATE_NAME ) );
+        assertTrue( getSysOut().contains( MockUtils.CHILD_ONE_TEMPLATE_NAME ) );
+        assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
+    }
+
+
+    @Test
+    public void shouldPrint2SysOut() throws Exception
+    {
+        when( templateRegistry.getAllTemplates() ).thenReturn( Collections.<Template>emptyList() );
+        when( templateRegistry.getAllTemplates( MockUtils.LXC_ARCH ) ).thenReturn( Collections.<Template>emptyList() );
+
+        listTemplatesCommand.doExecute();
+
+
+        assertTrue( getSysOut().isEmpty() );
     }
 }

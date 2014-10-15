@@ -96,21 +96,21 @@ public abstract class Container
     }
 
 
-    public abstract boolean start() throws ContainerException;
+    public abstract DefaultCommandMessage start() throws ContainerException;
 
-    public abstract boolean stop() throws ContainerException;
+    public abstract DefaultCommandMessage stop() throws ContainerException;
 
-    public abstract boolean isConnected() throws ContainerException;
-
-
-    public void setIps( final List<String> ips )
-    {
-        this.ips = ips;
-    }
+    public abstract DefaultCommandMessage isConnected() throws ContainerException;
 
 
     public List<String> getIps()
     {
         return ips;
+    }
+
+
+    public void setIps( final List<String> ips )
+    {
+        this.ips = ips;
     }
 }

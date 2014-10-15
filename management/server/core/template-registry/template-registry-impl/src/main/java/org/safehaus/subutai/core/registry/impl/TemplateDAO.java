@@ -2,18 +2,20 @@ package org.safehaus.subutai.core.registry.impl;
 
 
 import java.lang.reflect.Type;
+import java.sql.Clob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.registry.api.Template;
+import javax.sql.DataSource;
+
+import org.safehaus.subutai.common.util.DbUtil;
+import org.safehaus.subutai.common.protocol.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
@@ -29,14 +31,30 @@ public class TemplateDAO
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateDAO.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final String TEMPLATE_ARCH_FORMAT = "%s-%s";
-    private DbManager dbManager;
+    protected DbUtil dbUtil;
 
 
-    public TemplateDAO( final DbManager dbManager )
+    public TemplateDAO( final DataSource dataSource ) throws DaoException
     {
-        Preconditions.checkNotNull( dbManager, "DB Manager is null" );
-        this.dbManager = dbManager;
+        Preconditions.checkNotNull( dataSource, "Data source is null" );
+
+        this.dbUtil = new DbUtil( dataSource );
+        setupDb();
+    }
+
+
+    protected void setupDb() throws DaoException
+    {
+        String sql = "create table if not exists template_registry_info ( template varchar(100), arch varchar(10), "
+                + "parent varchar(100), info clob, PRIMARY KEY (template, arch) );";
+        try
+        {
+            dbUtil.update( sql );
+        }
+        catch ( SQLException e )
+        {
+            throw new DaoException( e );
+        }
     }
 
 
@@ -45,39 +63,40 @@ public class TemplateDAO
      *
      * @return {@code List<Template>}
      */
-    public List<Template> getAllTemplates() throws DBException
+    public List<Template> getAllTemplates() throws DaoException
     {
-
         try
         {
-            ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info" );
+            ResultSet rs = dbUtil.select( "select info from template_registry_info" );
 
             return getTemplatesFromResultSet( rs );
         }
-        catch ( JsonSyntaxException ex )
+        catch ( SQLException | JsonSyntaxException ex )
         {
             LOG.error( "Error in getAllTemplates", ex );
-            throw new DBException( String.format( "Error in getAllTemplates %s", ex ) );
+            throw new DaoException( ex );
         }
     }
 
 
-    private List<Template> getTemplatesFromResultSet( ResultSet rs )
+    private List<Template> getTemplatesFromResultSet( ResultSet rs ) throws SQLException
     {
         List<Template> list = new ArrayList<>();
-        if ( rs != null )
+
+        while ( rs != null && rs.next() )
         {
-            for ( Row row : rs )
+            Clob infoClob = rs.getClob( "info" );
+            if ( infoClob != null && infoClob.length() > 0 )
             {
-                String info = row.getString( "info" );
+                String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
                 Template template = GSON.fromJson( info, Template.class );
                 if ( template != null )
                 {
-
                     list.add( template );
                 }
             }
         }
+
         return list;
     }
 
@@ -90,22 +109,21 @@ public class TemplateDAO
      *
      * @return {@code List<Template>}
      */
-    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch ) throws DBException
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch ) throws DaoException
     {
         if ( parentTemplateName != null && lxcArch != null )
         {
             try
             {
-                ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where parent = ?",
-                        String.format( TEMPLATE_ARCH_FORMAT, parentTemplateName.toLowerCase(),
-                                lxcArch.toLowerCase() ) );
+                ResultSet rs = dbUtil.select( "select info from template_registry_info where parent = ? and arch = ?",
+                        parentTemplateName.toLowerCase(), lxcArch.toLowerCase() );
 
                 return getTemplatesFromResultSet( rs );
             }
-            catch ( JsonSyntaxException ex )
+            catch ( SQLException | JsonSyntaxException ex )
             {
                 LOG.error( "Error in getChildTemplates", ex );
-                throw new DBException( String.format( "Error in getChildTemplates %s", ex ) );
+                throw new DaoException( ex );
             }
         }
         return Collections.emptyList();
@@ -120,24 +138,24 @@ public class TemplateDAO
      *
      * @return {@code Template}
      */
-    public Template getTemplateByName( String templateName, String lxcArch ) throws DBException
+    public Template getTemplateByName( String templateName, String lxcArch ) throws DaoException
     {
         if ( templateName != null && lxcArch != null )
         {
             try
             {
-                ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where template = ?",
-                        String.format( TEMPLATE_ARCH_FORMAT, templateName.toLowerCase(), lxcArch.toLowerCase() ) );
+                ResultSet rs = dbUtil.select( "select info from template_registry_info where template = ? and arch = ?",
+                        templateName.toLowerCase(), lxcArch.toLowerCase() );
                 List<Template> list = getTemplatesFromResultSet( rs );
                 if ( !list.isEmpty() )
                 {
                     return list.iterator().next();
                 }
             }
-            catch ( JsonSyntaxException ex )
+            catch ( SQLException | JsonSyntaxException ex )
             {
                 LOG.error( "Error in getTemplateByName", ex );
-                throw new DBException( String.format( "Error in getTemplateByName %s", ex ) );
+                throw new DaoException( ex );
             }
         }
         return null;
@@ -149,17 +167,22 @@ public class TemplateDAO
      *
      * @param template - template to save
      */
-    public void saveTemplate( Template template ) throws DBException
+    public void saveTemplate( Template template ) throws DaoException
     {
         Type templateType = new TypeToken<Template>()
+        {}.getType();
+        try
         {
-        }.getType();
-        dbManager.executeUpdate2( "insert into template_registry_info(template, parent, info) values(?,?,?)",
-                String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
-                        template.getLxcArch().toLowerCase() ),
-                Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
-                String.format( TEMPLATE_ARCH_FORMAT, template.getParentTemplateName().toLowerCase(),
-                        template.getLxcArch().toLowerCase() ), GSON.toJson( template, templateType ) );
+            dbUtil.update( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
+                    template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase(),
+                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
+                    template.getParentTemplateName().toLowerCase(), GSON.toJson( template, templateType ) );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( "Error in saveTemplate", e );
+            throw new DaoException( e );
+        }
     }
 
 
@@ -168,11 +191,17 @@ public class TemplateDAO
      *
      * @param template - template to delete
      */
-    public void removeTemplate( Template template ) throws DBException
+    public void removeTemplate( Template template ) throws DaoException
     {
-
-        dbManager.executeUpdate2( "delete from template_registry_info where template = ?",
-                String.format( TEMPLATE_ARCH_FORMAT, template.getTemplateName().toLowerCase(),
-                        template.getLxcArch().toLowerCase() ) );
+        try
+        {
+            dbUtil.update( "delete from template_registry_info where template = ? and arch = ?",
+                    template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( "Error in removeTemplate", e );
+            throw new DaoException( e );
+        }
     }
 }

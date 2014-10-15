@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.registry.cli;
 
 import java.util.List;
 
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -17,19 +17,20 @@ import com.google.common.base.Strings;
 /**
  * CLI for TemplateRegistryManager.listTemplates command
  */
-@Command( scope = "registry", name = "list-templates", description = "List templates" )
+@Command(scope = "registry", name = "list-templates", description = "List templates")
 public class ListTemplatesCommand extends OsgiCommandSupport
 {
-    @Argument( index = 0, name = "lxc arch", required = false, multiValued = false,
-            description = "lxc arch, default = amd64" )
+    @Argument(index = 0, name = "lxc arch", required = false, multiValued = false,
+            description = "lxc arch, default = amd64")
     String lxcArch;
 
-    private TemplateRegistry templateRegistry;
+    private final TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    public ListTemplatesCommand( final TemplateRegistry templateRegistry )
     {
         Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null." );
+
         this.templateRegistry = templateRegistry;
     }
 
