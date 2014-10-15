@@ -235,6 +235,7 @@ public class PeerRegisterForm extends CustomComponent
                             {
                                 case REQUESTED:
                                     peer.setStatus( PeerStatus.REGISTERED );
+                                    //                                    update( peer, peer.getIp(), "8181" );
                                     break;
                                 case REGISTERED:
                                     peer.setStatus( PeerStatus.BLOCKED );
@@ -247,7 +248,7 @@ public class PeerRegisterForm extends CustomComponent
                             property.setValue( peer.getStatus() );
                             peerManagerPortalModule.getPeerManager().register( peer );
 
-                            registerPeerToAnother( peer, peer.getIp(), "8181" );
+                            updatePeerOnAnother( peer, peer.getIp(), "8181" );
                         }
 
 
@@ -268,7 +269,7 @@ public class PeerRegisterForm extends CustomComponent
                                     peerManagerPortalModule.getPeerManager().register( peer );
                                     Property property = peersTable.getItem( peer.getId() ).getItemProperty( "Status" );
                                     property.setValue( peer.getStatus() );
-                                    registerPeerToAnother( peer, peer.getIp(), "8181" );
+                                    updatePeerOnAnother( peer, peer.getIp(), "8181" );
                                     break;
                             }
                         }
