@@ -167,6 +167,7 @@ function promote {
   # ---------------------------------------------------------------------------
   # (2) replace package manifest next to config file
   # ---------------------------------------------------------------------------
+  lxc_remove_agent $lxc_template
 
   lxc_home=/var/lib/lxc/$lxc_template
   for debpkg in "`lxc-attach -n $lxc_template -- dpkg -l`"; do
@@ -183,7 +184,7 @@ function promote {
   fi
 
   uuid=`git_add_commit $lxc_template`
-
+  
   # inject the commit UUID 
   echo "subutai.git.uuid = $uuid" >> $lxc_home/config
   msg_info "    - commit UUID extracted: $uuid"

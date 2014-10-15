@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -119,8 +120,16 @@ public class DbUtil
             short i = 0;
             for ( Object par : params )
             {
-                ps.setObject( ++i, par );
+                if ( par instanceof Reader )
+                {
+                    ps.setCharacterStream( ++i, ( Reader ) par );
+                }
+                else
+                {
+                    ps.setObject( ++i, par );
+                }
             }
+
             return ps.executeUpdate();
         }
         catch ( SQLException ex )

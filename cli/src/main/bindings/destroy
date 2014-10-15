@@ -163,8 +163,8 @@ function destroy {
   rm -rf $debian_root
   
   #deleting related veth pair port from ovs
-  ovs-vsctl --if-exist del-port br-int $clone
-  ovs-vsctl --if-exist del-port br-int $clone-2
+  ovs-vsctl --if-exist del-port br-int $clone > /dev/null 2>&1
+  ovs-vsctl --if-exist del-port br-int $clone-2 > /dev/null 2>&1
 
   unlock_container_read $clone
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

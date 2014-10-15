@@ -2,14 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <!--<reference id="dataSource" interface="javax.sql.DataSource"-->
-             <!--filter="(osgi.jndi.service.name=jdbc/tracker)" />-->
+  <!--filter="(osgi.jndi.service.name=jdbc/tracker)" />-->
 
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/tracker;mv_store=false" />
+    <property name="URL" value="jdbc:h2:~/tracker" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
-
 
   <bean id="tracker" class="org.safehaus.subutai.core.tracker.impl.TrackerImpl"
         scope="singleton" activation="eager">
