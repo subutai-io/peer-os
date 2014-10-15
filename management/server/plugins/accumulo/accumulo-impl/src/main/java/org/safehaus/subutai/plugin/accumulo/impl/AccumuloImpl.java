@@ -6,9 +6,12 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.naming.NamingException;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -191,8 +194,16 @@ public class AccumuloImpl implements Accumulo
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster configuration is null" );
         Preconditions.checkNotNull( zookeeperClusterConfig, "Zookeeper cluster configuration is null" );
 
-        AbstractOperationHandler operationHandler =
-                new InstallOperationHandler( this, accumuloClusterConfig, hadoopClusterConfig, zookeeperClusterConfig );
+        ServiceLocator serviceLocator = new ServiceLocator();
+        AbstractOperationHandler operationHandler = null;
+        try
+        {
+            operationHandler = new InstallOperationHandler( this, accumuloClusterConfig, hadoopClusterConfig, zookeeperClusterConfig, serviceLocator);
+        }
+        catch ( NamingException e )
+        {
+            e.printStackTrace();
+        }
 
         executor.execute( operationHandler );
 
