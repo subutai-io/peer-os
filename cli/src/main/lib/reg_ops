@@ -13,13 +13,13 @@ function is_registered {
     return
   fi
 
-  resp=`curl -s -XGET $url`
-
-  # response should contain quoted template name
-  if [[ -n "$resp" && "$resp" == *\"$template\"* ]]; then 
+  response=$(curl --write-out %{http_code} -s --output /dev/null -XGET $url)
+  if [ $response == "200"  ]; then
     echo true
+    return
   else
     echo false
+    return
   fi
 } 
 
@@ -32,12 +32,14 @@ function has_child_templates_registered {
     echo false
     return
   fi
-  response=`curl -s -XGET $url`
-  # response should contain quoted template name
-  if [[ -n "$response" && "$response" == *\"*\"* ]]; then
+ 
+  response=$(curl --write-out %{http_code} -s --output /dev/null -XGET $url)
+  if [ $response == "200"  ]; then
     echo true
+    return
   else
     echo false
+    return
   fi
 }
 
@@ -83,6 +85,7 @@ function is_template_in_use {
     echo false
     return
   fi
+
   response=`curl -s -XGET $url`
   # response should contain quoted template name
   if [[ -n "$response" && "$response" == *true* ]]; then
@@ -126,7 +129,8 @@ function list_reg_templates {
   local parents="$1"
   local url=`build_rest_url $SUBUTAI_REST_LIST_TEMPLATES`
   IFS=$'\n'
-  for i in `curl -s $url` 
+  response=$(curl -s $url)
+  for i in $response
   do
     if [ "$parents" == "parents" ]; then
       echo $i | tr " " "\t"
@@ -152,9 +156,12 @@ function send_n_register {
     return
   fi
 
-  curl -f -s -XPOST $url -F file=@$debian_file -F config_dir=$config_dir
-
-  check_status "Sending Debian file $debian_file to management server" "$?"
+  response=$(curl -f -XPOST $url -F file=@$debian_file -F config_dir=$config_dir)
+  send_n_register_status=$?
+  check_status "Sending Debian file $debian_file to management server" "$send_n_register_status"
+  if [ $send_n_register_status != "0" ]; then
+    msg_error "$response"
+  fi
 } 
 
 
