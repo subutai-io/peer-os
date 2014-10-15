@@ -5,7 +5,7 @@
              <!--filter="(osgi.jndi.service.name=jdbc/tracker)" />-->
 
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:~/tracker" />
+    <property name="URL" value="jdbc:h2:~/tracker;mv_store=false" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
