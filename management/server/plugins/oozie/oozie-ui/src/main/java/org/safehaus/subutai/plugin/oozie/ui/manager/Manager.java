@@ -51,12 +51,14 @@ import com.vaadin.ui.Window;
 public class Manager extends BaseManager
 {
 
-    public final static String SERVER_TABLE_CAPTION = "Server";
-    public final static String CLIENT_TABLE_CAPTION = "Clients";
+    //public final static String SERVER_TABLE_CAPTION = "Server";
+    //public final static String CLIENT_TABLE_CAPTION = "Clients";
+
+    public final static String NODES_TABLE_CAPTION = "Nodes";
 
     private final ComboBox clusterCombo;
-    private final Table serverTable;
-    private final Table clientsTable;
+    //private final Table serverTable;
+    private final Table nodesTable;
     private final Oozie oozieManager;
     private final Hadoop hadoopManager;
     private final Tracker tracker;
@@ -84,8 +86,10 @@ public class Manager extends BaseManager
         contentRoot.setColumns( 1 );
 
         //tables go here
-        serverTable = createTableTemplate( SERVER_TABLE_CAPTION );
-        clientsTable = createTableTemplate( CLIENT_TABLE_CAPTION );
+        //serverTable = createTableTemplate( SERVER_TABLE_CAPTION );
+        //clientsTable = createTableTemplate( CLIENT_TABLE_CAPTION );
+
+        nodesTable = createTableTemplate(NODES_TABLE_CAPTION);
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -123,7 +127,7 @@ public class Manager extends BaseManager
 
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button checkAllBtn = new Button( "Check all" );
+        /*Button checkAllBtn = new Button( "Check all" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -132,7 +136,7 @@ public class Manager extends BaseManager
             {
                 clickAllCheckButtons( serverTable );
             }
-        } );
+        } );*/
 
         Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
         destroyClusterBtn.addStyleName( "default" );
@@ -185,8 +189,10 @@ public class Manager extends BaseManager
         controlsContent.addComponent( getProgressBar() );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
-        contentRoot.addComponent( serverTable, 0, 1, 0, 5 );
-        contentRoot.addComponent( clientsTable, 0, 6, 0, 10 );
+        //contentRoot.addComponent( serverTable, 0, 1, 0, 5 );
+        //contentRoot.addComponent( clientsTable, 0, 6, 0, 10 );
+        contentRoot.addComponent( nodesTable, 0, 1, 0, 5 );
+
     }
 
 
@@ -267,14 +273,57 @@ public class Manager extends BaseManager
     {
         if ( config != null )
         {
-            populateServerTable( serverTable, config.getServer() );
-            populateClientsTable( clientsTable, config.getClients() );
-            clickAllCheckButtons( serverTable );
+            //populateServerTable( serverTable, config.getServer() );
+            //populateClientsTable( clientsTable, config.getClients() );
+            //clickAllCheckButtons( serverTable );
+
+            populateClientsTable( nodesTable, config.getClients());
+            checkServer();
         }
         else
         {
-            serverTable.removeAllItems();
-            clientsTable.removeAllItems();
+            /*serverTable.removeAllItems();
+            clientsTable.removeAllItems();*/
+            nodesTable.removeAllItems();
+        }
+    }
+    public void checkServer()
+    {
+        if ( nodesTable != null )
+        {
+            for ( Object o : nodesTable.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = nodesTable.getItem( rowId );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
+                    if ( checkBtn != null )
+                    {
+                        checkBtn.click();
+                    }
+                }
+            }
+        }
+    }
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
         }
     }
 
@@ -283,6 +332,7 @@ public class Manager extends BaseManager
     {
         List<Agent> agentList = new ArrayList<>();
         agentList.add( agent );
+        agentList.add(config.getServer());
         populateTable( table, agentList );
     }
 
@@ -324,6 +374,9 @@ public class Manager extends BaseManager
         table.removeAllItems();
         List<Agent> agentList = new ArrayList<>();
         agentList.addAll( clientNodes );
+
+        agentList.add(config.getServer());
+
         populateTable( table, agentList );
     }
 
@@ -390,12 +443,17 @@ public class Manager extends BaseManager
     {
         Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
         Preconditions.checkNotNull( agent, "Cannot add null agent to the table" );
-        if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) ) {
+        /*if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) ) {
             addServerRow( table, agent );
+        }
+        else {*/
+        if ( config.getServer().equals( agent ) ) {
+            addServerRow(table,agent);
         }
         else {
             addClientRow( table, agent );
         }
+        //}
     }
 
 
