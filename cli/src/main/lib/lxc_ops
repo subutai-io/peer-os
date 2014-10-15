@@ -431,7 +431,7 @@ function lxc_remove_agent {
   container=$1
   lxc_assert $container
   lxc-wait -n $container -s RUNNING
-  o=`lxc-attach -n $container -- apt-get purge -y -f subutai-agent`
+  lxc-attach -n $container -- apt-get purge -y -f subutai-agent > /dev/null 2>&1
   status=$?
   message="    - agent removed from \"$container\""
   if [ "$status" == "0" ]
