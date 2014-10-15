@@ -53,7 +53,8 @@ public class Manager
     protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
     protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
-    protected static final String SERVER_TABLE_CAPTION = "Nodes";
+    protected static final String SERVER_TABLE_CAPTION = "Server Nodes";
+    protected static final String CLIENT_TABLE_CAPTION = "Client Nodes";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
@@ -63,7 +64,7 @@ public class Manager
     final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
 
     private final ComboBox clusterCombo;
-    private final Table nodesTable;
+    private final Table serverTable, clientsTable;
     private final Hive hive;
     private final ExecutorService executorService;
     private final Tracker tracker;
@@ -89,9 +90,14 @@ public class Manager
         contentRoot.setColumns( 1 );
 
         //tables go here
+        serverTable = createTableTemplate(SERVER_TABLE_CAPTION);
+        serverTable.setId("HiveTable");
+        clientsTable = createTableTemplate(CLIENT_TABLE_CAPTION);
+        clientsTable.setId("HiveClientsTable");
+        /*
         nodesTable = createTableTemplate( SERVER_TABLE_CAPTION );
         nodesTable.setId("HiveTable");
-
+*/
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -150,7 +156,8 @@ public class Manager
         tablesLayout.setSizeFull();
         tablesLayout.setSpacing( true );
 
-        addGivenComponents( tablesLayout, nodesTable );
+        addGivenComponents( tablesLayout, serverTable );
+        addGivenComponents( tablesLayout, clientsTable );
 
 
         PROGRESS_ICON.setVisible( false );
@@ -247,12 +254,12 @@ public class Manager
 
     public void checkServer()
     {
-        if ( nodesTable != null )
+        if ( serverTable != null )
         {
-            for ( Object o : nodesTable.getItemIds() )
+            for ( Object o : serverTable.getItemIds() )
             {
                 int rowId = ( Integer ) o;
-                Item row = nodesTable.getItem( rowId );
+                Item row = serverTable.getItem( rowId );
                 HorizontalLayout availableOperationsLayout =
                         ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
                 if ( availableOperationsLayout != null )
@@ -339,11 +346,15 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getAllNodes() );
+            Set<Agent> cli_agents = new HashSet<>();
+            cli_agents.add(config.getServer());
+            populateTable( serverTable, cli_agents );
+            populateTable( clientsTable, config.getClients() );
         }
         else
         {
-            nodesTable.removeAllItems();
+            serverTable.removeAllItems();
+            clientsTable.removeAllItems();
         }
     }
 
