@@ -51,7 +51,6 @@ public class CassandraImpl implements Cassandra
 
     private static final Logger LOG = LoggerFactory.getLogger( CassandraImpl.class.getName() );
     private Commands commands;
-    //    private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
@@ -60,7 +59,6 @@ public class CassandraImpl implements Cassandra
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
-    //    private PluginDAO pluginDAO;
     private PluginDAO pluginDAO;
     private DataSource dataSource;
 
@@ -69,18 +67,6 @@ public class CassandraImpl implements Cassandra
     {
         this.dataSource = dataSource;
     }
-
-
-    /*public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
-    }*/
 
 
     public Tracker getTracker()
@@ -206,7 +192,7 @@ public class CassandraImpl implements Cassandra
         }
         catch ( SQLException e )
         {
-
+            LOG.error( e.getMessage(), e );
         }
         this.commands = new Commands( commandRunner );
 
@@ -237,17 +223,11 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public PluginDAO getPluginDAO()
-    {
-        return pluginDAO;
-    }
-
-
     @Override
     public List<CassandraClusterConfig> getClusters()
     {
         return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-//        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
+        //        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
     }
 
 
@@ -257,7 +237,8 @@ public class CassandraImpl implements Cassandra
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
 
-//        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
+        //        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName,
+        // CassandraClusterConfig.class );
     }
 
 
@@ -265,6 +246,12 @@ public class CassandraImpl implements Cassandra
     public UUID addNode( final String clusterName, final String agentHostName )
     {
         return null;
+    }
+
+
+    public PluginDAO getPluginDAO()
+    {
+        return pluginDAO;
     }
 
 
