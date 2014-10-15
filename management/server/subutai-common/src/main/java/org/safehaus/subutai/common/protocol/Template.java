@@ -149,6 +149,12 @@ public class Template
     }
 
 
+    protected List<Template> getChildren()
+    {
+        return Collections.unmodifiableList( children );
+    }
+
+
     public String getMd5sum()
     {
         return md5sum;

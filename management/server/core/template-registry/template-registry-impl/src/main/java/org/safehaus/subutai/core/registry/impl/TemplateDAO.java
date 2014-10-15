@@ -43,7 +43,7 @@ public class TemplateDAO
     }
 
 
-    private void setupDb() throws DaoException
+    protected void setupDb() throws DaoException
     {
         String sql = "create table if not exists template_registry_info ( template varchar(100), arch varchar(10), "
                 + "parent varchar(100), info clob, PRIMARY KEY (template, arch) );";

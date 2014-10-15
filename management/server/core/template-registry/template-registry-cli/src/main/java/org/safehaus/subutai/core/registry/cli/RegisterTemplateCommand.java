@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.registry.cli;
 import java.nio.charset.Charset;
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -17,26 +16,25 @@ import com.google.common.base.Preconditions;
 /**
  * CLI for TemplateRegistryManager.registerTemplate command
  */
-@Command( scope = "registry", name = "register-template", description = "Register template with registry" )
+@Command(scope = "registry", name = "register-template", description = "Register template with registry")
 public class RegisterTemplateCommand extends OsgiCommandSupport
 {
-    @Argument( index = 0, name = "path to template config file", required = true, multiValued = false,
-            description = "path to template config file" )
+    @Argument(index = 0, name = "path to template config file", required = true, multiValued = false,
+            description = "path to template config file")
     String configFilePath = "";
-    @Argument( index = 1, name = "path to template packages file", required = true, multiValued = false,
-            description = "path to template packages file" )
+    @Argument(index = 1, name = "path to template packages file", required = true, multiValued = false,
+            description = "path to template packages file")
     String packagesFilePath = "";
-    @Argument( index = 2, name = "md5sum of packages file", required = true, multiValued = false,
-            description = "md5sum of packages file" )
+    @Argument(index = 2, name = "md5sum of packages file", required = true, multiValued = false,
+            description = "md5sum of packages file")
     String md5sum;
 
-    private TemplateRegistry templateRegistry;
-    private PeerManager peerManager;
+    private final TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    public RegisterTemplateCommand( final TemplateRegistry templateRegistry )
     {
-        Preconditions.checkNotNull( templateRegistry );
+        Preconditions.checkNotNull( templateRegistry, "Template Registry is null" );
         this.templateRegistry = templateRegistry;
     }
 
@@ -51,11 +49,5 @@ public class RegisterTemplateCommand extends OsgiCommandSupport
         System.out.println( "Template registered successfully" );
 
         return null;
-    }
-
-
-    public TemplateRegistry getTemplateRegistry()
-    {
-        return templateRegistry;
     }
 }

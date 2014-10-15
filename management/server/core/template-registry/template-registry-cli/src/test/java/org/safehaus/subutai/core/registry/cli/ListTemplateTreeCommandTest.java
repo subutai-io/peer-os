@@ -1,56 +1,60 @@
 package org.safehaus.subutai.core.registry.cli;
 
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 
-import static org.junit.Assert.assertNotSame;
+import com.google.common.collect.Lists;
+
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 /**
- * Created by talas on 10/2/14.
+ * Test for ListTemplateTreeCommand
  */
-public class ListTemplateTreeCommandTest
+public class ListTemplateTreeCommandTest extends TestParent
 {
     private TemplateRegistry templateRegistry;
     private ListTemplateTreeCommand templateTreeCommand;
 
 
     @Before
-    public void setupClasses()
+    public void setUp()
     {
         templateRegistry = mock( TemplateRegistry.class );
-        templateTreeCommand = new ListTemplateTreeCommand();
-        templateTreeCommand.setTemplateRegistry( templateRegistry );
+        templateTreeCommand = new ListTemplateTreeCommand( templateRegistry );
+        List<Template> rootTemplates = Lists.newArrayList( MockUtils.PARENT_TEMPLATE );
+        List<Template> childTemplates =
+                Lists.newArrayList( MockUtils.CHILD_TEMPLATE_TWO, MockUtils.CHILD_TEMPLATE_ONE );
+
+        TemplateTree templateTree = mock( TemplateTree.class );
+        when( templateRegistry.getTemplateTree() ).thenReturn( templateTree );
+        when( templateTree.getRootTemplates() ).thenReturn( rootTemplates );
+        when( templateTree.getChildrenTemplates( MockUtils.PARENT_TEMPLATE ) ).thenReturn( childTemplates );
     }
 
 
     @Test( expected = NullPointerException.class )
-    public void shouldThrowExceptionForSettingNullTemplateRegistry()
+    public void testConstructorShouldFailOnNullRegistry() throws Exception
     {
-        templateTreeCommand.setTemplateRegistry( null );
+        new ListTemplateTreeCommand( null );
     }
 
 
     @Test
-    public void shouldSetNewTemplateRegistryValue()
+    public void testPrint() throws Exception
     {
-        TemplateRegistry registry = mock( TemplateRegistry.class );
-        templateTreeCommand.setTemplateRegistry( registry );
-        assertNotSame( templateRegistry, templateTreeCommand.getTemplateRegistry() );
-    }
-
-
-    @Test
-    public void shouldAccessTemplateRegistryAndCallGetTemplateTree() throws Exception
-    {
-        when( templateRegistry.getTemplateTree() ).thenReturn( new TemplateTree() );
         templateTreeCommand.doExecute();
-        verify( templateRegistry ).getTemplateTree();
+
+        assertTrue( getSysOut().contains( MockUtils.CHILD_TWO_TEMPLATE_NAME ) );
+        assertTrue( getSysOut().contains( MockUtils.CHILD_ONE_TEMPLATE_NAME ) );
+        assertTrue( getSysOut().contains( MockUtils.PARENT_TEMPLATE_NAME ) );
     }
 }

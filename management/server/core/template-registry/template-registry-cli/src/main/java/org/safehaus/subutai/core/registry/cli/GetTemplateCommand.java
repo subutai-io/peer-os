@@ -15,30 +15,25 @@ import com.google.common.base.Strings;
 /**
  * CLI for TemplateRegistryManager.getTemplate command
  */
-@Command( scope = "registry", name = "get-template", description = "Get template by name" )
+@Command(scope = "registry", name = "get-template", description = "Get template by name")
 public class GetTemplateCommand extends OsgiCommandSupport
 {
-    @Argument( index = 0, name = "template name", required = true, multiValued = false,
-            description = "template name" )
+    @Argument(index = 0, name = "template name", required = true, multiValued = false,
+            description = "template name")
     String templateName;
-    @Argument( index = 1, name = "lxc arch", required = false, multiValued = false,
-            description = "lxc arch, default = amd64" )
+    @Argument(index = 1, name = "lxc arch", required = false, multiValued = false,
+            description = "lxc arch, default = amd64")
     String lxcArch;
 
 
-    private TemplateRegistry templateRegistry;
+    private final TemplateRegistry templateRegistry;
 
 
-    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    public GetTemplateCommand( final TemplateRegistry templateRegistry )
     {
         Preconditions.checkNotNull( templateRegistry, "TemplateRegistry is null." );
+
         this.templateRegistry = templateRegistry;
-    }
-
-
-    public TemplateRegistry getTemplateRegistry()
-    {
-        return templateRegistry;
     }
 
 

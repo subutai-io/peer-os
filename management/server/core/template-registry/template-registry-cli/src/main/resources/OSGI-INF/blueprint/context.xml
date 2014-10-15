@@ -3,13 +3,10 @@
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
-  <reference id="peerManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
-
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/get-template">
       <action class="org.safehaus.subutai.core.registry.cli.GetTemplateCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -17,8 +14,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/register-template">
       <action class="org.safehaus.subutai.core.registry.cli.RegisterTemplateCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
-        <property name="peerManager" ref="peerManager" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -26,7 +22,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/get-child-templates">
       <action class="org.safehaus.subutai.core.registry.cli.GetChildTemplatesCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -34,7 +30,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/get-parent-template">
       <action class="org.safehaus.subutai.core.registry.cli.GetParentTemplateCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -42,7 +38,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/unregister-template">
       <action class="org.safehaus.subutai.core.registry.cli.UnregisterTemplateCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -50,7 +46,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/list-template-tree">
       <action class="org.safehaus.subutai.core.registry.cli.ListTemplateTreeCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -58,7 +54,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/list-templates">
       <action class="org.safehaus.subutai.core.registry.cli.ListTemplatesCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -66,7 +62,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="registry/get-parent-templates">
       <action class="org.safehaus.subutai.core.registry.cli.GetParentTemplatesCommand">
-        <property name="templateRegistry" ref="templateRegistry" />
+        <argument ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>

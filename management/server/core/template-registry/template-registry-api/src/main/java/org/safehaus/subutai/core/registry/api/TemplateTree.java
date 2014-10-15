@@ -7,8 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.Template;
-
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
@@ -31,6 +30,8 @@ public class TemplateTree
      */
     public void addTemplate( Template template )
     {
+        Preconditions.checkNotNull( template, "Template is null" );
+
         String parentTemplateName = Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
                                     String.format( TEMPLATE_ARCH_FORMAT, template.getParentTemplateName().toLowerCase(),
                                             template.getLxcArch().toLowerCase() );
