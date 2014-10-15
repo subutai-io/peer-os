@@ -4,22 +4,26 @@ package org.safehaus.subutai.core.template.api;
 public enum ActionType
 {
 
-    SETUP( "setup" ),
-    CLONE( "clone" ),
-    DESTROY( "destroy" ),
-    RENAME( "rename" ),
-    EXPORT( "export" ),
-    IMPORT( "import" ),
-    PROMOTE( "promote" ),
-    INSTALL( "apt-get --force-yes --assume-yes install", true ),
+    SETUP( "setup %s" ),
+    CLONE( "clone %s %s -e %s &" ),
+    DESTROY( "destroy %s" ),
+    RENAME( "rename %s" ),
+    EXPORT( "export %s" ),
+    IMPORT( "import %s" ),
+    PROMOTE( "promote %s" ),
+    INSTALL( "apt-get --force-yes --assume-yes install %s", true ),
     // list commands
-    LIST_TEMPLATES( "list -t" ),
-    LIST_CONTAINERS( "list -c" ),
-    LIST_CONT_TEMP( "list" ),
+    LIST_TEMPLATES( "list -t %s" ),
+    LIST_CONTAINERS( "list -c %s" ),
+    LIST_CONT_TEMP( "list %s" ),
     // gets generated debian package name for template. TODO: find a better way
     GET_DEB_PACKAGE_NAME(
-            ". /etc/subutai/config && . /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name", true ),
-    GET_PACKAGE_NAME( ". /usr/share/subutai-cli/subutai/lib/deb_ops && get_package_name", true ), PREPARE( "install" );
+            ". /etc/subutai/config && . /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name  %s",
+            true ),
+    GET_PACKAGE_NAME( ". /usr/share/subutai-cli/subutai/lib/deb_ops && get_package_name  %s", true ),
+    ADD_SOURCE( "echo \"deb http://gw.intra.lan:9999/%1$s trusty main\" > /etc/apt/sources.list.d/%1$s.list ", true ),
+    IS_PACKAGE_ACCESSIBLE( "apt-cache show " + "%1$s | grep \"Package: %1$s\"", true ),
+    APT_GET_UPDATE( "apt-get update", true );
 
     private static final String PARENT_DIR = "/usr/bin/subutai ";
     private final String script;
@@ -47,20 +51,22 @@ public enum ActionType
 
     public String buildCommand( String... args )
     {
-        StringBuilder sb = new StringBuilder();
-        if ( !standAloneCommand )
-        {
-            sb.append( PARENT_DIR );
-        }
-        sb.append( this.script );
-        if ( args != null )
-        {
-            for ( String arg : args )
-            {
-                sb.append( " " ).append( arg );
-            }
-        }
-        return sb.toString();
+        //        StringBuilder sb = new StringBuilder();
+        //        if ( !standAloneCommand )
+        //        {
+        //            sb.append( PARENT_DIR );
+        //        }
+        //        sb.append( this.script );
+        //        if ( args != null )
+        //        {
+        //            for ( String arg : args )
+        //            {
+        //                sb.append( " " ).append( arg );
+        //            }
+        //        }
+        String s = String.format( this.script, args );
+        return ( standAloneCommand ? "" : PARENT_DIR ) + s;
     }
+
 
 }

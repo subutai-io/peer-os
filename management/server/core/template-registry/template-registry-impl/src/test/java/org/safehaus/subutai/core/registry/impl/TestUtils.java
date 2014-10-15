@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 
 
 /**
@@ -50,10 +50,12 @@ public class TestUtils
                     "package of kiskis distribution.";
     public static final String CHILD_PACKAGES_MANIFEST =
             "ii  ksks-test                    1.0.1                         amd64        This is a test package";
-    public static final String TEST_PACKAGE = "ksks-test";
+    public static final String PARENT_PACKAGE = "ksks-logstash";
+    public static final String CHILD_PACKAGE = "ksks-test";
 
     public static final String MD_5_SUM = "ec6c39f0aed6b6a1256321d2e927a392";
     public static final String TEMPLATE_NAME = "master";
+    public static final String CHILD_TEMPLATE_NAME = "cassandra";
     public static final String SUBUTAI_PARENT = "master";
     public static final String UTS_NAME = "master";
     public static final String LXC_ARCH = "amd64";
@@ -80,8 +82,14 @@ public class TestUtils
     }
 
 
-    public static Template getDefaultTemplate() throws IOException
+    public static Template getParentTemplate() throws IOException
     {
         return getTemplateFromConfigFiles( CONFIG_FILE, PACKAGES_MANIFEST, MD_5_SUM );
+    }
+
+
+    public static Template getChildTemplate() throws IOException
+    {
+        return getTemplateFromConfigFiles( CHILD_CONFIG_FILE, CHILD_PACKAGES_MANIFEST, MD_5_SUM );
     }
 }

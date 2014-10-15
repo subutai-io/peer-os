@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.template.api.ActionType;
+import org.safehaus.subutai.core.template.api.TemplateException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -52,7 +53,7 @@ public class TemplateManagerImplTest
 
 
 //    @Test
-    public void testCloneParentTemplateExists()
+    public void testCloneParentTemplateExists() throws TemplateException
     {
 
         UUID envId = UUID.randomUUID();

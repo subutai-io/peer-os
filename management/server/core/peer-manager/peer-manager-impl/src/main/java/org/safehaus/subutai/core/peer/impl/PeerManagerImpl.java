@@ -27,6 +27,7 @@ import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -49,7 +50,6 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +138,19 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean register( final Peer peer )
     {
+        Agent management = agentManager.getAgentByHostname( "management" );
+        String cmd = String.format( "sed '/^path_map.*$/ s/$/ ; %s %s/' apt-cacher.conf > apt-cacher.conf"
+                        + ".new && mv apt-cacher.conf.new apt-cacher.conf && /etc/init.d/apt-cacher reload",
+                peer.getId().toString(),
+                ( "http://" + peer.getIp() + "/ksks" ).replace( ".", "\\." ).replace( "/", "\\/" ) );
+
+        LOG.info( cmd );
+        RequestBuilder rb = new RequestBuilder( cmd );
+        rb.withCwd( "/etc/apt-cacher/" );
+        Command command = commandRunner.createCommand( rb, Sets.newHashSet( management ) );
+        commandRunner.runCommand( command );
+        boolean r = command.hasSucceeded();
+        LOG.info( "Apt-cacher mapping result: " + r );
         return peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
     }
 
@@ -433,27 +446,48 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new IllegalArgumentException( "Peer could not be null." );
         }
-        if ( !peerId.equals( getSiteId() ) )
-        {
-            // Is the remote template exists in the local peer?
-            boolean isTemplateExists = templateRegistry.getTemplate( template ) != null;
-            if ( !isTemplateExists )
-            {
-                //TODO: download the remote template and register it in the local registry
-
-            }
-        }
-
 
         return containerManager.clone( envId, template, numberOfNodes, strategy, null );
     }
 
 
+    protected boolean isRemotePeer( final UUID peerId )
+    {
+        return getSiteId().equals( peerId );
+    }
+
+
+    private void registerTemplate( final Template template ) throws RegistryException
+    {
+        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
+        {
+            templateRegistry.registerTemplate( template );
+        }
+    }
+
+    //
+    //    protected Template getRemoteTemplate( final String template,
+    // UUID remotePeerId ) throws ContainerCreateException
+    //    {
+    //        PeerCommandMessage getTemplateCommand =
+    //                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, remotePeerId, null );
+    //        getTemplateCommand.setInput( template );
+    //        peerCommandDispatcher.invoke( getTemplateCommand );
+    //        if ( getTemplateCommand.isSuccess() )
+    //        {
+    //            return JsonUtil.fromJson( getTemplateCommand.getResult().toString(), Template.class );
+    //        }
+    //        else
+    //        {
+    //            throw new ContainerCreateException( "Could not get remote template." );
+    //        }
+    //    }
+
+
     @Override
     public boolean startContainer( final PeerContainer container )
     {
-        Agent a = agentManager.getAgentByUUID( container.getAgentId() );
-        Agent parentAgent = agentManager.getAgentByHostname( a.getParentHostName() );
+        Agent parentAgent = agentManager.getAgentByUUID( container.getParentHostId() );
         if ( parentAgent == null )
         {
             return false;
@@ -519,17 +553,23 @@ public class PeerManagerImpl implements PeerManager
             case CLONE:
                 if ( peerCommandMessage instanceof CloneContainersMessage )
                 {
+
                     CloneContainersMessage ccm = ( CloneContainersMessage ) peerCommandMessage;
                     try
                     {
+                        for ( Template t : ccm.getTemplates() )
+                        {
+                            if ( t.isRemote() )
+                            {
+                                registerTemplate( t );
+                            }
+                        }
                         Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getPeerId(), ccm.getTemplate(),
                                 ccm.getNumberOfNodes(), ccm.getStrategy() );
                         ccm.setResult( agents );
-                        //                        ccm.setSuccess( true );
                     }
-                    catch ( ContainerCreateException e )
+                    catch ( Exception e )
                     {
-                        //                        peerCommandMessage.setSuccess( false );
                         peerCommandMessage.setExceptionMessage( e.toString() );
                     }
                 }
@@ -537,7 +577,6 @@ public class PeerManagerImpl implements PeerManager
             case GET_PEER_ID:
                 UUID peerId = getSiteId();
                 peerCommandMessage.setResult( peerId );
-                //                peerCommandMessage.setSuccess( true );
                 break;
             case GET_CONNECTED_CONTAINERS:
                 Set<Agent> agents = agentManager.getAgents();

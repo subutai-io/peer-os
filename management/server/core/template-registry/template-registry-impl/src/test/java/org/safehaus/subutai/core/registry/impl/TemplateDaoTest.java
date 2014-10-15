@@ -11,9 +11,9 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.core.registry.api.Template;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -76,7 +76,7 @@ public class TemplateDaoTest
         Clob clob = mock( Clob.class );
         when( resultSet.getClob( "info" ) ).thenReturn( clob );
         when( clob.length() ).thenReturn( 1L );
-        String templateJson = JsonUtil.toJson( TestUtils.getDefaultTemplate() );
+        String templateJson = JsonUtil.toJson( TestUtils.getParentTemplate() );
         when( clob.getSubString( 1, 1 ) ).thenReturn( templateJson );
     }
 
@@ -106,7 +106,7 @@ public class TemplateDaoTest
     {
         List<Template> allTemplates = templateDAO.getAllTemplates();
 
-        assertTrue( allTemplates.contains( TestUtils.getDefaultTemplate() ) );
+        assertTrue( allTemplates.contains( TestUtils.getParentTemplate() ) );
     }
 
 
@@ -124,7 +124,7 @@ public class TemplateDaoTest
     {
         List<Template> allTemplates = templateDAO.getChildTemplates( TEMPLATE_NAME, ARCH );
 
-        assertTrue( allTemplates.contains( TestUtils.getDefaultTemplate() ) );
+        assertTrue( allTemplates.contains( TestUtils.getParentTemplate() ) );
     }
 
 
@@ -163,7 +163,7 @@ public class TemplateDaoTest
     {
         Template template = templateDAO.getTemplateByName( TEMPLATE_NAME, ARCH );
 
-        assertEquals( TestUtils.getDefaultTemplate(), template );
+        assertEquals( TestUtils.getParentTemplate(), template );
     }
 
 
@@ -200,7 +200,7 @@ public class TemplateDaoTest
     @Test
     public void testSaveTemplate() throws Exception
     {
-        templateDAO.saveTemplate( TestUtils.getDefaultTemplate() );
+        templateDAO.saveTemplate( TestUtils.getParentTemplate() );
 
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass( String.class );
         ArgumentCaptor<String> sqlCaptor2 = ArgumentCaptor.forClass( String.class );
@@ -210,12 +210,12 @@ public class TemplateDaoTest
         verify( dbUtil ).update( sqlCaptor.capture(), sqlCaptor2.capture(), sqlCaptor3.capture(), sqlCaptor4.capture(),
                 sqlCaptor5.capture() );
 
-        assertEquals( "insert into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
+        assertEquals( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
                 sqlCaptor.getValue() );
         assertEquals( TestUtils.TEMPLATE_NAME.toLowerCase(), sqlCaptor2.getValue() );
         assertEquals( TestUtils.LXC_ARCH.toLowerCase(), sqlCaptor3.getValue() );
         assertEquals( null, sqlCaptor4.getValue() );
-        assertEquals( JsonUtil.toJson( TestUtils.getDefaultTemplate() ), sqlCaptor5.getValue() );
+        assertEquals( JsonUtil.toJson( TestUtils.getParentTemplate() ), sqlCaptor5.getValue() );
     }
 
 
@@ -225,14 +225,14 @@ public class TemplateDaoTest
 
         throwDbException();
 
-        templateDAO.saveTemplate( TestUtils.getDefaultTemplate() );
+        templateDAO.saveTemplate( TestUtils.getParentTemplate() );
     }
 
 
     @Test
     public void testRemoteTemplate() throws Exception
     {
-        templateDAO.removeTemplate( TestUtils.getDefaultTemplate() );
+        templateDAO.removeTemplate( TestUtils.getParentTemplate() );
 
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass( String.class );
         ArgumentCaptor<String> sqlCaptor2 = ArgumentCaptor.forClass( String.class );
@@ -252,7 +252,7 @@ public class TemplateDaoTest
 
         throwDbException();
 
-        templateDAO.removeTemplate( TestUtils.getDefaultTemplate() );
+        templateDAO.removeTemplate( TestUtils.getParentTemplate() );
     }
 
 
