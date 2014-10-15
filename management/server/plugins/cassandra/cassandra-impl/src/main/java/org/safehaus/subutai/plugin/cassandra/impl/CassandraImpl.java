@@ -165,18 +165,6 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    /*public PluginDAO getPluginDAO()
-    {
-        return pluginDAO;
-    }
-
-
-    public void setPluginDAO( final PluginDAO pluginDAO )
-    {
-        this.pluginDAO = pluginDAO;
-    }*/
-
-
     public Commands getCommands()
     {
         return commands;
@@ -185,7 +173,6 @@ public class CassandraImpl implements Cassandra
 
     public void init()
     {
-        //        this.pluginDAO = new PluginDAO( dbManager );
         try
         {
             this.pluginDAO = new PluginDAO( dataSource );
