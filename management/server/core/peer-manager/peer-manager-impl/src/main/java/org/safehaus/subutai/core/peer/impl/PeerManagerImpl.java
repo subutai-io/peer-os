@@ -156,6 +156,13 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public boolean update( final Peer peer )
+    {
+        return peerDAO.saveInfo( SOURCE, peer.getId().toString(), peer );
+    }
+
+
+    @Override
     public UUID getSiteId()
     {
         return UUIDUtil.generateMACBasedUUID();

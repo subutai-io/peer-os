@@ -50,7 +50,7 @@ public class Commands
         return commandRunnerBase.createCommand( "Register node with replica", new RequestBuilder(
                 String.format( "mongo --port %s --eval \"%s\"", dataNodePort,
                         "rs.add('" + secondaryNodeAgent.getHostname() + "." + domainName + ":" + dataNodePort
-                                + "');" ) ).withTimeout( 90 ), Sets.newHashSet( primaryNodeAgent ) );
+                                + "');" ) ).withTimeout( 900 ), Sets.newHashSet( primaryNodeAgent ) );
     }
 
 
@@ -59,7 +59,7 @@ public class Commands
     {
         return commandRunnerBase.createCommand( "Unregister node from replica", new RequestBuilder(
                         String.format( "mongo --port %s --eval \"rs.remove('%s.%s:%s');\"", dataNodePort,
-                                removeNode.getHostname(), domainName, dataNodePort ) ).withTimeout( 30 ),
+                                removeNode.getHostname(), domainName, dataNodePort ) ).withTimeout( 300 ),
                 Sets.newHashSet( primaryNodeAgent ) );
     }
 
