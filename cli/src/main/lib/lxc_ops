@@ -80,9 +80,7 @@ function lxc_assert_no {
     if [ $lxc == "master" ]; then
       unlock_subutai_system
     fi
-    if [ -n $usage  ]; then
-      show_usage "$usage"
-    fi
+    show_usage "$usage"
   else
     msg_info "    - check passed: container \"$lxc\" does NOT exist."
   fi
@@ -429,3 +427,19 @@ function lxc_rename {
   lxc_stop "$dst"
 }
 
+function lxc_remove_agent {
+  container=$1
+  lxc_assert $container
+  lxc-wait -n $container -s RUNNING
+  lxc-attach -n $container -- apt-get purge -y -f subutai-agent > /dev/null 2>&1
+  status=$?
+  message="    - agent removed from \"$container\""
+  if [ "$status" == "0" ]
+  then
+      msg_info "$message"
+  else
+      msg_fail "$message"
+  fi
+
+
+}

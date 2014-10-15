@@ -210,6 +210,32 @@ public class RestServiceImpl implements RestService
     public Response processRegisterRequest( String peer )
     {
         Peer p = GSON.fromJson( peer, Peer.class );
+        peerManager.register( p );
+        return Response.ok( GSON.toJson( p ) ).build();
+    }
+
+
+    @Override
+    public Response unregisterPeer( String peerId )
+    {
+        UUID id = GSON.fromJson( peerId, UUID.class );
+        boolean result = peerManager.unregister( id.toString() );
+        if ( result )
+        {
+            return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+    }
+
+
+    @Override
+    public Response updatePeer( String peer )
+    {
+        Peer p = GSON.fromJson( peer, Peer.class );
+        peerManager.update( p );
         return Response.ok( GSON.toJson( p ) ).build();
     }
 
