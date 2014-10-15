@@ -215,6 +215,30 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response unregisterPeer( String peerId )
+    {
+        boolean result = peerManager.unregister( peerId );
+        if ( result )
+        {
+            return Response.ok( "Successfully unregistered peer: " + peerId ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+    }
+
+
+    @Override
+    public Response updatePeer( String peer )
+    {
+        Peer p = GSON.fromJson( peer, Peer.class );
+        peerManager.update( p );
+        return Response.ok( GSON.toJson( p ) ).build();
+    }
+
+
     private Peer getSamplePeer()
     {
         String localIp = getLocalIp();
