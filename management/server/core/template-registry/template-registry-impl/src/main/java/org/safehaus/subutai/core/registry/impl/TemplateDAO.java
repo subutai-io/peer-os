@@ -12,7 +12,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.util.DbUtil;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,7 +173,7 @@ public class TemplateDAO
         {}.getType();
         try
         {
-            dbUtil.update( "insert into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
+            dbUtil.update( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
                     template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase(),
                     Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
                     template.getParentTemplateName().toLowerCase(), GSON.toJson( template, templateType ) );

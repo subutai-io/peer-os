@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.environment.api.helper.Node;
-import org.safehaus.subutai.core.registry.api.Template;
+import org.safehaus.subutai.common.protocol.Template;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
