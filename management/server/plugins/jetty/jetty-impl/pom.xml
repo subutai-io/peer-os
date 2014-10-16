@@ -11,8 +11,8 @@
 
   <artifactId>jetty-plugin-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Jetty Plugin</name>
-  <description>Subutai Jetty Plugin</description>
+  <name>Subutai Jetty Impl</name>
+  <description>Subutai Jetty Impl</description>
 
   <dependencies>
     <dependency>

@@ -16,11 +16,12 @@ public class JettyConfig implements ConfigBase
 
     public static final String PRODUCT_KEY = "Jetty";
     public static final String PRODUCT_NAME = "Jetty";
-    private String templateName = PRODUCT_NAME;
+    private String templateName = PRODUCT_NAME.toLowerCase();
     private String clusterName = "";
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private int numberOfNodes;
     private Set<Agent> nodes;
+
 
     @Override
     public String getProductKey()
@@ -58,6 +59,7 @@ public class JettyConfig implements ConfigBase
     {
         return PRODUCT_KEY;
     }
+
 
     public Set<Agent> getNodes()
     {
@@ -98,10 +100,9 @@ public class JettyConfig implements ConfigBase
     @Override
     public String toString()
     {
-        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE )
-                .append( "clusterName", clusterName )
-                .append( "domainName", domainName )
-                .append( "numberOfNodes", numberOfNodes )
-                .toString();
+        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE ).append( "clusterName", clusterName )
+                                                                            .append( "domainName", domainName )
+                                                                            .append( "numberOfNodes", numberOfNodes )
+                                                                            .toString();
     }
 }
