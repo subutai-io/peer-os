@@ -82,11 +82,9 @@ public class VerificationStep extends Panel
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
-
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
-
                 UUID trackID = wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ?
                                accumulo.installCluster( wizard.getConfig() ) :
                                accumulo.installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig(),

@@ -3,18 +3,14 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import javax.naming.NamingException;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -30,20 +26,17 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
     private final AccumuloClusterConfig config;
     private HadoopClusterConfig hadoopClusterConfig;
     private ZookeeperClusterConfig zookeeperClusterConfig;
-    private Hadoop hadoop;
 
 
     public InstallOperationHandler( final AccumuloImpl manager, final AccumuloClusterConfig config,
                                     final HadoopClusterConfig hadoopClusterConfig,
-                                    final ZookeeperClusterConfig zookeeperClusterConfig,
-                                    final ServiceLocator serviceLocator ) throws NamingException
+                                    final ZookeeperClusterConfig zookeeperClusterConfig )
     {
         this( manager, config );
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop config is null" );
         Preconditions.checkNotNull( zookeeperClusterConfig, "Zookeeper config is null" );
         this.hadoopClusterConfig = hadoopClusterConfig;
         this.zookeeperClusterConfig = zookeeperClusterConfig;
-        this.hadoop = serviceLocator.getService( Hadoop.class );
     }
 
 
@@ -66,7 +59,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
     @Override
     public void run()
     {
-
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 Strings.isNullOrEmpty( config.getZookeeperClusterName() ) ||
                 Strings.isNullOrEmpty( config.getHadoopClusterName() ) ||
@@ -90,8 +82,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
 
     private void setupOverHadoopNZk()
     {
-        // start hadoop before setting up accumulo
-        startHadoopCluster();
         try
         {
             //setup up Accumulo cluster
@@ -107,13 +97,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
     }
 
-    private void startHadoopCluster(){
-        hadoop.startNameNode( hadoopClusterConfig );
-    }
 
     private void setupWithHadoopNZk()
     {
-
         try
         {
             final String COMBO_TEMPLATE_NAME = "hadoopnzknaccumulo";
