@@ -85,7 +85,9 @@ public class Manager extends BaseManager
 
         //tables go here
         serverTable = createTableTemplate( SERVER_TABLE_CAPTION );
+        serverTable.setId("OozieMngServerTable");
         clientsTable = createTableTemplate( CLIENT_TABLE_CAPTION );
+        clientsTable.setId("OozieMngClientsTable");
 
         /*
         nodesTable = createTableTemplate(NODES_TABLE_CAPTION);
@@ -100,7 +102,7 @@ public class Manager extends BaseManager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("OozieMngClusterCombox");
+        clusterCombo.setId("OozieMngClusterCombo");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -584,7 +586,7 @@ public class Manager extends BaseManager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 Button destroyButton = clickEvent.getButton();
-                enableProgressBar();
+                //enableProgressBar();
                 destroyButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
@@ -599,7 +601,7 @@ public class Manager extends BaseManager
                     {
                         refreshClustersInfo();
                         refreshUI();
-                        disableProgressBar();
+                        //disableProgressBar();
                     }
                 } );
                 contentRoot.getUI().addWindow( window.getWindow() );
