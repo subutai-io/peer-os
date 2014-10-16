@@ -73,7 +73,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<NutchImp
     private boolean uninstall( NutchConfig config )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Lucene..." );
+        po.addLog( "Uninstalling " + NutchConfig.PRODUCT_KEY );
 
         Command cmd = manager.getCommands().getUninstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );

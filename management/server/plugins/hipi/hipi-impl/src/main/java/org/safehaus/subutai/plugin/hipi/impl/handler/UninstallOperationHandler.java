@@ -73,7 +73,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HipiImpl
     private boolean uninstall( HipiConfig config )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Hipi..." );
+        po.addLog( "Uninstalling " + HipiConfig.PRODUCT_KEY );
 
         Command cmd = manager.getCommands().getUninstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );

@@ -107,7 +107,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<NutchImpl>
         if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
         {
             skipInstall = true;
-            po.addLog( "Node already has Lucene installed" );
+            po.addLog( "Node already has " + NutchConfig.PRODUCT_KEY + " installed" );
         }
         else if ( !result.getStdOut().contains( hadoopPack ) )
         {
@@ -117,7 +117,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<NutchImpl>
         //install nutch
         if ( !skipInstall )
         {
-            po.addLog( "Installing Lucene..." );
+            po.addLog( "Installing " + NutchConfig.PRODUCT_KEY );
             Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 

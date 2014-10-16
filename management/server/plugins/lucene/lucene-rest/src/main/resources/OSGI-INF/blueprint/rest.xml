@@ -13,11 +13,11 @@
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
-  <reference id="hipiManager" availability="mandatory" interface="org.safehaus.subutai.plugin.lucene.api.Lucene" />
+  <reference id="luceneManager" availability="mandatory" interface="org.safehaus.subutai.plugin.lucene.api.Lucene" />
 
   <bean id="restService" class="org.safehaus.subutai.plugin.lucene.rest.RestService">
     <property name="agentManager" ref="agentManager" />
-    <property name="hipiManager" ref="hipiManager" />
+    <property name="luceneManager" ref="luceneManager" />
   </bean>
 
   <jaxrs:server address="/lucene" id="luceneRestService">

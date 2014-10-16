@@ -92,14 +92,14 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<HipiIm
     private boolean uninstall( Agent agent )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Hipi..." );
+        po.addLog( "Uninstalling " + HipiConfig.PRODUCT_KEY );
 
         Command cmd = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )
         {
-            po.addLog( "Hipi removed from " + agent.getHostname() );
+            po.addLog( HipiConfig.PRODUCT_KEY + " removed from " + agent.getHostname() );
             return true;
         }
         else

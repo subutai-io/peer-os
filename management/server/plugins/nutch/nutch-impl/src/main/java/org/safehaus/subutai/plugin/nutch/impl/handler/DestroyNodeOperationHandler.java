@@ -93,14 +93,14 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<NutchI
     private boolean uninstall( Agent agent )
     {
         ProductOperation po = productOperation;
-        po.addLog( "Uninstalling Lucene..." );
+        po.addLog( "Uninstalling " + NutchConfig.PRODUCT_KEY );
 
         Command cmd = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )
         {
-            po.addLog( "Lucene removed from " + agent.getHostname() );
+            po.addLog( NutchConfig.PRODUCT_KEY + " removed from " + agent.getHostname() );
             return true;
         }
         else

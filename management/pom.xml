@@ -1330,8 +1330,9 @@
         <artifactId>storm-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- zookeeper -->
 
+
+      <!-- zookeeper -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>zookeeper-plugin-api</artifactId>

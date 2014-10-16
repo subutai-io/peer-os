@@ -107,7 +107,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<HipiImpl>
         if ( result.getStdOut().contains( Commands.PACKAGE_NAME ) )
         {
             skipInstall = true;
-            po.addLog( "Node already has Hipi installed" );
+            po.addLog( "Node already has " + HipiConfig.PRODUCT_KEY + " installed" );
         }
         else if ( !result.getStdOut().contains( hadoopPack ) )
         {
@@ -117,7 +117,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<HipiImpl>
         //install hipi
         if ( !skipInstall )
         {
-            po.addLog( "Installing Hipi..." );
+            po.addLog( "Installing " + HipiConfig.PRODUCT_KEY );
             Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
