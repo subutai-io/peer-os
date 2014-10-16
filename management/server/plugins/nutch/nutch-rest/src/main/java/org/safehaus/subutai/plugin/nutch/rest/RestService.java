@@ -19,6 +19,7 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.nutch.api.Nutch;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
+import org.safehaus.subutai.plugin.nutch.api.SetupType;
 
 
 public class RestService
@@ -74,7 +75,7 @@ public class RestService
 
 
     @POST
-    @Path("clusters/")
+    @Path("clusters/{clusterName}")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response installCluster( @PathParam("clusterName") String clusterName,
                                     @QueryParam("hadoopClusterName") String hadoopClusterName,
@@ -83,6 +84,7 @@ public class RestService
 
         NutchConfig config = new NutchConfig();
         config.setClusterName( clusterName );
+        config.setSetupType( SetupType.OVER_HADOOP );
         config.setHadoopClusterName( hadoopClusterName );
 
 
