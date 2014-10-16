@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -45,8 +44,9 @@ public class PluginDAO
     protected void setupDb() throws SQLException
     {
 
-        String sql1 = "create table if not exists cluster_data (source varchar(100), id uuid, info clob, " +
-                "PRIMARY KEY (source, " + "id));";
+        String sql1 =
+                "create table if not exists cluster_data (source varchar(100), id varchar(100), info clob, " +
+                        "PRIMARY KEY (source, " + "id));";
         dbUtil.update( sql1 );
     }
 
@@ -59,8 +59,8 @@ public class PluginDAO
 
         try
         {
-            dbUtil.update( "merge into cluster_data (source, id, info) values (? , ?, ?)", source,
-                    UUID.fromString( key ), gson.toJson( info ) );
+            dbUtil.update( "merge into cluster_data (source, id, info) values (? , ?, ?)", source, key,
+                    gson.toJson( info ) );
 
             return true;
         }
@@ -129,8 +129,7 @@ public class PluginDAO
         try
         {
 
-            ResultSet rs = dbUtil.select( "select info from cluster_data where source = ? and id = ?", source,
-                    UUID.fromString( key ) );
+            ResultSet rs = dbUtil.select( "select info from cluster_data where source = ? and id = ?", source, key );
             if ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
@@ -166,7 +165,7 @@ public class PluginDAO
 
         try
         {
-            dbUtil.update( "delete from cluster_data where source = ? and id = ?", source, UUID.fromString( key ) );
+            dbUtil.update( "delete from cluster_data where source = ? and id = ?", source, key );
             return true;
         }
         catch ( SQLException e )
