@@ -3,6 +3,8 @@ package org.safehaus.subutai.plugin.jetty.ui.wizard;
 
 import java.util.Arrays;
 
+import org.h2.util.StringUtils;
+
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -42,7 +44,6 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField domainNameTxtFld = new TextField( "Enter domain name" );
-        domainNameTxtFld.setInputPrompt( "Domain name" );
         domainNameTxtFld.setInputPrompt( "intra.lan" );
         domainNameTxtFld.setRequired( true );
         domainNameTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -52,6 +53,38 @@ public class ConfigurationStep extends VerticalLayout
             public void valueChange( Property.ValueChangeEvent event )
             {
                 wizard.getConfig().setDomainName( event.getProperty().getValue().toString().trim() );
+            }
+        } );
+
+        final TextField baseDirectoryText = new TextField( "Enter base directory" );
+        baseDirectoryText.setInputPrompt( wizard.getConfig().getBaseDirectory() );
+        baseDirectoryText.setRequired( true );
+        baseDirectoryText.setValue( wizard.getConfig().getClusterName() );
+        baseDirectoryText.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                wizard.getConfig().setBaseDirectory( event.getProperty().getValue().toString().trim() );
+            }
+        } );
+
+        final TextField portTextField = new TextField( "Enter port" );
+        portTextField.setInputPrompt( ""+wizard.getConfig().getPort() );
+        portTextField.setRequired( true );
+        portTextField.setValue( wizard.getConfig().getClusterName() );
+        portTextField.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                String value = event.getProperty().getValue().toString();
+                if( !StringUtils.isNumber(value)) {
+                    show("Please input numbers");
+                    return;
+                }
+                int port = Integer.valueOf( value );
+                wizard.getConfig().setPort( port );
             }
         } );
 
@@ -118,6 +151,8 @@ public class ConfigurationStep extends VerticalLayout
 
         content.addComponent( clusterNameTxtFld );
         content.addComponent( domainNameTxtFld );
+        content.addComponent( baseDirectoryText );
+        content.addComponent( portTextField );
         content.addComponent( nodesCountCombo );
         content.addComponent( buttons );
 

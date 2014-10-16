@@ -31,11 +31,9 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.api.NodeType;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.jetty.api.Jetty;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.handler.CheckClusterHandler;
-import org.safehaus.subutai.plugin.jetty.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.CheckServiceHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.StartClusterHandler;
@@ -46,7 +44,6 @@ import org.safehaus.subutai.plugin.jetty.impl.handler.UninstallOperationHandler;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 public class JettyImpl implements Jetty
@@ -336,6 +333,7 @@ public class JettyImpl implements Jetty
         return environmentBuildTask;
     }
 
+
     private Set<String> getSetOfAgentsHostName() throws ClusterSetupException
     {
         Set<Agent> agents = agentManager.getPhysicalAgents();
@@ -357,6 +355,7 @@ public class JettyImpl implements Jetty
         }
     }
 
+
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment env, final JettyConfig config,
                                                          final ProductOperation po )
@@ -368,6 +367,6 @@ public class JettyImpl implements Jetty
         }
         config.setNodes( cassNodes );
 
-        return new JettySetupStrategy( this, config,  po);
+        return new JettySetupStrategy( this, config, po );
     }
 }

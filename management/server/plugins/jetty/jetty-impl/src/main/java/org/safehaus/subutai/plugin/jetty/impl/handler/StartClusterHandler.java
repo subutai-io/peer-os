@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.jetty.impl.handler;
 
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
@@ -31,6 +33,7 @@ public class StartClusterHandler extends AbstractOperationHandler<JettyImpl>
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
+
         Command startServiceCommand = manager.getCommands().getStartCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( startServiceCommand );
 
