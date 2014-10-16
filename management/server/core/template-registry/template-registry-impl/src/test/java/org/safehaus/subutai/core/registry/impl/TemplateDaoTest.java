@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -94,7 +96,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullDataSource() throws Exception
     {
         new TemplateDAO( null );
@@ -110,7 +112,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test( expected = DaoException.class )
+    @Test(expected = DaoException.class)
     public void testGetAllTemplatesException() throws Exception
     {
         throwDbException();
@@ -149,7 +151,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test( expected = DaoException.class )
+    @Test(expected = DaoException.class)
     public void testGetChildTemplatesException() throws Exception
     {
         throwDbException();
@@ -188,7 +190,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test( expected = DaoException.class )
+    @Test(expected = DaoException.class)
     public void testGetTemplateByNameException() throws Exception
     {
         throwDbException();
@@ -206,7 +208,7 @@ public class TemplateDaoTest
         ArgumentCaptor<String> sqlCaptor2 = ArgumentCaptor.forClass( String.class );
         ArgumentCaptor<String> sqlCaptor3 = ArgumentCaptor.forClass( String.class );
         ArgumentCaptor<String> sqlCaptor4 = ArgumentCaptor.forClass( String.class );
-        ArgumentCaptor<String> sqlCaptor5 = ArgumentCaptor.forClass( String.class );
+        ArgumentCaptor<StringReader> sqlCaptor5 = ArgumentCaptor.forClass( StringReader.class );
         verify( dbUtil ).update( sqlCaptor.capture(), sqlCaptor2.capture(), sqlCaptor3.capture(), sqlCaptor4.capture(),
                 sqlCaptor5.capture() );
 
@@ -215,7 +217,27 @@ public class TemplateDaoTest
         assertEquals( TestUtils.TEMPLATE_NAME.toLowerCase(), sqlCaptor2.getValue() );
         assertEquals( TestUtils.LXC_ARCH.toLowerCase(), sqlCaptor3.getValue() );
         assertEquals( null, sqlCaptor4.getValue() );
-        assertEquals( JsonUtil.toJson( TestUtils.getParentTemplate() ), sqlCaptor5.getValue() );
+        assertEquals( JsonUtil.toJson( TestUtils.getParentTemplate() ),
+                convertStringReaderToString( sqlCaptor5.getValue() ) );
+    }
+
+
+    private String convertStringReaderToString( StringReader reader ) throws IOException
+    {
+        StringBuilder builder = new StringBuilder();
+        int charsRead = -1;
+        char[] chars = new char[100];
+        do
+        {
+            charsRead = reader.read( chars, 0, chars.length );
+            //if we have valid chars, append them to end of string.
+            if ( charsRead > 0 )
+            {
+                builder.append( chars, 0, charsRead );
+            }
+        }
+        while ( charsRead > 0 );
+        return builder.toString();
     }
 
 
@@ -246,7 +268,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test( expected = DaoException.class )
+    @Test(expected = DaoException.class)
     public void testRemoteTemplateException() throws Exception
     {
 
@@ -271,7 +293,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test( expected = DaoException.class )
+    @Test(expected = DaoException.class)
     public void testSetupDbException() throws Exception
     {
 

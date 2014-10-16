@@ -170,4 +170,24 @@ public class PeerDAO
 
         return false;
     }
+
+
+    public boolean updateInfo( String source, String key, Object info )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkNotNull( info, "Info is null" );
+
+        try
+        {
+            dbUtil.update( "merge into peer (source, id, info) values (?, ? ,?)", source, UUID.fromString( key ),
+                    GSON.toJson( info ) );
+            return true;
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage() );
+        }
+        return false;
+    }
 }

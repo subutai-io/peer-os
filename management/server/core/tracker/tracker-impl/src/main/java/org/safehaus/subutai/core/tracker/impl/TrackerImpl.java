@@ -6,6 +6,7 @@
 package org.safehaus.subutai.core.tracker.impl;
 
 
+import java.io.StringReader;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,8 +63,10 @@ public class TrackerImpl implements Tracker
     protected void setupDb() throws SQLException
     {
 
-        String sql = "create table if not exists product_operation(source varchar(100), id uuid, ts timestamp, "
-                + "info clob, PRIMARY KEY (source, id));";
+        String sql =
+                "SET MAX_LENGTH_INPLACE_LOB 2048; create table if not exists product_operation(source varchar(100), " +
+                        "id uuid, ts timestamp, "
+                        + "info clob, PRIMARY KEY (source, id));";
 
         dbUtil.update( sql );
     }
@@ -89,9 +92,9 @@ public class TrackerImpl implements Tracker
 
             return constructProductOperation( rs );
         }
-        catch ( SQLException | JsonSyntaxException ex )
+        catch ( SQLException | RuntimeException e )
         {
-            LOG.error( "Error in getProductOperation", ex );
+            LOG.error( "Error in getProductOperation", e );
         }
         return null;
     }
@@ -129,7 +132,7 @@ public class TrackerImpl implements Tracker
         try
         {
             dbUtil.update( "merge into product_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
-                    po.getId(), po.createDate(), GSON.toJson( po ) );
+                    po.getId(), po.createDate(), new StringReader( GSON.toJson( po ) ) );
             return true;
         }
         catch ( SQLException e )
