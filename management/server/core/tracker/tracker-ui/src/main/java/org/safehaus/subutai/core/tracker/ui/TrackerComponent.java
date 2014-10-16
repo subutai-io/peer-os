@@ -56,8 +56,8 @@ public class TrackerComponent extends CustomComponent
     private Date fromDateValue, toDateValue;
     private volatile UUID trackID;
     private volatile boolean track = false;
+    private volatile String source;
     private List<ProductOperationView> currentOperations = new ArrayList<>();
-    private String source;
     private int limit = 10;
 
 
@@ -244,7 +244,7 @@ public class TrackerComponent extends CustomComponent
                 @Override
                 public void run()
                 {
-                    while ( track )
+                    while ( isTrack() )
                     {
                         try
                         {
@@ -421,6 +421,14 @@ public class TrackerComponent extends CustomComponent
     {
         super.detach();
         stopTracking();
+    }
+
+
+    @Override
+    public void attach()
+    {
+        super.attach();
+        startTracking();
     }
 
 

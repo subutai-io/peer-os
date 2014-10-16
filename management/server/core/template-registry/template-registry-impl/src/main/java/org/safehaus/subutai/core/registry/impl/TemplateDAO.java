@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.registry.impl;
 
 
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.sql.Clob;
 import java.sql.ResultSet;
@@ -11,8 +12,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.util.DbUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +177,8 @@ public class TemplateDAO
             dbUtil.update( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",
                     template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase(),
                     Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
-                    template.getParentTemplateName().toLowerCase(), GSON.toJson( template, templateType ) );
+                    template.getParentTemplateName().toLowerCase(),
+                    new StringReader( GSON.toJson( template, templateType ) ) );
         }
         catch ( SQLException e )
         {
