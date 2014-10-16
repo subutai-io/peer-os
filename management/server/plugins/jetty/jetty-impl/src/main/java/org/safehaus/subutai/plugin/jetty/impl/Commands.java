@@ -6,14 +6,10 @@
 package org.safehaus.subutai.plugin.jetty.impl;
 
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -48,50 +44,26 @@ public class Commands
     }
 
 
+    public Command getCheckInstalledCommand( Set<Agent> agents )
+    {
+        return commandRunner.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+    }
+
+
     public Command getStartCommand( Set<Agent> agents )
     {
-        return commandRunner.createCommand( new RequestBuilder( "service cassandra start" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service jetty start" ), agents );
     }
 
 
     public Command getStopCommand( Set<Agent> agents )
     {
-        return commandRunner.createCommand( new RequestBuilder( "service cassandra stop" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service jetty stop" ), agents );
     }
 
 
     public Command getStatusCommand( Set<Agent> agents )
     {
-        return commandRunner.createCommand( new RequestBuilder( "service cassandra status" ), agents );
-    }
-
-
-    public Command getStatusCommand( Agent agent )
-    {
-        return commandRunner
-                .createCommand( new RequestBuilder( "/etc/init.d/cassandra status" ), Sets.newHashSet( agent ) );
-    }
-
-
-    public Command getConfigureCommand( Set<Agent> agents, String param )
-    {
-
-        return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s", param ) ),
-                agents );
-    }
-
-
-    public Command getConfigureRpcAndListenAddressesCommand( Set<Agent> agents, String param )
-    {
-        Set<AgentRequestBuilder> sarb = new HashSet<AgentRequestBuilder>();
-        for ( Agent agent : agents )
-        {
-            AgentRequestBuilder arb = new AgentRequestBuilder( agent,
-                    String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s", param,
-                            AgentUtil.getAgentIpByMask( agent, Common.IP_MASK ) ) );
-            sarb.add( arb );
-        }
-        return commandRunner.createCommand( sarb );
+        return commandRunner.createCommand( new RequestBuilder( "service jetty status" ), agents );
     }
 }

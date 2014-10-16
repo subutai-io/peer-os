@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.cassandra.ui.wizard;
+package org.safehaus.subutai.plugin.jetty.ui.wizard;
 
 
 import java.util.Arrays;
@@ -55,44 +55,7 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        final TextField dataDirectoryTxtFld = new TextField( "Data directory" );
-        dataDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/data" );
-        dataDirectoryTxtFld.setRequired( true );
-        dataDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
-        dataDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                wizard.getConfig().setDataDirectory( event.getProperty().getValue().toString().trim() );
-            }
-        } );
 
-        final TextField commitLogDirectoryTxtFld = new TextField( "Commit log directory" );
-        commitLogDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/commitlog" );
-        commitLogDirectoryTxtFld.setRequired( true );
-        commitLogDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
-        commitLogDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                wizard.getConfig().setCommitLogDirectory( event.getProperty().getValue().toString().trim() );
-            }
-        } );
-
-        final TextField savedCachesDirectoryTxtFld = new TextField( "Saved caches directory" );
-        savedCachesDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/saved_caches" );
-        savedCachesDirectoryTxtFld.setRequired( true );
-        savedCachesDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
-        savedCachesDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                wizard.getConfig().setSavedCachesDirectory( event.getProperty().getValue().toString().trim() );
-            }
-        } );
 
         final ComboBox nodesCountCombo =
                 new ComboBox( "Choose number of nodes in cluster", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
@@ -110,21 +73,6 @@ public class ConfigurationStep extends VerticalLayout
             }
         } );
 
-        final ComboBox seedsCountCombo =
-                new ComboBox( "Choose number of seeds", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        seedsCountCombo.setImmediate( true );
-        seedsCountCombo.setImmediate( true );
-        seedsCountCombo.setNullSelectionAllowed( false );
-        seedsCountCombo.setValue( wizard.getConfig() );
-
-        seedsCountCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                wizard.getConfig().setNumberOfSeeds( ( Integer ) event.getProperty().getValue() );
-            }
-        } );
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
@@ -140,14 +88,6 @@ public class ConfigurationStep extends VerticalLayout
                 else if ( Strings.isNullOrEmpty( wizard.getConfig().getDomainName() ) )
                 {
                     show( "Please provide domain name !" );
-                }
-                else if ( nodesCountCombo.getValue() == null || seedsCountCombo.getValue() == null )
-                {
-                    show( "Please provide number of nodes and seeds !" );
-                }
-                else if ( ( int ) nodesCountCombo.getValue() <= ( int ) seedsCountCombo.getValue() )
-                {
-                    show( "Number of seeds should be smaller than total number nodes in the cluster !" );
                 }
                 else
                 {
@@ -178,11 +118,7 @@ public class ConfigurationStep extends VerticalLayout
 
         content.addComponent( clusterNameTxtFld );
         content.addComponent( domainNameTxtFld );
-        content.addComponent( dataDirectoryTxtFld );
-        content.addComponent( commitLogDirectoryTxtFld );
-        content.addComponent( savedCachesDirectoryTxtFld );
         content.addComponent( nodesCountCombo );
-        content.addComponent( seedsCountCombo );
         content.addComponent( buttons );
 
         addComponent( layout );

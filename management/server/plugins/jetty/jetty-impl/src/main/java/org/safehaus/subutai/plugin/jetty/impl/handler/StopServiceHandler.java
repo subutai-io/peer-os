@@ -31,8 +31,8 @@ public class StopServiceHandler extends AbstractOperationHandler<JettyImpl>
     @Override
     public void run()
     {
-        JettyConfig cassandraConfig = manager.getCluster( clusterName );
-        if ( cassandraConfig == null )
+        JettyConfig jettyConfig = manager.getCluster( clusterName );
+        if ( jettyConfig == null )
         {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
@@ -44,7 +44,7 @@ public class StopServiceHandler extends AbstractOperationHandler<JettyImpl>
             productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) )
+        if ( !jettyConfig.getNodes().contains( node ) )
         {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );

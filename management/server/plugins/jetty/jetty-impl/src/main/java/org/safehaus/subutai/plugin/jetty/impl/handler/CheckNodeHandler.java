@@ -28,7 +28,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<JettyImpl>
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation( JettyConfig.PRODUCT_KEY,
-                String.format( "Checking cassandra on %s of %s cluster...", lxcHostname, clusterName ) );
+                String.format( "Checking jetty on %s of %s cluster...", lxcHostname, clusterName ) );
     }
 
 
@@ -60,7 +60,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<JettyImpl>
 
         if ( statusServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Cassandra is running" );
+            productOperation.addLogDone( "Jetty is running" );
         }
         else
         {
@@ -80,11 +80,11 @@ public class CheckNodeHandler extends AbstractOperationHandler<JettyImpl>
             String status = "UNKNOWN";
             if ( e.getValue().getExitCode() == 0 )
             {
-                status = "Cassandra is running";
+                status = "Jetty is running";
             }
             else if ( e.getValue().getExitCode() == 768 )
             {
-                status = "Cassandra is not running";
+                status = "Jetty is not running";
             }
 
             log.append( String.format( "%s", status ) );

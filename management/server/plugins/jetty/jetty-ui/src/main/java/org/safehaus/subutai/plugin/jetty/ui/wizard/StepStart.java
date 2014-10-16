@@ -1,8 +1,8 @@
-package org.safehaus.subutai.plugin.cassandra.ui.wizard;
+package org.safehaus.subutai.plugin.jetty.ui.wizard;
 
 
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.plugin.cassandra.ui.CassandraPortalModule;
+import org.safehaus.subutai.plugin.jetty.ui.JettyPortalModule;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -23,13 +23,13 @@ public class StepStart extends VerticalLayout
         GridLayout gridLayout = new GridLayout( 10, 6 );
         gridLayout.setSizeFull();
 
-        Label welcomeMsg = new Label( "<center><h2>Welcome to Cassandra Installation Wizard!</h2></center>" );
+        Label welcomeMsg = new Label( "<center><h2>Welcome to Jetty Installation Wizard!</h2></center>" );
         welcomeMsg.addStyleName( "h2" );
         welcomeMsg.setContentMode( ContentMode.HTML );
         gridLayout.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
         Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( CassandraPortalModule.MODULE_IMAGE, this ) ) );
+        logoImg.setIcon( new FileResource( FileUtil.getFile( JettyPortalModule.MODULE_IMAGE, this ) ) );
         logoImg.setContentMode( ContentMode.HTML );
         logoImg.setHeight( 150, Unit.PIXELS );
         logoImg.setWidth( 220, Unit.PIXELS );

@@ -31,6 +31,6 @@
 
   </bean>
 
-  <service ref="jetty-impl" interface="org.safehaus.subutai.plugin.cassandra.api.Jetty" />
+  <service ref="jetty-impl" interface="org.safehaus.subutai.plugin.jetty.api.Jetty" />
 
 </blueprint>

@@ -68,11 +68,11 @@ public class CheckClusterHandler extends AbstractOperationHandler<JettyImpl>
             String status = "UNKNOWN";
             if ( e.getValue().getExitCode() == 0 )
             {
-                status = "Cassandra is running";
+                status = "Jetty is running";
             }
             else if ( e.getValue().getExitCode() == 768 )
             {
-                status = "Cassandra is not running";
+                status = "Jetty is not running";
             }
 
             log.append( String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status ) );

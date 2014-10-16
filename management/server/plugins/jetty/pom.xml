@@ -18,7 +18,6 @@
     <module>jetty-api</module>
     <module>jetty-impl</module>
     <module>jetty-ui</module>
-    <module>jetty-cli</module>
     <module>jetty-rest</module>
   </modules>
 </project>

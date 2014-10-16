@@ -1,12 +1,16 @@
 package org.safehaus.subutai.plugin.jetty.impl;
 
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
@@ -22,9 +26,12 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.api.NodeType;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.jetty.api.Jetty;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.handler.CheckClusterHandler;
@@ -294,5 +301,73 @@ public class JettyImpl implements Jetty
         AbstractOperationHandler operationHandler = new CheckServiceHandler( this, clusterName, lxchostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final JettyConfig config ) throws ClusterSetupException
+    {
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint
+                .setName( String.format( "%s-%s", JettyConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
+        environmentBlueprint.setLinkHosts( true );
+        environmentBlueprint.setExchangeSshKeys( true );
+        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+
+
+        Set<NodeGroup> nodeGroups = new HashSet<>();
+
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setName( NodeType.SLAVE_NODE.name() );
+        nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+
+        nodeGroups.add( nodeGroup );
+
+        environmentBlueprint.setNodeGroups( nodeGroups );
+
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+        environmentBuildTask.setPhysicalNodes( getSetOfAgentsHostName() );
+
+
+        return environmentBuildTask;
+    }
+
+    private Set<String> getSetOfAgentsHostName() throws ClusterSetupException
+    {
+        Set<Agent> agents = agentManager.getPhysicalAgents();
+
+        if ( agents != null && !agents.isEmpty() )
+        {
+            Set<String> hostNames = new HashSet<>( agents.size() );
+
+            for ( Agent agent : agents )
+            {
+                hostNames.add( agent.getHostname() );
+            }
+
+            return hostNames;
+        }
+        else
+        {
+            throw new ClusterSetupException( "No physical machines available" );
+        }
+    }
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment env, final JettyConfig config,
+                                                         final ProductOperation po )
+    {
+        Set<Agent> cassNodes = new HashSet<Agent>();
+        for ( Node node : env.getNodes() )
+        {
+            cassNodes.add( node.getAgent() );
+        }
+        config.setNodes( cassNodes );
+
+        return new JettySetupStrategy( this, config,  po);
     }
 }

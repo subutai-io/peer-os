@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.cassandra.ui.wizard;
+package org.safehaus.subutai.plugin.jetty.ui.wizard;
 
 
 import java.util.concurrent.ExecutorService;
@@ -7,8 +7,8 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.jetty.api.Jetty;
+import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -22,16 +22,16 @@ public class Wizard
     private final VerticalLayout verticalLayout;
     private final ExecutorService executorService;
     private final Tracker tracker;
-    private final Cassandra cassandra;
+    private final Jetty jetty;
     GridLayout grid;
     private int step = 1;
-    private CassandraClusterConfig config = new CassandraClusterConfig();
+    private JettyConfig config = new JettyConfig();
 
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
 
-        this.cassandra = serviceLocator.getService( Cassandra.class );
+        this.jetty = serviceLocator.getService( Jetty.class );
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
 
@@ -64,7 +64,7 @@ public class Wizard
             }
             case 3:
             {
-                verticalLayout.addComponent( new VerificationStep( cassandra, executorService, tracker, this ) );
+                verticalLayout.addComponent( new VerificationStep( jetty, executorService, tracker, this ) );
                 break;
             }
             default:
@@ -104,7 +104,7 @@ public class Wizard
     }
 
 
-    public CassandraClusterConfig getConfig()
+    public JettyConfig getConfig()
     {
         return config;
     }
@@ -113,7 +113,7 @@ public class Wizard
     public void init()
     {
         step = 1;
-        config = new CassandraClusterConfig();
+        config = new JettyConfig();
         putForm();
     }
 }

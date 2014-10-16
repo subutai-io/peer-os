@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.cassandra.ui.wizard;
+package org.safehaus.subutai.plugin.jetty.ui.wizard;
 
 
 import com.vaadin.data.Item;

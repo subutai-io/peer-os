@@ -482,39 +482,6 @@ public class Manager
 
     public void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button... buttons )
     {
-        getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
-                PROGRESS_ICON.setVisible( true );
-                disableButtons( buttons );
-                executorService.execute(
-                        new CheckTask( jetty, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
-                                {
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( result.contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
-                                    }
-                                } ) );
-            }
-        } );
     }
 
 

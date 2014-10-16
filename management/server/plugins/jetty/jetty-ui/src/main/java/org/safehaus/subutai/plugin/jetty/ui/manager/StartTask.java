@@ -19,10 +19,10 @@ public class StartTask implements Runnable
     private Tracker tracker;
 
 
-    public StartTask( Jetty cassandra, Tracker tracker, String clusterName, String lxcHostname,
+    public StartTask( Jetty jetty, Tracker tracker, String clusterName, String lxcHostname,
                       CompleteEvent completeEvent )
     {
-        this.jetty = cassandra;
+        this.jetty = jetty;
         this.tracker = tracker;
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;

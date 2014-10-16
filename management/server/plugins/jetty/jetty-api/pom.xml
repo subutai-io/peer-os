@@ -38,7 +38,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.plugin.cassandra.api</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.plugin.jetty.api</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>
