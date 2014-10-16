@@ -47,6 +47,7 @@ public class FlumeComponent extends CustomComponent
                 if ( caption.equals( "Manage" ) )
                 {
                     manager.refreshClustersInfo();
+                    manager.checkAllNodes();
                 }
             }
         } );

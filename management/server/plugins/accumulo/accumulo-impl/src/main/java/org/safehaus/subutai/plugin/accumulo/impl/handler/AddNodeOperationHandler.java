@@ -13,7 +13,6 @@ import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.ClusterConfiguration;
-import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 

@@ -194,6 +194,7 @@ public class AccumuloImpl implements Accumulo
         AbstractOperationHandler operationHandler =
                 new InstallOperationHandler( this, accumuloClusterConfig, hadoopClusterConfig, zookeeperClusterConfig );
 
+
         executor.execute( operationHandler );
 
         return operationHandler.getTrackerId();

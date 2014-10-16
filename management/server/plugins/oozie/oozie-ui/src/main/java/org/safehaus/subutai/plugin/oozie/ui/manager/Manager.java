@@ -243,7 +243,7 @@ public class Manager extends BaseManager
                             }
                             else
                             {
-                                show( "All nodes in corresponding Hadoop cluster have Presto installed" );
+                                show( "All nodes in corresponding Hadoop cluster have Oozie installed" );
                             }
                         }
                         else

@@ -28,6 +28,8 @@ public class Commands
                     s += " &"; // TODO:
                 }
                 return s;
+            case SERVICE_STATUS:
+                return "ps axu | grep [f]lume";
             default:
                 throw new AssertionError( type.name() );
         }
