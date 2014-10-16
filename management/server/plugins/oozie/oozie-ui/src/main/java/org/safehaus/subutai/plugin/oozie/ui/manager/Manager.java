@@ -445,9 +445,9 @@ public class Manager extends BaseManager
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
         checkButton.setId(agent.getListIP().get(0) + "-oozieCheck");
         final Button startButton = new Button( START_BUTTON_CAPTION );
-        startButton.setId(agent.getListIP().get(0) + "-oozieMulti");
+        startButton.setId(agent.getListIP().get(0) + "-oozieStart");
         final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-        stopButton.setId(agent.getListIP().get(0) + "-oozieMulti");
+        stopButton.setId(agent.getListIP().get(0) + "-oozieStop");
 
         checkButton.addStyleName( "default" );
         startButton.addStyleName( "default" );
@@ -466,7 +466,7 @@ public class Manager extends BaseManager
         statusGroup.addComponent( statusLabel );
 
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(), statusGroup, availableOperations
+                agent.getHostname(), agent.getListIP().get(0).toString(), statusGroup, availableOperations
         }, null );
 
         Item row = getAgentRow( table, agent );
@@ -496,7 +496,7 @@ public class Manager extends BaseManager
         availableOperations.addComponent( destroyButton );
 
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(),statusLayout, availableOperations
+                agent.getHostname(), agent.getListIP().get(0).toString(),statusLayout, availableOperations
         }, null );
 
         Item row = getAgentRow( table, agent );
