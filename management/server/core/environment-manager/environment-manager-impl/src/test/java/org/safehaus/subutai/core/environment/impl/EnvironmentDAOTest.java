@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.impl.dao;
+package org.safehaus.subutai.core.environment.impl;
 
 
 import javax.sql.DataSource;
@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 
 import static org.junit.Assert.assertTrue;
 

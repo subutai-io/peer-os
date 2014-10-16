@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.impl.builder;
+package org.safehaus.subutai.core.environment.impl;
 
 
 import org.junit.Before;
@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
