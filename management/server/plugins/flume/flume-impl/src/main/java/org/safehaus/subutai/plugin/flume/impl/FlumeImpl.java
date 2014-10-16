@@ -23,6 +23,7 @@ import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.flume.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.flume.impl.handler.InstallHandler;
+import org.safehaus.subutai.plugin.flume.impl.handler.ServiceStatusHandler;
 import org.safehaus.subutai.plugin.flume.impl.handler.StartHandler;
 import org.safehaus.subutai.plugin.flume.impl.handler.StatusHandler;
 import org.safehaus.subutai.plugin.flume.impl.handler.StopHandler;
@@ -227,6 +228,15 @@ public class FlumeImpl implements Flume
         AbstractOperationHandler h = new StatusHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
+    }
+
+    @Override
+    public UUID checkServiceStatus( final String clusterName, final String hostname )
+    {
+        AbstractOperationHandler h = new ServiceStatusHandler( this, clusterName, hostname );
+        executor.execute( h );
+        return h.getTrackerId();
+
     }
 
 
