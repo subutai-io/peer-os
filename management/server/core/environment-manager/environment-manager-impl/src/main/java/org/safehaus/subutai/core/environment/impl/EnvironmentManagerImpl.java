@@ -325,7 +325,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     ccm.addTemplate( t );
                 }
                 //
+
+                LOG.info( String.format("Creating containers on %s", ccm.getPeerId()) );
                 peerCommandDispatcher.invoke( ccm, timeout );
+                LOG.info( String.format("Finished cloning containers on %s", ccm.getPeerId()) );
 
                 boolean result = ccm.isSuccess();
                 if ( result )
