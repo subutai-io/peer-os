@@ -20,6 +20,8 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseType;
@@ -74,6 +76,7 @@ public class Manager
     private final ComboBox clusterCombo;
     private final ExecutorService executor;
     private final HBase hbase;
+    private final Hadoop hadoop;
     private final Tracker tracker;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
@@ -92,6 +95,7 @@ public class Manager
         Preconditions.checkNotNull( serviceLocator, "Service Locator is null" );
 
         this.hbase = serviceLocator.getService( HBase.class );
+        this.hadoop = serviceLocator.getService( Hadoop.class );
         this.tracker = serviceLocator.getService( Tracker.class );
         this.agentManager = serviceLocator.getService( AgentManager.class );
         this.commandRunner = serviceLocator.getService( CommandRunner.class );
@@ -291,7 +295,7 @@ public class Manager
     }
 
 
-    public void stopAllNodes()
+    private void stopAllNodes()
     {
         PROGRESS_ICON.setVisible( true );
         disableOREnableAllButtonsOnTable( nodesTable, false );
@@ -310,9 +314,10 @@ public class Manager
     }
 
 
-    public void startAllNodes()
+    private void startAllNodes()
     {
         PROGRESS_ICON.setVisible( true );
+        startHadoopCluster();
         disableOREnableAllButtonsOnTable( nodesTable, false );
         executor.execute( new StartTask( hbase, tracker, config.getClusterName(), new CompleteEvent()
         {
@@ -329,7 +334,12 @@ public class Manager
     }
 
 
-    public void disableOREnableAllButtonsOnTable( Table table, boolean value )
+    private void startHadoopCluster(){
+        HadoopClusterConfig hadoopClusterConfig = hadoop.getCluster( config.getHadoopClusterName() );
+        hadoop.startNameNode( hadoopClusterConfig );
+    }
+
+    private void disableOREnableAllButtonsOnTable( Table table, boolean value )
     {
         if ( table != null )
         {

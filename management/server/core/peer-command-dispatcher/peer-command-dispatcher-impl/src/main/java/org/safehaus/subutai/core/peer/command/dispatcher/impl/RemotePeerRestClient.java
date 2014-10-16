@@ -27,7 +27,7 @@ public class RemotePeerRestClient
 
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerRestClient.class.getName() );
     private static final long RECEIVE_TIMEOUT = 1000 * 60 * 5;
-    private static final long CONNECTION_TIMEOUT = 1000 * 60 * 5;
+    private static final long CONNECTION_TIMEOUT = 1000 * 60 * 1;
     private final long receiveTimeout;
     private final long connectionTimeout;
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -43,8 +43,8 @@ public class RemotePeerRestClient
 
     public RemotePeerRestClient( long timeout )
     {
-        this.connectionTimeout = 1000 * 60; // 15 sec
-        this.receiveTimeout = timeout - this.connectionTimeout;
+        this.connectionTimeout = CONNECTION_TIMEOUT;
+        this.receiveTimeout = timeout;
     }
 
 
