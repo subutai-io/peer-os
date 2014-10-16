@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
-import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -59,7 +58,8 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
         {
             productOperation.addLog( "Property removed successfully\nRestarting cluster..." );
 
-            Command restartClusterCommand = manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
+            Command restartClusterCommand =
+                    manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {

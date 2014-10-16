@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
-import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 
 
 /**
@@ -51,7 +50,7 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Accum
 
         productOperation.addLog( "Starting cluster..." );
 
-        Command startCommand =manager.getCommands().getStartCommand( accumuloClusterConfig.getMasterNode() );
+        Command startCommand = manager.getCommands().getStartCommand( accumuloClusterConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( startCommand );
 
         if ( startCommand.hasSucceeded() )

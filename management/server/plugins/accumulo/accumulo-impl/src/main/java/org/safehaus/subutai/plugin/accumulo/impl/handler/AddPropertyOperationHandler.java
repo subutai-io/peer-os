@@ -7,7 +7,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
-import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -55,15 +54,16 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
 
         productOperation.addLog( "Adding property..." );
 
-        Command addPropertyCommand =
-                manager.getCommands().getAddPropertyCommand( propertyName, propertyValue, accumuloClusterConfig.getAllNodes() );
+        Command addPropertyCommand = manager.getCommands().getAddPropertyCommand( propertyName, propertyValue,
+                accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( addPropertyCommand );
 
         if ( addPropertyCommand.hasSucceeded() )
         {
             productOperation.addLog( "Property added successfully\nRestarting cluster..." );
 
-            Command restartClusterCommand = manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
+            Command restartClusterCommand =
+                    manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {

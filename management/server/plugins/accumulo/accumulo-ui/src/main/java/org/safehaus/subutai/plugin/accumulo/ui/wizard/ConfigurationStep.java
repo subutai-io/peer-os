@@ -40,9 +40,6 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 
 
-/**
- * @author dilshat
- */
 public class ConfigurationStep extends Panel
 {
     private Property.ValueChangeListener masterNodeComboChangeListener;
@@ -789,6 +786,7 @@ public class ConfigurationStep extends Panel
         return twinColSelect;
     }
 
+
     public static TextField getTextField( String caption, String prompt, int maxLength )
     {
         TextField textField = new TextField( caption );
@@ -797,6 +795,7 @@ public class ConfigurationStep extends Panel
         textField.setRequired( true );
         return textField;
     }
+
 
     private void setComboDS( ComboBox target, List<Agent> agents )
     {
