@@ -246,14 +246,14 @@ public class TemplateRegistryComponent extends CustomComponent
         packagesInstalled.setValue( products.toString() );
         packagesInstalled.setReadOnly( true );
 
-        String packages = "";
+        StringBuilder packages = new StringBuilder();
         Set<String> diff = registryManager.getPackagesDiff( template );
         for ( String templatePackage : diff )
         {
-            packages += templatePackage + "\n";
+            packages.append( templatePackage ).append( "\n" );
         }
         packagesChanged.setReadOnly( false );
-        packagesChanged.setValue( packages );
+        packagesChanged.setValue( packages.toString() );
         packagesChanged.setReadOnly( true );
     }
 
