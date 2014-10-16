@@ -36,7 +36,7 @@ public class Commands
     public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 360 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 600 )
                                                                                               .withStdOutRedirection(
                                                                                                       OutputRedirection.NO ),
                 agents );

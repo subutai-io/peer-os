@@ -423,7 +423,7 @@ public class Manager
             }
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ),checkNodeRole(agent), availableOperations
             }, null );
 
             addClickListenerToCheckButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
