@@ -171,7 +171,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyClusterButton()
+    private void addClickListenerToDestroyClusterButton()
     {
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -217,7 +217,7 @@ public class Manager
     }
 
 
-    public void addClickListener( Button button )
+    private void addClickListener( Button button )
     {
         if ( button.getCaption().equals( REFRESH_CLUSTERS_CAPTION ) )
         {
@@ -289,7 +289,7 @@ public class Manager
     }
 
 
-    public void addStyleNameToButtons( Button... buttons )
+    private void addStyleNameToButtons( Button... buttons )
     {
         for ( Button b : buttons )
         {
@@ -298,7 +298,7 @@ public class Manager
     }
 
 
-    public void disableOREnableAllButtonsOnTable( Table table, boolean value )
+    private void disableOREnableAllButtonsOnTable( Table table, boolean value )
     {
         if ( table != null )
         {
@@ -425,7 +425,7 @@ public class Manager
     }
 
 
-    public Button getButton( String caption, Button... buttons )
+    private Button getButton( String caption, Button... buttons )
     {
         for ( Button b : buttons )
         {
@@ -438,7 +438,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    private void addClickListenerToStopButton( final Agent agent, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -465,7 +465,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    private void addClickListenerToStartButton( final Agent agent, final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -493,7 +493,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button... buttons )
+    private void addClickListenerToCheckButton( final Agent agent, final Label resultHolder, final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -531,7 +531,7 @@ public class Manager
     }
 
 
-    public void addGivenComponents( HorizontalLayout layout, Button... buttons )
+    private void addGivenComponents( HorizontalLayout layout, Button... buttons )
     {
         for ( Button b : buttons )
         {
@@ -540,7 +540,7 @@ public class Manager
     }
 
 
-    public void disableButtons( Button... buttons )
+    private void disableButtons( Button... buttons )
     {
         for ( Button b : buttons )
         {
@@ -549,7 +549,7 @@ public class Manager
     }
 
 
-    public void enableButtons( Button... buttons )
+    private void enableButtons( Button... buttons )
     {
         for ( Button b : buttons )
         {
@@ -558,7 +558,7 @@ public class Manager
     }
 
 
-    public void stopAllNodes()
+    private void stopAllNodes()
     {
         for ( Agent agent : config.getNodes() )
         {
@@ -581,7 +581,7 @@ public class Manager
     }
 
 
-    public void startAllNodes()
+    private void startAllNodes()
     {
         for ( Agent agent : config.getNodes() )
         {

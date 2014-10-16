@@ -36,7 +36,7 @@ public class Commands
     public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 360 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 600 )
                                                                                               .withStdOutRedirection(
                                                                                                       OutputRedirection.NO ),
                 agents );
@@ -146,8 +146,8 @@ public class Commands
     public Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s",
-                                slaveNode.getHostname() ) ), nodes );
+                String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s", slaveNode.getHostname() ) ),
+                nodes );
     }
 
 
@@ -170,8 +170,8 @@ public class Commands
     public Command getAddPropertyCommand( String propertyName, String propertyValue, Set<Agent> agents )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName,
-                                propertyValue ) ), agents );
+                String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName, propertyValue ) ),
+                agents );
     }
 
 
