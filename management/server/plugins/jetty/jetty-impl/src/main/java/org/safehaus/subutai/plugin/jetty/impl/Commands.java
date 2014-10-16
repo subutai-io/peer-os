@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 
 public class Commands
 {
+    private final int STOP_TIMEOUT = 60*1000;
     private final CommandRunnerBase commandRunner;
 
 
@@ -70,7 +71,7 @@ public class Commands
 
     public Command getStopCommand( Set<Agent> agents )
     {
-        return commandRunner.createCommand( new RequestBuilder( "service jetty stop" ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "service jetty stop" ).withTimeout( STOP_TIMEOUT ), agents );
     }
 
 

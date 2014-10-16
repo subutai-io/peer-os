@@ -57,7 +57,7 @@ public class CheckServiceHandler extends AbstractOperationHandler<JettyImpl>
         if ( statusServiceCommand.hasSucceeded() )
         {
             AgentResult ar = statusServiceCommand.getResults().get( agent.getUuid() );
-            if ( ar.getStdOut().contains( "is running" ) )
+            if ( ar.getStdOut().contains( "running" ) )
             {
                 productOperation.addLogDone( "Jetty is running" );
             }
