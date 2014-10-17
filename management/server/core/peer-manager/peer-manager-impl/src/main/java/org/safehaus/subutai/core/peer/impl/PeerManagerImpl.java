@@ -461,6 +461,7 @@ public class PeerManagerImpl implements PeerManager
     {
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
         {
+            template.getFaisUsingThisTemplate().clear();
             templateRegistry.registerTemplate( template );
         }
     }
