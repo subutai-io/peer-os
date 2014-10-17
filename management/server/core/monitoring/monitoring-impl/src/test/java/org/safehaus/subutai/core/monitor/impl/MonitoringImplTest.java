@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.monitor.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.RestUtil;
 
 
 /**
@@ -11,16 +12,46 @@ import org.safehaus.subutai.common.util.FileUtil;
  */
 public class MonitoringImplTest
 {
+    private static final String HOST = "host";
+    private static final int PORT = 9200;
+    private static final String RESPONSE =
+            FileUtil.getContent( "elasticsearch/test_response.json", MonitoringImpl.class );
+    private MonitoringImplExt monitoring;
 
-    private static final String DEFAULT_QUERY =
-            FileUtil.getContent( "elasticsearch/query_default.json", MonitoringImpl.class );
-    private MonitoringImpl monitoring;
+
+    class MonitoringImplExt extends MonitoringImpl
+    {
+        MonitoringImplExt( final String esHost, final int esPort )
+        {
+            super( esHost, esPort );
+        }
+
+
+        public void setRestUtil( RestUtil restUtil )
+        {
+            this.restUtil = restUtil;
+        }
+    }
 
 
     @Before
     public void setUp()
     {
-        monitoring = new MonitoringImpl( "172.16.131.203", 9200 );
+        monitoring = new MonitoringImplExt( HOST, PORT );
+    }
+
+
+    @Test( expected = IllegalArgumentException.class )
+    public void testConstructorShouldFailOnNullHost() throws Exception
+    {
+        new MonitoringImpl( null, PORT );
+    }
+
+
+    @Test( expected = IllegalArgumentException.class )
+    public void testConstructorShouldFailOnInvalidPort() throws Exception
+    {
+        new MonitoringImpl( HOST, -1 );
     }
 
 

@@ -45,7 +45,7 @@ public class MonitoringImpl implements Monitoring
     private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
     private final String esHost;
     private final int esPort;
-    private final RestUtil restUtil;
+    protected RestUtil restUtil;
 
 
     public MonitoringImpl( final String esHost, final int esPort )
