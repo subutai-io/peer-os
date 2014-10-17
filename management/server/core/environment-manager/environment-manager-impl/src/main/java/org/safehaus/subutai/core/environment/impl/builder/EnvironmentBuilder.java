@@ -122,7 +122,7 @@ public class EnvironmentBuilder
             {
 
                 //destroy lxcs here
-                Set<EnvironmentContainer> alreadyBuiltEnvironmentContainers = environment.getEnvironmentContainerNodes();
+                Set<EnvironmentContainer> alreadyBuiltEnvironmentContainers = environment.getContainers();
 
                 if ( alreadyBuiltEnvironmentContainers != null && !alreadyBuiltEnvironmentContainers.isEmpty() )
                 {
@@ -146,11 +146,11 @@ public class EnvironmentBuilder
                 throw new EnvironmentBuildException( ex.toString() );
             }
 
-            environment.getEnvironmentContainerNodes().addAll( environmentContainers );
+            environment.getContainers().addAll( environmentContainers );
         }
 
         List<Agent> allAgents = new ArrayList<>();
-        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             allAgents.add( environmentContainer.getAgent() );
         }
@@ -185,7 +185,7 @@ public class EnvironmentBuilder
             environmentContainers.add( environmentContainer );
         }
 
-        environment.setEnvironmentContainerNodes( environmentContainers );
+        environment.setContainers( environmentContainers );
         return environment;
     }
 }

@@ -18,14 +18,12 @@ public class Environment
 
     private final ServiceLocator serviceLocator;
     private UUID uuid;
-    private Set<EnvironmentContainer> environmentContainers;
     private String name;
     private Set<EnvironmentContainer> containers;
 
 
     public Environment( String name )
     {
-        this.environmentContainers = new HashSet<>();
         this.name = name;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
@@ -58,18 +56,6 @@ public class Environment
     }
 
 
-    public Set<EnvironmentContainer> getEnvironmentContainerNodes()
-    {
-        return environmentContainers;
-    }
-
-
-    public void setEnvironmentContainerNodes( final Set<EnvironmentContainer> environmentContainers )
-    {
-        this.environmentContainers = environmentContainers;
-    }
-
-
     public UUID getUuid()
     {
         return uuid;
@@ -89,17 +75,5 @@ public class Environment
             commandMessage.setExceptionMessage( e.toString() );
             //            commandMessage.setSuccess( false );
         }
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Environment{" +
-                "uuid=" + uuid +
-                ", nodes=" + environmentContainers +
-                ", name='" + name + '\'' +
-                ", containers=" + containers +
-                '}';
     }
 }
