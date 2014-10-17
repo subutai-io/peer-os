@@ -1,7 +1,7 @@
 Package: subutai-hbase
 Priority: optional
 Section: devel
-Installed-Size: 100
+Installed-Size: 43766
 Maintainer: 
 Architecture: amd64
 Version: 1.1.3

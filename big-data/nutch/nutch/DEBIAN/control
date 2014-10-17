@@ -1,7 +1,7 @@
 Package: subutai-nutch
 Priority: optional
 Section: devel
-Installed-Size: 100
+Installed-Size: 81740
 Maintainer: subutai
 Architecture: amd64 
 Version: 1.0.1

@@ -1,7 +1,7 @@
 Package: subutai-flume
 Priority: optional
 Section: devel
-Installed-Size: 100
+Installed-Size: 48682
 Maintainer: subutai 
 Architecture: amd64
 Version: 1.0.9

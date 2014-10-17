@@ -1,7 +1,7 @@
 Package: subutai-spark
 Priority: optional
 Section: devel
-Installed-Size: 100
+Installed-Size: 170055
 Maintainer: subutai
 Architecture: amd64 
 Version: 1.0.1
