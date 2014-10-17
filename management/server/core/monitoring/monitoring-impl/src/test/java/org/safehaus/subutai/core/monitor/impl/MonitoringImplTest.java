@@ -21,6 +21,7 @@ import org.safehaus.subutai.core.monitor.api.MonitorException;
 
 import com.google.common.collect.Sets;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
 public class MonitoringImplTest
 {
     private static final String HOST = "host";
+    private static final String UNITS = "KB";
     private static final int PORT = 9200;
     private static final String DEFAULT_RESPONSE =
             FileUtil.getContent( "elasticsearch/default_response.json", MonitoringImpl.class );
@@ -46,6 +48,9 @@ public class MonitoringImplTest
     private static final Date START_DATE = new Date();
     private static final Date END_DATE = new Date();
     private static final int LIMIT = 10;
+    private static final double METRIC_VALUE = 10;
+    private static final long READ = 10;
+    private static final long WRITE = 10;
 
     private MonitoringImplExt monitoring;
     private RestUtil restUtil = mock( RestUtil.class );
@@ -172,5 +177,31 @@ public class MonitoringImplTest
         } );
 
         monitoring.getMetrics( HOSTS, Sets.newHashSet( MetricType.DISK_OPS ), START_DATE, END_DATE, LIMIT );
+    }
+
+
+    @Test
+    public void testMetric() throws Exception
+    {
+        Metric metric = new Metric( MetricType.CPU_NICE, METRIC_VALUE, UNITS, HOST, START_DATE );
+
+        assertEquals( metric.getHost(), HOST );
+        assertEquals( metric.getTimestamp(), START_DATE );
+        assertEquals( metric.getMetricType(), MetricType.CPU_NICE );
+        assertEquals( metric.getUnits(), UNITS );
+        assertEquals( metric.getValue(), ( Double ) METRIC_VALUE );
+    }
+
+
+    @Test
+    public void testMetric2() throws Exception
+    {
+        Metric metric = new Metric( MetricType.CPU_NICE, READ, WRITE, HOST, START_DATE );
+
+        assertEquals( metric.getHost(), HOST );
+        assertEquals( metric.getTimestamp(), START_DATE );
+        assertEquals( metric.getMetricType(), MetricType.CPU_NICE );
+        assertEquals( metric.getRead(), ( Long ) READ );
+        assertEquals( metric.getWrite(), ( Long ) WRITE );
     }
 }
