@@ -26,9 +26,11 @@ echo "fileName:"$fileName
 #copying template files from repository
 rm -rf $BASE/$fileName/DEBIAN
 rm -rf $BASE/$fileName/opt
+rm -rf $BASE/$fileName/etc
 
 cp -a $BASE_SOURCE/debian/management/DEBIAN $BASE/$fileName/DEBIAN
 cp -a $BASE_SOURCE/debian/management/opt $BASE/$fileName/opt
+cp -a $BASE_SOURCE/debian/management/etc $BASE/$fileName/etc
 
 #copying subutai.tar.gz file from maven output target folder
 echo "copying subutai-management snapshot files.."
