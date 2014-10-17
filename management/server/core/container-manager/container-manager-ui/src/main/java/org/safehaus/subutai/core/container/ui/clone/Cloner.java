@@ -334,8 +334,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     lxcHostNames = new ArrayList<>();
                     agentFamilies.put( entry.getKey(), lxcHostNames );
                 }
-                lxcHostNames.add( String.format( "%s%d_%s", productName, lxcHostNames.size() + 1,
-                        UUIDUtil.generateTimeBasedUUID().toString().replace( '-', '_' ) ) );
+                lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 16 ) );
             }
         }
         else
@@ -345,8 +345,8 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                 List<String> lxcHostNames = new ArrayList<>();
                 for ( int i = 1; i <= count; i++ )
                 {
-                    lxcHostNames.add( String.format( "%s%d_%s", productName, lxcHostNames.size() + 1,
-                            UUIDUtil.generateTimeBasedUUID().toString().replace( '-', '_' ) ) );
+                    lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
+                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 16 ) );
                 }
                 agentFamilies.put( physAgent, lxcHostNames );
             }
@@ -356,7 +356,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
         populateLxcTable( agentFamilies );
         countProcessed = new AtomicInteger( ( int ) ( count ) );
         errorProcessed = new AtomicInteger( 0 );
-        UUID envId = UUIDUtil.generateTimeBasedUUID();;
+        UUID envId = UUIDUtil.generateMACBasedUUID();
         for ( final Map.Entry<Agent, List<String>> agent : agentFamilies.entrySet() )
         {
             AgentExecutor agentExecutor = new AgentExecutorImpl( agent.getKey().getHostname(), agent.getValue() );
