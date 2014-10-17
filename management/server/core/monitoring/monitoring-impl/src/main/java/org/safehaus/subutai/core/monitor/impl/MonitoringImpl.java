@@ -18,8 +18,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.util.HttpUtil;
 import org.safehaus.subutai.common.util.NumUtil;
+import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.MetricType;
@@ -45,6 +45,7 @@ public class MonitoringImpl implements Monitoring
     private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
     private final String esHost;
     private final int esPort;
+    private final RestUtil restUtil;
 
 
     public MonitoringImpl( final String esHost, final int esPort )
@@ -54,6 +55,7 @@ public class MonitoringImpl implements Monitoring
 
         this.esHost = esHost;
         this.esPort = esPort;
+        this.restUtil = new RestUtil();
     }
 
 
@@ -120,7 +122,7 @@ public class MonitoringImpl implements Monitoring
         try
         {
 
-            return HttpUtil.request( HttpUtil.RequestType.GET,
+            return restUtil.request( RestUtil.RequestType.GET,
                     String.format( "http://%s:%d/_all/logs/_search", esHost, esPort ), params );
         }
         catch ( HTTPException e )

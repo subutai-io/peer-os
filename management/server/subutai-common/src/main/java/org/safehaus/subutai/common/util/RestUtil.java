@@ -16,6 +16,25 @@ public class RestUtil
     public static final int RESPONSE_OK = 200;
 
 
+    public static enum RequestType
+    {
+        GET, POST
+    }
+
+
+    public String request( RequestType requestType, String url, Map<String, String> params ) throws HTTPException
+    {
+        if ( requestType == RequestType.GET )
+        {
+            return get( url, params );
+        }
+        else
+        {
+            return post( url, params );
+        }
+    }
+
+
     public static String get( String url, Map<String, String> params ) throws HTTPException
     {
         WebClient client = null;
