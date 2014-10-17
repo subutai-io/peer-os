@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.cassandra.ui.wizard;
+package org.safehaus.subutai.plugin.cassandra.ui.Environment;
 
 
 import java.util.concurrent.ExecutorService;
@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -16,24 +17,26 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class Wizard
+public class EnvironmentWizard
 {
 
     private final VerticalLayout verticalLayout;
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Cassandra cassandra;
+    private EnvironmentManager environmentManager;
     private GridLayout grid;
     private int step = 1;
     private CassandraClusterConfig config = new CassandraClusterConfig();
 
 
-    public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    public EnvironmentWizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
 
-        this.cassandra = serviceLocator.getService( Cassandra.class );
         this.executorService = executorService;
+        this.cassandra = serviceLocator.getService( Cassandra.class );
         this.tracker = serviceLocator.getService( Tracker.class );
+        this.environmentManager = serviceLocator.getService( EnvironmentManager.class );
 
         verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -44,6 +47,12 @@ public class Wizard
         grid.setComponentAlignment( verticalLayout, Alignment.TOP_CENTER );
 
         putForm();
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
     }
 
 

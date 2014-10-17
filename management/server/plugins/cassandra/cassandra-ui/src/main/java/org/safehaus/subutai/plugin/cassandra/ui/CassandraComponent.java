@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.ServiceLocator;
+import org.safehaus.subutai.plugin.cassandra.ui.Environment.EnvironmentWizard;
 import org.safehaus.subutai.plugin.cassandra.ui.manager.Manager;
 import org.safehaus.subutai.plugin.cassandra.ui.wizard.Wizard;
 
@@ -18,6 +19,7 @@ public class CassandraComponent extends CustomComponent
 {
 
     private final Wizard wizard;
+    private final EnvironmentWizard environmentWizard;
     private final Manager manager;
 
 
@@ -36,7 +38,9 @@ public class CassandraComponent extends CustomComponent
 
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
+        environmentWizard = new EnvironmentWizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
+        sheet.addTab( environmentWizard.getContent(), "Configure environment" );
         sheet.addTab( manager.getContent(), "Manage" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {

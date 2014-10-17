@@ -167,15 +167,15 @@ public class Node2PeerWizard extends Window
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
             {
-                ComboBox comboBox = new ComboBox();
+                ComboBox peersBox = new ComboBox();
                 BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
                 bic.addAll( selectedPeers() );
-                comboBox.setContainerDataSource( bic );
-                comboBox.setNullSelectionAllowed( false );
-                comboBox.setTextInputAllowed( false );
-                comboBox.setItemCaptionPropertyId( "name" );
+                peersBox.setContainerDataSource( bic );
+                peersBox.setNullSelectionAllowed( false );
+                peersBox.setTextInputAllowed( false );
+                peersBox.setItemCaptionPropertyId( "name" );
                 Object itemId = containerToPeerTable.addItem( new Object[] {
-                        ng.getTemplateName(), comboBox
+                        ng.getTemplateName(), peersBox
                 }, null );
                 nodeGroupMap.put( itemId, ng );
             }
