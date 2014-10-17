@@ -94,7 +94,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
+        //check installed subutai packages
         String s = CommandFactory.build( CommandType.LIST, null );
         Command checkInstalledCommand = manager.getCommandRunner().createCommand( new RequestBuilder( s ), Sets.newHashSet( agent )  );
         manager.getCommandRunner().runCommand( checkInstalledCommand );

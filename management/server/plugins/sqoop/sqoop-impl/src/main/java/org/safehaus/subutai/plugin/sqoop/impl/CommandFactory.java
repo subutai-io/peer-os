@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.sqoop.impl;
 
 
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportParameter;
@@ -10,7 +12,7 @@ import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 public class CommandFactory
 {
 
-    public static final String PACKAGE_NAME = "ksks-sqoop";
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + SqoopConfig.PRODUCT_KEY.toLowerCase();
     private static final String EXEC_PROFILE = ". /etc/profile";
 
 
@@ -21,7 +23,7 @@ public class CommandFactory
         switch ( type )
         {
             case LIST:
-                s = "dpkg -l | grep '^ii' | grep ksks";
+                s = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
                 break;
             case INSTALL:
             case PURGE:
