@@ -26,7 +26,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
@@ -365,9 +365,9 @@ public class JettyImpl implements Jetty
                                                          final ProductOperation po )
     {
         Set<Agent> cassNodes = new HashSet<Agent>();
-        for ( Node node : env.getNodes() )
+        for ( EnvironmentContainerNode environmentContainerNode : env.getEnvironmentContainerNodes() )
         {
-            cassNodes.add( node.getAgent() );
+            cassNodes.add( environmentContainerNode.getAgent() );
         }
         config.setNodes( cassNodes );
 

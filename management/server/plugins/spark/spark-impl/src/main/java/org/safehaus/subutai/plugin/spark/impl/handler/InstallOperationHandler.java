@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -103,13 +103,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
     void destroyNodes( Environment env )
     {
 
-        if ( env == null || env.getNodes().isEmpty() )
+        if ( env == null || env.getEnvironmentContainerNodes().isEmpty() )
         {
             return;
         }
 
-        Set<Agent> set = new HashSet<>( env.getNodes().size() );
-        for ( Node n : env.getNodes() )
+        Set<Agent> set = new HashSet<>( env.getEnvironmentContainerNodes().size() );
+        for ( EnvironmentContainerNode n : env.getEnvironmentContainerNodes() )
         {
             set.add( n.getAgent() );
         }

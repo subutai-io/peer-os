@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -67,36 +67,38 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getNodes().isEmpty() )
+        if ( environment.getEnvironmentContainerNodes().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
-        if ( environment.getNodes().size() < config.getNumberOfNodes() )
+        if ( environment.getEnvironmentContainerNodes().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException(
-                    String.format( "Environment has %d nodes but %d nodes are required", environment.getNodes().size(),
+                    String.format( "Environment has %d nodes but %d nodes are required", environment.getEnvironmentContainerNodes().size(),
                             config.getNumberOfNodes() ) );
         }
 
-        Set<Node> solrNodes = new HashSet<>();
-        for ( Node node : environment.getNodes() )
+        Set<EnvironmentContainerNode> solrEnvironmentContainerNodes = new HashSet<>();
+        for ( EnvironmentContainerNode environmentContainerNode : environment.getEnvironmentContainerNodes() )
         {
-            if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) )
+            if ( environmentContainerNode.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) )
             {
-                solrNodes.add( node );
+                solrEnvironmentContainerNodes.add( environmentContainerNode );
             }
         }
 
-        if ( solrNodes.size() < config.getNumberOfNodes() )
+        if ( solrEnvironmentContainerNodes.size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException(
-                    String.format( "Number of nodes with Solr installed is %d, but %d is required", solrNodes.size(),
+                    String.format( "Number of nodes with Solr installed is %d, but %d is required", solrEnvironmentContainerNodes
+
+                            .size(),
                             config.getNumberOfNodes() ) );
         }
 
         Set<Agent> solrAgents = new HashSet<>();
-        Iterator<Node> it = solrNodes.iterator();
+        Iterator<EnvironmentContainerNode> it = solrEnvironmentContainerNodes.iterator();
         for ( int i = 0; i < config.getNumberOfNodes(); i++ )
         {
             solrAgents.add( it.next().getAgent() );

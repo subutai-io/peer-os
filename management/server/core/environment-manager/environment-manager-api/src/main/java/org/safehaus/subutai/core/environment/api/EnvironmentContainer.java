@@ -30,15 +30,6 @@ public class EnvironmentContainer extends Container
         this.templateName = templateName;
     }
 
-    //    private transient Environment environment;
-
-
-    /*@Override
-    public UUID getEnvironmentId()
-    {
-        return environment.getUuid();
-    }*/
-
 
     @Override
     public UUID getEnvironmentId()
@@ -58,22 +49,8 @@ public class EnvironmentContainer extends Container
     {
         DefaultCommandMessage cmd =
                 new DefaultCommandMessage( PeerCommandType.START, environmentId, getPeerId(), getAgentId() );
-        //        environment.invoke( cmd );
-        //        return cmd.isSuccess();
         return cmd;
     }
-
-
-    /*public Environment getEnvironment()
-    {
-        return environment;
-    }
-
-
-    public void setEnvironment( final Environment environment )
-    {
-        this.environment = environment;
-    }*/
 
 
     @Override
@@ -81,8 +58,6 @@ public class EnvironmentContainer extends Container
     {
         DefaultCommandMessage cmd =
                 new DefaultCommandMessage( PeerCommandType.STOP, environmentId, getPeerId(), getAgentId() );
-        //        environment.invoke( cmd );
-        //        return cmd.isSuccess();
         return cmd;
     }
 
@@ -92,8 +67,6 @@ public class EnvironmentContainer extends Container
     {
         DefaultCommandMessage cmd =
                 new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, environmentId, getPeerId(), getAgentId() );
-        //        environment.invoke( cmd );
-        //        return cmd.isSuccess();
         return cmd;
     }
 }

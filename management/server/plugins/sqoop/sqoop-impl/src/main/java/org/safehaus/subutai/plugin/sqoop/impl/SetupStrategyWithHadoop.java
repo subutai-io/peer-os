@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 
 
@@ -42,13 +42,13 @@ class SetupStrategyWithHadoop extends SqoopSetupStrategy
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getNodes() == null || environment.getNodes().isEmpty() )
+        if ( environment.getEnvironmentContainerNodes() == null || environment.getEnvironmentContainerNodes().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         Set<Agent> nodes = new HashSet<>(), allNodes = new HashSet<>();
-        for ( Node n : environment.getNodes() )
+        for ( EnvironmentContainerNode n : environment.getEnvironmentContainerNodes() )
         {
             allNodes.add( n.getAgent() );
             if ( n.getTemplate().getProducts().contains( CommandFactory.PACKAGE_NAME ) )

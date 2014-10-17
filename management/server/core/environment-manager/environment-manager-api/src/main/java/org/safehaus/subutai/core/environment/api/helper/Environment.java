@@ -19,14 +19,14 @@ public class Environment
 
     private final ServiceLocator serviceLocator;
     private UUID uuid;
-    private Set<Node> nodes;
+    private Set<EnvironmentContainerNode> environmentContainerNodes;
     private String name;
     private Set<EnvironmentContainer> containers;
 
 
     public Environment( String name )
     {
-        this.nodes = new HashSet<>();
+        this.environmentContainerNodes = new HashSet<>();
         this.name = name;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
@@ -59,15 +59,15 @@ public class Environment
     }
 
 
-    public Set<Node> getNodes()
+    public Set<EnvironmentContainerNode> getEnvironmentContainerNodes()
     {
-        return nodes;
+        return environmentContainerNodes;
     }
 
 
-    public void setNodes( final Set<Node> nodes )
+    public void setEnvironmentContainerNodes( final Set<EnvironmentContainerNode> environmentContainerNodes )
     {
-        this.nodes = nodes;
+        this.environmentContainerNodes = environmentContainerNodes;
     }
 
 
@@ -98,7 +98,7 @@ public class Environment
     {
         return "Environment{" +
                 "uuid=" + uuid +
-                ", nodes=" + nodes +
+                ", nodes=" + environmentContainerNodes +
                 ", name='" + name + '\'' +
                 ", containers=" + containers +
                 '}';

@@ -20,7 +20,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
@@ -89,7 +89,7 @@ public class EnvironmentBuilder
                 throw new EnvironmentBuildException(
                         String.format( "Template %s not registered", nodeGroup.getTemplateName() ) );
             }
-            Set<Node> nodes = new HashSet<>();
+            Set<EnvironmentContainerNode> environmentContainerNodes = new HashSet<>();
             try
             {
                 Set<Agent> agents = containerManager
@@ -97,7 +97,7 @@ public class EnvironmentBuilder
                                 physicalAgents, placementStrategy );
                 for ( Agent agent : agents )
                 {
-                    nodes.add( new Node( agent, template, nodeGroup.getName() ) );
+                    environmentContainerNodes.add( new EnvironmentContainerNode( agent, template, nodeGroup.getName() ) );
                 }
 
 
@@ -123,15 +123,16 @@ public class EnvironmentBuilder
             {
 
                 //destroy lxcs here
-                Set<Node> alreadyBuiltNodes = environment.getNodes();
+                Set<EnvironmentContainerNode>
+                        alreadyBuiltEnvironmentContainerNodes = environment.getEnvironmentContainerNodes();
 
-                if ( alreadyBuiltNodes != null && !alreadyBuiltNodes.isEmpty() )
+                if ( alreadyBuiltEnvironmentContainerNodes != null && !alreadyBuiltEnvironmentContainerNodes.isEmpty() )
                 {
 
                     Set<Agent> agents = new HashSet<>();
-                    for ( Node node : alreadyBuiltNodes )
+                    for ( EnvironmentContainerNode environmentContainerNode : alreadyBuiltEnvironmentContainerNodes )
                     {
-                        agents.add( node.getAgent() );
+                        agents.add( environmentContainerNode.getAgent() );
                     }
 
                     try
@@ -147,13 +148,13 @@ public class EnvironmentBuilder
                 throw new EnvironmentBuildException( ex.toString() );
             }
 
-            environment.getNodes().addAll( nodes );
+            environment.getEnvironmentContainerNodes().addAll( environmentContainerNodes );
         }
 
         List<Agent> allAgents = new ArrayList<>();
-        for ( Node node : environment.getNodes() )
+        for ( EnvironmentContainerNode environmentContainerNode : environment.getEnvironmentContainerNodes() )
         {
-            allAgents.add( node.getAgent() );
+            allAgents.add( environmentContainerNode.getAgent() );
         }
 
         if ( blueprint.isLinkHosts() )
@@ -177,16 +178,17 @@ public class EnvironmentBuilder
 
     public Environment convertEnvironmentContainersToNodes( final Environment environment )
     {
-        final Set<Node> nodes = new HashSet<>();
+        final Set<EnvironmentContainerNode> environmentContainerNodes = new HashSet<>();
         for ( EnvironmentContainer container : environment.getContainers() )
         {
             Agent agent = agentManager.getAgentByHostname( container.getHostname() );
             Template template = templateRegistry.getTemplate( container.getTemplateName() );
-            Node node = new Node( agent, template, "cassandra" );
-            nodes.add( node );
+            EnvironmentContainerNode
+                    environmentContainerNode = new EnvironmentContainerNode( agent, template, "cassandra" );
+            environmentContainerNodes.add( environmentContainerNode );
         }
 
-        environment.setNodes( nodes );
+        environment.setEnvironmentContainerNodes( environmentContainerNodes );
         return environment;
     }
 }

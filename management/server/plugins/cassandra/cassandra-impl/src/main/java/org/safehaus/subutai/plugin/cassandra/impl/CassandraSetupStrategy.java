@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -64,9 +64,9 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
         }
 
         Set<Agent> cassNodes = new HashSet<Agent>();
-        for ( Node node : environment.getNodes() )
+        for ( EnvironmentContainerNode environmentContainerNode : environment.getEnvironmentContainerNodes() )
         {
-            cassNodes.add( node.getAgent() );
+            cassNodes.add( environmentContainerNode.getAgent() );
         }
         config.setNodes( cassNodes );
 
