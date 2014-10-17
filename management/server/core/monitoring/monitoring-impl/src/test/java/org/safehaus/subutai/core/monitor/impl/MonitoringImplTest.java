@@ -33,23 +33,23 @@ public class MonitoringImplTest
     @Test
     public void testQuery() throws Exception
     {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set( Calendar.YEAR, 2014 );
-        calendar.set( Calendar.MONTH, Calendar.OCTOBER );
-        calendar.set( Calendar.DAY_OF_MONTH, 15 );
-
-        Date startDate = calendar.getTime();
-        calendar.set( Calendar.DAY_OF_MONTH, 20 );
-        Date endDate = calendar.getTime();
-
-
-        List<Metric> metrics = monitoring
-                .getMetrics( Sets.newHashSet( "py627967291", "py420202276", "cassandra", "master1" ),
-                        Sets.newHashSet( MetricType.DISK_OPS , MetricType.CPU_USER), startDate, endDate, 10 );
-
-        for ( Metric metric : metrics )
-        {
-            System.out.println( metric );
-        }
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set( Calendar.YEAR, 2014 );
+//        calendar.set( Calendar.MONTH, Calendar.OCTOBER );
+//        calendar.set( Calendar.DAY_OF_MONTH, 15 );
+//
+//        Date startDate = calendar.getTime();
+//        calendar.set( Calendar.DAY_OF_MONTH, 20 );
+//        Date endDate = calendar.getTime();
+//
+//
+//        List<Metric> metrics = monitoring
+//                .getMetrics( Sets.newHashSet( "py627967291", "py420202276", "cassandra", "master1" ),
+//                        Sets.newHashSet( MetricType.DISK_OPS , MetricType.CPU_USER), startDate, endDate, 10 );
+//
+//        for ( Metric metric : metrics )
+//        {
+//            System.out.println( metric );
+//        }
     }
 }
