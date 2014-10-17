@@ -7,6 +7,7 @@ import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
+import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
 
 
@@ -16,6 +17,8 @@ import org.safehaus.subutai.common.protocol.Template;
 public class EnvironmentContainerNode extends Container
 {
 
+    private UUID environmentId;
+    private String templateName;
     private Agent agent;
     private Template template;
     private String nodeGroupName;
@@ -26,6 +29,58 @@ public class EnvironmentContainerNode extends Container
         this.agent = agent;
         this.template = template;
         this.nodeGroupName = nodeGroupName;
+    }
+
+
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
+
+
+    @Override
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
+    @Override
+    public DefaultCommandMessage start() throws ContainerException
+    {
+        DefaultCommandMessage cmd =
+                new DefaultCommandMessage( PeerCommandType.START, environmentId, getPeerId(), getAgentId() );
+        return cmd;
+    }
+
+
+    @Override
+    public DefaultCommandMessage stop() throws ContainerException
+    {
+        DefaultCommandMessage cmd =
+                new DefaultCommandMessage( PeerCommandType.STOP, environmentId, getPeerId(), getAgentId() );
+        return cmd;
+    }
+
+
+    @Override
+    public DefaultCommandMessage isConnected() throws ContainerException
+    {
+        DefaultCommandMessage cmd =
+                new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, environmentId, getPeerId(), getAgentId() );
+        return cmd;
     }
 
 
@@ -44,44 +99,5 @@ public class EnvironmentContainerNode extends Container
     public Template getTemplate()
     {
         return template;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Node{" +
-                "agent=" + agent +
-                ", template=" + template +
-                ", nodeGroupName='" + nodeGroupName + '\'' +
-                '}';
-    }
-
-
-    @Override
-    public UUID getEnvironmentId()
-    {
-        return null;
-    }
-
-
-    @Override
-    public DefaultCommandMessage start() throws ContainerException
-    {
-        return null;
-    }
-
-
-    @Override
-    public DefaultCommandMessage stop() throws ContainerException
-    {
-        return null;
-    }
-
-
-    @Override
-    public DefaultCommandMessage isConnected() throws ContainerException
-    {
-        return null;
     }
 }
