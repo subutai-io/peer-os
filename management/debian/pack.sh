@@ -38,15 +38,27 @@ cp -a $BASE_SOURCE/debian/management/var $BASE/$fileName/var
 
 #copying subutai.tar.gz file from maven output target folder
 echo "copying subutai-management snapshot files.."
-cp $SOURCE/subutai.tar.gz $BASE/
-tar xzvf $BASE/subutai.tar.gz
-cp -a $BASE/subutai/* $BASE/$fileName/opt/subutai-management/
- 
+
+cd $SOURCE
+#getting the name of subutai distro for instance: subutai-2.0.0.tar.gz
+distroName=`ls | grep tar.gz`
+#subutai distro's folder name for instance: subutai-2.0.0 
+distroFolderName=`ls | grep tar.gz | awk '{print substr($0, 0, length($0)-7)}'`
+cd $MANAGEMENT_BASE
+
+echo "distroName:"$distroName
+echo "distroFolderName:"$distroFolderName
+
+cp $SOURCE/$distroName $BASE/
+cd $BASE
+tar xzvf $distroName
+cp -a $BASE/$distroFolderName/* $BASE/$fileName/opt/subutai-management/
+
 #removing subutai and subutai.tar.gz fodler and files
 rm -rf $BASE/$fileName/opt/subutai-management/data
 rm -rf $BASE/$fileName/opt/subutai-management/bin
-rm $BASE/subutai.tar.gz
-rm -rf $BASE/subutai/
+rm $BASE/$distroName
+rm -rf $BASE/$distroFolderName
 
 #packaging subutai-management
 cd $BASE
