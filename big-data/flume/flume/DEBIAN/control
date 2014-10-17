@@ -1,9 +1,9 @@
-Package: ksks-flume
+Package: subutai-flume
 Priority: optional
 Section: devel
 Installed-Size: 100
-Maintainer: kiskis 
+Maintainer: subutai 
 Architecture: amd64
 Version: 1.0.9
-Depends: ksks-hadoop
-Description: This is a flume package of kiskis distribution.
+Depends: subutai-hadoop
+Description: This is a flume package of subutai distribution.
