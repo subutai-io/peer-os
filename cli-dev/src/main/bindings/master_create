@@ -56,8 +56,6 @@ function master_create {
   local subutai_repo_file="/var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list"
   echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
       >> $subutai_repo_file
-  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" \
-      >> $subutai_repo_file
 
   # Configuration for apt-proxy
   if [ -n "$SUBUTAI_APT_PROXY" ]; then
