@@ -35,4 +35,6 @@ public interface Cassandra extends ApiBase<CassandraClusterConfig>
                                                          ProductOperation po );
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint( CassandraClusterConfig config );
+
+    UUID configureEnvironmentCluster( CassandraClusterConfig config );
 }
