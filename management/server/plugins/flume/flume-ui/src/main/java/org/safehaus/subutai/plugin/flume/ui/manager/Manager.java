@@ -57,7 +57,7 @@ public class Manager
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String STYLE_NAME = "default";
-    private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Flume flume;
     private final Tracker tracker;
