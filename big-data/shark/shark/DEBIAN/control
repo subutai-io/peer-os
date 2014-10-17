@@ -1,8 +1,8 @@
-Package: ksks-shark
+Package: subutai-shark
 Priority: optional
 Section: devel
 Installed-Size: 100
-Maintainer: kiskis
+Maintainer: subutai
 Architecture: amd64 
 Version: 1.0.1
-Description: This is a shark package of kiskis distribution.
+Description: This is a shark package of subutai distribution.
