@@ -41,7 +41,7 @@ public class MonitoringImplTest
         //
         //        List<Metric> metrics = monitoring
         //                .getMetrics( Sets.newHashSet( "py627967291", "py420202276", "cassandra", "master1" ),
-        //                        Sets.newHashSet(  MetricType.CPU_USER ), startDate, endDate, 10 );
+        //                        Sets.newHashSet(  MetricType.DISK_OPS ), startDate, endDate, 10 );
         //
         //        for ( Metric metric : metrics )
         //        {
