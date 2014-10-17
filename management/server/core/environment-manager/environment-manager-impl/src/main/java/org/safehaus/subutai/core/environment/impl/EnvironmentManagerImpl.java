@@ -320,12 +320,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 UUID peerId = getPeerId();
                 for ( Template t : templates )
                 {
-                    t.setPeerId( peerId );
-                    t.setRemote( true );
-                    ccm.addTemplate( t );
+                    ccm.addTemplate( t.getRemoteClone( peerId ) );
                 }
                 //
+
+                LOG.info( String.format( "Creating containers on %s", ccm.getPeerId() ) );
                 peerCommandDispatcher.invoke( ccm, timeout );
+                LOG.info( String.format( "Finished cloning containers on %s", ccm.getPeerId() ) );
 
                 boolean result = ccm.isSuccess();
                 if ( result )

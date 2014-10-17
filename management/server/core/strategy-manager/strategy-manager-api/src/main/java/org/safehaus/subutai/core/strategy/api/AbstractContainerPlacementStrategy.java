@@ -19,6 +19,12 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     private List<Criteria> criteria = new ArrayList<>();
 
 
+    protected void clearPlacementInfo()
+    {
+        placementInfoMap.clear();
+    }
+
+
     public final void addPlacementInfo( Agent physicalNode, String nodeType, int numberOfLxcsToCreate )
     {
         if ( physicalNode == null )
