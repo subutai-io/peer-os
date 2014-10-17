@@ -5,20 +5,22 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 
 public class Commands
 {
 
 
-    public static final String PACKAGE_NAME = "ksks-pig";
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + PigConfig.PRODUCT_KEY.toLowerCase();
 
-    public final String INSTALL = "apt-get --force-yes --assume-yes install ksks-pig";
-    public final String UNINSTALL = "apt-get --force-yes --assume-yes purge ksks-pig";
-    public final String CHECK = "dpkg -l | grep '^ii' | grep ksks";
+    public final String INSTALL = "apt-get --force-yes --assume-yes install " + PACKAGE_NAME;
+    public final String UNINSTALL = "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME;
+    public final String CHECK = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
 
     private final CommandRunnerBase commandRunnerBase;
 
