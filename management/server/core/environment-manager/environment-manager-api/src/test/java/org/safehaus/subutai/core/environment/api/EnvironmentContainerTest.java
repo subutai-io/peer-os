@@ -8,10 +8,9 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 
@@ -23,13 +22,13 @@ public class EnvironmentContainerTest
     private static final UUID AGENT_UUID = UUIDUtil.generateTimeBasedUUID();
     private static final String DESCRIPTION = "description";
     private static final UUID PEER_ID = UUIDUtil.generateTimeBasedUUID();
-    EnvironmentContainer container;
+    private EnvironmentContainerNode container;
 
 
     @Before
     public void setUp() throws Exception
     {
-        this.container = new EnvironmentContainer();
+        this.container = new EnvironmentContainerNode();
     }
 
 

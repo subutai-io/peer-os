@@ -9,10 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 
 import static org.mockito.Mockito.when;
 
@@ -41,7 +40,7 @@ public class DescribeEnvironmentCommandTest
     {
         String name = "name";
         Environment environment = new Environment( name );
-        final Set<EnvironmentContainer> set = new HashSet<>();
+        final Set<EnvironmentContainerNode> set = new HashSet<>();
         environment.setContainers( set );
         describeEnvironmentCommand.setEnvironmentName( name );
         when( manager.getEnvironment( name ) ).thenReturn( environment );

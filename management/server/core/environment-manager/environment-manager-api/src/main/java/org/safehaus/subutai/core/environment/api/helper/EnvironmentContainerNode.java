@@ -19,9 +19,17 @@ public class EnvironmentContainerNode extends Container
 
     private UUID environmentId;
     private String templateName;
+    //TODO: should get rid of Agent
     private Agent agent;
+    //TODO: should get rid of Template
     private Template template;
     private String nodeGroupName;
+
+
+    public EnvironmentContainerNode()
+    {
+
+    }
 
 
     public EnvironmentContainerNode( final Agent agent, final Template template, final String nodeGroupName )

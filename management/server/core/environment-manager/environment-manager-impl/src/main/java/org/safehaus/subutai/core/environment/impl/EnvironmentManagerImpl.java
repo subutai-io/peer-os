@@ -28,7 +28,7 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -335,7 +335,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                     {
                         for ( Agent agent : agents )
                         {
-                            EnvironmentContainer container = new EnvironmentContainer();
+                            EnvironmentContainerNode container = new EnvironmentContainerNode();
 
                             container.setPeerId( agent.getSiteId() );
                             container.setAgentId( agent.getUuid() );
@@ -423,16 +423,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public Set<EnvironmentContainer> getConnectedContainers( final Environment environment )
+    public Set<EnvironmentContainerNode> getConnectedContainers( final Environment environment )
     {
 
         Set<UUID> peers = new HashSet<>();
-        for ( EnvironmentContainer ec : environment.getContainers() )
+        for ( EnvironmentContainerNode ec : environment.getContainers() )
         {
             peers.add( ec.getPeerId() );
         }
 
-        Set<EnvironmentContainer> freshContainers = new HashSet<>();
+        Set<EnvironmentContainerNode> freshContainers = new HashSet<>();
         for ( UUID peerId : peers )
         {
             PeerCommandMessage cmd =
@@ -450,7 +450,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 for ( Container c : containers )
                 {
-                    EnvironmentContainer ec = new EnvironmentContainer();
+                    EnvironmentContainerNode ec = new EnvironmentContainerNode();
                     ec.setEnvironmentId( environment.getUuid() );
 
                     ec.setAgentId( c.getAgentId() );

@@ -20,7 +20,7 @@ public class Environment
     private UUID uuid;
     private Set<EnvironmentContainerNode> environmentContainerNodes;
     private String name;
-    private Set<EnvironmentContainer> containers;
+    private Set<EnvironmentContainerNode> containers;
 
 
     public Environment( String name )
@@ -33,20 +33,20 @@ public class Environment
     }
 
 
-    public void addContainer( EnvironmentContainer container )
+    public void addContainer( EnvironmentContainerNode container )
     {
         container.setEnvironmentId( uuid );
         this.containers.add( container );
     }
 
 
-    public Set<EnvironmentContainer> getContainers()
+    public Set<EnvironmentContainerNode> getContainers()
     {
         return containers;
     }
 
 
-    public void setContainers( final Set<EnvironmentContainer> containers )
+    public void setContainers( final Set<EnvironmentContainerNode> containers )
     {
         this.containers = containers;
     }
