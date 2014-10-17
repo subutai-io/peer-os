@@ -383,7 +383,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( "No containers assigned to the Environment" );
         }
-    }
+     }
 
 
     // TODO: Implement it via PCD

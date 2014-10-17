@@ -52,7 +52,7 @@ public class VerificationStep extends VerticalLayout
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-                UUID trackID = cassandra.installCluster( environmentWizard.getConfig() );
+                UUID trackID = cassandra.configureEnvironmentCluster( environmentWizard.getConfig() );
                 ProgressWindow window =
                         new ProgressWindow( executorService, tracker, trackID, CassandraClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
