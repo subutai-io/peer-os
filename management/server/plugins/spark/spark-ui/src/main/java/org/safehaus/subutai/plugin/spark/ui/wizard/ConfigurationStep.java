@@ -48,6 +48,7 @@ public class ConfigurationStep extends Panel
         content.setMargin( true );
 
         TextField nameTxt = new TextField( "Cluster name" );
+        nameTxt.setId("sparkClusterName");
         nameTxt.setRequired( true );
         nameTxt.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -61,6 +62,7 @@ public class ConfigurationStep extends Panel
         nameTxt.setValue( wizard.getConfig().getClusterName() );
 
         Button next = new Button( "Next" );
+        next.setId("sparkNext");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -72,6 +74,7 @@ public class ConfigurationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
+        back.setId("sparkBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -111,6 +114,10 @@ public class ConfigurationStep extends Panel
         final ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
         final ComboBox masterNodeCombo = new ComboBox( "Master node" );
         final TwinColSelect slaveNodesSelect = new TwinColSelect( "Slave nodes", new ArrayList<Agent>() );
+
+        hadoopClustersCombo.setId("sparkHadoopCluster");
+        masterNodeCombo.setId("sparkMasterNode");
+        slaveNodesSelect.setId("sparkSlaveNodes");
 
         masterNodeCombo.setImmediate( true );
         masterNodeCombo.setTextInputAllowed( false );
