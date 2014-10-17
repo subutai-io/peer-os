@@ -192,6 +192,10 @@ public class JettyImpl implements Jetty
         return commands;
     }
 
+    public void setCommands(Commands commands) {
+        this.commands = commands;
+    }
+
 
     public void init()
     {
