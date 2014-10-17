@@ -966,11 +966,6 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>jetty-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
         <artifactId>jetty-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
