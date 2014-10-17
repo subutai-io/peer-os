@@ -437,18 +437,18 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
