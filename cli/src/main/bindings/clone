@@ -74,7 +74,7 @@ function clone {
   #cloning operation is starting..
   lxc_clone $parent $child $environmentId "`usage`"
   
-  # Create 2 veth for container if openvs
+  # Create 2 veth for container if openvswitch is enabled
   if [ "x$ovs_enabled" == "xtrue" ]; then
     msg_info "    - configuring $child network with openvswitch"
     ovs_configure_lxc $child
