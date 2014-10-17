@@ -37,6 +37,7 @@
     <module>hipi</module>
     <module>nutch</module>
     <module>plugin-common</module>
+    <module>jetty</module>
   </modules>
 
 </project>

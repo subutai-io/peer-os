@@ -319,9 +319,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 UUID peerId = getPeerId();
                 for ( Template t : templates )
                 {
-                    t.setPeerId( peerId );
-                    t.setRemote( true );
-                    ccm.addTemplate( t );
+                    ccm.addTemplate( t.getRemoteClone( peerId ) );
                 }
                 //
 

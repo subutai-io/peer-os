@@ -952,6 +952,23 @@
         <artifactId>cassandra-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- jetty -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>jetty-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>jetty-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>jetty-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- elasticsearch -->
 
       <dependency>
