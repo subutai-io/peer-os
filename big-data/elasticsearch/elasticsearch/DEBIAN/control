@@ -1,9 +1,9 @@
-Package: ksks-elasticsearch
+Package: subutai-elasticsearch
 Version: 1.2.1
 Section: web
 Priority: optional
 Architecture: all
 Depends: libc6, adduser
 Installed-Size: 21590
-Maintainer: kiskis
-Description: This is a elasticsearch package of kiskis distribution.
+Maintainer: subutai
+Description: This is a elasticsearch package of subutai distribution.
