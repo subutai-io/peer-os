@@ -623,6 +623,11 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
+            checkBtn.setId(agent.getListIP().get(0)+"-zookeeperCheck");
+            startBtn.setId(agent.getListIP().get(0)+"-zookeeperStart");
+            stopBtn.setId(agent.getListIP().get(0)+"-zookeeperStop");
+            destroyBtn.setId(agent.getListIP().get(0)+"-zookeeperDestroy");
+
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
             availableOperations.addStyleName( "default" );
