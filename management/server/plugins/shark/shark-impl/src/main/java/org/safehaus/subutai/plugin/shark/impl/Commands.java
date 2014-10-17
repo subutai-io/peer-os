@@ -5,15 +5,17 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
 
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = "ksks-shark";
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + SharkClusterConfig.PRODUCT_KEY.toLowerCase();
 
     private static CommandRunnerBase commandRunner;
 
@@ -44,7 +46,7 @@ public class Commands
 
     public static Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+        return createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
     }
 
 
