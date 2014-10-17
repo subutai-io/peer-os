@@ -57,8 +57,7 @@ public class Commands
     public Command getCheckInstalledCommand( Set<Agent> agents )
     {
         // grep subutai-
-        return commandRunner.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX
-                .substring( 0, Common.PACKAGE_PREFIX.length() - 1 ) ), agents );
+        return commandRunner.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH), agents );
     }
 
 
