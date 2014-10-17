@@ -11,16 +11,17 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.core.network.api.NetworkManager;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import com.google.common.collect.Lists;
@@ -171,5 +172,21 @@ public class EnvironmentBuilder
     public void destroy( final Environment environment ) throws EnvironmentDestroyException
     {
         //TODO destroy environment code goes here
+    }
+
+
+    public Environment convertEnvironmentContainersToNodes( final Environment environment )
+    {
+        final Set<Node> nodes = new HashSet<>();
+        for ( EnvironmentContainer container : environment.getContainers() )
+        {
+            Agent agent = agentManager.getAgentByHostname( container.getHostname() );
+            Template template = templateRegistry.getTemplate( container.getTemplateName() );
+            Node node = new Node( agent, template, "cassandra" );
+            nodes.add( node );
+        }
+
+        environment.setNodes( nodes );
+        return environment;
     }
 }

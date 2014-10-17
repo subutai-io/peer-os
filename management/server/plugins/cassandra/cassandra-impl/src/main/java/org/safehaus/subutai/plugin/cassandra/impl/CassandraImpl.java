@@ -33,6 +33,7 @@ import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckServiceHandler;
+import org.safehaus.subutai.plugin.cassandra.impl.handler.ConfigureEnvironmentClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.InstallClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StartClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StartServiceHandler;
@@ -198,6 +199,14 @@ public class CassandraImpl implements Cassandra
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new InstallClusterHandler( this, config );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+    public UUID configureEnvironmentCluster( final CassandraClusterConfig config )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        AbstractOperationHandler operationHandler = new ConfigureEnvironmentClusterHandler( this, config );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

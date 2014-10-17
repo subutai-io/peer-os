@@ -19,7 +19,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
-import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
@@ -326,9 +325,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 }
                 //
 
-                LOG.info( String.format("Creating containers on %s", ccm.getPeerId()) );
+                LOG.info( String.format( "Creating containers on %s", ccm.getPeerId() ) );
                 peerCommandDispatcher.invoke( ccm, timeout );
-                LOG.info( String.format("Finished cloning containers on %s", ccm.getPeerId()) );
+                LOG.info( String.format( "Finished cloning containers on %s", ccm.getPeerId() ) );
 
                 boolean result = ccm.isSuccess();
                 if ( result )
@@ -346,6 +345,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                             container.setHostname( agent.getHostname() );
                             container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
                             container.setName( agent.getHostname() );
+                            container.setTemplateName( ccm.getTemplate() );
 
                             environment.addContainer( container );
                         }
@@ -454,6 +454,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 {
                     EnvironmentContainer ec = new EnvironmentContainer();
                     ec.setEnvironmentId( environment.getUuid() );
+
                     ec.setAgentId( c.getAgentId() );
                     ec.setPeerId( c.getPeerId() );
                     freshContainers.add( ec );
@@ -461,5 +462,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
         }
         return freshContainers;
+    }
+
+
+    @Override
+    public Environment getEnvironmentByUUID( final UUID environmentId )
+    {
+        Environment environment = environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
+
+        environmentBuilder.convertEnvironmentContainersToNodes( environment );
+
+        return environment;
     }
 }

@@ -65,6 +65,12 @@ public class Environment
     }
 
 
+    public void setNodes( final Set<Node> nodes )
+    {
+        this.nodes = nodes;
+    }
+
+
     public UUID getUuid()
     {
         return uuid;

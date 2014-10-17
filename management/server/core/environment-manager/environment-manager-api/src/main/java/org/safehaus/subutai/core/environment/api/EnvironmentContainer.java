@@ -16,6 +16,20 @@ public class EnvironmentContainer extends Container
 {
 
     private UUID environmentId;
+    private String templateName;
+
+
+    public String getTemplateName()
+    {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
+    }
+
     //    private transient Environment environment;
 
 
