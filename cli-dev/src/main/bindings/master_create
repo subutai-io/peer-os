@@ -66,7 +66,10 @@ function master_create {
     echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
        >> $subutai_repo_file
   fi
-  
+  # Add option to add temporary apt_proxy while master template is being created to install necessary packages
+  if [ -n "$SUBUTAI_BUILD_APT_PROXY" ]; then
+    echo "deb http://$SUBUTAI_BUILD_APT_PROXY trusty main" >> $subutai_repo_file
+  fi  
   lxc-attach -n master -- apt-get update
   lxc-attach -n master -- apt-get -y dist-upgrade
 
@@ -80,7 +83,9 @@ function master_create {
   lxc-attach -n master -- apt-get -y autoremove
 
   echo "dpkg -l" | lxc-attach -n master > /var/lib/lxc/master/packages
-
+  # Remove temporary apt_proxy from master's apt repo file
+  sed '/deb http://$SUBUTAI_BUILD_APT_PROXY trusty main/d' $subutai_repo_file
+  
   lxc-stop -n master
   lxc-wait -n master -s 'STOPPED'
   sleep 2
