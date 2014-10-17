@@ -50,6 +50,7 @@ public class NodeSelectionStep extends Panel
         content.setMargin( true );
 
         TextField nameTxt = new TextField( "Cluster name" );
+        nameTxt.setId("HiveClusterName");
         nameTxt.setRequired( true );
         nameTxt.setWidth( controlWidth, Unit.POINTS );
         nameTxt.addValueChangeListener( new Property.ValueChangeListener()

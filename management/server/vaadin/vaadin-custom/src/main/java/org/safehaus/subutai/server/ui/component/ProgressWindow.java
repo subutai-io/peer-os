@@ -165,7 +165,7 @@ public class ProgressWindow
             }
         }
         finally {
-//            VaadinSession.getCurrent().getLockInstance().unlock();
+            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
 
