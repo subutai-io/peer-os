@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -18,7 +19,7 @@ import com.google.common.collect.Sets;
 public class Commands
 {
     private final CommandRunnerBase commandRunner;
-
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase();
 
     public Commands( final CommandRunnerBase commandRunner )
     {
@@ -31,7 +32,7 @@ public class Commands
     public Command getInstallCommand( HadoopClusterConfig hadoopClusterConfig )
     {
         return commandRunner.createCommand( "Installing hadoop deb package",
-                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install ksks-hadoop" )
+                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
                         .withTimeout( 180 ), Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
     }
 
@@ -39,7 +40,7 @@ public class Commands
     public Command getInstallCommand( Agent agent )
     {
         return commandRunner.createCommand( "Installing hadoop deb package",
-                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install ksks-hadoop" )
+                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
                         .withTimeout( 180 ), Sets.newHashSet( agent ) );
     }
 
