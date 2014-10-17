@@ -45,8 +45,8 @@ public class ContainerManagerImplTest
     public void setUpMethod()
     {
         Monitoring monitor = mock( Monitoring.class );
-        when( monitor.getData( any( String.class ), any( MetricType.class ), any( Date.class ), any( Date.class ) ) )
-                .thenReturn( Collections.EMPTY_MAP );
+//        when( monitor.getData( any( String.class ), any( MetricType.class ), any( Date.class ), any( Date.class ) ) )
+//                .thenReturn( Collections.EMPTY_MAP );
         templateManager = mock( TemplateManager.class );
         templateRegistry = mock( TemplateRegistry.class );
         dbManager = mock( DbManager.class );

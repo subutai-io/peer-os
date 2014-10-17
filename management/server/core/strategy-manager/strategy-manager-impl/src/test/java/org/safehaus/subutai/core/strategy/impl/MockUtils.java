@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -74,9 +75,9 @@ public class MockUtils
     {
         Map<Agent, ServerMetric> result = new HashMap<>();
 
-        Map<Metric, Double> avgMetric = new HashMap<>();
-        avgMetric.put( Metric.CPU_USER, 1.0 );
-        avgMetric.put( Metric.MEM_FREE, 4096.0 );
+        Map<MetricType, Double> avgMetric = new HashMap<>();
+        avgMetric.put( MetricType.CPU_USER, 1.0 );
+        avgMetric.put( MetricType.MEM_FREE, 4096.0 );
         Set<Agent> physicalAgents = getPhysicalAgents();
         int i = 0;
         for ( Agent agent : physicalAgents )

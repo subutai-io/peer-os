@@ -25,12 +25,14 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcState;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.lxcmanager.LxcManagerImpl;
 import org.safehaus.subutai.core.container.impl.strategy.DefaultLxcPlacementStrategy;
-import org.safehaus.subutai.core.monitor.api.MetricType;
+import org.safehaus.subutai.core.monitor.api.MonitorException;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,11 +47,11 @@ public class LxcManagerImplTest
 
 
     @Before
-    public void setUpMethod()
+    public void setUpMethod() throws MonitorException
     {
         Monitoring monitoring = mock( Monitoring.class );
-        when( monitoring.getData( any( String.class ), any( MetricType.class ), any( Date.class ), any( Date.class ) ) )
-                .thenReturn( Collections.EMPTY_MAP );
+        when( monitoring.getMetrics( anySet(), anySet(), any( Date.class ), any( Date.class ), anyInt() ) )
+                .thenReturn( Collections.EMPTY_LIST );
         lxcManager = new LxcManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitoring );
         ( ( LxcManagerImpl ) lxcManager ).init();
     }

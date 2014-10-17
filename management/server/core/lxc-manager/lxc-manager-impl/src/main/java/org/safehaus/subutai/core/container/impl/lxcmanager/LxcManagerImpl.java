@@ -260,22 +260,7 @@ public class LxcManagerImpl implements LxcManager
                             Date startDate = cal.getTime();
                             Date endDate = Calendar.getInstance().getTime();
                             Map<MetricType, Double> averageMetrics = new EnumMap<>( MetricType.class );
-                            for ( MetricType metricTypeKey : MetricType.values() )
-                            {
-                                Map<Date, Double> metricMap =
-                                        monitoring.getData( agent.getHostname(), metricTypeKey, startDate, endDate );
-                                if ( !metricMap.isEmpty() )
-                                {
-                                    double avg = 0;
-                                    for ( Map.Entry<Date, Double> metricEntry : metricMap.entrySet() )
-                                    {
-                                        avg += metricEntry.getValue();
-                                    }
-                                    avg /= metricMap.size();
 
-                                    averageMetrics.put( metricTypeKey, avg );
-                                }
-                            }
                             ServerMetric serverMetric =
                                     new ServerMetric( freeHddMb, freeRamMb, ( int ) cpuLoadPercent, numOfProc,
                                             averageMetrics );

@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -46,7 +47,6 @@ import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -611,21 +611,6 @@ public class ContainerManagerImpl extends ContainerManagerBase
         Date startDate = cal.getTime();
         Date endDate = Calendar.getInstance().getTime();
         Map<MetricType, Double> averageMetrics = new EnumMap<>( MetricType.class );
-        for ( MetricType metricTypeKey : MetricType.values() )
-        {
-            Map<Date, Double> metricMap = monitoring.getData( agent.getHostname(), metricTypeKey, startDate, endDate );
-            if ( !metricMap.isEmpty() )
-            {
-                double avg = 0;
-                for ( Map.Entry<Date, Double> metricEntry : metricMap.entrySet() )
-                {
-                    avg += metricEntry.getValue();
-                }
-                avg /= metricMap.size();
-
-                averageMetrics.put( metricTypeKey, avg );
-            }
-        }
         return averageMetrics;
     }
 
