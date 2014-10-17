@@ -1,6 +1,34 @@
 #!/bin/bash
-# creating default ovs bridge and ports durin lxc startup
-BRIDGE="br-int"
-ovs-vsctl --may-exist add-br $BRIDGE
-ovs-vsctl --if-exists del-port $BRIDGE $5
-ovs-vsctl --may-exist add-port $BRIDGE $5
+
+# ==========================================================================
+# Set of functions that configures openvswitch related stuff
+# ==========================================================================
+
+function ovs_configure_lxc {
+  local lxc="$1"
+  if [ -z $lxc ]; then
+    msg_error "lxc name cannot be empty. Aborting!"
+    unlock_container_read $1
+    exit 1
+  fi
+  config="/var/lib/lxc/$lxc/config"
+
+  #TODO properly add the configurations related with ovs
+  #into config file of lxc so that they don't get replicated
+  #after each clone operation!!!
+#################################FIX_HERE########################################
+  #changing default network link to related veth pair name
+  #sed -i '/lxc.network.link =.*/c\lxc.network.veth.pair = $lxc' $config
+  #adding ovs_ops script for lxc startup
+  #echo "lxc.network.script.up = $subutai_script_base/create_ovs_interface" >> $config
+  #creating second network interface
+  #echo "lxc.network.type = veth" >> $config
+  #echo "lxc.network.flags = up" >> $config
+
+  #defining 2 veth pair for each lxc container
+  #sed -i "/lxc.network.veth.pair =.*/c\lxc.network.veth.pair = $child" $config
+  #echo "lxc.network.veth.pair = $child-2" >> $config
+#################################FIX_HERE########################################
+}
+
+

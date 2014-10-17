@@ -45,12 +45,16 @@ function clone {
   fi
   #getting environmentId using getopts
   local environmentId=""
+  local ovs_enabled="false"
   shift_amount=0;
   while getopts ":e:" opt; do
      case $opt in
        e)
           environmentId=$OPTARG;
           ;;
+       o)
+	  ovs_enabled="true"
+	  ;;
        \?)
           msg_error "Unrecognized option -$OPTARG"
           exit 1
@@ -70,10 +74,12 @@ function clone {
   #cloning operation is starting..
   lxc_clone $parent $child $environmentId "`usage`"
   
-  #defining 2 veth pair for each lxc container
-  sed -i "/lxc.network.veth.pair =.*/c\lxc.network.veth.pair = $child" $config
-  echo "lxc.network.veth.pair = $child-2" >> $config
-  
+  # Create 2 veth for container if openvs
+  if [ "x$ovs_enabled" == "xtrue" ]; then
+    msg_info "    - configuring $child network with openvswitch"
+    ovs_configure_lxc $child
+  fi
+
   git_child_branch $child
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
