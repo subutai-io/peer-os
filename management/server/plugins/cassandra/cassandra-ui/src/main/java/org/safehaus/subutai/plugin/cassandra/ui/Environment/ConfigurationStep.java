@@ -100,7 +100,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         List<Environment> environmentList = environmentWizard.getEnvironmentManager().getEnvironments();
-        final ComboBox envCombo = new ComboBox("Choose environment");
+        final ComboBox envCombo = new ComboBox( "Choose environment" );
         BeanItemContainer<Environment> eBean = new BeanItemContainer<>( Environment.class );
         eBean.addAll( environmentList );
         envCombo.setContainerDataSource( eBean );
@@ -153,7 +153,8 @@ public class ConfigurationStep extends VerticalLayout
                 {
                     show( "Please provide number of nodes and seeds !" );
                 }
-                else if ( ( int ) envCombo.getValue() <= ( int ) seedsCountCombo.getValue() )
+                else if ( ( int ) ( ( Environment ) envCombo.getValue() ).getContainers().size()
+                        <= ( int ) seedsCountCombo.getValue() )
                 {
                     show( "Number of seeds should be smaller than total number nodes in the cluster !" );
                 }
