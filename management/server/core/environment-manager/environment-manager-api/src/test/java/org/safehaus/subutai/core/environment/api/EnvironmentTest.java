@@ -53,7 +53,7 @@ public class EnvironmentTest
     @Test
     public void testNodesNotNull() throws Exception
     {
-        Set<EnvironmentContainer> environmentContainers = environment.getEnvironmentContainerNodes();
+        Set<EnvironmentContainer> environmentContainers = environment.getContainers();
         assertNotNull( environmentContainers );
     }
 

@@ -103,13 +103,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
     void destroyNodes( Environment env )
     {
 
-        if ( env == null || env.getEnvironmentContainerNodes().isEmpty() )
+        if ( env == null || env.getContainers().isEmpty() )
         {
             return;
         }
 
-        Set<Agent> set = new HashSet<>( env.getEnvironmentContainerNodes().size() );
-        for ( EnvironmentContainer n : env.getEnvironmentContainerNodes() )
+        Set<Agent> set = new HashSet<>( env.getContainers().size() );
+        for ( EnvironmentContainer n : env.getContainers() )
         {
             set.add( n.getAgent() );
         }

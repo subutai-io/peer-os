@@ -64,7 +64,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
         }
 
         Set<Agent> cassNodes = new HashSet<Agent>();
-        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             cassNodes.add( environmentContainer.getAgent() );
         }

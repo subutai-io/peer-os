@@ -365,7 +365,7 @@ public class JettyImpl implements Jetty
                                                          final ProductOperation po )
     {
         Set<Agent> cassNodes = new HashSet<Agent>();
-        for ( EnvironmentContainer environmentContainer : env.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : env.getContainers() )
         {
             cassNodes.add( environmentContainer.getAgent() );
         }

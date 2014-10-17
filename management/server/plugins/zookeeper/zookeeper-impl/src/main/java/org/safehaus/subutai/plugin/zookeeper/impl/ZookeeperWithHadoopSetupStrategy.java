@@ -62,15 +62,15 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", zookeeperClusterConfig.getClusterName() ) );
         }
 
-        if ( environment.getEnvironmentContainerNodes().size() < zookeeperClusterConfig.getNumberOfNodes() )
+        if ( environment.getContainers().size() < zookeeperClusterConfig.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
-                    zookeeperClusterConfig.getNumberOfNodes(), environment.getEnvironmentContainerNodes().size() ) );
+                    zookeeperClusterConfig.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
 
         Set<Agent> zkAgents = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             if ( environmentContainer.getTemplate().getProducts()
                      .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )

@@ -48,13 +48,13 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getEnvironmentContainerNodes() == null || environment.getEnvironmentContainerNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         // check installed packages
-        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
             {
@@ -103,7 +103,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         else
         // find out nimbus node in environment
         {
-            for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
+            for ( EnvironmentContainer n : environment.getContainers() )
             {
                 if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
                 {
@@ -113,7 +113,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
 
         // collect worker nodes in environment
-        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             if ( n.getNodeGroupName().equals( StormService.SUPERVISOR.toString() ) )
             {

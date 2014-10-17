@@ -84,7 +84,7 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
 
         //get ZK nodes with Hadoop installed from environment
         Set<Agent> accumuloAgents = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
                     && environmentContainer.getTemplate().getProducts()

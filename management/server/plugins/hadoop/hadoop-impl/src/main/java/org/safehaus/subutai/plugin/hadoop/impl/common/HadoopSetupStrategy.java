@@ -162,7 +162,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<Agent> masterNodes = new HashSet<>();
 
-        for ( EnvironmentContainer environmentContainer : this.environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : this.environment.getContainers() )
         {
             if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
@@ -191,7 +191,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<Agent> slaveNodes = new HashSet<>();
 
-        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {

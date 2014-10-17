@@ -59,14 +59,14 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getEnvironmentContainerNodes().size() < config.getNumberOfNodes() )
+        if ( environment.getContainers().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
-                    config.getNumberOfNodes(), environment.getEnvironmentContainerNodes().size() ) );
+                    config.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
         Set<Agent> elasticsearhcNodes = new HashSet<Agent>();
-        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             elasticsearhcNodes.add( environmentContainer.getAgent() );
         }

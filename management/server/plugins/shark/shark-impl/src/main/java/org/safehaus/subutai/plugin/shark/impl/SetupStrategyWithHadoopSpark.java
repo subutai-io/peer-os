@@ -40,7 +40,7 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
         {
             throw new ClusterSetupException( "Environment not specified" );
         }
-        if ( environment.getEnvironmentContainerNodes() == null || environment.getEnvironmentContainerNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
@@ -55,7 +55,7 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
         {
             config.setNodes( new HashSet<Agent>() );
         }
-        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
             {

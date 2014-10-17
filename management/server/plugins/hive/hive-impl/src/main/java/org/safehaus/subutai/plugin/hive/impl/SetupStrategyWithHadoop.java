@@ -42,13 +42,13 @@ class SetupStrategyWithHadoop extends HiveSetupStrategy
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getEnvironmentContainerNodes() == null || environment.getEnvironmentContainerNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         Set<Agent> clients = new HashSet<>(), allNodes = new HashSet<>();
-        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             allNodes.add( n.getAgent() );
             // if Derby installed on node and server node is not yet set

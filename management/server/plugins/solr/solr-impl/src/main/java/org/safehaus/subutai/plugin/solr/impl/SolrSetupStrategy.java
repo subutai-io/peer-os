@@ -67,20 +67,20 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getEnvironmentContainerNodes().isEmpty() )
+        if ( environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
-        if ( environment.getEnvironmentContainerNodes().size() < config.getNumberOfNodes() )
+        if ( environment.getContainers().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException(
-                    String.format( "Environment has %d nodes but %d nodes are required", environment.getEnvironmentContainerNodes().size(),
+                    String.format( "Environment has %d nodes but %d nodes are required", environment.getContainers().size(),
                             config.getNumberOfNodes() ) );
         }
 
         Set<EnvironmentContainer> solrEnvironmentContainers = new HashSet<>();
-        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) )
             {

@@ -42,13 +42,13 @@ public class SetupStrategyWithHadoop extends SetupHelper implements ClusterSetup
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getEnvironmentContainerNodes() == null || environment.getEnvironmentContainerNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         config.getWorkers().clear();
-        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
             {
