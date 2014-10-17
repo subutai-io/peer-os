@@ -1,9 +1,9 @@
-Package: ksks-hbase
+Package: subutai-hbase
 Priority: optional
 Section: devel
 Installed-Size: 100
-Maintainer: kiskis
+Maintainer: 
 Architecture: amd64
 Version: 1.1.3
-Depends: ksks-hadoop
-Description: This is a hbase package of kiskis distribution.
+Depends: subutai-hadoop
+Description: This is a hbase package of subutai distribution.
