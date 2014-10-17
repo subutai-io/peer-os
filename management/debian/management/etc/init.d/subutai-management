@@ -1,6 +1,6 @@
 #!/bin/bash
 SUBUTAI_HOME="/opt/subutai-management"
-SUBUTAI_BIN="/opt/subutai-managemnt/bin"
+SUBUTAI_BIN="/opt/subutai-management/bin"
 SUBUTAI_DATA="/opt/subutai-management/data"
 SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
 
