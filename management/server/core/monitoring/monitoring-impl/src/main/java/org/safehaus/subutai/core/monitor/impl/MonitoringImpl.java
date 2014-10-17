@@ -37,7 +37,6 @@ public class MonitoringImpl implements Monitoring
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( MonitoringImpl.class );
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String DEFAULT_QUERY =
             FileUtil.getContent( "elasticsearch/query_default.json", MonitoringImpl.class );
     private static final String DISK_QUERY =
@@ -45,6 +44,7 @@ public class MonitoringImpl implements Monitoring
     private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
     private final String esHost;
     private final int esPort;
+    protected ObjectMapper objectMapper;
     protected RestUtil restUtil;
 
 
@@ -55,6 +55,7 @@ public class MonitoringImpl implements Monitoring
 
         this.esHost = esHost;
         this.esPort = esPort;
+        objectMapper = new ObjectMapper();
         this.restUtil = new RestUtil();
     }
 
@@ -193,7 +194,7 @@ public class MonitoringImpl implements Monitoring
 
     protected List<JsonNode> toNodes( String response ) throws IOException
     {
-        JsonNode json = OBJECT_MAPPER.readTree( response );
+        JsonNode json = objectMapper.readTree( response );
         JsonNode hits = json.get( "hits" ).get( "hits" );
 
         List<JsonNode> nodes = new ArrayList<>();
