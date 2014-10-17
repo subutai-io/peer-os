@@ -61,7 +61,7 @@ public class CheckClusterHandlerTest
 
 
     @Test
-    public void testRun()
+    public void testRun() throws InterruptedException
     {
         JettyConfig jettyConfig = new JettyConfig();
         jettyConfig.setClusterName( clusterName );
@@ -75,6 +75,8 @@ public class CheckClusterHandlerTest
 
         ExecutorService executor = Executors.newCachedThreadPool();
         executor.execute( handler );
+
+        Thread.sleep( 3000 );
 
         verify( manager.getCommandRunner() ).runCommand( isA( CommandMock.class ) );
     }
