@@ -25,7 +25,7 @@ import com.google.common.collect.Sets;
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = "ksks-cassandra";
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + "cassandra";
     private final CommandRunnerBase commandRunner;
 
 
