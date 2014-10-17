@@ -1,8 +1,8 @@
-Package: ksks-solr
+Package: subutai-solr
 Priority: optional
 Section: devel
 Installed-Size: 212000
-Maintainer: kiskis
+Maintainer: subutai
 Architecture: all
 Version: 1.0.10
-Description: This is a solr package of kiskis distribution.
+Description: This is a solr package of subutai distribution.
