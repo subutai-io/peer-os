@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 

@@ -25,7 +25,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcState;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.lxcmanager.LxcManagerImpl;
 import org.safehaus.subutai.core.container.impl.strategy.DefaultLxcPlacementStrategy;
-import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 
 import static org.junit.Assert.assertFalse;
@@ -48,7 +48,7 @@ public class LxcManagerImplTest
     public void setUpMethod()
     {
         Monitoring monitoring = mock( Monitoring.class );
-        when( monitoring.getData( any( String.class ), any( Metric.class ), any( Date.class ), any( Date.class ) ) )
+        when( monitoring.getData( any( String.class ), any( MetricType.class ), any( Date.class ), any( Date.class ) ) )
                 .thenReturn( Collections.EMPTY_MAP );
         lxcManager = new LxcManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitoring );
         ( ( LxcManagerImpl ) lxcManager ).init();

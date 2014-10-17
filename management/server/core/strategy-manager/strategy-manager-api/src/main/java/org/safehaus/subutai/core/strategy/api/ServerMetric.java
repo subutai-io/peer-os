@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.strategy.api;
 import java.util.Collections;
 import java.util.Map;
 
-import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 
 
 /**
@@ -19,7 +19,7 @@ public class ServerMetric
 {
 
     //average metrics obtained from elastic search
-    private Map<Metric, Double> averageMetrics;
+    private Map<MetricType, Double> averageMetrics;
     private int freeHddMb;
     private int freeRamMb;
     private int cpuLoadPercent;
@@ -28,7 +28,7 @@ public class ServerMetric
 
 
     public ServerMetric( int freeHddMb, int freeRamMb, int cpuLoadPercent, int numOfProcessors,
-                         Map<Metric, Double> averageMetrics )
+                         Map<MetricType, Double> averageMetrics )
     {
         this.freeHddMb = freeHddMb;
         this.freeRamMb = freeRamMb;
@@ -38,21 +38,21 @@ public class ServerMetric
     }
 
 
-    public Map<Metric, Double> getAverageMetrics()
+    public Map<MetricType, Double> getAverageMetrics()
     {
         return Collections.unmodifiableMap( averageMetrics );
     }
 
 
-    public void setAverageMetrics( Map<Metric, Double> averageMetrics )
+    public void setAverageMetrics( Map<MetricType, Double> averageMetrics )
     {
         this.averageMetrics = averageMetrics;
     }
 
 
-    public Double getAverageMetric( Metric metricKey )
+    public Double getAverageMetric( MetricType metricTypeKey )
     {
-        return averageMetrics.get( metricKey );
+        return averageMetrics.get( metricTypeKey );
     }
 
 

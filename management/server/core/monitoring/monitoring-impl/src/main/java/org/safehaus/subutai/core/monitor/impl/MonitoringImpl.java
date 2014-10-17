@@ -6,22 +6,31 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.safehaus.subutai.common.exception.HTTPException;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.HttpUtil;
+import org.safehaus.subutai.common.util.NumUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
+import org.safehaus.subutai.core.monitor.api.MonitorException;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
+import org.safehaus.subutai.core.monitor.api.PluginType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public class MonitoringImpl implements Monitoring
@@ -29,85 +38,159 @@ public class MonitoringImpl implements Monitoring
 
     private static final Logger LOG = LoggerFactory.getLogger( MonitoringImpl.class );
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json", MonitoringImpl.class );
+    private static final String DEFAULT_QUERY =
+            FileUtil.getContent( "elasticsearch/query_default.json", MonitoringImpl.class );
+    private static final String DISK_QUERY =
+            FileUtil.getContent( "elasticsearch/query_disk.json", MonitoringImpl.class );
     private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+    private final String esHost;
+    private final int esPort;
 
 
-    /**
-     * The method uses the simplest way to get the data for all the metrics. In terms of performance this is not the
-     * best way but the speed should not be an issue for near future. Further optimization should be done with rewriting
-     * the query to elasticsearch. See: query.json.
-     */
-    @Override
-    public Map<Metric, Map<Date, Double>> getDataForAllMetrics( String host, Date startDate, Date endDate )
+    public MonitoringImpl( final String esHost, final int esPort )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( esHost ), "ES host is missing" );
+        Preconditions.checkArgument( esPort >= 1024 && esPort <= 65536, "Port must be n range 1024 and 65536" );
 
-        Map<Metric, Map<Date, Double>> data = new HashMap<>();
-
-        for ( Metric metric : Metric.values() )
-        {
-            Map<Date, Double> metricData = getData( host, metric, startDate, endDate );
-            data.put( metric, metricData );
-        }
-
-        return data;
+        this.esHost = esHost;
+        this.esPort = esPort;
     }
 
 
     @Override
-    public Map<Date, Double> getData( String host, Metric metric, Date startDate, Date endDate )
+    public List<Metric> getMetrics( Set<String> hosts, Set<MetricType> metricTypes, Date startDate, Date endDate,
+                                    int limit ) throws MonitorException
     {
-        LOG.info( "host: {}, metric: {}, startDate: {}, endDate: {}", host, metric, startDate, endDate );
 
-        Map<Date, Double> data = Collections.emptyMap();
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ), "Hosts is empty" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( metricTypes ), "Metrics is empty" );
+        Preconditions.checkNotNull( startDate, "Start date is null" );
+        Preconditions.checkNotNull( endDate, "End date is null" );
+        Preconditions.checkArgument( NumUtil.isIntBetween( limit, 1, 10000 ), "Limit must be between 1 and 1000" );
 
-        try
+
+        Set<String> defaultMetricsTypes = new HashSet<>();
+        Set<String> hddMetricsTypes = new HashSet<>();
+        for ( MetricType metricType : metricTypes )
         {
-            data = execute( host, metric, startDate, endDate );
-        }
-        catch ( IOException e )
-        {
-            LOG.error( "Error while executing query: ", e );
+            if ( metricType.getPluginType() == PluginType.DEFAULT )
+            {
+                defaultMetricsTypes.add( metricType.name().toLowerCase() );
+            }
+            else if ( metricType.getPluginType() == PluginType.DISK )
+            {
+                hddMetricsTypes.add( metricType.name().toLowerCase() );
+            }
         }
 
-        return data;
+        List<Metric> result = new ArrayList<>();
+        if ( !defaultMetricsTypes.isEmpty() )
+        {
+            result.addAll( getDefaultMetrics(
+                    executeQuery( PluginType.DEFAULT, hosts, defaultMetricsTypes, startDate, endDate, limit ) ) );
+        }
+        if ( !hddMetricsTypes.isEmpty() )
+        {
+            result.addAll( getHddMetrics(
+                    executeQuery( PluginType.DISK, hosts, hddMetricsTypes, startDate, endDate, limit ) ) );
+        }
+
+        return result;
     }
 
 
-    private Map<Date, Double> execute( String host, Metric metric, Date startDate, Date endDate ) throws IOException
+    private String executeQuery( PluginType pluginType, Set<String> hosts, Set<String> metricNames, Date startDate,
+                                 Date endDate, int limit ) throws MonitorException
     {
-
-        String query = QUERY.replace( "$host", host ).replace( "$metricName", metric.name().toLowerCase() )
-                            .replace( "$startDate", dateToStr( startDate ) )
-                            .replace( "$endDate", dateToStr( endDate ) );
-
-        LOG.debug( "query: {}", query );
-
-        String response = "";
+        String query;
+        switch ( pluginType )
+        {
+            case DISK:
+                query = DISK_QUERY;
+                break;
+            default:
+                query = DEFAULT_QUERY;
+        }
+        query = query.replace( "$startDate", dateToStr( startDate ) ).replace( "$endDate", dateToStr( endDate ) )
+                     .replace( "$hosts", "[" + StringUtil.joinStrings( hosts, ',', true ) + "]" )
+                     .replace( "$names", "[" + StringUtil.joinStrings( metricNames, ',', true ) + "]" )
+                     .replace( "$limit", String.valueOf( limit ) );
+        Map<String, String> params = new HashMap<>();
+        params.put( "source", query );
         try
         {
-            Map<String, String> params = new HashMap<>();
-            params.put( "source", query );
-            response = HttpUtil.request( HttpUtil.RequestType.GET, "http://127.0.0.1:9200/_all/logs/_search", params );
+
+            return HttpUtil.request( HttpUtil.RequestType.GET,
+                    String.format( "http://%s:%d/_all/logs/_search", esHost, esPort ), params );
         }
         catch ( HTTPException e )
         {
-            LOG.error( "Error in execute", e );
+            LOG.error( "Error in getDefaultMetrics", e );
+            throw new MonitorException( e );
         }
-        List<JsonNode> nodes = toNodes( response );
-
-        LOG.info( "nodes count: {}", nodes.size() );
-
-        // Reversing the list b/c the query returns the data in desc order (to get the latest values first).
-        Collections.reverse( nodes );
-
-        return toMap( nodes );
     }
 
 
-    private static List<JsonNode> toNodes( String response ) throws IOException
+    private List<Metric> getHddMetrics( final String response ) throws MonitorException
     {
+        try
+        {
+            List<JsonNode> nodes = toNodes( response );
+            List<Metric> metrics = new ArrayList<>();
 
+            for ( JsonNode node : nodes )
+            {
+                Date date = strToDate( node.get( "@timestamp" ).asText() );
+                String host = node.get( "host" ).asText();
+                String name = node.get( "collectd_type" ).asText();
+                Long read = node.get( "read" ).getLongValue();
+                Long write = node.get( "write" ).getLongValue();
+
+                Metric metric = new Metric( MetricType.valueOf( name.toUpperCase() ), read, write, host, date );
+                metrics.add( metric );
+            }
+
+            return metrics;
+        }
+        catch ( ParseException | IOException e )
+        {
+            LOG.error( "Error in getHddMetrics", e );
+            throw new MonitorException( e );
+        }
+    }
+
+
+    private List<Metric> getDefaultMetrics( String response ) throws MonitorException
+    {
+        try
+        {
+            List<JsonNode> nodes = toNodes( response );
+            List<Metric> metrics = new ArrayList<>();
+
+            for ( JsonNode node : nodes )
+            {
+                Date date = strToDate( node.get( "@timestamp" ).asText() );
+                String host = node.get( "log_host" ).asText();
+                String name = node.get( "name" ).asText();
+                Double value = node.get( "val" ).asDouble();
+                String units = node.get( "units" ).asText();
+
+                Metric metric = new Metric( MetricType.valueOf( name.toUpperCase() ), value, units, host, date );
+                metrics.add( metric );
+            }
+
+            return metrics;
+        }
+        catch ( ParseException | IOException e )
+        {
+            LOG.error( "Error in getDefaultMetrics", e );
+            throw new MonitorException( e );
+        }
+    }
+
+
+    protected List<JsonNode> toNodes( String response ) throws IOException
+    {
         JsonNode json = OBJECT_MAPPER.readTree( response );
         JsonNode hits = json.get( "hits" ).get( "hits" );
 
@@ -115,52 +198,24 @@ public class MonitoringImpl implements Monitoring
 
         for ( int i = 0; i < hits.size(); i++ )
         {
-            JsonNode node = hits.get( i ).get( "_source" );
+            JsonNode node = hits.get( i ).get( "fields" );
             nodes.add( node );
-
-            LOG.debug( "node: {}", node );
         }
 
         return nodes;
     }
 
 
-    private Map<Date, Double> toMap( List<JsonNode> nodes )
-    {
-
-        Map<Date, Double> values = new TreeMap<>();
-
-        for ( JsonNode node : nodes )
-        {
-            Date date = strToDate( node.get( "@timestamp" ).asText() );
-            double value = node.get( "read" ).asDouble();
-            values.put( date, value );
-        }
-
-        return values;
-    }
-
-
-    private Date strToDate( String dateStr )
+    protected Date strToDate( String dateStr ) throws ParseException
     {
 
         String target = dateStr.replace( "T", " " ).replace( "Z", "" );
-        Date date = null;
 
-        try
-        {
-            date = dateFormat.parse( target );
-        }
-        catch ( ParseException e )
-        {
-            LOG.error( "Error while parsing time: ", e );
-        }
-
-        return date;
+        return dateFormat.parse( target );
     }
 
 
-    private String dateToStr( Date date )
+    protected String dateToStr( Date date )
     {
         return dateFormat.format( date ).replace( " ", "T" );
     }

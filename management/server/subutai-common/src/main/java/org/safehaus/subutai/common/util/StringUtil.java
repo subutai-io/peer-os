@@ -1,13 +1,22 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.util.Set;
+
+
 /**
  * Provides utility functions for working with Strings
  */
 public class StringUtil
 {
 
-    public static int countNumberOfOccurences( String strToSearch, String strToCount )
+
+    private StringUtil()
+    {
+    }
+
+
+    public static int countNumberOfOccurrences( String strToSearch, String strToCount )
     {
         int count = 0;
         if ( !isStringNullOrEmpty( strToSearch ) && !isStringNullOrEmpty( strToCount ) )
@@ -46,5 +55,26 @@ public class StringUtil
     public static boolean areStringsEqual( String str1, String str2 )
     {
         return str1 != null && str2 != null && str2.equals( str1 );
+    }
+
+
+    public static String joinStrings( Set<String> strings, char delimiter, boolean wrapWithQuotes )
+    {
+        StringBuilder sb = new StringBuilder();
+        for ( String string : strings )
+        {
+            if ( wrapWithQuotes )
+            {
+                sb.append( "\"" );
+            }
+            sb.append( string );
+            if ( wrapWithQuotes )
+            {
+                sb.append( "\"" );
+            }
+            sb.append( delimiter ).append( " " );
+        }
+        sb.replace( sb.length() - 2, sb.length(), "" );
+        return sb.toString();
     }
 }

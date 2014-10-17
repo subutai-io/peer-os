@@ -44,7 +44,7 @@ import org.safehaus.subutai.core.container.api.ContainerException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -435,7 +435,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
                 if ( serverMetric != null )
                 {
                     Agent agent = agentManager.getAgentByUUID( result.getAgentUUID() );
-                    Map<Metric, Double> averageMetrics = gatherAvgMetrics( agent );
+                    Map<MetricType, Double> averageMetrics = gatherAvgMetrics( agent );
                     serverMetric.setAverageMetrics( averageMetrics );
                     serverMetrics.put( agent, serverMetric );
                 }
@@ -599,7 +599,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     /**
      * Gather metrics from elastic search for a one week period
      */
-    private Map<Metric, Double> gatherAvgMetrics( Agent agent )
+    private Map<MetricType, Double> gatherAvgMetrics( Agent agent )
     {
 
         if ( agent == null )
@@ -610,10 +610,10 @@ public class ContainerManagerImpl extends ContainerManagerBase
         cal.add( Calendar.DATE, -7 );
         Date startDate = cal.getTime();
         Date endDate = Calendar.getInstance().getTime();
-        Map<Metric, Double> averageMetrics = new EnumMap<>( Metric.class );
-        for ( Metric metricKey : Metric.values() )
+        Map<MetricType, Double> averageMetrics = new EnumMap<>( MetricType.class );
+        for ( MetricType metricTypeKey : MetricType.values() )
         {
-            Map<Date, Double> metricMap = monitoring.getData( agent.getHostname(), metricKey, startDate, endDate );
+            Map<Date, Double> metricMap = monitoring.getData( agent.getHostname(), metricTypeKey, startDate, endDate );
             if ( !metricMap.isEmpty() )
             {
                 double avg = 0;
@@ -623,7 +623,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
                 }
                 avg /= metricMap.size();
 
-                averageMetrics.put( metricKey, avg );
+                averageMetrics.put( metricTypeKey, avg );
             }
         }
         return averageMetrics;

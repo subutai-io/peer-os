@@ -36,7 +36,7 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcState;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.core.container.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.core.container.impl.strategy.RoundRobinStrategy;
-import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -259,11 +259,11 @@ public class LxcManagerImpl implements LxcManager
                             cal.add( Calendar.DATE, -7 );
                             Date startDate = cal.getTime();
                             Date endDate = Calendar.getInstance().getTime();
-                            Map<Metric, Double> averageMetrics = new EnumMap<>( Metric.class );
-                            for ( Metric metricKey : Metric.values() )
+                            Map<MetricType, Double> averageMetrics = new EnumMap<>( MetricType.class );
+                            for ( MetricType metricTypeKey : MetricType.values() )
                             {
                                 Map<Date, Double> metricMap =
-                                        monitoring.getData( agent.getHostname(), metricKey, startDate, endDate );
+                                        monitoring.getData( agent.getHostname(), metricTypeKey, startDate, endDate );
                                 if ( !metricMap.isEmpty() )
                                 {
                                     double avg = 0;
@@ -273,7 +273,7 @@ public class LxcManagerImpl implements LxcManager
                                     }
                                     avg /= metricMap.size();
 
-                                    averageMetrics.put( metricKey, avg );
+                                    averageMetrics.put( metricTypeKey, avg );
                                 }
                             }
                             ServerMetric serverMetric =

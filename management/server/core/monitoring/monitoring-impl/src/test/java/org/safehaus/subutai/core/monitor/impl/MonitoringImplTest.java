@@ -1,50 +1,55 @@
 package org.safehaus.subutai.core.monitor.impl;
 
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.monitor.api.Metric;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.safehaus.subutai.core.monitor.api.MetricType;
+
+import com.google.common.collect.Sets;
 
 
 /**
- * Created by talas on 10/6/14.
+ * Test for MonitoringImpl
  */
 public class MonitoringImplTest
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MonitoringImpl.class );
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String QUERY = FileUtil.getContent( "elasticsearch/query.json", MonitoringImpl.class );
-    private final DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 
     private MonitoringImpl monitoring;
 
 
     @Before
-    public void setupClasses()
+    public void setUp()
     {
-        monitoring = new MonitoringImpl();
+        monitoring = new MonitoringImpl( "172.16.131.203", 9200 );
     }
 
 
     @Test
-    public void shouldReturnData()
+    public void testQuery() throws Exception
     {
-        monitoring.getDataForAllMetrics( "host", new Date(), new Date() );
-    }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set( Calendar.YEAR, 2014 );
+        calendar.set( Calendar.MONTH, Calendar.OCTOBER );
+        calendar.set( Calendar.DAY_OF_MONTH, 15 );
+
+        Date startDate = calendar.getTime();
+        calendar.set( Calendar.DAY_OF_MONTH, 20 );
+        Date endDate = calendar.getTime();
 
 
-    @Test
-    public void shouldTestGetData()
-    {
-        monitoring.getData( "host", Metric.CPU_IDLE, new Date(), new Date() );
+        List<Metric> metrics = monitoring
+                .getMetrics( Sets.newHashSet( "py627967291", "py420202276", "cassandra", "master1" ),
+                        Sets.newHashSet( MetricType.DISK_OPS , MetricType.CPU_USER), startDate, endDate, 10 );
+
+        for ( Metric metric : metrics )
+        {
+            System.out.println( metric );
+        }
     }
 }
