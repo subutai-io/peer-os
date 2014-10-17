@@ -202,7 +202,7 @@ function lxc_clone {
   if [ -z "$environmentId" ]; then
     msg_error "environmentId parameter not provided. Aborting ..."
     unlock_container_read $parent
-    unlcok_container_read $child
+    unlock_container_read $child
     exit 1
   fi
 
