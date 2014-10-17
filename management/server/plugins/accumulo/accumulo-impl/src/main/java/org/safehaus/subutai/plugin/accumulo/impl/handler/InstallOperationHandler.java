@@ -59,7 +59,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
     @Override
     public void run()
     {
-
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 Strings.isNullOrEmpty( config.getZookeeperClusterName() ) ||
                 Strings.isNullOrEmpty( config.getHadoopClusterName() ) ||
@@ -101,7 +100,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
 
     private void setupWithHadoopNZk()
     {
-
         try
         {
             final String COMBO_TEMPLATE_NAME = "hadoopnzknaccumulo";

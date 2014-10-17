@@ -25,12 +25,15 @@ import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -46,12 +49,15 @@ public class Manager
     protected static final String REFRESH_CLUSTERS_CAPTION = "Refresh Clusters";
     protected static final String START_BUTTON_CAPTION = "Start";
     protected static final String STOP_BUTTON_CAPTION = "Stop";
+    protected static final String CHECK_BUTTON_CAPTION = "Check";
     protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
     protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
+    protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String STYLE_NAME = "default";
+    private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Flume flume;
     private final Tracker tracker;
@@ -93,6 +99,9 @@ public class Manager
         getRefreshClusterButton( controlsContent );
         getDestroyClusterButton( controlsContent );
         getAddNodeButton( controlsContent );
+
+        PROGRESS_ICON.setVisible( false );
+        controlsContent.addComponent( PROGRESS_ICON );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -196,6 +205,48 @@ public class Manager
         controlsContent.addComponent( destroyClusterBtn );
     }
 
+    public void checkAllNodes()
+    {
+        if ( nodesTable != null )
+        {
+            for ( Object o : nodesTable.getItemIds() )
+            {
+                int rowId = ( Integer ) o;
+                Item row = nodesTable.getItem( rowId );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                if ( availableOperationsLayout != null )
+                {
+                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
+                    if ( checkBtn != null )
+                    {
+                        checkBtn.click();
+                    }
+                }
+            }
+        }
+    }
+
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
+
 
     private void getRefreshClusterButton( HorizontalLayout controlsContent )
     {
@@ -227,6 +278,8 @@ public class Manager
             {
                 config = ( FlumeConfig ) event.getProperty().getValue();
                 refreshUI();
+                checkAllNodes();
+                checkAllNodes();
             }
         } );
 
@@ -254,86 +307,28 @@ public class Manager
 
         for ( final Agent agent : agents )
         {
+            final Label resultHolder = new Label();
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
+            final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
 
-            enableButton( stopBtn, startBtn );
+            enableButton( stopBtn, startBtn, checkBtn, destroyBtn );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
 
-            addStyleName( startBtn, stopBtn, destroyBtn, availableOperations );
-            addGivenComponents( availableOperations, startBtn, stopBtn, destroyBtn );
+            addStyleName( checkBtn, startBtn, stopBtn, destroyBtn, availableOperations );
+            addGivenComponents( availableOperations, startBtn, stopBtn, checkBtn, destroyBtn );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ), resultHolder, availableOperations
             }, null );
 
-            startBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    disableButton( startBtn, stopBtn, destroyBtn );
 
-                    final UUID trackID = flume.startNode( config.getClusterName(), agent.getHostname() );
-                    ProgressWindow window =
-                            new ProgressWindow( executorService, tracker, trackID, FlumeConfig.PRODUCT_KEY );
-                    window.getWindow().addCloseListener( new Window.CloseListener()
-                    {
-                        @Override
-                        public void windowClose( Window.CloseEvent closeEvent )
-                        {
-                            ProductOperationView po = tracker.getProductOperation( FlumeConfig.PRODUCT_KEY, trackID );
-                            if ( po.getState() == ProductOperationState.SUCCEEDED )
-                            {
-                                stopBtn.setEnabled( true );
-                            }
-                            else
-                            {
-                                startBtn.setEnabled( true );
-                            }
-                            destroyBtn.setEnabled( true );
-                        }
-                    } );
-                    contentRoot.getUI().addWindow( window.getWindow() );
-                }
-            } );
-
-            stopBtn.addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                    startBtn.setEnabled( false );
-                    stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
-
-                    final UUID trackID = flume.stopNode( config.getClusterName(), agent.getHostname() );
-
-                    ProgressWindow window =
-                            new ProgressWindow( executorService, tracker, trackID, FlumeConfig.PRODUCT_KEY );
-                    window.getWindow().addCloseListener( new Window.CloseListener()
-                    {
-                        @Override
-                        public void windowClose( Window.CloseEvent closeEvent )
-                        {
-                            ProductOperationView po = tracker.getProductOperation( FlumeConfig.PRODUCT_KEY, trackID );
-                            if ( po.getState() == ProductOperationState.SUCCEEDED )
-                            {
-                                startBtn.setEnabled( true );
-                            }
-                            else
-                            {
-                                stopBtn.setEnabled( true );
-                            }
-                            destroyBtn.setEnabled( true );
-                        }
-                    } );
-                    contentRoot.getUI().addWindow( window.getWindow() );
-                }
-            } );
+            addCheckButtonClickListener( agent, resultHolder, checkBtn, startBtn, stopBtn, destroyBtn );
+            addClickListenerToStartButton( agent, checkBtn, startBtn, stopBtn, destroyBtn );
+            addClickListenerToStopButton ( agent, checkBtn, startBtn, stopBtn, destroyBtn );
 
             destroyBtn.addClickListener( new Button.ClickListener()
             {
@@ -348,6 +343,8 @@ public class Manager
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent )
                         {
+                            // before destroying installation, stop flume process
+                            stopBtn.click();
                             UUID trackID = flume.destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
                                     new ProgressWindow( executorService, tracker, trackID, FlumeConfig.PRODUCT_KEY );
@@ -367,6 +364,125 @@ public class Manager
                 }
             } );
         }
+    }
+
+
+    private Button getButton( String caption, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            if ( b.getCaption().equals( caption ) )
+            {
+                return b;
+            }
+        }
+        return null;
+    }
+
+
+    private void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    private void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    {
+        getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new StartTask( flume, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    @Override
+                                    public void onComplete( String result )
+                                    {
+                                        enableButton( buttons );
+                                        PROGRESS_ICON.setVisible( false );
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
+    }
+
+
+    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    {
+        getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute( new StopTask( flume, tracker, config.getClusterName(), agent.getHostname(),
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                enableButton( buttons );
+                                PROGRESS_ICON.setVisible( false );
+                                synchronized ( PROGRESS_ICON )
+                                {
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
+            }
+        } );
+    }
+
+    public void addCheckButtonClickListener( final Agent agent, final Label resultHolder, final Button... buttons )
+    {
+        getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new CheckTask( flume, tracker, config.getClusterName(), agent.getHostname(),
+                                new CompleteEvent()
+                                {
+                                    public void onComplete( String result )
+                                    {
+                                        synchronized ( PROGRESS_ICON )
+                                        {
+                                            resultHolder.setValue( result );
+                                            if ( resultHolder.getValue().contains( "not" ) )
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                            }
+                                            else
+                                            {
+                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            }
+                                            PROGRESS_ICON.setVisible( false );
+                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        }
+                                    }
+                                } ) );
+            }
+        } );
     }
 
 
@@ -449,6 +565,7 @@ public class Manager
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );

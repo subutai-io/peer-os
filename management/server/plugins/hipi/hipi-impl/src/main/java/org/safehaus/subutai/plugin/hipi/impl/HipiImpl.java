@@ -46,7 +46,7 @@ public class HipiImpl implements Hipi
 
 
     public HipiImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                       Hadoop hadoopManager, EnvironmentManager environmentManager, ContainerManager containerManager )
+                     Hadoop hadoopManager, EnvironmentManager environmentManager, ContainerManager containerManager )
     {
         this.commands = new Commands( commandRunner );
         this.commandRunner = commandRunner;

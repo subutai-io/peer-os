@@ -82,8 +82,7 @@ public class VerificationStep extends Panel
                     trackId = hipi.installCluster( config, wizard.getHadoopConfig() );
                 }
 
-                ProgressWindow window =
-                        new ProgressWindow( executorService, tracker, trackId, HipiConfig.PRODUCT_KEY );
+                ProgressWindow window = new ProgressWindow( executorService, tracker, trackId, HipiConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener()
                 {
                     @Override

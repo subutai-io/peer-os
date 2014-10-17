@@ -290,7 +290,6 @@ public class Template
                 ", subutaiParent='" + subutaiParent + '\'' +
                 ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
-                ", packagesManifest='" + packagesManifest + '\'' +
                 ", children=" + children +
                 ", products=" + products +
                 ", md5sum='" + md5sum + '\'' +

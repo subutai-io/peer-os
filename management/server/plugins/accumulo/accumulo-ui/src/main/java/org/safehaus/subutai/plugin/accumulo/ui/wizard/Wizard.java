@@ -23,9 +23,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 
 
-/**
- * @author dilshat
- */
 public class Wizard
 {
 
@@ -43,7 +40,6 @@ public class Wizard
 
     public Wizard( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
     {
-
         this.executorService = executorService;
         this.accumulo = serviceLocator.getService( Accumulo.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
@@ -53,7 +49,6 @@ public class Wizard
         grid = new GridLayout( 1, 20 );
         grid.setMargin( true );
         grid.setSizeFull();
-
         putForm();
     }
 

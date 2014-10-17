@@ -17,7 +17,8 @@ public class Commands
     public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + "hipi";
     public static final String INSTALL = "apt-get --force-yes --assume-yes install " + PACKAGE_NAME;
     public static final String UNINSTALL = "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME;
-    public static final String CHECK = "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX.substring( 0, Common.PACKAGE_PREFIX.length()-1 );
+    public static final String CHECK =
+            "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX.substring( 0, Common.PACKAGE_PREFIX.length() - 1 );
 
     private final CommandRunnerBase commandRunner;
 
