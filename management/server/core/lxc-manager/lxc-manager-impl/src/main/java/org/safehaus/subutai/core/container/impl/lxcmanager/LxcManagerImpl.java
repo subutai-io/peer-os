@@ -251,7 +251,7 @@ public class LxcManagerImpl implements LxcManager
                     }
                     if ( serverOK )
                     {
-                        //get metrics from elastic search for a one week period
+                        //get metrics from elastic search for a one week period  .
                         Agent agent = agentManager.getAgentByUUID( result.getAgentUUID() );
                         if ( agent != null )
                         {
