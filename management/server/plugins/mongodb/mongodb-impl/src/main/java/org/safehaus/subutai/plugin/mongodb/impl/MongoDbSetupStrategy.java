@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
@@ -113,13 +113,13 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         }
 
         Set<Agent> mongoAgents = new HashSet<>();
-        Set<EnvironmentContainerNode> mongoEnvironmentContainerNodes = new HashSet<>();
-        for ( EnvironmentContainerNode environmentContainerNode : environment.getEnvironmentContainerNodes() )
+        Set<EnvironmentContainer> mongoEnvironmentContainers = new HashSet<>();
+        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
         {
-            if ( environmentContainerNode.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
+            if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
             {
-                mongoAgents.add( environmentContainerNode.getAgent() );
-                mongoEnvironmentContainerNodes.add( environmentContainerNode );
+                mongoAgents.add( environmentContainer.getAgent() );
+                mongoEnvironmentContainers.add( environmentContainer );
             }
         }
 
@@ -133,19 +133,19 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         Set<Agent> configServers = new HashSet<>();
         Set<Agent> routers = new HashSet<>();
         Set<Agent> dataNodes = new HashSet<>();
-        for ( EnvironmentContainerNode environmentContainerNode : mongoEnvironmentContainerNodes )
+        for ( EnvironmentContainer environmentContainer : mongoEnvironmentContainers )
         {
-            if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( environmentContainerNode.getNodeGroupName() ) )
+            if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                configServers.add( environmentContainerNode.getAgent() );
+                configServers.add( environmentContainer.getAgent() );
             }
-            else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( environmentContainerNode.getNodeGroupName() ) )
+            else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                routers.add( environmentContainerNode.getAgent() );
+                routers.add( environmentContainer.getAgent() );
             }
-            else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( environmentContainerNode.getNodeGroupName() ) )
+            else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                dataNodes.add( environmentContainerNode.getAgent() );
+                dataNodes.add( environmentContainer.getAgent() );
             }
         }
 

@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.common.protocol.Template;
 
 import static org.junit.Assert.assertEquals;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
 public class EnvironmentContainerNodeTest
 {
     private static final String NODE_GROUP_NAME = "name";
-    EnvironmentContainerNode environmentContainerNode;
+    EnvironmentContainer environmentContainer;
     @Mock
     Agent agent;
     @Mock
@@ -28,14 +28,14 @@ public class EnvironmentContainerNodeTest
     @Before
     public void setUp() throws Exception
     {
-        this.environmentContainerNode = new EnvironmentContainerNode( agent, template, NODE_GROUP_NAME );
+        this.environmentContainer = new EnvironmentContainer( agent, template, NODE_GROUP_NAME );
     }
 
 
     @Test
     public void testGetAgent() throws Exception
     {
-        Agent agent = environmentContainerNode.getAgent();
+        Agent agent = environmentContainer.getAgent();
         assertNotNull( agent );
     }
 
@@ -43,7 +43,7 @@ public class EnvironmentContainerNodeTest
     @Test
     public void testGetNodeGroupName() throws Exception
     {
-        String ngn = environmentContainerNode.getNodeGroupName();
+        String ngn = environmentContainer.getNodeGroupName();
         assertEquals( NODE_GROUP_NAME, ngn );
     }
 
@@ -51,7 +51,7 @@ public class EnvironmentContainerNodeTest
     @Test
     public void testGetTemplate() throws Exception
     {
-        Template t = environmentContainerNode.getTemplate();
+        Template t = environmentContainer.getTemplate();
         assertNotNull( t );
     }
 }

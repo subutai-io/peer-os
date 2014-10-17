@@ -1,30 +1,28 @@
-package org.safehaus.subutai.plugin.spark.impl;
+package org.safehaus.subutai.plugin.presto.impl;
 
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.handler.StopNodeOperationHandler;
-import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.impl.handler.StopNodeOperationHandler;
+import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 
 
-@Ignore
-public class StopEnvironmentContainerNodeOperationHandlerTest
+public class StopEnvironmentContainerOperationHandlerTest
 {
-    private SparkImplMock mock;
+    private PrestoImplMock mock;
     private AbstractOperationHandler handler;
 
 
     @Before
     public void setUp()
     {
-        mock = new SparkImplMock();
-        handler = new StopNodeOperationHandler( mock, "test-cluster", "test-host", true );
+        mock = new PrestoImplMock();
+        handler = new StopNodeOperationHandler( mock, "test-cluster", "test-host" );
     }
 
 
@@ -43,7 +41,7 @@ public class StopEnvironmentContainerNodeOperationHandlerTest
     @Test
     public void testWithNotConnectedAgents()
     {
-        SparkClusterConfig config = new SparkClusterConfig();
+        PrestoClusterConfig config = new PrestoClusterConfig();
         mock.setClusterConfig( config );
         handler.run();
 

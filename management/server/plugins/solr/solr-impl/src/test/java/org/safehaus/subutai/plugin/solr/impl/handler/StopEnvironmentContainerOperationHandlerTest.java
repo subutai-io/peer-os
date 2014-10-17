@@ -12,7 +12,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 
-public class StopEnvironmentContainerNodeOperationHandlerTest
+public class StopEnvironmentContainerOperationHandlerTest
 {
 
 

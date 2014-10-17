@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class StopEnvironmentContainerNodeOperationHandlerTest
+public class StopEnvironmentContainerOperationHandlerTest
 {
     @Test
     public void testWithoutCluster()

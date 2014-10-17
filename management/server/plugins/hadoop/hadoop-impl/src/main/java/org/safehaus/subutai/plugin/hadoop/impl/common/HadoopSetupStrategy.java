@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
@@ -162,14 +162,14 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<Agent> masterNodes = new HashSet<>();
 
-        for ( EnvironmentContainerNode environmentContainerNode : this.environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : this.environment.getEnvironmentContainerNodes() )
         {
-            if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainerNode.getNodeGroupName() ) )
+            if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                if ( environmentContainerNode.getTemplate().getProducts()
+                if ( environmentContainer.getTemplate().getProducts()
                          .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
                 {
-                    masterNodes.add( environmentContainerNode.getAgent() );
+                    masterNodes.add( environmentContainer.getAgent() );
                 }
             }
         }
@@ -191,14 +191,14 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<Agent> slaveNodes = new HashSet<>();
 
-        for ( EnvironmentContainerNode environmentContainerNode : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
         {
-            if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( environmentContainerNode.getNodeGroupName() ) )
+            if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                if ( environmentContainerNode.getTemplate().getProducts()
+                if ( environmentContainer.getTemplate().getProducts()
                          .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
                 {
-                    slaveNodes.add( environmentContainerNode.getAgent() );
+                    slaveNodes.add( environmentContainer.getAgent() );
                 }
             }
         }

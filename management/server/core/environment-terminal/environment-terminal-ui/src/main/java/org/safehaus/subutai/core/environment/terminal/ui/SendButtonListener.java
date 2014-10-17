@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class SendButtonListener implements Button.ClickListener
     @Override
     public void buttonClick( Button.ClickEvent event )
     {
-        Set<EnvironmentContainerNode> containers = form.environmentTree.getSelectedContainers();
+        Set<EnvironmentContainer> containers = form.environmentTree.getSelectedContainers();
         if ( CollectionUtil.isCollectionEmpty( containers ) )
         {
             form.show( "Please, select container(s)" );
@@ -66,7 +66,7 @@ public class SendButtonListener implements Button.ClickListener
     }
 
 
-    private void executeCommand( Set<EnvironmentContainerNode> containers )
+    private void executeCommand( Set<EnvironmentContainer> containers )
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( form.programTxtFld.getValue() );

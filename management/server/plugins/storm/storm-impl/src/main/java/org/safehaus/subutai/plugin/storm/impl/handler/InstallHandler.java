@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
@@ -81,7 +81,7 @@ public class InstallHandler extends AbstractHandler
         }
 
         Set<Agent> set = new HashSet<>( env.getEnvironmentContainerNodes().size() );
-        for ( EnvironmentContainerNode n : env.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : env.getEnvironmentContainerNodes() )
         {
             set.add( n.getAgent() );
         }

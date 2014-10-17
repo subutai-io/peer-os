@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 
 
@@ -48,7 +48,7 @@ class WithHadoopSetupStrategy extends PigSetupStrategy
         }
 
         Set<Agent> pigNodes = new HashSet<>(), allNodes = new HashSet<>();
-        for ( EnvironmentContainerNode n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
         {
             allNodes.add( n.getAgent() );
             if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )

@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -76,12 +76,12 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
         }
 
         Set<Agent> zkAgents = new HashSet<>();
-        for ( EnvironmentContainerNode environmentContainerNode : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
         {
-            if ( environmentContainerNode.getTemplate().getProducts()
+            if ( environmentContainer.getTemplate().getProducts()
                      .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
             {
-                zkAgents.add( environmentContainerNode.getAgent() );
+                zkAgents.add( environmentContainer.getAgent() );
             }
         }
 

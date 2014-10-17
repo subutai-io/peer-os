@@ -15,7 +15,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -54,7 +54,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
 
         // check installed packages
-        for ( EnvironmentContainerNode n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
         {
             if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
             {
@@ -103,7 +103,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         else
         // find out nimbus node in environment
         {
-            for ( EnvironmentContainerNode n : environment.getEnvironmentContainerNodes() )
+            for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
             {
                 if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
                 {
@@ -113,7 +113,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
 
         // collect worker nodes in environment
-        for ( EnvironmentContainerNode n : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer n : environment.getEnvironmentContainerNodes() )
         {
             if ( n.getNodeGroupName().equals( StormService.SUPERVISOR.toString() ) )
             {

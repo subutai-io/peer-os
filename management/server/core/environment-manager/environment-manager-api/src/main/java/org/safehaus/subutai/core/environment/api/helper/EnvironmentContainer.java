@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.protocol.Template;
 /**
  * Created by bahadyr on 7/24/14.
  */
-public class EnvironmentContainerNode extends Container
+public class EnvironmentContainer extends Container
 {
 
     private UUID environmentId;
@@ -26,13 +26,13 @@ public class EnvironmentContainerNode extends Container
     private String nodeGroupName;
 
 
-    public EnvironmentContainerNode()
+    public EnvironmentContainer()
     {
 
     }
 
 
-    public EnvironmentContainerNode( final Agent agent, final Template template, final String nodeGroupName )
+    public EnvironmentContainer( final Agent agent, final Template template, final String nodeGroupName )
     {
         this.agent = agent;
         this.template = template;

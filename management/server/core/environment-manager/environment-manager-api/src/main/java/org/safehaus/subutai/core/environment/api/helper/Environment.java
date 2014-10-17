@@ -18,14 +18,14 @@ public class Environment
 
     private final ServiceLocator serviceLocator;
     private UUID uuid;
-    private Set<EnvironmentContainerNode> environmentContainerNodes;
+    private Set<EnvironmentContainer> environmentContainers;
     private String name;
-    private Set<EnvironmentContainerNode> containers;
+    private Set<EnvironmentContainer> containers;
 
 
     public Environment( String name )
     {
-        this.environmentContainerNodes = new HashSet<>();
+        this.environmentContainers = new HashSet<>();
         this.name = name;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
@@ -33,20 +33,20 @@ public class Environment
     }
 
 
-    public void addContainer( EnvironmentContainerNode container )
+    public void addContainer( EnvironmentContainer container )
     {
         container.setEnvironmentId( uuid );
         this.containers.add( container );
     }
 
 
-    public Set<EnvironmentContainerNode> getContainers()
+    public Set<EnvironmentContainer> getContainers()
     {
         return containers;
     }
 
 
-    public void setContainers( final Set<EnvironmentContainerNode> containers )
+    public void setContainers( final Set<EnvironmentContainer> containers )
     {
         this.containers = containers;
     }
@@ -58,15 +58,15 @@ public class Environment
     }
 
 
-    public Set<EnvironmentContainerNode> getEnvironmentContainerNodes()
+    public Set<EnvironmentContainer> getEnvironmentContainerNodes()
     {
-        return environmentContainerNodes;
+        return environmentContainers;
     }
 
 
-    public void setEnvironmentContainerNodes( final Set<EnvironmentContainerNode> environmentContainerNodes )
+    public void setEnvironmentContainerNodes( final Set<EnvironmentContainer> environmentContainers )
     {
-        this.environmentContainerNodes = environmentContainerNodes;
+        this.environmentContainers = environmentContainers;
     }
 
 
@@ -97,7 +97,7 @@ public class Environment
     {
         return "Environment{" +
                 "uuid=" + uuid +
-                ", nodes=" + environmentContainerNodes +
+                ", nodes=" + environmentContainers +
                 ", name='" + name + '\'' +
                 ", containers=" + containers +
                 '}';

@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 import com.google.common.base.Preconditions;
@@ -66,9 +66,9 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
         }
 
         Set<Agent> elasticsearhcNodes = new HashSet<Agent>();
-        for ( EnvironmentContainerNode environmentContainerNode : environment.getEnvironmentContainerNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getEnvironmentContainerNodes() )
         {
-            elasticsearhcNodes.add( environmentContainerNode.getAgent() );
+            elasticsearhcNodes.add( environmentContainer.getAgent() );
         }
         config.setNodes( elasticsearhcNodes );
 

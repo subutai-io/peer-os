@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
@@ -147,7 +147,7 @@ public class EnvironmentsForm
     }
 
 
-    private VerticalLayout genConfigureContainersTable( Environment environment, Set<EnvironmentContainerNode> containers )
+    private VerticalLayout genConfigureContainersTable( Environment environment, Set<EnvironmentContainer> containers )
     {
         VerticalLayout vl = new VerticalLayout();
 
@@ -198,7 +198,7 @@ public class EnvironmentsForm
     }
 
 
-    private VerticalLayout genContainersTable( Environment environment, Set<EnvironmentContainerNode> containers )
+    private VerticalLayout genContainersTable( Environment environment, Set<EnvironmentContainer> containers )
     {
         VerticalLayout vl = new VerticalLayout();
 
