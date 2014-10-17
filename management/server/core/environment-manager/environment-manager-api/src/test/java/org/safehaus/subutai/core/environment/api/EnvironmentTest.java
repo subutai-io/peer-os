@@ -10,6 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainerNode;
 
 import static org.junit.Assert.assertEquals;

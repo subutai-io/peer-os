@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.environment.api;
+package org.safehaus.subutai.core.environment.api.helper;
 
 
 import java.util.UUID;

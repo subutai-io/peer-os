@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
