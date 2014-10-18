@@ -102,6 +102,7 @@ public class Manager
         getAddNodeButton( controlsContent );
 
         PROGRESS_ICON.setVisible( false );
+        PROGRESS_ICON.setId("indicator");
         controlsContent.addComponent( PROGRESS_ICON );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
