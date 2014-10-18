@@ -455,7 +455,7 @@ function install_subutai_agent {
     lxc-attach -n $container -- apt-get --force-yes --assume-yes install $agent_package > /dev/null
     status=$?
     message="Subutai agent installed on $container"
-    if [ $status == "0" ]
+    if [ $status == "0" ]; then
       msg_info "$message"
     else
       msg_error "$message"
