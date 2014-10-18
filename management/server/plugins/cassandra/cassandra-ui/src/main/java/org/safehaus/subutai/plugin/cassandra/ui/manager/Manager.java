@@ -674,29 +674,32 @@ public class Manager
     public void refreshClustersInfo()
     {
         List<CassandraClusterConfig> info = cassandra.getClusters();
-        CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        if ( info != null && !info.isEmpty() )
+        if ( !info.isEmpty() )
         {
-            for ( CassandraClusterConfig cassandraInfo : info )
-            {
-                clusterCombo.addItem( cassandraInfo );
-                clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
-            }
-            if ( clusterInfo != null )
+            CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
+            clusterCombo.removeAllItems();
+            if ( info != null && !info.isEmpty() )
             {
                 for ( CassandraClusterConfig cassandraInfo : info )
                 {
-                    if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    clusterCombo.addItem( cassandraInfo );
+                    clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
+                }
+                if ( clusterInfo != null )
+                {
+                    for ( CassandraClusterConfig cassandraInfo : info )
                     {
-                        clusterCombo.setValue( cassandraInfo );
-                        return;
+                        if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
+                        {
+                            clusterCombo.setValue( cassandraInfo );
+                            return;
+                        }
                     }
                 }
-            }
-            else
-            {
-                clusterCombo.setValue( info.iterator().next() );
+                else
+                {
+                    clusterCombo.setValue( info.iterator().next() );
+                }
             }
         }
     }

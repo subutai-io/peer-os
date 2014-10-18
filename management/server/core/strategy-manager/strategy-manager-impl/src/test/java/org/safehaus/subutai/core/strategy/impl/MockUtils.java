@@ -7,11 +7,13 @@ package org.safehaus.subutai.core.strategy.impl;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -25,17 +27,25 @@ import static org.mockito.Mockito.when;
 public class MockUtils
 {
 
-    private static final UUID physicalUUID = UUID.randomUUID();
-    private static final UUID lxcUUID = UUID.randomUUID();
-    private static final String PHYSICAL_HOSTNAME = "py111";
-    private static final String LXC_HOSTNAME = "py111-lxc-222";
+    private static final UUID physicalUUID_1 = UUID.randomUUID();
+    private static final UUID physicalUUID_2 = UUID.randomUUID();
+    private static final UUID physicalUUID_3 = UUID.randomUUID();
+    private static final UUID lxcUUID_1 = UUID.randomUUID();
+    private static final UUID lxcUUID_2 = UUID.randomUUID();
+    private static final UUID lxcUUID_3 = UUID.randomUUID();
+    private static final String PHYSICAL_HOSTNAME_1 = "py111";
+    private static final String PHYSICAL_HOSTNAME_2 = "py222";
+    private static final String PHYSICAL_HOSTNAME_3 = "py333";
+    private static final String LXC_HOSTNAME_1 = "py111-lxc-111";
+    private static final String LXC_HOSTNAME_2 = "py111-lxc-222";
+    private static final String LXC_HOSTNAME_3 = "py111-lxc-333";
 
 
     public static Agent getPhysicalAgent()
     {
         Agent agent = mock( Agent.class );
-        when( agent.getHostname() ).thenReturn( PHYSICAL_HOSTNAME );
-        when( agent.getUuid() ).thenReturn( physicalUUID );
+        when( agent.getHostname() ).thenReturn( PHYSICAL_HOSTNAME_1 );
+        when( agent.getUuid() ).thenReturn( physicalUUID_1 );
         when( agent.isLXC() ).thenReturn( false );
         when( agent.getParentHostName() ).thenReturn( null );
         when( agent.compareTo( agent ) ).thenCallRealMethod();
@@ -60,18 +70,24 @@ public class MockUtils
         return new BestServerStrategy();
     }
 
-//
-//    public static Map<Agent, ServerMetric> getServerMetrics()
-//    {
-//        Map<Agent, ServerMetric> result = new HashMap<>();
-//
-//        Map<Metric, Double> avgMetric = new HashMap<>();
-//        avgMetric.put( Metric.CPU_USER, 1.0 );
-//        avgMetric.put( Metric.MEM_FREE, 4096.0 );
-//        ServerMetric metric = new ServerMetric( 20000, 40000, 30, 4, avgMetric );
-//        result.put( getPhysicalAgent(), metric );
-//        return result;
-//    }
+
+    public static Map<Agent, ServerMetric> getServerMetrics()
+    {
+        Map<Agent, ServerMetric> result = new HashMap<>();
+
+        Map<MetricType, Double> avgMetric = new HashMap<>();
+        avgMetric.put( MetricType.CPU_USER, 1.0 );
+        avgMetric.put( MetricType.MEM_FREE, 4096.0 );
+        Set<Agent> physicalAgents = getPhysicalAgents();
+        int i = 0;
+        for ( Agent agent : physicalAgents )
+        {
+            ServerMetric metric =
+                    new ServerMetric( 20000 + ( i++ ), 40000 + ( i++ ), 30 + ( i++ ), 4 + ( i++ ), avgMetric );
+            result.put( agent, metric );
+        }
+        return result;
+    }
 
 
     public Map<Agent, ServerMetric> getAvgMetrics()
@@ -80,12 +96,43 @@ public class MockUtils
         return result;
     }
 
+
+    public static Set<Agent> getPhysicalAgents()
+    {
+        Agent agent1 = mock( Agent.class );
+        when( agent1.getHostname() ).thenReturn( PHYSICAL_HOSTNAME_1 );
+        when( agent1.getUuid() ).thenReturn( physicalUUID_1 );
+        when( agent1.isLXC() ).thenReturn( true );
+        when( agent1.getParentHostName() ).thenReturn( null );
+        when( agent1.compareTo( agent1 ) ).thenCallRealMethod();
+
+        Agent agent2 = mock( Agent.class );
+        when( agent2.getHostname() ).thenReturn( PHYSICAL_HOSTNAME_2 );
+        when( agent2.getUuid() ).thenReturn( physicalUUID_2 );
+        when( agent2.isLXC() ).thenReturn( true );
+        when( agent2.getParentHostName() ).thenReturn( null );
+        when( agent2.compareTo( agent2 ) ).thenCallRealMethod();
+
+        Agent agent3 = mock( Agent.class );
+        when( agent3.getHostname() ).thenReturn( PHYSICAL_HOSTNAME_3 );
+        when( agent3.getUuid() ).thenReturn( physicalUUID_3 );
+        when( agent3.isLXC() ).thenReturn( true );
+        when( agent3.getParentHostName() ).thenReturn( null );
+        when( agent3.compareTo( agent3 ) ).thenCallRealMethod();
+
+        Set<Agent> agents = new HashSet<>();
+        agents.add( agent1 );
+        agents.add( agent2 );
+        agents.add( agent3 );
+        return agents;
+    }
+
     //
     //    public static Agent getPhysicalAgent()
     //    {
     //        Agent agent = mock( Agent.class );
-    //        when( agent.getHostname() ).thenReturn( PHYSICAL_HOSTNAME );
-    //        when( agent.getUuid() ).thenReturn( physicalUUID );
+    //        when( agent.getHostname() ).thenReturn( PHYSICAL_HOSTNAME_1 );
+    //        when( agent.getUuid() ).thenReturn( physicalUUID_1 );
     //        when( agent.isLXC() ).thenReturn( false );
     //        when( agent.getParentHostName() ).thenReturn( null );
     //        when( agent.compareTo( agent ) ).thenCallRealMethod();
@@ -96,10 +143,10 @@ public class MockUtils
     //    public static Agent getLxcAgent()
     //    {
     //        Agent agent = mock( Agent.class );
-    //        when( agent.getHostname() ).thenReturn( LXC_HOSTNAME );
-    //        when( agent.getUuid() ).thenReturn( lxcUUID );
+    //        when( agent.getHostname() ).thenReturn( LXC_HOSTNAME_1 );
+    //        when( agent.getUuid() ).thenReturn( lxcUUID_1 );
     //        when( agent.isLXC() ).thenReturn( true );
-    //        when( agent.getParentHostName() ).thenReturn( PHYSICAL_HOSTNAME );
+    //        when( agent.getParentHostName() ).thenReturn( PHYSICAL_HOSTNAME_1 );
     //        when( agent.compareTo( agent ) ).thenCallRealMethod();
     //        return agent;
     //    }
@@ -116,7 +163,7 @@ public class MockUtils
     //                    {
     //                        Object[] arguments = invocation.getArguments();
     //                        RequestBuilder requestBuilder = ( RequestBuilder ) arguments[0];
-    //                        Request request = requestBuilder.build( physicalUUID, UUID.randomUUID() );
+    //                        Request request = requestBuilder.build( physicalUUID_1, UUID.randomUUID() );
     //                        if ( request.getProgram().contains( "lxc-info" ) )
     //                        {
     //                            return MockUtils.getCommand( true, true, 0, "RUNNING", null );
@@ -147,9 +194,9 @@ public class MockUtils
     //        when( agentResult.getExitCode() ).thenReturn( exitCode );
     //        when( agentResult.getStdOut() ).thenReturn( stdOut );
     //        when( agentResult.getStdErr() ).thenReturn( stdErr );
-    //        when( agentResult.getAgentUUID() ).thenReturn( physicalUUID );
+    //        when( agentResult.getAgentUUID() ).thenReturn( physicalUUID_1 );
     //        Map<UUID, AgentResult> results = new HashMap<>();
-    //        results.put( physicalUUID, agentResult );
+    //        results.put( physicalUUID_1, agentResult );
     //        when( command.getResults() ).thenReturn( results );
     //        return command;
     //    }

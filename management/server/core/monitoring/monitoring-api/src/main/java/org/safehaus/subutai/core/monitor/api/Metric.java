@@ -1,44 +1,98 @@
 package org.safehaus.subutai.core.monitor.api;
 
 
-public enum Metric
+import java.util.Date;
+
+
+/**
+ * Metric
+ */
+public class Metric
 {
-
-    CPU_USER( "CPU User", "%" ),
-    CPU_SYSTEM( "CPU System", "%" ),
-    CPU_IDLE( "CPU Idle", "%" ),
-    CPU_WIO( "CPU wio", "%" ),
-    MEM_FREE( "Free Memory", "KB" ),
-    DISK_OPS( "Disk operations", "KB" ),
-    MEM_CACHED( "Cached Memory", "KB" ),
-    MEM_BUFFERS( "Memory Buffers", "KB" ),
-    SWAP_FREE( "Free Swap Space", "KB" ),
-    PKTS_IN( "Packets Received", "packets/sec" ),
-    PKTS_OUT( "Packets Sent", "packets/sec" ),
-    BYTES_IN( "Bytes Received", "bytes/sec" ),
-    BYTES_OUT( "Bytes Sent", "bytes/sec" ),
-    PART_MAX_USED( "Maximum Disk Space Used", "%" );
-
-    private String unit = "";
-    private String description = "";
+    private MetricType metricType;
+    private Double value;
+    private String units;
+    private String host;
+    private Date timestamp;
+    private Long read;
+    private Long write;
 
 
-    private Metric( String description, String unit )
+    public Metric( final MetricType metricType, final Double value, final String units, final String host,
+                   final Date timestamp )
     {
-        this.description = description;
-        this.unit = unit;
+        this.metricType = metricType;
+        this.value = value;
+        this.units = units;
+        this.host = host;
+        this.timestamp = timestamp;
     }
 
 
-    public String getUnit()
+    public Metric( final MetricType metricType, final Long read, final Long write, final String host,
+                   final Date timestamp )
     {
-        return unit;
+        this.metricType = metricType;
+        this.host = host;
+        this.timestamp = timestamp;
+        this.read = read;
+        this.write = write;
+    }
+
+
+    public Long getRead()
+    {
+        return read;
+    }
+
+
+    public Long getWrite()
+    {
+        return write;
+    }
+
+
+    public MetricType getMetricType()
+    {
+        return metricType;
+    }
+
+
+    public Double getValue()
+    {
+        return value;
+    }
+
+
+    public String getUnits()
+    {
+        return units;
+    }
+
+
+    public String getHost()
+    {
+        return host;
+    }
+
+
+    public Date getTimestamp()
+    {
+        return timestamp;
     }
 
 
     @Override
     public String toString()
     {
-        return description;
+        return "SystemMetric{" +
+                "metricType=" + metricType +
+                ", value=" + value +
+                ", units='" + units + '\'' +
+                ", host='" + host + '\'' +
+                ", timestamp=" + timestamp +
+                ", read=" + read +
+                ", write=" + write +
+                '}';
     }
 }

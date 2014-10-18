@@ -70,14 +70,14 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         }
 
         // check if nodes are connected
-        if ( manager.agentManager.getAgentByHostname( config.getHbaseMaster().getHostname() ) == null )
+        if ( manager.getAgentManager().getAgentByHostname( config.getHbaseMaster().getHostname() ) == null )
         {
             throw new ClusterSetupException( "Master node is not connected" );
         }
 
         for ( Agent a : config.getRegionServers() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
                 throw new ClusterSetupException( "Not all region server are connected" );
             }
@@ -85,7 +85,7 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
 
         for ( Agent a : config.getQuorumPeers() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
                 throw new ClusterSetupException( "Not all quorum peer nodes are connected" );
             }
@@ -93,14 +93,14 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
 
         for ( Agent a : config.getBackupMasters() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
                 throw new ClusterSetupException( "Not all backup master nodes are connected" );
             }
         }
 
         // check Hadoop cluster
-        HadoopClusterConfig hc = manager.hadoopManager.getCluster( config.getHadoopClusterName() );
+        HadoopClusterConfig hc = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
         if ( hc == null )
         {
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );

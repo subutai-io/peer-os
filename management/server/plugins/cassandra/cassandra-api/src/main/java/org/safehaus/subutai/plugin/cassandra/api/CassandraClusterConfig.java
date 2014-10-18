@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.cassandra.api;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
@@ -23,6 +24,19 @@ public class CassandraClusterConfig implements ConfigBase
     private String dataDirectory = "/var/lib/cassandra/data";
     private String commitLogDirectory = "/var/lib/cassandra/commitlog";
     private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
+    private UUID environmentId;
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final UUID environmentId )
+    {
+        this.environmentId = environmentId;
+    }
 
 
     public String getTemplateName()

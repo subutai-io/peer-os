@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -84,13 +84,13 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
 
         //get ZK nodes with Hadoop installed from environment
         Set<Agent> accumuloAgents = new HashSet<>();
-        for ( Node node : environment.getNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
-                    && node.getTemplate().getProducts()
+            if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
+                    && environmentContainer.getTemplate().getProducts()
                            .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
             {
-                accumuloAgents.add( node.getAgent() );
+                accumuloAgents.add( environmentContainer.getAgent() );
             }
         }
 

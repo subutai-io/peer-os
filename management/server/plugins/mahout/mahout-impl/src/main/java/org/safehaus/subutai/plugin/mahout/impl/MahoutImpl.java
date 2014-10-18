@@ -6,10 +6,13 @@
 package org.safehaus.subutai.plugin.mahout.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -27,16 +30,18 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.SetupType;
+import org.safehaus.subutai.plugin.mahout.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.InstallHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.UninstallHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -45,8 +50,9 @@ import com.google.common.collect.Sets;
 public class MahoutImpl implements Mahout
 {
 
-    PluginDAO pluginDAO;
-    Commands commands;
+    private static final Logger LOG = LoggerFactory.getLogger( MahoutImpl.class.getName() );
+    private PluginDAO pluginDAO;
+    private Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
@@ -55,11 +61,12 @@ public class MahoutImpl implements Mahout
     private ContainerManager containerManager;
     private ExecutorService executor;
     private Hadoop hadoopManager;
+    private DataSource dataSource;
 
 
-    public MahoutImpl()
+    public MahoutImpl( DataSource dataSource )
     {
-
+        this.dataSource = dataSource;
     }
 
 
@@ -179,7 +186,14 @@ public class MahoutImpl implements Mahout
 
     public void init()
     {
-        this.pluginDAO = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDAO( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
         this.commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();
     }

@@ -8,6 +8,7 @@ package org.safehaus.subutai.core.environment.api;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
@@ -15,6 +16,7 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 
 
 /**
@@ -65,4 +67,9 @@ public interface EnvironmentManager
     void invoke( PeerCommandMessage commandMessage, long timeout );
 
     Set<EnvironmentContainer> getConnectedContainers( Environment environment );
+
+    Environment getEnvironmentByUUID( UUID environmentId );
+
+
+
 }
