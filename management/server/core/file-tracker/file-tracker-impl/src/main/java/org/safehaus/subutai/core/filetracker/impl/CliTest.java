@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 public class CliTest extends OsgiCommandSupport implements ResponseListener
 {
 
-    private static final String[] CONFIG_POINTS = new String[] { "/etc", "/etc/ksks-agent" };
+    private static final String[] CONFIG_POINTS = new String[] { "/etc", "/etc/subutai-agent" };
 
     private AgentManager agentManager;
 

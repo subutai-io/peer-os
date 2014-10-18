@@ -26,7 +26,7 @@ public class Common
     public static final String APT_REPO_AMD64_PACKAGES_SUBPATH = "amd64/trusty/";
     public static final String TMP_DEB_PACKAGE_UNPACK_PATH = "/tmp";
     public static final String DEFAULT_LXC_ARCH = "amd64";
-    public static final String PACKAGE_PREFIX = "ksks-";
-    public static final String PACKAGE_PREFIX_WITHOUT_DASH = "ksks";
+    public static final String PACKAGE_PREFIX = "subutai-";
+    public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";
     public static final String DEFAULT_DOMAIN_NAME = "intra.lan";
 }

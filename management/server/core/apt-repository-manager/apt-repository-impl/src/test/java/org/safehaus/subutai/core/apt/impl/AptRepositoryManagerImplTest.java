@@ -32,8 +32,8 @@ import static org.mockito.Mockito.verify;
 public class AptRepositoryManagerImplTest
 {
 
-    private static final String PACKAGES = "i   ksks-mgmt                     - This is a Subutai package " +
-            "distribution.\n" + "i   ksks-nginx                    - This is an nginx package of kiskis dist\n";
+    private static final String PACKAGES = "i   subutai-mgmt                     - This is a Subutai package " +
+            "distribution.\n" + "i   subutai-nginx                    - This is an nginx package of subutai dist\n";
     private static final String FILE_CONTENT = "some dummy content";
     private static final String FILE_NAME = "test";
     private static final String PATTERN = "pattern";
@@ -54,9 +54,9 @@ public class AptRepositoryManagerImplTest
         List<PackageInfo> packages = aptRepositoryManager.listPackages( agent, PATTERN );
 
         assertTrue(
-                packages.contains( new PackageInfo( "i", "ksks-mgmt", "- This is a Subutai package distribution." ) ) );
+                packages.contains( new PackageInfo( "i", "subutai-mgmt", "- This is a Subutai package distribution." ) ) );
         assertTrue( packages.contains(
-                new PackageInfo( "i", "ksks-nginx", "- This is an nginx package of kiskis dist" ) ) );
+                new PackageInfo( "i", "subutai-nginx", "- This is an nginx package of subutai dist" ) ) );
     }
 
 
