@@ -32,7 +32,8 @@ public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<H
             return;
         }
 
-        if ( ! hadoopClusterConfig.getTaskTrackers().contains( lxcHostName )) {
+        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostName );
+        if ( ! hadoopClusterConfig.getTaskTrackers().contains( agent )) {
             productOperation.addLogFailed( String.format( "TaskTracker on %s does not exist", clusterName ) );
             return;
         }
