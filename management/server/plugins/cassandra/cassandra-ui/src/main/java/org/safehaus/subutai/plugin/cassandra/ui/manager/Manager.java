@@ -663,7 +663,7 @@ public class Manager
      */
     public String checkIfSeed( UUID agentUUID )
     {
-        if ( config.getSeedNodes().contains( UUID.fromString( agentUUID.toString() )) )
+        if ( config.getSeedNodes().contains( UUID.fromString( agentUUID.toString() ) ) )
         {
             return "Seed";
         }
@@ -681,28 +681,25 @@ public class Manager
         {
             CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
             clusterCombo.removeAllItems();
-            if ( info != null && !info.isEmpty() )
+            for ( CassandraClusterConfig cassandraInfo : info )
+            {
+                clusterCombo.addItem( cassandraInfo );
+                clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
+            }
+            if ( clusterInfo != null )
             {
                 for ( CassandraClusterConfig cassandraInfo : info )
                 {
-                    clusterCombo.addItem( cassandraInfo );
-                    clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
-                }
-                if ( clusterInfo != null )
-                {
-                    for ( CassandraClusterConfig cassandraInfo : info )
+                    if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {
-                        if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
-                        {
-                            clusterCombo.setValue( cassandraInfo );
-                            return;
-                        }
+                        clusterCombo.setValue( cassandraInfo );
+                        return;
                     }
                 }
-                else
-                {
-                    clusterCombo.setValue( info.iterator().next() );
-                }
+            }
+            else
+            {
+                clusterCombo.setValue( info.iterator().next() );
             }
         }
     }
