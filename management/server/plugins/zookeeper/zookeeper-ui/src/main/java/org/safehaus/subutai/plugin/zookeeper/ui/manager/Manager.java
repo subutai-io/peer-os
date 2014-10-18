@@ -276,6 +276,7 @@ public class Manager
         customPropertyContent.addComponent( addPropertyBtn );
 
         PROGRESS_ICON.setVisible( false );
+        PROGRESS_ICON.setId("indicator");
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( customPropertyContent, 0, 1 );
