@@ -165,6 +165,7 @@ public class Manager
         addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
 
         PROGRESS_ICON.setVisible( false );
+        PROGRESS_ICON.setId("indicator");
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );

@@ -385,6 +385,7 @@ public class Manager
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
             PROGRESS_ICON.setVisible( false );
+            PROGRESS_ICON.setId("indicator");
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
