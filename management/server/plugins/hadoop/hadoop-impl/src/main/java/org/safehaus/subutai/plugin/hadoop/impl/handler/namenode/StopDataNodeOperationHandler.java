@@ -35,8 +35,8 @@ public class StopDataNodeOperationHandler extends AbstractOperationHandler<Hadoo
             productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
-
-        if ( !hadoopClusterConfig.getDataNodes().contains( lxcHostName ) )
+        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostName );
+        if ( !hadoopClusterConfig.getDataNodes().contains( agent ) )
         {
             productOperation.addLogFailed( String.format( "Datanode on %s does not exist", clusterName ) );
             return;
