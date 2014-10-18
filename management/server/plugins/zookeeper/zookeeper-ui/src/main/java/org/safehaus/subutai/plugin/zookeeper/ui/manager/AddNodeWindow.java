@@ -147,6 +147,7 @@ class AddNodeWindow extends Window
         indicator.setVisible( false );
 
         ok = new Button( "Ok" );
+        ok.setId("btnOk");
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
