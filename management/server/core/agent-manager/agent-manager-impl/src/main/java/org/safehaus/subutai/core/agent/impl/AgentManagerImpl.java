@@ -153,7 +153,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     public Agent getAgentByUUID( UUID uuid )
     {
-        return agents.getIfPresent( uuid );
+        return agents.getIfPresent( UUID.fromString( uuid.toString() ) );
     }
 
 
@@ -246,6 +246,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
             result = getAgentByHostname( hostname );
         }
         return result;
+    }
+
+
+    @Override
+    public Set<Agent> returnAgentsByGivenUUIDSet( final Set<UUID> agentUUIDs )
+    {
+        Set<Agent> agentSet = new HashSet<>();
+        for ( UUID uuid : agentUUIDs )
+        {
+            agentSet.add( getAgentByUUID( uuid ) );
+        }
+        return agentSet;
     }
 
 
