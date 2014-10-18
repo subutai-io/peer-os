@@ -132,6 +132,7 @@ public class Manager
 
         /**  Destroy cluster button  */
         destroyInstallationBtn = new Button( DESTROY_INSTALLATION_BUTTON_CAPTION );
+        destroyInstallationBtn.setId("SolrDestroyCluster");
         destroyInstallationBtn.addStyleName( "default" );
         addClickListenerToDestroyInstallationButton();
         controlsContent.addComponent( destroyInstallationBtn );

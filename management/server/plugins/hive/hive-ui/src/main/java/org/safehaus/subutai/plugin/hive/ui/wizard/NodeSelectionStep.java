@@ -115,6 +115,7 @@ public class NodeSelectionStep extends Panel
     private void addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
     {
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
+        hadoopClusters.setId("HiveHadoopClusterCb");
         final ComboBox cmbServerNode = makeServerNodeComboBox( config );
 
         hadoopClusters.setImmediate( true );
