@@ -378,13 +378,14 @@ public class Manager
      * Fill out the table in which all nodes in the cluster are listed.
      *
      * @param table table to be filled
-     * @param agents nodes
      */
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<UUID> agentUUIDs )
     {
         table.removeAllItems();
-        for ( final Agent agent : agents )
+
+        for ( final UUID agentUUID : agentUUIDs )
         {
+            Agent agent = agentManager.getAgentByUUID( agentUUID );
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
             final Button startButton = new Button( START_BUTTON_CAPTION );
@@ -401,7 +402,7 @@ public class Manager
 
             addGivenComponents( availableOperations, checkButton, startButton, stopButton );
 
-            String isSeed = checkIfSeed( agent );
+            String isSeed = checkIfSeed( agent.getUuid() );
 
             table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
@@ -549,8 +550,9 @@ public class Manager
 
     private void stopAllNodes()
     {
-        for ( Agent agent : config.getNodes() )
+        for ( UUID agentUUID : config.getNodes() )
         {
+            Agent agent = agentManager.getAgentByUUID( agentUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
@@ -572,8 +574,9 @@ public class Manager
 
     private void startAllNodes()
     {
-        for ( Agent agent : config.getNodes() )
+        for ( UUID agentUUID : config.getNodes() )
         {
+            Agent agent = agentManager.getAgentByUUID( agentUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
@@ -654,13 +657,13 @@ public class Manager
 
 
     /**
-     * @param agent agent
+     * @param agentUUID agent
      *
      * @return Yes if give agent is among seeds, otherwise returns No
      */
-    public String checkIfSeed( Agent agent )
+    public String checkIfSeed( UUID agentUUID )
     {
-        if ( config.getSeedNodes().contains( agent ) )
+        if ( config.getSeedNodes().contains( UUID.fromString( agentUUID.toString() )) )
         {
             return "Seed";
         }

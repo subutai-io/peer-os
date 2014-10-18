@@ -116,4 +116,11 @@ public class AgentManagerFake implements AgentManager
     {
         return null;
     }
+
+
+    @Override
+    public Set<Agent> returnAgentsByGivenUUIDSet( final Set<UUID> agentUUIDs )
+    {
+        return null;
+    }
 }

@@ -56,6 +56,6 @@ public class CassandraComponent extends CustomComponent
             }
         } );
         verticalLayout.addComponent( sheet );
-        manager.refreshClustersInfo();
+        //manager.refreshClustersInfo();
     }
 }

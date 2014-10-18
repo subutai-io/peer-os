@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
@@ -44,7 +46,7 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
             productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) )
+        if ( !cassandraConfig.getNodes().contains( UUID.fromString( node.getUuid().toString() ) ) )
         {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );

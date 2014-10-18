@@ -4,10 +4,10 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -63,18 +63,18 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        Set<Agent> cassNodes = new HashSet<Agent>();
+        Set<UUID> cassNodes = new HashSet<>();
         for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            cassNodes.add( environmentContainer.getAgent() );
+            cassNodes.add( environmentContainer.getAgent().getUuid() );
         }
         config.setNodes( cassNodes );
 
         Iterator nodesItr = cassNodes.iterator();
-        Set<Agent> seedNodes = new HashSet<Agent>();
+        Set<UUID> seedNodes = new HashSet<>();
         while ( nodesItr.hasNext() )
         {
-            seedNodes.add( ( Agent ) nodesItr.next() );
+            seedNodes.add( ( UUID ) nodesItr.next() );
             if ( seedNodes.size() == config.getNumberOfSeeds() )
             {
                 break;
