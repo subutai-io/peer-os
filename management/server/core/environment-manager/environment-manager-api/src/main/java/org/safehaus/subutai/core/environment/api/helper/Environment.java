@@ -10,7 +10,6 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 
@@ -19,14 +18,12 @@ public class Environment
 
     private final ServiceLocator serviceLocator;
     private UUID uuid;
-    private Set<Node> nodes;
     private String name;
     private Set<EnvironmentContainer> containers;
 
 
     public Environment( String name )
     {
-        this.nodes = new HashSet<>();
         this.name = name;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
@@ -59,18 +56,6 @@ public class Environment
     }
 
 
-    public Set<Node> getNodes()
-    {
-        return nodes;
-    }
-
-
-    public void setNodes( final Set<Node> nodes )
-    {
-        this.nodes = nodes;
-    }
-
-
     public UUID getUuid()
     {
         return uuid;
@@ -90,17 +75,5 @@ public class Environment
             commandMessage.setExceptionMessage( e.toString() );
             //            commandMessage.setSuccess( false );
         }
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Environment{" +
-                "uuid=" + uuid +
-                ", nodes=" + nodes +
-                ", name='" + name + '\'' +
-                ", containers=" + containers +
-                '}';
     }
 }

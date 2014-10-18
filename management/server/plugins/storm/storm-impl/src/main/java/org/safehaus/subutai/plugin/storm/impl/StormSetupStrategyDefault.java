@@ -15,7 +15,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -48,13 +48,13 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getNodes() == null || environment.getNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         // check installed packages
-        for ( Node n : environment.getNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             if ( !n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
             {
@@ -103,7 +103,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         else
         // find out nimbus node in environment
         {
-            for ( Node n : environment.getNodes() )
+            for ( EnvironmentContainer n : environment.getContainers() )
             {
                 if ( n.getNodeGroupName().equals( StormService.NIMBUS.toString() ) )
                 {
@@ -113,7 +113,7 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
         }
 
         // collect worker nodes in environment
-        for ( Node n : environment.getNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             if ( n.getNodeGroupName().equals( StormService.SUPERVISOR.toString() ) )
             {

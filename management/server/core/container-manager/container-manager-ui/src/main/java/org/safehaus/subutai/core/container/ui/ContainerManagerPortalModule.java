@@ -19,7 +19,7 @@ import com.vaadin.ui.Component;
 public class ContainerManagerPortalModule implements PortalModule
 {
 
-    public static final String MODULE_IMAGE = "lxc.png";
+    public static final String MODULE_IMAGE = "cont.png";
     public static final String MODULE_NAME = "Container";
     protected static final Logger LOG = Logger.getLogger( ContainerManagerPortalModule.class.getName() );
     private final ServiceLocator serviceLocator;
