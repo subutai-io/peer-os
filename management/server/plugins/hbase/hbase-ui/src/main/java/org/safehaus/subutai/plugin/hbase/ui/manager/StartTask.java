@@ -53,7 +53,6 @@ public class StartTask implements Runnable
                     catch ( InterruptedException e )
                     {
                         LOG.warning( "Waiting hbase services to start" );
-                        e.printStackTrace();
                     }
                     completeEvent.onComplete( po.getLog() );
                     break;
