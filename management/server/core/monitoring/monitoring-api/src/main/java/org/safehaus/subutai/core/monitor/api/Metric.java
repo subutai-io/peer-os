@@ -34,7 +34,7 @@ public class Metric
     {
         this.metricType = metricType;
         this.host = host;
-        this.timestamp = timestamp;
+        this.timestamp = ( Date ) timestamp.clone();
         this.read = read;
         this.write = write;
     }
@@ -78,7 +78,7 @@ public class Metric
 
     public Date getTimestamp()
     {
-        return timestamp;
+        return ( Date ) timestamp.clone();
     }
 
 
