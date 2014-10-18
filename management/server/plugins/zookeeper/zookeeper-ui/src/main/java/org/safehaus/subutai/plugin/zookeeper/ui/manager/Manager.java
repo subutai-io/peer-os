@@ -536,7 +536,6 @@ public class Manager
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( STATUS_COLUMN_CAPTION, Label.class, null );
         table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
         table.setSizeFull();
@@ -620,7 +619,7 @@ public class Manager
             PROGRESS_ICON.setVisible( false );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), "Fill here !!!", resultHolder, availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ), resultHolder, availableOperations
             }, null );
 
 
