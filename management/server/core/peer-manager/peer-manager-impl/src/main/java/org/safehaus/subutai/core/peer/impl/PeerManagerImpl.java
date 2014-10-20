@@ -95,7 +95,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( SQLException e )
         {
-            e.printStackTrace();
+            LOG.error( e.getMessage(), e );
         }
     }
 

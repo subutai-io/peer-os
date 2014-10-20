@@ -36,7 +36,8 @@ public class StartDataNodeOperationHandler extends AbstractOperationHandler<Hado
             return;
         }
 
-        if ( !hadoopClusterConfig.getDataNodes().contains( lxcHostName ) )
+        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostName );
+        if ( !hadoopClusterConfig.getDataNodes().contains( agent ) )
         {
             productOperation.addLogFailed( String.format( "Datanode on %s does not exist", clusterName ) );
             return;

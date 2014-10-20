@@ -35,27 +35,28 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl>
     @Override
     public void run()
     {
-        CassandraClusterConfig cassandraClusterConfig = manager.getCluster( clusterName );
-        if ( cassandraClusterConfig == null )
+        CassandraClusterConfig config = manager.getCluster( clusterName );
+        if ( config == null )
         {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( node == null )
+        final Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        if ( agent == null )
         {
             productOperation.addLogFailed( "Agent is not connected !" );
             return;
         }
-        if ( !cassandraClusterConfig.getNodes().contains( node ) )
+
+        if ( !config.getNodes().contains( UUID.fromString( agent.getUuid().toString() ) ) )
         {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
-        Command statusServiceCommand = manager.getCommands().getStatusCommand( Sets.newHashSet( node ) );
+        Command statusServiceCommand = manager.getCommands().getStatusCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( statusServiceCommand );
 
         if ( statusServiceCommand.hasSucceeded() )

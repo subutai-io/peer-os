@@ -1,6 +1,7 @@
 package org.safehaus.subutai.common.util;
 
 
+import java.util.Collection;
 import java.util.UUID;
 
 import com.fasterxml.uuid.EthernetAddress;
@@ -23,5 +24,21 @@ public class UUIDUtil
     public static UUID generateMACBasedUUID()
     {
         return UUID.nameUUIDFromBytes( SysUtil.getMacAddress().getBytes() );
+    }
+
+
+    public boolean isIdInCollection( UUID id, Collection<UUID> uuids )
+    {
+        if ( !CollectionUtil.isCollectionEmpty( uuids ) )
+        {
+            for ( UUID uuid : uuids )
+            {
+                if ( uuid.compareTo( id ) == 0 )
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

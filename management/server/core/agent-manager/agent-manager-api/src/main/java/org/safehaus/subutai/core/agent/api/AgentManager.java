@@ -98,4 +98,6 @@ public interface AgentManager
      * @return agent if agents is connected within timeout or null otherwise
      */
     public Agent waitForRegistration( String hostname, long timeout );
+
+    Set<Agent> returnAgentsByGivenUUIDSet( Set<UUID> agentUUIDs );
 }
