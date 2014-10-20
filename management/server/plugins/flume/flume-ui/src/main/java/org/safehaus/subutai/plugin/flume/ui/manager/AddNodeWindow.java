@@ -54,6 +54,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox hadoopNodes = new ComboBox();
+        hadoopNodes.setId("FluHadoopNodeCb");
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
@@ -69,10 +70,12 @@ public class AddNodeWindow extends Window
         topContent.addComponent( hadoopNodes );
 
         final Button addNodeBtn = new Button( "Add" );
+        addNodeBtn.setId("FluAddSelectedNodeBtn");
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
         final Button ok = new Button( "Ok" );
+        ok.setId("btnOk");
 
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -125,6 +128,7 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setId("outputTxtArea");
         outputTxtArea.setRows( 10 );
         outputTxtArea.setColumns( 30 );
         outputTxtArea.setImmediate( true );
@@ -133,6 +137,7 @@ public class AddNodeWindow extends Window
         content.addComponent( outputTxtArea );
 
         indicator = new Label();
+        indicator.setId("indicator");
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );

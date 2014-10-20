@@ -41,7 +41,7 @@ public class Commands
     {
 
         return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 360 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 600 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
                 agents );

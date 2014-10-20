@@ -59,6 +59,7 @@ public class StepSetConfig extends Panel
         vl.addComponent( server );
 
         final ComboBox cbServers = new ComboBox();
+        cbServers.setId("OozieConfServersCombo");
         cbServers.setImmediate( true );
         cbServers.setTextInputAllowed( false );
         cbServers.setRequired( true );
@@ -80,6 +81,7 @@ public class StepSetConfig extends Panel
         }
 
         final TwinColSelect selectClients = new TwinColSelect( "", new ArrayList<String>() );
+        selectClients.setId("OozieConfClientNodes");
         selectClients.setItemCaptionPropertyId( "hostname" );
         selectClients.setRows( 7 );
         selectClients.setNullSelectionAllowed( true );
@@ -101,6 +103,7 @@ public class StepSetConfig extends Panel
         grid.setComponentAlignment( vl, Alignment.TOP_CENTER );
 
         Button next = new Button( "Next" );
+        next.setId("OozieConfWizardNext");
         next.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -134,6 +137,7 @@ public class StepSetConfig extends Panel
         } );
 
         Button back = new Button( "Back" );
+        back.setId("OozieConfWizardBack");
         back.addClickListener( new Button.ClickListener()
         {
             @Override

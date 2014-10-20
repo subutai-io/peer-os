@@ -103,7 +103,7 @@ class SetupStrategyOverHadoop extends HiveSetupStrategy
         for ( Product p : new Product[] { Product.HIVE, Product.DERBY } )
         {
             s = Commands.make( CommandType.INSTALL, p );
-            cmd = manager.commandRunner.createCommand( new RequestBuilder( s ).withTimeout( 120 ),
+            cmd = manager.commandRunner.createCommand( new RequestBuilder( s ).withTimeout( 1200 ),
                     new HashSet<>( Arrays.asList( config.getServer() ) ) );
             manager.commandRunner.runCommand( cmd );
             if ( !cmd.hasSucceeded() )
@@ -119,7 +119,7 @@ class SetupStrategyOverHadoop extends HiveSetupStrategy
         po.addLog( "Installing clients..." );
         s = Commands.make( CommandType.INSTALL, Product.HIVE );
         cmd = manager.getCommandRunner()
-                     .createCommand( new RequestBuilder( s ).withTimeout( 120 ), config.getClients() );
+                     .createCommand( new RequestBuilder( s ).withTimeout( 1200 ), config.getClients() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

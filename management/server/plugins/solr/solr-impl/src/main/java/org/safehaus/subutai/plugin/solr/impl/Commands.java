@@ -29,7 +29,7 @@ public class Commands
     public Command getStartCommand( Agent agent )
     {
         return commandRunnerBase.createCommand(
-                new RequestBuilder( START ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ),
+                new RequestBuilder( START ).withTimeout( 900 ).withStdOutRedirection( OutputRedirection.NO ),
                 Sets.newHashSet( agent ) );
     }
 
@@ -37,13 +37,13 @@ public class Commands
     public Command getStopCommand( Agent agent )
     {
         return commandRunnerBase
-                .createCommand( new RequestBuilder( STOP ).withTimeout( 60 ), Sets.newHashSet( agent ) );
+                .createCommand( new RequestBuilder( STOP ).withTimeout( 600 ), Sets.newHashSet( agent ) );
     }
 
 
     public Command getStatusCommand( Agent agent )
     {
         return commandRunnerBase
-                .createCommand( new RequestBuilder( STATUS ).withTimeout( 60 ), Sets.newHashSet( agent ) );
+                .createCommand( new RequestBuilder( STATUS ).withTimeout( 600 ), Sets.newHashSet( agent ) );
     }
 }

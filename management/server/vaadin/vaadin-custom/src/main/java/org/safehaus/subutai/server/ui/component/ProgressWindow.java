@@ -61,6 +61,7 @@ public class ProgressWindow
         content.setSpacing( true );
 
         outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setId( "outputTxtArea" );
         outputTxtArea.setRows( 13 );
         outputTxtArea.setColumns( 42 );
         outputTxtArea.setImmediate( true );
@@ -69,6 +70,7 @@ public class ProgressWindow
         content.addComponent( outputTxtArea );
 
         ok = new Button( "Ok" );
+        ok.setId( "btnOk" );
         ok.setStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
@@ -82,6 +84,7 @@ public class ProgressWindow
         } );
 
         indicator = new Label();
+        indicator.setId("indicator");
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Sizeable.Unit.PIXELS );
@@ -154,16 +157,18 @@ public class ProgressWindow
     private void setOutput( String output )
     {
         try {
-//            VaadinSession.getCurrent().getLockInstance().lock();
+            VaadinSession.getCurrent().getLockInstance().lock();
+
             if ( !Strings.isNullOrEmpty( output ) ) {
                 outputTxtArea.setValue( output );
                 outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
             }
         }
         finally {
-//            VaadinSession.getCurrent().getLockInstance().unlock();
+            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
+
 
 
     private void hideProgress()
