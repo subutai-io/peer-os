@@ -71,7 +71,7 @@ public class NodeGroup2PeerWizard extends Window
             }
             case 2:
             {
-                setContent( genContainerToPeersTable() );
+                setContent( genNodeGroupToPeersTable() );
                 break;
             }
             default:
@@ -150,7 +150,7 @@ public class NodeGroup2PeerWizard extends Window
     }
 
 
-    private VerticalLayout genContainerToPeersTable()
+    private VerticalLayout genNodeGroupToPeersTable()
     {
         VerticalLayout vl = new VerticalLayout();
 
@@ -175,7 +175,7 @@ public class NodeGroup2PeerWizard extends Window
             comboBox.setTextInputAllowed( false );
             comboBox.setItemCaptionPropertyId( "name" );
             Object itemId = containerToPeerTable.addItem( new Object[] {
-                    ng.getTemplateName(), comboBox
+                    ng.getName(), comboBox
             }, null );
             nodeGroupMap.put( itemId, ng );
             //            }
