@@ -28,11 +28,11 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -102,7 +102,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( SQLException e )
         {
-            e.printStackTrace();
+            LOG.error( e.getMessage(), e );
         }
         environmentBuilder = new EnvironmentBuilder( templateRegistry, agentManager, networkManager, containerManager );
     }
@@ -381,7 +381,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             throw new EnvironmentBuildException( "No containers assigned to the Environment" );
         }
-     }
+    }
 
 
     // TODO: Implement it via PCD
@@ -395,9 +395,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         catch ( NamingException e )
         {
-            e.printStackTrace();
-            return null;
+            LOG.error( e.getMessage(), e );
         }
+        return null;
     }
 
 

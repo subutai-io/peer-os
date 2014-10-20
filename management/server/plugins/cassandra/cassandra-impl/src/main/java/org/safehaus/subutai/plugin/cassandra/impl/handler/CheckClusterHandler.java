@@ -2,10 +2,12 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -43,7 +45,8 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
             return;
         }
 
-        Command checkStatusCommand = manager.getCommands().getStatusCommand( config.getNodes() );
+        Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
+        Command checkStatusCommand = manager.getCommands().getStatusCommand( agentSet );
         manager.getCommandRunner().runCommand( checkStatusCommand );
 
         if ( checkStatusCommand.hasSucceeded() )

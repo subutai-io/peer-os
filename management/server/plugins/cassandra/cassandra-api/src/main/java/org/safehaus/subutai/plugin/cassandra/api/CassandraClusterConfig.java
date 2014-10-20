@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.cassandra.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
@@ -19,8 +18,8 @@ public class CassandraClusterConfig implements ConfigBase
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private int numberOfSeeds;
     private int numberOfNodes;
-    private Set<Agent> seedNodes;
-    private Set<Agent> nodes;
+    private Set<UUID> seedNodes;
+    private Set<UUID> nodes;
     private String dataDirectory = "/var/lib/cassandra/data";
     private String commitLogDirectory = "/var/lib/cassandra/commitlog";
     private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
@@ -125,25 +124,25 @@ public class CassandraClusterConfig implements ConfigBase
     }
 
 
-    public Set<Agent> getSeedNodes()
+    public Set<UUID> getSeedNodes()
     {
         return seedNodes;
     }
 
 
-    public void setSeedNodes( Set<Agent> seedNodes )
+    public void setSeedNodes( Set<UUID> seedNodes )
     {
         this.seedNodes = seedNodes;
     }
 
 
-    public Set<Agent> getNodes()
+    public Set<UUID> getNodes()
     {
         return nodes;
     }
 
 
-    public void setNodes( Set<Agent> nodes )
+    public void setNodes( Set<UUID> nodes )
     {
         this.nodes = nodes;
     }

@@ -5,6 +5,8 @@
              interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
@@ -53,6 +55,7 @@
     <command name="cassandra/describe-cluster">
       <action class="org.safehaus.subutai.plugin.cassandra.cli.DescribeClusterCommand">
         <property name="cassandraManager" ref="cassandraManager" />
+        <property name="agentManager" ref="agentManager" />
       </action>
     </command>
 

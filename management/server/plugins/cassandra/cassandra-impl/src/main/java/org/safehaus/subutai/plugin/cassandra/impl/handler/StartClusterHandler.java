@@ -1,7 +1,10 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
@@ -32,7 +35,9 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
-        Command startServiceCommand = manager.getCommands().getStartCommand( config.getNodes() );
+
+        Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
+        Command startServiceCommand = manager.getCommands().getStartCommand( agentSet );
         manager.getCommandRunner().runCommand( startServiceCommand );
 
         if ( startServiceCommand.hasSucceeded() )
