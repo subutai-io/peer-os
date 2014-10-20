@@ -1,13 +1,12 @@
 #!/bin/bash
 SUBUTAI_HOME="/opt/subutai-management"
-SUBUTAI_BIN="/usr/bin/subutai-management"
-SUBUTAI_DATA="/var/log/subutai-management/data"
+SUBUTAI_BIN="/opt/subutai-management/bin"
+SUBUTAI_DATA="/opt/subutai-management/data"
 SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
 
 subutaiGetPid(){
 SUBUTAI_PID=$(pgrep -l -f karaf | grep java | awk '{print $1}')
 }
-
 
 case "$1" in
 start)
@@ -29,12 +28,12 @@ stop)
                 echo "Subutai-Management is not running now.."
         else
                 echo "Subutai-Management is stopping now..($SUBUTAI_PID)"
-                sudo $SUBUTAI_BIN/stop
+                sudo pkill -f karaf
         fi
         ;;
 restart)
         echo "Subutai-Management is restarting now.."
-        sudo $SUBUTAI_BIN/stop
+        sudo pkill -f karaf
         sudo rm -rf $SUBUTAI_DATA/*
         sudo $SUBUTAI_BIN/start
         subutaiGetPid

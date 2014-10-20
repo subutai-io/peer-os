@@ -1,7 +1,10 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
@@ -36,7 +39,8 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
         productOperation.addLog( "Destroying lxc containers" );
         try
         {
-            manager.getContainerManager().clonesDestroy( config.getNodes() );
+            Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
+            manager.getContainerManager().clonesDestroy( agentSet );
             productOperation.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex )

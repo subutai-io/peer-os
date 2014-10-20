@@ -1,10 +1,13 @@
 package org.safehaus.subutai.plugin.oozie.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -19,15 +22,14 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
+import org.safehaus.subutai.plugin.oozie.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.oozie.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.DestroyNodeOperationHandler;
@@ -35,6 +37,8 @@ import org.safehaus.subutai.plugin.oozie.impl.handler.InstallHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.StartServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.StopServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.UninstallHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -44,10 +48,10 @@ import com.google.common.collect.Sets;
 public class OozieImpl implements Oozie
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( OozieImpl.class.getName() );
     private PluginDAO pluginDAO;
     private Commands commands;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private CommandRunner commandRunner;
     private LxcManager lxcManager;
@@ -55,17 +59,25 @@ public class OozieImpl implements Oozie
     private ContainerManager containerManager;
     private Hadoop hadoopManager;
     private ExecutorService executor;
+    private DataSource dataSource;
 
 
-    public OozieImpl()
+    public OozieImpl( DataSource dataSource )
     {
-
+        this.dataSource = dataSource;
     }
 
 
     public void init()
     {
-        this.pluginDAO = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDAO( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
         this.commands = new Commands( commandRunner );
 
         executor = Executors.newCachedThreadPool();
@@ -99,18 +111,6 @@ public class OozieImpl implements Oozie
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 
@@ -332,8 +332,7 @@ public class OozieImpl implements Oozie
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
 
-        AbstractOperationHandler operationHandler =
-                new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }

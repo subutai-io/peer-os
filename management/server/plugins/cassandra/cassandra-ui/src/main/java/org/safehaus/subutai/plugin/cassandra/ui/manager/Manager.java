@@ -386,42 +386,50 @@ public class Manager
      * Fill out the table in which all nodes in the cluster are listed.
      *
      * @param table table to be filled
-     * @param agents nodes
      */
-    private void populateTable( final Table table, Set<Agent> agents )
+    private void populateTable( final Table table, Set<UUID> agentUUIDs )
     {
         table.removeAllItems();
-        for ( final Agent agent : agents )
+
+        for ( final UUID agentUUID : agentUUIDs )
         {
-            final Label resultHolder = new Label();
-            resultHolder.setId(agent.getListIP().get(0)+"-cassandraResult");
-            final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-            checkButton.setId(agent.getListIP().get(0)+"-cassandraCheck");
-            final Button startButton = new Button( START_BUTTON_CAPTION );
-            startButton.setId(agent.getListIP().get(0)+"-cassandraStart");
-            final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-            stopButton.setId(agent.getListIP().get(0)+"-cassandraStop");
+            Agent agent = agentManager.getAgentByUUID( agentUUID );
+            if ( agent != null )
+            {
+                final Label resultHolder = new Label();
+                resultHolder.setId(agent.getListIP().get(0)+"-cassandraResult");
+                final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
+                checkButton.setId(agent.getListIP().get(0)+"-cassandraCheck");
+                final Button startButton = new Button( START_BUTTON_CAPTION );
+                startButton.setId(agent.getListIP().get(0)+"-cassandraStart");
+                final Button stopButton = new Button( STOP_BUTTON_CAPTION );
+                stopButton.setId(agent.getListIP().get(0)+"-cassandraStop");
 
-            addStyleNameToButtons( checkButton, startButton, stopButton );
+                addStyleNameToButtons( checkButton, startButton, stopButton );
 
-            disableButtons( startButton, stopButton );
-            PROGRESS_ICON.setVisible( false );
+                disableButtons( startButton, stopButton );
+                PROGRESS_ICON.setVisible( false );
 
-            final HorizontalLayout availableOperations = new HorizontalLayout();
-            availableOperations.addStyleName( "default" );
-            availableOperations.setSpacing( true );
+                final HorizontalLayout availableOperations = new HorizontalLayout();
+                availableOperations.addStyleName( "default" );
+                availableOperations.setSpacing( true );
 
-            addGivenComponents( availableOperations, checkButton, startButton, stopButton );
+                addGivenComponents( availableOperations, checkButton, startButton, stopButton );
 
-            String isSeed = checkIfSeed( agent );
+                String isSeed = checkIfSeed( agent.getUuid() );
 
-            table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
-            }, null );
+                table.addItem( new Object[] {
+                        agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
+                }, null );
 
-            addClickListenerToCheckButton( agent, resultHolder, checkButton, startButton, stopButton );
-            addClickListenerToStartButton( agent, checkButton, startButton, stopButton );
-            addClickListenerToStopButton( agent, checkButton, startButton, stopButton );
+                addClickListenerToCheckButton( agent, resultHolder, checkButton, startButton, stopButton );
+                addClickListenerToStartButton( agent, checkButton, startButton, stopButton );
+                addClickListenerToStopButton( agent, checkButton, startButton, stopButton );
+            }
+            else
+            {
+                show( "Agent is not connected" );
+            }
         }
     }
 
@@ -449,18 +457,18 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute( new StopTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
@@ -561,8 +569,9 @@ public class Manager
 
     private void stopAllNodes()
     {
-        for ( Agent agent : config.getNodes() )
+        for ( UUID agentUUID : config.getNodes() )
         {
+            Agent agent = agentManager.getAgentByUUID( agentUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
@@ -584,8 +593,9 @@ public class Manager
 
     private void startAllNodes()
     {
-        for ( Agent agent : config.getNodes() )
+        for ( UUID agentUUID : config.getNodes() )
         {
+            Agent agent = agentManager.getAgentByUUID( agentUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
@@ -666,13 +676,13 @@ public class Manager
 
 
     /**
-     * @param agent agent
+     * @param agentUUID agent
      *
      * @return Yes if give agent is among seeds, otherwise returns No
      */
-    public String checkIfSeed( Agent agent )
+    public String checkIfSeed( UUID agentUUID )
     {
-        if ( config.getSeedNodes().contains( agent ) )
+        if ( config.getSeedNodes().contains( UUID.fromString( agentUUID.toString() ) ) )
         {
             return "Seed";
         }
@@ -686,10 +696,10 @@ public class Manager
     public void refreshClustersInfo()
     {
         List<CassandraClusterConfig> info = cassandra.getClusters();
-        CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        if ( info != null && !info.isEmpty() )
+        if ( !info.isEmpty() )
         {
+            CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
+            clusterCombo.removeAllItems();
             for ( CassandraClusterConfig cassandraInfo : info )
             {
                 clusterCombo.addItem( cassandraInfo );

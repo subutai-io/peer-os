@@ -10,6 +10,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.strategy.api.ContainerPlacementStrategy;
 import org.safehaus.subutai.core.strategy.api.StrategyException;
 
+import junit.framework.TestCase;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
@@ -21,6 +23,7 @@ public class StrategyManagerImplTest
 {
     StrategyManagerImpl strategyManager;
     ContainerPlacementStrategy defaultContainerPlacementStrategy;
+    ContainerPlacementStrategy roundRobinPlacementStrategy;
 
 
     @Before
@@ -28,6 +31,7 @@ public class StrategyManagerImplTest
     {
         strategyManager = new StrategyManagerImpl();
         defaultContainerPlacementStrategy = MockUtils.getDefaultContainerPlacementStrategy();
+        roundRobinPlacementStrategy = MockUtils.getRoundRobinPlacementStrategy();
     }
 
 
@@ -57,15 +61,28 @@ public class StrategyManagerImplTest
         assertEquals( 0, strategies.size() );
     }
 
-//
-//    @Test
-//    public void testGetPlacementDistribution() throws StrategyException
-//    {
-//        strategyManager.registerStrategy( defaultContainerPlacementStrategy );
-//        Map<Agent, Integer> result = strategyManager
-//                .getPlacementDistribution( MockUtils.getServerMetrics(), 3, defaultContainerPlacementStrategy.getId(),
-//                        null );
-//        assertNotNull( result );
-//        strategyManager.registerStrategy( defaultContainerPlacementStrategy );
-//    }
+
+    @Test
+    public void testRoundRobinPlacementStrategy() throws StrategyException
+    {
+        strategyManager.registerStrategy( roundRobinPlacementStrategy );
+        Map<Agent, Integer> result = strategyManager
+                .getPlacementDistribution( MockUtils.getServerMetrics(), 3, roundRobinPlacementStrategy.getId(), null );
+        assertNotNull( result );
+        TestCase.assertEquals( 3, result.size() );
+
+        result = strategyManager
+                .getPlacementDistribution( MockUtils.getServerMetrics(), 5, roundRobinPlacementStrategy.getId(), null );
+        assertNotNull( result );
+
+        result = strategyManager
+                .getPlacementDistribution( MockUtils.getServerMetrics(), 15, roundRobinPlacementStrategy.getId(), null );
+        assertNotNull( result );
+
+        result = strategyManager
+                .getPlacementDistribution( MockUtils.getServerMetrics(), 20, roundRobinPlacementStrategy.getId(), null );
+        assertNotNull( result );
+
+        strategyManager.unregisterStrategy( roundRobinPlacementStrategy );
+    }
 }

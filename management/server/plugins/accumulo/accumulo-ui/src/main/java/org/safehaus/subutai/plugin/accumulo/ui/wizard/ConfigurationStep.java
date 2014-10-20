@@ -81,9 +81,11 @@ public class ConfigurationStep extends Panel
             //tracers
             final TwinColSelect tracersSelect =
                     getTwinSelect( "Tracers", "hostname", "Available Nodes", "Selected Nodes", 4 );
+            tracersSelect.setId("TracersSelect");
             //slave nodes
             final TwinColSelect slavesSelect =
                     getTwinSelect( "Slaves", "hostname", "Available Nodes", "Selected Nodes", 4 );
+            slavesSelect.setId("SlavesSelect");
 
             //get existing hadoop clusters
             List<HadoopClusterConfig> hadoopClusters = hadoop.getClusters();

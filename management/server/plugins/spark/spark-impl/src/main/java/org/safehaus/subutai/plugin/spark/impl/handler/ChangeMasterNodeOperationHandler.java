@@ -128,7 +128,7 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
                         @Override
                         public void onResponse( Response response, AgentResult agentResult, Command command )
                         {
-                            okCount.set( StringUtil.countNumberOfOccurences( agentResult.getStdOut(), "starting" ) );
+                            okCount.set( StringUtil.countNumberOfOccurrences( agentResult.getStdOut(), "starting" ) );
 
                             if ( okCount.get() >= config.getAllNodes().size() )
                             {

@@ -6,7 +6,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
@@ -42,14 +42,14 @@ public class SetupStrategyWithHadoop extends SetupBase implements ClusterSetupSt
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getNodes() == null || environment.getNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         config.getSlaveNodes().clear();
         config.getHadoopNodes().clear();
-        for ( Node n : environment.getNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             config.getHadoopNodes().add( n.getAgent() );
             if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )

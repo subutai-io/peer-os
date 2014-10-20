@@ -1,7 +1,10 @@
 package org.safehaus.subutai.plugin.cassandra.cli;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
@@ -21,6 +24,19 @@ public class DescribeClusterCommand extends OsgiCommandSupport
             multiValued = false)
     String clusterName = null;
     private Cassandra cassandraManager;
+    private AgentManager agentManager;
+
+
+    public AgentManager getAgentManager()
+    {
+        return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
 
 
     public Cassandra getCassandraManager()
@@ -43,14 +59,16 @@ public class DescribeClusterCommand extends OsgiCommandSupport
             StringBuilder sb = new StringBuilder();
             sb.append( "Cluster name: " ).append( config.getClusterName() ).append( "\n" );
             sb.append( "Nodes:" ).append( "\n" );
-            for ( Agent agent : config.getNodes() )
+            for ( UUID agentUUID : config.getNodes() )
             {
+                Agent agent = agentManager.getAgentByUUID( agentUUID );
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( ", Agent UUID: " )
                   .append( agent.getUuid() ).append( "\n" );
             }
             sb.append( "Seeds:" ).append( "\n" );
-            for ( Agent agent : config.getSeedNodes() )
+            for ( UUID agentUUID : config.getSeedNodes() )
             {
+                Agent agent = agentManager.getAgentByUUID( agentUUID );
                 sb.append( "Hostname: " ).append( agent.getHostname() ).append( ", Agent UUID: " )
                   .append( agent.getUuid() ).append( "\n" );
             }

@@ -38,6 +38,12 @@ public class HttpUtil
     private static final Logger LOG = LoggerFactory.getLogger( HttpUtil.class.getName() );
 
 
+    public String doRequest( RequestType requestType, String url, Map<String, String> params ) throws HTTPException
+    {
+        return request( requestType, url, params );
+    }
+
+
     public static String request( RequestType requestType, String url, Map<String, String> params ) throws HTTPException
     {
         if ( requestType == RequestType.GET )

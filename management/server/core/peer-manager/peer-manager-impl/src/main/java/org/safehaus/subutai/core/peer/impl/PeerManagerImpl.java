@@ -95,7 +95,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( SQLException e )
         {
-            e.printStackTrace();
+            LOG.error( e.getMessage(), e );
         }
     }
 
@@ -457,7 +457,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private void registerTemplate( final Template template ) throws RegistryException
+    private void tryToRegister( final Template template ) throws RegistryException
     {
         if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
         {
@@ -561,7 +561,7 @@ public class PeerManagerImpl implements PeerManager
                         {
                             if ( t.isRemote() )
                             {
-                                registerTemplate( t );
+                                tryToRegister( t );
                             }
                         }
                         Set<Agent> agents = createContainers( ccm.getEnvId(), ccm.getPeerId(), ccm.getTemplate(),

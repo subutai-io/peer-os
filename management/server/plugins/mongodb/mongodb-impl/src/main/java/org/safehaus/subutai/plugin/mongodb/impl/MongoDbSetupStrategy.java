@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
@@ -98,28 +98,28 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getNodes().isEmpty() )
+        if ( environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         int totalNodesRequired =
                 config.getNumberOfRouters() + config.getNumberOfConfigServers() + config.getNumberOfDataNodes();
-        if ( environment.getNodes().size() < totalNodesRequired )
+        if ( environment.getContainers().size() < totalNodesRequired )
         {
             throw new ClusterSetupException(
                     String.format( "Environment needs to have %d but has %d nodes", totalNodesRequired,
-                            environment.getNodes().size() ) );
+                            environment.getContainers().size() ) );
         }
 
         Set<Agent> mongoAgents = new HashSet<>();
-        Set<Node> mongoNodes = new HashSet<>();
-        for ( Node node : environment.getNodes() )
+        Set<EnvironmentContainer> mongoEnvironmentContainers = new HashSet<>();
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
+            if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
             {
-                mongoAgents.add( node.getAgent() );
-                mongoNodes.add( node );
+                mongoAgents.add( environmentContainer.getAgent() );
+                mongoEnvironmentContainers.add( environmentContainer );
             }
         }
 
@@ -133,19 +133,19 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         Set<Agent> configServers = new HashSet<>();
         Set<Agent> routers = new HashSet<>();
         Set<Agent> dataNodes = new HashSet<>();
-        for ( Node node : mongoNodes )
+        for ( EnvironmentContainer environmentContainer : mongoEnvironmentContainers )
         {
-            if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) )
+            if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                configServers.add( node.getAgent() );
+                configServers.add( environmentContainer.getAgent() );
             }
-            else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) )
+            else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                routers.add( node.getAgent() );
+                routers.add( environmentContainer.getAgent() );
             }
-            else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) )
+            else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                dataNodes.add( node.getAgent() );
+                dataNodes.add( environmentContainer.getAgent() );
             }
         }
 

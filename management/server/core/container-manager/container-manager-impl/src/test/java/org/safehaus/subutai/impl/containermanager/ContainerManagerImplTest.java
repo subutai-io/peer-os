@@ -16,7 +16,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.impl.ContainerManagerImpl;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -45,8 +45,8 @@ public class ContainerManagerImplTest
     public void setUpMethod()
     {
         Monitoring monitor = mock( Monitoring.class );
-        when( monitor.getData( any( String.class ), any( Metric.class ), any( Date.class ), any( Date.class ) ) )
-                .thenReturn( Collections.EMPTY_MAP );
+//        when( monitor.getData( any( String.class ), any( MetricType.class ), any( Date.class ), any( Date.class ) ) )
+//                .thenReturn( Collections.EMPTY_MAP );
         templateManager = mock( TemplateManager.class );
         templateRegistry = mock( TemplateRegistry.class );
         dbManager = mock( DbManager.class );
