@@ -25,10 +25,10 @@ public class BlueprintsForm
 {
 
     private static final String NO_BLUEPRINTS = "No blueprints found";
-    private static final String N2P = "N2P";
-    private static final String B2PG = "B2PG";
-    private static final String NG2PG = "NG2PG";
-    private static final String NG2P = "NG2P";
+    private static final String N2P = "Node 2 Peer";
+    private static final String B2PG = "Blueprint 2 Peer Group";
+    private static final String NG2PG = "Node Group 2 Peer Group";
+    private static final String NG2P = "Node Group 2 Peer";
     private static final String DELETE = "Delete";
     private static final String VIEW = "View";
     private static final String NAME = "Name";
