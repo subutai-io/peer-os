@@ -13,6 +13,7 @@ init
 . $subutai_lib_base/git_ops
 . $subutai_lib_base/deb_ops
 . $subutai_lib_base/lock_ops
+. $subutai_lib_base/ovs_ops
 # Function addmount:
 # -----------------------------------------------------------------------------
 # 
