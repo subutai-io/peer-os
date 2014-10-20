@@ -14,7 +14,7 @@ import com.vaadin.ui.Component;
 public class EnvironmentTerminalPortalModule implements PortalModule
 {
 
-    public static final String MODULE_IMAGE = "terminal.png";
+    public static final String MODULE_IMAGE = "env_terminal.png";
     public static final String MODULE_NAME = "Environment Terminal";
     private EnvironmentManager environmentManager;
     private CommandDispatcher commandDispatcher;
