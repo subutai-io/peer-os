@@ -155,7 +155,7 @@ public class NodeGroup2PeerWizard extends Window
         VerticalLayout vl = new VerticalLayout();
 
         containerToPeerTable = new Table();
-        containerToPeerTable.addContainerProperty( "Container", String.class, null );
+        containerToPeerTable.addContainerProperty( "Node Group", String.class, null );
         containerToPeerTable.addContainerProperty( "Put", ComboBox.class, null );
         containerToPeerTable.setPageLength( 10 );
         containerToPeerTable.setSelectable( false );
