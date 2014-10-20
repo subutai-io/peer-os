@@ -54,6 +54,7 @@ public class ConfigurationStep extends Panel
         content.setMargin( true );
 
         TextField nameTxt = new TextField( "Cluster name" );
+        nameTxt.setId("PrestoClusterName");
         nameTxt.setRequired( true );
         nameTxt.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -67,6 +68,7 @@ public class ConfigurationStep extends Panel
         nameTxt.setValue( wizard.getConfig().getClusterName() );
 
         Button next = new Button( "Next" );
+        next.setId("PresConfNext");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -78,6 +80,7 @@ public class ConfigurationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
+        back.setId("PresConfBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -118,8 +121,11 @@ public class ConfigurationStep extends Panel
     {
 
         hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
+        hadoopClustersCombo.setId("PresHadoopClusterCb");
         coordinatorNodeCombo = new ComboBox( "Coordinator" );
+        coordinatorNodeCombo.setId("PresCoordinatorCb");
         workersSelect = new TwinColSelect( "Workers", new ArrayList<Agent>() );
+        workersSelect.setId("PresSelect");
 
         coordinatorNodeCombo.setImmediate( true );
         coordinatorNodeCombo.setTextInputAllowed( false );

@@ -85,7 +85,14 @@ public class Manager extends BaseManager
 
         //tables go here
         serverTable = createTableTemplate( SERVER_TABLE_CAPTION );
+        serverTable.setId("OozieMngServerTable");
         clientsTable = createTableTemplate( CLIENT_TABLE_CAPTION );
+        clientsTable.setId("OozieMngClientsTable");
+
+        /*
+        nodesTable = createTableTemplate(NODES_TABLE_CAPTION);
+        nodesTable.setId("OozieMngNodesTable");
+*/
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -95,6 +102,7 @@ public class Manager extends BaseManager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
+        clusterCombo.setId("OozieMngClusterCombo");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -111,6 +119,7 @@ public class Manager extends BaseManager
         controlsContent.addComponent( clusterCombo );
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
+        refreshClustersBtn.setId("OozieMngRefresh");
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -123,7 +132,7 @@ public class Manager extends BaseManager
 
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button checkAllBtn = new Button( "Check all" );
+        /*Button checkAllBtn = new Button( "Check all" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -132,9 +141,10 @@ public class Manager extends BaseManager
             {
                 clickAllCheckButtons( serverTable );
             }
-        } );
+        } );*/
 
         Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.setId("OozieMngDestroy");
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -177,6 +187,7 @@ public class Manager extends BaseManager
 
 
         Button addNodeButton = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeButton.setId("OozieMngAddNode");
         addNodeButton.addStyleName( "default" );
         addNodeButton.addClickListener( addNodeButtonListener() );
 
@@ -187,6 +198,8 @@ public class Manager extends BaseManager
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( serverTable, 0, 1, 0, 5 );
         contentRoot.addComponent( clientsTable, 0, 6, 0, 10 );
+        //contentRoot.addComponent( nodesTable, 0, 1, 0, 5 );
+
     }
 
 
@@ -278,11 +291,31 @@ public class Manager extends BaseManager
         }
     }
 
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
 
     private void populateServerTable( final Table table, final Agent agent )
     {
         List<Agent> agentList = new ArrayList<>();
         agentList.add( agent );
+        //agentList.add(config.getServer());
         populateTable( table, agentList );
     }
 
@@ -412,10 +445,15 @@ public class Manager extends BaseManager
 
         // Buttons to be added to availableOperations
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-        final Button startStopButton = new Button( START_STOP_BUTTON_DEFAULT_CAPTION );
+        checkButton.setId(agent.getListIP().get(0) + "-oozieCheck");
+        final Button startButton = new Button( START_BUTTON_CAPTION );
+        startButton.setId(agent.getListIP().get(0) + "-oozieStart");
+        final Button stopButton = new Button( STOP_BUTTON_CAPTION );
+        stopButton.setId(agent.getListIP().get(0) + "-oozieStop");
 
         checkButton.addStyleName( "default" );
-        startStopButton.addStyleName( "default" );
+        startButton.addStyleName( "default" );
+        stopButton.addStyleName( "default" );
         // Buttons to be added to availableOperations
 
         // Labels to be added to statusGroup
@@ -425,17 +463,19 @@ public class Manager extends BaseManager
         // Labels to be added to statusGroup
 
         availableOperations.addComponent( checkButton );
-        availableOperations.addComponent( startStopButton );
+        availableOperations.addComponent( startButton );
+        availableOperations.addComponent( stopButton );
         statusGroup.addComponent( statusLabel );
 
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(), statusGroup, availableOperations
+                agent.getHostname(), agent.getListIP().get(0).toString(), statusGroup, availableOperations
         }, null );
 
         Item row = getAgentRow( table, agent );
 
         checkButton.addClickListener( checkButtonListener( row ) );
-        startStopButton.addClickListener( startStopButtonListener( row ) );
+        startButton.addClickListener( startButtonListener( row ) );
+        stopButton.addClickListener(  stopButtonListener( row ) );
     }
 
 
@@ -450,6 +490,7 @@ public class Manager extends BaseManager
 
         // Buttons to be added to availableOperations
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
+        destroyButton.setId(agent.getListIP().get(0) + "-oozieDestroy");
 
         destroyButton.addStyleName( "default" );
         // Buttons to be added to availableOperations
@@ -457,7 +498,7 @@ public class Manager extends BaseManager
         availableOperations.addComponent( destroyButton );
 
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(),statusLayout, availableOperations
+                agent.getHostname(), agent.getListIP().get(0).toString(),statusLayout, availableOperations
         }, null );
 
         Item row = getAgentRow( table, agent );
@@ -476,6 +517,7 @@ public class Manager extends BaseManager
                 final Button startStopButton = clickEvent.getButton();
                 HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
                 final Button checkButton = getCheckButton( availableOperationsLayout );
+
                 startStopButton.setEnabled( false );
                 boolean isRunning = startStopButton.getCaption().contains( STOP_BUTTON_CAPTION );
                 enableProgressBar();
@@ -502,7 +544,8 @@ public class Manager extends BaseManager
     {
         HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
         final Button checkButton = getCheckButton( availableOperationsLayout );
-        final Button startStopButton = getStartStopButton( availableOperationsLayout );
+        final Button startButton = getStartButton( availableOperationsLayout );
+        final Button stopButton = getStopButton( availableOperationsLayout );
         HorizontalLayout statusLayout = getStatusLayout( row );
         final Label statusLabel = getStatusLabel( statusLayout );
 
@@ -514,14 +557,14 @@ public class Manager extends BaseManager
                 if ( state == NodeState.RUNNING )
                 {
                     statusLabel.setValue( "Server is running" );
-                    startStopButton.setCaption( STOP_BUTTON_CAPTION );
-                    startStopButton.setEnabled( true );
+                    //stopButton.setCaption( STOP_BUTTON_CAPTION );
+                    stopButton.setEnabled( true );
                 }
                 else if ( state == NodeState.STOPPED )
                 {
                     statusLabel.setValue( "Server is stopped" );
-                    startStopButton.setCaption( START_BUTTON_CAPTION );
-                    startStopButton.setEnabled( true );
+                    //startButton.setCaption( START_BUTTON_CAPTION );
+                    startButton.setEnabled( true );
                 }
                 else
                 {
@@ -543,7 +586,7 @@ public class Manager extends BaseManager
             public void buttonClick( Button.ClickEvent clickEvent )
             {
                 Button destroyButton = clickEvent.getButton();
-                enableProgressBar();
+                //enableProgressBar();
                 destroyButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 
@@ -558,10 +601,77 @@ public class Manager extends BaseManager
                     {
                         refreshClustersInfo();
                         refreshUI();
-                        disableProgressBar();
+                        //disableProgressBar();
                     }
                 } );
                 contentRoot.getUI().addWindow( window.getWindow() );
+            }
+        } ;
+    }
+    private Button.ClickListener startButtonListener( final Item row )
+    {
+        return new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                final Button startButton = clickEvent.getButton();
+                final Button stopButton = clickEvent.getButton();
+                HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
+                final Button checkButton = getCheckButton( availableOperationsLayout );
+
+                startButton.setEnabled( false );
+                stopButton.setEnabled( false );
+                boolean isRunning = startButton.isEnabled();
+                enableProgressBar();
+                startButton.setEnabled( false );
+                stopButton.setEnabled( false );
+                checkButton.setEnabled( false );
+                Agent agent = getAgentByRow( row );
+
+                OperationType operationType;
+                if ( !isRunning ) {
+                    operationType = OperationType.Start;
+
+                    executorService
+                        .execute( new OperationTask( oozieManager, tracker, operationType,
+                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
+                }
+            }
+        } ;
+    }
+
+    private Button.ClickListener stopButtonListener( final Item row )
+    {
+        return new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                final Button startButton = clickEvent.getButton();
+                final Button stopButton = clickEvent.getButton();
+                HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
+                final Button checkButton = getCheckButton( availableOperationsLayout );
+
+                startButton.setEnabled( false );
+                stopButton.setEnabled( false );
+                boolean isRunning = stopButton.isEnabled();
+                enableProgressBar();
+                startButton.setEnabled( false );
+                stopButton.setEnabled( false );
+                checkButton.setEnabled( false );
+                Agent agent = getAgentByRow( row );
+
+                OperationType operationType;
+                if ( !isRunning )
+                {
+                    operationType = OperationType.Stop;
+
+                    executorService
+                        .execute( new OperationTask( oozieManager, tracker, operationType,
+                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
+
+                }
             }
         } ;
     }
@@ -576,10 +686,12 @@ public class Manager extends BaseManager
 
                 final Button checkButton = clickEvent.getButton();
                 HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
-                final Button startStopButton = getStartStopButton( availableOperationsLayout );
+                final Button startButton = getStartButton( availableOperationsLayout );
+                final Button stopButton = getStopButton( availableOperationsLayout );
                 checkButton.setEnabled( false );
                 enableProgressBar();
-                startStopButton.setEnabled( false );
+                startButton.setEnabled( false );
+                stopButton.setEnabled( false );
                 checkButton.setEnabled( false );
                 Agent agent = getAgentByRow( row );
 

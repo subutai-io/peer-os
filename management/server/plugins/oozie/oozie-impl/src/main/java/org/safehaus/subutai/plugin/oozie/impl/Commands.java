@@ -63,7 +63,7 @@ public class Commands
 
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-server" )
-                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents
+                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents
                             );
     }
 
@@ -73,7 +73,7 @@ public class Commands
 
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-client" )
-                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents
+                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents
                             );
     }
 

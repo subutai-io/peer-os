@@ -35,7 +35,10 @@ public class HBaseComponent extends CustomComponent
         final Manager manager = new Manager( executor, serviceLocator );
         Wizard wizard = new Wizard( executor, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
+        sheet.getTab(0).setId("HbaseInstallTab");
         sheet.addTab( manager.getContent(), "Manage" );
+        sheet.getTab(1).setId("HbaseManageTab");
+
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override
