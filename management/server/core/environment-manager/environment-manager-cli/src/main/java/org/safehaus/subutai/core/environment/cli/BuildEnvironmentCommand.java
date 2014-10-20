@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.environment.cli;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -48,11 +47,9 @@ public class BuildEnvironmentCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        EnvironmentBuildTask task = new EnvironmentBuildTask();
         Set<String> physicalServers = new HashSet<>();
         physicalServers.add( String.valueOf( physicalServers ) );
-
-
+        //TODO: code
         return null;
     }
 }

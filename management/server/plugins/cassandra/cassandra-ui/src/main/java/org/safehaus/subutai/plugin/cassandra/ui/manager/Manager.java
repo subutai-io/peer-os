@@ -386,31 +386,38 @@ public class Manager
         for ( final UUID agentUUID : agentUUIDs )
         {
             Agent agent = agentManager.getAgentByUUID( agentUUID );
-            final Label resultHolder = new Label();
-            final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-            final Button startButton = new Button( START_BUTTON_CAPTION );
-            final Button stopButton = new Button( STOP_BUTTON_CAPTION );
+            if ( agent != null )
+            {
+                final Label resultHolder = new Label();
+                final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
+                final Button startButton = new Button( START_BUTTON_CAPTION );
+                final Button stopButton = new Button( STOP_BUTTON_CAPTION );
 
-            addStyleNameToButtons( checkButton, startButton, stopButton );
+                addStyleNameToButtons( checkButton, startButton, stopButton );
 
-            disableButtons( startButton, stopButton );
-            PROGRESS_ICON.setVisible( false );
+                disableButtons( startButton, stopButton );
+                PROGRESS_ICON.setVisible( false );
 
-            final HorizontalLayout availableOperations = new HorizontalLayout();
-            availableOperations.addStyleName( "default" );
-            availableOperations.setSpacing( true );
+                final HorizontalLayout availableOperations = new HorizontalLayout();
+                availableOperations.addStyleName( "default" );
+                availableOperations.setSpacing( true );
 
-            addGivenComponents( availableOperations, checkButton, startButton, stopButton );
+                addGivenComponents( availableOperations, checkButton, startButton, stopButton );
 
-            String isSeed = checkIfSeed( agent.getUuid() );
+                String isSeed = checkIfSeed( agent.getUuid() );
 
-            table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
-            }, null );
+                table.addItem( new Object[] {
+                        agent.getHostname(), agent.getListIP().get( 0 ), isSeed, resultHolder, availableOperations
+                }, null );
 
-            addClickListenerToCheckButton( agent, resultHolder, checkButton, startButton, stopButton );
-            addClickListenerToStartButton( agent, checkButton, startButton, stopButton );
-            addClickListenerToStopButton( agent, checkButton, startButton, stopButton );
+                addClickListenerToCheckButton( agent, resultHolder, checkButton, startButton, stopButton );
+                addClickListenerToStartButton( agent, checkButton, startButton, stopButton );
+                addClickListenerToStopButton( agent, checkButton, startButton, stopButton );
+            }
+            else
+            {
+                show( "Agent is not connected" );
+            }
         }
     }
 
@@ -663,7 +670,7 @@ public class Manager
      */
     public String checkIfSeed( UUID agentUUID )
     {
-        if ( config.getSeedNodes().contains( UUID.fromString( agentUUID.toString() )) )
+        if ( config.getSeedNodes().contains( UUID.fromString( agentUUID.toString() ) ) )
         {
             return "Seed";
         }
@@ -681,28 +688,25 @@ public class Manager
         {
             CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
             clusterCombo.removeAllItems();
-            if ( info != null && !info.isEmpty() )
+            for ( CassandraClusterConfig cassandraInfo : info )
+            {
+                clusterCombo.addItem( cassandraInfo );
+                clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
+            }
+            if ( clusterInfo != null )
             {
                 for ( CassandraClusterConfig cassandraInfo : info )
                 {
-                    clusterCombo.addItem( cassandraInfo );
-                    clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
-                }
-                if ( clusterInfo != null )
-                {
-                    for ( CassandraClusterConfig cassandraInfo : info )
+                    if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {
-                        if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
-                        {
-                            clusterCombo.setValue( cassandraInfo );
-                            return;
-                        }
+                        clusterCombo.setValue( cassandraInfo );
+                        return;
                     }
                 }
-                else
-                {
-                    clusterCombo.setValue( info.iterator().next() );
-                }
+            }
+            else
+            {
+                clusterCombo.setValue( info.iterator().next() );
             }
         }
     }
