@@ -31,6 +31,7 @@ public class ConfigurationStep extends VerticalLayout
         content.setMargin( true );
 
         final TextField clusterNameTxtFld = new TextField( "Enter installation name" );
+        clusterNameTxtFld.setId("SlrClusterNameTxtFld");
         clusterNameTxtFld.setInputPrompt( "Installation name" );
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setMaxLength( 20 );
@@ -46,6 +47,7 @@ public class ConfigurationStep extends VerticalLayout
 
 
         Button next = new Button( "Next" );
+        next.setId("SlrConfNext");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -64,6 +66,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
+        back.setId("SlrConfBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

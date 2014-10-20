@@ -29,6 +29,7 @@ public class ConfigurationStep extends VerticalLayout
         content.setMargin( true );
 
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
+        clusterNameTxtFld.setId("CassClusterNameTxtField");
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -42,6 +43,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField domainNameTxtFld = new TextField( "Enter domain name" );
+        domainNameTxtFld.setId("CassDomainNameTxtField");
         domainNameTxtFld.setInputPrompt( "Domain name" );
         domainNameTxtFld.setInputPrompt( "intra.lan" );
         domainNameTxtFld.setRequired( true );
@@ -56,6 +58,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField dataDirectoryTxtFld = new TextField( "Data directory" );
+        dataDirectoryTxtFld.setId("CassDirectoryTxtField");
         dataDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/data" );
         dataDirectoryTxtFld.setRequired( true );
         dataDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -69,6 +72,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField commitLogDirectoryTxtFld = new TextField( "Commit log directory" );
+        commitLogDirectoryTxtFld.setId("CassCommitLogDirectoryTxtField");
         commitLogDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/commitlog" );
         commitLogDirectoryTxtFld.setRequired( true );
         commitLogDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -82,6 +86,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField savedCachesDirectoryTxtFld = new TextField( "Saved caches directory" );
+        savedCachesDirectoryTxtFld.setId("CassSavedCachesDirectoryTxtFld");
         savedCachesDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/saved_caches" );
         savedCachesDirectoryTxtFld.setRequired( true );
         savedCachesDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -96,8 +101,10 @@ public class ConfigurationStep extends VerticalLayout
 
         final ComboBox nodesCountCombo =
                 new ComboBox( "Choose number of nodes in cluster", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+        nodesCountCombo.setId("CassNodesCountCombo");
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setImmediate( true );
+        nodesCountCombo.setTextInputAllowed( false );
         nodesCountCombo.setNullSelectionAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
 
@@ -112,8 +119,10 @@ public class ConfigurationStep extends VerticalLayout
 
         final ComboBox seedsCountCombo =
                 new ComboBox( "Choose number of seeds", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+        seedsCountCombo.setId("CassSeedsCountCombo");
         seedsCountCombo.setImmediate( true );
         seedsCountCombo.setImmediate( true );
+        seedsCountCombo.setTextInputAllowed( false );
         seedsCountCombo.setNullSelectionAllowed( false );
         seedsCountCombo.setValue( wizard.getConfig() );
 
@@ -127,6 +136,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button next = new Button( "Next" );
+        next.setId("CassConfNextBtn");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -157,6 +167,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
+        back.setId("CassConfBackBtn");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

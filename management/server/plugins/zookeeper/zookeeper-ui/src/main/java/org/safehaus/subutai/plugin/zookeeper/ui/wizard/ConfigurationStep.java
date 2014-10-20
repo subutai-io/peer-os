@@ -47,6 +47,7 @@ public class ConfigurationStep extends Panel
             standaloneInstallationControls.setMargin( true );
 
             final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
+            clusterNameTxtFld.setId("ZookeeperConfClusterName");
             clusterNameTxtFld.setInputPrompt( "Cluster name" );
             clusterNameTxtFld.setRequired( true );
             clusterNameTxtFld.setMaxLength( 20 );
@@ -63,6 +64,7 @@ public class ConfigurationStep extends Panel
             //number of nodes
             ComboBox nodesCountCombo =
                     new ComboBox( "Choose number of nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+            nodesCountCombo.setId("ZookeeperNumNodes");
             nodesCountCombo.setImmediate( true );
             nodesCountCombo.setTextInputAllowed( false );
             nodesCountCombo.setNullSelectionAllowed( false );
@@ -78,6 +80,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button next = new Button( "Next" );
+            next.setId("ZookeeperConfNext");
             next.addStyleName( "default" );
             next.addClickListener( new Button.ClickListener()
             {
@@ -98,6 +101,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button back = new Button( "Back" );
+            back.setId("ZookeeperConfBack");
             back.addStyleName( "default" );
             back.addClickListener( new Button.ClickListener()
             {
@@ -129,6 +133,7 @@ public class ConfigurationStep extends Panel
             overHadoopInstallationControls.setMargin( true );
 
             final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
+            clusterNameTxtFld.setId("zookeeperClusterName");
             clusterNameTxtFld.setInputPrompt( "Cluster name" );
             clusterNameTxtFld.setRequired( true );
             clusterNameTxtFld.setMaxLength( 20 );
@@ -143,7 +148,10 @@ public class ConfigurationStep extends Panel
             } );
 
             ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
+            hadoopClustersCombo.setId("ZookeeperConfHadoopCluster");
+
             final TwinColSelect hadoopNodesSelect = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+            hadoopNodesSelect.setId("ZookeeperConfHadoopNodesSelection");
 
             hadoopClustersCombo.setImmediate( true );
             hadoopClustersCombo.setTextInputAllowed( false );
@@ -227,6 +235,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button next = new Button( "Next" );
+            next.setId("ZookeeperConfNext");
             next.addStyleName( "default" );
             next.addClickListener( new Button.ClickListener()
             {
@@ -254,6 +263,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button back = new Button( "Back" );
+            back.setId("ZookeeperConfBack");
             back.addStyleName( "default" );
             back.addClickListener( new Button.ClickListener()
             {
@@ -283,6 +293,7 @@ public class ConfigurationStep extends Panel
             //Hadoop settings
 
             final TextField hadoopClusterNameTxtFld = new TextField( "Enter Hadoop cluster name" );
+            hadoopClusterNameTxtFld.setId("ZookeeperConfHadoopCluster");
             hadoopClusterNameTxtFld.setInputPrompt( "Hadoop cluster name" );
             hadoopClusterNameTxtFld.setRequired( true );
             hadoopClusterNameTxtFld.setMaxLength( 20 );
@@ -307,6 +318,7 @@ public class ConfigurationStep extends Panel
             }
 
             ComboBox hadoopSlaveNodesComboBox = new ComboBox( "Choose number of Hadoop slave nodes", count );
+            hadoopSlaveNodesComboBox.setId("ZookeeperConfHadoopNodesSelection");
             hadoopSlaveNodesComboBox.setImmediate( true );
             hadoopSlaveNodesComboBox.setTextInputAllowed( false );
             hadoopSlaveNodesComboBox.setNullSelectionAllowed( false );
@@ -324,6 +336,7 @@ public class ConfigurationStep extends Panel
             //configuration replication factor
             ComboBox hadoopReplicationFactorComboBox =
                     new ComboBox( "Choose replication factor for Hadoop slave nodes", count );
+            hadoopReplicationFactorComboBox.setId("ZookeeperConfHadoopReplFactor");
             hadoopReplicationFactorComboBox.setImmediate( true );
             hadoopReplicationFactorComboBox.setTextInputAllowed( false );
             hadoopReplicationFactorComboBox.setNullSelectionAllowed( false );
@@ -339,6 +352,7 @@ public class ConfigurationStep extends Panel
             } );
 
             TextField HadoopDomainTxtFld = new TextField( "Enter Hadoop cluster domain name" );
+            HadoopDomainTxtFld.setId("ZookeeperConfHadoopDomain");
             HadoopDomainTxtFld.setInputPrompt( wizard.getHadoopClusterConfig().getDomainName() );
             HadoopDomainTxtFld.setValue( wizard.getHadoopClusterConfig().getDomainName() );
             HadoopDomainTxtFld.setMaxLength( 20 );
@@ -361,6 +375,7 @@ public class ConfigurationStep extends Panel
             withHadoopInstallationControls.setMargin( true );
 
             final TextField clusterNameTxtFld = new TextField( "Enter Zookeeper cluster name" );
+            clusterNameTxtFld .setId("ZookeeperConfClusterName");
             clusterNameTxtFld.setInputPrompt( "Zookeeper cluster name" );
             clusterNameTxtFld.setRequired( true );
             clusterNameTxtFld.setMaxLength( 20 );
@@ -377,6 +392,7 @@ public class ConfigurationStep extends Panel
             //number of nodes
             ComboBox nodesCountCombo =
                     new ComboBox( "Choose number of Zookeeper nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+            nodesCountCombo .setId("ZookeeperConfNodesNum");
             nodesCountCombo.setImmediate( true );
             nodesCountCombo.setTextInputAllowed( false );
             nodesCountCombo.setNullSelectionAllowed( false );
@@ -392,6 +408,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button next = new Button( "Next" );
+            next.setId("ZookeeperConfNext");
             next.addStyleName( "default" );
             next.addClickListener( new Button.ClickListener()
             {
@@ -438,6 +455,7 @@ public class ConfigurationStep extends Panel
             } );
 
             Button back = new Button( "Back" );
+            back.setId("ZookeeperConfBack");
             back.addStyleName( "default" );
             back.addClickListener( new Button.ClickListener()
             {

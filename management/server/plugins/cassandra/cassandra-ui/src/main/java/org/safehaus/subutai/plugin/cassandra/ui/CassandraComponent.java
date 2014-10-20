@@ -40,8 +40,10 @@ public class CassandraComponent extends CustomComponent
         wizard = new Wizard( executorService, serviceLocator );
         environmentWizard = new EnvironmentWizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
+        sheet.getTab(0).setId("CassandraInstallTab");
         sheet.addTab( environmentWizard.getContent(), "Configure environment" );
         sheet.addTab( manager.getContent(), "Manage" );
+        sheet.getTab(1).setId("CassandraManageTab");
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

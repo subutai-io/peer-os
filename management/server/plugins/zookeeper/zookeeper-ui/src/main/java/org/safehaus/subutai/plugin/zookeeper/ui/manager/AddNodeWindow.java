@@ -63,6 +63,7 @@ class AddNodeWindow extends Window
         topContent.addComponent( lblNodes );
 
         final ComboBox hadoopNodes = new ComboBox();
+        hadoopNodes.setId("ZookeeperMngHadoopNodes");
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
@@ -78,6 +79,7 @@ class AddNodeWindow extends Window
         topContent.addComponent( hadoopNodes );
 
         final Button addNodeBtn = new Button( "Add" );
+        addNodeBtn.setId("ZookeeperMngAddSelectedNode");
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
@@ -128,6 +130,7 @@ class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setId("outputTxtArea");
         outputTxtArea.setRows( 10 );
         outputTxtArea.setWidth( 80, Unit.PERCENTAGE );
         outputTxtArea.setImmediate( true );
@@ -136,6 +139,7 @@ class AddNodeWindow extends Window
         content.addComponent( outputTxtArea );
 
         indicator = new Label();
+        indicator.setId("indicator");
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );
@@ -143,6 +147,7 @@ class AddNodeWindow extends Window
         indicator.setVisible( false );
 
         ok = new Button( "Ok" );
+        ok.setId("btnOk");
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {

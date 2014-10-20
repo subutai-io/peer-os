@@ -34,7 +34,9 @@ public class StormComponent extends CustomComponent
         TabSheet tabSheet = new TabSheet();
         tabSheet.setSizeFull();
         tabSheet.addTab( wizard.getContent(), "Install" );
+        tabSheet.getTab(0).setId("StormInstallTab");
         tabSheet.addTab( manager.getContent(), "Manage" );
+        tabSheet.getTab(1).setId("StormManageTab");
 
         verticalLayout.addComponent( tabSheet );
         setCompositionRoot( verticalLayout );
