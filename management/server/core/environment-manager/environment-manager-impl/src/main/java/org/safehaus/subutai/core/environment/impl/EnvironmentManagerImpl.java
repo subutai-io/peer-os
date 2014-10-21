@@ -326,13 +326,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 process.getEnvironmentBlueprint().getName() );
 
         int containerCount = 0;
-        long timeout = 1000 * 360;
+        long timeout = 1000 * 60;
         for ( String key : process.getMessageMap().keySet() )
         {
             CloneContainersMessage ccm = process.getMessageMap().get( key );
             ccm.setEnvId( environment.getUuid() );
 
             containerCount = containerCount + ccm.getNumberOfNodes();
+            timeout = 1000 * 15 * ccm.getNumberOfNodes();
 
             //TODO: move template addition on create ccm
             List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );

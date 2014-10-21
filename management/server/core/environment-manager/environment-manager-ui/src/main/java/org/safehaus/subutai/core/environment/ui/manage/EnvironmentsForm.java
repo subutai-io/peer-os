@@ -223,6 +223,7 @@ public class EnvironmentsForm
 
         Table containersTable = new Table();
         containersTable.addContainerProperty( NAME, String.class, null );
+        containersTable.addContainerProperty( "Peer", String.class, null );
         containersTable.addContainerProperty( PROPERTIES, Button.class, null );
         containersTable.addContainerProperty( START, Button.class, null );
         containersTable.addContainerProperty( STOP, Button.class, null );
@@ -237,7 +238,7 @@ public class EnvironmentsForm
         {
 
             containersTable.addItem( new Object[] {
-                    container.getName() + " on " + container.getPeerId(), propertiesButton( container ),
+                    container.getName(), container.getPeerId().toString(), propertiesButton( container ),
                     startButton( environment, container ), stopButton( environment, container ),
                     destroyButton( environment, container )
             }, null );
