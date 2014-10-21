@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -13,10 +13,10 @@ public class SetupStartegyBase
 {
     final SharkImpl manager;
     final SharkClusterConfig config;
-    final ProductOperation po;
+    final TrackerOperation po;
 
 
-    public SetupStartegyBase( SharkImpl manager, SharkClusterConfig config, ProductOperation po )
+    public SetupStartegyBase( SharkImpl manager, SharkClusterConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;

@@ -1,11 +1,8 @@
 package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
@@ -19,7 +16,7 @@ import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 public class DestroyAllOperationHandler extends AbstractHandler
 {
 
-    public DestroyAllOperationHandler( SqoopImpl manager, String clusterName,  ProductOperation po )
+    public DestroyAllOperationHandler( SqoopImpl manager, String clusterName,  TrackerOperation po )
     {
         super( manager, clusterName, po );
     }
@@ -28,7 +25,7 @@ public class DestroyAllOperationHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         SqoopConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -74,7 +71,7 @@ public class DestroyAllOperationHandler extends AbstractHandler
 
     private boolean uninstall( SqoopConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Sqoop..." );
 
 
@@ -96,7 +93,7 @@ public class DestroyAllOperationHandler extends AbstractHandler
 
     private boolean destroyNodes( SqoopConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Destroying node(s)..." );
         try
         {

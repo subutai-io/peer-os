@@ -20,7 +20,7 @@ public class StopTaskTrackerOperationHandler extends AbstractOperationHandler<Ha
     {
         super( manager, clusterName );
         this.lxcHostName = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping TaskTracker in %s", clusterName ) );
     }
 
@@ -32,20 +32,20 @@ public class StopTaskTrackerOperationHandler extends AbstractOperationHandler<Ha
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( !hadoopClusterConfig.getTaskTrackers().contains( lxcHostName ) )
         {
-            productOperation.addLogFailed( String.format( "TaskTracker on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "TaskTracker on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostName );
         if ( node == null )
         {
-            productOperation.addLogFailed( "TaskTracker is not connected" );
+            trackerOperation.addLogFailed( "TaskTracker is not connected" );
             return;
         }
 
@@ -83,11 +83,11 @@ public class StopTaskTrackerOperationHandler extends AbstractOperationHandler<Ha
 
         if ( NodeState.UNKNOWN.equals( nodeState ) )
         {
-            productOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
+            trackerOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogDone( String.format( "TaskTracker of %s is %s", node.getHostname(), nodeState ) );
+            trackerOperation.addLogDone( String.format( "TaskTracker of %s is %s", node.getHostname(), nodeState ) );
         }
     }
 }

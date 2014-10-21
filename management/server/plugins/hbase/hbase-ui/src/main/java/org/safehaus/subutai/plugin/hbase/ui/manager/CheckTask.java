@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.hbase.ui.manager;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
@@ -38,7 +38,7 @@ public class CheckTask implements Runnable
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( HBaseClusterConfig.PRODUCT_KEY, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( HBaseClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != ProductOperationState.RUNNING )

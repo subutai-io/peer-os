@@ -21,7 +21,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Checking %s cluster node %s ...", clusterName, lxcHostname ) );
     }
 
@@ -32,7 +32,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
         HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -40,7 +40,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent is not connected !" ) );
+            trackerOperation.addLogFailed( String.format( "Agent is not connected !" ) );
             return;
         }
 
@@ -49,11 +49,11 @@ public class CheckNodeHandler extends AbstractOperationHandler<HBaseImpl>
 
         if ( checkCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( checkCommand.getResults().get( node.getUuid() ).getStdOut() );
+            trackerOperation.addLogDone( checkCommand.getResults().get( node.getUuid() ).getStdOut() );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
         }
     }
 }

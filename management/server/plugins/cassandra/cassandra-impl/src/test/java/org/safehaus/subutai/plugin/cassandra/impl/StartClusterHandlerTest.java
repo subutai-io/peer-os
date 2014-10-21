@@ -49,7 +49,7 @@ public class StartClusterHandlerTest
         AbstractOperationHandler operationHandler = new StartClusterHandler( cassandraMock, "test-cluster" );
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 }

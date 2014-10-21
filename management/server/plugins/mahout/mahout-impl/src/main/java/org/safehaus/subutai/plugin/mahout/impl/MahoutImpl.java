@@ -21,7 +21,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -285,7 +285,7 @@ public class MahoutImpl implements Mahout
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( Environment env, MahoutClusterConfig config,
-                                                         ProductOperation po )
+                                                         TrackerOperation po )
     {
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP )

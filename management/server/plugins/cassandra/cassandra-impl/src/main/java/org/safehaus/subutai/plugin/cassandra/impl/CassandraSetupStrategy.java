@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -24,11 +24,11 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
     private Environment environment;
     private CassandraClusterConfig config;
     private CassandraImpl cassandraManager;
-    private ProductOperation productOperation;
+    private TrackerOperation trackerOperation;
 
 
     public CassandraSetupStrategy( final Environment environment, final CassandraClusterConfig config,
-                                   final ProductOperation po, final CassandraImpl cassandra )
+                                   final TrackerOperation po, final CassandraImpl cassandra )
     {
 
         Preconditions.checkNotNull( environment, "Environment is null" );
@@ -37,7 +37,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
         Preconditions.checkNotNull( cassandra, "Mongo manager is null" );
         this.environment = environment;
         this.config = config;
-        this.productOperation = po;
+        this.trackerOperation = po;
         this.cassandraManager = cassandra;
     }
 
@@ -85,7 +85,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
 
         try
         {
-            new ClusterConfiguration( productOperation, cassandraManager ).configureCluster( config );
+            new ClusterConfiguration( trackerOperation, cassandraManager ).configureCluster( config );
         }
         catch ( ClusterConfigurationException e )
         {

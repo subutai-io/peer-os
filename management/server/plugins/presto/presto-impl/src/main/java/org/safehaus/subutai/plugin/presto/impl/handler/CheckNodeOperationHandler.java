@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
@@ -21,7 +21,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
     {
         super( manager, clusterName );
         this.hostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( PrestoClusterConfig.PRODUCT_KEY,
                 String.format( "Checking state of %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -29,7 +29,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

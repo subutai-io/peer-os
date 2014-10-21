@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -28,7 +28,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        productOperation = manager.getTracker().createProductOperation( SqoopConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SqoopConfig.PRODUCT_KEY,
                 String.format( "Adding node %s to %s", ( hostname != null ? hostname : "" ), clusterName ) );
     }
 
@@ -36,7 +36,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         SqoopConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -78,7 +78,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
 
     public Agent setupHost( SqoopConfig config ) throws ClusterSetupException
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
 
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )

@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.hive.impl.handler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -45,7 +45,7 @@ public class InstallHandlerTest
         handler = new InstallHandler( mock, config );
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "exists" ) );
         Assert.assertTrue( po.getLog().contains( config.getClusterName() ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
@@ -63,7 +63,7 @@ public class InstallHandlerTest
         handler = new InstallHandler( mock, config );
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
 }

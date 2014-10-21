@@ -11,7 +11,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -495,10 +495,10 @@ public class Manager
                     @Override
                     public void run()
                     {
-                        ProductOperationView po = null;
+                        TrackerOperationView po = null;
                         while ( po == null || po.getState() == ProductOperationState.RUNNING )
                         {
-                            po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, trackID );
+                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
                         }
                         getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                         checkServer();
@@ -524,10 +524,10 @@ public class Manager
                     @Override
                     public void run()
                     {
-                        ProductOperationView po = null;
+                        TrackerOperationView po = null;
                         while ( po == null || po.getState() == ProductOperationState.RUNNING )
                         {
-                            po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, trackID );
+                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
                         }
                         getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                         checkServer();
@@ -553,10 +553,10 @@ public class Manager
                     @Override
                     public void run()
                     {
-                        ProductOperationView po = null;
+                        TrackerOperationView po = null;
                         while ( po == null || po.getState() == ProductOperationState.RUNNING )
                         {
-                            po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, trackId );
+                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackId );
                         }
                         PROGRESS_ICON.setVisible( false );
                         boolean running = po.getState() == ProductOperationState.SUCCEEDED;

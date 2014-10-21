@@ -7,7 +7,7 @@ import java.util.concurrent.Executor;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -106,8 +106,8 @@ public class AddNodeWindow extends Window
                     {
                         while ( track )
                         {
-                            ProductOperationView po =
-                                    tracker.getProductOperation( SparkClusterConfig.PRODUCT_KEY, trackID );
+                            TrackerOperationView po =
+                                    tracker.getTrackerOperation( SparkClusterConfig.PRODUCT_KEY, trackID );
                             if ( po != null )
                             {
                                 setOutput(

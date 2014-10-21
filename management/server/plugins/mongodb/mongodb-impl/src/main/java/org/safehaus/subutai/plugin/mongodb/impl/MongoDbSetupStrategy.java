@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
@@ -37,12 +37,12 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
 {
 
     private MongoImpl mongoManager;
-    private ProductOperation po;
+    private TrackerOperation po;
     private MongoClusterConfig config;
     private Environment environment;
 
 
-    public MongoDbSetupStrategy( Environment environment, MongoClusterConfig config, ProductOperation po,
+    public MongoDbSetupStrategy( Environment environment, MongoClusterConfig config, TrackerOperation po,
                                  MongoImpl mongoManager )
     {
 

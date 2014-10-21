@@ -6,7 +6,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -22,7 +22,7 @@ public class WithHadoopSetupStrategy extends OozieSetupStrategy
     private Environment environment;
 
 
-    public WithHadoopSetupStrategy( OozieImpl manager, ProductOperation po, OozieClusterConfig config )
+    public WithHadoopSetupStrategy( OozieImpl manager, TrackerOperation po, OozieClusterConfig config )
     {
         super( manager, po, config );
     }

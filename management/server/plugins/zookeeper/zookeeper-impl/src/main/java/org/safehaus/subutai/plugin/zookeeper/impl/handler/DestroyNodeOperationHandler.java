@@ -28,7 +28,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -36,7 +36,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -46,26 +46,26 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         final ZookeeperClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !config.getNodes().contains( agent ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
         if ( config.getNodes().size() == 1 )
         {
-            productOperation.addLogFailed( "This is the last node in the cluster. Please, destroy cluster instead" );
+            trackerOperation.addLogFailed( "This is the last node in the cluster. Please, destroy cluster instead" );
             return;
         }
 
@@ -74,22 +74,22 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
 
         try
         {
-            new ClusterConfiguration( manager, productOperation ).configureCluster( config );
+            new ClusterConfiguration( manager, trackerOperation ).configureCluster( config );
         }
         catch ( ClusterConfigurationException e )
         {
-            productOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
             return;
         }
 
         if ( config.getSetupType() == SetupType.STANDALONE )
         {
             //destroy lxc
-            productOperation.addLog( "Destroying lxc container..." );
+            trackerOperation.addLog( "Destroying lxc container..." );
             Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
             if ( physicalAgent == null )
             {
-                productOperation.addLog( String.format(
+                trackerOperation.addLog( String.format(
                         "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
                         agent.getHostname() ) );
             }
@@ -99,11 +99,11 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
                 try
                 {
                     manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
-                    productOperation.addLog( "Lxc container destroyed successfully" );
+                    trackerOperation.addLog( "Lxc container destroyed successfully" );
                 }
                 catch ( LxcDestroyException e )
                 {
-                    productOperation.addLog(
+                    trackerOperation.addLog(
                             String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
                                     e.getMessage() ) );
                 }
@@ -112,7 +112,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         else
         {
             //just uninstall Zookeeper
-            productOperation.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
+            trackerOperation.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
             Command uninstallCommand = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( uninstallCommand );
@@ -121,25 +121,25 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
             {
                 if ( uninstallCommand.hasSucceeded() )
                 {
-                    productOperation.addLog( "Cluster successfully uninstalled" );
+                    trackerOperation.addLog( "Cluster successfully uninstalled" );
                 }
                 else
                 {
-                    productOperation.addLog( String.format( "Uninstallation failed, %s, skipping...",
+                    trackerOperation.addLog( String.format( "Uninstallation failed, %s, skipping...",
                             uninstallCommand.getAllErrors() ) );
                 }
             }
             else
             {
-                productOperation.addLog( "Uninstallation failed, command timed out, skipping..." );
+                trackerOperation.addLog( "Uninstallation failed, command timed out, skipping..." );
             }
         }
 
 
         //update db
-        productOperation.addLog( "Updating cluster information in database..." );
+        trackerOperation.addLog( "Updating cluster information in database..." );
 
         manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-        productOperation.addLogDone( "Cluster information updated in database" );
+        trackerOperation.addLogDone( "Cluster information updated in database" );
     }
 }

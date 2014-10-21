@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for ProductOperation class
  */
-public class ProductOperationImplTest
+public class TrackerOperationImplTest
 {
 
     private final UUID ID = UUIDUtil.generateTimeBasedUUID();
@@ -38,28 +38,28 @@ public class ProductOperationImplTest
     @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailNullSource()
     {
-        new ProductOperationImpl( null, DESCRIPTION, mock( TrackerImpl.class ) );
+        new TrackerOperationImpl( null, DESCRIPTION, mock( TrackerImpl.class ) );
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailNullDescription()
     {
-        new ProductOperationImpl( SOURCE, null, mock( TrackerImpl.class ) );
+        new TrackerOperationImpl( SOURCE, null, mock( TrackerImpl.class ) );
     }
 
 
     @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullTracker()
     {
-        new ProductOperationImpl( SOURCE, DESCRIPTION, null );
+        new TrackerOperationImpl( SOURCE, DESCRIPTION, null );
     }
 
 
     @Test
     public void shouldReturnValidValues()
     {
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
 
         assertEquals( DESCRIPTION, poi.getDescription() );
         assertEquals( ProductOperationState.RUNNING, poi.getState() );
@@ -71,7 +71,7 @@ public class ProductOperationImplTest
     @Test
     public void shouldAddLog()
     {
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
 
         poi.addLog( DUMMY_LOG );
         poi.addLog( DUMMY_LOG );
@@ -83,7 +83,7 @@ public class ProductOperationImplTest
     @Test
     public void shouldAddLogNSucceed()
     {
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
 
         poi.addLogDone( DUMMY_LOG );
 
@@ -96,7 +96,7 @@ public class ProductOperationImplTest
     @Test
     public void shouldAddLogNFail()
     {
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
 
         poi.addLogFailed( DUMMY_LOG );
 
@@ -110,7 +110,7 @@ public class ProductOperationImplTest
     public void shouldCallTracker()
     {
         TrackerImpl ti = mock( TrackerImpl.class );
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, ti );
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, ti );
 
         poi.addLogFailed( DUMMY_LOG );
 
@@ -122,8 +122,8 @@ public class ProductOperationImplTest
     public void testHashCodeNEquals() throws Exception
     {
 
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
-        Map<ProductOperationImpl, ProductOperationImpl> map = new HashMap<>();
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        Map<TrackerOperationImpl, TrackerOperationImpl> map = new HashMap<>();
         map.put( poi, poi );
 
         assertEquals( map.get( poi ), poi );
@@ -133,9 +133,9 @@ public class ProductOperationImplTest
     @Test
     public void testHashCodeNEquals2() throws Exception
     {
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
-        ProductOperationViewImpl povi = new ProductOperationViewImpl( poi );
-        Map<ProductOperationViewImpl, ProductOperationViewImpl> map = new HashMap<>();
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        TrackerOperationViewImpl povi = new TrackerOperationViewImpl( poi );
+        Map<TrackerOperationViewImpl, TrackerOperationViewImpl> map = new HashMap<>();
         map.put( povi, povi );
 
         assertEquals( map.get( povi ), povi );
@@ -148,21 +148,21 @@ public class ProductOperationImplTest
     @Test(expected = NullPointerException.class)
     public void poViewConstructorShouldFailNullPO()
     {
-        new ProductOperationViewImpl( null );
+        new TrackerOperationViewImpl( null );
     }
 
 
     @Test
     public void poViewShouldReturnSameValuesAsPO()
     {
-        ProductOperationImpl poi = mock( ProductOperationImpl.class );
+        TrackerOperationImpl poi = mock( TrackerOperationImpl.class );
         when( poi.getId() ).thenReturn( ID );
         when( poi.getDescription() ).thenReturn( DESCRIPTION );
         when( poi.getState() ).thenReturn( ProductOperationState.RUNNING );
         when( poi.getLog() ).thenReturn( DUMMY_LOG );
         when( poi.createDate() ).thenReturn( new Date() );
 
-        ProductOperationViewImpl povi = new ProductOperationViewImpl( poi );
+        TrackerOperationViewImpl povi = new TrackerOperationViewImpl( poi );
 
         assertEquals( poi.getId(), povi.getId() );
         assertEquals( poi.createDate(), povi.getCreateDate() );

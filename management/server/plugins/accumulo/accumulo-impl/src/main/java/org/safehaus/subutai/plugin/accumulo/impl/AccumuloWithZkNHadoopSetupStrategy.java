@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -29,13 +29,13 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
 
     private final Environment environment;
     private final AccumuloImpl accumuloManager;
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final AccumuloClusterConfig accumuloClusterConfig;
 
 
     public AccumuloWithZkNHadoopSetupStrategy( final Environment environment,
                                                final AccumuloClusterConfig accumuloClusterConfig,
-                                               final ProductOperation po, final AccumuloImpl accumuloManager )
+                                               final TrackerOperation po, final AccumuloImpl accumuloManager )
     {
 
         Preconditions.checkNotNull( environment, "Environment is null" );

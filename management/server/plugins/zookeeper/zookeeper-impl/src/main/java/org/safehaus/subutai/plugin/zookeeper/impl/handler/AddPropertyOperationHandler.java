@@ -32,7 +32,7 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
         this.fileName = fileName;
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;
-        productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Adding property %s=%s to file %s", propertyName, propertyValue, fileName ) );
     }
 
@@ -40,7 +40,7 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -50,18 +50,18 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
         if ( Strings.isNullOrEmpty( clusterName ) || Strings.isNullOrEmpty( fileName ) || Strings
                 .isNullOrEmpty( propertyName ) )
         {
-            productOperation.addLogFailed( "Malformed arguments\nOperation aborted" );
+            trackerOperation.addLogFailed( "Malformed arguments\nOperation aborted" );
             return;
         }
         final ZookeeperClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Adding property..." );
+        trackerOperation.addLog( "Adding property..." );
 
         Command addPropertyCommand =
                 manager.getCommands().getAddPropertyCommand( fileName, propertyName, propertyValue, config.getNodes() );
@@ -69,7 +69,7 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
 
         if ( addPropertyCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Property added successfully\nRestarting cluster..." );
+            trackerOperation.addLog( "Property added successfully\nRestarting cluster..." );
 
             Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
             final AtomicInteger count = new AtomicInteger();
@@ -90,17 +90,17 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Zookee
 
             if ( count.get() == config.getNodes().size() )
             {
-                productOperation.addLogDone( "Cluster successfully restarted" );
+                trackerOperation.addLogDone( "Cluster successfully restarted" );
             }
             else
             {
-                productOperation.addLogFailed(
+                trackerOperation.addLogFailed(
                         String.format( "Failed to restart cluster, %s", restartCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Adding property failed, %s", addPropertyCommand.getAllErrors() ) );
         }
     }

@@ -21,7 +21,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( SharkClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", hostname, clusterName ) );
     }
 
@@ -32,7 +32,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
         SharkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -40,25 +40,25 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s is not connected\nOperation aborted", hostname ) );
             return;
         }
 
         if ( !config.getNodes().contains( agent ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", hostname, clusterName ) );
             return;
         }
 
         if ( config.getNodes().size() == 1 )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
             return;
         }
-        productOperation.addLog( "Uninstalling Shark..." );
+        trackerOperation.addLog( "Uninstalling Shark..." );
         Command uninstallCommand = Commands.getUninstallCommand( new HashSet<>( Arrays.asList( agent ) ) );
         manager.getCommandRunner().runCommand( uninstallCommand );
 
@@ -66,29 +66,29 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
         {
             if ( uninstallCommand.hasSucceeded() )
             {
-                productOperation.addLog( String.format( "Shark is removed from node %s", agent.getHostname() ) );
+                trackerOperation.addLog( String.format( "Shark is removed from node %s", agent.getHostname() ) );
             }
             else
             {
-                productOperation.addLog( "Failed to remove Shark: " + uninstallCommand.getAllErrors() );
+                trackerOperation.addLog( "Failed to remove Shark: " + uninstallCommand.getAllErrors() );
             }
 
             config.getNodes().remove( agent );
 
-            productOperation.addLog( "Updating db..." );
+            trackerOperation.addLog( "Updating db..." );
             try
             {
                 manager.getPluginDao().saveInfo( SharkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-                productOperation.addLogDone( "Cluster info update in DB\nDone" );
+                trackerOperation.addLogDone( "Cluster info update in DB\nDone" );
             }
             catch ( Exception ex )
             {
-                productOperation.addLogFailed( "Failed to update cluster info: " + ex.getMessage() );
+                trackerOperation.addLogFailed( "Failed to update cluster info: " + ex.getMessage() );
             }
         }
         else
         {
-            productOperation.addLogFailed( "Uninstallation failed, command timed out" );
+            trackerOperation.addLogFailed( "Uninstallation failed, command timed out" );
         }
     }
 }

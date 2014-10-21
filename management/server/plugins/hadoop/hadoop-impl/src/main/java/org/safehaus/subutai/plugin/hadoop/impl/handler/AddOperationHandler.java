@@ -24,7 +24,7 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
 //    public AddOperationHandler( HadoopImpl manager, String clusterName ) {
         super( manager, clusterName );
         this.nodeCount = nodeCount;
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Adding %d node to cluster %s", nodeCount, clusterName ) );
 //                String.format( "Adding node to cluster %s", clusterName ) );
     }
@@ -37,35 +37,35 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Malformed configuration\nAdding new node to %s aborted", clusterName ) );
             return;
         }
 
-        productOperation.addLog(String.format("Creating %d lxc container(s)...", nodeCount));
+        trackerOperation.addLog(String.format("Creating %d lxc container(s)...", nodeCount));
 //        productOperation.addLog( String.format( "Creating " + nodeCount + " lxc containers..." ) );
         try {
             Set<Agent> agents = manager.getContainerManager().clone( hadoopClusterConfig.getTemplateName(),
                     nodeCount, manager.getAgentManager().getPhysicalAgents(),
                     HadoopSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.SLAVE_NODE ) );
 
-            productOperation.addLog( "Lxc containers created successfully\nConfiguring network..." );
+            trackerOperation.addLog( "Lxc containers created successfully\nConfiguring network..." );
             for ( Agent agent : agents ) {
                 if ( manager.getNetworkManager().configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent,
                         hadoopClusterConfig.getDomainName() ) && manager.getNetworkManager().configSshOnAgents(
                         hadoopClusterConfig.getAllNodes(), agent ) ) {
-                    productOperation.addLog( "Cluster network configured for " + agent.getHostname() );
+                    trackerOperation.addLog( "Cluster network configured for " + agent.getHostname() );
 
                     AddNodeOperation addOperation = new AddNodeOperation(manager.getCommands(), hadoopClusterConfig, agent );
                     for ( Command command : addOperation.getCommandList() ) {
-                        productOperation.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
+                        trackerOperation.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
                         manager.getCommandRunner().runCommand( command );
 
                         if ( command.hasSucceeded() ) {
-                            productOperation.addLog( String.format( "%s succeeded", command.getDescription() ) );
+                            trackerOperation.addLog( String.format( "%s succeeded", command.getDescription() ) );
                         }
                         else {
-                            productOperation.addLogFailed(
+                            trackerOperation.addLogFailed(
                                     String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
                         }
                     }
@@ -76,16 +76,16 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl>
                     manager.getPluginDAO()
                            .saveInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
                                    hadoopClusterConfig);
-                    productOperation.addLogDone( "Cluster info saved to DB" );
+                    trackerOperation.addLogDone( "Cluster info saved to DB" );
                 }
                 else {
-                    productOperation.addLogFailed("Could not configure network! Please see logs\nLXC creation aborted");
+                    trackerOperation.addLogFailed("Could not configure network! Please see logs\nLXC creation aborted");
                 }
             }
         }
         catch ( LxcCreateException e )
         {
-            productOperation.addLogFailed( e.getMessage() );
+            trackerOperation.addLogFailed( e.getMessage() );
         }
     }
 

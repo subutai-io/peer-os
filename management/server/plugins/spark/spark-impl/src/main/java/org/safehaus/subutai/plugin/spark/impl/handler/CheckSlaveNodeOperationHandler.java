@@ -19,7 +19,7 @@ public class CheckSlaveNodeOperationHandler extends AbstractOperationHandler<Spa
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Checking state of %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -30,20 +30,20 @@ public class CheckSlaveNodeOperationHandler extends AbstractOperationHandler<Spa
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
         if ( !config.getAllNodes().contains( node ) )
         {
-            productOperation.addLogFailed( String.format( "Node %s does not belong to this cluster", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Node %s does not belong to this cluster", lxcHostname ) );
             return;
         }
 
@@ -53,11 +53,11 @@ public class CheckSlaveNodeOperationHandler extends AbstractOperationHandler<Spa
         AgentResult res = checkNodeCommand.getResults().get( node.getUuid() );
         if ( checkNodeCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( String.format( "%s", res.getStdOut() ) );
+            trackerOperation.addLogDone( String.format( "%s", res.getStdOut() ) );
         }
         else
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Failed to check status, %s", checkNodeCommand.getAllErrors() ) );
         }
     }

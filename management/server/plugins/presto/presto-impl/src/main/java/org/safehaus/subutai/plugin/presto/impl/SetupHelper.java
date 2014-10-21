@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
@@ -19,12 +19,12 @@ import com.google.common.base.Preconditions;
 public class SetupHelper
 {
 
-    final ProductOperation po;
+    final TrackerOperation po;
     final PrestoImpl manager;
     final PrestoClusterConfig config;
 
 
-    public SetupHelper( ProductOperation po, PrestoImpl manager, PrestoClusterConfig config )
+    public SetupHelper( TrackerOperation po, PrestoImpl manager, PrestoClusterConfig config )
     {
 
         Preconditions.checkNotNull( config, "Presto cluster config is null" );

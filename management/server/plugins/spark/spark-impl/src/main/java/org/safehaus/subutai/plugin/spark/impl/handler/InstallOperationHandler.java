@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -30,8 +30,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation(
-                SparkClusterConfig.PRODUCT_KEY, String.format( "Installing %s", SparkClusterConfig.PRODUCT_KEY ) );
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
+                String.format( "Installing %s", SparkClusterConfig.PRODUCT_KEY ) );
     }
 
 
@@ -44,7 +44,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         Environment env = null;
         if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {
@@ -114,15 +114,15 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
             set.add( n.getAgent() );
         }
 
-        productOperation.addLog( "Destroying node(s)..." );
+        trackerOperation.addLog( "Destroying node(s)..." );
         try
         {
             manager.getContainerManager().clonesDestroy( set );
-            productOperation.addLog( "Destroying node(s) completed" );
+            trackerOperation.addLog( "Destroying node(s) completed" );
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+            trackerOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
         }
     }
 

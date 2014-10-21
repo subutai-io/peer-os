@@ -29,7 +29,7 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
         Preconditions.checkArgument( !Strings.isNullOrEmpty( propertyValue ), "Property Value is null or empty" );
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;
-        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Adding property %s=%s", propertyName, propertyValue ) );
     }
 
@@ -37,7 +37,7 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -48,11 +48,11 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
 
         if ( accumuloClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Adding property..." );
+        trackerOperation.addLog( "Adding property..." );
 
         Command addPropertyCommand = manager.getCommands().getAddPropertyCommand( propertyName, propertyValue,
                 accumuloClusterConfig.getAllNodes() );
@@ -60,24 +60,24 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
 
         if ( addPropertyCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Property added successfully\nRestarting cluster..." );
+            trackerOperation.addLog( "Property added successfully\nRestarting cluster..." );
 
             Command restartClusterCommand =
                     manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {
-                productOperation.addLogDone( "Cluster restarted successfully" );
+                trackerOperation.addLogDone( "Cluster restarted successfully" );
             }
             else
             {
-                productOperation.addLogFailed(
+                trackerOperation.addLogFailed(
                         String.format( "Cluster restart failed, %s", restartClusterCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Adding property failed, %s", addPropertyCommand.getAllErrors() ) );
         }
     }

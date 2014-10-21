@@ -22,9 +22,9 @@ public class UninstallOperationHandlerTest
 
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "test-cluster" ) );
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "test-cluster" ) );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 
 
@@ -35,8 +35,8 @@ public class UninstallOperationHandlerTest
 
         operationHandler.run();
 
-        //        assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation info deleted" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.SUCCEEDED );
+        //        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Installation info deleted" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.SUCCEEDED );
     }
 
 
@@ -48,8 +48,8 @@ public class UninstallOperationHandlerTest
 
         operationHandler.run();
 
-        //        assertTrue( operationHandler.getProductOperation().getLog().contains( "Error while deleting
+        //        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Error while deleting
         // installation" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 }

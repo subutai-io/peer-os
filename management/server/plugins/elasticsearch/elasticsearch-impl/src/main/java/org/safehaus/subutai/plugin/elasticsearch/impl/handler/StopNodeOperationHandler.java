@@ -23,7 +23,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Elasticse
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Stopping %s cluster...", clusterName ) );
     }
 
@@ -34,19 +34,19 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Elasticse
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !elasticsearchClusterConfiguration.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -59,16 +59,16 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Elasticse
             AgentResult ar = stopServiceCommand.getResults().get( node.getUuid() );
             if ( ar.getStdOut().contains( "Stopping Elasticsearch Server" ) )
             {
-                productOperation.addLogDone( "elasticsearch is not running" );
+                trackerOperation.addLogDone( "elasticsearch is not running" );
             }
             else
             {
-                productOperation.addLogFailed( "Could not stop Elasticsearch" );
+                trackerOperation.addLogFailed( "Could not stop Elasticsearch" );
             }
         }
         else
         {
-            productOperation.addLogFailed( "Elasticsearch stop command is not succeeded !!!\"" );
+            trackerOperation.addLogFailed( "Elasticsearch stop command is not succeeded !!!\"" );
         }
     }
 }

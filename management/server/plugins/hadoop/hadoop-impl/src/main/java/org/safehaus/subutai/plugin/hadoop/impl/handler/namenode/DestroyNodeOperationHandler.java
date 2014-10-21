@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -20,7 +20,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
     {
         super( manager, clusterName );
         this.lxcHostName = lxcHostName;
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s node and updating cluster information of %s", lxcHostName,
                         clusterName ) );
     }
@@ -34,62 +34,62 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( !hadoopClusterConfig.getDataNodes().contains( node ) || !hadoopClusterConfig.getTaskTrackers()
                                                                                          .contains( node ) )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Node in %s cluster as a slave does not exist", clusterName ) );
             return;
         }
 
         if ( node == null )
         {
-            productOperation.addLogFailed( "Node is not connected" );
+            trackerOperation.addLogFailed( "Node is not connected" );
             return;
         }
 
         Command removeTaskTrackerCommand =
                 manager.getCommands().getRemoveTaskTrackerCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( removeTaskTrackerCommand );
-        logCommand( removeTaskTrackerCommand, productOperation );
+        logCommand( removeTaskTrackerCommand, trackerOperation );
 
         Command excludeTaskTrackerCommand =
                 manager.getCommands().getExcludeTaskTrackerCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( excludeTaskTrackerCommand );
-        logCommand( excludeTaskTrackerCommand, productOperation );
+        logCommand( excludeTaskTrackerCommand, trackerOperation );
 
         Command removeDataNodeCommand = manager.getCommands().getRemoveDataNodeCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( removeDataNodeCommand );
-        logCommand( removeDataNodeCommand, productOperation );
+        logCommand( removeDataNodeCommand, trackerOperation );
 
         Command excludeDataNodeCommand = manager.getCommands().getExcludeDataNodeCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( excludeDataNodeCommand );
-        logCommand( excludeDataNodeCommand, productOperation );
+        logCommand( excludeDataNodeCommand, trackerOperation );
 
 
         Command refreshJobTrackerCommand = manager.getCommands().getRefreshJobTrackerCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshJobTrackerCommand );
-        productOperation.addLog( refreshJobTrackerCommand.getDescription() );
+        trackerOperation.addLog( refreshJobTrackerCommand.getDescription() );
 
 
         Command refreshNameNodeCommand = manager.getCommands().getRefreshNameNodeCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshNameNodeCommand );
-        productOperation.addLog( refreshNameNodeCommand.getDescription() );
+        trackerOperation.addLog( refreshNameNodeCommand.getDescription() );
 
-        productOperation.addLog( "Destroying lxc container " + lxcHostName + "..." );
+        trackerOperation.addLog( "Destroying lxc container " + lxcHostName + "..." );
 
         try
         {
             manager.getContainerManager().cloneDestroy( node.getParentHostName(), lxcHostName );
-            productOperation.addLog( "Lxc container successfully destroyed" );
+            trackerOperation.addLog( "Lxc container successfully destroyed" );
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Lxc container could not destroyed: %s, ", ex.getMessage() ) );
         }
 
@@ -97,11 +97,11 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Hadoop
 
         manager.getPluginDAO()
                .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
-        productOperation.addLogDone( "Cluster info saved to DB" );
+        trackerOperation.addLogDone( "Cluster info saved to DB" );
     }
 
 
-    private void logCommand( Command command, ProductOperation po )
+    private void logCommand( Command command, TrackerOperation po )
     {
         if ( command.hasSucceeded() )
         {

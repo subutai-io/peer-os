@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.pig.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
 import org.safehaus.subutai.plugin.pig.api.SetupType;
 
@@ -13,14 +13,14 @@ abstract class PigSetupStrategy implements ClusterSetupStrategy
 
     final PigImpl manager;
     final PigConfig config;
-    final ProductOperation productOperation;
+    final TrackerOperation trackerOperation;
 
 
-    public PigSetupStrategy( PigImpl manager, PigConfig config, ProductOperation po )
+    public PigSetupStrategy( PigImpl manager, PigConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;
-        this.productOperation = po;
+        this.trackerOperation = po;
     }
 
 
