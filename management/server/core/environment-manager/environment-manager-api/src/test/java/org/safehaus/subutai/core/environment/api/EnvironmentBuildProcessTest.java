@@ -53,13 +53,6 @@ public class EnvironmentBuildProcessTest
 
 
     @Test
-    public void testCompleteStatus() throws Exception
-    {
-        process.setCompleteStatus( Boolean.TRUE );
-    }
-
-
-    @Test
     public void testUuid() throws Exception
     {
         UUID uuid = UUIDUtil.generateTimeBasedUUID();

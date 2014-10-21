@@ -47,16 +47,19 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
         {
             public BuildProcessExecutionEvent call()
             {
-                fireEvent( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.START ) );
+                fireEvent( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.START,
+                        "Started" ) );
                 try
                 {
                     BuildProcessCommand command = commandFactory.newCommand();
                     command.execute();
-                    return ( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.SUCCESS ) );
+                    return ( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.SUCCESS,
+                            "Success" ) );
                 }
                 catch ( BuildProcessExecutionException ce )
                 {
-                    return ( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.FAIL ) );
+                    return ( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.FAIL,
+                            ce.getMessage() ) );
                 }
             }
         } );
@@ -77,7 +80,8 @@ public class BuildProcessExecutorImpl implements BuildProcessExecutor
                 }
                 catch ( InterruptedException | ExecutionException e )
                 {
-                    fireEvent( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.FAIL ) );
+                    fireEvent( new BuildProcessExecutionEvent( buildProcess, BuildProcessExecutionEventType.FAIL,
+                            e.getMessage() ) );
                 }
             }
         } );

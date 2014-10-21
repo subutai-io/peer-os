@@ -33,6 +33,7 @@ import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildExcep
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -300,64 +301,105 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
         Environment environment = new Environment( process.getEnvironmentBlueprint().getName() );
+        saveEnvironment( environment );
+
         int containerCount = 0;
         long timeout = 1000 * 360;
         for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
         {
             CloneContainersMessage ccm = process.getMessageMap().get( key );
+            ccm.setEnvId( environment.getUuid() );
 
-            ccm.setType( PeerCommandType.CLONE );
             containerCount = containerCount + ccm.getNumberOfNodes();
+
+            //TODO: move template addition on create ccm
+            List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
+            if ( templates.isEmpty() )
+            {
+                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                saveEnvironment( environment );
+                throw new EnvironmentBuildException( "Could not fetch parent templates list" );
+            }
+
+            Template installationTemplate = templateRegistry.getTemplate( ccm.getTemplate() );
+            if ( installationTemplate != null )
+            {
+                templates.add( installationTemplate );
+            }
+            else
+            {
+                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                saveEnvironment( environment );
+                throw new EnvironmentBuildException( "Could not get installation template data" );
+            }
+
+            UUID peerId = getPeerId();
+            if ( peerId == null )
+            {
+                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                saveEnvironment( environment );
+                throw new EnvironmentBuildException( "Could not get Peer ID" );
+            }
+
+
+            for ( Template t : templates )
+            {
+                ccm.addTemplate( t.getRemoteClone( peerId ) );
+            }
+
             try
             {
-                ccm.setEnvId( environment.getUuid() );
-
-
-                //TODO: move template addition on create ccm
-                List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
-                templates.add( templateRegistry.getTemplate( ccm.getTemplate() ) );
-                UUID peerId = getPeerId();
-                for ( Template t : templates )
-                {
-                    ccm.addTemplate( t.getRemoteClone( peerId ) );
-                }
-                //
-
-                LOG.info( String.format( "Creating containers on %s", ccm.getPeerId() ) );
                 peerCommandDispatcher.invoke( ccm, timeout );
-                LOG.info( String.format( "Finished cloning containers on %s", ccm.getPeerId() ) );
-
-                boolean result = ccm.isSuccess();
-                if ( result )
-                {
-                    Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
-                    if ( !agents.isEmpty() )
-                    {
-                        for ( Agent agent : agents )
-                        {
-                            EnvironmentContainer container = new EnvironmentContainer();
-
-                            container.setPeerId( agent.getSiteId() );
-                            container.setAgentId( agent.getUuid() );
-                            container.setIps( agent.getListIP() );
-                            container.setHostname( agent.getHostname() );
-                            container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
-                            container.setName( agent.getHostname() );
-                            container.setTemplateName( ccm.getTemplate() );
-
-                            environment.addContainer( container );
-                        }
-                    }
-                }
             }
             catch ( PeerCommandException e )
             {
                 LOG.error( e.getMessage(), e );
                 throw new EnvironmentBuildException( e.getMessage() );
             }
+            finally
+            {
+                environment.setStatus( EnvironmentStatusEnum.UNHEALTHY );
+                saveEnvironment( environment );
+            }
+
+            boolean result = ccm.isSuccess();
+            if ( result )
+            {
+                Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
+                if ( !agents.isEmpty() )
+                {
+                    for ( Agent agent : agents )
+                    {
+                        EnvironmentContainer container = new EnvironmentContainer();
+
+                        container.setPeerId( agent.getSiteId() );
+                        container.setAgentId( agent.getUuid() );
+                        container.setIps( agent.getListIP() );
+                        container.setHostname( agent.getHostname() );
+                        container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
+                        container.setName( agent.getHostname() );
+                        container.setTemplateName( ccm.getTemplate() );
+
+                        environment.addContainer( container );
+                    }
+                }
+            }
+            else
+            {
+                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                saveEnvironment( environment );
+                throw new EnvironmentBuildException(
+                        String.format( "FAILED creating environment on %s", ccm.getPeerId() ) );
+            }
         }
 
-        if ( !environment.getContainers().isEmpty() )
+        if ( environment.getContainers().isEmpty() )
+        {
+            environment.setStatus( EnvironmentStatusEnum.EMPTY );
+            saveEnvironment( environment );
+            throw new EnvironmentBuildException( "No containers assigned to the Environment" );
+        }
+        else
         {
             Set<Container> containers = Sets.newHashSet();
             containers.addAll( environment.getContainers() );
@@ -370,16 +412,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 networkManager.configHosts( process.getEnvironmentBlueprint().getDomainName(), containers );
             }
-
-            saveEnvironment( environment );
             if ( environment.getContainers().size() != containerCount )
             {
-                throw new EnvironmentBuildException( "Not all containers created" );
+                environment.setStatus( EnvironmentStatusEnum.UNHEALTHY );
             }
-        }
-        else
-        {
-            throw new EnvironmentBuildException( "No containers assigned to the Environment" );
+            else
+            {
+                environment.setStatus( EnvironmentStatusEnum.HEALTHY );
+            }
+            saveEnvironment( environment );
         }
     }
 
