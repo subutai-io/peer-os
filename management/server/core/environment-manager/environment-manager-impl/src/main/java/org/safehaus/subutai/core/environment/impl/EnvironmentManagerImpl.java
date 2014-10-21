@@ -9,6 +9,7 @@ package org.safehaus.subutai.core.environment.impl;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
@@ -30,14 +32,17 @@ import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentStatusEnum;
 import org.safehaus.subutai.core.environment.impl.builder.EnvironmentBuilder;
+import org.safehaus.subutai.core.environment.impl.builder.TopologyBuilder;
 import org.safehaus.subutai.core.environment.impl.dao.EnvironmentDAO;
 import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
@@ -529,5 +534,45 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         environmentBuilder.convertEnvironmentContainersToNodes( environment );
 
         return environment;
+    }
+
+
+    @Override
+    public boolean saveBuildProcess( final EnvironmentBuildTask environmentBuildTask, final Map<Object, Peer> topology,
+                                     final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
+    {
+        EnvironmentBuildProcess process = null;
+        TopologyBuilder topologyBuilder = new TopologyBuilder();
+        switch ( topologyEnum )
+        {
+            case NODE_2_PEER:
+            {
+                process = topologyBuilder.createEnvironmentBuildProcessN2P( environmentBuildTask, topology, map );
+                break;
+            }
+            case NODE_GROUP_2_PEER:
+            {
+                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( environmentBuildTask, topology, map );
+                break;
+            }
+            case BLUEPRINT_2_PEER:
+                break;
+            case BLUEPRINT_2_PEER_GROUP:
+                break;
+            case NODE_GROUP_2_PEER_GROUP:
+                break;
+            default:
+            {
+                break;
+            }
+        }
+        if ( process != null )
+        {
+            return environmentDAO.saveInfo( PROCESS, process.getUuid().toString(), process );
+        }
+        else
+        {
+            return false;
+        }
     }
 }

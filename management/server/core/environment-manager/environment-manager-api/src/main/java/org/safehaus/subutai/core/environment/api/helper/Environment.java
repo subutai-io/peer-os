@@ -21,6 +21,7 @@ public class Environment
     private String name;
     private Set<EnvironmentContainer> containers;
     private EnvironmentStatusEnum status;
+    private long creationTimestamp;
 
     public Environment( String name )
     {
@@ -29,6 +30,13 @@ public class Environment
         this.containers = new HashSet<>();
         this.serviceLocator = new ServiceLocator();
         this.status = EnvironmentStatusEnum.EMPTY;
+        this.creationTimestamp = System.currentTimeMillis();
+    }
+
+
+    public long getCreationTimestamp()
+    {
+        return creationTimestamp;
     }
 
 
