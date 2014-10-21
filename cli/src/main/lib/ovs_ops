@@ -35,7 +35,6 @@ function ovs_configure_lxc {
   # Add these after the $add_after_line
   # NOTICE: the line added last will be the closest line to the $add_after_line
   add_after_line="lxc.network.script.up"
-#  sed -i "0,/$add_after_line/a \lxc.network.script.up = $subutai_script_base/create_ovs_interface" $config
   sed -i "/$add_after_line/a \lxc.network.veth.pair = $ovs_port_name-2" $config
   sed -i "/$add_after_line/a \lxc.network.flags = up" $config
   sed -i "/$add_after_line/a \lxc.network.type = veth" $config
