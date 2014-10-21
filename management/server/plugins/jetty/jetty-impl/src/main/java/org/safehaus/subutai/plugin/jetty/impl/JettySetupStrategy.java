@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 
@@ -16,14 +16,14 @@ public class JettySetupStrategy implements ClusterSetupStrategy
 {
     final JettyImpl manager;
     final JettyConfig config;
-    final ProductOperation productOperation;
+    final TrackerOperation trackerOperation;
 
 
-    public JettySetupStrategy( JettyImpl manager, JettyConfig config, ProductOperation po )
+    public JettySetupStrategy( JettyImpl manager, JettyConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;
-        this.productOperation = po;
+        this.trackerOperation = po;
     }
 
 
@@ -54,11 +54,11 @@ public class JettySetupStrategy implements ClusterSetupStrategy
     {
         checkConfig();
 
-        productOperation.addLog( "Updating db..." );
+        trackerOperation.addLog( "Updating db..." );
         try
         {
             manager.getPluginDAO().saveInfo( JettyConfig.PRODUCT_KEY, config.getClusterName(), config );
-            productOperation.addLog( "Cluster info saved to DB." );
+            trackerOperation.addLog( "Cluster info saved to DB." );
         }
         catch ( Exception ex )
         {
@@ -68,58 +68,58 @@ public class JettySetupStrategy implements ClusterSetupStrategy
 
         for ( Agent agent : config.getNodes() )
         {
-            productOperation.addLog( String.format( "Creating base directory '%s' for %s", config.getBaseDirectory(),
+            trackerOperation.addLog( String.format( "Creating base directory '%s' for %s", config.getBaseDirectory(),
                     agent.getHostname() ) );
             Command mkdirCommand = manager.getCommands().getMakeDirectoryCommand( config.getBaseDirectory(), agent );
             manager.getCommandRunner().runCommand( mkdirCommand );
 
             if ( !mkdirCommand.hasSucceeded() )
             {
-                productOperation.addLog( "Creating base directory failed" );
+                trackerOperation.addLog( "Creating base directory failed" );
             }
             else
             {
-                productOperation.addLog( "Succesfully created base directory" );
+                trackerOperation.addLog( "Succesfully created base directory" );
             }
 
-            productOperation.addLog( String.format( "Preparing base directory '%s' for %s", config.getBaseDirectory(),
+            trackerOperation.addLog( String.format( "Preparing base directory '%s' for %s", config.getBaseDirectory(),
                     agent.getHostname() ) );
             Command prepareBaseCommand = manager.getCommands().getPrepareJettyBaseCommand( config, agent );
             manager.getCommandRunner().runCommand( prepareBaseCommand );
 
             if ( !prepareBaseCommand.hasSucceeded() )
             {
-                productOperation.addLog( "Base directory preparation failed" );
+                trackerOperation.addLog( "Base directory preparation failed" );
             }
             else
             {
-                productOperation.addLog( "Succesfully prepared base directory" );
+                trackerOperation.addLog( "Succesfully prepared base directory" );
             }
 
-            productOperation.addLog( "Setting JETTY_BASE variable" );
+            trackerOperation.addLog( "Setting JETTY_BASE variable" );
             Command setBaseVarCommand = manager.getCommands().getSetJettyBaseVariableCommand( config, agent );
             manager.getCommandRunner().runCommand( setBaseVarCommand );
             if ( !setBaseVarCommand.hasSucceeded() )
             {
-                productOperation.addLog( "Setting JETTY_BASE variable failed" );
+                trackerOperation.addLog( "Setting JETTY_BASE variable failed" );
             }
             else
             {
-                productOperation.addLog(
+                trackerOperation.addLog(
                         String.format( "Succesfully JETTY_BASE variable set to '%s'", config.getBaseDirectory() ) );
             }
 
-            productOperation.addLog( "Setting jetty.port" );
+            trackerOperation.addLog( "Setting jetty.port" );
             Command setPortVarCommand = manager.getCommands().getSetJettyPortVariableCommand( config, agent );
             manager.getCommandRunner().runCommand( setPortVarCommand );
 
             if ( !setPortVarCommand.hasSucceeded() )
             {
-                productOperation.addLog( String.format( "Setting jetty.port to %d failed", config.getPort() ) );
+                trackerOperation.addLog( String.format( "Setting jetty.port to %d failed", config.getPort() ) );
             }
             else
             {
-                productOperation
+                trackerOperation
                         .addLog( String.format( "jetty.port succesfully have been set to %d", config.getPort() ) );
             }
         }

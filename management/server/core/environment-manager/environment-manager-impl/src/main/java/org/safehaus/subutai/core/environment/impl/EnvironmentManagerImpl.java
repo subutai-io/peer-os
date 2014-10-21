@@ -24,6 +24,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -42,6 +43,7 @@ import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +75,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     private AgentManager agentManager;
     private NetworkManager networkManager;
     private PeerCommandDispatcher peerCommandDispatcher;
+    private Tracker tracker;
     private DataSource dataSource;
 
 
@@ -80,6 +83,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Preconditions.checkNotNull( dataSource, "Data source is null" );
         this.dataSource = dataSource;
+    }
+
+
+    public Tracker getTracker()
+    {
+        return tracker;
+    }
+
+
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
     }
 
 
@@ -302,10 +317,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = new Environment( process.getEnvironmentBlueprint().getName() );
         saveEnvironment( environment );
+        TrackerOperation operation = tracker.createTrackerOperation( process.getUuid().toString(),
+                process.getEnvironmentBlueprint().getName() );
 
         int containerCount = 0;
         long timeout = 1000 * 360;
-        for ( String key : ( Set<String> ) process.getMessageMap().keySet() )
+        for ( String key : process.getMessageMap().keySet() )
         {
             CloneContainersMessage ccm = process.getMessageMap().get( key );
             ccm.setEnvId( environment.getUuid() );
@@ -349,17 +366,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             try
             {
+                operation.addLog( String.format( "sending clone command: %s", ccm.toString() ) );
                 peerCommandDispatcher.invoke( ccm, timeout );
             }
             catch ( PeerCommandException e )
             {
                 LOG.error( e.getMessage(), e );
-                throw new EnvironmentBuildException( e.getMessage() );
-            }
-            finally
-            {
-                environment.setStatus( EnvironmentStatusEnum.UNHEALTHY );
+                operation.addLogFailed( "Error occured while invoking command." );
+                environment.setStatus( EnvironmentStatusEnum.BROKEN );
                 saveEnvironment( environment );
+                throw new EnvironmentBuildException( e.getMessage() );
             }
 
             boolean result = ccm.isSuccess();
@@ -421,6 +437,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 environment.setStatus( EnvironmentStatusEnum.HEALTHY );
             }
             saveEnvironment( environment );
+            operation.addLogDone( "Complete" );
         }
     }
 

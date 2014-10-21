@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.StopNodeOperationHandler;
@@ -32,7 +32,7 @@ public class StopEnvironmentContainerOperationHandlerTest
 
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().contains( "not exist" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
@@ -45,7 +45,7 @@ public class StopEnvironmentContainerOperationHandlerTest
         mock.setClusterConfig( config );
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().contains( "not connected" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }

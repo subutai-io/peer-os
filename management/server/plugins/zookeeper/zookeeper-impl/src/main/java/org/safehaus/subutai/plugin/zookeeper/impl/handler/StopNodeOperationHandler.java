@@ -24,7 +24,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping node %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -32,7 +32,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -42,7 +42,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
         ZookeeperClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -50,17 +50,17 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
         if ( !config.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
-        productOperation.addLog( "Stopping node..." );
+        trackerOperation.addLog( "Stopping node..." );
 
         Command stopCommand = manager.getCommands().getStopCommand( node );
         manager.getCommandRunner().runCommand( stopCommand );
@@ -76,11 +76,11 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
 
         if ( NodeState.STOPPED.equals( state ) )
         {
-            productOperation.addLogDone( String.format( "Node on %s stopped", lxcHostname ) );
+            trackerOperation.addLogDone( String.format( "Node on %s stopped", lxcHostname ) );
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Failed to stop node %s, %s", lxcHostname, stopCommand.getAllErrors() ) );
         }
     }

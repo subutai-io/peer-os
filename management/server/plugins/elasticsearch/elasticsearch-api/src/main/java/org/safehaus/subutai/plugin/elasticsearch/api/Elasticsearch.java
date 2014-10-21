@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
@@ -30,5 +30,5 @@ public interface Elasticsearch extends ApiBase<ElasticsearchClusterConfiguration
 
     ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
                                                   ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,
-                                                  ProductOperation po );
+                                                  TrackerOperation po );
 }

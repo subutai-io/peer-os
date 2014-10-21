@@ -5,36 +5,36 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 
 public class TrackerMock implements Tracker
 {
     @Override
-    public ProductOperationView getProductOperation( String source, UUID operationTrackId )
+    public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId )
     {
         return null;
     }
 
 
     @Override
-    public ProductOperation createProductOperation( String source, String description )
+    public TrackerOperation createTrackerOperation( String source, String description )
     {
-        return new ProductOperationMock();
+        return new TrackerOperationMock();
     }
 
 
     @Override
-    public List<ProductOperationView> getProductOperations( String source, Date fromDate, Date toDate, int limit )
+    public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit )
     {
         return null;
     }
 
 
     @Override
-    public List<String> getProductOperationSources()
+    public List<String> getTrackerOperationSources()
     {
         return null;
     }

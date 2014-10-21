@@ -1,27 +1,20 @@
 package org.safehaus.subutai.plugin.jetty.impl.handler;
 
 
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
-import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
-import org.safehaus.subutai.plugin.common.mock.ProductOperationMock;
-import org.safehaus.subutai.plugin.common.mock.TrackerMock;
+import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.Commands;
 import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
-
-import com.google.common.collect.Sets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
@@ -50,9 +43,9 @@ public class CheckClusterHandlerTest
         manager.setPluginDAO( mock( PluginDAO.class ) );
         manager.setCommands( new Commands( manager.getCommandRunner() ));
 
-        doReturn( new ProductOperationMock() )
+        doReturn( new TrackerOperationMock() )
                 .when( manager.getTracker() )
-                .createProductOperation( anyString(), any(String.class) );
+                .createTrackerOperation( anyString(), any( String.class ) );
 
         handler = new CheckClusterHandler( manager, clusterName );
 

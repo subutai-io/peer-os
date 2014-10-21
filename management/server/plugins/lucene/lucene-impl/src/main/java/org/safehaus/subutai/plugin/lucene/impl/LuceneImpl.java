@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -188,7 +188,7 @@ public class LuceneImpl implements Lucene
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, LuceneConfig config, ProductOperation po )
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, LuceneConfig config, TrackerOperation po )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {

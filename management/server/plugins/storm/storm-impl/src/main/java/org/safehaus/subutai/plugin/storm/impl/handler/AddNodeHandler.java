@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
@@ -18,7 +18,7 @@ public class AddNodeHandler extends AbstractHandler
     public AddNodeHandler( StormImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.productOperation = manager.getTracker().createProductOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
                 "Add node to cluster " + clusterName );
     }
 
@@ -26,7 +26,7 @@ public class AddNodeHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         StormConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -27,12 +27,12 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
 
     private final ZookeeperClusterConfig zookeeperClusterConfig;
     private final ZookeeperImpl zookeeperManager;
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final Environment environment;
 
 
     public ZookeeperStandaloneSetupStrategy( final Environment environment,
-                                             final ZookeeperClusterConfig zookeeperClusterConfig, ProductOperation po,
+                                             final ZookeeperClusterConfig zookeeperClusterConfig, TrackerOperation po,
                                              ZookeeperImpl zookeeperManager )
     {
         Preconditions.checkNotNull( environment, "Environment is null" );

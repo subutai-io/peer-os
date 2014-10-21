@@ -22,7 +22,6 @@ public class Environment
     private Set<EnvironmentContainer> containers;
     private EnvironmentStatusEnum status;
 
-
     public Environment( String name )
     {
         this.name = name;

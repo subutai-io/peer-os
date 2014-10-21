@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -18,7 +18,7 @@ import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
  */
 public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 {
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final String lxcHostname;
 
 
@@ -26,7 +26,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<MongoImp
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( MongoClusterConfig.PRODUCT_KEY,
                 String.format( "Checking state of %s in %s", lxcHostname, clusterName ) );
     }
 

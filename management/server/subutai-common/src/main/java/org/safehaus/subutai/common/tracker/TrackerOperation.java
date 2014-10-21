@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Entity is to logs actions of product operations such as installation, start, stop etc.
  */
-public interface ProductOperation
+public interface TrackerOperation
 {
 
     /**
