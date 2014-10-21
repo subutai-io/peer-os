@@ -14,6 +14,13 @@
   <packaging>bundle</packaging>
   <name>Subutai Metric API</name>
 
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
