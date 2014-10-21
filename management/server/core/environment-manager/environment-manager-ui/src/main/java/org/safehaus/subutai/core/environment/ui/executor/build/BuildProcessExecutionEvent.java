@@ -12,13 +12,21 @@ public class BuildProcessExecutionEvent
 
     private BuildProcessExecutionEventType eventType;
     private EnvironmentBuildProcess environmentBuildProcess;
+    private String exceptionMessage;
 
 
     public BuildProcessExecutionEvent( EnvironmentBuildProcess environmentBuildProcess,
-                                       BuildProcessExecutionEventType type )
+                                       BuildProcessExecutionEventType type, String exceptionMessage )
     {
         this.eventType = type;
         this.environmentBuildProcess = environmentBuildProcess;
+        this.exceptionMessage = exceptionMessage;
+    }
+
+
+    public String getExceptionMessage()
+    {
+        return exceptionMessage;
     }
 
 

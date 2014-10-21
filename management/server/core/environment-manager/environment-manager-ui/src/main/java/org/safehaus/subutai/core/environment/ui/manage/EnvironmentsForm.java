@@ -7,9 +7,9 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 
 import com.vaadin.ui.Button;
@@ -20,7 +20,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class EnvironmentsForm
 {
 
@@ -34,6 +34,8 @@ public class EnvironmentsForm
     private static final String START = "Start";
     private static final String STOP = "Stop";
     private static final String MANAGE_TITLE = "Manage environment containers";
+    private static final String ID = "ID";
+    private static final String STATUS = "Status";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -71,6 +73,8 @@ public class EnvironmentsForm
     {
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
+        table.addContainerProperty( ID, String.class, null );
+        table.addContainerProperty( STATUS, String.class, null );
         table.addContainerProperty( MANAGE, Button.class, null );
         table.addContainerProperty( CONFIGURE, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
@@ -132,7 +136,8 @@ public class EnvironmentsForm
             } );
 
             environmentsTable.addItem( new Object[] {
-                    environment.getName() + " " + environment.getUuid(), manageButton, configureButton, destroyButton
+                    environment.getName(), environment.getUuid().toString(), environment.getStatus().toString(),
+                    manageButton, configureButton, destroyButton
             }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
