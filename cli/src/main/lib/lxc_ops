@@ -429,12 +429,15 @@ function lxc_rename {
 
 function lxc_remove_agent {
   container=$1
+  agent_package="subutai-agent"
+  
   lxc_assert $container
   lxc-wait -n $container -s RUNNING
-  lxc-attach -n $container -- apt-get purge -y -f subutai-agent > /dev/null 2>&1
+  lxc-attach -n $container -- apt-get purge -y -f $agent_package > /dev/null 2>&1
+  lxc-attach -n $container -- dpkg -s $agent_package > /dev/null 2>&1
   status=$?
   message="    - agent removed from \"$container\""
-  if [ "$status" == "0" ]
+  if [ "$status" == "1" ]
   then
       msg_info "$message"
   else
@@ -443,7 +446,7 @@ function lxc_remove_agent {
 }
 
 
-function install_subutai_agent {
+function lxc_install_agent {
   container=$1
   lxc_wait_net $container
   if [ "$SUBUTAI_OFFLINE_MODE" == "true" ]; then

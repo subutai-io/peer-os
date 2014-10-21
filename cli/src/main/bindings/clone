@@ -71,7 +71,7 @@ function clone {
 
   ovs_configure_lxc $child
   git_child_branch $child
-  install_subutai_agent $child
+  lxc_install_agent $child
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
