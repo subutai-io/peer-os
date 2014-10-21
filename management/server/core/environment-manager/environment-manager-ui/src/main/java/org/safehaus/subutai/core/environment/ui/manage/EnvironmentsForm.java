@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.environment.ui.manage;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsForm
 {
 
@@ -36,6 +38,7 @@ public class EnvironmentsForm
     private static final String MANAGE_TITLE = "Manage environment containers";
     private static final String ID = "ID";
     private static final String STATUS = "Status";
+    private static final String DATE_CREATED = "Date";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -74,6 +77,7 @@ public class EnvironmentsForm
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( ID, String.class, null );
+        table.addContainerProperty( DATE_CREATED, String.class, null );
         table.addContainerProperty( STATUS, String.class, null );
         table.addContainerProperty( MANAGE, Button.class, null );
         table.addContainerProperty( CONFIGURE, Button.class, null );
@@ -135,12 +139,22 @@ public class EnvironmentsForm
                 }
             } );
 
+
+            String cdate = getCreationDate( environment.getCreationTimestamp() );
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), environment.getUuid().toString(), environment.getStatus().toString(),
+                    environment.getName(), environment.getUuid().toString(), cdate, environment.getStatus().toString(),
                     manageButton, configureButton, destroyButton
             }, environment.getUuid() );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private String getCreationDate( long ts )
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat( "MMM dd,yyyy HH:mm" );
+        Date cdate = new Date( ts );
+        return sdf.format( cdate );
     }
 
 

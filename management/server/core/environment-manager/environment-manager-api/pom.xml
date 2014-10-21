@@ -25,6 +25,10 @@
       <artifactId>template-registry-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
