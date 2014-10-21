@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
@@ -27,6 +28,8 @@ import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
@@ -37,9 +40,11 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
@@ -64,7 +69,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * PeerManager implementation
  */
-public class PeerManagerImpl implements PeerManager
+public class PeerManagerImpl implements PeerManager, ResponseListener
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class.getName() );
@@ -78,6 +83,8 @@ public class PeerManagerImpl implements PeerManager
     private TemplateRegistry templateRegistry;
     private DataSource dataSource;
     private Set<PeerContainer> containers = new HashSet<>();
+    private CommunicationManager communicationManager;
+    private ManagementHost managementHost;
 
 
     public PeerManagerImpl( final DataSource dataSource )
@@ -97,11 +104,19 @@ public class PeerManagerImpl implements PeerManager
         {
             LOG.error( e.getMessage(), e );
         }
+        communicationManager.addListener( this );
     }
 
 
     public void destroy()
     {
+        communicationManager.removeListener( this );
+    }
+
+
+    public void setCommunicationManager( final CommunicationManager communicationManager )
+    {
+        this.communicationManager = communicationManager;
     }
 
 
@@ -197,15 +212,6 @@ public class PeerManagerImpl implements PeerManager
 
         return peerDAO.getInfo( SOURCE, uuid.toString(), Peer.class );
     }
-
-
-    /*@Override
-    public String getRemoteId( final String baseUrl )
-    {
-        RemotePeerClient client = new RemotePeerClient();
-        client.setBaseUrl( baseUrl );
-        return client.callRemoteRest();
-    }*/
 
 
     @Override
@@ -464,24 +470,6 @@ public class PeerManagerImpl implements PeerManager
             templateRegistry.registerTemplate( template );
         }
     }
-
-    //
-    //    protected Template getRemoteTemplate( final String template,
-    // UUID remotePeerId ) throws ContainerCreateException
-    //    {
-    //        PeerCommandMessage getTemplateCommand =
-    //                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, remotePeerId, null );
-    //        getTemplateCommand.setInput( template );
-    //        peerCommandDispatcher.invoke( getTemplateCommand );
-    //        if ( getTemplateCommand.isSuccess() )
-    //        {
-    //            return JsonUtil.fromJson( getTemplateCommand.getResult().toString(), Template.class );
-    //        }
-    //        else
-    //        {
-    //            throw new ContainerCreateException( "Could not get remote template." );
-    //        }
-    //    }
 
 
     @Override
@@ -835,5 +823,65 @@ public class PeerManagerImpl implements PeerManager
     public Collection<PeerMessageListener> getPeerMessageListeners()
     {
         return Collections.unmodifiableCollection( peerMessageListeners );
+    }
+
+
+    @Override
+    public void onResponse( final Response response )
+    {
+        if ( response == null || response.getType() == null )
+        {
+            return;
+        }
+
+        if ( response.getType().equals( ResponseType.REGISTRATION_REQUEST ) || response.getType().equals(
+                ResponseType.HEARTBEAT_RESPONSE ) )
+        {
+            if ( response.getHostname().equals( "management" ) )
+            {
+                if ( managementHost == null )
+                {
+                    managementHost = new ManagementHost();
+                    managementHost.setAgent( PeerUtils.buildAgent( response ) );
+                }
+                managementHost.updateHeartBeat();
+                return;
+            }
+
+            if ( managementHost == null )
+            {
+                return;
+            }
+
+            if ( response.getHostname().startsWith( "py" ) )
+            {
+                Host host = managementHost.getChildHost( response.getHostname() );
+                if ( host == null )
+                {
+                    host = new ResourceHost();
+                    host.setAgent( PeerUtils.buildAgent( response ) );
+                    managementHost.addSlaveHost( host );
+                }
+                host.updateHeartBeat();
+                return;
+            }
+
+            Host resourceHost = managementHost.getChildHost( response.getParentHostName() );
+            if ( resourceHost == null )
+            {
+                return;
+            }
+
+            Host containerHost = resourceHost.getChildHost( response.getHostname() );
+
+            if ( containerHost == null )
+            {
+                containerHost = new ResourceHost();
+                containerHost.setAgent( PeerUtils.buildAgent( response ) );
+                resourceHost.addSlaveHost( containerHost );
+            }
+
+            containerHost.updateHeartBeat();
+        }
     }
 }
