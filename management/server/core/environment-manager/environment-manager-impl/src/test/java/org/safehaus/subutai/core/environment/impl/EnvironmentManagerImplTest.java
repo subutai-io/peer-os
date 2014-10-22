@@ -84,7 +84,7 @@ public class EnvironmentManagerImplTest
     public void shoudBuildEnvironment() throws Exception
     {
         EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
-        when( process.getBluerpintName() ).thenReturn( NAME );
+        when( process.getBlueprintName() ).thenReturn( NAME );
         when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID() );
 
         Map<String, CloneContainersMessage> map = new HashMap<>();

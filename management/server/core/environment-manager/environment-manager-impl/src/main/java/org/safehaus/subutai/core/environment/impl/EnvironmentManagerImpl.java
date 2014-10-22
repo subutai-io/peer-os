@@ -355,12 +355,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBluerpintName() );
+            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintName() );
 
-            Environment environment = new Environment( process.getBluerpintName() );
+            Environment environment = new Environment( process.getBlueprintName() );
             saveEnvironment( environment );
             TrackerOperation operation =
-                    tracker.createTrackerOperation( process.getUuid().toString(), process.getBluerpintName() );
+                    tracker.createTrackerOperation( process.getUuid().toString(), process.getBlueprintName() );
 
             int containerCount = 0;
             long timeout = 1000 * 60;

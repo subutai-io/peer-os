@@ -20,21 +20,21 @@ public class EnvironmentBuildProcess
     private ProcessStatusEnum processStatusEnum;
     private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
-    private String bluerpintName;
+    private String blueprintName;
 
 
     public EnvironmentBuildProcess( String name )
     {
-        this.bluerpintName = name;
+        this.blueprintName = name;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.messageMap = new HashMap<>();
     }
 
 
-    public String getBluerpintName()
+    public String getBlueprintName()
     {
-        return bluerpintName;
+        return blueprintName;
     }
 
 
