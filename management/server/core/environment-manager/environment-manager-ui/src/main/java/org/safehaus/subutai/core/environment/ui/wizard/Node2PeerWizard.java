@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
@@ -29,7 +29,7 @@ public class Node2PeerWizard extends Window
 {
 
     private int step = 0;
-    private EnvironmentBuildTask environmentBuildTask;
+    private EnvironmentBlueprint blueprint;
     private Table peersTable;
     private Table containerToPeerTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -37,7 +37,7 @@ public class Node2PeerWizard extends Window
 
 
     public Node2PeerWizard( final String caption, EnvironmentManagerPortalModule managerUI,
-                            EnvironmentBuildTask environmentBuildTask )
+                            EnvironmentBlueprint blueprint )
     {
         super( caption );
         setCaption( caption );
@@ -47,7 +47,7 @@ public class Node2PeerWizard extends Window
         setWidth( "800px" );
         setHeight( "500px" );
         this.managerUI = managerUI;
-        this.environmentBuildTask = environmentBuildTask;
+        this.blueprint = blueprint;
         next();
     }
 
@@ -162,7 +162,7 @@ public class Node2PeerWizard extends Window
         containerToPeerTable.setImmediate( true );
         containerToPeerTable.setSizeFull();
         nodeGroupMap = new HashMap<>();
-        for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
+        for ( NodeGroup ng : blueprint.getNodeGroups() )
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
             {
@@ -190,7 +190,7 @@ public class Node2PeerWizard extends Window
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
                     managerUI.getEnvironmentManager()
-                             .saveBuildProcess( environmentBuildTask, topology, map, TopologyEnum.NODE_2_PEER );
+                             .saveBuildProcess( blueprint, topology, map, TopologyEnum.NODE_2_PEER );
                 }
                 else
                 {

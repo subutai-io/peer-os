@@ -10,7 +10,9 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.DbUtil;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -28,7 +31,6 @@ public class EnvironmentDAO
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDAO.class.getName() );
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     protected DbUtil dbUtil;
 
@@ -45,9 +47,7 @@ public class EnvironmentDAO
     protected void setupDb() throws SQLException
     {
 
-        String sql1 =
-                "create table if not exists blueprint (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
-                        + "id));";
+        String sql1 = "create table if not exists blueprint (name varchar(100), info clob, PRIMARY KEY (name));";
         String sql2 =
                 "create table if not exists process (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
                         + "id));";
@@ -69,7 +69,7 @@ public class EnvironmentDAO
         try
         {
             dbUtil.update( "merge into environment (source, id, info) values (? , ?, ?)", source,
-                    UUID.fromString( key ), gson.toJson( info ) );
+                    UUID.fromString( key ), GSON.toJson( info ) );
 
             return true;
         }
@@ -183,5 +183,57 @@ public class EnvironmentDAO
             LOG.error( e.getMessage(), e );
         }
         return false;
+    }
+
+
+    public void saveBlueprint( final EnvironmentBlueprint blueprint ) throws EnvironmentPersistenceException
+    {
+        try
+        {
+            String json = GSON.toJson( blueprint );
+            dbUtil.update( "merge into blueprint (name, info) values (? , ?)", blueprint.getName(), json );
+        }
+        catch ( JsonParseException | SQLException e )
+        {
+            throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+    }
+
+
+    public List<EnvironmentBlueprint> getBlueprints() throws EnvironmentPersistenceException
+    {
+        List<EnvironmentBlueprint> blueprints = new ArrayList<>();
+        try
+        {
+            ResultSet rs = dbUtil.select( "select info from blueprint" );
+            while ( rs != null && rs.next() )
+            {
+                Clob infoClob = rs.getClob( "info" );
+                if ( infoClob != null && infoClob.length() > 0 )
+                {
+                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                    blueprints.add( GSON.fromJson( info, EnvironmentBlueprint.class ) );
+                }
+            }
+        }
+        catch ( JsonSyntaxException | SQLException e )
+        {
+            throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+        return blueprints;
+    }
+
+
+    public void deleteBlueprint( final String name ) throws EnvironmentPersistenceException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Blueprint name is null or empty" );
+        try
+        {
+            dbUtil.update( "delete from blueprint where name = ?", name );
+        }
+        catch ( SQLException e )
+        {
+            throw new EnvironmentPersistenceException( e.getMessage() );
+        }
     }
 }

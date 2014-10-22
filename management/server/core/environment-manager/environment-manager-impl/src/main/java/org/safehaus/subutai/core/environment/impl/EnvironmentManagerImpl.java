@@ -7,6 +7,7 @@ package org.safehaus.subutai.core.environment.impl;
 
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
@@ -212,11 +214,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    /**
+     * This method should be deprecated soon
+     * @param environmentBuildTask
+     * @return
+     * @throws EnvironmentBuildException
+     */
     @Override
     public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
             throws EnvironmentBuildException
     {
-
         return environmentBuilder.build( environmentBuildTask );
     }
 
@@ -268,31 +275,60 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             EnvironmentBlueprint environmentBlueprint = GSON.fromJson( blueprint, EnvironmentBlueprint.class );
-            EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-            environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
-
-            return environmentDAO
-                    .saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
+            environmentDAO.saveBlueprint( environmentBlueprint );
+            return true;
         }
-        catch ( JsonParseException e )
+        catch ( JsonParseException | EnvironmentPersistenceException e )
         {
-            LOG.info( e.getMessage() );
+            LOG.error( e.getMessage() );
         }
         return false;
     }
 
 
     @Override
-    public List<EnvironmentBuildTask> getBlueprints()
+    public List<EnvironmentBuildTask> getBlueprintTasks()
     {
         return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
     }
 
 
     @Override
-    public boolean deleteBlueprint( String uuid )
+    public List<EnvironmentBlueprint> getBlueprints()
+    {
+        List<EnvironmentBlueprint> blueprints = new ArrayList<>();
+        try
+        {
+            blueprints = environmentDAO.getBlueprints();
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return blueprints;
+    }
+
+
+    @Override
+    public boolean deleteBlueprintTask( String uuid )
     {
         return environmentDAO.deleteInfo( BLUEPRINT, uuid );
+    }
+
+
+    @Override
+    public boolean deleteBlueprint( String name )
+    {
+        try
+        {
+            environmentDAO.deleteBlueprint( name );
+            return true;
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return false;
     }
 
 
@@ -539,7 +575,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean saveBuildProcess( final EnvironmentBuildTask environmentBuildTask, final Map<Object, Peer> topology,
+    public boolean saveBuildProcess( final EnvironmentBlueprint blueprint, final Map<Object, Peer> topology,
                                      final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
     {
         EnvironmentBuildProcess process = null;
@@ -548,12 +584,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             case NODE_2_PEER:
             {
-                process = topologyBuilder.createEnvironmentBuildProcessN2P( environmentBuildTask, topology, map );
+                process = topologyBuilder.createEnvironmentBuildProcessN2P( blueprint, topology, map );
                 break;
             }
             case NODE_GROUP_2_PEER:
             {
-                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( environmentBuildTask, topology, map );
+                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( blueprint, topology, map );
                 break;
             }
             case BLUEPRINT_2_PEER:

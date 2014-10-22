@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
@@ -46,12 +47,13 @@ public interface EnvironmentManager
      */
     boolean destroyEnvironment( String environmentName ) throws EnvironmentDestroyException;
 
-    /**
-     * Saves blueprint test into database
-     */
     boolean saveBlueprint( String blueprint );
 
-    List<EnvironmentBuildTask> getBlueprints();
+    List<EnvironmentBuildTask> getBlueprintTasks();
+
+    List<EnvironmentBlueprint> getBlueprints();
+
+    boolean deleteBlueprintTask( String name );
 
     boolean deleteBlueprint( String name );
 
@@ -73,6 +75,6 @@ public interface EnvironmentManager
 
     Environment getEnvironmentByUUID( UUID environmentId );
 
-    boolean saveBuildProcess( EnvironmentBuildTask environmentBuildTask, Map<Object, Peer> topology,
-                              Map<Object, NodeGroup> map, TopologyEnum topologyEnum );
+    boolean saveBuildProcess( EnvironmentBlueprint blueprint, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
+                              TopologyEnum topologyEnum );
 }
