@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.protocol.Container;
 /**
  * Interface for ContainerHostMetric
  */
-public interface ContainerHostMetric
+public interface ContainerHostMetric extends Metric
 {
     public Container getContainer();  //TODO return here ContainerHost
 }
