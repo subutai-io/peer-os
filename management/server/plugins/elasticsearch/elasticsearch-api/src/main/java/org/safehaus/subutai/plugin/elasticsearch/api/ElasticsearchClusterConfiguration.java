@@ -14,7 +14,7 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     public static final String PRODUCT_KEY = "Elasticsearch";
     public static final String PRODUCT_NAME = "elasticsearch";
 
-    public static final String templateName = "elastic";
+    public static final String templateName = "osman";
 
     private String clusterName = "";
     private int numberOfNodes;
