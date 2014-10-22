@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.cassandra.impl.dao;
+package org.safehaus.subutai.plugin.common;
 
 
 import java.sql.Clob;
@@ -23,7 +23,7 @@ import com.google.gson.JsonSyntaxException;
 /**
  * PluginDAO is used to manage cluster configuration information in database
  */
-public class PluginDAO
+public class PluginDaoNew
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( PluginDAO.class.getName() );
@@ -32,7 +32,7 @@ public class PluginDAO
     protected DbUtil dbUtil;
 
 
-    public PluginDAO( DataSource dataSource ) throws SQLException
+    public PluginDaoNew( DataSource dataSource ) throws SQLException
     {
         Preconditions.checkNotNull( dataSource, "DataSource is null" );
         this.dbUtil = new DbUtil( dataSource );

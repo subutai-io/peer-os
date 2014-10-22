@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -28,7 +30,7 @@ import org.safehaus.subutai.plugin.accumulo.impl.handler.RemovePropertyOperation
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
@@ -49,35 +51,42 @@ public class AccumuloImpl implements Accumulo
     private Zookeeper zkManager;
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
-    private PluginDAO pluginDAO;
+    private PluginDaoNew pluginDAO;
+    private DataSource dataSource;
 
 
-    public AccumuloImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager )
+    public AccumuloImpl( DataSource dataSource )
     {
-
-        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
-        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
-        Preconditions.checkNotNull( tracker, "Tracker is null" );
-        Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
-        Preconditions.checkNotNull( zkManager, "Zookeeper manager is null" );
-        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
-
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.tracker = tracker;
-        this.hadoopManager = hadoopManager;
-        this.zkManager = zkManager;
-        this.environmentManager = environmentManager;
-        this.pluginDAO = new PluginDAO( dbManager );
-        this.commands = new Commands( commandRunner );
-
-        commands = new Commands( commandRunner );
+        this.dataSource = dataSource;
     }
 
 
-    public PluginDAO getPluginDAO()
+//    public AccumuloImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
+//                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager )
+//    {
+//
+//        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+//        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+//        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+//        Preconditions.checkNotNull( tracker, "Tracker is null" );
+//        Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
+//        Preconditions.checkNotNull( zkManager, "Zookeeper manager is null" );
+//        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
+//
+//        this.commandRunner = commandRunner;
+//        this.agentManager = agentManager;
+//        this.tracker = tracker;
+//        this.hadoopManager = hadoopManager;
+//        this.zkManager = zkManager;
+//        this.environmentManager = environmentManager;
+//        this.pluginDAO = new PluginDaoNew( dbManager );
+//        this.commands = new Commands( commandRunner );
+//
+//        commands = new Commands( commandRunner );
+//    }
+
+
+    public PluginDaoNew getPluginDAO()
     {
         return pluginDAO;
     }

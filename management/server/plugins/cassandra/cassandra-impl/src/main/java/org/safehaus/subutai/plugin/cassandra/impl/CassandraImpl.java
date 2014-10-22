@@ -28,7 +28,6 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckServiceHandler;
@@ -39,6 +38,7 @@ import org.safehaus.subutai.plugin.cassandra.impl.handler.StartServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallClusterHandler;
+import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class CassandraImpl implements Cassandra
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
-    private PluginDAO pluginDAO;
+    private PluginDaoNew pluginDAO;
     private DataSource dataSource;
 
 
@@ -176,7 +176,7 @@ public class CassandraImpl implements Cassandra
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
+            this.pluginDAO = new PluginDaoNew( dataSource );
         }
         catch ( SQLException e )
         {
@@ -245,7 +245,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDaoNew getPluginDAO()
     {
         return pluginDAO;
     }
