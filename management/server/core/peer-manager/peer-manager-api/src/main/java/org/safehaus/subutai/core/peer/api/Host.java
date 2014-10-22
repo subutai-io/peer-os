@@ -11,6 +11,8 @@ import java.util.UUID;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.NullAgent;
+import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -31,7 +33,7 @@ public abstract class Host implements Serializable
 {
     private static final Logger LOG = LoggerFactory.getLogger( Host.class );
 
-    private Agent agent;
+    private Agent agent = new NullAgent();
     private long lastHeartbeat;
     private long inactiveTime = 5 * 1000 * 60; // 5 min
     private Host parentHost;
@@ -60,11 +62,14 @@ public abstract class Host implements Serializable
     }
 
 
+    public abstract void invoke( PeerCommandMessage commandMessage ) throws PeerException;
+
+
     public Command execute( RequestBuilder requestBilder ) throws CommandException
     {
-        if ( agent == null )
+        if ( agent == null || !isConnected() )
         {
-            throw new CommandException( "Could not execute command. Agent is null" );
+            throw new CommandException( "Could not execute command. Agent is null or disconnected" );
         }
         CommandDispatcher commandDispatcher = getCommandDispatcher();
 
@@ -180,5 +185,34 @@ public abstract class Host implements Serializable
             }
         }
         return result;
+    }
+
+
+    public Host getChildHost( final UUID uuid )
+    {
+        Host result = null;
+        Iterator<Host> iterator = slaveHosts.iterator();
+
+        while ( result == null && iterator.hasNext() )
+        {
+            Host host = iterator.next();
+            if ( uuid.equals( host.getAgent().getUuid() ) )
+            {
+                result = host;
+            }
+        }
+        return result;
+    }
+
+
+    public Set<Host> getSlaveHosts()
+    {
+        return slaveHosts;
+    }
+
+
+    public void setSlaveHosts( final Set<Host> slaveHosts )
+    {
+        this.slaveHosts = slaveHosts;
     }
 }

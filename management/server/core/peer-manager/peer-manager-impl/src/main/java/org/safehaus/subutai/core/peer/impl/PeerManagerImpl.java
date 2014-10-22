@@ -484,6 +484,18 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     }
 
 
+    public boolean startContainerHost( Host container )
+    {
+        return containerManager.startLxcOnHost( container.getParentHost().getAgent(), container.getHostname() );
+    }
+
+
+    public boolean stopContainerHost( Host container )
+    {
+        return containerManager.stopLxcOnHost( container.getParentHost().getAgent(), container.getHostname() );
+    }
+
+
     @Override
     public boolean stopContainer( final PeerContainer container )
     {
@@ -533,6 +545,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             return;
         }
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
+        Host destinationHost = findHost( peerCommandMessage.getAgentId() );
         LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
         boolean result;
         Template template;
@@ -582,7 +595,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 peerCommandMessage.setResult( jsonObject );
                 break;
             case START:
-                result = startContainer( peerContainer );
+                result = startContainerHost( destinationHost );
                 if ( result )
                 {
                     peerCommandMessage.setResult( "true" );
@@ -593,7 +606,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 }
                 break;
             case STOP:
-                result = stopContainer( peerContainer );
+                result = stopContainerHost( destinationHost );
                 if ( result )
                 {
                     peerCommandMessage.setResult( "true" );
@@ -605,7 +618,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 break;
             case IS_CONNECTED:
 
-                result = isContainerConnected( peerContainer );
+                result = destinationHost.isConnected();
                 if ( result )
                 {
                     peerCommandMessage.setResult( "true" );
@@ -662,13 +675,10 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                         Agent agent = agentManager.getAgentByHostname( dcm.getHostname() );
                         Agent parentAgent = agentManager.getAgentByHostname( agent.getParentHostName() );
                         containerManager.destroy( parentAgent.getHostname(), agent.getHostname() );
-
-                        //                        peerCommandMessage.setSuccess( true );
                     }
                     catch ( ContainerDestroyException e )
                     {
                         LOG.error( e.getMessage(), e );
-                        //                        peerCommandMessage.setSuccess( false );
                     }
                 }
                 else
@@ -783,6 +793,26 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             if ( c.getAgentId().equals( agentId ) )
             {
                 result = c;
+            }
+        }
+        return result;
+    }
+
+
+    private Host findHost( UUID uuid )
+    {
+        Iterator iterator = managementHost.getSlaveHosts().iterator();
+        Host result = null;
+        while ( result == null && iterator.hasNext() )
+        {
+            Host c = ( Host ) iterator.next();
+            if ( c.getAgent().getUuid().equals( uuid ) )
+            {
+                result = c;
+            }
+            else
+            {
+                result = c.getChildHost( uuid );
             }
         }
         return result;
