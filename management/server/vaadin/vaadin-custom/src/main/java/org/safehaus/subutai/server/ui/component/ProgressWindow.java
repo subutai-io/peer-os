@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import com.google.gwt.thirdparty.guava.common.base.Strings;
@@ -114,7 +114,7 @@ public class ProgressWindow
             {
                 while ( track )
                 {
-                    ProductOperationView po = tracker.getProductOperation( source, trackID );
+                    TrackerOperationView po = tracker.getTrackerOperation( source, trackID );
                     if ( po != null )
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );

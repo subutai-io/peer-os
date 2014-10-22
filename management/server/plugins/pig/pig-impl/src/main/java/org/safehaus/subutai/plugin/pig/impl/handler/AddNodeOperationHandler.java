@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -27,7 +27,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        productOperation = manager.getTracker().createProductOperation( PigConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( PigConfig.PRODUCT_KEY,
                 String.format( "Adding node %s to %s", ( hostname != null ? hostname : "" ), clusterName ) );
     }
 
@@ -35,7 +35,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         PigConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -77,7 +77,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl>
 
     public Agent setupHost( PigConfig config ) throws ClusterSetupException
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
 
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )

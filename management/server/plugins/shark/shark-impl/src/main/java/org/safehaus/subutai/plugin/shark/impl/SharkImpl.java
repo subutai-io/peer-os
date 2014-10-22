@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -186,7 +186,7 @@ public class SharkImpl implements Shark
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, SharkClusterConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, SharkClusterConfig config,
                                                          Environment environment )
     {
         if ( config.getSetupType() == SetupType.OVER_SPARK )

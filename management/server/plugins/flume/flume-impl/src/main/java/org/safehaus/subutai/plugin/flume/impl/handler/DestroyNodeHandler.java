@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
@@ -25,7 +25,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation = manager.getTracker().createProductOperation( FlumeConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
                 "Remove node from cluster: " + hostname );
     }
 
@@ -33,7 +33,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         FlumeConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -76,7 +76,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl>
 
     private boolean uninstallFlume( Agent agent )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Flume..." );
         Command cmd = manager.getCommandRunner()
                              .createCommand( new RequestBuilder( Commands.make( CommandType.PURGE ) ),

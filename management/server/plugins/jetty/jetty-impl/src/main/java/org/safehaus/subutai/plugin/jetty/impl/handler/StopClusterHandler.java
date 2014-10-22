@@ -17,7 +17,7 @@ public class StopClusterHandler extends AbstractOperationHandler<JettyImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( JettyConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( JettyConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 
@@ -28,7 +28,7 @@ public class StopClusterHandler extends AbstractOperationHandler<JettyImpl>
         JettyConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
@@ -38,11 +38,11 @@ public class StopClusterHandler extends AbstractOperationHandler<JettyImpl>
 
         if ( stopServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Stop succeeded" );
+            trackerOperation.addLogDone( "Stop succeeded" );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
         }
     }
 }

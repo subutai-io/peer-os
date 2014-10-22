@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.sqoop.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.handler.CheckHandler;
 import org.safehaus.subutai.plugin.sqoop.impl.mock.SqoopImplMock;
@@ -16,7 +16,7 @@ public class CheckHandlerTest
     @Test
     public void testWithoutConfiguration()
     {
-        ProductOperation po = SqoopImplMock.getProductOperationMock();
+        TrackerOperation po = SqoopImplMock.getProductOperationMock();
         SqoopImplMock sqoopImplMock = new SqoopImplMock();
         CheckHandler checkHandler = new CheckHandler( sqoopImplMock.getSqoopImplMock(), "test", po );
         checkHandler.run();
@@ -27,7 +27,7 @@ public class CheckHandlerTest
     @Test
     public void testNodeNotConnected()
     {
-        ProductOperation po = SqoopImplMock.getProductOperationMock();
+        TrackerOperation po = SqoopImplMock.getProductOperationMock();
         SqoopImplMock sqoopImplMock = new SqoopImplMock();
         SqoopConfig config = new SqoopConfig();
         config.setHadoopClusterName( "test" );

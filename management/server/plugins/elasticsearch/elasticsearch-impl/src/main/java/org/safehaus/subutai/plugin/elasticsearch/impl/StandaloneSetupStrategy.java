@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
@@ -23,13 +23,13 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
 
     private final ElasticsearchClusterConfiguration config;
     private final ElasticsearchImpl elasticsearchManager;
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final Environment environment;
 
 
     public StandaloneSetupStrategy( final Environment environment,
                                     final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,
-                                    ProductOperation po, ElasticsearchImpl elasticsearchManager )
+                                    TrackerOperation po, ElasticsearchImpl elasticsearchManager )
     {
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Cluster config is null" );

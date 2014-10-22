@@ -9,6 +9,7 @@ import java.util.Map;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -71,7 +72,7 @@ public class NodeGroup2PeerGroupWizard extends Window
             }
             case 2:
             {
-                setContent( genContainerToPeersTable() );
+                setContent( genNodeGroupToPeerGroupTable() );
                 break;
             }
             default:
@@ -150,7 +151,7 @@ public class NodeGroup2PeerGroupWizard extends Window
     }
 
 
-    private VerticalLayout genContainerToPeersTable()
+    private VerticalLayout genNodeGroupToPeerGroupTable()
     {
         VerticalLayout vl = new VerticalLayout();
 
@@ -189,9 +190,9 @@ public class NodeGroup2PeerGroupWizard extends Window
                 Map<Object, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
-                    EnvironmentBuildProcess process = createEnvironmentBuildProcess( environmentBuildTask, topology );
-
-                    managerUI.getEnvironmentManager().saveBuildProcess( process );
+                    Map<Object, NodeGroup> map = getNodeGroupMap();
+                    managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildTask, topology, map,
+                            TopologyEnum.NODE_GROUP_2_PEER_GROUP );
                 }
                 else
                 {

@@ -20,7 +20,7 @@ public class StopDataNodeOperationHandler extends AbstractOperationHandler<Hadoo
     {
         super( manager, clusterName );
         this.lxcHostName = lxcHostName;
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping Datanode in %s", clusterName ) );
     }
 
@@ -32,20 +32,20 @@ public class StopDataNodeOperationHandler extends AbstractOperationHandler<Hadoo
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostName );
         if ( !hadoopClusterConfig.getDataNodes().contains( agent ) )
         {
-            productOperation.addLogFailed( String.format( "Datanode on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Datanode on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostName );
         if ( node == null )
         {
-            productOperation.addLogFailed( "Datanode is not connected" );
+            trackerOperation.addLogFailed( "Datanode is not connected" );
             return;
         }
 
@@ -83,11 +83,11 @@ public class StopDataNodeOperationHandler extends AbstractOperationHandler<Hadoo
 
         if ( NodeState.STOPPED.equals( nodeState ) )
         {
-            productOperation.addLogDone( String.format( "Datanode on %s stopped", node.getHostname() ) );
+            trackerOperation.addLogDone( String.format( "Datanode on %s stopped", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Failed to stop Datanode %s. %s", node.getHostname(),
+            trackerOperation.addLogFailed( String.format( "Failed to stop Datanode %s. %s", node.getHostname(),
                     startCommand.getAllErrors() ) );
         }
     }

@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.oozie.impl;
 
 
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 
@@ -16,10 +16,10 @@ abstract class OozieSetupStrategy implements ClusterSetupStrategy
     //    private Environment environment;
     final OozieClusterConfig config;
     final OozieImpl oozieManager;
-    final ProductOperation po;
+    final TrackerOperation po;
 
 
-    public OozieSetupStrategy( OozieImpl oozie, ProductOperation po, OozieClusterConfig config )
+    public OozieSetupStrategy( OozieImpl oozie, TrackerOperation po, OozieClusterConfig config )
     {
 
         //        this.environment = environment;

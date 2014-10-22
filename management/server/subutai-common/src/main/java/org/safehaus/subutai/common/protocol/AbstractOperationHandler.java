@@ -3,7 +3,7 @@ package org.safehaus.subutai.common.protocol;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -13,7 +13,7 @@ public abstract class AbstractOperationHandler<T extends ApiBase> implements Run
 {
     protected final T manager;
     protected final String clusterName;
-    protected ProductOperation productOperation;
+    protected TrackerOperation trackerOperation;
 
 
     public AbstractOperationHandler( T manager, String clusterName )
@@ -27,7 +27,7 @@ public abstract class AbstractOperationHandler<T extends ApiBase> implements Run
 
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -37,8 +37,8 @@ public abstract class AbstractOperationHandler<T extends ApiBase> implements Run
     }
 
 
-    public ProductOperation getProductOperation()
+    public TrackerOperation getTrackerOperation()
     {
-        return productOperation;
+        return trackerOperation;
     }
 }

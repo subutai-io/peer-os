@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -20,7 +20,7 @@ import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 class SetupStrategyOverHadoop extends HiveSetupStrategy
 {
 
-    public SetupStrategyOverHadoop( HiveImpl manager, HiveConfig config, ProductOperation po )
+    public SetupStrategyOverHadoop( HiveImpl manager, HiveConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }

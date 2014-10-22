@@ -26,7 +26,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
 
         super( manager, elasticsearchClusterConfiguration.getClusterName() );
         this.elasticsearchClusterConfiguration = elasticsearchClusterConfiguration;
-        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", elasticsearchClusterConfiguration.getClusterName() ) );
     }
 
@@ -34,7 +34,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -43,13 +43,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
     {
         if ( Strings.isNullOrEmpty( elasticsearchClusterConfiguration.getClusterName() ) )
         {
-            productOperation.addLogFailed( "Malformed configuration" );
+            trackerOperation.addLogFailed( "Malformed configuration" );
             return;
         }
 
         if ( manager.getCluster( clusterName ) != null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
             return;
         }
 
@@ -65,14 +65,14 @@ public class InstallOperationHandler extends AbstractOperationHandler<Elasticsea
                     manager.getDefaultEnvironmentBlueprint( elasticsearchClusterConfiguration ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
-                    manager.getClusterSetupStrategy( env, elasticsearchClusterConfiguration, productOperation );
+                    manager.getClusterSetupStrategy( env, elasticsearchClusterConfiguration, trackerOperation );
             clusterSetupStrategy.setup();
 
-            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Failed to setup Elasticsearch cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }

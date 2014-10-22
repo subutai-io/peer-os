@@ -12,7 +12,7 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
-import org.safehaus.subutai.plugin.common.mock.ProductOperationMock;
+import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.Commands;
 import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
@@ -45,8 +45,8 @@ public class InstallOperationHandlerTest
 
         config.setClusterName( clusterName );
 
-        doReturn( new ProductOperationMock() ).when( manager.getTracker() )
-                                              .createProductOperation( anyString(), any( String.class ) );
+        doReturn( new TrackerOperationMock() ).when( manager.getTracker() )
+                                              .createTrackerOperation( anyString(), any( String.class ) );
 
         handler = new InstallOperationHandler( manager, config );
 

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.lucene.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 
@@ -13,14 +13,14 @@ abstract class LuceneSetupStrategy implements ClusterSetupStrategy
 
     final LuceneImpl manager;
     final LuceneConfig config;
-    final ProductOperation productOperation;
+    final TrackerOperation trackerOperation;
 
 
-    public LuceneSetupStrategy( LuceneImpl manager, LuceneConfig config, ProductOperation po )
+    public LuceneSetupStrategy( LuceneImpl manager, LuceneConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;
-        this.productOperation = po;
+        this.trackerOperation = po;
     }
 
 
