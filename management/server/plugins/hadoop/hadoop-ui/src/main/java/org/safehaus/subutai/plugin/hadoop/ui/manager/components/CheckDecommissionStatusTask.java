@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -49,8 +49,8 @@ public class CheckDecommissionStatusTask implements Runnable {
 
         if ( trackID != null ) {
             while ( true ) {
-                ProductOperationView prevPo =
-                        tracker.getProductOperation(HadoopClusterConfig.PRODUCT_KEY, trackID);
+                TrackerOperationView prevPo =
+                        tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
                 if ( prevPo.getState() == ProductOperationState.RUNNING ) {
                     try {
                         Thread.sleep( 1000 );
@@ -71,8 +71,8 @@ public class CheckDecommissionStatusTask implements Runnable {
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() ) {
-            ProductOperationView po =
-                    tracker.getProductOperation(HadoopClusterConfig.PRODUCT_KEY, trackID);
+            TrackerOperationView po =
+                    tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null && po.getState() != ProductOperationState.RUNNING ) {
                 if ( po.getLog().contains( NodeState.STOPPED.toString() ) ) {
                     state = NodeState.STOPPED;
@@ -98,8 +98,8 @@ public class CheckDecommissionStatusTask implements Runnable {
             trackID = hadoop.checkDecomissionStatus(hadoopClusterConfig);
             start = System.currentTimeMillis();
             while ( !Thread.interrupted() ) {
-                ProductOperationView po =
-                        tracker.getProductOperation(HadoopClusterConfig.PRODUCT_KEY, trackID);
+                TrackerOperationView po =
+                        tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
                 if ( po != null && po.getState() != ProductOperationState.RUNNING ) {
                     operationLog = po.getLog();
                     break;

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
 class OverHadoopSetupStrategy extends PigSetupStrategy
 {
 
-    public OverHadoopSetupStrategy( PigImpl manager, PigConfig config, ProductOperation po )
+    public OverHadoopSetupStrategy( PigImpl manager, PigConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -47,7 +47,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
             Agent node = it.next();
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
-                productOperation.addLog(
+                trackerOperation.addLog(
                         String.format( "Node %s is not connected. Omitting this node from installation",
                                 node.getHostname() ) );
                 it.remove();
@@ -59,10 +59,10 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
             throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
         }
 
-        productOperation.addLog( "Checking prerequisites..." );
+        trackerOperation.addLog( "Checking prerequisites..." );
 
         // Check installed packages
-        productOperation.addLog( "Installing Pig..." );
+        trackerOperation.addLog( "Installing Pig..." );
 
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
@@ -79,7 +79,7 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
 
             if ( result.getStdOut().contains( PigConfig.PRODUCT_PACKAGE ) )
             {
-                productOperation.addLog(
+                trackerOperation.addLog(
                         String.format( "Node %s already has Pig installed. Omitting this node from installation",
                                 node.getHostname() ) );
                 it.remove();
@@ -96,13 +96,13 @@ class OverHadoopSetupStrategy extends PigSetupStrategy
         manager.getCommandRunner().runCommand( installCommand );
         if ( installCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Installation succeeded" );
-            productOperation.addLog( "Updating db..." );
+            trackerOperation.addLog( "Installation succeeded" );
+            trackerOperation.addLog( "Updating db..." );
             manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
 
         return config;

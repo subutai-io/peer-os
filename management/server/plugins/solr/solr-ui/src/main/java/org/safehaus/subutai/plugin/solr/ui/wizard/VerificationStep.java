@@ -45,6 +45,7 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Installation Name", wizard.getSolrClusterConfig().getClusterName() );
 
         Button install = new Button( "Install" );
+        install.setId("SlrVerInstall");
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -67,6 +68,7 @@ public class VerificationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
+        back.setId("SlrConfBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

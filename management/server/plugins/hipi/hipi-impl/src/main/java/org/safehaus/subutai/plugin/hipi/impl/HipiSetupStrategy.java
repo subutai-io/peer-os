@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hipi.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
 import org.safehaus.subutai.plugin.hipi.api.SetupType;
 
@@ -13,14 +13,14 @@ abstract class HipiSetupStrategy implements ClusterSetupStrategy
 
     final HipiImpl manager;
     final HipiConfig config;
-    final ProductOperation productOperation;
+    final TrackerOperation trackerOperation;
 
 
-    public HipiSetupStrategy( HipiImpl manager, HipiConfig config, ProductOperation po )
+    public HipiSetupStrategy( HipiImpl manager, HipiConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;
-        this.productOperation = po;
+        this.trackerOperation = po;
     }
 
 

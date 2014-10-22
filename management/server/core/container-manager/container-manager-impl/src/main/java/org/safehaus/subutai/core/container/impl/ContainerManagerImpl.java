@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -44,9 +45,8 @@ import org.safehaus.subutai.core.container.api.ContainerException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.monitor.api.Metric;
+import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
@@ -66,6 +66,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    private static final int MAX_LXC_NAME = 15;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
     private final Queue<ContainerEventListener> listeners = new ConcurrentLinkedQueue<>();
     private ConcurrentMap<String, AtomicInteger> sequences;
@@ -435,7 +436,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
                 if ( serverMetric != null )
                 {
                     Agent agent = agentManager.getAgentByUUID( result.getAgentUUID() );
-                    Map<Metric, Double> averageMetrics = gatherAvgMetrics( agent );
+                    Map<MetricType, Double> averageMetrics = gatherAvgMetrics( agent );
                     serverMetric.setAverageMetrics( averageMetrics );
                     serverMetrics.put( agent, serverMetric );
                 }
@@ -599,7 +600,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
     /**
      * Gather metrics from elastic search for a one week period
      */
-    private Map<Metric, Double> gatherAvgMetrics( Agent agent )
+    private Map<MetricType, Double> gatherAvgMetrics( Agent agent )
     {
 
         if ( agent == null )
@@ -610,22 +611,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         cal.add( Calendar.DATE, -7 );
         Date startDate = cal.getTime();
         Date endDate = Calendar.getInstance().getTime();
-        Map<Metric, Double> averageMetrics = new EnumMap<>( Metric.class );
-        for ( Metric metricKey : Metric.values() )
-        {
-            Map<Date, Double> metricMap = monitoring.getData( agent.getHostname(), metricKey, startDate, endDate );
-            if ( !metricMap.isEmpty() )
-            {
-                double avg = 0;
-                for ( Map.Entry<Date, Double> metricEntry : metricMap.entrySet() )
-                {
-                    avg += metricEntry.getValue();
-                }
-                avg /= metricMap.size();
-
-                averageMetrics.put( metricKey, avg );
-            }
-        }
+        Map<MetricType, Double> averageMetrics = new EnumMap<>( MetricType.class );
         return averageMetrics;
     }
 
@@ -747,7 +733,10 @@ public class ContainerManagerImpl extends ContainerManagerBase
         }
         while ( true )
         {
-            String name = templateName + i.incrementAndGet();
+            String suffix = String.valueOf( i.incrementAndGet() );
+            int prefixLen = MAX_LXC_NAME - suffix.length();
+            String name = ( templateName.length() > prefixLen ? templateName.substring( 0, prefixLen ) : templateName )
+                    + suffix;
             if ( !existingNames.contains( name ) )
             {
                 return name;

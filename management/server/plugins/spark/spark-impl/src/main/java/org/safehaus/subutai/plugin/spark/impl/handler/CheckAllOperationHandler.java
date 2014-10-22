@@ -14,7 +14,7 @@ public class CheckAllOperationHandler extends AbstractOperationHandler<SparkImpl
     public CheckAllOperationHandler( SparkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Checking state of all nodes in %s", clusterName ) );
     }
 
@@ -25,7 +25,7 @@ public class CheckAllOperationHandler extends AbstractOperationHandler<SparkImpl
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -34,11 +34,11 @@ public class CheckAllOperationHandler extends AbstractOperationHandler<SparkImpl
 
         if ( checkStatusCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "All nodes are running." );
+            trackerOperation.addLogDone( "All nodes are running." );
         }
         else
         {
-            productOperation.addLogFailed( "Could not check all nodes successfully !" );
+            trackerOperation.addLogFailed( "Could not check all nodes successfully !" );
         }
     }
 }

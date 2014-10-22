@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +47,11 @@ public class RestServiceImpl implements RestService
         {
             UUID poUUID = UUID.fromString( uuid );
 
-            ProductOperationView productOperationView = tracker.getProductOperation( source, poUUID );
+            TrackerOperationView trackerOperationView = tracker.getTrackerOperation( source, poUUID );
 
-            if ( productOperationView != null )
+            if ( trackerOperationView != null )
             {
-                return Response.ok().entity( GSON.toJson( productOperationView ) ).build();
+                return Response.ok().entity( GSON.toJson( trackerOperationView ) ).build();
             }
             else
             {
@@ -60,7 +60,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( NullPointerException | IllegalArgumentException e )
         {
-            LOG.error( "Error in getProductOperation", e );
+            LOG.error( "Error in getTrackerOperation", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -76,13 +76,13 @@ public class RestServiceImpl implements RestService
             Date fromDat = df.parse( fromDate + " 00:00:00" );
             Date toDat = df.parse( toDate + " 23:59:59" );
 
-            List<ProductOperationView> pos = tracker.getProductOperations( source, fromDat, toDat, limit );
+            List<TrackerOperationView> pos = tracker.getTrackerOperations( source, fromDat, toDat, limit );
 
             return Response.ok().entity( GSON.toJson( pos ) ).build();
         }
         catch ( ParseException e )
         {
-            LOG.error( "Error in getProductOperations", e );
+            LOG.error( "Error in getTrackerOperations", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
     }
@@ -91,6 +91,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getProductOperationSources()
     {
-        return Response.ok().entity( GSON.toJson( tracker.getProductOperationSources() ) ).build();
+        return Response.ok().entity( GSON.toJson( tracker.getTrackerOperationSources() ) ).build();
     }
 }

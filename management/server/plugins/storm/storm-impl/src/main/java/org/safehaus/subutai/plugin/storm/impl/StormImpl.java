@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
@@ -158,7 +158,7 @@ public class StormImpl extends StormBase
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, StormConfig config,
-                                                         ProductOperation po )
+                                                         TrackerOperation po )
     {
 
         return new StormSetupStrategyDefault( this, config, environment, po );

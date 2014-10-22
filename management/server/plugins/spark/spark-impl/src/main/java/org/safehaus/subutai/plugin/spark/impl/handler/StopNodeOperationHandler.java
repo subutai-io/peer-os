@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -21,7 +21,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SparkImpl
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         this.master = master;
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping node %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -29,7 +29,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SparkImpl
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

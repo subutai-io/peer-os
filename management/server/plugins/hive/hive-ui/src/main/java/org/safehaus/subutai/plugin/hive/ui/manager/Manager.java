@@ -11,7 +11,7 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -53,17 +53,18 @@ public class Manager
     protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
     protected static final String ADD_NODE_BUTTON_CAPTION = "Add Node";
-    protected static final String SERVER_TABLE_CAPTION = "Nodes";
+    protected static final String SERVER_TABLE_CAPTION = "Server Nodes";
+    protected static final String CLIENT_TABLE_CAPTION = "Client Nodes";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected static final String BUTTON_STYLE_NAME = "default";
-    private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String MESSAGE = "No cluster is installed !";
     final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
 
     private final ComboBox clusterCombo;
-    private final Table nodesTable;
+    private final Table serverTable, clientsTable;
     private final Hive hive;
     private final ExecutorService executorService;
     private final Tracker tracker;
@@ -89,8 +90,14 @@ public class Manager
         contentRoot.setColumns( 1 );
 
         //tables go here
+        serverTable = createTableTemplate(SERVER_TABLE_CAPTION);
+        serverTable.setId("HiveTable");
+        clientsTable = createTableTemplate(CLIENT_TABLE_CAPTION);
+        clientsTable.setId("HiveClientsTable");
+        /*
         nodesTable = createTableTemplate( SERVER_TABLE_CAPTION );
-
+        nodesTable.setId("HiveTable");
+*/
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -99,6 +106,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
+        clusterCombo.setId("HiveClusterCb");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -115,6 +123,7 @@ public class Manager
 
         /** Refresh Cluster Button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
+        refreshClustersBtn.setId("hiveRefreshClusterBtn");
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -127,11 +136,13 @@ public class Manager
 
         /** Destroy Cluster Button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.setId("HiveDestroyClusterBtn");
         addClickListenerToDestroyClusterButton();
 
 
         /** Add Node Button */
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId("HiveAddNodeBtn");
         addClickListenerToAddNodeButton();
 
 
@@ -145,10 +156,12 @@ public class Manager
         tablesLayout.setSizeFull();
         tablesLayout.setSpacing( true );
 
-        addGivenComponents( tablesLayout, nodesTable );
+        addGivenComponents( tablesLayout, serverTable );
+        addGivenComponents( tablesLayout, clientsTable );
 
 
         PROGRESS_ICON.setVisible( false );
+        PROGRESS_ICON.setId("indicator");
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( tablesLayout, 0, 1, 0, 9 );
@@ -241,12 +254,12 @@ public class Manager
 
     public void checkServer()
     {
-        if ( nodesTable != null )
+        if ( serverTable != null )
         {
-            for ( Object o : nodesTable.getItemIds() )
+            for ( Object o : serverTable.getItemIds() )
             {
                 int rowId = ( Integer ) o;
-                Item row = nodesTable.getItem( rowId );
+                Item row = serverTable.getItem( rowId );
                 HorizontalLayout availableOperationsLayout =
                         ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
                 if ( availableOperationsLayout != null )
@@ -333,11 +346,15 @@ public class Manager
     {
         if ( config != null )
         {
-            populateTable( nodesTable, config.getAllNodes() );
+            Set<Agent> cli_agents = new HashSet<>();
+            cli_agents.add(config.getServer());
+            populateTable( serverTable, cli_agents );
+            populateTable( clientsTable, config.getClients() );
         }
         else
         {
-            nodesTable.removeAllItems();
+            serverTable.removeAllItems();
+            clientsTable.removeAllItems();
         }
     }
 
@@ -349,9 +366,13 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
+            checkBtn.setId(agent.getListIP().get(0)+"-hiveCheck");
             final Button startBtn = new Button( START_BUTTON_CAPTION );
+            startBtn.setId(agent.getListIP().get(0)+"-hiveStart");
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
+            stopBtn.setId(agent.getListIP().get(0)+"-hiveStop");
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            destroyBtn.setId(agent.getListIP().get(0)+"-hiveDestroy");
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
@@ -402,7 +423,7 @@ public class Manager
             }
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ), checkNodeRole( agent ), availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ),checkNodeRole(agent), availableOperations
             }, null );
 
             addClickListenerToCheckButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
@@ -474,10 +495,10 @@ public class Manager
                     @Override
                     public void run()
                     {
-                        ProductOperationView po = null;
+                        TrackerOperationView po = null;
                         while ( po == null || po.getState() == ProductOperationState.RUNNING )
                         {
-                            po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, trackID );
+                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
                         }
                         getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                         checkServer();
@@ -503,10 +524,10 @@ public class Manager
                     @Override
                     public void run()
                     {
-                        ProductOperationView po = null;
+                        TrackerOperationView po = null;
                         while ( po == null || po.getState() == ProductOperationState.RUNNING )
                         {
-                            po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, trackID );
+                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
                         }
                         getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                         checkServer();
@@ -532,10 +553,10 @@ public class Manager
                     @Override
                     public void run()
                     {
-                        ProductOperationView po = null;
+                        TrackerOperationView po = null;
                         while ( po == null || po.getState() == ProductOperationState.RUNNING )
                         {
-                            po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, trackId );
+                            po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackId );
                         }
                         PROGRESS_ICON.setVisible( false );
                         boolean running = po.getState() == ProductOperationState.SUCCEEDED;

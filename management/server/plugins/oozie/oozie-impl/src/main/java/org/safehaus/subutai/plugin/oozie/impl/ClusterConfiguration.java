@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.oozie.impl;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -19,14 +19,14 @@ import com.google.common.collect.Sets;
 public class ClusterConfiguration
 {
 
-    private ProductOperation po;
+    private TrackerOperation po;
     private OozieImpl manager;
 
 
-    public ClusterConfiguration( final ProductOperation productOperation, final OozieImpl oozieManager )
+    public ClusterConfiguration( final TrackerOperation trackerOperation, final OozieImpl oozieManager )
     {
 
-        this.po = productOperation;
+        this.po = trackerOperation;
         this.manager = oozieManager;
     }
 

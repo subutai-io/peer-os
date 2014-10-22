@@ -46,7 +46,7 @@ public class Commands
     public Command getUninstallCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand( "Uninstall Mahout",
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-mahout" ).withTimeout( 60 ), agents );
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-mahout" ).withTimeout( 600 ), agents );
     }
 
 

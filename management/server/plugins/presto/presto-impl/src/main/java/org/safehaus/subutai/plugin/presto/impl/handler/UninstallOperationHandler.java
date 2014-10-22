@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
@@ -17,7 +17,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
     public UninstallOperationHandler( PrestoImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( PrestoClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
 
@@ -25,7 +25,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -71,7 +71,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
 
     private boolean uninstall( PrestoClusterConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Presto..." );
 
         Command cmd = manager.getCommands().getUninstallCommand( config.getAllNodes() );
@@ -91,16 +91,16 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
     private boolean destroyNodes( PrestoClusterConfig config )
     {
 
-        productOperation.addLog( "Destroying node(s)..." );
+        trackerOperation.addLog( "Destroying node(s)..." );
         try
         {
             manager.getContainerManager().clonesDestroy( config.getAllNodes() );
-            productOperation.addLog( "Destroying node(s) completed" );
+            trackerOperation.addLog( "Destroying node(s) completed" );
             return true;
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+            trackerOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
             return false;
         }
     }

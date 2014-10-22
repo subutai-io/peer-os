@@ -17,7 +17,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -29,7 +29,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
 
         if ( solrClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -37,13 +37,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
 
         if ( agent == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
         if ( !solrClusterConfig.getNodes().contains( agent ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to installation %s", lxcHostname,
                             clusterName ) );
             return;
@@ -51,7 +51,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
 
         if ( solrClusterConfig.getNodes().size() == 1 )
         {
-            productOperation.addLogFailed( "This is the last node, destroy installation instead" );
+            trackerOperation.addLogFailed( "This is the last node, destroy installation instead" );
             return;
         }
 
@@ -59,12 +59,12 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
         solrClusterConfig.setNumberOfNodes( solrClusterConfig.getNumberOfNodes() - 1 );
 
         // Destroy lxc
-        productOperation.addLog( "Destroying lxc container..." );
+        trackerOperation.addLog( "Destroying lxc container..." );
         Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
 
         if ( physicalAgent == null )
         {
-            productOperation.addLog(
+            trackerOperation.addLog(
                     String.format( "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
                             agent.getHostname() ) );
         }
@@ -73,21 +73,21 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
             try
             {
                 manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
-                productOperation.addLog( "Lxc container destroyed successfully" );
+                trackerOperation.addLog( "Lxc container destroyed successfully" );
             }
             catch ( LxcDestroyException e )
             {
-                productOperation.addLog(
+                trackerOperation.addLog(
                         String.format( "Could not destroy lxc container, %s. Use LXC module to cleanup, skipping...",
                                 e.getMessage() ) );
             }
         }
 
         // Update db
-        productOperation.addLog( "Saving information to database..." );
+        trackerOperation.addLog( "Saving information to database..." );
 
         manager.getPluginDAO()
                .saveInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName(), solrClusterConfig );
-        productOperation.addLogDone( "Saved information to database" );
+        trackerOperation.addLogDone( "Saved information to database" );
     }
 }

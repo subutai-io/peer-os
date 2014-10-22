@@ -25,7 +25,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
         super( manager, clusterName );
         this.propertyName = propertyName;
         Preconditions.checkArgument( !Strings.isNullOrEmpty( propertyName ), "Property name is null or empty" );
-        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Removing property %s", propertyName ) );
     }
 
@@ -33,7 +33,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -44,11 +44,11 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
         final AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Removing property..." );
+        trackerOperation.addLog( "Removing property..." );
 
         Command removePropertyCommand =
                 manager.getCommands().getRemovePropertyCommand( propertyName, accumuloClusterConfig.getAllNodes() );
@@ -56,24 +56,24 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
 
         if ( removePropertyCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Property removed successfully\nRestarting cluster..." );
+            trackerOperation.addLog( "Property removed successfully\nRestarting cluster..." );
 
             Command restartClusterCommand =
                     manager.getCommands().getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() )
             {
-                productOperation.addLogDone( "Cluster restarted successfully" );
+                trackerOperation.addLogDone( "Cluster restarted successfully" );
             }
             else
             {
-                productOperation.addLogFailed(
+                trackerOperation.addLogFailed(
                         String.format( "Cluster restart failed, %s", restartClusterCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Removing property failed, %s", removePropertyCommand.getAllErrors() ) );
         }
     }

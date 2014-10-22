@@ -6,7 +6,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -26,12 +26,12 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy
 
 
     private final AccumuloImpl accumuloManager;
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final AccumuloClusterConfig accumuloClusterConfig;
 
 
     public AccumuloOverZkNHadoopSetupStrategy( final AccumuloClusterConfig accumuloClusterConfig,
-                                               final ProductOperation po, final AccumuloImpl accumuloManager )
+                                               final TrackerOperation po, final AccumuloImpl accumuloManager )
     {
 
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );

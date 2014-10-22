@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -28,15 +28,16 @@ public class ServiceStatusHandler extends AbstractOperationHandler<FlumeImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation =
-                manager.getTracker().createProductOperation( FlumeConfig.PRODUCT_KEY, "Check service on node " + hostname );
+        this.trackerOperation =
+                manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
+                        "Check service on node " + hostname );
     }
 
 
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         if ( manager.getCluster( clusterName ) == null )
         {
             po.addLogFailed( "Cluster does not exist: " + clusterName );
@@ -69,12 +70,12 @@ public class ServiceStatusHandler extends AbstractOperationHandler<FlumeImpl>
         }
         else
         {
-            logStatusResults( productOperation, cmd );
+            logStatusResults( trackerOperation, cmd );
         }
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    private void logStatusResults( TrackerOperation po, Command checkStatusCommand )
     {
 
         StringBuilder log = new StringBuilder();

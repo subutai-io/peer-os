@@ -9,9 +9,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
-import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -54,8 +53,8 @@ public class EnvironmentTest
     @Test
     public void testNodesNotNull() throws Exception
     {
-        Set<Node> nodes = environment.getNodes();
-        assertNotNull( nodes );
+        Set<EnvironmentContainer> environmentContainers = environment.getContainers();
+        assertNotNull( environmentContainers );
     }
 
 

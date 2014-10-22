@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -28,7 +28,7 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
         super( manager, clusterName );
         this.newMasterHostname = newMasterHostname;
         this.keepSlave = keepSlave;
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Changing master to %s in %s", newMasterHostname, clusterName ) );
     }
 
@@ -36,7 +36,7 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         final SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -128,7 +128,7 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
                         @Override
                         public void onResponse( Response response, AgentResult agentResult, Command command )
                         {
-                            okCount.set( StringUtil.countNumberOfOccurences( agentResult.getStdOut(), "starting" ) );
+                            okCount.set( StringUtil.countNumberOfOccurrences( agentResult.getStdOut(), "starting" ) );
 
                             if ( okCount.get() >= config.getAllNodes().size() )
                             {

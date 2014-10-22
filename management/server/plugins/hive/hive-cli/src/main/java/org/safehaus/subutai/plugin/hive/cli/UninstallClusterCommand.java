@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.hive.cli;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -58,7 +58,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport
         int logSize = 0;
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( HiveConfig.PRODUCT_KEY, uuid );
+            TrackerOperationView po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, uuid );
             if ( po != null )
             {
                 if ( logSize != po.getLog().length() )

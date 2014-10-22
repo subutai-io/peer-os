@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
@@ -23,7 +23,7 @@ import com.google.common.collect.Sets;
  */
 public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 {
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final String lxcHostname;
 
 
@@ -31,7 +31,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImp
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( MongoClusterConfig.PRODUCT_KEY,
                 String.format( "Starting node %s in %s", lxcHostname, clusterName ) );
     }
 

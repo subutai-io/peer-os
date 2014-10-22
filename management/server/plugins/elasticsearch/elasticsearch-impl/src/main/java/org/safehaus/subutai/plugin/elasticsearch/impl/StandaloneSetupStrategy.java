@@ -9,9 +9,9 @@ import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 import com.google.common.base.Preconditions;
@@ -23,13 +23,13 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
 
     private final ElasticsearchClusterConfiguration config;
     private final ElasticsearchImpl elasticsearchManager;
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final Environment environment;
 
 
     public StandaloneSetupStrategy( final Environment environment,
                                     final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration,
-                                    ProductOperation po, ElasticsearchImpl elasticsearchManager )
+                                    TrackerOperation po, ElasticsearchImpl elasticsearchManager )
     {
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( elasticsearchClusterConfiguration, "Cluster config is null" );
@@ -59,16 +59,16 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
-        if ( environment.getNodes().size() < config.getNumberOfNodes() )
+        if ( environment.getContainers().size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
-                    config.getNumberOfNodes(), environment.getNodes().size() ) );
+                    config.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
         Set<Agent> elasticsearhcNodes = new HashSet<Agent>();
-        for ( Node node : environment.getNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            elasticsearhcNodes.add( node.getAgent() );
+            elasticsearhcNodes.add( environmentContainer.getAgent() );
         }
         config.setNodes( elasticsearhcNodes );
 

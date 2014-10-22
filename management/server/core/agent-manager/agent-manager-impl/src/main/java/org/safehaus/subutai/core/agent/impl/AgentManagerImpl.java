@@ -249,6 +249,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
     }
 
 
+    @Override
+    public Set<Agent> returnAgentsByGivenUUIDSet( final Set<UUID> agentUUIDs )
+    {
+        Set<Agent> agentSet = new HashSet<>();
+        for ( UUID uuid : agentUUIDs )
+        {
+            agentSet.add( getAgentByUUID( uuid ) );
+        }
+        return agentSet;
+    }
+
+
     /**
      * Returns agent by its node's hostname or null if agent is not connected
      *

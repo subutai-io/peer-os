@@ -7,9 +7,9 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -19,7 +19,7 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
     Environment environment;
 
 
-    public SetupStrategyWithHadoopSpark( SharkImpl manager, SharkClusterConfig config, ProductOperation po )
+    public SetupStrategyWithHadoopSpark( SharkImpl manager, SharkClusterConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -40,7 +40,7 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
         {
             throw new ClusterSetupException( "Environment not specified" );
         }
-        if ( environment.getNodes() == null || environment.getNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
@@ -55,7 +55,7 @@ public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements C
         {
             config.setNodes( new HashSet<Agent>() );
         }
-        for ( Node n : environment.getNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
             {

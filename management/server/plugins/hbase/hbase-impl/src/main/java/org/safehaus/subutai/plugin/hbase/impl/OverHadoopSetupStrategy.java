@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -19,7 +19,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupStrategy
 {
 
-    public OverHadoopSetupStrategy( HBaseImpl manager, ProductOperation po, HBaseClusterConfig config )
+    public OverHadoopSetupStrategy( HBaseImpl manager, TrackerOperation po, HBaseClusterConfig config )
     {
         super( po, manager, config );
     }
@@ -69,14 +69,14 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
         }
 
         // check if nodes are connected
-        if ( manager.agentManager.getAgentByHostname( config.getHbaseMaster().getHostname() ) == null )
+        if ( manager.getAgentManager().getAgentByHostname( config.getHbaseMaster().getHostname() ) == null )
         {
             throw new ClusterSetupException( "Master node is not connected" );
         }
 
         for ( Agent a : config.getRegionServers() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
                 throw new ClusterSetupException( "Not all region server are connected" );
             }
@@ -84,7 +84,7 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
 
         for ( Agent a : config.getQuorumPeers() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
                 throw new ClusterSetupException( "Not all quorum peer nodes are connected" );
             }
@@ -92,14 +92,14 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
 
         for ( Agent a : config.getBackupMasters() )
         {
-            if ( manager.agentManager.getAgentByHostname( a.getHostname() ) == null )
+            if ( manager.getAgentManager().getAgentByHostname( a.getHostname() ) == null )
             {
                 throw new ClusterSetupException( "Not all backup master nodes are connected" );
             }
         }
 
         // check Hadoop cluster
-        HadoopClusterConfig hc = manager.hadoopManager.getCluster( config.getHadoopClusterName() );
+        HadoopClusterConfig hc = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
         if ( hc == null )
         {
             throw new ClusterSetupException( "Could not find Hadoop cluster " + config.getHadoopClusterName() );

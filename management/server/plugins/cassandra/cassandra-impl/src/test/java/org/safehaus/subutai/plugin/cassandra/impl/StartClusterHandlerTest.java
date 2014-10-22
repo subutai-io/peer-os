@@ -10,8 +10,8 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StartClusterHandler;
-import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 
 import static junit.framework.Assert.assertTrue;
@@ -49,7 +49,7 @@ public class StartClusterHandlerTest
         AbstractOperationHandler operationHandler = new StartClusterHandler( cassandraMock, "test-cluster" );
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 }

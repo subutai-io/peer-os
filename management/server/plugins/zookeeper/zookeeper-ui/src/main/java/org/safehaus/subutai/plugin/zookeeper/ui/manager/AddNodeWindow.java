@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -63,6 +63,7 @@ class AddNodeWindow extends Window
         topContent.addComponent( lblNodes );
 
         final ComboBox hadoopNodes = new ComboBox();
+        hadoopNodes.setId("ZookeeperMngHadoopNodes");
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
@@ -78,6 +79,7 @@ class AddNodeWindow extends Window
         topContent.addComponent( hadoopNodes );
 
         final Button addNodeBtn = new Button( "Add" );
+        addNodeBtn.setId("ZookeeperMngAddSelectedNode");
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
@@ -97,7 +99,8 @@ class AddNodeWindow extends Window
                     {
                         while ( track )
                         {
-                            ProductOperationView po = tracker.getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID );
+                            TrackerOperationView po = tracker.getTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+                                    trackID );
                             if ( po != null )
                             {
                                 setOutput(
@@ -128,6 +131,7 @@ class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setId("outputTxtArea");
         outputTxtArea.setRows( 10 );
         outputTxtArea.setWidth( 80, Unit.PERCENTAGE );
         outputTxtArea.setImmediate( true );
@@ -136,6 +140,7 @@ class AddNodeWindow extends Window
         content.addComponent( outputTxtArea );
 
         indicator = new Label();
+        indicator.setId("indicator");
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );
@@ -143,6 +148,7 @@ class AddNodeWindow extends Window
         indicator.setVisible( false );
 
         ok = new Button( "Ok" );
+        ok.setId("btnOk");
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {

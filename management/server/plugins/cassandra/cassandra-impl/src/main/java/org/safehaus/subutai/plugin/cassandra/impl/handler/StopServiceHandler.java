@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
@@ -23,7 +25,7 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping %s cluster...", clusterName ) );
     }
 
@@ -34,19 +36,19 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
         CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
         if ( cassandraConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
-        if ( !cassandraConfig.getNodes().contains( node ) )
+        if ( !cassandraConfig.getNodes().contains( UUID.fromString( node.getUuid().toString() ) ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -57,12 +59,12 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl>
         if ( stopServiceCommand.hasSucceeded() )
         {
             AgentResult ar = stopServiceCommand.getResults().get( node.getUuid() );
-            productOperation.addLog( ar.getStdOut() );
-            productOperation.addLogDone( "Stop succeeded" );
+            trackerOperation.addLog( ar.getStdOut() );
+            trackerOperation.addLogDone( "Stop succeeded" );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
         }
     }
 }

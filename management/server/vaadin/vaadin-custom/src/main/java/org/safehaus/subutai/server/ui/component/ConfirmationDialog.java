@@ -46,6 +46,7 @@ public class ConfirmationDialog
         buttons.setSpacing( true );
         l.addComponent( buttons );
 
+        cancel.setId("CancelAlertWindow");
         cancel.addStyleName( "small" );
         cancel.addStyleName( "wide" );
         cancel.addClickListener( new Button.ClickListener()
@@ -59,6 +60,7 @@ public class ConfirmationDialog
         buttons.addComponent( cancel );
 
 
+        ok.setId("OkAlertWindow");
         ok.addStyleName( "default" );
         ok.addStyleName( "small" );
         ok.addStyleName( "wide" );

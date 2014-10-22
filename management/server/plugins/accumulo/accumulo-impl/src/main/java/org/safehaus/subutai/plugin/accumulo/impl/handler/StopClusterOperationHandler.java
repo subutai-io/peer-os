@@ -19,7 +19,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
     {
         super( manager, clusterName );
 
-        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping cluster %s", clusterName ) );
     }
 
@@ -27,7 +27,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -37,30 +37,30 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
         AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() )
                 == null )
         {
-            productOperation.addLogFailed( String.format( "Master node '%s' is not connected",
+            trackerOperation.addLogFailed( String.format( "Master node '%s' is not connected",
                     accumuloClusterConfig.getMasterNode().getHostname() ) );
             return;
         }
 
-        productOperation.addLog( "Stopping cluster..." );
+        trackerOperation.addLog( "Stopping cluster..." );
 
         Command stopCommand = manager.getCommands().getStopCommand( accumuloClusterConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( stopCommand );
 
         if ( stopCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Cluster stopped successfully" );
+            trackerOperation.addLogDone( "Cluster stopped successfully" );
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Failed to stop cluster %s, %s", clusterName, stopCommand.getAllErrors() ) );
         }
     }

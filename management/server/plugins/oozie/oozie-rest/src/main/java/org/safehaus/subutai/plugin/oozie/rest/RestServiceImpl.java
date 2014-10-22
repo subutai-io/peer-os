@@ -104,7 +104,8 @@ public class RestServiceImpl implements RestService
             clients.add( agent );
             //            hadoopNodes.add( agent.getHostname() );
         }
-        clients.remove( tocc.getServerHostname() );
+        Agent agent = agentManager.getAgentByHostname( tocc.getServerHostname() );
+        clients.remove( agent );
         occ.setClients( clients );
         //        config.setHadoopNodes( hadoopNodes );
         occ.setHadoopClusterName( hadoopConfig.getClusterName() );

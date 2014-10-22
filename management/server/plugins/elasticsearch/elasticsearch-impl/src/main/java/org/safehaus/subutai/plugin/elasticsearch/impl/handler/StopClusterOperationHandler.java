@@ -16,7 +16,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Elasti
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Stopping %s cluster...", clusterName ) );
     }
 
@@ -26,7 +26,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Elasti
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
@@ -37,11 +37,11 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Elasti
 
         if ( stopServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Stop succeeded" );
+            trackerOperation.addLogDone( "Stop succeeded" );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
         }
     }
 }

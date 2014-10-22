@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -20,7 +20,7 @@ import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 class SetupStrategyOverHadoop extends HiveSetupStrategy
 {
 
-    public SetupStrategyOverHadoop( HiveImpl manager, HiveConfig config, ProductOperation po )
+    public SetupStrategyOverHadoop( HiveImpl manager, HiveConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -103,7 +103,7 @@ class SetupStrategyOverHadoop extends HiveSetupStrategy
         for ( Product p : new Product[] { Product.HIVE, Product.DERBY } )
         {
             s = Commands.make( CommandType.INSTALL, p );
-            cmd = manager.commandRunner.createCommand( new RequestBuilder( s ).withTimeout( 120 ),
+            cmd = manager.commandRunner.createCommand( new RequestBuilder( s ).withTimeout( 1200 ),
                     new HashSet<>( Arrays.asList( config.getServer() ) ) );
             manager.commandRunner.runCommand( cmd );
             if ( !cmd.hasSucceeded() )
@@ -119,7 +119,7 @@ class SetupStrategyOverHadoop extends HiveSetupStrategy
         po.addLog( "Installing clients..." );
         s = Commands.make( CommandType.INSTALL, Product.HIVE );
         cmd = manager.getCommandRunner()
-                     .createCommand( new RequestBuilder( s ).withTimeout( 120 ), config.getClients() );
+                     .createCommand( new RequestBuilder( s ).withTimeout( 1200 ), config.getClients() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

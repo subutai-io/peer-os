@@ -1,33 +1,37 @@
 package org.safehaus.subutai.plugin.hbase.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
+import org.safehaus.subutai.plugin.hbase.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.InstallHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.UninstallHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
@@ -35,21 +39,24 @@ import com.google.common.base.Preconditions;
 public class HBaseImpl implements HBase
 {
 
-    AgentManager agentManager;
-    Hadoop hadoopManager;
-    DbManager dbManager;
-    Tracker tracker;
-    ExecutorService executor;
-    CommandRunner commandRunner;
-    EnvironmentManager environmentManager;
-    ContainerManager containerManager;
-    PluginDAO pluginDAO;
-    Commands commands;
+    private static final Logger LOG = LoggerFactory.getLogger( HBaseImpl.class.getName() );
+    private AgentManager agentManager;
+    private Hadoop hadoopManager;
+    private Tracker tracker;
+    private ExecutorService executor;
+    private CommandRunner commandRunner;
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
+    private PluginDAO pluginDAO;
+    private Commands commands;
+    private DataSource dataSource;
 
 
-    public HBaseImpl()
+
+
+    public HBaseImpl( DataSource dataSource )
     {
-
+        this.dataSource = dataSource;
     }
 
 
@@ -74,18 +81,6 @@ public class HBaseImpl implements HBase
     public void setAgentManager( AgentManager agentManager )
     {
         this.agentManager = agentManager;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 
@@ -151,7 +146,14 @@ public class HBaseImpl implements HBase
 
     public void init()
     {
-        this.pluginDAO = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDAO( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
         this.commands = new Commands( commandRunner );
 
         commands = new Commands( commandRunner );
@@ -227,7 +229,7 @@ public class HBaseImpl implements HBase
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseClusterConfig config,
-                                                         final ProductOperation po )
+                                                         final TrackerOperation po )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {

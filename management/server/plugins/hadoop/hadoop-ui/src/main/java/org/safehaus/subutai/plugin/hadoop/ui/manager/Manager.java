@@ -72,7 +72,9 @@ public class Manager extends BaseManager {
 
         //tables go here
         masterNodesTable = createTableTemplate( "Master Nodes" );
+        masterNodesTable.setId("HadoopMasterNodesTable");
         slaveNodesTable = createTableTemplate( "Slave Nodes" );
+        slaveNodesTable.setId("HadoopSlaveNodesTable");
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -82,6 +84,7 @@ public class Manager extends BaseManager {
         controlsContent.addComponent( clusterNameLabel );
 
         clusterList = new ComboBox();
+        clusterList.setId("HadoopClustersCb");
         clusterList.setImmediate( true );
         clusterList.setTextInputAllowed( false );
         clusterList.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -96,6 +99,7 @@ public class Manager extends BaseManager {
         controlsContent.addComponent( clusterList );
 
         checkAllButton = new Button( CHECK_ALL_BUTTON_CAPTION );
+        checkAllButton.setId("HadoopCheckAll");
         checkAllButton.addStyleName( "default" );
         checkAllButton.addClickListener( managerListener.checkAllButtonListener( checkAllButton ) );
 
@@ -103,6 +107,7 @@ public class Manager extends BaseManager {
 
 
         Button startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
+        startAllBtn.setId("HadoopStartAll");
         startAllBtn.addStyleName( "default" );
         startAllBtn.addClickListener( new Button.ClickListener() {
             @Override
@@ -113,6 +118,7 @@ public class Manager extends BaseManager {
         controlsContent.addComponent( startAllBtn );
 
         Button stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
+        stopAllBtn.setId("HadoopStopAll");
         stopAllBtn.addStyleName( "default" );
         stopAllBtn.addClickListener( new Button.ClickListener() {
             @Override
@@ -123,12 +129,14 @@ public class Manager extends BaseManager {
         controlsContent.addComponent( stopAllBtn );
 
         Button destroyClusterButton = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterButton.setId("HadoopDestroyCluster");
         destroyClusterButton.addStyleName( "default" );
         destroyClusterButton.addClickListener( managerListener.destroyClusterButtonListener() );
 
         controlsContent.addComponent( destroyClusterButton );
 
         Button addNodeButton = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeButton.setId("HadoopaddNode");
         addNodeButton.addStyleName( "default" );
         addNodeButton.addClickListener( managerListener.addNodeButtonListener() );
 
@@ -271,10 +279,15 @@ public class Manager extends BaseManager {
 
         // Buttons to be added to availableOperations
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
+        checkButton.setId(agent.getListIP().get(0)+"-hadoopCheck");
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
+        destroyButton.setId(agent.getListIP().get(0)+"-hadoopDestroy");
         final Button startStopButton = new Button( START_STOP_BUTTON_DEFAULT_CAPTION );
+        startStopButton.setId(agent.getListIP().get(0)+"-hadoopStartStop");
         final Button excludeIncludeNodeButton = new Button( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION );
+        excludeIncludeNodeButton.setId(agent.getListIP().get(0)+"-hadoopExcludeInclude");
         final Button urlButton = new Button( URL_BUTTON_CAPTION );
+        urlButton.setId(agent.getHostname()+"-hadoopUrl");
 
         checkButton.addStyleName( "default" );
         startStopButton.addStyleName( "default" );
@@ -286,8 +299,11 @@ public class Manager extends BaseManager {
 
         // Labels to be added to statusGroup
         final Label statusDatanode = new Label( "" );
+        statusDatanode.setId(agent.getListIP().get(0)+"-hadoopStatusDataNode");
         final Label statusTaskTracker = new Label( "" );
+        statusTaskTracker.setId(agent.getListIP().get(0)+"-hadoopStatusTaskTracker");
         final Label statusDecommission = new Label( "" );
+        statusDecommission.setId(agent.getListIP().get(0)+"-hadoopStatusDecommission");
 
         statusDatanode.addStyleName( "default" );
         statusTaskTracker.addStyleName( "default" );

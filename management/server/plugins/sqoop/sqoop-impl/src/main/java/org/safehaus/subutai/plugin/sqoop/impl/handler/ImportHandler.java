@@ -8,7 +8,7 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
@@ -21,7 +21,7 @@ public class ImportHandler extends AbstractHandler
     private ImportSetting settings;
 
 
-    public ImportHandler( SqoopImpl manager, String clusterName, ProductOperation po )
+    public ImportHandler( SqoopImpl manager, String clusterName, TrackerOperation po )
     {
         super( manager, clusterName, po );
     }
@@ -43,7 +43,7 @@ public class ImportHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )
         {

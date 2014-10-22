@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -26,15 +26,15 @@ public class StopHandler extends AbstractHandler
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation =
-                manager.getTracker().createProductOperation( HiveConfig.PRODUCT_KEY, "Stop node " + hostname );
+        this.trackerOperation =
+                manager.getTracker().createTrackerOperation( HiveConfig.PRODUCT_KEY, "Stop node " + hostname );
     }
 
 
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         HiveConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

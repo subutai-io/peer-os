@@ -8,9 +8,8 @@ package org.safehaus.subutai.plugin.zookeeper.ui.manager;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -42,11 +41,10 @@ public class StopTask implements Runnable
         UUID trackID = zookeeper.stopNode( clusterName, lxcHostname );
 
         long start = System.currentTimeMillis();
-        NodeState state = NodeState.UNKNOWN;
 
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != ProductOperationState.RUNNING )

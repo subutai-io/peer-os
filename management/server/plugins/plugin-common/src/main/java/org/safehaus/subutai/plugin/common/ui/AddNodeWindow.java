@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import com.google.common.base.Strings;
@@ -54,6 +54,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox availableNodesComboBox = new ComboBox();
+        availableNodesComboBox.setId("AddNodeWindowAvailableNodes");
         availableNodesComboBox.setImmediate( true );
         availableNodesComboBox.setTextInputAllowed( false );
         availableNodesComboBox.setNullSelectionAllowed( false );
@@ -69,10 +70,12 @@ public class AddNodeWindow extends Window
         topContent.addComponent( availableNodesComboBox );
 
         final Button addNodeBtn = new Button( "Add" );
+        addNodeBtn.setId("AddNode");
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
         final Button ok = new Button( "Ok" );
+        ok.setId("btnOk");
 
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -95,8 +98,8 @@ public class AddNodeWindow extends Window
                     {
                         while ( track )
                         {
-                            ProductOperationView po =
-                                    tracker.getProductOperation( config.getProductKey(), trackID );
+                            TrackerOperationView po =
+                                    tracker.getTrackerOperation( config.getProductKey(), trackID );
                             if ( po != null )
                             {
                                 setOutput(
@@ -129,6 +132,7 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setId("outputTxtArea");
         outputTxtArea.setRows( 10 );
         outputTxtArea.setColumns( 30 );
         outputTxtArea.setImmediate( true );
@@ -137,6 +141,7 @@ public class AddNodeWindow extends Window
         content.addComponent( outputTxtArea );
 
         indicator = new Label();
+        indicator.setId("indicator");
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );

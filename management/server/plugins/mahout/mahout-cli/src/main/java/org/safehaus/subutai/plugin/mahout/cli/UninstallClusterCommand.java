@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.mahout.cli;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
@@ -58,7 +58,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport
         int logSize = 0;
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( MahoutClusterConfig.PRODUCT_KEY, uuid );
+            TrackerOperationView po = tracker.getTrackerOperation( MahoutClusterConfig.PRODUCT_KEY, uuid );
             if ( po != null )
             {
                 if ( logSize != po.getLog().length() )

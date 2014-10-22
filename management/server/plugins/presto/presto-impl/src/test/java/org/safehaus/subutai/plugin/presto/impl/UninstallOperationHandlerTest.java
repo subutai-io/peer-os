@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.SetupType;
@@ -34,7 +34,7 @@ public class UninstallOperationHandlerTest
     {
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
@@ -49,7 +49,7 @@ public class UninstallOperationHandlerTest
         mock.setClusterConfig( config );
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "uninstallation failed" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }

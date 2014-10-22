@@ -2,11 +2,13 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -24,7 +26,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        this.productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Checking all nodes of %s cluster...", clusterName ) );
     }
 
@@ -38,26 +40,27 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
-        Command checkStatusCommand = manager.getCommands().getStatusCommand( config.getNodes() );
+        Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
+        Command checkStatusCommand = manager.getCommands().getStatusCommand( agentSet );
         manager.getCommandRunner().runCommand( checkStatusCommand );
 
         if ( checkStatusCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "All nodes are running." );
+            trackerOperation.addLogDone( "All nodes are running." );
         }
         else
         {
-            logStatusResults( productOperation, checkStatusCommand );
+            logStatusResults( trackerOperation, checkStatusCommand );
         }
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    private void logStatusResults( TrackerOperation po, Command checkStatusCommand )
     {
 
         StringBuilder log = new StringBuilder();

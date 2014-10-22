@@ -17,9 +17,9 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
@@ -80,7 +80,7 @@ public class TrackerImpl implements Tracker
      *
      * @return - product operation view
      */
-    public ProductOperationView getProductOperation( String source, UUID operationTrackId )
+    public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
@@ -94,13 +94,13 @@ public class TrackerImpl implements Tracker
         }
         catch ( SQLException | RuntimeException e )
         {
-            LOG.error( "Error in getProductOperation", e );
+            LOG.error( "Error in getTrackerOperation", e );
         }
         return null;
     }
 
 
-    private ProductOperationViewImpl constructProductOperation( ResultSet rs ) throws SQLException
+    private TrackerOperationViewImpl constructProductOperation( ResultSet rs ) throws SQLException
     {
         if ( rs != null && rs.next() )
         {
@@ -108,8 +108,8 @@ public class TrackerImpl implements Tracker
             if ( infoClob != null && infoClob.length() > 0 )
             {
                 String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
-                ProductOperationImpl po = GSON.fromJson( info, ProductOperationImpl.class );
-                return new ProductOperationViewImpl( po );
+                TrackerOperationImpl po = GSON.fromJson( info, TrackerOperationImpl.class );
+                return new TrackerOperationViewImpl( po );
             }
         }
         return null;
@@ -124,7 +124,7 @@ public class TrackerImpl implements Tracker
      *
      * @return - true if all went well, false otherwise
      */
-    boolean saveProductOperation( String source, ProductOperationImpl po )
+    boolean saveProductOperation( String source, TrackerOperationImpl po )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( po, "Product operation is null" );
@@ -152,12 +152,12 @@ public class TrackerImpl implements Tracker
      *
      * @return - returns created product operation
      */
-    public ProductOperation createProductOperation( String source, String description )
+    public TrackerOperation createTrackerOperation( String source, String description )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
 
-        ProductOperationImpl po = new ProductOperationImpl( source.toLowerCase(), description, this );
+        TrackerOperationImpl po = new TrackerOperationImpl( source.toLowerCase(), description, this );
         if ( saveProductOperation( source, po ) )
         {
             return po;
@@ -176,20 +176,20 @@ public class TrackerImpl implements Tracker
      *
      * @return - list of product operation views
      */
-    public List<ProductOperationView> getProductOperations( String source, Date fromDate, Date toDate, int limit )
+    public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit )
     {
         Preconditions.checkArgument( limit > 0, "Limit must be greater than 0" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( fromDate, "From Date is null" );
         Preconditions.checkNotNull( toDate, "To Date is null" );
 
-        List<ProductOperationView> list = new ArrayList<>();
+        List<TrackerOperationView> list = new ArrayList<>();
         try
         {
             ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and ts between ? and ?"
                     + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
 
-            ProductOperationViewImpl productOperationViewImpl = constructProductOperation( rs );
+            TrackerOperationViewImpl productOperationViewImpl = constructProductOperation( rs );
             while ( productOperationViewImpl != null )
             {
                 list.add( productOperationViewImpl );
@@ -198,7 +198,7 @@ public class TrackerImpl implements Tracker
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
-            LOG.error( "Error in getProductOperations", ex );
+            LOG.error( "Error in getTrackerOperations", ex );
         }
         return list;
     }
@@ -209,7 +209,7 @@ public class TrackerImpl implements Tracker
      *
      * @return list of product operation sources
      */
-    public List<String> getProductOperationSources()
+    public List<String> getTrackerOperationSources()
     {
         List<String> sources = new ArrayList<>();
         try
@@ -227,7 +227,7 @@ public class TrackerImpl implements Tracker
         }
         catch ( SQLException e )
         {
-            LOG.error( "Error in getProductOperationSources", e );
+            LOG.error( "Error in getTrackerOperationSources", e );
         }
 
         return sources;
@@ -247,7 +247,7 @@ public class TrackerImpl implements Tracker
         long startedTs = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = getProductOperation( source.toLowerCase(), operationTrackId );
+            TrackerOperationView po = getTrackerOperation( source.toLowerCase(), operationTrackId );
             if ( po != null )
             {
                 //print log if anything new is appended to it
