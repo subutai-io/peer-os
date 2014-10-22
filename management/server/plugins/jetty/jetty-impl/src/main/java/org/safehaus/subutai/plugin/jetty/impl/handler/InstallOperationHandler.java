@@ -6,10 +6,9 @@ import java.util.UUID;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.jetty.api.Jetty;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
 
@@ -17,14 +16,14 @@ import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
 public class InstallOperationHandler extends AbstractOperationHandler<JettyImpl>
 {
     private JettyConfig config;
-    private ProductOperation po;
+    private TrackerOperation po;
 
 
     public InstallOperationHandler( final JettyImpl manager, final JettyConfig config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( JettyConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( JettyConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -39,7 +38,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<JettyImpl>
     @Override
     public void run()
     {
-        productOperation = po;
+        trackerOperation = po;
         po.addLog( "Building environment..." );
 
         try

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.flume.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -21,7 +21,7 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl>
     public UninstallHandler( FlumeImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.productOperation = manager.getTracker().createProductOperation( FlumeConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
                 "Destroy cluster " + clusterName );
     }
 
@@ -29,7 +29,7 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         FlumeConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -67,7 +67,7 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl>
     private boolean uninstallFlume( FlumeConfig config )
     {
 
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         // check if nodes are connected
         for ( Agent a : config.getNodes() )
         {
@@ -114,7 +114,7 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl>
 
     private boolean destroyNodes( FlumeConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Destroying container(s)..." );
         try
         {

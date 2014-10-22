@@ -27,7 +27,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Elastics
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
@@ -38,19 +38,19 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Elastics
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !elasticsearchClusterConfiguration.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -73,11 +73,11 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Elastics
 
         if ( ok.get() )
         {
-            productOperation.addLogDone( String.format( "Node %s started", node.getHostname() ) );
+            trackerOperation.addLogDone( String.format( "Node %s started", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Starting node %s failed, %s", node.getHostname(),
+            trackerOperation.addLogFailed( String.format( "Starting node %s failed, %s", node.getHostname(),
                     startNodeCommand.getAllErrors() ) );
         }
     }

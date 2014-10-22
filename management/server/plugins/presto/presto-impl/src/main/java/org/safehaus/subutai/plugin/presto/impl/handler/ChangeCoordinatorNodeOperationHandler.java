@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
@@ -25,7 +25,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
     {
         super( manager, clusterName );
         this.newCoordinatorHostname = newCoordinatorHostname;
-        productOperation = manager.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( PrestoClusterConfig.PRODUCT_KEY,
                 String.format( "Changing coordinator to %s in %s", newCoordinatorHostname, clusterName ) );
     }
 
@@ -33,7 +33,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         final PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 
@@ -18,7 +18,7 @@ import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 class SetupStrategyOverHadoop extends SqoopSetupStrategy
 {
 
-    public SetupStrategyOverHadoop( SqoopImpl manager, SqoopConfig config, ProductOperation po )
+    public SetupStrategyOverHadoop( SqoopImpl manager, SqoopConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }

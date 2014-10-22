@@ -19,6 +19,7 @@
              interface="org.safehaus.subutai.core.network.api.NetworkManager" />
   <reference id="peerCommandDispatcher"
              interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />
+  <reference id="tracker" interface="org.safehaus.subutai.core.tracker.api.Tracker" />
 
   <bean id="environmentManager" scope="singleton"
         init-method="init"
@@ -29,6 +30,7 @@
     <property name="agentManager" ref="agentManager" />
     <property name="networkManager" ref="networkManager" />
     <property name="peerCommandDispatcher" ref="peerCommandDispatcher" />
+    <property name="tracker" ref="tracker" />
     <argument ref="dataSource" />
   </bean>
 

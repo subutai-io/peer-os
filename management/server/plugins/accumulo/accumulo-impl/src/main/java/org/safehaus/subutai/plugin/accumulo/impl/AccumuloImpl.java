@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -301,7 +301,7 @@ public class AccumuloImpl implements Accumulo
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
                                                          AccumuloClusterConfig accumuloClusterConfig,
-                                                         ProductOperation po )
+                                                         TrackerOperation po )
     {
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );

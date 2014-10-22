@@ -17,7 +17,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SolrImpl>
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping node %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -29,7 +29,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SolrImpl>
 
         if ( solrClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -37,13 +37,13 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SolrImpl>
 
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
         if ( !solrClusterConfig.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -53,11 +53,11 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SolrImpl>
 
         if ( stopServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Stop succeeded" );
+            trackerOperation.addLogDone( "Stop succeeded" );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
         }
 
         //        productOperation.addLog( "Stopping node..." );

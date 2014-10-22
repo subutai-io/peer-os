@@ -28,8 +28,8 @@ public class CheckEnvironmentContainerNodeOperationHandlerTest
 
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 
 
@@ -42,7 +42,7 @@ public class CheckEnvironmentContainerNodeOperationHandlerTest
                 new CheckNodeOperationHandler( accumuloImpl, "test-cluster", "test-node" );
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not connected" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 }

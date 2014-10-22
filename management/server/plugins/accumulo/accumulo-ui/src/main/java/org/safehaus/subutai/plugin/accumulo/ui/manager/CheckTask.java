@@ -9,7 +9,7 @@ package org.safehaus.subutai.plugin.accumulo.ui.manager;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -44,7 +44,7 @@ public class CheckTask implements Runnable
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( AccumuloClusterConfig.PRODUCT_KEY, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != ProductOperationState.RUNNING )

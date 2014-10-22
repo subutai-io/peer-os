@@ -10,10 +10,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.core.tracker.impl.ProductOperationImpl;
-import org.safehaus.subutai.core.tracker.impl.ProductOperationViewImpl;
+import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
+import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 
 import com.google.common.collect.Lists;
@@ -42,19 +42,19 @@ public class TrackerComponentTest
     private static final String DESCRIPTION = "description";
     private static final UUID OPERATION_ID = UUID.randomUUID();
     private TrackerComponent trackerComponent;
-    private ProductOperationImpl po;
+    private TrackerOperationImpl po;
 
 
     @Before
     public void setUp() throws Exception
     {
         trackerComponent = new TrackerComponent( tracker, executorService );
-        po = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
-        final ProductOperationView productOperationView = new ProductOperationViewImpl( po );
-        when( tracker.getProductOperation( SOURCE, OPERATION_ID ) ).thenReturn( productOperationView );
-        when( tracker.getProductOperationSources() ).thenReturn( Lists.newArrayList( SOURCE ) );
-        when( tracker.getProductOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
-                .thenReturn( Lists.newArrayList( productOperationView ) );
+        po = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        final TrackerOperationView trackerOperationView = new TrackerOperationViewImpl( po );
+        when( tracker.getTrackerOperation( SOURCE, OPERATION_ID ) ).thenReturn( trackerOperationView );
+        when( tracker.getTrackerOperationSources() ).thenReturn( Lists.newArrayList( SOURCE ) );
+        when( tracker.getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
+                .thenReturn( Lists.newArrayList( trackerOperationView ) );
     }
 
 
@@ -93,7 +93,7 @@ public class TrackerComponentTest
 
         trackerComponent.refreshSources();
 
-        verify( tracker ).getProductOperationSources();
+        verify( tracker ).getTrackerOperationSources();
     }
 
 
@@ -108,7 +108,7 @@ public class TrackerComponentTest
         trackerComponent.populateLogs();
 
 
-        verify( tracker ).getProductOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() );
+        verify( tracker ).getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() );
     }
 
 
@@ -118,12 +118,12 @@ public class TrackerComponentTest
 
         trackerComponent.refreshSources();
         po.addLogDone( "" );
-        when( tracker.getProductOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
-                .thenReturn( Lists.<ProductOperationView>newArrayList( new ProductOperationViewImpl( po ) ) );
+        when( tracker.getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
+                .thenReturn( Lists.<TrackerOperationView>newArrayList( new TrackerOperationViewImpl( po ) ) );
 
         trackerComponent.populateOperations();
 
-        verify( tracker ).getProductOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() );
+        verify( tracker ).getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() );
     }
 
 
@@ -132,11 +132,11 @@ public class TrackerComponentTest
     {
         trackerComponent.refreshSources();
         po.addLogFailed( "" );
-        when( tracker.getProductOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
-                .thenReturn( Lists.<ProductOperationView>newArrayList( new ProductOperationViewImpl( po ) ) );
+        when( tracker.getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
+                .thenReturn( Lists.<TrackerOperationView>newArrayList( new TrackerOperationViewImpl( po ) ) );
 
         trackerComponent.populateOperations();
 
-        verify( tracker ).getProductOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() );
+        verify( tracker ).getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() );
     }
 }

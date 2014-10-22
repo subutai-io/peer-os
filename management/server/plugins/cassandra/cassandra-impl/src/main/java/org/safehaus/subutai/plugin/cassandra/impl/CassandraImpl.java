@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -17,7 +16,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -334,7 +333,7 @@ public class CassandraImpl implements Cassandra
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
                                                          final CassandraClusterConfig config,
-                                                         final ProductOperation po )
+                                                         final TrackerOperation po )
     {
         return new CassandraSetupStrategy( environment, config, po, this );
     }

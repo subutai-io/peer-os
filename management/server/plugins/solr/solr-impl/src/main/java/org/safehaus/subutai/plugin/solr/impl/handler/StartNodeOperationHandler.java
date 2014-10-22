@@ -22,7 +22,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Starting node %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -34,7 +34,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( solrClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -42,13 +42,13 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
         if ( !solrClusterConfig.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -72,11 +72,11 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( ok.get() )
         {
-            productOperation.addLogDone( String.format( "Node %s started", node.getHostname() ) );
+            trackerOperation.addLogDone( String.format( "Node %s started", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Starting node %s failed, %s", node.getHostname(),
+            trackerOperation.addLogFailed( String.format( "Starting node %s failed, %s", node.getHostname(),
                     startNodeCommand.getAllErrors() ) );
         }
 

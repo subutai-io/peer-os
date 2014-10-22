@@ -66,6 +66,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
     private static final Logger LOG = LoggerFactory.getLogger( ContainerManagerImpl.class );
     private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
+    private static final int MAX_LXC_NAME = 15;
     private final Pattern loadAveragePattern = Pattern.compile( "load average: (.*)" );
     private final Queue<ContainerEventListener> listeners = new ConcurrentLinkedQueue<>();
     private ConcurrentMap<String, AtomicInteger> sequences;
@@ -732,7 +733,10 @@ public class ContainerManagerImpl extends ContainerManagerBase
         }
         while ( true )
         {
-            String name = templateName + i.incrementAndGet();
+            String suffix = String.valueOf( i.incrementAndGet() );
+            int prefixLen = MAX_LXC_NAME - suffix.length();
+            String name = ( templateName.length() > prefixLen ? templateName.substring( 0, prefixLen ) : templateName )
+                    + suffix;
             if ( !existingNames.contains( name ) )
             {
                 return name;

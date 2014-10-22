@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
@@ -30,7 +30,7 @@ import com.google.common.base.Strings;
  */
 public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 {
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final NodeType nodeType;
 
 
@@ -38,7 +38,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
     {
         super( manager, clusterName );
         this.nodeType = nodeType;
-        po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( MongoClusterConfig.PRODUCT_KEY,
                 String.format( "Adding %s to %s...", nodeType, clusterName ) );
     }
 
@@ -121,7 +121,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
     }
 
 
-    private boolean addDataNode( ProductOperation po, final MongoClusterConfig config, Agent agent )
+    private boolean addDataNode( TrackerOperation po, final MongoClusterConfig config, Agent agent )
     {
         List<Command> commands = manager.getCommands().getAddDataNodeCommands( config, agent );
 
@@ -228,7 +228,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
     }
 
 
-    private boolean addRouter( ProductOperation po, final MongoClusterConfig config, Agent agent )
+    private boolean addRouter( TrackerOperation po, final MongoClusterConfig config, Agent agent )
     {
         List<Command> commands = manager.getCommands().getAddRouterCommands( config, agent );
 

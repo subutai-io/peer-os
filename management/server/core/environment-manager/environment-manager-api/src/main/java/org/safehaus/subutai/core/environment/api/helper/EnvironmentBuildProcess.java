@@ -18,7 +18,6 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 public class EnvironmentBuildProcess
 {
     private UUID uuid;
-    private boolean completeStatus;
     private ProcessStatusEnum processStatusEnum;
     private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
@@ -103,17 +102,5 @@ public class EnvironmentBuildProcess
     public void setUuid( final UUID uuid )
     {
         this.uuid = uuid;
-    }
-
-
-    public boolean isCompleteStatus()
-    {
-        return completeStatus;
-    }
-
-
-    public void setCompleteStatus( final boolean completeStatus )
-    {
-        this.completeStatus = completeStatus;
     }
 }

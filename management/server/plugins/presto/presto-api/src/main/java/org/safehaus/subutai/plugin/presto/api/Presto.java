@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -51,6 +51,6 @@ public interface Presto extends ApiBase<PrestoClusterConfig>
      */
     public UUID checkNode( String clusterName, String lxcHostName );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, PrestoClusterConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( TrackerOperation po, PrestoClusterConfig config,
                                                          Environment environment );
 }

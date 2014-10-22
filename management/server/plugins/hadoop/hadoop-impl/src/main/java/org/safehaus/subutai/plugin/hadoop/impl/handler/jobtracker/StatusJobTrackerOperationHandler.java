@@ -16,7 +16,7 @@ public class StatusJobTrackerOperationHandler extends AbstractOperationHandler<H
     public StatusJobTrackerOperationHandler( HadoopImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Checking JobTracker in %s", clusterName ) );
     }
 
@@ -28,20 +28,20 @@ public class StatusJobTrackerOperationHandler extends AbstractOperationHandler<H
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( hadoopClusterConfig.getJobTracker() == null )
         {
-            productOperation.addLogFailed( String.format( "JobTracker on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "JobTracker on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( hadoopClusterConfig.getJobTracker().getHostname() );
         if ( node == null )
         {
-            productOperation.addLogFailed( "JobTracker is not connected" );
+            trackerOperation.addLogFailed( "JobTracker is not connected" );
             return;
         }
 
@@ -77,11 +77,11 @@ public class StatusJobTrackerOperationHandler extends AbstractOperationHandler<H
 
         if ( NodeState.UNKNOWN.equals( nodeState ) )
         {
-            productOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
+            trackerOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogDone( String.format( "JobTracker of %s is %s", node.getHostname(), nodeState ) );
+            trackerOperation.addLogDone( String.format( "JobTracker of %s is %s", node.getHostname(), nodeState ) );
         }
     }
 }

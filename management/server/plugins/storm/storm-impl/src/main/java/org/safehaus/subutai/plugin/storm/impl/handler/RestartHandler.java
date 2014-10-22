@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.impl.CommandType;
 import org.safehaus.subutai.plugin.storm.impl.Commands;
@@ -25,15 +25,15 @@ public class RestartHandler extends AbstractHandler
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation =
-                manager.getTracker().createProductOperation( StormConfig.PRODUCT_NAME, "Restart node " + hostname );
+        this.trackerOperation =
+                manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME, "Restart node " + hostname );
     }
 
 
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         StormConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * This is an interface for product operation view
  */
-public interface ProductOperationView
+public interface TrackerOperationView
 {
 
     /**
