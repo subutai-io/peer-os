@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -12,12 +12,12 @@ import com.google.common.base.Preconditions;
 public class SetupBase
 {
 
-    final ProductOperation po;
+    final TrackerOperation po;
     final SparkImpl manager;
     final SparkClusterConfig config;
 
 
-    public SetupBase( ProductOperation po, SparkImpl manager, SparkClusterConfig config )
+    public SetupBase( TrackerOperation po, SparkImpl manager, SparkClusterConfig config )
     {
 
         Preconditions.checkNotNull( config, "Presto cluster config is null" );

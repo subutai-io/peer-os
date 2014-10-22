@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
@@ -18,7 +18,7 @@ import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 public class DestroyNodeHandler extends AbstractHandler
 {
 
-    public DestroyNodeHandler( SqoopImpl manager, String clusterName, ProductOperation po )
+    public DestroyNodeHandler( SqoopImpl manager, String clusterName, TrackerOperation po )
     {
         super( manager, clusterName, po );
     }
@@ -27,7 +27,7 @@ public class DestroyNodeHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         SqoopConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -83,17 +83,17 @@ public class DestroyNodeHandler extends AbstractHandler
             return;
         }
 
-        productOperation.addLog( "Destroying nodes..." );
+        trackerOperation.addLog( "Destroying nodes..." );
         try
         {
             manager.getContainerManager().clonesDestroy( config.getHadoopNodes() );
             manager.getLogger().info( "Destroyed {} node(s)", config.getHadoopNodes().size() );
-            productOperation.addLog( "Nodes successfully destroyed" );
+            trackerOperation.addLog( "Nodes successfully destroyed" );
         }
         catch ( LxcDestroyException ex )
         {
             String m = "Failed to destroy node(s)";
-            productOperation.addLog( m + ": " + ex.getMessage() );
+            trackerOperation.addLog( m + ": " + ex.getMessage() );
             manager.getLogger().error( m, ex );
         }
     }

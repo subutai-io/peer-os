@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.presto.impl;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
@@ -16,7 +16,7 @@ public class SetupStrategyWithHadoop extends SetupHelper implements ClusterSetup
     private Environment environment;
 
 
-    public SetupStrategyWithHadoop( ProductOperation po, PrestoImpl manager, PrestoClusterConfig config )
+    public SetupStrategyWithHadoop( TrackerOperation po, PrestoImpl manager, PrestoClusterConfig config )
     {
         super( po, manager, config );
     }

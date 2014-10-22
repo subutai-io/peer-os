@@ -19,7 +19,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<SparkI
     {
         super( manager, clusterName );
 
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping %s cluster", clusterName ) );
     }
 
@@ -31,7 +31,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<SparkI
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -52,11 +52,11 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<SparkI
 
         if ( ok.get() )
         {
-            productOperation.addLogDone( "All nodes are stopped successfully." );
+            trackerOperation.addLogDone( "All nodes are stopped successfully." );
         }
         else
         {
-            productOperation.addLogFailed( "Could not stop all nodes !" );
+            trackerOperation.addLogFailed( "Could not stop all nodes !" );
         }
     }
 }

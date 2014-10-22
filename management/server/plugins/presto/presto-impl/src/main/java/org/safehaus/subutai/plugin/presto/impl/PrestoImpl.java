@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.Presto;
@@ -164,7 +164,7 @@ public class PrestoImpl extends PrestoBase implements Presto
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final ProductOperation po, final PrestoClusterConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( final TrackerOperation po, final PrestoClusterConfig config,
                                                          final Environment environment )
     {
 

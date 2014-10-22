@@ -23,7 +23,7 @@ public class StartServiceHandler extends AbstractOperationHandler<JettyImpl>
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( JettyConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( JettyConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
@@ -34,19 +34,19 @@ public class StartServiceHandler extends AbstractOperationHandler<JettyImpl>
         JettyConfig jettyConfig = manager.getCluster( clusterName );
         if ( jettyConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !jettyConfig.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -60,13 +60,13 @@ public class StartServiceHandler extends AbstractOperationHandler<JettyImpl>
             if ( ar.getStdOut().contains( "starting Jetty ..." ) || ar.getStdOut()
                                                                           .contains( "is already running..." ) )
             {
-                productOperation.addLog( ar.getStdOut() );
-                productOperation.addLogDone( "Start succeeded" );
+                trackerOperation.addLog( ar.getStdOut() );
+                trackerOperation.addLogDone( "Start succeeded" );
             }
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
         }
     }
 }

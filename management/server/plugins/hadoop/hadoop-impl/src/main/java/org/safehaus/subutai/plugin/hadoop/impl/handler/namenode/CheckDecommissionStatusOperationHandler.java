@@ -16,7 +16,7 @@ public class CheckDecommissionStatusOperationHandler extends AbstractOperationHa
     public CheckDecommissionStatusOperationHandler( HadoopImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Checking decommissioning status of %s", clusterName ) );
     }
 
@@ -28,20 +28,20 @@ public class CheckDecommissionStatusOperationHandler extends AbstractOperationHa
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( hadoopClusterConfig.getNameNode() == null )
         {
-            productOperation.addLogFailed( String.format( "NameNode on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "NameNode on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
         if ( node == null )
         {
-            productOperation.addLogFailed( "NameNode is not connected" );
+            trackerOperation.addLogFailed( "NameNode is not connected" );
             return;
         }
 
@@ -52,7 +52,7 @@ public class CheckDecommissionStatusOperationHandler extends AbstractOperationHa
 
         if ( statusCommand.hasCompleted() )
         {
-            productOperation.addLogDone( result.getStdOut() );
+            trackerOperation.addLogDone( result.getStdOut() );
         }
     }
 }

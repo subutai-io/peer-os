@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hipi.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.hipi.api.HipiConfig;
@@ -22,7 +22,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<HipiIm
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( HipiConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HipiConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -30,7 +30,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<HipiIm
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         HipiConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -92,7 +92,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<HipiIm
 
     private boolean uninstall( Agent agent )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling " + HipiConfig.PRODUCT_KEY );
 
         Command cmd = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
@@ -120,7 +120,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<HipiIm
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
+            trackerOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
             return false;
         }
     }

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -18,13 +18,13 @@ public class ClusterConfiguration
 {
 
     private static final Logger LOG = Logger.getLogger( ClusterConfiguration.class.getName() );
-    private ProductOperation po;
+    private TrackerOperation po;
     private CassandraImpl cassandraManager;
 
 
-    public ClusterConfiguration( final ProductOperation productOperation, final CassandraImpl cassandraManager )
+    public ClusterConfiguration( final TrackerOperation trackerOperation, final CassandraImpl cassandraManager )
     {
-        this.po = productOperation;
+        this.po = trackerOperation;
         this.cassandraManager = cassandraManager;
     }
 

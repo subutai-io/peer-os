@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.lucene.api.LuceneConfig;
@@ -19,7 +19,7 @@ class WithHadoopSetupStrategy extends LuceneSetupStrategy
     Environment environment;
 
 
-    public WithHadoopSetupStrategy( LuceneImpl manager, LuceneConfig config, ProductOperation po )
+    public WithHadoopSetupStrategy( LuceneImpl manager, LuceneConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -78,9 +78,9 @@ class WithHadoopSetupStrategy extends LuceneSetupStrategy
             }
         }
 
-        productOperation.addLog( "Saving to db..." );
+        trackerOperation.addLog( "Saving to db..." );
         manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
-        productOperation.addLog( "Cluster info successfully saved" );
+        trackerOperation.addLog( "Cluster info successfully saved" );
 
         return config;
     }

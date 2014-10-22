@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.mahout.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
@@ -22,7 +22,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<MahoutImpl>
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( MahoutClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -30,7 +30,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<MahoutImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         MahoutClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -92,7 +92,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<MahoutImpl>
 
     private boolean uninstall( Agent agent )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Mahout..." );
 
         Command cmd = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
@@ -120,7 +120,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<MahoutImpl>
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
+            trackerOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
             return false;
         }
     }

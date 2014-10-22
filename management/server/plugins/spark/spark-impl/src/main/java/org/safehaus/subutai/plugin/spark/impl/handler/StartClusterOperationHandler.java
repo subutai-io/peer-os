@@ -18,7 +18,7 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Spark
     public StartClusterOperationHandler( SparkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster", clusterName ) );
     }
 
@@ -29,7 +29,7 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Spark
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -50,11 +50,11 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Spark
 
         if ( ok.get() )
         {
-            productOperation.addLogDone( "All nodes are started successfully." );
+            trackerOperation.addLogDone( "All nodes are started successfully." );
         }
         else
         {
-            productOperation.addLogFailed( "Could not start all nodes !" );
+            trackerOperation.addLogFailed( "Could not start all nodes !" );
         }
     }
 }

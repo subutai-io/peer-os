@@ -71,7 +71,7 @@ public class TrackerImplPersistenceTest
     public void shouldCallDbManagerExecuteUpdateWhenCreatePO() throws SQLException
     {
 
-        ti.createProductOperation( SOURCE, DESCRIPTION );
+        ti.createTrackerOperation( SOURCE, DESCRIPTION );
 
         verify( preparedStatement, times( 2 ) ).executeUpdate();
     }
@@ -81,7 +81,7 @@ public class TrackerImplPersistenceTest
     public void shouldCallDbManagerExecuteUpdateWhenSavePO() throws SQLException
     {
 
-        ProductOperationImpl poi = new ProductOperationImpl( SOURCE, DESCRIPTION, ti );
+        TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, ti );
 
         ti.saveProductOperation( SOURCE, poi );
 
@@ -93,7 +93,7 @@ public class TrackerImplPersistenceTest
     public void shouldCallDbManagerExecuteQueryWhenGetPO() throws SQLException
     {
 
-        ti.getProductOperation( SOURCE, poID );
+        ti.getTrackerOperation( SOURCE, poID );
 
         verify( preparedStatement ).executeUpdate();
     }
@@ -103,7 +103,7 @@ public class TrackerImplPersistenceTest
     public void shouldCallDbManagerExecuteQueryWhenGetPOs() throws SQLException
     {
 
-        ti.getProductOperations( SOURCE, mock( Date.class ), mock( Date.class ), 1 );
+        ti.getTrackerOperations( SOURCE, mock( Date.class ), mock( Date.class ), 1 );
 
         verify( preparedStatement ).executeUpdate();
     }
@@ -113,7 +113,7 @@ public class TrackerImplPersistenceTest
     public void shouldCallDbManagerExecuteQueryWhenGetPOSources() throws SQLException
     {
 
-        ti.getProductOperationSources();
+        ti.getTrackerOperationSources();
 
         verify( preparedStatement ).executeUpdate();
     }

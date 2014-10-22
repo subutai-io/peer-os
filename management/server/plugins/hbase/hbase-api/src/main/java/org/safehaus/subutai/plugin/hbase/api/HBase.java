@@ -12,7 +12,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
@@ -40,7 +40,7 @@ public interface HBase extends ApiBase<HBaseClusterConfig>
     //    HadoopClusterConfig getHadoopCluster( String clusterName );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseClusterConfig config,
-                                                         ProductOperation po );
+                                                         TrackerOperation po );
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint( HBaseClusterConfig config );
 

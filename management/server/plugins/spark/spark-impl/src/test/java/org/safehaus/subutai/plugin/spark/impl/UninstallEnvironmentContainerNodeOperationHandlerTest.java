@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.spark.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
@@ -32,7 +32,7 @@ public class UninstallEnvironmentContainerNodeOperationHandlerTest
     {
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }

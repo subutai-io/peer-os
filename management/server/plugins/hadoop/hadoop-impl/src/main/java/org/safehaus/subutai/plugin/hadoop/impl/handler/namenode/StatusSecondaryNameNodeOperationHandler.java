@@ -16,7 +16,7 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
     public StatusSecondaryNameNodeOperationHandler( HadoopImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Checking Secondary NameNode in %s", clusterName ) );
     }
 
@@ -28,13 +28,13 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( hadoopClusterConfig.getNameNode() == null )
         {
-            productOperation.addLogFailed( String.format( "Secondary NameNode on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Secondary NameNode on %s does not exist", clusterName ) );
             return;
         }
 
@@ -42,7 +42,7 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
                             .getAgentByHostname( hadoopClusterConfig.getSecondaryNameNode().getHostname() );
         if ( node == null )
         {
-            productOperation.addLogFailed( "Secondary NameNode is not connected" );
+            trackerOperation.addLogFailed( "Secondary NameNode is not connected" );
             return;
         }
         Command statusCommand = manager.getCommands().getNameNodeCommand( node, "status" );
@@ -78,12 +78,12 @@ public class StatusSecondaryNameNodeOperationHandler extends AbstractOperationHa
 
         if ( NodeState.UNKNOWN.equals( nodeState ) )
         {
-            productOperation.addLogFailed( String.format( "Failed to check status of %s, %s", node.getHostname(),
+            trackerOperation.addLogFailed( String.format( "Failed to check status of %s, %s", node.getHostname(),
                     statusCommand.getAllErrors() ) );
         }
         else
         {
-            productOperation
+            trackerOperation
                     .addLogDone( String.format( "Secondary NameNode %s is %s", node.getHostname(), nodeState ) );
         }
     }

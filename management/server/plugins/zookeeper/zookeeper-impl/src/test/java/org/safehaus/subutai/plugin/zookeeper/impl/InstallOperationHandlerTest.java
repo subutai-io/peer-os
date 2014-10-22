@@ -39,8 +39,8 @@ public class InstallOperationHandlerTest
         AbstractOperationHandler operationHandler = new InstallOperationHandler( zookeeperMock, config );
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "already exists" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "already exists" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 
 
@@ -63,8 +63,8 @@ public class InstallOperationHandlerTest
         AbstractOperationHandler operationHandler = new InstallOperationHandler( zookeeperMock, config );
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Malformed configuration" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Malformed configuration" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 
 
@@ -87,7 +87,7 @@ public class InstallOperationHandlerTest
         AbstractOperationHandler operationHandler = new InstallOperationHandler( zookeeperMock, config );
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Malformed configuration" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+        assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Malformed configuration" ) );
+        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
     }
 }

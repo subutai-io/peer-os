@@ -9,9 +9,9 @@ package org.safehaus.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 
 import com.google.common.base.Preconditions;
 
@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 /**
  * This is an implementation of ProductOperationView
  */
-public class ProductOperationViewImpl implements ProductOperationView
+public class TrackerOperationViewImpl implements TrackerOperationView
 {
 
     /**
@@ -44,7 +44,7 @@ public class ProductOperationViewImpl implements ProductOperationView
     private final Date createDate;
 
 
-    public ProductOperationViewImpl( ProductOperation po )
+    public TrackerOperationViewImpl( TrackerOperation po )
     {
         Preconditions.checkNotNull( po, "Product operation is null" );
 
@@ -104,7 +104,7 @@ public class ProductOperationViewImpl implements ProductOperationView
         {
             return false;
         }
-        final ProductOperationViewImpl other = ( ProductOperationViewImpl ) obj;
+        final TrackerOperationViewImpl other = ( TrackerOperationViewImpl ) obj;
         return !( this.id != other.id && ( this.id == null || !this.id.equals( other.id ) ) );
     }
 

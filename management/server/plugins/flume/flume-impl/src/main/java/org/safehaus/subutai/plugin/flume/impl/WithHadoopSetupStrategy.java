@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
@@ -19,7 +19,7 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy
     Environment environment;
 
 
-    public WithHadoopSetupStrategy( FlumeImpl manager, FlumeConfig config, ProductOperation po )
+    public WithHadoopSetupStrategy( FlumeImpl manager, FlumeConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }

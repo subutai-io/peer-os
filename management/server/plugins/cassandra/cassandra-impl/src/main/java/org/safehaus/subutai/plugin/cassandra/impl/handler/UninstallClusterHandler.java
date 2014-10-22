@@ -20,7 +20,7 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
 
@@ -28,29 +28,29 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
     @Override
     public void run()
     {
-        productOperation.addLog( "Building environment..." );
+        trackerOperation.addLog( "Building environment..." );
         CassandraClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Destroying lxc containers" );
+        trackerOperation.addLog( "Destroying lxc containers" );
         try
         {
             Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
             manager.getContainerManager().clonesDestroy( agentSet );
-            productOperation.addLog( "Lxc containers successfully destroyed" );
+            trackerOperation.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+            trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
 
-        productOperation.addLog( "Deleting cluster information from database.." );
+        trackerOperation.addLog( "Deleting cluster information from database.." );
 
         manager.getPluginDAO().deleteInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
-        productOperation.addLogDone( "Cluster info deleted from database" );
+        trackerOperation.addLogDone( "Cluster info deleted from database" );
     }
 }

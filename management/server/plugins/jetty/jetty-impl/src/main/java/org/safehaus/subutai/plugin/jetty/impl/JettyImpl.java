@@ -17,7 +17,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -362,7 +362,7 @@ public class JettyImpl implements Jetty
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment env, final JettyConfig config,
-                                                         final ProductOperation po )
+                                                         final TrackerOperation po )
     {
         Set<Agent> cassNodes = new HashSet<Agent>();
         for ( EnvironmentContainer environmentContainer : env.getContainers() )

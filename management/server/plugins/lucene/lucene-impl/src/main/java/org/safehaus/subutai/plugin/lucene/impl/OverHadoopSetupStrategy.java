@@ -6,7 +6,7 @@ import java.util.Iterator;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -18,7 +18,7 @@ import com.google.common.base.Strings;
 class OverHadoopSetupStrategy extends LuceneSetupStrategy
 {
 
-    public OverHadoopSetupStrategy( LuceneImpl manager, LuceneConfig config, ProductOperation po )
+    public OverHadoopSetupStrategy( LuceneImpl manager, LuceneConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -47,7 +47,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
             Agent node = it.next();
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
-                productOperation.addLog(
+                trackerOperation.addLog(
                         String.format( "Node %s is not connected. Omitting this node from installation",
                                 node.getHostname() ) );
                 it.remove();
@@ -59,10 +59,10 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
             throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
         }
 
-        productOperation.addLog( "Checking prerequisites..." );
+        trackerOperation.addLog( "Checking prerequisites..." );
 
         // Check installed packages
-        productOperation.addLog( "Installing Lucene..." );
+        trackerOperation.addLog( "Installing Lucene..." );
 
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
@@ -79,7 +79,7 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
 
             if ( result.getStdOut().contains( LuceneConfig.PRODUCT_PACKAGE ) )
             {
-                productOperation.addLog(
+                trackerOperation.addLog(
                         String.format( "Node %s already has Lucene installed. Omitting this node from installation",
                                 node.getHostname() ) );
                 it.remove();
@@ -96,13 +96,13 @@ class OverHadoopSetupStrategy extends LuceneSetupStrategy
         manager.getCommandRunner().runCommand( installCommand );
         if ( installCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Installation succeeded" );
-            productOperation.addLog( "Updating db..." );
+            trackerOperation.addLog( "Installation succeeded" );
+            trackerOperation.addLog( "Updating db..." );
             manager.getPluginDao().saveInfo( LuceneConfig.PRODUCT_KEY, config.getClusterName(), config );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
 
         return config;

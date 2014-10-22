@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
@@ -22,7 +22,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Checking node %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -34,7 +34,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( solrClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -42,13 +42,13 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
         if ( !solrClusterConfig.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to installation %s", lxcHostname,
                             clusterName ) );
             return;
@@ -60,16 +60,16 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( statusServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Solr is running" );
+            trackerOperation.addLogDone( "Solr is running" );
         }
         else
         {
-            logStatusResults( productOperation, statusServiceCommand );
+            logStatusResults( trackerOperation, statusServiceCommand );
         }
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    private void logStatusResults( TrackerOperation po, Command checkStatusCommand )
     {
 
         StringBuilder log = new StringBuilder();

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
@@ -26,7 +26,7 @@ import com.google.common.base.Strings;
  */
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 {
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final String lxcHostname;
 
 
@@ -34,7 +34,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( MongoClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 

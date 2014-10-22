@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.sqoop.impl.mock;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
@@ -18,9 +18,9 @@ public class SqoopImplMock extends SqoopImpl
     private SqoopConfig sqoopConfig = null;
 
 
-    public static ProductOperation getProductOperationMock()
+    public static TrackerOperation getProductOperationMock()
     {
-        return mock( ProductOperation.class );
+        return mock( TrackerOperation.class );
     }
 
 

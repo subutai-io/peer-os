@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 
@@ -64,7 +64,7 @@ public class TrackerImplTest
     private static final String DONE = "done";
     private static final UUID operationId = UUID.randomUUID();
 
-    private ProductOperationImpl productOperation;
+    private TrackerOperationImpl productOperation;
 
 
     private ByteArrayOutputStream myOut;
@@ -73,7 +73,7 @@ public class TrackerImplTest
     @Before
     public void setUp() throws SQLException
     {
-        productOperation = new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
+        productOperation = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
         tracker = new TrackerImplExt( dataSource, dbUtil );
         when( dbUtil.select( anyString(), anyVararg() ) ).thenReturn( resultSet );
         when( resultSet.next() ).thenReturn( true ).thenReturn( false );
@@ -111,7 +111,7 @@ public class TrackerImplTest
     @Test
     public void testGetProductOperation() throws Exception
     {
-        ProductOperationView pv = tracker.getProductOperation( SOURCE, operationId );
+        TrackerOperationView pv = tracker.getTrackerOperation( SOURCE, operationId );
 
         assertNotNull( pv );
     }
@@ -122,7 +122,7 @@ public class TrackerImplTest
     {
         when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
-        ProductOperationView pv = tracker.getProductOperation( SOURCE, operationId );
+        TrackerOperationView pv = tracker.getTrackerOperation( SOURCE, operationId );
 
         assertNull( pv );
     }
@@ -147,7 +147,7 @@ public class TrackerImplTest
     @Test
     public void testCreateProductOperation() throws Exception
     {
-        ProductOperation po = tracker.createProductOperation( SOURCE, DESCRIPTION );
+        TrackerOperation po = tracker.createTrackerOperation( SOURCE, DESCRIPTION );
 
         assertNotNull( po );
     }
@@ -159,7 +159,7 @@ public class TrackerImplTest
 
         when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
-        ProductOperation po = tracker.createProductOperation( SOURCE, DESCRIPTION );
+        TrackerOperation po = tracker.createTrackerOperation( SOURCE, DESCRIPTION );
 
         assertNull( po );
     }
@@ -169,7 +169,7 @@ public class TrackerImplTest
     public void testGetProductOperations() throws Exception
     {
 
-        List<ProductOperationView> pos = tracker.getProductOperations( SOURCE, new Date(), new Date(), 1 );
+        List<TrackerOperationView> pos = tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
 
         assertNotNull( pos );
         assertFalse( pos.isEmpty() );
@@ -181,7 +181,7 @@ public class TrackerImplTest
     {
         when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
-        List<ProductOperationView> pos = tracker.getProductOperations( SOURCE, new Date(), new Date(), 1 );
+        List<TrackerOperationView> pos = tracker.getTrackerOperations( SOURCE, new Date(), new Date(), 1 );
 
         assertNotNull( pos );
         assertTrue( pos.isEmpty() );
@@ -191,7 +191,7 @@ public class TrackerImplTest
     @Test
     public void testGetProductOperationSources() throws Exception
     {
-        List<String> sources = tracker.getProductOperationSources();
+        List<String> sources = tracker.getTrackerOperationSources();
 
         assertNotNull( sources );
         assertFalse( sources.isEmpty() );
@@ -203,7 +203,7 @@ public class TrackerImplTest
     {
         when( dbUtil.select( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
-        List<String> sources = tracker.getProductOperationSources();
+        List<String> sources = tracker.getTrackerOperationSources();
 
         assertNotNull( sources );
         assertTrue( sources.isEmpty() );

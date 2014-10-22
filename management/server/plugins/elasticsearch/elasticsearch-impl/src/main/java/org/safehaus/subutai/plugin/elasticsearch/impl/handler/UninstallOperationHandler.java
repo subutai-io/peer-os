@@ -13,7 +13,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Elastics
     public UninstallOperationHandler( ElasticsearchImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Destroying %s cluster...", clusterName ) );
     }
 
@@ -23,27 +23,27 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Elastics
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Destroying lxc containers..." );
+        trackerOperation.addLog( "Destroying lxc containers..." );
 
         try
         {
             manager.getContainerManager().clonesDestroy( elasticsearchClusterConfiguration.getNodes() );
-            productOperation.addLog( "Lxc containers successfully destroyed" );
+            trackerOperation.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+            trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
 
-        productOperation.addLog( "Updating db..." );
+        trackerOperation.addLog( "Updating db..." );
 
         manager.getPluginDAO().deleteInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 elasticsearchClusterConfiguration.getClusterName() );
-        productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
+        trackerOperation.addLogDone( "Cluster info deleted from DB\nDone" );
     }
 }

@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -19,7 +19,7 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 public class InstallHandler extends AbstractOperationHandler<OozieImpl>
 {
 
-    private final ProductOperation productOperation;
+    private final TrackerOperation trackerOperation;
     private OozieClusterConfig config;
     private HadoopClusterConfig hadoopConfig;
 
@@ -28,7 +28,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -36,7 +36,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -50,11 +50,11 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
 
             if ( hadoopConfig == null )
             {
-                productOperation.addLogFailed( "No Hadoop configuration specified" );
+                trackerOperation.addLogFailed( "No Hadoop configuration specified" );
                 return;
             }
 
-            productOperation.addLog( "Preparing environment..." );
+            trackerOperation.addLog( "Preparing environment..." );
             hadoopConfig.setTemplateName( OozieClusterConfig.PRODUCT_NAME_SERVER );
             try
             {
@@ -63,18 +63,18 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
             }
             catch ( ClusterSetupException ex )
             {
-                productOperation.addLogFailed( "Failed to prepare environment: " + ex.getMessage() );
+                trackerOperation.addLogFailed( "Failed to prepare environment: " + ex.getMessage() );
                 return;
             }
             catch ( EnvironmentBuildException ex )
             {
-                productOperation.addLogFailed( "Failed to build environment: " + ex.getMessage() );
+                trackerOperation.addLogFailed( "Failed to build environment: " + ex.getMessage() );
                 return;
             }
-            productOperation.addLog( "Environment preparation completed" );
+            trackerOperation.addLog( "Environment preparation completed" );
         }
 
-        ClusterSetupStrategy s = manager.getClusterSetupStrategy( env, config, productOperation );
+        ClusterSetupStrategy s = manager.getClusterSetupStrategy( env, config, trackerOperation );
         try
         {
             if ( s == null )
@@ -83,11 +83,11 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl>
             }
 
             s.setup();
-            productOperation.addLogDone( "Done" );
+            trackerOperation.addLogDone( "Done" );
         }
         catch ( ClusterSetupException ex )
         {
-            productOperation.addLogFailed( "Failed to setup cluster: " + ex.getMessage() );
+            trackerOperation.addLogFailed( "Failed to setup cluster: " + ex.getMessage() );
         }
     }
 }

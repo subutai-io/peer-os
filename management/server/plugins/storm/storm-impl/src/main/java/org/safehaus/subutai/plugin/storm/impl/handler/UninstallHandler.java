@@ -8,7 +8,7 @@ import java.util.Set;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.impl.CommandType;
@@ -22,7 +22,7 @@ public class UninstallHandler extends AbstractHandler
     public UninstallHandler( StormImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.productOperation = manager.getTracker().createProductOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
                 "Uninstall cluster " + clusterName );
     }
 
@@ -30,7 +30,7 @@ public class UninstallHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         StormConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

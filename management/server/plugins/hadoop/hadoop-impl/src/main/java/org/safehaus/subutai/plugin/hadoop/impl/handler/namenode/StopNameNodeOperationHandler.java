@@ -18,7 +18,7 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
     public StopNameNodeOperationHandler( HadoopImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping NameNode in %s", clusterName ) );
     }
 
@@ -30,20 +30,20 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( hadoopClusterConfig.getNameNode() == null )
         {
-            productOperation.addLogFailed( String.format( "NameNode on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "NameNode on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
         if ( node == null )
         {
-            productOperation.addLogFailed( "NameNode is not connected" );
+            trackerOperation.addLogFailed( "NameNode is not connected" );
             return;
         }
 
@@ -83,11 +83,11 @@ public class StopNameNodeOperationHandler extends AbstractOperationHandler<Hadoo
 
         if ( NodeState.STOPPED.equals( nodeState ) )
         {
-            productOperation.addLogDone( String.format( "NameNode on %s stopped", hadoopClusterConfig.getNameNode() ) );
+            trackerOperation.addLogDone( String.format( "NameNode on %s stopped", hadoopClusterConfig.getNameNode() ) );
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Failed to start NameNode %s. %s", hadoopClusterConfig.getNameNode(),
                             startCommand.getAllErrors() ) );
         }

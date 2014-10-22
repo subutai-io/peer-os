@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -15,10 +15,10 @@ public class SetupHelper
 
     private final SparkImpl manager;
     private final SparkClusterConfig config;
-    private final ProductOperation po;
+    private final TrackerOperation po;
 
 
-    public SetupHelper( SparkImpl manager, SparkClusterConfig config, ProductOperation po )
+    public SetupHelper( SparkImpl manager, SparkClusterConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;

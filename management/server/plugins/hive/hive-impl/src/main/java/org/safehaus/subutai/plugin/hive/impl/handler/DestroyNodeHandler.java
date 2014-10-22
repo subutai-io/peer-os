@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -25,7 +25,7 @@ public class DestroyNodeHandler extends AbstractHandler
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.productOperation = manager.getTracker().createProductOperation( HiveConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( HiveConfig.PRODUCT_KEY,
                 "Remove node from cluster: " + hostname );
     }
 
@@ -33,7 +33,7 @@ public class DestroyNodeHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         HiveConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

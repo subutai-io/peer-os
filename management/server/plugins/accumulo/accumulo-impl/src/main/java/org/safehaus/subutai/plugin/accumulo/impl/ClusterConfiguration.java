@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
@@ -19,11 +19,11 @@ import com.google.common.collect.Sets;
 public class ClusterConfiguration
 {
 
-    private ProductOperation po;
+    private TrackerOperation po;
     private AccumuloImpl accumuloManager;
 
 
-    public ClusterConfiguration( final ProductOperation po, final AccumuloImpl accumuloManager )
+    public ClusterConfiguration( final TrackerOperation po, final AccumuloImpl accumuloManager )
     {
         Preconditions.checkNotNull( accumuloManager, "Accumulo Manager is null" );
         Preconditions.checkNotNull( po, "Product Operation is null" );

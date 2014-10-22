@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
@@ -25,7 +25,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        this.productOperation = manager.getTracker().createProductOperation( FlumeConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
                 "Install Flume instances: " + config.getClusterName() );
     }
 
@@ -45,7 +45,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         Environment env = null;
 
         if ( config.getSetupType() == SetupType.WITH_HADOOP )

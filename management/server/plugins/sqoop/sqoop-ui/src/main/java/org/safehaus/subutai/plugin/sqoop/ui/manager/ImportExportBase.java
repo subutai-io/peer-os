@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
@@ -213,7 +213,7 @@ public abstract class ImportExportBase extends VerticalLayout
             String m = "";
             while ( true )
             {
-                ProductOperationView po = tracker.getProductOperation( SqoopConfig.PRODUCT_KEY, trackId );
+                TrackerOperationView po = tracker.getTrackerOperation( SqoopConfig.PRODUCT_KEY, trackId );
                 if ( po == null )
                 {
                     break;

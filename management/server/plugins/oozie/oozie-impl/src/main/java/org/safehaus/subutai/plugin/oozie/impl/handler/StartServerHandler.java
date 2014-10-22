@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
@@ -15,13 +15,13 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
 public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
 {
-    private final ProductOperation productOperation;
+    private final TrackerOperation trackerOperation;
 
 
     public StartServerHandler( final OozieImpl manager, final String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Starting server on %s cluster...", clusterName ) );
     }
 
@@ -29,7 +29,7 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -46,7 +46,7 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
                         OozieClusterConfig.class );
                 if ( config == null )
                 {
-                    productOperation.addLogFailed(
+                    trackerOperation.addLogFailed(
                             String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
@@ -54,7 +54,7 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
 
                 if ( serverAgent == null )
                 {
-                    productOperation
+                    trackerOperation
                             .addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
@@ -65,7 +65,7 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
 
                 if ( startServiceCommand.hasCompleted() )
                 {
-                    productOperation.addLog( "Checking status..." );
+                    trackerOperation.addLog( "Checking status..." );
 
                     Command checkCommand = manager.getCommands().getStatusServerCommand( servers );
                     manager.getCommandRunner().runCommand( checkCommand );
@@ -73,18 +73,18 @@ public class StartServerHandler extends AbstractOperationHandler<OozieImpl>
                     if ( checkCommand.hasCompleted() )
                     {
 
-                        productOperation
+                        trackerOperation
                                 .addLogDone( checkCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                     }
                     else
                     {
-                        productOperation.addLogFailed(
+                        trackerOperation.addLogFailed(
                                 String.format( "Failed to check status, %s", checkCommand.getAllErrors() ) );
                     }
                 }
                 else
                 {
-                    productOperation
+                    trackerOperation
                             .addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
                 }
             }
