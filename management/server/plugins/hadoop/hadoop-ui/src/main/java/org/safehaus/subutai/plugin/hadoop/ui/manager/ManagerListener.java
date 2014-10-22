@@ -89,6 +89,9 @@ public class ManagerListener {
                     final QuestionDialog questionDialog = new QuestionDialog<Integer>( ADD_ITEM_ACTION ,
                             "How many nodes do you want to add?",
                             Integer.class, "Next","Cancel");
+                    questionDialog.getOk().setId("addNodeOk");
+                    questionDialog.getCancel().setId("addNodeCancel");
+                    questionDialog.getInputField().setId("addNodeInput");
                     questionDialog.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( final Button.ClickEvent clickEvent ) {
