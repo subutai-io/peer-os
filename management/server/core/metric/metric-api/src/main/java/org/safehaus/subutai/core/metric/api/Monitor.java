@@ -15,11 +15,11 @@ public interface Monitor
     /**
      * Returns current metrics of containers belonging to the given environment
      *
-     * @param environmentId id of environment which containers' metrics to return
+     * @param environment environment which containers' metrics to return
      *
      * @return set of metrics, one per each container within an environment
      */
-    public Set<ContainerHostMetric> getContainerMetrics( UUID environmentId );
+    public Set<ContainerHostMetric> getContainerMetrics( Environment environment );
 
 
     /**
