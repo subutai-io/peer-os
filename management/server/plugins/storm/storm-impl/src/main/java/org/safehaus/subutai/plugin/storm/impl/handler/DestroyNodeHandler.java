@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
@@ -17,7 +17,7 @@ public class DestroyNodeHandler extends AbstractHandler
     public DestroyNodeHandler( StormImpl manager, String clusterName, String hostname )
     {
         super( manager, clusterName );
-        this.productOperation = manager.getTracker().createProductOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
                 "Remove node from cluster: " + hostname );
         this.hostname = hostname;
     }
@@ -26,7 +26,7 @@ public class DestroyNodeHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         StormConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

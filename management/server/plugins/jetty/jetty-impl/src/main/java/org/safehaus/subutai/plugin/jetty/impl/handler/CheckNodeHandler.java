@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -27,7 +27,7 @@ public class CheckNodeHandler extends AbstractOperationHandler<JettyImpl>
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( JettyConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( JettyConfig.PRODUCT_KEY,
                 String.format( "Checking jetty on %s of %s cluster...", lxcHostname, clusterName ) );
     }
 
@@ -38,19 +38,19 @@ public class CheckNodeHandler extends AbstractOperationHandler<JettyImpl>
         JettyConfig JettyConfig = manager.getCluster( clusterName );
         if ( JettyConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( "Agent is not connected !" );
+            trackerOperation.addLogFailed( "Agent is not connected !" );
             return;
         }
         if ( !JettyConfig.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -60,16 +60,16 @@ public class CheckNodeHandler extends AbstractOperationHandler<JettyImpl>
 
         if ( statusServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Jetty is running" );
+            trackerOperation.addLogDone( "Jetty is running" );
         }
         else
         {
-            logStatusResults( productOperation, statusServiceCommand );
+            logStatusResults( trackerOperation, statusServiceCommand );
         }
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    private void logStatusResults( TrackerOperation po, Command checkStatusCommand )
     {
 
         StringBuilder log = new StringBuilder();

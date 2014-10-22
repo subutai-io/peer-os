@@ -20,7 +20,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 
@@ -31,7 +31,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
         CassandraClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
@@ -42,11 +42,11 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
 
         if ( stopServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Stop succeeded" );
+            trackerOperation.addLogDone( "Stop succeeded" );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
         }
     }
 }

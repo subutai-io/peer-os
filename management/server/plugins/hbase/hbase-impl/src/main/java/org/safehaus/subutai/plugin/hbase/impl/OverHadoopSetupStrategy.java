@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -20,7 +20,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupStrategy
 {
 
-    public OverHadoopSetupStrategy( HBaseImpl manager, ProductOperation po, HBaseClusterConfig config )
+    public OverHadoopSetupStrategy( HBaseImpl manager, TrackerOperation po, HBaseClusterConfig config )
     {
         super( po, manager, config );
     }

@@ -215,20 +215,22 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private void terminateBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
 
-        if ( executorServiceMap.containsKey( environmentBuildProcess.getUuid() ) )
+        UUID uuid = UUID.fromString( environmentBuildProcess.getUuid().toString() );
+        if ( executorServiceMap.containsKey( uuid ) )
         {
-            ExecutorService executorService = executorServiceMap.get( environmentBuildProcess.getUuid() );
+            ExecutorService executorService = executorServiceMap.get( uuid );
             if ( !executorService.isTerminated() )
             {
                 executorService.shutdown();
-                executorServiceMap.remove( environmentBuildProcess.getUuid() );
-                environmentBuildProcess.setCompleteStatus( true );
+                executorServiceMap.remove( uuid );
                 environmentBuildProcess.setProcessStatusEnum( ProcessStatusEnum.TERMINATED );
                 module.getEnvironmentManager().saveBuildProcess( environmentBuildProcess );
             }
+            Notification.show( "Terminated" );
         }
         else
         {
+            Notification.show( "No such process" );
             //TODO: check build process actual state in db and/or environments
         }
     }
@@ -270,12 +272,14 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
 
     private void updateEnvironmentsTableStatus( final BuildProcessExecutionEvent event )
     {
+        Notification.show( event.getExceptionMessage() );
         contentRoot.getUI().access( new Runnable()
         {
             @Override
             public void run()
             {
                 Item row = environmentsTable.getItem( event.getEnvironmentBuildProcess().getUuid() );
+                EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                 if ( row != null )
                 {
                     Property p = row.getItemProperty( STATUS );
@@ -284,34 +288,26 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     {
                         actionBtn.setEnabled( false );
                         p.setValue( new Embedded( "", new ThemeResource( LOAD_ICON_SOURCE ) ) );
-                        Notification.show( EnvAnswer.START.getAnswer() );
 
-                        EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
-                        ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.IN_PROGRESS );
                         module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.SUCCESS.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( OK_ICON_SOURCE ) ) );
-                        Notification.show( EnvAnswer.SUCCESS.getAnswer() );
 
-                        EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
-                        ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.SUCCESSFUL );
                         module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                     else if ( BuildProcessExecutionEventType.FAIL.equals( event.getEventType() ) )
                     {
                         p.setValue( new Embedded( "", new ThemeResource( ERROR_ICON_SOURCE ) ) );
-                        Notification.show( EnvAnswer.FAIL.getAnswer() );
 
-                        EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
-                        ebp.setCompleteStatus( true );
                         ebp.setProcessStatusEnum( ProcessStatusEnum.FAILED );
-                        module.getEnvironmentManager().saveBuildProcess( ebp );
                     }
                 }
+
+                module.getEnvironmentManager().saveBuildProcess( ebp );
             }
         } );
     }

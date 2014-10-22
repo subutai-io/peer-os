@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
@@ -26,11 +26,11 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy
     private final StormImpl manager;
     private final StormConfig config;
     private final Environment environment;
-    private final ProductOperation po;
+    private final TrackerOperation po;
 
 
     public StormSetupStrategyDefault( StormImpl manager, StormConfig config, Environment environment,
-                                      ProductOperation po )
+                                      TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;

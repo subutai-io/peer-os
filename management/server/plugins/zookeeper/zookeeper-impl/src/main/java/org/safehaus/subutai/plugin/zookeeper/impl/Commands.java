@@ -46,7 +46,7 @@ public class Commands
     public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 90 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 900)
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
                 agents );
@@ -56,7 +56,7 @@ public class Commands
     public Command getUninstallCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 90 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 900 )
                                                                                               .withStdOutRedirection(
                                                                                                       OutputRedirection.NO ),
                 agents );

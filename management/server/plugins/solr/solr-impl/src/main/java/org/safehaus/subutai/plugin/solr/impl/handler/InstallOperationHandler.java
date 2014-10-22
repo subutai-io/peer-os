@@ -19,7 +19,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl>
     {
         super( manager, solrClusterConfig.getClusterName() );
         this.solrClusterConfig = solrClusterConfig;
-        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 
@@ -28,7 +28,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl>
     public void run()
     {
 
-        productOperation.addLog( "Building environment..." );
+        trackerOperation.addLog( "Building environment..." );
 
         try
         {
@@ -36,14 +36,14 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl>
                     manager.getDefaultEnvironmentBlueprint( solrClusterConfig ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
-                    manager.getClusterSetupStrategy( env, solrClusterConfig, productOperation );
+                    manager.getClusterSetupStrategy( env, solrClusterConfig, trackerOperation );
             clusterSetupStrategy.setup();
 
-            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }

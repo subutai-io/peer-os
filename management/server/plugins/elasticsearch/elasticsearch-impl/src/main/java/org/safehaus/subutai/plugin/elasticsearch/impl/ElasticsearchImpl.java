@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -280,7 +280,7 @@ public class ElasticsearchImpl implements Elasticsearch
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
                                                          final ElasticsearchClusterConfiguration
                                                                  elasticsearchClusterConfiguration,
-                                                         final ProductOperation po )
+                                                         final TrackerOperation po )
     {
 
         Preconditions.checkNotNull( environment, "Environment is null" );

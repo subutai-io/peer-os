@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
@@ -15,7 +15,7 @@ import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 public class SetupStrategyOverSpark extends SetupStartegyBase implements ClusterSetupStrategy
 {
 
-    public SetupStrategyOverSpark( SharkImpl manager, SharkClusterConfig config, ProductOperation po )
+    public SetupStrategyOverSpark( SharkImpl manager, SharkClusterConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }

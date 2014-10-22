@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -24,10 +24,10 @@ public class ClusterConfiguration
 {
 
     private ZookeeperImpl manager;
-    private ProductOperation po;
+    private TrackerOperation po;
 
 
-    public ClusterConfiguration( final ZookeeperImpl manager, final ProductOperation po )
+    public ClusterConfiguration( final ZookeeperImpl manager, final TrackerOperation po )
     {
         this.manager = manager;
         this.po = po;

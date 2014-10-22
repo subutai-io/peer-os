@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
@@ -15,13 +15,13 @@ import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
  */
 public class UninstallOperationHandler extends AbstractOperationHandler<MongoImpl>
 {
-    private final ProductOperation po;
+    private final TrackerOperation po;
 
 
     public UninstallOperationHandler( MongoImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( MongoClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
 

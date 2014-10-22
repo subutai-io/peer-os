@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.pig.api.PigConfig;
@@ -19,7 +19,7 @@ class WithHadoopSetupStrategy extends PigSetupStrategy
     Environment environment;
 
 
-    public WithHadoopSetupStrategy( PigImpl manager, PigConfig config, ProductOperation po )
+    public WithHadoopSetupStrategy( PigImpl manager, PigConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -72,9 +72,9 @@ class WithHadoopSetupStrategy extends PigSetupStrategy
             }
         }
 
-        productOperation.addLog( "Saving to db..." );
+        trackerOperation.addLog( "Saving to db..." );
         manager.getPluginDao().saveInfo( PigConfig.PRODUCT_KEY, config.getClusterName(), config );
-        productOperation.addLog( "Cluster info successfully saved" );
+        trackerOperation.addLog( "Cluster info successfully saved" );
 
         return config;
     }

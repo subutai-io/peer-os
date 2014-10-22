@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -19,7 +19,7 @@ import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
 {
 
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final MongoClusterConfig config;
 
 
@@ -27,7 +27,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( MongoClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 

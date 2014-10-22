@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -27,7 +27,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         super( manager, config.getClusterName() );
         this.config = config;
         this.hadoopConfig = hadoopConfig;
-        this.productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( SharkClusterConfig.PRODUCT_KEY,
                 String.format( "Installing %s", SharkClusterConfig.PRODUCT_KEY ) );
     }
 
@@ -41,7 +41,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         Environment env = null;
         ClusterSetupStrategy css;
         if ( config.getSetupType() == SetupType.WITH_HADOOP_SPARK )
@@ -109,11 +109,11 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
             try
             {
                 manager.getEnvironmentManager().destroyEnvironment( env.getUuid().toString() );
-                productOperation.addLog( "Environment destroyed" );
+                trackerOperation.addLog( "Environment destroyed" );
             }
             catch ( EnvironmentDestroyException ex )
             {
-                productOperation.addLog( "Failed to destroy environment: " + ex.getMessage() );
+                trackerOperation.addLog( "Failed to destroy environment: " + ex.getMessage() );
             }
         }
     }

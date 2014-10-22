@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
@@ -18,7 +18,7 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
 {
 
     private static final Logger logger = Logger.getLogger( CheckServerHandler.class.getName() );
-    private final ProductOperation productOperation;
+    private final TrackerOperation trackerOperation;
     private String clusterName;
 
 
@@ -26,7 +26,7 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Checking status of cluster %s", clusterName ) );
     }
 
@@ -34,7 +34,7 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -54,7 +54,7 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                 Agent serverAgent = config.getServer();
                 if ( serverAgent == null )
                 {
-                    productOperation
+                    trackerOperation
                             .addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
@@ -66,12 +66,12 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl>
                 if ( statusServiceCommand.hasCompleted() )
                 {
 
-                    productOperation
+                    trackerOperation
                             .addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                 }
                 else
                 {
-                    productOperation.addLogFailed(
+                    trackerOperation.addLogFailed(
                             String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
                 }
             }

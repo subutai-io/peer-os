@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
@@ -19,7 +19,7 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
     {
         super( manager, clusterName );
         this.lxcHostName = lxcHostName;
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Including node %s again to cluster %s", lxcHostName, clusterName ) );
     }
 
@@ -32,77 +32,77 @@ public class IncludeNodeOperationHandler extends AbstractOperationHandler<Hadoop
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( !hadoopClusterConfig.getDataNodes().contains( node ) || !hadoopClusterConfig.getTaskTrackers()
                                                                                          .contains( node ) )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Node in %s cluster as a slave does not exist", clusterName ) );
             return;
         }
 
         if ( node == null )
         {
-            productOperation.addLogFailed( "Node is not connected" );
+            trackerOperation.addLogFailed( "Node is not connected" );
             return;
         }
 
         Command addDataNodeCommand = manager.getCommands().getSetDataNodeCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( addDataNodeCommand );
-        logCommand( addDataNodeCommand, productOperation );
+        logCommand( addDataNodeCommand, trackerOperation );
 
         Command includeDataNodeCommand = manager.getCommands().getExcludeDataNodeCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( includeDataNodeCommand );
-        logCommand( includeDataNodeCommand, productOperation );
+        logCommand( includeDataNodeCommand, trackerOperation );
 
         Command stopDataNodeCommand = manager.getCommands().getStopDatanodeCommand( node );
         manager.getCommandRunner().runCommand( stopDataNodeCommand );
-        logCommand( stopDataNodeCommand, productOperation );
+        logCommand( stopDataNodeCommand, trackerOperation );
 
         Command startDataNodeCommand = manager.getCommands().getStartDataNodeCommand( node );
         manager.getCommandRunner().runCommand( startDataNodeCommand );
-        logCommand( startDataNodeCommand, productOperation );
+        logCommand( startDataNodeCommand, trackerOperation );
 
         Command refreshDataNodeCommand = manager.getCommands().getRefreshNameNodeCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshDataNodeCommand );
-        logCommand( refreshDataNodeCommand, productOperation );
+        logCommand( refreshDataNodeCommand, trackerOperation );
 
 
         Command addTaskTrackerCommand = manager.getCommands().getSetTaskTrackerCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( addTaskTrackerCommand );
-        logCommand( addTaskTrackerCommand, productOperation );
+        logCommand( addTaskTrackerCommand, trackerOperation );
 
         Command includeTaskTrackerCommand =
                 manager.getCommands().getExcludeTaskTrackerCommand( hadoopClusterConfig, node );
         manager.getCommandRunner().runCommand( includeTaskTrackerCommand );
-        logCommand( includeTaskTrackerCommand, productOperation );
+        logCommand( includeTaskTrackerCommand, trackerOperation );
 
         Command stopTaskTrackerCommand = manager.getCommands().getStopTaskTrackerCommand( node );
         manager.getCommandRunner().runCommand( stopTaskTrackerCommand );
-        logCommand( stopTaskTrackerCommand, productOperation );
+        logCommand( stopTaskTrackerCommand, trackerOperation );
 
         Command startTaskTrackerCommand = manager.getCommands().getStartTaskTrackerCommand( node );
         manager.getCommandRunner().runCommand( startTaskTrackerCommand );
-        logCommand( startTaskTrackerCommand, productOperation );
+        logCommand( startTaskTrackerCommand, trackerOperation );
 
         Command refreshJobTrackerCommand = manager.getCommands().getRefreshJobTrackerCommand( hadoopClusterConfig );
         manager.getCommandRunner().runCommand( refreshJobTrackerCommand );
-        logCommand( refreshJobTrackerCommand, productOperation );
+        logCommand( refreshJobTrackerCommand, trackerOperation );
 
 
         hadoopClusterConfig.getBlockedAgents().remove( node );
 
         manager.getPluginDAO()
                .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
-        productOperation.addLogDone( "Cluster info saved to DB" );
+        trackerOperation.addLogDone( "Cluster info saved to DB" );
         return;
     }
 
 
-    private void logCommand( Command command, ProductOperation po )
+    private void logCommand( Command command, TrackerOperation po )
     {
         if ( command.hasSucceeded() )
         {

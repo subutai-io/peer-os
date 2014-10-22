@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -19,7 +19,7 @@ class SetupStrategyWithHadoop extends SqoopSetupStrategy
     Environment environment;
 
 
-    public SetupStrategyWithHadoop( SqoopImpl manager, SqoopConfig config, ProductOperation po )
+    public SetupStrategyWithHadoop( SqoopImpl manager, SqoopConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }

@@ -39,12 +39,14 @@ public class WelcomeStep extends Panel
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start over-Spark installation" );
+        next.setId("startOverHadoop");
         next.addStyleName( "default" );
         next.addClickListener( new NextButtonClickHandler( wizard, SetupType.OVER_SPARK ) );
         grid.addComponent( next, 4, 4, 4, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
         Button next2 = new Button( "Start with-Spark installation" );
+        next2.setId("startWithHadoop");
         next2.addStyleName( "default" );
         next2.addClickListener( new NextButtonClickHandler( wizard, SetupType.WITH_HADOOP_SPARK ) );
         grid.addComponent( next2, 5, 4, 5, 4 );

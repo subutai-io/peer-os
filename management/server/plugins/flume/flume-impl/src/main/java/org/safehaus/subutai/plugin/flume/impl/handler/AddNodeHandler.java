@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -29,7 +29,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        productOperation = manager.getTracker().createProductOperation( FlumeConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
                 String.format( "Adding node %s to %s", ( hostname != null ? hostname : "" ), clusterName ) );
     }
 
@@ -37,7 +37,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         FlumeConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -79,7 +79,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl>
 
     public Agent setupHost( FlumeConfig config ) throws ClusterSetupException
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
 
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )

@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 
@@ -16,10 +16,10 @@ abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl>
     protected String hostname;
 
 
-    public AbstractHandler( SqoopImpl manager, String clusterName, ProductOperation po )
+    public AbstractHandler( SqoopImpl manager, String clusterName, TrackerOperation po )
     {
         super( manager, clusterName );
-        this.productOperation = po;
+        this.trackerOperation = po;
     }
 
 
@@ -64,7 +64,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl>
                 it.remove();
                 m += " Omitting from clients list";
             }
-            productOperation.addLog( m );
+            trackerOperation.addLog( m );
         }
         return connected;
     }

@@ -20,7 +20,7 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 
@@ -31,7 +31,7 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
         HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -43,29 +43,29 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
         }
         catch ( Exception e )
         {
-            productOperation.addLogFailed( e.getMessage() );
+            trackerOperation.addLogFailed( e.getMessage() );
             return;
         }
 
-        productOperation.addLog( "Uninstalling..." );
+        trackerOperation.addLog( "Uninstalling..." );
 
         Command installCommand = manager.getCommands().getUninstallCommand( allNodes );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Uninstallation success.." );
+            trackerOperation.addLog( "Uninstallation success.." );
         }
         else
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
             return;
         }
 
-        productOperation.addLog( "Updating db..." );
+        trackerOperation.addLog( "Updating db..." );
         manager.getPluginDAO().deleteInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName() );
-        productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
+        trackerOperation.addLogDone( "Cluster info deleted from DB\nDone" );
     }
 
 

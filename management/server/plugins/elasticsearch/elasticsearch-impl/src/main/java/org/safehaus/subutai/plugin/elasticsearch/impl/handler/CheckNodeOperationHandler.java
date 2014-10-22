@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
@@ -27,8 +27,8 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
         super( manager, clusterName );
         this.lxcHostname = agentUUID;
         this.clusterName = clusterName;
-        this.productOperation = manager.getTracker()
-                                       .createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker()
+                                       .createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                                                String.format( "Checking %s cluster...", clusterName ) );
     }
 
@@ -40,19 +40,19 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( "Agent is not connected !" );
+            trackerOperation.addLogFailed( "Agent is not connected !" );
             return;
         }
         if ( !elasticsearchClusterConfiguration.getNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -62,16 +62,16 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Elastics
 
         if ( statusServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "elasticsearch is running" );
+            trackerOperation.addLogDone( "elasticsearch is running" );
         }
         else
         {
-            logStatusResults( productOperation, statusServiceCommand );
+            logStatusResults( trackerOperation, statusServiceCommand );
         }
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    private void logStatusResults( TrackerOperation po, Command checkStatusCommand )
     {
 
         StringBuilder log = new StringBuilder();

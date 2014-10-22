@@ -38,7 +38,7 @@ public class Commands
     public Command getUninstallCommand( Set<Agent> agents )
     {
         RequestBuilder rb = new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME );
-        return commandRunnerBase.createCommand( rb.withTimeout( 60 ), agents );
+        return commandRunnerBase.createCommand( rb.withTimeout( 600 ), agents );
     }
 
 

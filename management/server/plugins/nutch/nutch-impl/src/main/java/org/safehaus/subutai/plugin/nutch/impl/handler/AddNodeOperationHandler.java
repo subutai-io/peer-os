@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -26,7 +26,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<NutchImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        productOperation = manager.getTracker().createProductOperation( NutchConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( NutchConfig.PRODUCT_KEY,
                 String.format( "Adding node %s to %s", ( hostname != null ? hostname : "" ), clusterName ) );
     }
 
@@ -34,7 +34,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<NutchImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         NutchConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -76,7 +76,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<NutchImpl>
 
     public Agent setupHost( NutchConfig config ) throws ClusterSetupException
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
 
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )

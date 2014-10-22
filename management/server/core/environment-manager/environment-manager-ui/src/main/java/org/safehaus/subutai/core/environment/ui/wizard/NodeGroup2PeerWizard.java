@@ -6,10 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
 
@@ -71,7 +70,7 @@ public class NodeGroup2PeerWizard extends Window
             }
             case 2:
             {
-                setContent( genContainerToPeersTable() );
+                setContent( genNodeGroupToPeersTable() );
                 break;
             }
             default:
@@ -150,12 +149,12 @@ public class NodeGroup2PeerWizard extends Window
     }
 
 
-    private VerticalLayout genContainerToPeersTable()
+    private VerticalLayout genNodeGroupToPeersTable()
     {
         VerticalLayout vl = new VerticalLayout();
 
         containerToPeerTable = new Table();
-        containerToPeerTable.addContainerProperty( "Container", String.class, null );
+        containerToPeerTable.addContainerProperty( "Node Group", String.class, null );
         containerToPeerTable.addContainerProperty( "Put", ComboBox.class, null );
         containerToPeerTable.setPageLength( 10 );
         containerToPeerTable.setSelectable( false );
@@ -175,7 +174,7 @@ public class NodeGroup2PeerWizard extends Window
             comboBox.setTextInputAllowed( false );
             comboBox.setItemCaptionPropertyId( "name" );
             Object itemId = containerToPeerTable.addItem( new Object[] {
-                    ng.getTemplateName(), comboBox
+                    ng.getName(), comboBox
             }, null );
             nodeGroupMap.put( itemId, ng );
             //            }
@@ -189,9 +188,9 @@ public class NodeGroup2PeerWizard extends Window
                 Map<Object, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
-                    EnvironmentBuildProcess process = createEnvironmentBuildProcess( environmentBuildTask, topology );
-
-                    managerUI.getEnvironmentManager().saveBuildProcess( process );
+                    Map<Object, NodeGroup> map = getNodeGroupMap();
+                    managerUI.getEnvironmentManager()
+                             .saveBuildProcess( environmentBuildTask, topology, map, TopologyEnum.NODE_GROUP_2_PEER );
                 }
                 else
                 {
@@ -245,36 +244,6 @@ public class NodeGroup2PeerWizard extends Window
     public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
     {
         this.nodeGroupMap = nodeGroupMap;
-    }
-
-
-    public EnvironmentBuildProcess createEnvironmentBuildProcess( EnvironmentBuildTask ebt, Map<Object, Peer> topology )
-    {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint() );
-
-        Map<Object, NodeGroup> map = getNodeGroupMap();
-        for ( Object itemId : map.keySet() )
-        {
-            Peer peer = topology.get( itemId );
-            NodeGroup ng = map.get( itemId );
-
-            String key = peer.getId().toString() + "-" + ng.getTemplateName();
-
-            if ( !process.getMessageMap().containsKey( key ) )
-            {
-                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
-                ccm.setTemplate( ng.getTemplateName() );
-                ccm.setNumberOfNodes( ng.getNumberOfNodes() );
-                ccm.setStrategy( ng.getPlacementStrategy().toString() );
-                process.putCloneContainerMessage( key, ccm );
-            }
-            /*else
-            {
-                process.getMessageMap().get( key ).incrementNumberOfNodes();
-            }*/
-        }
-
-        return process;
     }
 
 

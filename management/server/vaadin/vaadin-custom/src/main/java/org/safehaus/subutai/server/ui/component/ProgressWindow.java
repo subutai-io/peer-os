@@ -10,13 +10,12 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -61,6 +60,7 @@ public class ProgressWindow
         content.setSpacing( true );
 
         outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setId( "outputTxtArea" );
         outputTxtArea.setRows( 13 );
         outputTxtArea.setColumns( 42 );
         outputTxtArea.setImmediate( true );
@@ -69,6 +69,7 @@ public class ProgressWindow
         content.addComponent( outputTxtArea );
 
         ok = new Button( "Ok" );
+        ok.setId( "btnOk" );
         ok.setStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
@@ -82,6 +83,7 @@ public class ProgressWindow
         } );
 
         indicator = new Label();
+        indicator.setId("indicator");
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Sizeable.Unit.PIXELS );
@@ -112,7 +114,7 @@ public class ProgressWindow
             {
                 while ( track )
                 {
-                    ProductOperationView po = tracker.getProductOperation( source, trackID );
+                    TrackerOperationView po = tracker.getTrackerOperation( source, trackID );
                     if ( po != null )
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
@@ -155,6 +157,7 @@ public class ProgressWindow
     {
         try {
 //            VaadinSession.getCurrent().getLockInstance().lock();
+
             if ( !Strings.isNullOrEmpty( output ) ) {
                 outputTxtArea.setValue( output );
                 outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
@@ -164,6 +167,7 @@ public class ProgressWindow
 //            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
+
 
 
     private void hideProgress()

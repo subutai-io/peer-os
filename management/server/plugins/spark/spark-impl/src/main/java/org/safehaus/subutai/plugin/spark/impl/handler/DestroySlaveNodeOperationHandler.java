@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
@@ -26,7 +26,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -34,7 +34,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         final SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

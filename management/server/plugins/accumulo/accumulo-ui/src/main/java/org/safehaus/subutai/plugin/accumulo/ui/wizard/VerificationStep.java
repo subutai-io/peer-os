@@ -79,6 +79,7 @@ public class VerificationStep extends Panel
         }
 
         Button install = new Button( "Install" );
+        install.setId("installBtn");
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -104,6 +105,7 @@ public class VerificationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
+        back.setId("verBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

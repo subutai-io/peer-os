@@ -38,6 +38,7 @@ public class NodeSelectionStep extends Panel
         content.setMargin( true );
 
         TextField clusterNameTxt = new TextField( "Cluster name" );
+        clusterNameTxt.setId("StormConfClusterName");
         clusterNameTxt.setRequired( true );
         clusterNameTxt.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -53,7 +54,9 @@ public class NodeSelectionStep extends Panel
         if ( wizard.getConfig().isExternalZookeeper() )
         {
             ComboBox zkClustersCombo = new ComboBox( "Zookeeper cluster" );
+            zkClustersCombo.setId("StormConfClusterCombo");
             final ComboBox masterNodeCombo = makeMasterNodeComboBox( wizard );
+            masterNodeCombo.setId("StormMasterNodeCombo");
 
             zkClustersCombo.setImmediate( true );
             zkClustersCombo.setTextInputAllowed( false );
@@ -111,6 +114,8 @@ public class NodeSelectionStep extends Panel
 
         ComboBox nodesCountCmb =
                 new ComboBox( "Number of supervisor nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+
+        nodesCountCmb.setId("StormConfNumSupervisorNodes");
         nodesCountCmb.setImmediate( true );
         nodesCountCmb.setRequired( true );
         nodesCountCmb.setTextInputAllowed( false );
@@ -136,6 +141,7 @@ public class NodeSelectionStep extends Panel
         }
 
         Button next = new Button( "Next" );
+        next.setId("StormConfNext");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -164,6 +170,7 @@ public class NodeSelectionStep extends Panel
         } );
 
         Button back = new Button( "Back" );
+        back.setId("StormConfBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -196,6 +203,7 @@ public class NodeSelectionStep extends Panel
     {
         ComboBox cb = new ComboBox( "Nodes" );
 
+        cb.setId("StormConfMasterNodes");
         cb.setImmediate( true );
         cb.setTextInputAllowed( false );
         cb.setRequired( true );

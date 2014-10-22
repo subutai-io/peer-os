@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -50,7 +50,7 @@ public class StopTask implements Runnable
 
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( MongoClusterConfig.PRODUCT_KEY, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( MongoClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != ProductOperationState.RUNNING )

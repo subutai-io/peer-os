@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -24,7 +24,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<NutchImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( NutchConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( NutchConfig.PRODUCT_KEY,
                 String.format( "Installing %s", NutchConfig.PRODUCT_KEY ) );
     }
 
@@ -38,7 +38,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<NutchImpl>
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         Environment env = null;
 
         if ( config.getSetupType() == SetupType.WITH_HADOOP )

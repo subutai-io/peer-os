@@ -30,7 +30,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
         super( manager, clusterName );
         this.fileName = fileName;
         this.propertyName = propertyName;
-        productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Removing property %s from file %s", propertyName, fileName ) );
     }
 
@@ -38,7 +38,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -48,18 +48,18 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
         if ( Strings.isNullOrEmpty( clusterName ) || Strings.isNullOrEmpty( fileName ) || Strings
                 .isNullOrEmpty( propertyName ) )
         {
-            productOperation.addLogFailed( "Malformed arguments\nOperation aborted" );
+            trackerOperation.addLogFailed( "Malformed arguments\nOperation aborted" );
             return;
         }
         final ZookeeperClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Removing property..." );
+        trackerOperation.addLog( "Removing property..." );
 
         Command removePropertyCommand =
                 manager.getCommands().getRemovePropertyCommand( fileName, propertyName, config.getNodes() );
@@ -67,7 +67,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
 
         if ( removePropertyCommand.hasSucceeded() )
         {
-            productOperation.addLog( "Property removed successfully\nRestarting cluster..." );
+            trackerOperation.addLog( "Property removed successfully\nRestarting cluster..." );
 
             Command restartCommand = manager.getCommands().getRestartCommand( config.getNodes() );
             final AtomicInteger count = new AtomicInteger();
@@ -88,17 +88,17 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
 
             if ( count.get() == config.getNodes().size() )
             {
-                productOperation.addLogDone( "Cluster successfully restarted" );
+                trackerOperation.addLogDone( "Cluster successfully restarted" );
             }
             else
             {
-                productOperation.addLogFailed(
+                trackerOperation.addLogFailed(
                         String.format( "Failed to restart cluster, %s", restartCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Removing property failed, %s", removePropertyCommand.getAllErrors() ) );
         }
     }

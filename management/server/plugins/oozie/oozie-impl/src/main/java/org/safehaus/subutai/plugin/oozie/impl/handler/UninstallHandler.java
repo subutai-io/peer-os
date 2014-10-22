@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
@@ -16,7 +16,7 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
 {
 
-    private final ProductOperation productOperation;
+    private final TrackerOperation trackerOperation;
     //    private OozieConfig config;
     private String clusterName;
 
@@ -25,7 +25,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Unistalling %s cluster...", clusterName ) );
     }
 
@@ -33,7 +33,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -49,7 +49,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                         OozieClusterConfig.class );
                 if ( config == null )
                 {
-                    productOperation.addLogFailed(
+                    trackerOperation.addLogFailed(
                             String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
                     return;
                 }
@@ -63,7 +63,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
                 {
                     if ( manager.getAgentManager().getAgentByHostname( node ) == null )
                     {
-                        productOperation.addLogFailed( String.format( "Node %s not connected. Aborted", node ) );
+                        trackerOperation.addLogFailed( String.format( "Node %s not connected. Aborted", node ) );
                         return;
                     }
                 }
@@ -77,11 +77,11 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
 
                 if ( uninstallServerCommand.hasSucceeded() )
                 {
-                    productOperation.addLog( "Uninstall server succeeded" );
+                    trackerOperation.addLog( "Uninstall server succeeded" );
                 }
                 else
                 {
-                    productOperation.addLogFailed(
+                    trackerOperation.addLogFailed(
                             String.format( "Uninstall server failed, %s", uninstallServerCommand.getAllErrors() ) );
                     return;
                 }
@@ -98,21 +98,21 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl>
 
                     if ( uninstallClientsCommand.hasSucceeded() )
                     {
-                        productOperation.addLog( "Uninstall clients succeeded" );
+                        trackerOperation.addLog( "Uninstall clients succeeded" );
                     }
                     else
                     {
-                        productOperation.addLogFailed(
+                        trackerOperation.addLogFailed(
                                 String.format( "Uninstall clients failed, %s", uninstallClientsCommand.getAllErrors() ) );
                         return;
                     }
                 }
 
 
-                productOperation.addLog( "Updating db..." );
+                trackerOperation.addLog( "Updating db..." );
                 manager.getPluginDAO().deleteInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName() );
                 // TODO check if delete is succesful
-                productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
+                trackerOperation.addLogDone( "Cluster info deleted from DB\nDone" );
             }
         } );
     }

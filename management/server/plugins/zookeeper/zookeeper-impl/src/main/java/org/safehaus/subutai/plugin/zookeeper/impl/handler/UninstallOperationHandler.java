@@ -20,7 +20,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
     public UninstallOperationHandler( ZookeeperImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
 
@@ -28,7 +28,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -38,7 +38,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
         ZookeeperClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -48,26 +48,26 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
         // installed later
         if ( config.getSetupType() == SetupType.STANDALONE )
         {
-            productOperation.addLog( "Destroying lxc containers" );
+            trackerOperation.addLog( "Destroying lxc containers" );
             try
             {
                 manager.getContainerManager().clonesDestroy( config.getNodes() );
-                productOperation.addLog( "Lxc containers successfully destroyed" );
+                trackerOperation.addLog( "Lxc containers successfully destroyed" );
             }
             catch ( LxcDestroyException ex )
             {
-                productOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+                trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
             }
 
-            productOperation.addLog( "Deleting cluster information from database..." );
+            trackerOperation.addLog( "Deleting cluster information from database..." );
 
             manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
-            productOperation.addLogDone( "Cluster information deleted from database" );
+            trackerOperation.addLogDone( "Cluster information deleted from database" );
         }
         else
         {
             //just uninstall nodes
-            productOperation.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
+            trackerOperation.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
             Command uninstallCommand = manager.getCommands().getUninstallCommand( config.getNodes() );
             manager.getCommandRunner().runCommand( uninstallCommand );
@@ -76,22 +76,22 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
             {
                 if ( uninstallCommand.hasSucceeded() )
                 {
-                    productOperation.addLog( "Cluster successfully uninstalled" );
+                    trackerOperation.addLog( "Cluster successfully uninstalled" );
                 }
                 else
                 {
-                    productOperation.addLog( String.format( "Uninstallation failed, %s, skipping...",
+                    trackerOperation.addLog( String.format( "Uninstallation failed, %s, skipping...",
                             uninstallCommand.getAllErrors() ) );
                 }
 
-                productOperation.addLog( "Deleting cluster information from database..." );
+                trackerOperation.addLog( "Deleting cluster information from database..." );
 
                 manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
-                productOperation.addLogDone( "Cluster information deleted from database" );
+                trackerOperation.addLogDone( "Cluster information deleted from database" );
             }
             else
             {
-                productOperation.addLogFailed( "Uninstallation failed, command timed out" );
+                trackerOperation.addLogFailed( "Uninstallation failed, command timed out" );
             }
         }
     }

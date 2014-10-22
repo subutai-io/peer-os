@@ -21,7 +21,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
     }
 
@@ -32,7 +32,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -41,26 +41,26 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
         if ( elasticsearchClusterConfiguration.getNodes().contains( agent ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Checking prerequisites..." );
+        trackerOperation.addLog( "Checking prerequisites..." );
 
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( "Failed to check presence of installed subutai packages\nInstallation aborted" );
             return;
         }
@@ -69,18 +69,18 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
 
         if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase() ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Node %s already has Elasticsearch installed\nInstallation aborted", lxcHostname ) );
             return;
         }
 
         elasticsearchClusterConfiguration.getNodes().add( agent );
-        productOperation.addLog( "Updating db..." );
+        trackerOperation.addLog( "Updating db..." );
         //save to db
         if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
         {
-            productOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
+            trackerOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
             //install mahout
 
             Command installCommand = manager.getCommands().getInstallCommand( Sets.newHashSet( agent ) );
@@ -88,18 +88,18 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
 
             if ( installCommand.hasSucceeded() )
             {
-                productOperation.addLogDone( "Installation succeeded\nDone" );
+                trackerOperation.addLogDone( "Installation succeeded\nDone" );
             }
             else
             {
 
-                productOperation
+                trackerOperation
                         .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
             }
         }
         else
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( "Could not update cluster info in DB! Please see logs\nInstallation aborted" );
         }
     }

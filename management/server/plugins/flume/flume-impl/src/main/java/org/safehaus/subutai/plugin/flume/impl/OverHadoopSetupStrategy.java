@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -16,7 +16,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 class OverHadoopSetupStrategy extends FlumeSetupStrategy
 {
 
-    public OverHadoopSetupStrategy( FlumeImpl manager, FlumeConfig config, ProductOperation po )
+    public OverHadoopSetupStrategy( FlumeImpl manager, FlumeConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -78,7 +78,7 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy
 
         po.addLog( "Installing Flume..." );
         String s = Commands.make( CommandType.INSTALL );
-        cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ).withTimeout( 180 ), config.getNodes() );
+        cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ).withTimeout( 1800 ), config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )
