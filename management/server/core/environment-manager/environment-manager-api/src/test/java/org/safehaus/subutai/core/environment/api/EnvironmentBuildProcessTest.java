@@ -27,7 +27,8 @@ public class EnvironmentBuildProcessTest
     @Before
     public void setUp() throws Exception
     {
-        process = new EnvironmentBuildProcess( NAME );
+        UUID blueprintUUID = UUID.randomUUID();
+        process = new EnvironmentBuildProcess( blueprintUUID );
     }
 
 

@@ -190,7 +190,7 @@ public class Node2PeerWizard extends Window
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
                     managerUI.getEnvironmentManager()
-                             .saveBuildProcess( blueprint.getName(), topology, map, TopologyEnum.NODE_2_PEER );
+                             .saveBuildProcess( blueprint.getId(), topology, map, TopologyEnum.NODE_2_PEER );
                 }
                 else
                 {

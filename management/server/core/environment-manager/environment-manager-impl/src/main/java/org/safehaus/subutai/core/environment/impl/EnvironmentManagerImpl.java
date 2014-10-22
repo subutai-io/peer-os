@@ -314,11 +314,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean deleteBlueprint( String name )
+    public boolean deleteBlueprint( UUID blueprintId )
     {
         try
         {
-            environmentDAO.deleteBlueprint( name );
+            environmentDAO.deleteBlueprint( blueprintId );
             return true;
         }
         catch ( EnvironmentPersistenceException e )
@@ -355,12 +355,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintName() );
+            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintUUID() );
 
-            Environment environment = new Environment( process.getBlueprintName() );
+            Environment environment = new Environment( blueprint.getName() );
             saveEnvironment( environment );
-            TrackerOperation operation =
-                    tracker.createTrackerOperation( process.getUuid().toString(), process.getBlueprintName() );
+            TrackerOperation operation = tracker.createTrackerOperation( environment.getName(), environment.getName() );
 
             int containerCount = 0;
             long timeout = 1000 * 60;
@@ -574,7 +573,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean saveBuildProcess( final String blueprintName, final Map<Object, Peer> topology,
+    public boolean saveBuildProcess( final UUID blueprintId, final Map<Object, Peer> topology,
                                      final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
     {
         EnvironmentBuildProcess process = null;
@@ -583,12 +582,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             case NODE_2_PEER:
             {
-                process = topologyBuilder.createEnvironmentBuildProcessN2P( blueprintName, topology, map );
+                process = topologyBuilder.createEnvironmentBuildProcessN2P( blueprintId, topology, map );
                 break;
             }
             case NODE_GROUP_2_PEER:
             {
-                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( blueprintName, topology, map );
+                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( blueprintId, topology, map );
                 break;
             }
             case BLUEPRINT_2_PEER:

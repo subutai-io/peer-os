@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.environment.impl.builder;
 
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.NodeGroup;
@@ -16,10 +17,10 @@ public class TopologyBuilder
 {
 
 
-    public EnvironmentBuildProcess createEnvironmentBuildProcessN2P( String blueprintName, Map<Object, Peer> topology,
+    public EnvironmentBuildProcess createEnvironmentBuildProcessN2P( UUID blueprintId, Map<Object, Peer> topology,
                                                                      Map<Object, NodeGroup> map )
     {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( blueprintName );
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( blueprintId );
 
         for ( Object itemId : map.keySet() )
         {
@@ -48,11 +49,11 @@ public class TopologyBuilder
     }
 
 
-    public EnvironmentBuildProcess createEnvironmentBuildProcessNG2Peer( String blueprintName,
+    public EnvironmentBuildProcess createEnvironmentBuildProcessNG2Peer( UUID blueprintId,
                                                                          Map<Object, Peer> topology,
                                                                          Map<Object, NodeGroup> map )
     {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( blueprintName );
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( blueprintId );
 
         for ( Object itemId : map.keySet() )
         {

@@ -55,7 +55,7 @@ public interface EnvironmentManager
 
     boolean deleteBlueprintTask( String name );
 
-    boolean deleteBlueprint( String name );
+    boolean deleteBlueprint( UUID blueprintId );
 
     void saveEnvironment( final Environment environment );
 
@@ -75,6 +75,6 @@ public interface EnvironmentManager
 
     Environment getEnvironmentByUUID( UUID environmentId );
 
-    boolean saveBuildProcess( String blueprintName, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
+    boolean saveBuildProcess( UUID blueprintId, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
                               TopologyEnum topologyEnum );
 }

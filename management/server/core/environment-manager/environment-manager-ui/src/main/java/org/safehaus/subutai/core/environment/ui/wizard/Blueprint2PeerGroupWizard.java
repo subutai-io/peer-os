@@ -190,7 +190,7 @@ public class Blueprint2PeerGroupWizard extends Window
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
-                    managerUI.getEnvironmentManager().saveBuildProcess( blueprint.getName(), topology, map,
+                    managerUI.getEnvironmentManager().saveBuildProcess( blueprint.getId(), topology, map,
                             TopologyEnum.BLUEPRINT_2_PEER_GROUP );
                 }
                 else

@@ -158,7 +158,7 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        boolean result = module.getEnvironmentManager().deleteBlueprint( blueprint.getName() );
+                        boolean result = module.getEnvironmentManager().deleteBlueprint( blueprint.getId() );
                         if ( result )
                         {
                             Notification.show( "Blueprint deleted" );

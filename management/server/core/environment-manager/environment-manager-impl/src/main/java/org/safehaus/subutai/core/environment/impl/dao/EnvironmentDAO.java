@@ -47,7 +47,7 @@ public class EnvironmentDAO
     protected void setupDb() throws SQLException
     {
 
-        String sql1 = "create table if not exists blueprint (name varchar(100), info clob, PRIMARY KEY (name));";
+        String sql1 = "create table if not exists blueprint (id uuid, info clob, PRIMARY KEY (id));";
         String sql2 =
                 "create table if not exists process (source varchar(100), id uuid, info clob, PRIMARY KEY (source, "
                         + "id));";
@@ -191,7 +191,7 @@ public class EnvironmentDAO
         try
         {
             String json = GSON.toJson( blueprint );
-            dbUtil.update( "merge into blueprint (name, info) values (? , ?)", blueprint.getName(), json );
+            dbUtil.update( "merge into blueprint (id, info) values (? , ?)", blueprint.getId(), json );
         }
         catch ( JsonParseException | SQLException e )
         {
@@ -224,12 +224,11 @@ public class EnvironmentDAO
     }
 
 
-    public boolean deleteBlueprint( final String name ) throws EnvironmentPersistenceException
+    public boolean deleteBlueprint( final UUID blueprintId ) throws EnvironmentPersistenceException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Blueprint name is null or empty" );
         try
         {
-            dbUtil.update( "delete from blueprint where name = ?", name );
+            dbUtil.update( "delete from blueprint where id = ?", blueprintId );
             return true;
         }
         catch ( SQLException e )
@@ -239,11 +238,11 @@ public class EnvironmentDAO
     }
 
 
-    public EnvironmentBlueprint getBlueprint( String name ) throws EnvironmentPersistenceException
+    public EnvironmentBlueprint getBlueprint( UUID blueprintId ) throws EnvironmentPersistenceException
     {
         try
         {
-            ResultSet rs = dbUtil.select( "select info from blueprint where name = ?", name );
+            ResultSet rs = dbUtil.select( "select info from blueprint where id = ?", blueprintId );
             if ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
