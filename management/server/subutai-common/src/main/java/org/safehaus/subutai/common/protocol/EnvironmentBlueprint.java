@@ -3,6 +3,7 @@ package org.safehaus.subutai.common.protocol;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.settings.Common;
 
@@ -18,11 +19,19 @@ public class EnvironmentBlueprint
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
+    private transient UUID id;
 
 
     public EnvironmentBlueprint()
     {
+        this.id = UUID.randomUUID();
         this.nodeGroups = new HashSet<>();
+    }
+
+
+    public UUID getId()
+    {
+        return id;
     }
 
 
