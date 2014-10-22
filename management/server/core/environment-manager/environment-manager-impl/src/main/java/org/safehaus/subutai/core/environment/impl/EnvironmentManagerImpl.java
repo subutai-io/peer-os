@@ -333,7 +333,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             ccm.setEnvId( environment.getUuid() );
 
             containerCount = containerCount + ccm.getNumberOfNodes();
-            timeout = 1000 * 15 * ccm.getNumberOfNodes();
+            timeout = 1000 * 30 * ccm.getNumberOfNodes();
 
             //TODO: move template addition on create ccm
             List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
