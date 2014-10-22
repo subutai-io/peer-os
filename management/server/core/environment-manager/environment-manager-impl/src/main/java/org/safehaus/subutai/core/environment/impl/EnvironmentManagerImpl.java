@@ -216,9 +216,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     /**
      * This method should be deprecated soon
-     * @param environmentBuildTask
-     * @return
-     * @throws EnvironmentBuildException
      */
     @Override
     public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
@@ -373,13 +370,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             //TODO: move template addition on create ccm
             List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
-            if ( templates.isEmpty() )
-            {
-                environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                saveEnvironment( environment );
-                throw new EnvironmentBuildException( "Could not fetch parent templates list" );
-            }
-
             Template installationTemplate = templateRegistry.getTemplate( ccm.getTemplate() );
             if ( installationTemplate != null )
             {
