@@ -23,10 +23,10 @@ public class ExecuteCommandMessage extends PeerCommandMessage
     private String cwd;
 
 
-    public ExecuteCommandMessage( UUID envId, UUID peerId, UUID agentId, String command, RequestType requestType,
+    public ExecuteCommandMessage( /*UUID envId,*/ UUID peerId, UUID agentId, String command, RequestType requestType,
                                   long timeout, String cwd )
     {
-        super( PeerCommandType.EXECUTE, envId, peerId, agentId );
+        super( PeerCommandType.EXECUTE,/* envId, */peerId, agentId );
         this.command = command;
         this.requestType = requestType;
         this.timeout = timeout;

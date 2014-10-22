@@ -29,10 +29,10 @@ public class DestroyContainersMessage extends PeerCommandMessage
     }
 
 
-    public DestroyContainersMessage( final PeerCommandType type, final UUID envId, final UUID peerId,
+    public DestroyContainersMessage( final PeerCommandType type,/* final UUID envId,*/ final UUID peerId,
                                      final UUID agentId )
     {
-        super( type, envId, peerId, agentId );
+        super( type, /*envId,*/ peerId, agentId );
     }
 
 

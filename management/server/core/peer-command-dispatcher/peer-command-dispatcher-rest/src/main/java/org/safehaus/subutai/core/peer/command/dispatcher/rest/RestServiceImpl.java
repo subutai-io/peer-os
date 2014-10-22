@@ -97,8 +97,8 @@ public class RestServiceImpl implements RestService
     @Override
     public String getCreateContainersMsgJsonFormat()
     {
-        CloneContainersMessage ccm =
-                new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
+        CloneContainersMessage ccm = new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID() );
+        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
         ccm.setStrategy( "ROUND_ROBIN" );
         //        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
         ccm.setNumberOfNodes( 2 );

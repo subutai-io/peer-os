@@ -27,6 +27,7 @@ import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.ContainerState;
 import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
+import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
@@ -44,18 +45,25 @@ import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.LocalPeerImpl;
+import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
+import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.peer.api.message.Common;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
+import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +93,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     private Set<PeerContainer> containers = new HashSet<>();
     private CommunicationManager communicationManager;
     private ManagementHost managementHost;
+    private LocalPeer localPeer;
 
 
     public PeerManagerImpl( final DataSource dataSource )
@@ -105,6 +114,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             LOG.error( e.getMessage(), e );
         }
         communicationManager.addListener( this );
+        localPeer = new LocalPeerImpl( this );
     }
 
 
@@ -201,14 +211,14 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     @Override
     public Peer getPeerByUUID( UUID uuid )
     {
-        if ( getSiteId().compareTo( uuid ) == 0 )
-        {
-            Peer peer = new Peer();
-            peer.setId( uuid );
-            peer.setIp( getLocalIp() );
-            peer.setName( "Me" );
-            return peer;
-        }
+        //        if ( getSiteId().compareTo( uuid ) == 0 )
+        //        {
+        //            Peer peer = new Peer();
+        //            peer.setId( uuid );
+        //            peer.setIp( getLocalIp() );
+        //            peer.setName( "Me" );
+        //            return peer;
+        //        }
 
         return peerDAO.getInfo( SOURCE, uuid.toString(), Peer.class );
     }
@@ -484,18 +494,6 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     }
 
 
-    public boolean startContainerHost( Host container )
-    {
-        return containerManager.startLxcOnHost( container.getParentHost().getAgent(), container.getHostname() );
-    }
-
-
-    public boolean stopContainerHost( Host container )
-    {
-        return containerManager.stopLxcOnHost( container.getParentHost().getAgent(), container.getHostname() );
-    }
-
-
     @Override
     public boolean stopContainer( final PeerContainer container )
     {
@@ -545,7 +543,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             return;
         }
         PeerContainer peerContainer = containerLookup( peerCommandMessage );
-        Host destinationHost = findHost( peerCommandMessage.getAgentId() );
+        //        HostImpl destinationHost = findHost( peerCommandMessage.getAgentId() );
         LOG.debug( String.format( "Before =================[%s]", peerCommandMessage ) );
         boolean result;
         Template template;
@@ -580,6 +578,9 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 peerCommandMessage.setResult( peerId );
                 break;
             case GET_CONNECTED_CONTAINERS:
+                //TODO: implement with ContainerHost
+                UUID envId = JsonUtil.fromJson( peerCommandMessage.getInput().toString(), UUID.class );
+
                 Set<Agent> agents = agentManager.getAgents();
 
                 Set<PeerContainer> containers = new HashSet<>();
@@ -595,7 +596,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 peerCommandMessage.setResult( jsonObject );
                 break;
             case START:
-                result = startContainerHost( destinationHost );
+                result = startContainer( peerContainer );
                 if ( result )
                 {
                     peerCommandMessage.setResult( "true" );
@@ -606,7 +607,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 }
                 break;
             case STOP:
-                result = stopContainerHost( destinationHost );
+                result = stopContainer( peerContainer );
                 if ( result )
                 {
                     peerCommandMessage.setResult( "true" );
@@ -618,22 +619,22 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 break;
             case IS_CONNECTED:
 
-                result = destinationHost.isConnected();
-                if ( result )
-                {
-                    peerCommandMessage.setResult( "true" );
-                }
-                else
-                {
-                    //                    peerCommandMessage.setSuccess( result );
-                    peerCommandMessage.setExceptionMessage( "Container is not connected." );
-                }
+                //                result = peerContainer.isConnected();
+                //                if ( result )
+                //                {
+                //                    peerCommandMessage.setResult( "true" );
+                //                }
+                //                else
+                //                {
+                //                    //                    peerCommandMessage.setSuccess( result );
+                //                    peerCommandMessage.setExceptionMessage( "Container is not connected." );
+                //                }
                 break;
             case EXECUTE:
                 if ( peerCommandMessage instanceof ExecuteCommandMessage )
                 {
                     ExecuteCommandMessage ecm = ( ExecuteCommandMessage ) peerCommandMessage;
-                    executeCommand( peerContainer, ecm );
+                    executeCommand( ecm );
                 }
                 else
                 {
@@ -730,8 +731,87 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     }
 
 
-    private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
+    @Override
+    public PeerInterface getPeer( final UUID peerId )
     {
+        Peer peer = findPeerById( peerId );
+
+        if ( peer != null )
+        {
+
+            if ( peer.getId().equals( getSiteId() ) )
+            {
+                return localPeer;
+            }
+            else
+            {
+                return new RemotePeerImpl( peer );
+            }
+        }
+        return null;
+    }
+
+
+    private Peer findPeerById( final UUID peerId )
+    {
+        Peer result = null;
+        Iterator<Peer> iterator = peers().iterator();
+        while ( result == null && iterator.hasNext() )
+        {
+
+            Peer peer = iterator.next();
+            if ( peer.getId().equals( peerId ) )
+            {
+                result = peer;
+            }
+        }
+        return result;
+    }
+
+
+    @Override
+    public Set<ContainerHost> createContainers( final UUID envId, final String templateName, final int quantity,
+                                                final String strategyId, final List<Criteria> criteria )
+            throws ContainerCreateException
+    {
+        //TODO: implement me
+        return null;
+    }
+
+
+    @Override
+    public boolean isConnected( final Host host )
+    {
+        return false;
+    }
+
+
+    private void executeCommand( final ExecuteCommandMessage ecm )
+    {
+        //        HostImpl host = findHost( ecm.getAgentId() );
+        //        RequestBuilder requestBuilder = new RequestBuilder( ecm.getCommand() );
+        //
+        //
+        //        if ( ecm.getCwd() != null && !Strings.isNullOrEmpty( ecm.getCwd() ) )
+        //        {
+        //            requestBuilder.withCwd( ecm.getCwd() );
+        //        }
+        //
+        //        long timeout = ecm.getTimeout();
+        //        requestBuilder.withTimeout( ( int ) timeout );
+        //        try
+        //        {
+        //            Command cmd = host.execute( requestBuilder );
+        //            AgentResult result = cmd.getResults().get( ecm.getAgentId() );
+        //            ExecuteCommandMessage.ExecutionResult executionResult =
+        //                    ecm.createExecutionResult( result.getStdOut(), result.getStdErr(), result.getExitCode() );
+        //            ecm.setResult( executionResult );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //            ecm.setExceptionMessage( e.toString() );
+        //        }
+
         Agent agent = agentManager.getAgentByUUID( ecm.getAgentId() );
         if ( agent == null )
         {
@@ -799,24 +879,24 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     }
 
 
-    private Host findHost( UUID uuid )
-    {
-        Iterator iterator = managementHost.getSlaveHosts().iterator();
-        Host result = null;
-        while ( result == null && iterator.hasNext() )
-        {
-            Host c = ( Host ) iterator.next();
-            if ( c.getAgent().getUuid().equals( uuid ) )
-            {
-                result = c;
-            }
-            else
-            {
-                result = c.getChildHost( uuid );
-            }
-        }
-        return result;
-    }
+    //    private HostImpl findHost( UUID uuid )
+    //    {
+    //        Iterator iterator = managementHost.getSlaveHosts().iterator();
+    //        HostImpl result = null;
+    //        while ( result == null && iterator.hasNext() )
+    //        {
+    //            HostImpl c = ( HostImpl ) iterator.next();
+    //            if ( c.getAgent().getUuid().equals( uuid ) )
+    //            {
+    //                result = c;
+    //            }
+    //            else
+    //            {
+    //                result = c.getChildHost( uuid );
+    //            }
+    //        }
+    //        return result;
+    //    }
 
 
     private String getLocalIp()
@@ -871,10 +951,11 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             {
                 if ( managementHost == null )
                 {
-                    managementHost = new ManagementHost();
+                    managementHost = new ManagementHostImpl();
                     managementHost.setAgent( PeerUtils.buildAgent( response ) );
+                    managementHost.setParentAgent( NullAgent.getInstance() );
                 }
-                managementHost.updateHeartBeat();
+                managementHost.updateHeartbeat();
                 return;
             }
 
@@ -885,33 +966,42 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
             if ( response.getHostname().startsWith( "py" ) )
             {
-                Host host = managementHost.getChildHost( response.getHostname() );
+                ResourceHost host = managementHost.getResourceHostByName( response.getHostname() );
                 if ( host == null )
                 {
-                    host = new ResourceHost();
+                    host = new ResourceHostImpl();
                     host.setAgent( PeerUtils.buildAgent( response ) );
-                    managementHost.addSlaveHost( host );
+                    host.setParentAgent( managementHost.getAgent() );
+                    managementHost.addResourceHost( host );
                 }
-                host.updateHeartBeat();
+                host.updateHeartbeat();
                 return;
             }
 
-            Host resourceHost = managementHost.getChildHost( response.getParentHostName() );
+            ResourceHost resourceHost = managementHost.getResourceHostByName( response.getParentHostName() );
             if ( resourceHost == null )
             {
                 return;
             }
 
-            Host containerHost = resourceHost.getChildHost( response.getHostname() );
+            ContainerHost containerHost = resourceHost.getContainerHostByName( response.getHostname() );
 
             if ( containerHost == null )
             {
-                containerHost = new ResourceHost();
+                containerHost = new ContainerHostImpl();
                 containerHost.setAgent( PeerUtils.buildAgent( response ) );
-                resourceHost.addSlaveHost( containerHost );
+                containerHost.setParentAgent( resourceHost.getAgent() );
+                resourceHost.addContainerHost( containerHost );
             }
 
-            containerHost.updateHeartBeat();
+            containerHost.updateHeartbeat();
         }
+    }
+
+
+    @Override
+    public ManagementHost getManagementHost()
+    {
+        return this.managementHost;
     }
 }

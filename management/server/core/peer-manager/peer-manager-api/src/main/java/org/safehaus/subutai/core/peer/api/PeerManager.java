@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
+import org.safehaus.subutai.core.strategy.api.Criteria;
 
 
 /**
@@ -66,4 +67,14 @@ public interface PeerManager
     void deletePeerGroup( PeerGroup group );
 
     boolean savePeerGroup( PeerGroup group );
+
+    public PeerInterface getPeer( UUID peerId );
+
+
+    public Set<ContainerHost> createContainers( UUID envId, String templateName, int quantity, String strategyId,
+                                                List<Criteria> criteria ) throws ContainerCreateException;
+
+    public boolean isConnected( Host host );
+
+    public ManagementHost getManagementHost();
 }
