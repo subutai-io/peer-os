@@ -50,12 +50,6 @@ public class EnvironmentWizard
     }
 
 
-    public EnvironmentManager getEnvironmentManager()
-    {
-        return environmentManager;
-    }
-
-
     private void putForm()
     {
         verticalLayout.removeAllComponents();
@@ -83,6 +77,12 @@ public class EnvironmentWizard
                 break;
             }
         }
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
     }
 
 

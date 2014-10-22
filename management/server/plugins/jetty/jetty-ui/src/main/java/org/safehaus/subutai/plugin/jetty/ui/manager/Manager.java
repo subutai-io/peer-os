@@ -185,8 +185,8 @@ public class Manager
                             stopAllBtn.click();
                             UUID trackID = jetty.uninstallCluster( config.getClusterName() );
 
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    JettyConfig.PRODUCT_KEY );
+                            ProgressWindow window =
+                                    new ProgressWindow( executorService, tracker, trackID, JettyConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -433,19 +433,19 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute( new StopTask( jetty, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                executorService.execute(
+                        new StopTask( jetty, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
@@ -461,19 +461,18 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( jetty, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new StartTask( jetty, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
@@ -489,29 +488,28 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( jetty, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CheckTask( jetty, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    resultHolder.setValue( result );
+                                    if ( resultHolder.getValue().contains( "not" ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( resultHolder.getValue().contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
                                     }
-                                } ) );
+                                    else
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        } ) );
             }
         } );
     }

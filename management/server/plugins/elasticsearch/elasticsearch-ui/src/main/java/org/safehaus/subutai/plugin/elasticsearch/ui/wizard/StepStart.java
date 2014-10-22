@@ -36,7 +36,7 @@ public class StepStart extends VerticalLayout
         gridLayout.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start" );
-        next.setId("ElasticSearchStart");
+        next.setId( "ElasticSearchStart" );
         next.addStyleName( "default" );
         next.setWidth( 100, Unit.PIXELS );
         gridLayout.addComponent( next, 6, 4, 6, 4 );

@@ -141,43 +141,10 @@ public class PigImpl implements Pig
 
 
     @Override
-    public UUID uninstallCluster( final String clusterName )
-    {
-        AbstractOperationHandler operationHandler = new DestroyClusterOperationHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public List<PigConfig> getClusters()
-    {
-        return pluginDao.getInfo( PigConfig.PRODUCT_KEY, PigConfig.class );
-    }
-
-
-    @Override
-    public PigConfig getCluster( String clusterName )
-    {
-        return pluginDao.getInfo( PigConfig.PRODUCT_KEY, clusterName, PigConfig.class );
-    }
-
-
-    @Override
     public UUID installCluster( PigConfig config, HadoopClusterConfig hadoopConfig )
     {
         InstallOperationHandler operationHandler = new InstallOperationHandler( this, config );
         operationHandler.setHadoopConfig( hadoopConfig );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID installCluster( PigConfig config )
-    {
-        Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -215,5 +182,38 @@ public class PigImpl implements Pig
             return s;
         }
         return null;
+    }
+
+
+    @Override
+    public UUID installCluster( PigConfig config )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID uninstallCluster( final String clusterName )
+    {
+        AbstractOperationHandler operationHandler = new DestroyClusterOperationHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public List<PigConfig> getClusters()
+    {
+        return pluginDao.getInfo( PigConfig.PRODUCT_KEY, PigConfig.class );
+    }
+
+
+    @Override
+    public PigConfig getCluster( String clusterName )
+    {
+        return pluginDao.getInfo( PigConfig.PRODUCT_KEY, clusterName, PigConfig.class );
     }
 }

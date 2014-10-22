@@ -28,10 +28,10 @@ import static org.mockito.Mockito.when;
 
 public class InstallOperationHandlerTest
 {
-    private String clusterName = "testClusterName";
     JettyImpl manager = new JettyImpl();
     JettyConfig config = new JettyConfig();
     InstallOperationHandler handler;
+    private String clusterName = "testClusterName";
 
 
     @Before

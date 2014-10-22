@@ -116,7 +116,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy
         Set<EnvironmentContainer> mongoEnvironmentContainers = new HashSet<>();
         for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
+            if ( environmentContainer.getTemplate().getProducts()
+                                     .contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) )
             {
                 mongoAgents.add( environmentContainer.getAgent() );
                 mongoEnvironmentContainers.add( environmentContainer );

@@ -85,9 +85,9 @@ public class Manager extends BaseManager
 
         //tables go here
         serverTable = createTableTemplate( SERVER_TABLE_CAPTION );
-        serverTable.setId("OozieMngServerTable");
+        serverTable.setId( "OozieMngServerTable" );
         clientsTable = createTableTemplate( CLIENT_TABLE_CAPTION );
-        clientsTable.setId("OozieMngClientsTable");
+        clientsTable.setId( "OozieMngClientsTable" );
 
         /*
         nodesTable = createTableTemplate(NODES_TABLE_CAPTION);
@@ -102,7 +102,7 @@ public class Manager extends BaseManager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("OozieMngClusterCombo");
+        clusterCombo.setId( "OozieMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -119,7 +119,7 @@ public class Manager extends BaseManager
         controlsContent.addComponent( clusterCombo );
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
-        refreshClustersBtn.setId("OozieMngRefresh");
+        refreshClustersBtn.setId( "OozieMngRefresh" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -144,7 +144,7 @@ public class Manager extends BaseManager
         } );*/
 
         Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("OozieMngDestroy");
+        destroyClusterBtn.setId( "OozieMngDestroy" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -187,7 +187,7 @@ public class Manager extends BaseManager
 
 
         Button addNodeButton = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeButton.setId("OozieMngAddNode");
+        addNodeButton.setId( "OozieMngAddNode" );
         addNodeButton.addStyleName( "default" );
         addNodeButton.addClickListener( addNodeButtonListener() );
 
@@ -263,8 +263,8 @@ public class Manager extends BaseManager
                             public void buttonClick( Button.ClickEvent event )
                             {
                                 UUID trackId = oozieManager.addNode( config.getClusterName(), null );
-                                ProgressWindow w = new ProgressWindow( executorService, tracker, trackId,
-                                        config.getProductKey() );
+                                ProgressWindow w =
+                                        new ProgressWindow( executorService, tracker, trackId, config.getProductKey() );
                                 contentRoot.getUI().addWindow( w.getWindow() );
                             }
                         } );
@@ -291,31 +291,22 @@ public class Manager extends BaseManager
         }
     }
 
-    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
-    {
-        if ( availableOperationsLayout == null )
-        {
-            return null;
-        }
-        else
-        {
-            for ( Component component : availableOperationsLayout )
-            {
-                if ( component.getCaption().equals( caption ) )
-                {
-                    return ( Button ) component;
-                }
-            }
-            return null;
-        }
-    }
-
 
     private void populateServerTable( final Table table, final Agent agent )
     {
         List<Agent> agentList = new ArrayList<>();
         agentList.add( agent );
         //agentList.add(config.getServer());
+        populateTable( table, agentList );
+    }
+
+
+    private void populateClientsTable( final Table table, Set<Agent> clientNodes )
+    {
+
+        table.removeAllItems();
+        List<Agent> agentList = new ArrayList<>();
+        agentList.addAll( clientNodes );
         populateTable( table, agentList );
     }
 
@@ -351,23 +342,24 @@ public class Manager extends BaseManager
     }
 
 
-    private void populateClientsTable( final Table table, Set<Agent> clientNodes )
+    @Override
+    public void addRowComponents( Table table, final Agent agent )
     {
-
-        table.removeAllItems();
-        List<Agent> agentList = new ArrayList<>();
-        agentList.addAll( clientNodes );
-        populateTable( table, agentList );
+        Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
+        Preconditions.checkNotNull( agent, "Cannot add null agent to the table" );
+        if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) )
+        {
+            addServerRow( table, agent );
+        }
+        else
+        {
+            addClientRow( table, agent );
+        }
     }
 
 
-    private void show( String notification )
+    public Table createTableTemplate( String caption )
     {
-        Notification.show( notification );
-    }
-
-
-    public Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
@@ -412,23 +404,35 @@ public class Manager extends BaseManager
     }
 
 
-    public Component getContent()
+    private void show( String notification )
     {
-        return contentRoot;
+        Notification.show( notification );
     }
 
 
-    @Override
-    public void addRowComponents( Table table, final Agent agent )
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
     {
-        Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
-        Preconditions.checkNotNull( agent, "Cannot add null agent to the table" );
-        if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) ) {
-            addServerRow( table, agent );
+        if ( availableOperationsLayout == null )
+        {
+            return null;
         }
-        else {
-            addClientRow( table, agent );
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
         }
+    }
+
+
+    public Component getContent()
+    {
+        return contentRoot;
     }
 
 
@@ -445,11 +449,11 @@ public class Manager extends BaseManager
 
         // Buttons to be added to availableOperations
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-        checkButton.setId(agent.getListIP().get(0) + "-oozieCheck");
+        checkButton.setId( agent.getListIP().get( 0 ) + "-oozieCheck" );
         final Button startButton = new Button( START_BUTTON_CAPTION );
-        startButton.setId(agent.getListIP().get(0) + "-oozieStart");
+        startButton.setId( agent.getListIP().get( 0 ) + "-oozieStart" );
         final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-        stopButton.setId(agent.getListIP().get(0) + "-oozieStop");
+        stopButton.setId( agent.getListIP().get( 0 ) + "-oozieStop" );
 
         checkButton.addStyleName( "default" );
         startButton.addStyleName( "default" );
@@ -468,14 +472,14 @@ public class Manager extends BaseManager
         statusGroup.addComponent( statusLabel );
 
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().get(0).toString(), statusGroup, availableOperations
+                agent.getHostname(), agent.getListIP().get( 0 ).toString(), statusGroup, availableOperations
         }, null );
 
         Item row = getAgentRow( table, agent );
 
         checkButton.addClickListener( checkButtonListener( row ) );
         startButton.addClickListener( startButtonListener( row ) );
-        stopButton.addClickListener(  stopButtonListener( row ) );
+        stopButton.addClickListener( stopButtonListener( row ) );
     }
 
 
@@ -490,7 +494,7 @@ public class Manager extends BaseManager
 
         // Buttons to be added to availableOperations
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
-        destroyButton.setId(agent.getListIP().get(0) + "-oozieDestroy");
+        destroyButton.setId( agent.getListIP().get( 0 ) + "-oozieDestroy" );
 
         destroyButton.addStyleName( "default" );
         // Buttons to be added to availableOperations
@@ -498,7 +502,7 @@ public class Manager extends BaseManager
         availableOperations.addComponent( destroyButton );
 
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().get(0).toString(),statusLayout, availableOperations
+                agent.getHostname(), agent.getListIP().get( 0 ).toString(), statusLayout, availableOperations
         }, null );
 
         Item row = getAgentRow( table, agent );
@@ -526,17 +530,19 @@ public class Manager extends BaseManager
                 Agent agent = getAgentByRow( row );
 
                 OperationType operationType;
-                if ( !isRunning ) {
+                if ( !isRunning )
+                {
                     operationType = OperationType.Start;
                 }
-                else {
+                else
+                {
                     operationType = OperationType.Stop;
                 }
-                executorService
-                        .execute( new OperationTask( oozieManager, tracker, operationType,
-                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
+                executorService.execute(
+                        new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
+                                startStopCheckCompleteEvent( row ), null, agent ) );
             }
-        } ;
+        };
     }
 
 
@@ -578,6 +584,37 @@ public class Manager extends BaseManager
     }
 
 
+    private Label getStatusLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 0 );
+    }
+
+
+    protected Agent getAgentByRow( final Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
+
+        Set<Agent> clusterNodeList = config.getAllOozieAgents();
+        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+
+        for ( Agent agent : clusterNodeList )
+        {
+            if ( agent.getHostname().equals( lxcHostname ) )
+            {
+                return agent;
+            }
+        }
+        return null;
+    }
+
+
     private Button.ClickListener destroyButtonListener( final Item row )
     {
         return new Button.ClickListener()
@@ -606,8 +643,10 @@ public class Manager extends BaseManager
                 } );
                 contentRoot.getUI().addWindow( window.getWindow() );
             }
-        } ;
+        };
     }
+
+
     private Button.ClickListener startButtonListener( final Item row )
     {
         return new Button.ClickListener()
@@ -630,16 +669,18 @@ public class Manager extends BaseManager
                 Agent agent = getAgentByRow( row );
 
                 OperationType operationType;
-                if ( !isRunning ) {
+                if ( !isRunning )
+                {
                     operationType = OperationType.Start;
 
-                    executorService
-                        .execute( new OperationTask( oozieManager, tracker, operationType,
-                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
+                    executorService.execute(
+                            new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
+                                    startStopCheckCompleteEvent( row ), null, agent ) );
                 }
             }
-        } ;
+        };
     }
+
 
     private Button.ClickListener stopButtonListener( final Item row )
     {
@@ -667,14 +708,14 @@ public class Manager extends BaseManager
                 {
                     operationType = OperationType.Stop;
 
-                    executorService
-                        .execute( new OperationTask( oozieManager, tracker, operationType,
-                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
-
+                    executorService.execute(
+                            new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
+                                    startStopCheckCompleteEvent( row ), null, agent ) );
                 }
             }
-        } ;
+        };
     }
+
 
     private Button.ClickListener checkButtonListener( final Item row )
     {
@@ -696,36 +737,10 @@ public class Manager extends BaseManager
                 Agent agent = getAgentByRow( row );
 
                 OperationType operationType = OperationType.Status;
-                executorService
-                        .execute( new OperationTask( oozieManager, tracker, operationType,
-                                NodeType.SERVER, config, startStopCheckCompleteEvent( row ), null, agent ) );
-
+                executorService.execute(
+                        new OperationTask( oozieManager, tracker, operationType, NodeType.SERVER, config,
+                                startStopCheckCompleteEvent( row ), null, agent ) );
             }
         };
-    }
-
-
-    protected Agent getAgentByRow( final Item row ) {
-        if ( row == null ) {
-            return null;
-        }
-
-        Set<Agent> clusterNodeList = config.getAllOozieAgents();
-        String lxcHostname= row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-
-        for ( Agent agent : clusterNodeList ) {
-            if ( agent.getHostname().equals( lxcHostname ) ) {
-                return agent;
-            }
-        }
-        return null;
-    }
-
-
-    private Label getStatusLabel( final HorizontalLayout statusGroupLayout ) {
-        if ( statusGroupLayout == null ) {
-            return null;
-        }
-        return (Label) statusGroupLayout.getComponent( 0 );
     }
 }

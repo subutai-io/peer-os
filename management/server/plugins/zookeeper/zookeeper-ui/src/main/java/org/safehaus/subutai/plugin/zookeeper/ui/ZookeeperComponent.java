@@ -35,9 +35,9 @@ public class ZookeeperComponent extends CustomComponent
         final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         zookeeperSheet.addTab( wizard.getContent(), "Install" );
-        zookeeperSheet.getTab(0).setId("ZookeeperInstallTab");
+        zookeeperSheet.getTab( 0 ).setId( "ZookeeperInstallTab" );
         zookeeperSheet.addTab( manager.getContent(), "Manage" );
-        zookeeperSheet.getTab(1).setId("ZookeeperManageTab");
+        zookeeperSheet.getTab( 1 ).setId( "ZookeeperManageTab" );
         zookeeperSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

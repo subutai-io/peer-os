@@ -46,7 +46,7 @@ public class VerificationStep extends Panel
         cfgView.addStringCfg( "Supervisor nodes count", config.getSupervisorsCount() + "" );
 
         Button install = new Button( "Install" );
-        install.setId("StormVerificationInstall");
+        install.setId( "StormVerificationInstall" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -71,7 +71,7 @@ public class VerificationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("StormVerificationBack");
+        back.setId( "StormVerificationBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

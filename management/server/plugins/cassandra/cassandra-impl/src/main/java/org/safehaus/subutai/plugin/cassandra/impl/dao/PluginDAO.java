@@ -44,9 +44,8 @@ public class PluginDAO
     protected void setupDb() throws SQLException
     {
 
-        String sql1 =
-                "create table if not exists cluster_data (source varchar(100), id varchar(100), info clob, " +
-                        "PRIMARY KEY (source, " + "id));";
+        String sql1 = "create table if not exists cluster_data (source varchar(100), id varchar(100), info clob, " +
+                "PRIMARY KEY (source, " + "id));";
         dbUtil.update( sql1 );
     }
 

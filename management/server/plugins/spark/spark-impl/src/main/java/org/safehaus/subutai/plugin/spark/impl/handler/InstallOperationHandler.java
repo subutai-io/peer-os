@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -125,7 +126,5 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
             trackerOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
         }
     }
-
-
 }
 

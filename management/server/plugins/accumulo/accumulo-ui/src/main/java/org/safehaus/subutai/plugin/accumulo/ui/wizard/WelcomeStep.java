@@ -45,7 +45,7 @@ public class WelcomeStep extends Panel
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button startOverHadoopNZK = new Button( "Start over Hadoop & ZK installation" );
-        startOverHadoopNZK.setId("startOverHadoopNZK");
+        startOverHadoopNZK.setId( "startOverHadoopNZK" );
         startOverHadoopNZK.addStyleName( "default" );
         grid.addComponent( startOverHadoopNZK, 4, 4, 4, 4 );
         grid.setComponentAlignment( startOverHadoopNZK, Alignment.BOTTOM_RIGHT );

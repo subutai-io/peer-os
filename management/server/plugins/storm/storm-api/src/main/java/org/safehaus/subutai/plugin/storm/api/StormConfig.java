@@ -37,8 +37,10 @@ public class StormConfig implements ConfigBase
         return PRODUCT_NAME;
     }
 
+
     @Override
-    public String getProductKey() {
+    public String getProductKey()
+    {
         return PRODUCT_NAME;
     }
 

@@ -44,7 +44,7 @@ public class Commands
     public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 900)
+                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 900 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
                 agents );
@@ -118,7 +118,7 @@ public class Commands
     public Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents )
     {
         return commandRunnerBase.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
-                                propertyName ) ), agents );
+                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
+                agents );
     }
 }

@@ -52,8 +52,6 @@ public class HBaseImpl implements HBase
     private DataSource dataSource;
 
 
-
-
     public HBaseImpl( DataSource dataSource )
     {
         this.dataSource = dataSource;

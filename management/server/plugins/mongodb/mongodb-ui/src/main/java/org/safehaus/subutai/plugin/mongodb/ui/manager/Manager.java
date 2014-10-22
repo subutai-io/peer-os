@@ -87,11 +87,11 @@ public class Manager
 
         //tables go here
         configServersTable = createTableTemplate( "Config Servers" );
-        configServersTable.setId("MongoConfigsserversTbl");
+        configServersTable.setId( "MongoConfigsserversTbl" );
         routersTable = createTableTemplate( "Query Routers" );
-        routersTable.setId("MongoRoutersTbl");
+        routersTable.setId( "MongoRoutersTbl" );
         dataNodesTable = createTableTemplate( "Data Nodes" );
-        dataNodesTable.setId("MongoDataNodesTbl");
+        dataNodesTable.setId( "MongoDataNodesTbl" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -101,7 +101,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("MongoClusterCb");
+        clusterCombo.setId( "MongoClusterCb" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -118,7 +118,7 @@ public class Manager
         controlsContent.addComponent( clusterCombo );
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
-        refreshClustersBtn.setId("MongoRefreshClustersBtn");
+        refreshClustersBtn.setId( "MongoRefreshClustersBtn" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -132,7 +132,7 @@ public class Manager
         controlsContent.addComponent( refreshClustersBtn );
 
         Button checkAllBtn = new Button( "Check all" );
-        checkAllBtn.setId("MongoCheckAllBtn");
+        checkAllBtn.setId( "MongoCheckAllBtn" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -147,7 +147,7 @@ public class Manager
         controlsContent.addComponent( checkAllBtn );
 
         Button startAllBtn = new Button( "Start all" );
-        startAllBtn.setId("MongoStartAllBtn");
+        startAllBtn.setId( "MongoStartAllBtn" );
         startAllBtn.addStyleName( "default" );
         startAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -162,7 +162,7 @@ public class Manager
         controlsContent.addComponent( startAllBtn );
 
         Button stopAllBtn = new Button( "Stop all" );
-        stopAllBtn.setId("MongoStopAllBtn");
+        stopAllBtn.setId( "MongoStopAllBtn" );
         stopAllBtn.addStyleName( "default" );
         stopAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -177,7 +177,7 @@ public class Manager
         controlsContent.addComponent( stopAllBtn );
 
         Button destroyClusterBtn = new Button( "Destroy cluster" );
-        destroyClusterBtn.setId("MongoDestroyClusterBtn");
+        destroyClusterBtn.setId( "MongoDestroyClusterBtn" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -221,7 +221,7 @@ public class Manager
         controlsContent.addComponent( destroyClusterBtn );
 
         Button addRouterBtn = new Button( "Add Router" );
-        addRouterBtn.setId("MongoAddRouterBtn");
+        addRouterBtn.setId( "MongoAddRouterBtn" );
         addRouterBtn.addStyleName( "default" );
         addRouterBtn.addClickListener( new Button.ClickListener()
         {
@@ -263,7 +263,7 @@ public class Manager
         } );
 
         Button addDataNodeBtn = new Button( "Add Data Node" );
-        addDataNodeBtn.setId("MongoAddNodeBtn");
+        addDataNodeBtn.setId( "MongoAddNodeBtn" );
         addDataNodeBtn.addStyleName( "default" );
         addDataNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -418,19 +418,19 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button checkBtn = new Button( "Check" );
-            checkBtn.setId(agent.getListIP().get(0)+"-mongoCheck");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-mongoCheck" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
-            startBtn.setId(agent.getListIP().get(0)+"-mongoStart");
+            startBtn.setId( agent.getListIP().get( 0 ) + "-mongoStart" );
             startBtn.addStyleName( "default" );
             final Button stopBtn = new Button( "Stop" );
-            stopBtn.setId(agent.getListIP().get(0)+"mongoStop");
+            stopBtn.setId( agent.getListIP().get( 0 ) + "mongoStop" );
             stopBtn.addStyleName( "default" );
             final Button destroyBtn = new Button( "Destroy" );
-            destroyBtn.setId(agent.getListIP().get(0)+"mongoDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "mongoDestroy" );
             destroyBtn.addStyleName( "default" );
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setId(agent.getListIP().get(0)+"mongoProgress");
+            progressIcon.setId( agent.getListIP().get( 0 ) + "mongoProgress" );
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
             progressIcon.setVisible( false );

@@ -73,7 +73,7 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy
         for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
             if ( environmentContainer.getTemplate().getProducts()
-                     .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
+                                     .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
             {
                 zkAgents.add( environmentContainer.getAgent() );
             }

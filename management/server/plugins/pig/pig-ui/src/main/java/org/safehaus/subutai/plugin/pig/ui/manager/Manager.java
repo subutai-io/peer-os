@@ -80,7 +80,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("PigMngNodesTable");
+        nodesTable.setId( "PigMngNodesTable" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -89,7 +89,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("PigMngClusterCombo");
+        clusterCombo.setId( "PigMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -107,7 +107,7 @@ public class Manager
 
         /** Refresh Cluster button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("PigMngRefresh");
+        refreshClustersBtn.setId( "PigMngRefresh" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -121,14 +121,14 @@ public class Manager
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("PigMngDestroy");
+        destroyClusterBtn.setId( "PigMngDestroy" );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
         /** Add Node button */
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId("PigMngAddNode");
+        addNodeBtn.setId( "PigMngAddNode" );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
         controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
@@ -337,7 +337,7 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId(agent.getListIP().get(0) + "-pigDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-pigDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();

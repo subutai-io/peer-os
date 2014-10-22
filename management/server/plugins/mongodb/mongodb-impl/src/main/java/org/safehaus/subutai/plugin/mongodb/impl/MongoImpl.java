@@ -274,8 +274,8 @@ public class MongoImpl implements Mongo
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUIDUtil
-                .generateTimeBasedUUID() ) );
+        environmentBlueprint
+                .setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
 

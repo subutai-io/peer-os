@@ -82,11 +82,11 @@ public class Manager
         contentRoot.setSizeFull();
         contentRoot.setRows( 10 );
         contentRoot.setColumns( 1 );
-        contentRoot.setId("MahoutMngContentRoot");
+        contentRoot.setId( "MahoutMngContentRoot" );
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("MahoutMngNodesTable");
+        nodesTable.setId( "MahoutMngNodesTable" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -96,7 +96,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("MahoutMngClusterCombo");
+        clusterCombo.setId( "MahoutMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -113,7 +113,7 @@ public class Manager
         controlsContent.addComponent( clusterCombo );
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("MahoutMngRefresh");
+        refreshClustersBtn.setId( "MahoutMngRefresh" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -126,13 +126,13 @@ public class Manager
 
 
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("MahoutMngDestroy");
+        destroyClusterBtn.setId( "MahoutMngDestroy" );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
 
 
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId("MahoutMngAddNode");
+        addNodeBtn.setId( "MahoutMngAddNode" );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
 
@@ -340,7 +340,7 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId(agent.getListIP().get(0) + "-mahoutDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-mahoutDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();

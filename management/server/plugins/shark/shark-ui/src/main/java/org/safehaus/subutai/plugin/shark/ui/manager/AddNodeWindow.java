@@ -55,7 +55,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox cmbNodes = new ComboBox();
-        cmbNodes.setId("SharkHadoopNodesCb");
+        cmbNodes.setId( "SharkHadoopNodesCb" );
         cmbNodes.setImmediate( true );
         cmbNodes.setTextInputAllowed( false );
         cmbNodes.setNullSelectionAllowed( false );
@@ -71,12 +71,12 @@ public class AddNodeWindow extends Window
         topContent.addComponent( cmbNodes );
 
         final Button addNodeBtn = new Button( "Add" );
-        addNodeBtn.setId("SharkAddSelectedNodeBtn");
+        addNodeBtn.setId( "SharkAddSelectedNodeBtn" );
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
         ok = new Button( "Ok" );
-        ok.setId("btnOk");
+        ok.setId( "btnOk" );
         ok.addStyleName( "default" );
         ok.addClickListener( new Button.ClickListener()
         {
@@ -136,7 +136,7 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
-        outputTxtArea.setId("outputTxtArea");
+        outputTxtArea.setId( "outputTxtArea" );
         outputTxtArea.setRows( 13 );
         outputTxtArea.setColumns( 43 );
         outputTxtArea.setImmediate( true );
@@ -145,7 +145,7 @@ public class AddNodeWindow extends Window
         content.addComponent( outputTxtArea );
 
         indicator = new Label();
-        indicator.setId("indicator");
+        indicator.setId( "indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );

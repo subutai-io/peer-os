@@ -96,7 +96,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
 
         //check installed ksks packages
         String s = CommandFactory.build( CommandType.LIST, null );
-        Command checkInstalledCommand = manager.getCommandRunner().createCommand( new RequestBuilder( s ), Sets.newHashSet( agent )  );
+        Command checkInstalledCommand =
+                manager.getCommandRunner().createCommand( new RequestBuilder( s ), Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -122,7 +123,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
         {
             po.addLog( "Installing Sqoop..." );
             s = CommandFactory.build( CommandType.INSTALL, null );
-            Command installCommand = manager.getCommandRunner().createCommand( new RequestBuilder( s ).withTimeout( 180 ),  Sets.newHashSet( agent ) );
+            Command installCommand = manager.getCommandRunner()
+                                            .createCommand( new RequestBuilder( s ).withTimeout( 180 ),
+                                                    Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )

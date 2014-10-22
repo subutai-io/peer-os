@@ -51,9 +51,9 @@ public class ZookeeperImpl implements Zookeeper
     private final ContainerManager containerManager;
     private final EnvironmentManager environmentManager;
     private final Hadoop hadoopManager;
+    private final Commands commands;
     private ExecutorService executor;
     private PluginDAO pluginDAO;
-    private final Commands commands;
 
 
     public ZookeeperImpl( final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
@@ -326,8 +326,8 @@ public class ZookeeperImpl implements Zookeeper
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUIDUtil
-                .generateTimeBasedUUID() ) );
+        environmentBlueprint.setName(
+                String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUIDUtil.generateTimeBasedUUID() ) );
 
         //node group
         NodeGroup nodesGroup = new NodeGroup();

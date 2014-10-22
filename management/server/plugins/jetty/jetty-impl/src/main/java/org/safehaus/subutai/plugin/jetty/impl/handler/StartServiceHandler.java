@@ -57,8 +57,7 @@ public class StartServiceHandler extends AbstractOperationHandler<JettyImpl>
         if ( startCommand.hasSucceeded() )
         {
             AgentResult ar = startCommand.getResults().get( node.getUuid() );
-            if ( ar.getStdOut().contains( "starting Jetty ..." ) || ar.getStdOut()
-                                                                          .contains( "is already running..." ) )
+            if ( ar.getStdOut().contains( "starting Jetty ..." ) || ar.getStdOut().contains( "is already running..." ) )
             {
                 trackerOperation.addLog( ar.getStdOut() );
                 trackerOperation.addLogDone( "Start succeeded" );

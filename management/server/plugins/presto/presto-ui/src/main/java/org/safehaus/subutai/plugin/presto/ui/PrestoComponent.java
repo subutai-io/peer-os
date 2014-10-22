@@ -30,9 +30,9 @@ public class PrestoComponent extends CustomComponent
         final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         cassandraSheet.addTab( wizard.getContent(), "Install" );
-        cassandraSheet.getTab(0).setId("PrestoInstallTab");
+        cassandraSheet.getTab( 0 ).setId( "PrestoInstallTab" );
         cassandraSheet.addTab( manager.getContent(), "Manage" );
-        cassandraSheet.getTab(1).setId("PrestoManageTab");
+        cassandraSheet.getTab( 1 ).setId( "PrestoManageTab" );
         cassandraSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

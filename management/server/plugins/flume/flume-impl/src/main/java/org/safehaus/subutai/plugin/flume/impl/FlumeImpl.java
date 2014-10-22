@@ -230,13 +230,13 @@ public class FlumeImpl implements Flume
         return h.getTrackerId();
     }
 
+
     @Override
     public UUID checkServiceStatus( final String clusterName, final String hostname )
     {
         AbstractOperationHandler h = new ServiceStatusHandler( this, clusterName, hostname );
         executor.execute( h );
         return h.getTrackerId();
-
     }
 
 

@@ -34,6 +34,12 @@ public class Commands
     }
 
 
+    private static Command createCommand( RequestBuilder rb, Set<Agent> agents )
+    {
+        return commandRunner.createCommand( rb, agents );
+    }
+
+
     public static Command getUninstallCommand( Set<Agent> agents )
     {
         return createCommand(
@@ -53,12 +59,6 @@ public class Commands
         return createCommand( new RequestBuilder(
                 String.format( ". /etc/profile && sharkConf.sh clear master ; sharkConf.sh master %s",
                         masterNode.getHostname() ) ).withTimeout( 60 ), agents );
-    }
-
-
-    private static Command createCommand( RequestBuilder rb, Set<Agent> agents )
-    {
-        return commandRunner.createCommand( rb, agents );
     }
 }
 

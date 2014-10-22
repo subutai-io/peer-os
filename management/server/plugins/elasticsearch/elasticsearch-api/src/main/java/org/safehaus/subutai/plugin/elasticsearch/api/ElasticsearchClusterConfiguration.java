@@ -28,11 +28,6 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     private Set<Agent> dataNodes = new HashSet<>();
 
 
-    @Override
-    public String getProductKey() {
-        return PRODUCT_KEY;
-    }
-
     public static String getTemplateName()
     {
         return templateName;
@@ -54,6 +49,13 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
 
     @Override
     public String getProductName()
+    {
+        return PRODUCT_KEY;
+    }
+
+
+    @Override
+    public String getProductKey()
     {
         return PRODUCT_KEY;
     }
