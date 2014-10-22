@@ -31,7 +31,7 @@ expect "# " { send "rm -rf /var/lib/cassandra\r" }
 sleep 5
 #Starting cassandra
 expect "# " { send "service cassandra start\r" }
-sleep 10
+sleep 30
 #import cassandra keyspace
 expect "# " { send "/opt/cassandra-2.0.4/bin/cqlsh\r" }
 sleep 2
