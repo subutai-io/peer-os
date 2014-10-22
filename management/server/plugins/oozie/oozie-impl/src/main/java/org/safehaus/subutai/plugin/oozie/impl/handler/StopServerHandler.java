@@ -94,7 +94,8 @@ public class StopServerHandler extends AbstractOperationHandler<OozieImpl>
                 //                else
                 //                {
                 //                    productOperation
-                //                            .addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+                //                            .addLogFailed( String.format( "Stop failed, %s",
+                // stopServiceCommand.getAllErrors() ) );
                 //                }
             }
         } );

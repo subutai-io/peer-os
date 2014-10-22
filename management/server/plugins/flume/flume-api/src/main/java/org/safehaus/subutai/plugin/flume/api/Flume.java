@@ -21,7 +21,7 @@ public interface Flume extends ApiBase<FlumeConfig>
 
     public UUID checkNode( String clusterName, String lxcHostname );
 
-    public UUID checkServiceStatus ( String clusterName, String lxcHostname );
+    public UUID checkServiceStatus( String clusterName, String lxcHostname );
 
     public UUID addNode( String clusterName, String lxcHostname );
 

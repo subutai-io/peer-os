@@ -34,33 +34,33 @@ import static org.mockito.Mockito.when;
 
 public class CheckServiceHandlerTest
 {
+    JettyImpl manager = new JettyImpl();
+    CheckServiceHandler handler;
     private String clusterName = "testClusterName";
     private String hostName = "testHostName";
     private Agent testAgent;
     private JettyConfig config;
-    JettyImpl manager = new JettyImpl();
-
-    CheckServiceHandler handler;
 
 
     @Before
     public void setUp()
     {
-        testAgent = new Agent( UUID.randomUUID(), hostName, "", "", new ArrayList<String>(), true, "", UUID.randomUUID(), UUID.randomUUID());
+        testAgent =
+                new Agent( UUID.randomUUID(), hostName, "", "", new ArrayList<String>(), true, "", UUID.randomUUID(),
+                        UUID.randomUUID() );
 
         config = new JettyConfig();
         config.setClusterName( clusterName );
-        config.setNodes( Sets.newHashSet(testAgent) );
+        config.setNodes( Sets.newHashSet( testAgent ) );
 
         manager.setTracker( mock( Tracker.class ) );
         manager.setCommandRunner( mock( CommandRunner.class ) );
         manager.setPluginDAO( mock( PluginDAO.class ) );
         manager.setAgentManager( mock( AgentManager.class ) );
 
-        doReturn( new TrackerOperationMock() )
-                .when( manager.getTracker() )
-                .createTrackerOperation( anyString(), any( String.class ) );
-        handler = new CheckServiceHandler( manager, clusterName,  hostName);
+        doReturn( new TrackerOperationMock() ).when( manager.getTracker() )
+                                              .createTrackerOperation( anyString(), any( String.class ) );
+        handler = new CheckServiceHandler( manager, clusterName, hostName );
 
         assertThat( "handler not null", handler != null );
     }
@@ -69,21 +69,20 @@ public class CheckServiceHandlerTest
     @Test()
     public void testRun() throws InterruptedException
     {
-        manager.setCommands( mock(Commands.class));
+        manager.setCommands( mock( Commands.class ) );
 
-        when( manager.getPluginDAO().getInfo( JettyConfig.PRODUCT_KEY, config.getClusterName(),
-                JettyConfig.class ) ).thenReturn( config );
+        when( manager.getPluginDAO().getInfo( JettyConfig.PRODUCT_KEY, config.getClusterName(), JettyConfig.class ) )
+                .thenReturn( config );
 
         doReturn( testAgent ).when( manager.getAgentManager() ).getAgentByHostname( hostName );
 
-        doReturn( new TrackerOperationMock() )
-                .when( manager.getTracker() )
-                .createTrackerOperation( anyString(), any( String.class ) );
+        doReturn( new TrackerOperationMock() ).when( manager.getTracker() )
+                                              .createTrackerOperation( anyString(), any( String.class ) );
 
         CommandMock checkCommand = new CommandMock();
         checkCommand.setSucceeded( false );
 
-        when (manager.getCommands().getStatusCommand( anySet() )).thenReturn( checkCommand );
+        when( manager.getCommands().getStatusCommand( anySet() ) ).thenReturn( checkCommand );
 
         ExecutorService executor = Executors.newCachedThreadPool();
         executor.execute( handler );

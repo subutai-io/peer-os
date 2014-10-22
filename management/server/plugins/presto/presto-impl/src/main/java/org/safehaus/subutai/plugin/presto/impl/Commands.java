@@ -44,7 +44,8 @@ public class Commands
 
     public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return commandRunnerBase.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
+        return commandRunnerBase.createCommand(
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
     }
 
 

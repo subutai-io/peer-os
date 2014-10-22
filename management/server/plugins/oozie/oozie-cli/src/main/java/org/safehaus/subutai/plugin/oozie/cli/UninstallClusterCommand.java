@@ -9,9 +9,9 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
-import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**

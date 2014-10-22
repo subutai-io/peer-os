@@ -103,14 +103,14 @@ public class Commands
                                            String hMasterMachineHostname )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) ),
-                agents );
+                        String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
+                                hMasterMachineHostname ) ), agents );
     }
 
 
     public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return commandRunner
-                .createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
+        return commandRunner.createCommand(
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
     }
 }

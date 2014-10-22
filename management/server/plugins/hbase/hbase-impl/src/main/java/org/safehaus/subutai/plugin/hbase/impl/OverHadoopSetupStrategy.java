@@ -136,7 +136,8 @@ public class OverHadoopSetupStrategy extends SetupBase implements ClusterSetupSt
                 config.getAllNodes().remove( node );
                 it.remove();
             }
-            else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_KEY.toLowerCase() ) )
+            else if ( !result.getStdOut()
+                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_KEY.toLowerCase() ) )
             {
                 po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                         node.getHostname() ) );

@@ -34,7 +34,8 @@ public class Commands
     public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
-                new RequestBuilder( INSTALL ).withTimeout( 900 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+                new RequestBuilder( INSTALL ).withTimeout( 900 ).withStdOutRedirection( OutputRedirection.NO ),
+                agents );
     }
 
 

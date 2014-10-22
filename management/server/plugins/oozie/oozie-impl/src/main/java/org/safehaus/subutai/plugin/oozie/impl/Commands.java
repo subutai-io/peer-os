@@ -15,9 +15,12 @@ import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-*";
-    public static final String SERVER_PACKAGE_NAME = Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-server";
-    public static final String CLIENT_PACKAGE_NAME = Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-client";
+    public static final String PACKAGE_NAME =
+            Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-*";
+    public static final String SERVER_PACKAGE_NAME =
+            Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-server";
+    public static final String CLIENT_PACKAGE_NAME =
+            Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-client";
 
     private final CommandRunnerBase commandRunnerBase;
 
@@ -65,8 +68,7 @@ public class Commands
 
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + SERVER_PACKAGE_NAME )
-                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents
-                            );
+                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
@@ -75,8 +77,7 @@ public class Commands
 
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + CLIENT_PACKAGE_NAME )
-                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents
-                            );
+                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
@@ -103,8 +104,7 @@ public class Commands
 
         return commandRunnerBase.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
-                        + ".root.hosts %s", param
-                                                               ) ), agents );
+                        + ".root.hosts %s", param ) ), agents );
     }
 
 
@@ -113,8 +113,7 @@ public class Commands
 
         return commandRunnerBase.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
-                        + ".root.groups '\\*' "
-                                                               ) ), agents );
+                        + ".root.groups '\\*' " ) ), agents );
     }
 
 
@@ -122,10 +121,9 @@ public class Commands
     {
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + SERVER_PACKAGE_NAME ).withTimeout( 90 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
-                agents
-                            );
+                                                                                                     .withStdOutRedirection(
+                                                                                                             OutputRedirection.NO ),
+                agents );
     }
 
 
@@ -133,10 +131,9 @@ public class Commands
     {
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + CLIENT_PACKAGE_NAME ).withTimeout( 90 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
-                agents
-                            );
+                                                                                                     .withStdOutRedirection(
+                                                                                                             OutputRedirection.NO ),
+                agents );
     }
 
 

@@ -29,23 +29,21 @@ import static org.mockito.Mockito.when;
 
 public class CheckClusterHandlerTest
 {
-    private String clusterName = "testClusterName";
     JettyImpl manager = new JettyImpl();
-
     CheckClusterHandler handler;
+    private String clusterName = "testClusterName";
 
 
     @Before
     public void setUp()
     {
-        manager.setTracker( mock(Tracker.class) );
+        manager.setTracker( mock( Tracker.class ) );
         manager.setCommandRunner( mock( CommandRunner.class ) );
         manager.setPluginDAO( mock( PluginDAO.class ) );
-        manager.setCommands( new Commands( manager.getCommandRunner() ));
+        manager.setCommands( new Commands( manager.getCommandRunner() ) );
 
-        doReturn( new TrackerOperationMock() )
-                .when( manager.getTracker() )
-                .createTrackerOperation( anyString(), any( String.class ) );
+        doReturn( new TrackerOperationMock() ).when( manager.getTracker() )
+                                              .createTrackerOperation( anyString(), any( String.class ) );
 
         handler = new CheckClusterHandler( manager, clusterName );
 
@@ -61,7 +59,8 @@ public class CheckClusterHandlerTest
 
         CommandMock checkCommand = new CommandMock();
         checkCommand.setSucceeded( true );
-        when (manager.getCommandRunner().createCommand(any( RequestBuilder.class), anySet())).thenReturn( checkCommand );
+        when( manager.getCommandRunner().createCommand( any( RequestBuilder.class ), anySet() ) )
+                .thenReturn( checkCommand );
 
         when( manager.getPluginDAO().getInfo( JettyConfig.PRODUCT_KEY.toLowerCase(), jettyConfig.getClusterName(),
                 JettyConfig.class ) ).thenReturn( jettyConfig );

@@ -32,9 +32,9 @@ public class CheckTask implements Runnable
     private NodeType nodeType;
 
 
-
     public CheckTask( Hadoop hadoop, Tracker tracker, NodeType nodeType, HadoopClusterConfig hadoopClusterConfig,
-                      CompleteEvent completeEvent, UUID trackID, Agent agent ) {
+                      CompleteEvent completeEvent, UUID trackID, Agent agent )
+    {
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.completeEvent = completeEvent;
@@ -72,20 +72,26 @@ public class CheckTask implements Runnable
         }
 
         NodeState state = NodeState.UNKNOWN;
-        if ( agent != null ) {
-            if ( nodeType.equals( NodeType.NAMENODE ) ) {
+        if ( agent != null )
+        {
+            if ( nodeType.equals( NodeType.NAMENODE ) )
+            {
                 trackID = hadoop.statusNameNode( hadoopClusterConfig );
             }
-            else if ( nodeType.equals( NodeType.JOBTRACKER ) ) {
+            else if ( nodeType.equals( NodeType.JOBTRACKER ) )
+            {
                 trackID = hadoop.statusJobTracker( hadoopClusterConfig );
             }
-            else if ( nodeType.equals( NodeType.SECONDARY_NAMENODE ) ) {
+            else if ( nodeType.equals( NodeType.SECONDARY_NAMENODE ) )
+            {
                 trackID = hadoop.statusSecondaryNameNode( hadoopClusterConfig );
             }
-            if ( nodeType.equals( NodeType.DATANODE ) ) {
+            if ( nodeType.equals( NodeType.DATANODE ) )
+            {
                 trackID = hadoop.statusDataNode( hadoopClusterConfig, agent );
             }
-            else if ( nodeType.equals( NodeType.TASKTRACKER ) ){
+            else if ( nodeType.equals( NodeType.TASKTRACKER ) )
+            {
                 trackID = hadoop.statusTaskTracker( hadoopClusterConfig, agent );
             }
 

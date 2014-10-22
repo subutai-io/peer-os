@@ -34,9 +34,9 @@ public class HiveComponent extends CustomComponent
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.getTab(0).setId("HiveInstallTab");
+        sheet.getTab( 0 ).setId( "HiveInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab(1).setId("HiveManageTab");
+        sheet.getTab( 1 ).setId( "HiveManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

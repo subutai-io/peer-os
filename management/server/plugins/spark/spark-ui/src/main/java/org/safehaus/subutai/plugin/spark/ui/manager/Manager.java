@@ -96,7 +96,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("sparkNodesTable");
+        nodesTable.setId( "sparkNodesTable" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -105,7 +105,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("sparkClusterCombo");
+        clusterCombo.setId( "sparkClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -164,13 +164,13 @@ public class Manager
         progressIcon.setVisible( false );
         controlsContent.addComponent( progressIcon );
 
-        refreshClustersBtn.setId("sparkRefresh");
-        checkAllBtn.setId("sparkCheckAll");
-        startAllNodesBtn.setId("sparkStartAll");
-        stopAllNodesBtn.setId("sparkStopAll");
-        destroyClusterBtn.setId("sparkDestroyCluster");
-        addNodeBtn.setId("sparkAddNode");
-        progressIcon.setId("indicator");
+        refreshClustersBtn.setId( "sparkRefresh" );
+        checkAllBtn.setId( "sparkCheckAll" );
+        startAllNodesBtn.setId( "sparkStartAll" );
+        stopAllNodesBtn.setId( "sparkStopAll" );
+        destroyClusterBtn.setId( "sparkDestroyCluster" );
+        addNodeBtn.setId( "sparkAddNode" );
+        progressIcon.setId( "indicator" );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -602,10 +602,10 @@ public class Manager
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            checkBtn.setId(agent.getListIP().get(0) + "-sparkCheck");
-            startBtn.setId(agent.getListIP().get(0) + "-sparkStart");
-            stopBtn.setId(agent.getListIP().get(0) + "-sparkStop");
-            destroyBtn.setId(agent.getListIP().get(0) + "-sparkDestroy");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-sparkCheck" );
+            startBtn.setId( agent.getListIP().get( 0 ) + "-sparkStart" );
+            stopBtn.setId( agent.getListIP().get( 0 ) + "-sparkStop" );
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-sparkDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             enableButtons( startBtn, stopBtn );
@@ -636,9 +636,9 @@ public class Manager
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
 
 
-        checkBtn.setId(master.getListIP().get(0) + "-sparkCheck");
-        startBtn.setId(master.getListIP().get(0) + "-sparkStart");
-        stopBtn.setId(master.getListIP().get(0) + "-sparkStop");
+        checkBtn.setId( master.getListIP().get( 0 ) + "-sparkCheck" );
+        startBtn.setId( master.getListIP().get( 0 ) + "-sparkStart" );
+        stopBtn.setId( master.getListIP().get( 0 ) + "-sparkStop" );
 
         addStyleNameToButtons( checkBtn, startBtn, stopBtn );
 

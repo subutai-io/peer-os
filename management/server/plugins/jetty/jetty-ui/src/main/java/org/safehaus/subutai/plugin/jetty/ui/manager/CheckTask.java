@@ -24,7 +24,8 @@ public class CheckTask implements Runnable
     private final Tracker tracker;
 
 
-    public CheckTask( Jetty jetty, Tracker tracker, String clusterName, String lxcHostname, CompleteEvent completeEvent )
+    public CheckTask( Jetty jetty, Tracker tracker, String clusterName, String lxcHostname,
+                      CompleteEvent completeEvent )
     {
         this.jetty = jetty;
         this.tracker = tracker;

@@ -67,7 +67,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase() ) )
+        if ( result.getStdOut()
+                   .contains( Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase() ) )
         {
             trackerOperation.addLogFailed(
                     String.format( "Node %s already has Elasticsearch installed\nInstallation aborted", lxcHostname ) );

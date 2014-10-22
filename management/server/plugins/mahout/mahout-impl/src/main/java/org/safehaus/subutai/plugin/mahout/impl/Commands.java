@@ -38,9 +38,8 @@ public class Commands
     {
         return commandRunnerBase.createCommand( "Install Mahout",
                 new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 360 )
-                                                                                            .withStdOutRedirection(
-                                                                                                    OutputRedirection
-                                                                                                            .NO ),
+                                                                                                .withStdOutRedirection(
+                                                                                                        OutputRedirection.NO ),
                 agents );
     }
 
@@ -48,7 +47,8 @@ public class Commands
     public Command getUninstallCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand( "Uninstall Mahout",
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ), agents );
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ),
+                agents );
     }
 
 

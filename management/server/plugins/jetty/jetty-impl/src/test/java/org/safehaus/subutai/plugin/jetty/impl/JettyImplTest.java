@@ -21,7 +21,6 @@ import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.CheckServiceHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.jetty.impl.handler.InstallOperationHandlerTest;
 import org.safehaus.subutai.plugin.jetty.impl.handler.StartServiceHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.StopClusterHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.StopServiceHandler;

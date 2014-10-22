@@ -28,9 +28,8 @@ public class ServiceStatusHandler extends AbstractOperationHandler<FlumeImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.trackerOperation =
-                manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
-                        "Check service on node " + hostname );
+        this.trackerOperation = manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
+                "Check service on node " + hostname );
     }
 
 
@@ -97,5 +96,4 @@ public class ServiceStatusHandler extends AbstractOperationHandler<FlumeImpl>
         }
         po.addLogDone( log.toString() );
     }
-
 }

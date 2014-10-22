@@ -48,9 +48,9 @@ public class RestService
 
     //create cluster
     @POST
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @QueryParam("config") String config )
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @QueryParam( "config" ) String config )
     {
         TrimmedConfig trimmedConfig = JsonUtil.fromJson( config, TrimmedConfig.class );
         PigConfig pigConfig = new PigConfig();
@@ -75,9 +75,9 @@ public class RestService
 
     //destroy cluster
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyCluster( @PathParam( "clusterName" ) String clusterName )
     {
         UUID uuid = pigManager.uninstallCluster( clusterName );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
@@ -87,8 +87,8 @@ public class RestService
 
     //list clusters
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getClusters()
     {
 
@@ -106,9 +106,9 @@ public class RestService
 
     //view cluster info
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         PigConfig config = pigManager.getCluster( clusterName );
 
@@ -119,9 +119,10 @@ public class RestService
 
     //destroy node
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{lxchostname}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName, @PathParam("lxchostname") String node )
+    @Path( "clusters/{clusterName}/nodes/{lxchostname}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName,
+                                @PathParam( "lxchostname" ) String node )
     {
         UUID uuid = pigManager.destroyNode( clusterName, node );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );

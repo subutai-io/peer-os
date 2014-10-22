@@ -89,12 +89,14 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + SparkClusterConfig.PRODUCT_KEY.toLowerCase() ) && install )
+        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + SparkClusterConfig.PRODUCT_KEY.toLowerCase() )
+                && install )
         {
             po.addLogFailed( String.format( "Node %s already has Spark installed. Operation aborted", hostname ) );
             return;
         }
-        else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_KEY.toLowerCase() ) )
+        else if ( !result.getStdOut()
+                         .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_KEY.toLowerCase() ) )
         {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation. Operation aborted", hostname ) );
             return;

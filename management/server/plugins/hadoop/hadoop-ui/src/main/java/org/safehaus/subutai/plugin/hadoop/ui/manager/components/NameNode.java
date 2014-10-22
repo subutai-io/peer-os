@@ -7,9 +7,9 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 
 import com.vaadin.event.MouseEvents;
 
@@ -43,7 +43,7 @@ public class NameNode extends ClusterNode
                 getStatus( hadoop.startNameNode( cluster ) );
             }
         } );
-        startButton.setId("nameNodeStart");
+        startButton.setId( "nameNodeStart" );
 
         stopButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -54,7 +54,7 @@ public class NameNode extends ClusterNode
                 getStatus( hadoop.stopNameNode( cluster ) );
             }
         } );
-        stopButton.setId("nameNodeStop");
+        stopButton.setId( "nameNodeStop" );
 
         restartButton.addClickListener( new MouseEvents.ClickListener()
         {
@@ -65,7 +65,7 @@ public class NameNode extends ClusterNode
                 getStatus( hadoop.restartNameNode( cluster ) );
             }
         } );
-        restartButton.setId("nameNodeRestart");
+        restartButton.setId( "nameNodeRestart" );
 
         getStatus( null );
     }
@@ -120,6 +120,6 @@ public class NameNode extends ClusterNode
         stopButton.setVisible( !isLoading );
         restartButton.setVisible( !isLoading );
         progressButton.setVisible( isLoading );
-        progressButton.setId("nameNodeProgress");
+        progressButton.setId( "nameNodeProgress" );
     }
 }

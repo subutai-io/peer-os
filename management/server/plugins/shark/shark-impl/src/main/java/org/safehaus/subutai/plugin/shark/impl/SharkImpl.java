@@ -127,15 +127,6 @@ public class SharkImpl implements Shark
 
 
     @Override
-    public UUID installCluster( SharkClusterConfig config, HadoopClusterConfig hadoopConfig )
-    {
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config, hadoopConfig );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
     public UUID uninstallCluster( final String clusterName )
     {
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
@@ -155,6 +146,15 @@ public class SharkImpl implements Shark
     public SharkClusterConfig getCluster( String clusterName )
     {
         return pluginDao.getInfo( SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class );
+    }
+
+
+    @Override
+    public UUID installCluster( SharkClusterConfig config, HadoopClusterConfig hadoopConfig )
+    {
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config, hadoopConfig );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 

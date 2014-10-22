@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
 import com.google.common.base.Preconditions;
@@ -17,8 +16,10 @@ import com.google.common.base.Preconditions;
 
 public class Commands
 {
+    private static final String PACKAGE_NAME =
+            Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase();
     private final CommandRunnerBase commandRunner;
-    private static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase();
+
 
     public Commands( final CommandRunnerBase commandRunner )
     {

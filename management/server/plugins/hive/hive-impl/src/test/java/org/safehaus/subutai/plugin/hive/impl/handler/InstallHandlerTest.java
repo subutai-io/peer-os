@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.hive.impl.handler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
@@ -26,7 +26,7 @@ public class InstallHandlerTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testWithNullConfig()
     {
         handler = new InstallHandler( mock, null );
