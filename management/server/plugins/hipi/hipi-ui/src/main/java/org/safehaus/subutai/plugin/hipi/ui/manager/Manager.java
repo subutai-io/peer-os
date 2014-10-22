@@ -84,6 +84,7 @@ public class Manager
         contentRoot.setColumns( 1 );
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
+        nodesTable.setId("hipiMngNodesTable");
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -92,6 +93,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
+        clusterCombo.setId("hipiClusterCombo");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -109,6 +111,7 @@ public class Manager
 
         /** Refresh Cluster button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
+        refreshClustersBtn.setId("hipiRefresh");
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -122,6 +125,7 @@ public class Manager
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.setId("hipiDestroy");
         destroyClusterBtn.addStyleName( "default" );
         addClickListenerToDestorClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
@@ -129,6 +133,7 @@ public class Manager
 
         /** Add Node button */
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId("hipiAddNode");
         addNodeBtn.addStyleName( "default" );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
