@@ -30,7 +30,7 @@ public class InstallOperationHandlerTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testWithNullConfig()
     {
         handler = new InstallOperationHandler( mock, null );

@@ -88,7 +88,8 @@ updatePackageContent() {
   updatedRelease=$versionFirst.$versionSecond.$updatedVersion
   replaceVersion="Version: $updatedRelease"
 
-  packageName=$package-$updatedRelease
+  arch=$(getArchitecture)
+  packageName="$package"_"$updatedRelease"_"$arch"
 
   # Update control file with the incremented version
   sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
@@ -110,6 +111,12 @@ generateMD5Sum() {
   pushd $BASE
   md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
   popd
+}
+
+
+getArchitecture() {
+  #TODO get the actual architecture from the debian packages control file
+  echo "all"
 }
 
 
