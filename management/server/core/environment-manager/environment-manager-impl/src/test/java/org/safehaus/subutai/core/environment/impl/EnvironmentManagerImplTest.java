@@ -40,6 +40,7 @@ public class EnvironmentManagerImplTest
 {
 
     private static final String HOSTNAME = "hostname";
+    private static final String NAME = "name";
     EnvironmentManagerImpl manager;
     @Mock
     ContainerManager containerManager;
@@ -83,7 +84,7 @@ public class EnvironmentManagerImplTest
     public void shoudBuildEnvironment() throws Exception
     {
         EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
-        when( process.getEnvironmentBlueprint() ).thenReturn( environmentBlueprint );
+        when( process.getBluerpintName() ).thenReturn( NAME );
         when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID() );
 
         Map<String, CloneContainersMessage> map = new HashMap<>();

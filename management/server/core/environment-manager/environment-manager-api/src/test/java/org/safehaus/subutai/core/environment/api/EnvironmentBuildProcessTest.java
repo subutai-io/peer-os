@@ -8,10 +8,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
@@ -19,19 +17,17 @@ import org.safehaus.subutai.core.environment.api.helper.ProcessStatusEnum;
 import static org.junit.Assert.assertEquals;
 
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class EnvironmentBuildProcessTest
 {
     private static final String NAME = "name";
     EnvironmentBuildProcess process;
-    @Mock
-    EnvironmentBlueprint environmentBlueprint;
 
 
     @Before
     public void setUp() throws Exception
     {
-        process = new EnvironmentBuildProcess( environmentBlueprint );
+        process = new EnvironmentBuildProcess( NAME );
     }
 
 

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
@@ -191,7 +190,7 @@ public class Blueprint2PeerGroupWizard extends Window
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
-                    managerUI.getEnvironmentManager().saveBuildProcess( blueprint, topology, map,
+                    managerUI.getEnvironmentManager().saveBuildProcess( blueprint.getName(), topology, map,
                             TopologyEnum.BLUEPRINT_2_PEER_GROUP );
                 }
                 else

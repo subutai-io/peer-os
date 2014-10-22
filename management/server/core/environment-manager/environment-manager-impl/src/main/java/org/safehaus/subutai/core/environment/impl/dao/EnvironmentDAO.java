@@ -224,16 +224,41 @@ public class EnvironmentDAO
     }
 
 
-    public void deleteBlueprint( final String name ) throws EnvironmentPersistenceException
+    public boolean deleteBlueprint( final String name ) throws EnvironmentPersistenceException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Blueprint name is null or empty" );
         try
         {
             dbUtil.update( "delete from blueprint where name = ?", name );
+            return true;
         }
         catch ( SQLException e )
         {
             throw new EnvironmentPersistenceException( e.getMessage() );
         }
+    }
+
+
+    public EnvironmentBlueprint getBlueprint( String name ) throws EnvironmentPersistenceException
+    {
+        try
+        {
+            ResultSet rs = dbUtil.select( "select info from blueprint where name = ?", name );
+            if ( rs != null && rs.next() )
+            {
+                Clob infoClob = rs.getClob( "info" );
+                if ( infoClob != null && infoClob.length() > 0 )
+                {
+                    String info = infoClob.getSubString( 1, ( int ) infoClob.length() );
+                    return GSON.fromJson( info, EnvironmentBlueprint.class );
+                }
+            }
+        }
+        catch ( JsonSyntaxException | SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentPersistenceException( e.getMessage() );
+        }
+        return null;
     }
 }

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
 //import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
@@ -21,27 +20,21 @@ public class EnvironmentBuildProcess
     private ProcessStatusEnum processStatusEnum;
     private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
-    private EnvironmentBlueprint environmentBlueprint;
+    private String bluerpintName;
 
 
-    public EnvironmentBuildProcess( EnvironmentBlueprint environmentBlueprint )
+    public EnvironmentBuildProcess( String name )
     {
-        this.environmentBlueprint = environmentBlueprint;
+        this.bluerpintName = name;
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.messageMap = new HashMap<>();
     }
 
 
-    public EnvironmentBlueprint getEnvironmentBlueprint()
+    public String getBluerpintName()
     {
-        return environmentBlueprint;
-    }
-
-
-    public void setEnvironmentBlueprint( final EnvironmentBlueprint environmentBlueprint )
-    {
-        this.environmentBlueprint = environmentBlueprint;
+        return bluerpintName;
     }
 
 

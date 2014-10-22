@@ -75,6 +75,6 @@ public interface EnvironmentManager
 
     Environment getEnvironmentByUUID( UUID environmentId );
 
-    boolean saveBuildProcess( EnvironmentBlueprint blueprint, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
+    boolean saveBuildProcess( String blueprintName, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
                               TopologyEnum topologyEnum );
 }

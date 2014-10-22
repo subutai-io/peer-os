@@ -353,123 +353,132 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
-        Environment environment = new Environment( process.getEnvironmentBlueprint().getName() );
-        saveEnvironment( environment );
-        TrackerOperation operation = tracker.createTrackerOperation( process.getUuid().toString(),
-                process.getEnvironmentBlueprint().getName() );
-
-        int containerCount = 0;
-        long timeout = 1000 * 60;
-        for ( String key : process.getMessageMap().keySet() )
+        try
         {
-            CloneContainersMessage ccm = process.getMessageMap().get( key );
-            ccm.setEnvId( environment.getUuid() );
+            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBluerpintName() );
 
-            containerCount = containerCount + ccm.getNumberOfNodes();
-            timeout = 1000 * 30 * ccm.getNumberOfNodes();
+            Environment environment = new Environment( process.getBluerpintName() );
+            saveEnvironment( environment );
+            TrackerOperation operation =
+                    tracker.createTrackerOperation( process.getUuid().toString(), process.getBluerpintName() );
 
-            //TODO: move template addition on create ccm
-            List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
-            Template installationTemplate = templateRegistry.getTemplate( ccm.getTemplate() );
-            if ( installationTemplate != null )
+            int containerCount = 0;
+            long timeout = 1000 * 60;
+            for ( String key : process.getMessageMap().keySet() )
             {
-                templates.add( installationTemplate );
-            }
-            else
-            {
-                environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                saveEnvironment( environment );
-                throw new EnvironmentBuildException( "Could not get installation template data" );
-            }
+                CloneContainersMessage ccm = process.getMessageMap().get( key );
+                ccm.setEnvId( environment.getUuid() );
 
-            UUID peerId = getPeerId();
-            if ( peerId == null )
-            {
-                environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                saveEnvironment( environment );
-                throw new EnvironmentBuildException( "Could not get Peer ID" );
-            }
+                containerCount = containerCount + ccm.getNumberOfNodes();
+                timeout = 1000 * 30 * ccm.getNumberOfNodes();
 
-
-            for ( Template t : templates )
-            {
-                ccm.addTemplate( t.getRemoteClone( peerId ) );
-            }
-
-            try
-            {
-                operation.addLog( String.format( "sending clone command: %s", ccm.toString() ) );
-                peerCommandDispatcher.invoke( ccm, timeout );
-            }
-            catch ( PeerCommandException e )
-            {
-                LOG.error( e.getMessage(), e );
-                operation.addLogFailed( "Error occured while invoking command." );
-                environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                saveEnvironment( environment );
-                throw new EnvironmentBuildException( e.getMessage() );
-            }
-
-            boolean result = ccm.isSuccess();
-            if ( result )
-            {
-                Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
-                if ( !agents.isEmpty() )
+                //TODO: move template addition on create ccm
+                List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
+                Template installationTemplate = templateRegistry.getTemplate( ccm.getTemplate() );
+                if ( installationTemplate != null )
                 {
-                    for ( Agent agent : agents )
+                    templates.add( installationTemplate );
+                }
+                else
+                {
+                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                    saveEnvironment( environment );
+                    throw new EnvironmentBuildException( "Could not get installation template data" );
+                }
+
+                UUID peerId = getPeerId();
+                if ( peerId == null )
+                {
+                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                    saveEnvironment( environment );
+                    throw new EnvironmentBuildException( "Could not get Peer ID" );
+                }
+
+
+                for ( Template t : templates )
+                {
+                    ccm.addTemplate( t.getRemoteClone( peerId ) );
+                }
+
+                try
+                {
+                    operation.addLog( String.format( "sending clone command: %s", ccm.toString() ) );
+                    peerCommandDispatcher.invoke( ccm, timeout );
+                }
+                catch ( PeerCommandException e )
+                {
+                    LOG.error( e.getMessage(), e );
+                    operation.addLogFailed( "Error occured while invoking command." );
+                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                    saveEnvironment( environment );
+                    throw new EnvironmentBuildException( e.getMessage() );
+                }
+
+                boolean result = ccm.isSuccess();
+                if ( result )
+                {
+                    Set<Agent> agents = ( Set<Agent> ) ccm.getResult();
+                    if ( !agents.isEmpty() )
                     {
-                        EnvironmentContainer container = new EnvironmentContainer();
+                        for ( Agent agent : agents )
+                        {
+                            EnvironmentContainer container = new EnvironmentContainer();
 
-                        container.setPeerId( agent.getSiteId() );
-                        container.setAgentId( agent.getUuid() );
-                        container.setIps( agent.getListIP() );
-                        container.setHostname( agent.getHostname() );
-                        container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
-                        container.setName( agent.getHostname() );
-                        container.setTemplateName( ccm.getTemplate() );
+                            container.setPeerId( agent.getSiteId() );
+                            container.setAgentId( agent.getUuid() );
+                            container.setIps( agent.getListIP() );
+                            container.setHostname( agent.getHostname() );
+                            container.setDescription( ccm.getTemplate() + " agent " + agent.getEnvironmentId() );
+                            container.setName( agent.getHostname() );
+                            container.setTemplateName( ccm.getTemplate() );
 
-                        environment.addContainer( container );
+                            environment.addContainer( container );
+                        }
                     }
                 }
+                else
+                {
+                    environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                    saveEnvironment( environment );
+                    throw new EnvironmentBuildException(
+                            String.format( "FAILED creating environment on %s", ccm.getPeerId() ) );
+                }
             }
-            else
+
+            if ( environment.getContainers().isEmpty() )
             {
-                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+                environment.setStatus( EnvironmentStatusEnum.EMPTY );
                 saveEnvironment( environment );
-                throw new EnvironmentBuildException(
-                        String.format( "FAILED creating environment on %s", ccm.getPeerId() ) );
-            }
-        }
-
-        if ( environment.getContainers().isEmpty() )
-        {
-            environment.setStatus( EnvironmentStatusEnum.EMPTY );
-            saveEnvironment( environment );
-            throw new EnvironmentBuildException( "No containers assigned to the Environment" );
-        }
-        else
-        {
-            Set<Container> containers = Sets.newHashSet();
-            containers.addAll( environment.getContainers() );
-
-            if ( process.getEnvironmentBlueprint().isExchangeSshKeys() )
-            {
-                networkManager.configSsh( containers );
-            }
-            if ( process.getEnvironmentBlueprint().isLinkHosts() )
-            {
-                networkManager.configHosts( process.getEnvironmentBlueprint().getDomainName(), containers );
-            }
-            if ( environment.getContainers().size() != containerCount )
-            {
-                environment.setStatus( EnvironmentStatusEnum.UNHEALTHY );
+                throw new EnvironmentBuildException( "No containers assigned to the Environment" );
             }
             else
             {
-                environment.setStatus( EnvironmentStatusEnum.HEALTHY );
+                Set<Container> containers = Sets.newHashSet();
+                containers.addAll( environment.getContainers() );
+
+                if ( blueprint.isExchangeSshKeys() )
+                {
+                    networkManager.configSsh( containers );
+                }
+                if ( blueprint.isLinkHosts() )
+                {
+                    networkManager.configHosts( blueprint.getDomainName(), containers );
+                }
+                if ( environment.getContainers().size() != containerCount )
+                {
+                    environment.setStatus( EnvironmentStatusEnum.UNHEALTHY );
+                }
+                else
+                {
+                    environment.setStatus( EnvironmentStatusEnum.HEALTHY );
+                }
+                saveEnvironment( environment );
+                operation.addLogDone( "Complete" );
             }
-            saveEnvironment( environment );
-            operation.addLogDone( "Complete" );
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
         }
     }
 
@@ -565,7 +574,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean saveBuildProcess( final EnvironmentBlueprint blueprint, final Map<Object, Peer> topology,
+    public boolean saveBuildProcess( final String blueprintName, final Map<Object, Peer> topology,
                                      final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
     {
         EnvironmentBuildProcess process = null;
@@ -574,12 +583,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         {
             case NODE_2_PEER:
             {
-                process = topologyBuilder.createEnvironmentBuildProcessN2P( blueprint, topology, map );
+                process = topologyBuilder.createEnvironmentBuildProcessN2P( blueprintName, topology, map );
                 break;
             }
             case NODE_GROUP_2_PEER:
             {
-                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( blueprint, topology, map );
+                process = topologyBuilder.createEnvironmentBuildProcessNG2Peer( blueprintName, topology, map );
                 break;
             }
             case BLUEPRINT_2_PEER:

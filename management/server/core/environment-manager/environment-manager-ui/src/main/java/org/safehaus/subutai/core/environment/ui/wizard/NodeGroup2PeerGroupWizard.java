@@ -6,12 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
 
@@ -40,7 +37,7 @@ public class NodeGroup2PeerGroupWizard extends Window
 
 
     public NodeGroup2PeerGroupWizard( final String caption, EnvironmentManagerPortalModule managerUI,
-                                      EnvironmentBlueprint blueprint)
+                                      EnvironmentBlueprint blueprint )
     {
         super( caption );
         setCaption( caption );
@@ -192,7 +189,7 @@ public class NodeGroup2PeerGroupWizard extends Window
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
-                    managerUI.getEnvironmentManager().saveBuildProcess( blueprint, topology, map,
+                    managerUI.getEnvironmentManager().saveBuildProcess( blueprint.getName(), topology, map,
                             TopologyEnum.NODE_GROUP_2_PEER_GROUP );
                 }
                 else
@@ -247,36 +244,6 @@ public class NodeGroup2PeerGroupWizard extends Window
     public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
     {
         this.nodeGroupMap = nodeGroupMap;
-    }
-
-
-    public EnvironmentBuildProcess createEnvironmentBuildProcess( EnvironmentBuildTask ebt, Map<Object, Peer> topology )
-    {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint() );
-
-        Map<Object, NodeGroup> map = getNodeGroupMap();
-        for ( Object itemId : map.keySet() )
-        {
-            Peer peer = topology.get( itemId );
-            NodeGroup ng = map.get( itemId );
-
-            String key = peer.getId().toString() + "-" + ng.getTemplateName();
-
-            if ( !process.getMessageMap().containsKey( key ) )
-            {
-                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
-                ccm.setTemplate( ng.getTemplateName() );
-                ccm.setNumberOfNodes( 1 );
-                ccm.setStrategy( ng.getPlacementStrategy().toString() );
-                process.putCloneContainerMessage( key, ccm );
-            }
-            else
-            {
-                process.getMessageMap().get( key ).incrementNumberOfNodes();
-            }
-        }
-
-        return process;
     }
 
 
