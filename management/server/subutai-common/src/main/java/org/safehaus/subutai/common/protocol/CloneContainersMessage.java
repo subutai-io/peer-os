@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class CloneContainersMessage extends PeerCommandMessage
 {
+    private UUID envId;
     private String template;
     private int numberOfNodes;
     private String Strategy;
@@ -23,9 +24,9 @@ public class CloneContainersMessage extends PeerCommandMessage
     //    private Set<Agent> agents;
 
 
-    public CloneContainersMessage( UUID envId, UUID peerId )
+    public CloneContainersMessage( /*UUID envId, */UUID peerId )
     {
-        super( PeerCommandType.CLONE, envId, peerId, null );
+        super( PeerCommandType.CLONE,/* envId, */peerId, null );
     }
 
 
@@ -74,6 +75,18 @@ public class CloneContainersMessage extends PeerCommandMessage
     public void setCriteria( final List<String> criteria )
     {
         this.criteria = criteria;
+    }
+
+
+    public UUID getEnvId()
+    {
+        return envId;
+    }
+
+
+    public void setEnvId( final UUID envId )
+    {
+        this.envId = envId;
     }
 
 

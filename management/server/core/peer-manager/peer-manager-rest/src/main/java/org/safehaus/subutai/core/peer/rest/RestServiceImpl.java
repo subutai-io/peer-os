@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.command.dispatcher.rest;
+package org.safehaus.subutai.core.peer.rest;
 
 
 import java.net.InetAddress;

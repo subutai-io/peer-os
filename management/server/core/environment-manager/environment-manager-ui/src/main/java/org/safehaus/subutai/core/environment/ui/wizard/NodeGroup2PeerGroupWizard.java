@@ -263,7 +263,8 @@ public class NodeGroup2PeerGroupWizard extends Window
 
             if ( !process.getMessageMap().containsKey( key ) )
             {
-                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
+                CloneContainersMessage ccm = new CloneContainersMessage( peer.getId() );
+                ccm.setEnvId( process.getUuid() );
                 ccm.setTemplate( ng.getTemplateName() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
