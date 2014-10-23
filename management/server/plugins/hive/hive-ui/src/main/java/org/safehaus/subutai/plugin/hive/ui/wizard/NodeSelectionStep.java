@@ -50,7 +50,7 @@ public class NodeSelectionStep extends Panel
         content.setMargin( true );
 
         TextField nameTxt = new TextField( "Cluster name" );
-        nameTxt.setId("HiveClusterName");
+        nameTxt.setId( "HiveClusterName" );
         nameTxt.setRequired( true );
         nameTxt.setWidth( controlWidth, Unit.POINTS );
         nameTxt.addValueChangeListener( new Property.ValueChangeListener()
@@ -65,7 +65,7 @@ public class NodeSelectionStep extends Panel
         nameTxt.setValue( wizard.getConfig().getClusterName() );
 
         Button next = new Button( "Next" );
-        next.setId("HiveNodeSelectionNext");
+        next.setId( "HiveNodeSelectionNext" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -115,7 +115,7 @@ public class NodeSelectionStep extends Panel
     private void addOverHadoopComponents( ComponentContainer parent, final HiveConfig config )
     {
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
-        hadoopClusters.setId("HiveHadoopClusterCb");
+        hadoopClusters.setId( "HiveHadoopClusterCb" );
         final ComboBox cmbServerNode = makeServerNodeComboBox( config );
 
         hadoopClusters.setImmediate( true );
@@ -169,6 +169,7 @@ public class NodeSelectionStep extends Panel
     private ComboBox makeServerNodeComboBox( final HiveConfig config )
     {
         ComboBox cb = new ComboBox( "Server node" );
+        cb.setId( "HiveserverNodecb" );
         cb.setImmediate( true );
         cb.setTextInputAllowed( false );
         cb.setRequired( true );

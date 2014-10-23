@@ -55,7 +55,6 @@ public class Manager
     protected static final String STOP_BUTTON_CAPTION = "Stop";
     protected static final String DESTROY_CLUSTER_BUTTON_CAPTION = "Destroy Cluster";
     protected static final String DESTROY_BUTTON_CAPTION = "Destroy";
-    protected static final String SET_AS_COORDINATOR_BUTTON_CAPTION = "Set As Coordinator";
     protected static final String HOST_COLUMN_CAPTION = "Host";
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
@@ -378,11 +377,9 @@ public class Manager
             startBtn.setId(agent.getListIP().get(0)+"-prestoStart");
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
             stopBtn.setId(agent.getListIP().get(0)+"-prestoStop");
-            final Button setCoordinatorBtn = new Button( SET_AS_COORDINATOR_BUTTON_CAPTION );
-            setCoordinatorBtn.setId(agent.getListIP().get(0)+"-prestoCoordinator");
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
 
-            addStyleNameToButtons( checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn );
+            addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
             PROGRESS_ICON.setVisible( false );
             PROGRESS_ICON.setId("indicator");
@@ -391,7 +388,7 @@ public class Manager
             availableOperations.setSpacing( true );
             availableOperations.addStyleName( BUTTON_STYLE_NAME );
 
-            addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn );
+            addGivenComponents( availableOperations, checkBtn, startBtn, stopBtn, destroyBtn );
 
             table.addItem( new Object[] {
                     agent.getHostname(), agent.getListIP().get( 0 ), checkIfCoordinator( agent ), resultHolder,
@@ -399,11 +396,9 @@ public class Manager
             }, null );
 
             /** add click listeners to button */
-            addClickListenerToSlavesCheckButton( agent, resultHolder, checkBtn, startBtn, stopBtn, setCoordinatorBtn,
-                    destroyBtn );
-            addClickListenerToStartButtons( agent, startBtn, stopBtn, checkBtn, setCoordinatorBtn, destroyBtn );
+            addClickListenerToSlavesCheckButton( agent, resultHolder, checkBtn, startBtn, stopBtn,destroyBtn );
+            addClickListenerToStartButtons( agent, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToStopButtons( agent, startBtn, stopBtn, checkBtn );
-            addClickListenerToSetCoordinatorButton( agent, setCoordinatorBtn );
             addClickListenerToDestroyButton( agent, destroyBtn );
         }
 
@@ -654,8 +649,7 @@ public class Manager
                                     PROGRESS_ICON.setVisible( false );
                                     for ( Button b : buttons )
                                     {
-                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption().equals(
-                                                SET_AS_COORDINATOR_BUTTON_CAPTION ) || b.getCaption().equals(
+                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION )  || b.getCaption().equals(
                                                 DESTROY_BUTTON_CAPTION ) )
                                         {
                                             enableButtons( b );
