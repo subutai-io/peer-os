@@ -1,13 +1,29 @@
 package org.safehaus.subutai.core.metric.api;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
+import java.util.UUID;
+
+import com.google.common.base.Preconditions;
 
 
 /**
  * Interface for ResourceHostMetric
  */
-public interface ResourceHostMetric extends Metric
+public abstract class ResourceHostMetric extends Metric
 {
-    public Agent getAgent();//TODO return here ResourceHost
+    protected UUID peerId;
+
+
+    public UUID getPeerId()
+    {
+        return peerId;
+    }
+
+
+    protected void setPeerId( final UUID peerId )
+    {
+        Preconditions.checkNotNull( peerId, "Invalid peer id" );
+
+        this.peerId = peerId;
+    }
 }

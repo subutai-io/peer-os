@@ -7,22 +7,63 @@ package org.safehaus.subutai.core.metric.api;
  * {"host":"test", "totalRam":"16306260","availableRam":"195028", "usedRam":"16111232", "cpuLoad5":"5.7",
  * "availableDisk" : "123", "usedDisk" : "123", "totalDisk" : "123"}
  */
-public interface Metric
+public abstract class Metric
 {
 
-    public String getHostname();
+    protected String hostname;
+    protected Double availableRam;
+    protected Double usedRam;
+    protected Double totalRam;
+    protected Double availableDisk;
+    protected Double usedDisk;
+    protected Double totalDisk;
+    protected Double cpuLoad5;
 
-    public Double getAvailableRam();
 
-    public Double getUsedRam();
+    public String getHostname()
+    {
+        return hostname;
+    }
 
-    public Double getTotalRam();
 
-    public Double getAvailableDisk();
+    public Double getAvailableRam()
+    {
+        return availableRam;
+    }
 
-    public Double getUsedDisk();
 
-    public Double getTotalDisk();
+    public Double getUsedRam()
+    {
+        return usedRam;
+    }
 
-    public Double getCpuLoad5();
+
+    public Double getTotalRam()
+    {
+        return totalRam;
+    }
+
+
+    public Double getAvailableDisk()
+    {
+        return availableDisk;
+    }
+
+
+    public Double getUsedDisk()
+    {
+        return usedDisk;
+    }
+
+
+    public Double getTotalDisk()
+    {
+        return totalDisk;
+    }
+
+
+    public Double getCpuLoad5()
+    {
+        return cpuLoad5;
+    }
 }

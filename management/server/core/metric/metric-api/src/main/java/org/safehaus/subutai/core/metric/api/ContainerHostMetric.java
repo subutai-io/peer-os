@@ -1,13 +1,29 @@
 package org.safehaus.subutai.core.metric.api;
 
 
-import org.safehaus.subutai.common.protocol.Container;
+import java.util.UUID;
+
+import com.google.common.base.Preconditions;
 
 
 /**
  * Interface for ContainerHostMetric
  */
-public interface ContainerHostMetric extends Metric
+public abstract class ContainerHostMetric extends Metric
 {
-    public Container getContainer();  //TODO return here ContainerHost
+    protected UUID environmentId;
+
+
+    public UUID getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    protected void setEnvironmentId( final UUID environmentId )
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        this.environmentId = environmentId;
+    }
 }
