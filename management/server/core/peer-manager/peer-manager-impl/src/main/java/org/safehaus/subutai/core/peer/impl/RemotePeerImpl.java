@@ -43,16 +43,16 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID environmentId, final String templateName, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria )
-            throws ContainerCreateException
+    public Set<ContainerHost> getContainerHostsByEnvironmentId( final UUID environmentId ) throws PeerException
     {
         return null;
     }
 
 
     @Override
-    public Set<ContainerHost> getContainers( final UUID environmentId ) throws PeerException
+    public Set<ContainerHost> createContainers( final UUID environmentId, final String templateName, final int quantity,
+                                                final String strategyId, final List<Criteria> criteria )
+            throws ContainerCreateException
     {
         return null;
     }

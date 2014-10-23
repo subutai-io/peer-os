@@ -48,7 +48,6 @@ import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.LocalPeer;
-import org.safehaus.subutai.core.peer.api.LocalPeerImpl;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerContainer;
@@ -63,7 +62,7 @@ import org.safehaus.subutai.core.peer.api.message.PeerMessageListener;
 import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
-import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.core.strategy.api.StrategyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +93,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     private CommunicationManager communicationManager;
     private ManagementHost managementHost;
     private LocalPeer localPeer;
+    private StrategyManager strategyManager;
 
 
     public PeerManagerImpl( final DataSource dataSource )
@@ -114,7 +114,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             LOG.error( e.getMessage(), e );
         }
         communicationManager.addListener( this );
-        localPeer = new LocalPeerImpl( this );
+        localPeer = new LocalPeerImpl( this, containerManager );
     }
 
 
@@ -127,6 +127,12 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     public void setCommunicationManager( final CommunicationManager communicationManager )
     {
         this.communicationManager = communicationManager;
+    }
+
+
+    public void setStrategyManager( final StrategyManager strategyManager )
+    {
+        this.strategyManager = strategyManager;
     }
 
 
@@ -770,16 +776,6 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID envId, final String templateName, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria )
-            throws ContainerCreateException
-    {
-        //TODO: implement me
-        return null;
-    }
-
-
-    @Override
     public boolean isConnected( final Host host )
     {
         return false;
@@ -1003,5 +999,12 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
     public ManagementHost getManagementHost()
     {
         return this.managementHost;
+    }
+
+
+    @Override
+    public LocalPeer getLocalPeer()
+    {
+        return localPeer;
     }
 }
