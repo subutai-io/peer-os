@@ -54,7 +54,7 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
             }
         }
 
-        Command setMasterIPCommand = Commands.getSetMasterIPCommand( config.getNodes(), sparkConfig.getMasterNode() );
+        Command setMasterIPCommand = manager.getCommands().getSetMasterIPCommand( config.getNodes(), sparkConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( setMasterIPCommand );
 
         if ( setMasterIPCommand.hasSucceeded() )

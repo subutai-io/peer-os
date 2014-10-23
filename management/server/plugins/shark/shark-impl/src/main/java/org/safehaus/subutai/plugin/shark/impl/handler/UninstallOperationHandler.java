@@ -44,7 +44,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SharkImp
 
         trackerOperation.addLog( "Uninstalling Shark..." );
 
-        Command uninstallCommand = Commands.getUninstallCommand( config.getNodes() );
+        Command uninstallCommand = manager.getCommands().getUninstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( uninstallCommand );
 
         if ( uninstallCommand.hasCompleted() )

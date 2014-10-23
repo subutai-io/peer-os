@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.shark.impl.mock;
 
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -21,8 +23,10 @@ public class SharkImplMock extends SharkImpl
 
     public SharkImplMock()
     {
-        super( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), new TrackerMock(),
-                mock( Spark.class ), mock( Hadoop.class ), mock( EnvironmentManager.class ) );
+        super( mock( DataSource.class ) );
+        setCommandRunner( mock( CommandRunner.class ) );
+        setAgentManager( mock( AgentManager.class ) );
+        setTracker( new TrackerMock() );
     }
 
 

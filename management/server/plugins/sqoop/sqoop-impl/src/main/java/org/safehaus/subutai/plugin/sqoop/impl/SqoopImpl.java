@@ -4,6 +4,8 @@ package org.safehaus.subutai.plugin.sqoop.impl;
 import java.util.List;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -24,6 +26,11 @@ import org.safehaus.subutai.plugin.sqoop.impl.handler.InstallHandler;
 
 public class SqoopImpl extends SqoopBase
 {
+
+    public SqoopImpl( DataSource dataSource )
+    {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public UUID installCluster( SqoopConfig config )
@@ -50,14 +57,14 @@ public class SqoopImpl extends SqoopBase
     @Override
     public List<SqoopConfig> getClusters()
     {
-        return pluginDao.getInfo( SqoopConfig.PRODUCT_KEY, SqoopConfig.class );
+        return pluginDAO.getInfo( SqoopConfig.PRODUCT_KEY, SqoopConfig.class );
     }
 
 
     @Override
     public SqoopConfig getCluster( String clusterName )
     {
-        return pluginDao.getInfo( SqoopConfig.PRODUCT_KEY, clusterName, SqoopConfig.class );
+        return pluginDAO.getInfo( SqoopConfig.PRODUCT_KEY, clusterName, SqoopConfig.class );
     }
 
 

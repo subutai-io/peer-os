@@ -59,7 +59,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             return;
         }
         trackerOperation.addLog( "Uninstalling Shark..." );
-        Command uninstallCommand = Commands.getUninstallCommand( new HashSet<>( Arrays.asList( agent ) ) );
+        Command uninstallCommand = manager.getCommands().getUninstallCommand( new HashSet<>( Arrays.asList( agent ) ) );
         manager.getCommandRunner().runCommand( uninstallCommand );
 
         if ( uninstallCommand.hasCompleted() )

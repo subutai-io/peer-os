@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.presto.impl.mock;
 
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -19,9 +21,9 @@ public class PrestoImplMock extends PrestoImpl
 
     public PrestoImplMock()
     {
+        super( mock( DataSource.class ) );
         setCommandRunner( mock( CommandRunner.class ) );
         setAgentManager( mock( AgentManager.class ) );
-        setDbManager( mock( DbManager.class ) );
         setTracker( new TrackerMock() );
     }
 

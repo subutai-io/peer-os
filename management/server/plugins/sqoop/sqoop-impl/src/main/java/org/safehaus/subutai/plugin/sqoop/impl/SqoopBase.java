@@ -1,8 +1,11 @@
 package org.safehaus.subutai.plugin.sqoop.impl;
 
 
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -11,6 +14,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.slf4j.Logger;
@@ -20,23 +24,32 @@ import org.slf4j.LoggerFactory;
 public abstract class SqoopBase implements Sqoop
 {
 
-    static final Logger logger = LoggerFactory.getLogger( SqoopImpl.class );
+    static final Logger LOG = LoggerFactory.getLogger( SqoopImpl.class );
 
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
     protected Tracker tracker;
     protected DbManager dbManager;
-    protected PluginDAO pluginDao;
+    protected PluginDaoNew pluginDAO;
     protected Hadoop hadoopManager;
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
+    public DataSource dataSource;
 
     protected ExecutorService executor;
 
 
     public void init()
     {
-        pluginDao = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDaoNew( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+
         executor = Executors.newCachedThreadPool();
     }
 
@@ -95,15 +108,15 @@ public abstract class SqoopBase implements Sqoop
     }
 
 
-    public PluginDAO getPluginDao()
+    public PluginDaoNew getPluginDao()
     {
-        return pluginDao;
+        return pluginDAO;
     }
 
 
-    public void setPluginDao( PluginDAO pluginDao )
+    public void setPluginDao( PluginDaoNew pluginDao )
     {
-        this.pluginDao = pluginDao;
+        this.pluginDAO = pluginDao;
     }
 
 
@@ -157,6 +170,6 @@ public abstract class SqoopBase implements Sqoop
 
     public Logger getLogger()
     {
-        return logger;
+        return LOG;
     }
 }
