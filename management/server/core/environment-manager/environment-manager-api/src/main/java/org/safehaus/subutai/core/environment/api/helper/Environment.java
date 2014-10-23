@@ -20,7 +20,8 @@ public class Environment
     private UUID uuid;
     private String name;
     private Set<EnvironmentContainer> containers;
-
+    private EnvironmentStatusEnum status;
+    private long creationTimestamp;
 
     public Environment( String name )
     {
@@ -28,6 +29,26 @@ public class Environment
         this.uuid = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
         this.serviceLocator = new ServiceLocator();
+        this.status = EnvironmentStatusEnum.EMPTY;
+        this.creationTimestamp = System.currentTimeMillis();
+    }
+
+
+    public long getCreationTimestamp()
+    {
+        return creationTimestamp;
+    }
+
+
+    public EnvironmentStatusEnum getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( final EnvironmentStatusEnum status )
+    {
+        this.status = status;
     }
 
 

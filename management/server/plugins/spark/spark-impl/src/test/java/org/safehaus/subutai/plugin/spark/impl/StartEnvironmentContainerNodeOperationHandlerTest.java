@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.StartNodeOperationHandler;
@@ -35,7 +35,7 @@ public class StartEnvironmentContainerNodeOperationHandlerTest
 
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().contains( "not exist" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }
@@ -47,7 +47,7 @@ public class StartEnvironmentContainerNodeOperationHandlerTest
         mock.setClusterConfig( new SparkClusterConfig() );
         handler.run();
 
-        ProductOperation po = handler.getProductOperation();
+        TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().contains( "not connected" ) );
         Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
     }

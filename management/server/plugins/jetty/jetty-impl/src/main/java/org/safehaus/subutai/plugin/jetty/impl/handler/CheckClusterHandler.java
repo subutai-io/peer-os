@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -24,7 +24,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<JettyImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        this.productOperation = manager.getTracker().createProductOperation( JettyConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( JettyConfig.PRODUCT_KEY,
                 String.format( "Checking all nodes of %s cluster...", clusterName ) );
     }
 
@@ -38,7 +38,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<JettyImpl>
 
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
@@ -48,16 +48,16 @@ public class CheckClusterHandler extends AbstractOperationHandler<JettyImpl>
 
         if ( checkStatusCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "All nodes are running." );
+            trackerOperation.addLogDone( "All nodes are running." );
         }
         else
         {
-            logStatusResults( productOperation, checkStatusCommand );
+            logStatusResults( trackerOperation, checkStatusCommand );
         }
     }
 
 
-    private void logStatusResults( ProductOperation po, Command checkStatusCommand )
+    private void logStatusResults( TrackerOperation po, Command checkStatusCommand )
     {
 
         StringBuilder log = new StringBuilder();

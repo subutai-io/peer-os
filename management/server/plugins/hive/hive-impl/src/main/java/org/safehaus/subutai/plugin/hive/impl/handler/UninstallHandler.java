@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -24,7 +24,7 @@ public class UninstallHandler extends AbstractHandler
     public UninstallHandler( HiveImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        this.productOperation = manager.getTracker().createProductOperation( HiveConfig.PRODUCT_KEY,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( HiveConfig.PRODUCT_KEY,
                 "Uninstalling cluster " + clusterName );
     }
 
@@ -32,7 +32,7 @@ public class UninstallHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         HiveConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -85,7 +85,7 @@ public class UninstallHandler extends AbstractHandler
 
     private boolean removeHive( HiveConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Removing Hive client(s)..." );
         String s = Commands.make( CommandType.PURGE, Product.HIVE );
         Command cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ), config.getClients() );
@@ -139,7 +139,7 @@ public class UninstallHandler extends AbstractHandler
 
     private boolean destroyNodes( HiveConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Destroying container(s)..." );
         try
         {

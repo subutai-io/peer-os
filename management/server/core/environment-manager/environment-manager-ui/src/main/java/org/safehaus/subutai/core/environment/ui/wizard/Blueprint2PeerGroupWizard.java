@@ -6,10 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
@@ -72,7 +71,7 @@ public class Blueprint2PeerGroupWizard extends Window
             }
             case 2:
             {
-                setContent( genContainerToPeersTable() );
+                setContent( genBlueprintToPeerGroupTable() );
                 break;
             }
             default:
@@ -151,7 +150,7 @@ public class Blueprint2PeerGroupWizard extends Window
     }
 
 
-    private VerticalLayout genContainerToPeersTable()
+    private VerticalLayout genBlueprintToPeerGroupTable()
     {
         VerticalLayout vl = new VerticalLayout();
 
@@ -190,9 +189,9 @@ public class Blueprint2PeerGroupWizard extends Window
                 Map<Object, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
-                    EnvironmentBuildProcess process = createEnvironmentBuildProcess( environmentBuildTask, topology );
-
-                    managerUI.getEnvironmentManager().saveBuildProcess( process );
+                    Map<Object, NodeGroup> map = getNodeGroupMap();
+                    managerUI.getEnvironmentManager().saveBuildProcess( environmentBuildTask, topology, map,
+                            TopologyEnum.BLUEPRINT_2_PEER_GROUP );
                 }
                 else
                 {
@@ -249,34 +248,7 @@ public class Blueprint2PeerGroupWizard extends Window
     }
 
 
-    public EnvironmentBuildProcess createEnvironmentBuildProcess( EnvironmentBuildTask ebt, Map<Object, Peer> topology )
-    {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint() );
 
-        Map<Object, NodeGroup> map = getNodeGroupMap();
-        for ( Object itemId : map.keySet() )
-        {
-            Peer peer = topology.get( itemId );
-            NodeGroup ng = map.get( itemId );
-
-            String key = peer.getId().toString() + "-" + ng.getTemplateName();
-
-            if ( !process.getMessageMap().containsKey( key ) )
-            {
-                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
-                ccm.setTemplate( ng.getTemplateName() );
-                ccm.setNumberOfNodes( 1 );
-                ccm.setStrategy( ng.getPlacementStrategy().toString() );
-                process.putCloneContainerMessage( key, ccm );
-            }
-            else
-            {
-                process.getMessageMap().get( key ).incrementNumberOfNodes();
-            }
-        }
-
-        return process;
-    }
 
 
     public Map<Object, Peer> topologySelection()

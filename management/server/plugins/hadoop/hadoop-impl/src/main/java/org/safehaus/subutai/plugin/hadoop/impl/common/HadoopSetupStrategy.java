@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -32,11 +32,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
     private Environment environment;
     private HadoopImpl hadoopManager;
-    private ProductOperation po;
+    private TrackerOperation po;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-    public HadoopSetupStrategy( ProductOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig )
+    public HadoopSetupStrategy( TrackerOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -48,7 +48,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    public HadoopSetupStrategy( ProductOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig,
+    public HadoopSetupStrategy( TrackerOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig,
                                 Environment environment )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
@@ -138,7 +138,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    private void destroyLXC( ProductOperation po, String log )
+    private void destroyLXC( TrackerOperation po, String log )
     {
         //destroy all lxcs also
         po.addLog( "Destroying lxc containers" );

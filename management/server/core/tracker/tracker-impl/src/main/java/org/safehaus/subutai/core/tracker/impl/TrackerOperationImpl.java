@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
@@ -20,7 +20,7 @@ import com.google.common.base.Strings;
 /**
  * This is an implementation of ProductOperation
  */
-public class ProductOperationImpl implements ProductOperation
+public class TrackerOperationImpl implements TrackerOperation
 {
 
     /**
@@ -54,7 +54,7 @@ public class ProductOperationImpl implements ProductOperation
     private ProductOperationState state;
 
 
-    public ProductOperationImpl( String source, String description, TrackerImpl tracker )
+    public TrackerOperationImpl( String source, String description, TrackerImpl tracker )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
@@ -152,7 +152,7 @@ public class ProductOperationImpl implements ProductOperation
         {
             return false;
         }
-        final ProductOperationImpl other = ( ProductOperationImpl ) obj;
+        final TrackerOperationImpl other = ( TrackerOperationImpl ) obj;
         return !( this.id != other.id && ( this.id == null || !this.id.equals( other.id ) ) );
     }
 }

@@ -20,7 +20,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Checking %s cluster...", clusterName ) );
     }
 
@@ -31,7 +31,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
         HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
@@ -43,13 +43,13 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
         }
         catch ( Exception e )
         {
-            productOperation.addLogFailed( e.getMessage() );
+            trackerOperation.addLogFailed( e.getMessage() );
 
             return;
         }
         if ( allNodes == null || allNodes.isEmpty() )
         {
-            productOperation.addLogFailed( "Nodes not connected" );
+            trackerOperation.addLogFailed( "Nodes not connected" );
             return;
         }
 
@@ -64,11 +64,11 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
                 status.append( agent.getHostname() ).append( ":\n" )
                       .append( checkCommand.getResults().get( agent.getUuid() ).getStdOut() ).append( "\n\n" );
             }
-            productOperation.addLogDone( status.toString() );
+            trackerOperation.addLogDone( status.toString() );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
         }
     }
 

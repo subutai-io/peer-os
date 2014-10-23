@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
@@ -27,12 +27,12 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
 {
 
     private SolrImpl manager;
-    private ProductOperation po;
+    private TrackerOperation po;
     private SolrClusterConfig config;
     private Environment environment;
 
 
-    public SolrSetupStrategy( final SolrImpl manager, final ProductOperation po, final SolrClusterConfig config,
+    public SolrSetupStrategy( final SolrImpl manager, final TrackerOperation po, final SolrClusterConfig config,
                               final Environment environment )
     {
         Preconditions.checkNotNull( manager, "Solr Manager is null" );

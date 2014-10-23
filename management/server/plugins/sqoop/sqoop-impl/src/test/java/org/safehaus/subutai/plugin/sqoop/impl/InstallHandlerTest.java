@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.sqoop.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.handler.InstallHandler;
@@ -17,7 +17,7 @@ public class InstallHandlerTest
     @Test
     public void testWithoutNodes()
     {
-        ProductOperation po = SqoopImplMock.getProductOperationMock();
+        TrackerOperation po = SqoopImplMock.getProductOperationMock();
         SqoopImplMock sqoopImplMock = new SqoopImplMock();
         InstallHandler installHandler = new InstallHandler( sqoopImplMock.getSqoopImplMock(), "test", po );
         SqoopConfig config = new SqoopConfig();

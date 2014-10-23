@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class TrackerComponent extends CustomComponent
     private volatile UUID trackID;
     private volatile boolean track = false;
     private volatile String source;
-    private List<ProductOperationView> currentOperations = new ArrayList<>();
+    private List<TrackerOperationView> currentOperations = new ArrayList<>();
     private int limit = 10;
 
 
@@ -273,8 +273,8 @@ public class TrackerComponent extends CustomComponent
     {
         if ( !Strings.isNullOrEmpty( source ) )
         {
-            List<ProductOperationView> operations =
-                    tracker.getProductOperations( source, fromDateValue, toDateValue, limit );
+            List<TrackerOperationView> operations =
+                    tracker.getTrackerOperations( source, fromDateValue, toDateValue, limit );
             if ( operations.isEmpty() )
             {
                 trackID = null;
@@ -283,13 +283,13 @@ public class TrackerComponent extends CustomComponent
             IndexedContainer container = ( IndexedContainer ) operationsTable.getContainerDataSource();
             currentOperations.removeAll( operations );
 
-            for ( ProductOperationView po : currentOperations )
+            for ( TrackerOperationView po : currentOperations )
             {
                 container.removeItem( po.getId() );
             }
 
             boolean sortNeeded = false;
-            for ( final ProductOperationView po : operations )
+            for ( final TrackerOperationView po : operations )
             {
                 sortNeeded |= populateOperation( container, po );
             }
@@ -312,7 +312,7 @@ public class TrackerComponent extends CustomComponent
     }
 
 
-    private boolean populateOperation( final IndexedContainer container, final ProductOperationView po )
+    private boolean populateOperation( final IndexedContainer container, final TrackerOperationView po )
     {
         boolean sortNeeded = false;
         Embedded progressIcon;
@@ -369,7 +369,7 @@ public class TrackerComponent extends CustomComponent
     {
         if ( trackID != null && !Strings.isNullOrEmpty( source ) )
         {
-            ProductOperationView po = tracker.getProductOperation( source, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( source, trackID );
             if ( po != null )
             {
                 setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
@@ -400,7 +400,7 @@ public class TrackerComponent extends CustomComponent
     {
         String oldSource = source;
         sourcesCombo.removeAllItems();
-        List<String> sources = tracker.getProductOperationSources();
+        List<String> sources = tracker.getTrackerOperationSources();
         for ( String src : sources )
         {
             sourcesCombo.addItem( src );

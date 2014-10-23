@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.oozie.cli;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
@@ -58,7 +58,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport
         int logSize = 0;
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( OozieClusterConfig.PRODUCT_KEY, uuid );
+            TrackerOperationView po = tracker.getTrackerOperation( OozieClusterConfig.PRODUCT_KEY, uuid );
             if ( po != null )
             {
                 if ( logSize != po.getLog().length() )

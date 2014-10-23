@@ -16,7 +16,7 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
     public ActualizeMasterIpOperationHandler( SharkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SharkClusterConfig.PRODUCT_KEY,
                 String.format( "Actualizing master IP of %s", clusterName ) );
     }
 
@@ -27,20 +27,20 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
         SharkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         if ( config.getSparkClusterName() == null )
         {
-            productOperation.addLogFailed( "Spark cluster name not specified" );
+            trackerOperation.addLogFailed( "Spark cluster name not specified" );
             return;
         }
         SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster( config.getSparkClusterName() );
         if ( sparkConfig == null )
         {
-            productOperation.addLogFailed( "Underlying Spark cluster not found: " + clusterName );
+            trackerOperation.addLogFailed( "Underlying Spark cluster not found: " + clusterName );
             return;
         }
 
@@ -48,7 +48,7 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
         {
             if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
             {
-                productOperation.addLogFailed(
+                trackerOperation.addLogFailed(
                         String.format( "Node %s is not connected\nOperation aborted", node.getHostname() ) );
                 return;
             }
@@ -59,11 +59,11 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
 
         if ( setMasterIPCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Master IP actualized successfully\nDone" );
+            trackerOperation.addLogDone( "Master IP actualized successfully\nDone" );
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Failed to actualize Master IP, %s", setMasterIPCommand.getAllErrors() ) );
         }
     }

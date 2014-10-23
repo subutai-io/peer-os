@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
@@ -18,10 +18,10 @@ abstract class HiveSetupStrategy implements ClusterSetupStrategy
 
     final HiveImpl manager;
     final HiveConfig config;
-    final ProductOperation po;
+    final TrackerOperation po;
 
 
-    public HiveSetupStrategy( HiveImpl manager, HiveConfig config, ProductOperation po )
+    public HiveSetupStrategy( HiveImpl manager, HiveConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;

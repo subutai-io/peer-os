@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
@@ -17,7 +17,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
     public UninstallOperationHandler( SparkImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
 
@@ -25,7 +25,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -71,7 +71,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
 
     private boolean uninstall( SparkClusterConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Spark..." );
 
         Command cmd = manager.getCommands().getUninstallCommand( config.getAllNodes() );
@@ -91,16 +91,16 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
     private boolean destroyNodes( SparkClusterConfig config )
     {
 
-        productOperation.addLog( "Destroying node(s)..." );
+        trackerOperation.addLog( "Destroying node(s)..." );
         try
         {
             manager.getContainerManager().clonesDestroy( config.getAllNodes() );
-            productOperation.addLogDone( "Destroying node(s) completed" );
+            trackerOperation.addLogDone( "Destroying node(s) completed" );
             return true;
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLogFailed( "Failed to destroy node(s): " + ex.getMessage() );
+            trackerOperation.addLogFailed( "Failed to destroy node(s): " + ex.getMessage() );
             return false;
         }
     }

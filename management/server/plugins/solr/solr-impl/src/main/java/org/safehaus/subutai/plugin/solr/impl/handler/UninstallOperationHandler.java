@@ -13,7 +13,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
     public UninstallOperationHandler( SolrImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying installation %s", clusterName ) );
     }
 
@@ -25,25 +25,25 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( solrClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
-        productOperation.addLog( "Destroying lxc containers..." );
+        trackerOperation.addLog( "Destroying lxc containers..." );
 
         try
         {
             manager.getContainerManager().clonesDestroy( solrClusterConfig.getNodes() );
-            productOperation.addLog( "Lxc containers successfully destroyed" );
+            trackerOperation.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+            trackerOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
 
-        productOperation.addLog( "Updating db..." );
+        trackerOperation.addLog( "Updating db..." );
 
         manager.getPluginDAO().deleteInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName() );
-        productOperation.addLogDone( "Information updated in database" );
+        trackerOperation.addLogDone( "Information updated in database" );
     }
 }

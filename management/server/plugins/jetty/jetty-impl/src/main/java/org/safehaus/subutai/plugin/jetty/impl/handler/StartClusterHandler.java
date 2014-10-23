@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.jetty.impl.handler;
 
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
@@ -18,7 +17,7 @@ public class StartClusterHandler extends AbstractOperationHandler<JettyImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( JettyConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( JettyConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
@@ -29,7 +28,7 @@ public class StartClusterHandler extends AbstractOperationHandler<JettyImpl>
         JettyConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist. Operation aborted", clusterName ) );
             return;
         }
@@ -39,11 +38,11 @@ public class StartClusterHandler extends AbstractOperationHandler<JettyImpl>
 
         if ( startServiceCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Start succeeded" );
+            trackerOperation.addLogDone( "Start succeeded" );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
         }
     }
 }

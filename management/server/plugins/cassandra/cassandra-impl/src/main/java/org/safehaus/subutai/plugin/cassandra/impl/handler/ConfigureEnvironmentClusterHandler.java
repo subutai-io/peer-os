@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
@@ -16,14 +16,14 @@ public class ConfigureEnvironmentClusterHandler extends AbstractOperationHandler
 {
 
     private CassandraClusterConfig config;
-    private ProductOperation po;
+    private TrackerOperation po;
 
 
     public ConfigureEnvironmentClusterHandler( final CassandraImpl manager, final CassandraClusterConfig config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createTrackerOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -38,7 +38,7 @@ public class ConfigureEnvironmentClusterHandler extends AbstractOperationHandler
     @Override
     public void run()
     {
-        productOperation = po;
+        trackerOperation = po;
         po.addLog( "Building environment..." );
 
         try

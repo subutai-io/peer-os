@@ -4,11 +4,11 @@ package org.safehaus.subutai.plugin.common.mock;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 
-public class ProductOperationMock implements ProductOperation
+public class TrackerOperationMock implements TrackerOperation
 {
     private final StringBuilder log = new StringBuilder();
 

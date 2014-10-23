@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
@@ -32,7 +32,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        productOperation = manager.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( PrestoClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node %s to %s", ( hostname != null ? hostname : "" ), clusterName ) );
     }
 
@@ -40,7 +40,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -89,7 +89,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 
     Agent setupHost( PrestoClusterConfig config ) throws ClusterSetupException
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
 
         Agent agent = manager.getAgentManager().getAgentByHostname( hostname );
         if ( agent == null )
@@ -166,7 +166,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
             throw new ClusterSetupException( "Inconsistent state: cloned more than one container" );
         }
 
-        SetupHelper sh = new SetupHelper( productOperation, manager, config );
+        SetupHelper sh = new SetupHelper( trackerOperation, manager, config );
         sh.configureAsWorker( set, config.getCoordinatorNode() );
         sh.startNodes( set );
 

@@ -95,20 +95,6 @@ public class CloneContainersMessage extends PeerCommandMessage
     }
 
 
-    @Override
-    public String toString()
-    {
-        return "CloneContainersMessage{" +
-                "envId=" + envId +
-                ", template='" + template + '\'' +
-                ", numberOfNodes=" + numberOfNodes +
-                ", Strategy='" + Strategy + '\'' +
-                ", criteria=" + criteria +
-                ", success=" + success +
-                '}';
-    }
-
-
     public void incrementNumberOfNodes()
     {
         numberOfNodes++;
@@ -128,5 +114,18 @@ public class CloneContainersMessage extends PeerCommandMessage
             throw new IllegalArgumentException( "Template could not be null." );
         }
         this.templates.add( t );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "CloneContainersMessage{" +
+                "template='" + template + '\'' +
+                ", numberOfNodes=" + numberOfNodes +
+                ", Strategy='" + Strategy + '\'' +
+                ", criteria=" + criteria +
+                ", templates=" + templates +
+                '}';
     }
 }

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.nutch.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
@@ -18,7 +18,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<NutchImp
     public UninstallOperationHandler( NutchImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( NutchConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( NutchConfig.PRODUCT_KEY,
                 String.format( "Destroying %s ", clusterName ) );
     }
 
@@ -26,7 +26,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<NutchImp
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         NutchConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -72,7 +72,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<NutchImp
 
     private boolean uninstall( NutchConfig config )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling " + NutchConfig.PRODUCT_KEY );
 
         Command cmd = manager.getCommands().getUninstallCommand( config.getNodes() );
@@ -92,16 +92,16 @@ public class UninstallOperationHandler extends AbstractOperationHandler<NutchImp
     private boolean destroyNodes( NutchConfig config )
     {
 
-        productOperation.addLog( "Destroying node(s)..." );
+        trackerOperation.addLog( "Destroying node(s)..." );
         try
         {
             manager.getContainerManager().clonesDestroy( config.getNodes() );
-            productOperation.addLog( "Destroying node(s) completed" );
+            trackerOperation.addLog( "Destroying node(s) completed" );
             return true;
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
+            trackerOperation.addLog( "Failed to destroy node(s): " + ex.getMessage() );
             return false;
         }
     }

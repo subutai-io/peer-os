@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.nutch.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
 import org.safehaus.subutai.plugin.nutch.api.SetupType;
 
@@ -13,14 +13,14 @@ abstract class NutchSetupStrategy implements ClusterSetupStrategy
 
     final NutchImpl manager;
     final NutchConfig config;
-    final ProductOperation productOperation;
+    final TrackerOperation trackerOperation;
 
 
-    public NutchSetupStrategy( NutchImpl manager, NutchConfig config, ProductOperation po )
+    public NutchSetupStrategy( NutchImpl manager, NutchConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;
-        this.productOperation = po;
+        this.trackerOperation = po;
     }
 
 

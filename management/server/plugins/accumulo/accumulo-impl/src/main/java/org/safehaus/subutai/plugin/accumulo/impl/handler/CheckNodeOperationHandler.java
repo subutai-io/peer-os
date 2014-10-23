@@ -26,7 +26,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
         super( manager, clusterName );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Checking node %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -34,7 +34,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -44,19 +44,19 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
         AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null )
         {
-            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            trackerOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !accumuloClusterConfig.getAllNodes().contains( node ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -66,12 +66,12 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
 
         if ( checkNodeCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
+            trackerOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
                     checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Failed to check status of %s, %s", lxcHostname, checkNodeCommand.getAllErrors() ) );
         }
     }

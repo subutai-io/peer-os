@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.flume.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
 
@@ -13,10 +13,10 @@ abstract class FlumeSetupStrategy implements ClusterSetupStrategy
 
     final FlumeImpl manager;
     final FlumeConfig config;
-    final ProductOperation po;
+    final TrackerOperation po;
 
 
-    public FlumeSetupStrategy( FlumeImpl manager, FlumeConfig config, ProductOperation po )
+    public FlumeSetupStrategy( FlumeImpl manager, FlumeConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;

@@ -335,7 +335,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                     agentFamilies.put( entry.getKey(), lxcHostNames );
                 }
                 lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 16 ) );
+                        UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
             }
         }
         else
@@ -346,7 +346,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener
                 for ( int i = 1; i <= count; i++ )
                 {
                     lxcHostNames.add( String.format( "%s%d%s", productName, lxcHostNames.size() + 1,
-                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 16 ) );
+                            UUIDUtil.generateTimeBasedUUID().toString().replace( "-", "" ) ).substring( 0, 11 ) );
                 }
                 agentFamilies.put( physAgent, lxcHostNames );
             }

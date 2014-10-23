@@ -11,17 +11,14 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
-import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
-import org.safehaus.subutai.plugin.common.mock.ProductOperationMock;
+import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.plugin.jetty.impl.Commands;
 import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -60,9 +57,9 @@ public class CheckServiceHandlerTest
         manager.setPluginDAO( mock( PluginDAO.class ) );
         manager.setAgentManager( mock( AgentManager.class ) );
 
-        doReturn( new ProductOperationMock() )
+        doReturn( new TrackerOperationMock() )
                 .when( manager.getTracker() )
-                .createProductOperation( anyString(), any(String.class) );
+                .createTrackerOperation( anyString(), any( String.class ) );
         handler = new CheckServiceHandler( manager, clusterName,  hostName);
 
         assertThat( "handler not null", handler != null );
@@ -79,9 +76,9 @@ public class CheckServiceHandlerTest
 
         doReturn( testAgent ).when( manager.getAgentManager() ).getAgentByHostname( hostName );
 
-        doReturn( new ProductOperationMock() )
+        doReturn( new TrackerOperationMock() )
                 .when( manager.getTracker() )
-                .createProductOperation( anyString(), any( String.class ) );
+                .createTrackerOperation( anyString(), any( String.class ) );
 
         CommandMock checkCommand = new CommandMock();
         checkCommand.setSucceeded( false );

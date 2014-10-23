@@ -19,7 +19,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping %s cluster...", clusterName ) );
     }
 
@@ -31,7 +31,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
         HBaseClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -39,7 +39,7 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
         Agent master = config.getHbaseMaster();
         if ( master == null )
         {
-            productOperation.addLogFailed( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
+            trackerOperation.addLogFailed( String.format( "Master node %s not connected", config.getHbaseMaster() ) );
             return;
         }
 
@@ -49,11 +49,11 @@ public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
 
         if ( stopCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Stop success.." );
+            trackerOperation.addLogDone( "Stop success.." );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Stop failed, %s", stopCommand.getAllErrors() ) );
+            trackerOperation.addLogFailed( String.format( "Stop failed, %s", stopCommand.getAllErrors() ) );
         }
     }
 }

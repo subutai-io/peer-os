@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
@@ -32,7 +32,7 @@ public interface Solr extends ApiBase<SolrClusterConfig>
     public UUID destroyNode( String clusterName, String lxcHostname );
 
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,
-                                                         final ProductOperation po );
+                                                         final TrackerOperation po );
 
     public EnvironmentBuildTask getDefaultEnvironmentBlueprint( SolrClusterConfig config );
 }

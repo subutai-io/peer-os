@@ -166,16 +166,22 @@ public class TemplateRegistryComponent extends CustomComponent
                 if ( item != null )
                 {
                     final Template template = ( Template ) item.getItemProperty( VALUE_PROPERTY ).getValue();
-
-                    Notification.show( template.toString() );
-                    getUI().access( new Runnable()
+                    if ( template != null )
                     {
-                        @Override
-                        public void run()
+                        Notification.show( template.toString() );
+                        getUI().access( new Runnable()
                         {
-                            showSelectedTemplateInfo( template );
-                        }
-                    } );
+                            @Override
+                            public void run()
+                            {
+                                showSelectedTemplateInfo( template );
+                            }
+                        } );
+                    }
+                    else
+                    {
+                        Notification.show( "No template" );
+                    }
                 }
             }
         } );

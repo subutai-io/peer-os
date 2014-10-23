@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import com.google.common.base.Strings;
@@ -98,8 +98,8 @@ public class AddNodeWindow extends Window
                     {
                         while ( track )
                         {
-                            ProductOperationView po =
-                                    tracker.getProductOperation( config.getProductKey(), trackID );
+                            TrackerOperationView po =
+                                    tracker.getTrackerOperation( config.getProductKey(), trackID );
                             if ( po != null )
                             {
                                 setOutput(

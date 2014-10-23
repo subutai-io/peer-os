@@ -153,7 +153,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager
      */
     public Agent getAgentByUUID( UUID uuid )
     {
-        return agents.getIfPresent( UUID.fromString( uuid.toString() ) );
+        return agents.getIfPresent( uuid );
     }
 
 

@@ -16,7 +16,7 @@ public class RestartJobTrackerOperationHandler extends AbstractOperationHandler<
     public RestartJobTrackerOperationHandler( HadoopImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Restarting JobTracker in %s", clusterName ) );
     }
 
@@ -28,20 +28,20 @@ public class RestartJobTrackerOperationHandler extends AbstractOperationHandler<
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( hadoopClusterConfig.getJobTracker() == null )
         {
-            productOperation.addLogFailed( String.format( "JobTracker on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "JobTracker on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( hadoopClusterConfig.getJobTracker().getHostname() );
         if ( node == null )
         {
-            productOperation.addLogFailed( "JobTracker is not connected" );
+            trackerOperation.addLogFailed( "JobTracker is not connected" );
             return;
         }
 
@@ -82,11 +82,11 @@ public class RestartJobTrackerOperationHandler extends AbstractOperationHandler<
 
         if ( NodeState.RUNNING.equals( nodeState ) )
         {
-            productOperation.addLogDone( String.format( "JobTracker on %s restarted", node.getHostname() ) );
+            trackerOperation.addLogDone( String.format( "JobTracker on %s restarted", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogFailed( String.format( "Failed to restart JobTracker %s. %s", node.getHostname(),
+            trackerOperation.addLogFailed( String.format( "Failed to restart JobTracker %s. %s", node.getHostname(),
                     startCommand.getAllErrors() ) );
         }
     }

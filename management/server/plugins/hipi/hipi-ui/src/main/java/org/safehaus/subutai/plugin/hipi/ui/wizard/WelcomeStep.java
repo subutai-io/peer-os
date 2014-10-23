@@ -55,7 +55,7 @@ public class WelcomeStep extends Panel
         } );
 
         Button next2 = new Button( "Start with-Hadoop installation" );
-        next.setId("hipiStartWithHadoop");
+        next2.setId("hipiStartWithHadoop");
         next2.setStyleName( "default" );
         next2.addClickListener( new Button.ClickListener()
         {

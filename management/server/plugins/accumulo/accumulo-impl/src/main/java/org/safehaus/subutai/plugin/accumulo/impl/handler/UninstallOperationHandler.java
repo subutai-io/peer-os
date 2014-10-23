@@ -19,7 +19,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
     public UninstallOperationHandler( AccumuloImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
 
@@ -27,7 +27,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -37,18 +37,18 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
         AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         try
         {
-            new ClusterConfiguration( productOperation, manager ).destroyCluster( accumuloClusterConfig );
-            productOperation.addLogDone( "Cluster successfully destroyed" );
+            new ClusterConfiguration( trackerOperation, manager ).destroyCluster( accumuloClusterConfig );
+            trackerOperation.addLogDone( "Cluster successfully destroyed" );
         }
         catch ( ClusterConfigurationException e )
         {
-            productOperation.addLogFailed( String.format( "Failed to destroy cluster, %s", e.getMessage() ) );
+            trackerOperation.addLogFailed( String.format( "Failed to destroy cluster, %s", e.getMessage() ) );
         }
     }
 }

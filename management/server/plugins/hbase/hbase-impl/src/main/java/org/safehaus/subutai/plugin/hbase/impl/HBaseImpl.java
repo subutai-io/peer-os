@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -229,7 +229,7 @@ public class HBaseImpl implements HBase
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseClusterConfig config,
-                                                         final ProductOperation po )
+                                                         final TrackerOperation po )
     {
         if ( config.getSetupType() == SetupType.OVER_HADOOP )
         {
