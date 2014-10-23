@@ -66,4 +66,16 @@ public interface PeerManager
     void deletePeerGroup( PeerGroup group );
 
     boolean savePeerGroup( PeerGroup group );
+
+    public PeerInterface getPeer( UUID peerId );
+
+
+    //    public Set<ContainerHost> createContainers( UUID envId, String templateName, int quantity, String strategyId,
+    //                                                List<Criteria> criteria ) throws ContainerCreateException;
+
+    public boolean isConnected( Host host );
+
+    public ManagementHost getManagementHost();
+
+    public LocalPeer getLocalPeer();
 }

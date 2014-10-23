@@ -336,12 +336,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
             //TODO: move template addition on create ccm
             List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
-            if ( templates.isEmpty() )
-            {
-                environment.setStatus( EnvironmentStatusEnum.BROKEN );
-                saveEnvironment( environment );
-                throw new EnvironmentBuildException( "Could not fetch parent templates list" );
-            }
+            //            if ( templates.isEmpty() )
+            //            {
+            //                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+            //                saveEnvironment( environment );
+            //                throw new EnvironmentBuildException( "Could not fetch parent templates list" );
+            //            }
 
             Template installationTemplate = templateRegistry.getTemplate( ccm.getTemplate() );
             if ( installationTemplate != null )
@@ -499,9 +499,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( UUID peerId : peers )
         {
             PeerCommandMessage cmd =
-                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, environment.getUuid(), peerId,
-                            null );
+                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
 
+            cmd.setInput( environment.getUuid().toString() );
             peerCommandDispatcher.invoke( cmd, TIMEOUT );
 
             Set<PeerContainer> containers =
