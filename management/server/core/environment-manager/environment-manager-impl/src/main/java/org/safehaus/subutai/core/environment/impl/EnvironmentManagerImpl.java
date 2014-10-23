@@ -35,6 +35,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentPersistenceException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
@@ -117,13 +118,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    PeerManager peerManager;
+
+
     public void init()
     {
         try
         {
+            peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
             this.environmentDAO = new EnvironmentDAO( dataSource );
         }
         catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        catch ( NamingException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -482,20 +491,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
+    }
+
+
     // TODO: Implement it via PCD
     private UUID getPeerId()
     {
-
-        try
-        {
-            PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-            return peerManager.getSiteId();
-        }
-        catch ( NamingException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        return null;
+        return peerManager.getSiteId();
     }
 
 
@@ -577,7 +588,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                      final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
     {
         EnvironmentBuildProcess process = null;
-        TopologyBuilder topologyBuilder = new TopologyBuilder();
+        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
         switch ( topologyEnum )
         {
             case NODE_2_PEER:
@@ -613,8 +624,40 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public boolean saveBuildProcessB2PG( final UUID envId, final UUID peerGroupId )
+    public boolean saveBuildProcessB2PG( final UUID blueprintId, final UUID peerGroupId )
+            throws EnvironmentManagerException
     {
-        return true;
+        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
+        try
+        {
+            EnvironmentBuildProcess process =
+                    topologyBuilder.createEnvironmentBuildProcessB2PG( blueprintId, peerGroupId );
+            if ( process != null )
+            {
+                return environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch ( EnvironmentBuildException e )
+        {
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public EnvironmentBlueprint getEnvironmentBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
+    {
+        try
+        {
+            return environmentDAO.getBlueprint( blueprintId );
+        }
+        catch ( EnvironmentPersistenceException e )
+        {
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
     }
 }

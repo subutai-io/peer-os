@@ -66,4 +66,6 @@ public interface PeerManager
     void deletePeerGroup( PeerGroup group );
 
     boolean savePeerGroup( PeerGroup group );
+
+    PeerGroup getPeerGroup( UUID peerGroupId );
 }

@@ -732,6 +732,13 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @Override
+    public PeerGroup getPeerGroup( final UUID peerGroupId )
+    {
+        return peerDAO.getInfo( PEER_GROUP, peerGroupId.toString(), PeerGroup.class );
+    }
+
+
     private void executeCommand( final PeerContainer peerContainer, final ExecuteCommandMessage ecm )
     {
         Agent agent = agentManager.getAgentByUUID( ecm.getAgentId() );

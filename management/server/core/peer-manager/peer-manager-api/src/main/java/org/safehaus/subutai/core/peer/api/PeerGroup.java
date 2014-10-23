@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.util.UUIDUtil;
+
 
 /**
  * Created by bahadyr on 10/8/14.
@@ -19,7 +21,7 @@ public class PeerGroup
     public PeerGroup()
     {
         this.peerIds = new HashSet<>();
-        this.id = UUID.randomUUID();
+        this.id = UUIDUtil.generateTimeBasedUUID();
     }
 
 

@@ -103,6 +103,7 @@ public class NodeGroup2PeerWizard extends Window
     private VerticalLayout genPeersTable()
     {
         VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
 
         peersTable = new Table();
         peersTable.addContainerProperty( "Name", String.class, null );
@@ -152,6 +153,7 @@ public class NodeGroup2PeerWizard extends Window
     private VerticalLayout genNodeGroupToPeersTable()
     {
         VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
 
         containerToPeerTable = new Table();
         containerToPeerTable.addContainerProperty( "Node Group", String.class, null );

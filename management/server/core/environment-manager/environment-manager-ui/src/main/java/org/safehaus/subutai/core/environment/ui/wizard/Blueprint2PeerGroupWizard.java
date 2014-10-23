@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.environment.ui.wizard;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 
@@ -117,7 +118,14 @@ public class Blueprint2PeerGroupWizard extends Window
                 PeerGroup peerGroup = getSelectedPeerGroup();
                 if ( peerGroup != null )
                 {
-                    module.getEnvironmentManager().saveBuildProcessB2PG( blueprint.getId(), peerGroup.getId() );
+                    try
+                    {
+                        module.getEnvironmentManager().saveBuildProcessB2PG( blueprint.getId(), peerGroup.getId() );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        Notification.show( e.getMessage() );
+                    }
                     next();
                 }
                 else

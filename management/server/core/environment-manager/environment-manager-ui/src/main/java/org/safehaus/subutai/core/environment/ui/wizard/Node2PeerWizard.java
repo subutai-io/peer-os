@@ -65,17 +65,17 @@ public class Node2PeerWizard extends Window
         {
             case 1:
             {
-                setContent( genPeersTable() );
+                setContent( genPeersLayout() );
                 break;
             }
             case 2:
             {
-                setContent( genNodesToPeersTable() );
+                setContent( genNodesToPeersLayout() );
                 break;
             }
             default:
             {
-                setContent( genPeersTable() );
+                setContent( genPeersLayout() );
                 break;
             }
         }
@@ -100,9 +100,10 @@ public class Node2PeerWizard extends Window
     }
 
 
-    private VerticalLayout genPeersTable()
+    private VerticalLayout genPeersLayout()
     {
         VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
 
         peersTable = new Table();
         peersTable.addContainerProperty( "Name", String.class, null );
@@ -149,9 +150,10 @@ public class Node2PeerWizard extends Window
     }
 
 
-    private VerticalLayout genNodesToPeersTable()
+    private VerticalLayout genNodesToPeersLayout()
     {
         VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
 
         containerToPeerTable = new Table();
         containerToPeerTable.addContainerProperty( "Container", String.class, null );
