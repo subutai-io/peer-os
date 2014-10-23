@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -35,11 +36,12 @@ import static org.mockito.Mockito.when;
  * Created by bahadyr on 9/25/14.
  */
 @Ignore
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class EnvironmentManagerImplTest
 {
 
     private static final String HOSTNAME = "hostname";
+    private static final String NAME = "name";
     EnvironmentManagerImpl manager;
     @Mock
     ContainerManager containerManager;
@@ -83,8 +85,8 @@ public class EnvironmentManagerImplTest
     public void shoudBuildEnvironment() throws Exception
     {
         EnvironmentBuildProcess process = mock( EnvironmentBuildProcess.class );
-        when( process.getEnvironmentBlueprint() ).thenReturn( environmentBlueprint );
-        when( process.getUuid() ).thenReturn( UUIDUtil.generateTimeBasedUUID() );
+        when( process.getBlueprintId() ).thenReturn( UUID.randomUUID() );
+        when( process.getId() ).thenReturn( UUIDUtil.generateTimeBasedUUID() );
 
         Map<String, CloneContainersMessage> map = new HashMap<>();
         CloneContainersMessage ccm = mock( CloneContainersMessage.class );

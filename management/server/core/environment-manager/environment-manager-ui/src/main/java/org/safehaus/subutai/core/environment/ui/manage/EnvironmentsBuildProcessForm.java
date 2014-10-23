@@ -176,8 +176,8 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
                     }
                 } );
                 environmentsTable.addItem( new Object[] {
-                        process.getEnvironmentBlueprint().getName(), icon, viewButton, processButton, destroyButton
-                }, process.getUuid() );
+                        process.getBlueprintId().toString(), icon, viewButton, processButton, destroyButton
+                }, process.getId() );
             }
         }
         else
@@ -215,7 +215,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
     private void terminateBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
 
-        UUID uuid = UUID.fromString( environmentBuildProcess.getUuid().toString() );
+        UUID uuid = UUID.fromString( environmentBuildProcess.getId().toString() );
         if ( executorServiceMap.containsKey( uuid ) )
         {
             ExecutorService executorService = executorServiceMap.get( uuid );
@@ -248,7 +248,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
         BuildProcessExecutor buildProcessExecutor = new BuildProcessExecutorImpl( environmentBuildProcess );
         buildProcessExecutor.addListener( this );
         ExecutorService executor = Executors.newCachedThreadPool();
-        executorServiceMap.put( environmentBuildProcess.getUuid(), executor );
+        executorServiceMap.put( environmentBuildProcess.getId(), executor );
 
 
         buildProcessExecutor.execute( executor,
@@ -278,7 +278,7 @@ public class EnvironmentsBuildProcessForm implements BuildProcessExecutionListen
             @Override
             public void run()
             {
-                Item row = environmentsTable.getItem( event.getEnvironmentBuildProcess().getUuid() );
+                Item row = environmentsTable.getItem( event.getEnvironmentBuildProcess().getId() );
                 EnvironmentBuildProcess ebp = event.getEnvironmentBuildProcess();
                 if ( row != null )
                 {

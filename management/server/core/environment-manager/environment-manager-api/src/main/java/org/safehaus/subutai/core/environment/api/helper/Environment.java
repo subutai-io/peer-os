@@ -17,7 +17,7 @@ public class Environment
 {
 
     private final ServiceLocator serviceLocator;
-    private UUID uuid;
+    private UUID id;
     private String name;
     private Set<EnvironmentContainer> containers;
     private EnvironmentStatusEnum status;
@@ -26,7 +26,7 @@ public class Environment
     public Environment( String name )
     {
         this.name = name;
-        this.uuid = UUIDUtil.generateTimeBasedUUID();
+        this.id = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
         this.serviceLocator = new ServiceLocator();
         this.status = EnvironmentStatusEnum.EMPTY;
@@ -54,7 +54,7 @@ public class Environment
 
     public void addContainer( EnvironmentContainer container )
     {
-        container.setEnvironmentId( uuid );
+        container.setEnvironmentId( id );
         this.containers.add( container );
     }
 
@@ -77,9 +77,9 @@ public class Environment
     }
 
 
-    public UUID getUuid()
+    public UUID getId()
     {
-        return uuid;
+        return id;
     }
 
 
