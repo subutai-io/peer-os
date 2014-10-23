@@ -230,6 +230,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
             throws EnvironmentBuildException
     {
+
         return environmentBuilder.build( environmentBuildTask );
     }
 
@@ -376,6 +377,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             {
                 CloneContainersMessage ccm = process.getMessageMap().get( key );
                 ccm.setEnvId( environment.getId() );
+            //TODO: move template addition on create ccm
+            List<Template> templates = templateRegistry.getParentTemplates( ccm.getTemplate() );
+            //            if ( templates.isEmpty() )
+            //            {
+            //                environment.setStatus( EnvironmentStatusEnum.BROKEN );
+            //                saveEnvironment( environment );
+            //                throw new EnvironmentBuildException( "Could not fetch parent templates list" );
+            //            }
 
                 containerCount = containerCount + ccm.getNumberOfNodes();
                 timeout = 1000 * 30 * ccm.getNumberOfNodes();
@@ -547,7 +556,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             PeerCommandMessage cmd =
                     new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, environment.getId(), peerId,
                             null );
+                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, peerId, null );
 
+            cmd.setInput( environment.getUuid().toString() );
             peerCommandDispatcher.invoke( cmd, TIMEOUT );
 
             Set<PeerContainer> containers =

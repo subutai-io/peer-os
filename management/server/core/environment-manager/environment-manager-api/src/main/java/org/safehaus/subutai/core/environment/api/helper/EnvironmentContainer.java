@@ -68,8 +68,7 @@ public class EnvironmentContainer extends Container
     @Override
     public DefaultCommandMessage start() throws ContainerException
     {
-        DefaultCommandMessage cmd =
-                new DefaultCommandMessage( PeerCommandType.START, environmentId, getPeerId(), getAgentId() );
+        DefaultCommandMessage cmd = new DefaultCommandMessage( PeerCommandType.START, getPeerId(), getAgentId() );
         return cmd;
     }
 
@@ -77,8 +76,7 @@ public class EnvironmentContainer extends Container
     @Override
     public DefaultCommandMessage stop() throws ContainerException
     {
-        DefaultCommandMessage cmd =
-                new DefaultCommandMessage( PeerCommandType.STOP, environmentId, getPeerId(), getAgentId() );
+        DefaultCommandMessage cmd = new DefaultCommandMessage( PeerCommandType.STOP, getPeerId(), getAgentId() );
         return cmd;
     }
 
@@ -87,7 +85,7 @@ public class EnvironmentContainer extends Container
     public DefaultCommandMessage isConnected() throws ContainerException
     {
         DefaultCommandMessage cmd =
-                new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, environmentId, getPeerId(), getAgentId() );
+                new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, getPeerId(), getAgentId() );
         return cmd;
     }
 

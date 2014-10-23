@@ -13,9 +13,9 @@ import com.google.gson.reflect.TypeToken;
 public class DefaultCommandMessage extends PeerCommandMessage
 {
 
-    public DefaultCommandMessage( PeerCommandType type, UUID envId, UUID peerId, UUID agentId )
+    public DefaultCommandMessage( PeerCommandType type, /*UUID envId, */UUID peerId, UUID agentId )
     {
-        super( type, envId, peerId, agentId );
+        super( type,/* envId,*/ peerId, agentId );
     }
 
 

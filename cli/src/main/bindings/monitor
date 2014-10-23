@@ -1,0 +1,78 @@
+#!/bin/bash
+
+
+function monitor_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Monitor containers.
+  echo
+  echo "        "subutai \[-qh\] monitor \[-p\] \[container_name\]
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+function monitor {
+  local is_physical="false"
+  shift_amount=0;
+  while getopts ":p" opt; do
+    case $opt in
+      p)
+        is_physical="true"
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+    esac
+    shift_amount=$(($shift_amount + 1))
+  done
+
+  while [ -n "`echo $1 | grep -`" ]; do
+    shift
+  done
+
+  if [ "x$is_physical" == "xtrue" ]; then
+    initialize_physical_machine_metrics
+  else
+    lxc=$1
+    lxc_assert "$lxc" > /dev/null
+    initialize_container_metrics $lxc
+  fi
+
+  # Result
+  printf '{"host":"%s", "totalRam":"%s", "availableRam":"%s", "usedRam":"%s", "cpuLoad5":"%s", "availableDisk":"%s", "usedDisk":"%s", "totalDisk":"%s"}\n' "$host" "$totalRam" "$availableRam" "$usedRam" "$cpuLoad5" "$availableDisk" "$usedDisk" "$totalDisk"
+
+}
+
+
+function initialize_physical_machine_metrics {
+  host=`hostname`
+  # Metrics
+  totalRam=$(get_physical_total_ram)
+  availableRam=$(get_physical_available_ram)
+  usedRam=$(get_physical_used_ram)
+  cpuLoad5=$(get_physical_cpu_load_seconds 5)
+  availableDisk=$(get_physical_available_disk)
+  usedDisk=$(get_physical_used_disk)
+  totalDisk=$(get_physical_total_disk)
+
+}
+
+
+function initialize_container_metrics {
+  host=$1
+  # Metrics
+  totalRam=$(get_total_ram $lxc)
+  availableRam=$(get_available_ram $lxc)
+  usedRam=$(get_used_ram $lxc)
+  cpuLoad5=$(get_cpu_load_seconds $lxc 5)
+  availableDisk=$(get_available_disk $lxc)
+  usedDisk=$(get_used_disk $lxc)
+  totalDisk=$(get_total_disk $lxc)
+
+}
+
+
+function monitor_description {
+  echo provides metrics for a running container
+}

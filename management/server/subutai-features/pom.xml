@@ -278,11 +278,12 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-command-dispatcher-impl</artifactId>
     </dependency>
+    <!--
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-command-dispatcher-rest</artifactId>
     </dependency>
-
+       -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- peer-manager -->
     <dependency>
@@ -301,7 +302,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-ui</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-rest</artifactId>
+    </dependency>
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- strategy-manager -->
     <dependency>

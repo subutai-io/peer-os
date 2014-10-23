@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions for monitoring functionality
+# ==========================================================================
+
+function get_total_ram {
+  local lxc="$1"
+  lxc_assert $lxc > /dev/null
+  
+  echo "16306260"
+}
+
+
+function get_available_ram {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+
+  echo "195028"
+}
+
+
+function get_used_ram {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+
+  echo "16111232"
+}
+
+
+function get_cpu_load_seconds {
+  local lxc=$1
+  local seconds=$2
+  lxc_assert $lxc > /dev/null
+  if [ -z $seconds ]; then
+    exit 1
+  fi
+
+  echo "5.7"
+}
+
+
+function get_physical_total_ram {
+  echo "32306260"
+}
+
+
+function get_physical_available_ram {
+  echo "16106140"
+}
+
+
+function get_physical_used_ram {
+  echo "16200120"
+}
+
+
+function get_physical_cpu_load_seconds {
+  local seconds=$1
+  if [ -z $seconds ]; then
+    exit 1
+  fi
+
+  echo "16.8"
+}
+
+
+function get_available_disk {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo "100000"
+}
+
+
+function get_used_disk {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo "50000"
+}
+
+
+function get_total_disk {
+  local lxc=$1
+  lxc_assert $lxc > /dev/null
+  echo "150000"
+}
+
+
+function get_physical_available_disk {
+  echo "400000"
+}
+
+
+function get_physical_used_disk {
+  echo "150000"
+}
+
+
+function get_physical_total_disk {
+  echo "550000"
+}

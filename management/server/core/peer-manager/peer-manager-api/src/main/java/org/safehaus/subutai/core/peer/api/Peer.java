@@ -15,17 +15,18 @@ public class Peer
     private String ip;
     private PeerStatus status;
     private UUID id;
+    private UUID ownerId;
 
 
-    public PeerStatus getStatus()
+    public UUID getId()
     {
-        return status;
+        return id;
     }
 
 
-    public void setStatus( final PeerStatus status )
+    public void setId( final UUID id )
     {
-        this.status = status;
+        this.id = id;
     }
 
 
@@ -53,25 +54,26 @@ public class Peer
     }
 
 
-    public UUID getId()
+    public PeerStatus getStatus()
     {
-        return id;
+        return status;
     }
 
 
-    public void setId( final UUID id )
+    public void setStatus( final PeerStatus status )
     {
-        this.id = id;
+        this.status = status;
     }
 
 
-    @Override
-    public String toString()
+    public UUID getOwnerId()
     {
-        return "Peer{" +
-                "name='" + name + '\'' +
-                ", ip='" + ip + '\'' +
-                ", id='" + id + '\'' +
-                '}';
+        return ownerId;
+    }
+
+
+    public void setOwnerId( final UUID ownerId )
+    {
+        this.ownerId = ownerId;
     }
 }
