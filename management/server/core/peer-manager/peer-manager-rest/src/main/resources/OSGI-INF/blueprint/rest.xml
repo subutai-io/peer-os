@@ -17,15 +17,11 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.command.dispatcher.rest.RestServiceImpl">
+  <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.rest.RestServiceImpl">
     <property name="peerManager" ref="peerManager" />
-    <property name="peerCommandDispatcher" ref="peerCommandDispatcher" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
-
-  <reference id="peerCommandDispatcher" availability="mandatory"
-             interface="org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher" />
 
 </blueprint>
