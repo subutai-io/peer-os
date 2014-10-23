@@ -215,7 +215,6 @@ public class CassandraImpl implements Cassandra
     public List<CassandraClusterConfig> getClusters()
     {
         return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-        //        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
     }
 
 
@@ -224,9 +223,6 @@ public class CassandraImpl implements Cassandra
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
-
-        //        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName,
-        // CassandraClusterConfig.class );
     }
 
 
