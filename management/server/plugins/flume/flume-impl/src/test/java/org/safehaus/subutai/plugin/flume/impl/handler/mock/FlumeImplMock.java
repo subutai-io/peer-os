@@ -18,6 +18,7 @@ public class FlumeImplMock extends FlumeImpl
 
     private FlumeConfig config;
 
+
     public FlumeImplMock()
     {
         super( mock( DataSource.class ) );
