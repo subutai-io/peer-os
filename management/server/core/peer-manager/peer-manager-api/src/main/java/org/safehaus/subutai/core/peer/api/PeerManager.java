@@ -78,4 +78,6 @@ public interface PeerManager
     public ManagementHost getManagementHost();
 
     public LocalPeer getLocalPeer();
+
+    PeerGroup getPeerGroup( UUID peerGroupId );
 }
