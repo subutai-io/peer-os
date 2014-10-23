@@ -73,7 +73,7 @@ public class EnvironmentDAO
 
             return true;
         }
-        catch ( SQLException e )
+        catch ( JsonSyntaxException | SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -108,11 +108,7 @@ public class EnvironmentDAO
                 }
             }
         }
-        catch ( JsonSyntaxException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        catch ( SQLException e )
+        catch ( JsonSyntaxException | SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -150,11 +146,7 @@ public class EnvironmentDAO
                 }
             }
         }
-        catch ( JsonSyntaxException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-        catch ( SQLException e )
+        catch ( JsonSyntaxException | SQLException e )
         {
             LOG.error( e.getMessage(), e );
         }
