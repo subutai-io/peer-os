@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
  * Created by bahadyr on 9/25/14.
  */
 @Ignore
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class EnvironmentDAOTest
 {
     private static final String SOURCE = "source";
@@ -31,7 +31,7 @@ public class EnvironmentDAOTest
     @Before
     public void setUp() throws Exception
     {
-        environmentDAO = new EnvironmentDAO( dataSource);
+        environmentDAO = new EnvironmentDAO( dataSource );
     }
 
 

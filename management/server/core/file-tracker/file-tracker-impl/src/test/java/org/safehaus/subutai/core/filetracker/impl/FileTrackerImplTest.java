@@ -47,14 +47,14 @@ public class FileTrackerImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void shouldThrowNullPointerExceptionOnSetCommandRunner()
     {
         fileTracker.setCommandRunner( null );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void shouldThrowNullPointerExceptionOnSetCommunicationManager()
     {
         fileTracker.setCommunicationManager( null );

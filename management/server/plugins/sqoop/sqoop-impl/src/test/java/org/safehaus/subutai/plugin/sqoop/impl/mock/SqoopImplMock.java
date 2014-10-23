@@ -27,6 +27,7 @@ public class SqoopImplMock extends SqoopImpl
         return mock( TrackerOperation.class );
     }
 
+
     public SqoopImplMock()
     {
         super( mock( DataSource.class ) );

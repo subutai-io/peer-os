@@ -53,8 +53,8 @@ public class AptRepositoryManagerImplTest
 
         List<PackageInfo> packages = aptRepositoryManager.listPackages( agent, PATTERN );
 
-        assertTrue(
-                packages.contains( new PackageInfo( "i", "subutai-mgmt", "- This is a Subutai package distribution." ) ) );
+        assertTrue( packages.contains(
+                new PackageInfo( "i", "subutai-mgmt", "- This is a Subutai package distribution." ) ) );
         assertTrue( packages.contains(
                 new PackageInfo( "i", "subutai-nginx", "- This is an nginx package of subutai dist" ) ) );
     }

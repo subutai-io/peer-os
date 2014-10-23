@@ -22,6 +22,7 @@ public class RemoveCommandTest
     String templateName;
     String configPath;
 
+
     @Before
     public void setupClasses()
     {

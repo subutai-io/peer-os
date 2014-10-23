@@ -19,12 +19,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "zookeeper", name = "uninstall-cluster", description = "Command to uninstall Zookeeper cluster")
+@Command( scope = "zookeeper", name = "uninstall-cluster", description = "Command to uninstall Zookeeper cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Zookeeper zookeeperManager;
     private Tracker tracker;

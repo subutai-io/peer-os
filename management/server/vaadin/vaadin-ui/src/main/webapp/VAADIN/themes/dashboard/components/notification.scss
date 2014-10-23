@@ -1,6 +1,8 @@
-@mixin dashboard-notification {
+@mixin dashboard-notification
+{
 
-  .v-Notification {
+  .v-Notification
+  {
     background: #000000;
     /* TODO mixin */
     background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.45) 0%, rgba(45, 45, 45, 0.45) 100%);
@@ -22,26 +24,30 @@
     @include box-shadow(0 3px 10px rgba(0, 0, 0, .25));
   }
 
-  .v-Notification h1 {
+  .v-Notification h1
+  {
     font-size: inherit;
     color: #fff;
     font-weight: normal;
   }
 
   .v-Notification h1,
-  .v-Notification p {
+  .v-Notification p
+  {
     margin: 0;
     display: inline-block;
     vertical-align: middle;
   }
 
-  .v-Notification h1 + p {
+  .v-Notification h1 + p
+  {
     margin-left: 2em;
     color: #d5d5d5;
     max-width: 28em;
   }
 
-  .v-Notification-system {
+  .v-Notification-system
+  {
     background: -webkit-linear-gradient(bottom, rgba(76, 76, 76, 0) 0%, rgba(76, 76, 76, .9) 60%, rgba(76, 76, 76, 1) 95%, rgba(52, 52, 52, 1) 100%);
     width: 100%;
     max-width: 100%;
@@ -59,7 +65,8 @@
     animation: pull-down 300ms ease-in-out;
   }
 
-  .v-Notification-system h1 {
+  .v-Notification-system h1
+  {
     display: inline-block;
     font-size: 14px;
     margin-right: 3em;
@@ -69,7 +76,8 @@
     color: #fff;
   }
 
-  .v-Notification-system p {
+  .v-Notification-system p
+  {
     display: inline-block;
     vertical-align: top;
     text-align: left;
@@ -77,23 +85,27 @@
     color: #ececec;
   }
 
-  .v-Notification-tray {
+  .v-Notification-tray
+  {
     font-size: 14px;
     line-height: 18px;
     margin: 0 14px 14px 0;
   }
 
   .v-Notification-tray h1,
-  .v-Notification-tray p {
+  .v-Notification-tray p
+  {
     display: block;
     margin: 0;
   }
 
-  .v-Notification-tray h1 {
+  .v-Notification-tray h1
+  {
     font-weight: bold;
   }
 
-  .v-Notification-tray h1 + p {
+  .v-Notification-tray h1 + p
+  {
     margin: .8em 0 0;
   }
 

@@ -32,6 +32,7 @@ public class SqoopImpl extends SqoopBase
         this.dataSource = dataSource;
     }
 
+
     @Override
     public UUID installCluster( SqoopConfig config )
     {

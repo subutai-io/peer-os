@@ -5,7 +5,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -54,7 +53,8 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
             }
         }
 
-        Command setMasterIPCommand = manager.getCommands().getSetMasterIPCommand( config.getNodes(), sparkConfig.getMasterNode() );
+        Command setMasterIPCommand =
+                manager.getCommands().getSetMasterIPCommand( config.getNodes(), sparkConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( setMasterIPCommand );
 
         if ( setMasterIPCommand.hasSucceeded() )

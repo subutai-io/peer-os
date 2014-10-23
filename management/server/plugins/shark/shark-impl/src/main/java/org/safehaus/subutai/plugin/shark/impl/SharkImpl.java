@@ -14,7 +14,6 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -107,7 +106,6 @@ public class SharkImpl implements Shark
         this.commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
-
 
 
     public Tracker getTracker()

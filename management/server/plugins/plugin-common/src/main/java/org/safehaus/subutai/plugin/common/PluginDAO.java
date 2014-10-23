@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -23,7 +22,7 @@ import com.google.gson.JsonSyntaxException;
 public class PluginDAO
 {
 
-    private static final Logger LOG = Logger.getLogger( PluginDAO.class.getName() );
+    //    private static final Logger LOG = Logger.getLogger( PluginDAO.class.getName() );
     private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DbManager dbManager;
 
@@ -48,7 +47,7 @@ public class PluginDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            //            LOG.severe( e.getMessage() );
         }
     }
 
@@ -76,7 +75,7 @@ public class PluginDAO
             }
             catch ( DBException e )
             {
-                LOG.severe( e.getMessage() );
+                //                LOG.severe( e.getMessage() );
             }
             if ( rs != null )
             {
@@ -121,7 +120,7 @@ public class PluginDAO
             }
             catch ( DBException e )
             {
-                LOG.severe( e.getMessage() );
+                //                LOG.severe( e.getMessage() );
             }
             if ( rs != null )
             {
@@ -136,7 +135,7 @@ public class PluginDAO
         }
         catch ( JsonSyntaxException ex )
         {
-            LOG.severe( ex.getMessage() );
+            //            LOG.severe( ex.getMessage() );
         }
         return null;
     }
@@ -160,7 +159,7 @@ public class PluginDAO
         }
         catch ( DBException e )
         {
-            LOG.severe( e.getMessage() );
+            //            LOG.severe( e.getMessage() );
         }
     }
 }

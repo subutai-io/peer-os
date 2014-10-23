@@ -18,22 +18,22 @@ import com.google.common.base.Preconditions;
 /**
  * Checkouts a remote branch (or creates a local branch)
  */
-@Command(scope = "git", name = "checkout", description = "Checkout remote branch/create local branch")
+@Command( scope = "git", name = "checkout", description = "Checkout remote branch/create local branch" )
 public class Checkout extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( Checkout.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "branch name", required = true, multiValued = false,
-            description = "branch name to switch to or create")
+    @Argument( index = 2, name = "branch name", required = true, multiValued = false,
+            description = "branch name to switch to or create" )
     String branchName;
-    @Argument(index = 3, name = "create branch", required = false, multiValued = false,
-            description = "create branch (true/false = default)")
+    @Argument( index = 3, name = "create branch", required = false, multiValued = false,
+            description = "create branch (true/false = default)" )
     boolean create;
 
     private GitManager gitManager;

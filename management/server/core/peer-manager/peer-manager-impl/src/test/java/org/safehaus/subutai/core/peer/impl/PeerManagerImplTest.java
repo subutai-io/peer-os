@@ -25,7 +25,7 @@ public class PeerManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        peerManager = new PeerManagerImpl(dataSource);
+        peerManager = new PeerManagerImpl( dataSource );
     }
 
 

@@ -50,8 +50,8 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response listClusters()
     {
 
@@ -69,9 +69,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         String cluster = JsonUtil.GSON.toJson( sharkManager.getCluster( clusterName ) );
         return Response.status( Response.Status.OK ).entity( cluster ).build();
@@ -79,9 +79,9 @@ public class RestService
 
 
     @POST
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @PathParam( "clusterName" ) String clusterName )
     {
         SparkClusterConfig sparkConfig = sparkManager.getCluster( clusterName );
         SharkClusterConfig sharkConfig = new SharkClusterConfig();
@@ -95,9 +95,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response uninstallCluster( @PathParam( "clusterName" ) String clusterName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, sharkManager.uninstallCluster( clusterName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
@@ -105,10 +105,10 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName,
-                             @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response addNode( @PathParam( "clusterName" ) String clusterName,
+                             @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, sharkManager.addNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
@@ -116,10 +116,10 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName,
-                                 @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyNode( @PathParam( "clusterName" ) String clusterName,
+                                 @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, sharkManager.destroyNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
@@ -127,9 +127,9 @@ public class RestService
 
 
     @PUT
-    @Path("actualize_master_ip/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response actualizeMasterIP( @PathParam("clusterName") String clusterName )
+    @Path( "actualize_master_ip/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response actualizeMasterIP( @PathParam( "clusterName" ) String clusterName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, sharkManager.actualizeMasterIP( clusterName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();

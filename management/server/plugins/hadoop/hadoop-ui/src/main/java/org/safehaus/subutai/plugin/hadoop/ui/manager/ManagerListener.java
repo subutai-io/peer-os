@@ -808,7 +808,7 @@ public class ManagerListener
         if ( agent != null )
         {
             statusDecommission.setValue( Manager.DECOMMISSION_STATUS_CAPTION + hadoopManager
-                            .getDecommissionStatus( hadoopManager.getDecommissionStatus(), agent ) );
+                    .getDecommissionStatus( hadoopManager.getDecommissionStatus(), agent ) );
             checkButton.setEnabled( true );
             destroyButton.setEnabled( true );
             hadoopManager.disableProgressBar();

@@ -44,8 +44,8 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getClusters()
     {
 
@@ -63,9 +63,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         NutchConfig config = nutchManager.getCluster( clusterName );
 
@@ -75,11 +75,11 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @PathParam("clusterName") String clusterName,
-                                    @QueryParam("hadoopClusterName") String hadoopClusterName,
-                                    @QueryParam("nodes") String nodes )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @PathParam( "clusterName" ) String clusterName,
+                                    @QueryParam( "hadoopClusterName" ) String hadoopClusterName,
+                                    @QueryParam( "nodes" ) String nodes )
     {
 
         NutchConfig config = new NutchConfig();
@@ -103,9 +103,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response uninstallCluster( @PathParam( "clusterName" ) String clusterName )
     {
         UUID uuid = nutchManager.uninstallCluster( clusterName );
 
@@ -115,9 +115,9 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response addNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = nutchManager.addNode( clusterName, node );
 
@@ -127,9 +127,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = nutchManager.destroyNode( clusterName, node );
 

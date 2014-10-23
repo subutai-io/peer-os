@@ -2,11 +2,13 @@
 	background-image: url(img/spinner.png);
 }*/
 
-@mixin dashboard-loading-indicator {
+@mixin dashboard-loading-indicator
+{
 
   .v-loading-indicator,
   .v-loading-indicator-delay,
-  .v-loading-indicator-wait {
+  .v-loading-indicator-wait
+  {
     top: 50%;
     left: 50%;
     right: auto;
@@ -35,10 +37,12 @@
   }
 
   .v-ie &,
-  .v-op & {
+  .v-op &
+  {
     .v-loading-indicator,
     .v-loading-indicator-delay,
-    .v-loading-indicator-wait {
+    .v-loading-indicator-wait
+    {
       background-image: url(img/spinner.gif);
       opacity: .8;
       filter: alpha(opacity=80);

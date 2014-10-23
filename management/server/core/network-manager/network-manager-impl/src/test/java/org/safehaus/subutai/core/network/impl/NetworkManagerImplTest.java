@@ -83,7 +83,7 @@ public class NetworkManagerImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullCommandRunner()
     {
 
@@ -155,7 +155,7 @@ public class NetworkManagerImplTest
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void shouldFailOnEmptyContainers2()
     {
 
@@ -324,7 +324,7 @@ public class NetworkManagerImplTest
                 .createContainerCommand( eq( new RequestBuilder( "cat /root/.ssh/id_dsa.pub" ) ), anySet() ) )
                 .thenReturn( errCommand );
 
-        when(errCommand.hasCompleted()).thenReturn( false );
+        when( errCommand.hasCompleted() ).thenReturn( false );
 
         boolean result = networkManager.configSsh( containers );
 

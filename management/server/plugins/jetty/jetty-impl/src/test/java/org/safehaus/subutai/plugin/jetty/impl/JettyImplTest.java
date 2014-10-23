@@ -4,6 +4,8 @@ package org.safehaus.subutai.plugin.jetty.impl;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -12,9 +14,8 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -37,10 +38,9 @@ import static org.mockito.Mockito.when;
 
 public class JettyImplTest
 {
-    private DbManager dbManager = mock( DbManager.class );
     private CommandRunner commandRunner = mock( CommandRunner.class );
     private ExecutorService executor = mock( ExecutorService.class );
-    private PluginDAO pluginDAO = mock( PluginDAO.class );
+    private PluginDaoNew pluginDAO = mock( PluginDaoNew.class );
     private Tracker tracker = new TrackerMock();
     private AgentManager agentManager = new AgentManagerMock();
     private ContainerManager containerManager = mock( ContainerManager.class );
@@ -51,7 +51,7 @@ public class JettyImplTest
     @Before
     public void setUp()
     {
-        jettyManager = new JettyImpl();
+        jettyManager = new JettyImpl( mock( DataSource.class ) );
         jettyManager.setExecutor( executor );
         jettyManager.setTracker( tracker );
         jettyManager.setAgentManager( agentManager );

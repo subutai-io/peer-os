@@ -15,11 +15,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hbase", name = "uninstall-cluster", description = "Command to uninstall HBase cluster")
+@Command( scope = "hbase", name = "uninstall-cluster", description = "Command to uninstall HBase cluster" )
 public class UninstallHBaseClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", required = true, multiValued = false, description = "Delete cluster")
+    @Argument( index = 0, name = "clusterName", required = true, multiValued = false, description = "Delete cluster" )
     String clusterName;
     private HBase hbaseManager;
     private Tracker tracker;

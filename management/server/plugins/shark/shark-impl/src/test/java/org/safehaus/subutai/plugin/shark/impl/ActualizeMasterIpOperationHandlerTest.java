@@ -17,6 +17,7 @@ import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.handler.ActualizeMasterIpOperationHandler;
 import org.safehaus.subutai.plugin.shark.impl.mock.SharkImplMock;
 
+
 @Ignore
 public class ActualizeMasterIpOperationHandlerTest
 {

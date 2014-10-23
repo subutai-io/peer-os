@@ -17,8 +17,8 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -65,8 +65,7 @@ public class TrackerImpl implements Tracker
 
         String sql =
                 "SET MAX_LENGTH_INPLACE_LOB 2048; create table if not exists product_operation(source varchar(100), " +
-                        "id uuid, ts timestamp, "
-                        + "info clob, PRIMARY KEY (source, id));";
+                        "id uuid, ts timestamp, " + "info clob, PRIMARY KEY (source, id));";
 
         dbUtil.update( sql );
     }

@@ -1,17 +1,19 @@
 package org.safehaus.subutai.core.db.ext.impl;
 
 
-import org.safehaus.subutai.core.db.ext.api.*;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+
+import org.safehaus.subutai.core.db.ext.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
-public class DbManagerImpl implements DbManager {
+public class DbManagerImpl implements DbManager
+{
 
 
     private EntityManagerFactory entFactory;
@@ -22,7 +24,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * Initializes db manager *******************************************************
      */
-    public void init() {
+    public void init()
+    {
 
         try
         {
@@ -40,8 +43,6 @@ public class DbManagerImpl implements DbManager {
 
             */
             LOG.info( "DbManager Started:Persistence Factory initialized." );
-
-
         }
         catch ( Exception ex )
         {
@@ -54,7 +55,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * Destroy db manager *******************************************************
      */
-    public void destroy() {
+    public void destroy()
+    {
 
         try
         {
@@ -81,7 +83,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * *******************************************************
      */
-    public List getDataList( String entityName ) throws Exception {
+    public List getDataList( String entityName ) throws Exception
+    {
 
         List dataList;
 
@@ -103,7 +106,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * *******************************************************
      */
-    public <T> Object getData( Class<T> objClass, Object primaryKey ) throws Exception {
+    public <T> Object getData( Class<T> objClass, Object primaryKey ) throws Exception
+    {
 
         Object obj;
 
@@ -124,7 +128,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * *******************************************************
      */
-    public void insertData( Object newObject ) throws Exception {
+    public void insertData( Object newObject ) throws Exception
+    {
 
         try
         {
@@ -147,7 +152,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * *******************************************************
      */
-    public void removeData( Object delObject ) throws Exception {
+    public void removeData( Object delObject ) throws Exception
+    {
 
         try
         {
@@ -171,7 +177,8 @@ public class DbManagerImpl implements DbManager {
      * *******************************************************
      */
 
-    public void startUpdateMode() throws Exception {
+    public void startUpdateMode() throws Exception
+    {
 
         try
         {
@@ -192,7 +199,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * *******************************************************
      */
-    public void commitData() throws Exception {
+    public void commitData() throws Exception
+    {
 
         try
         {
@@ -213,7 +221,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * *******************************************************
      */
-    public void executeUpdate( String sqlScript ) throws Exception {
+    public void executeUpdate( String sqlScript ) throws Exception
+    {
 
         try
         {
@@ -237,7 +246,8 @@ public class DbManagerImpl implements DbManager {
     /**
      * *******************************************************
      */
-    public List executeQuery( String sqlScript ) throws Exception {
+    public List executeQuery( String sqlScript ) throws Exception
+    {
 
         List dataList;
 
@@ -260,7 +270,8 @@ public class DbManagerImpl implements DbManager {
      * *******************************************************
      */
 
-    public static void main( String[] args ) throws Exception {
+    public static void main( String[] args ) throws Exception
+    {
 
 
         DbManagerImpl DbMan = new DbManagerImpl();

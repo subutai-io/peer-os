@@ -20,7 +20,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class BlueprintsForm
 {
 

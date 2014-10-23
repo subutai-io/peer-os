@@ -29,21 +29,21 @@ public class CacheEntryTest
     private final Integer TIME_TO_LIVE_MS = 100;
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullValue()
     {
         new CacheEntry( null, TIME_TO_LIVE_MS );
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailZeroTtl()
     {
         new CacheEntry( SOME_VALUE, 0 );
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailNegativeTtl()
     {
         new CacheEntry( SOME_VALUE, -10 );
@@ -81,7 +81,7 @@ public class CacheEntryTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void entryWithCallbackShouldFailNullCallback() throws InterruptedException
     {
         new CacheEntryWithExpiryCallback( SOME_VALUE, TIME_TO_LIVE_MS, null );

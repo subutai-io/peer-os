@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.presto.impl;
 import java.util.List;
 import java.util.UUID;
 
-
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;

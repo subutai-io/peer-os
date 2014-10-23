@@ -26,7 +26,7 @@ import com.google.gson.JsonSyntaxException;
 public class PluginDaoNew
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( PluginDAO.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PluginDaoNew.class.getName() );
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     protected DbUtil dbUtil;

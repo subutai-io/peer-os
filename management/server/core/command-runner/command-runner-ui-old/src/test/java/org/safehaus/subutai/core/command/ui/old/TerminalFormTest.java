@@ -22,7 +22,7 @@ public class TerminalFormTest
     private static final String DUMMY_OUTPUT = "some dumy output";
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullCommandRunner()
     {
 
@@ -30,7 +30,7 @@ public class TerminalFormTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullAgentManager()
     {
 

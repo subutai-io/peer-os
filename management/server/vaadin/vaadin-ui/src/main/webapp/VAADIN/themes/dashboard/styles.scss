@@ -9,7 +9,8 @@
 @include dashboard-keyframes;
 
 /* Output the actual theme selectors */
-.dashboard {
+.dashboard
+{
   @include dashboard;
 }
 

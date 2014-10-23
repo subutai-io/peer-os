@@ -248,9 +248,6 @@ public class Blueprint2PeerGroupWizard extends Window
     }
 
 
-
-
-
     public Map<Object, Peer> topologySelection()
     {
         Map<Object, Peer> topology = new HashMap<>();

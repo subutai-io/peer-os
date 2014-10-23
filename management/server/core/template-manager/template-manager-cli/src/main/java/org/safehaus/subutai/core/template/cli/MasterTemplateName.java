@@ -7,7 +7,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "template", name = "get-master-template-name", description = "get master template name")
+@Command( scope = "template", name = "get-master-template-name", description = "get master template name" )
 public class MasterTemplateName extends OsgiCommandSupport
 {
 

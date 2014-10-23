@@ -9,8 +9,8 @@ package org.safehaus.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
 import com.google.common.base.Preconditions;

@@ -46,8 +46,8 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response listClusters()
     {
 
@@ -64,9 +64,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         String cluster = JsonUtil.GSON.toJson( prestoManager.getCluster( clusterName ) );
         return Response.status( Response.Status.OK ).entity( cluster ).build();
@@ -74,9 +74,9 @@ public class RestService
 
 
     @POST
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @QueryParam("config") String config )
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @QueryParam( "config" ) String config )
     {
         TrimmedPrestoConfig trimmedPrestoConfig = JsonUtil.GSON.fromJson( config, TrimmedPrestoConfig.class );
         PrestoClusterConfig expandedConfig = new PrestoClusterConfig();
@@ -100,9 +100,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response uninstallCluster( @PathParam( "clusterName" ) String clusterName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, prestoManager.uninstallCluster( clusterName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
@@ -110,10 +110,10 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}/worker")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response addWorkerNode( @PathParam("clusterName") String clusterName,
-                                   @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}/worker" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response addWorkerNode( @PathParam( "clusterName" ) String clusterName,
+                                   @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, prestoManager.addWorkerNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
@@ -121,10 +121,10 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}/worker")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyWorkerNode( @PathParam("clusterName") String clusterName,
-                                       @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}/worker" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyWorkerNode( @PathParam( "clusterName" ) String clusterName,
+                                       @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId =
                 JsonUtil.toJson( OPERATION_ID, prestoManager.destroyWorkerNode( clusterName, lxcHostName ) );
@@ -133,10 +133,10 @@ public class RestService
 
 
     @PUT
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}/coordinator")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response changeCoordinatorNode( @PathParam("clusterName") String clusterName,
-                                           @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}/coordinator" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response changeCoordinatorNode( @PathParam( "clusterName" ) String clusterName,
+                                           @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId =
                 JsonUtil.toJson( OPERATION_ID, prestoManager.changeCoordinatorNode( clusterName, lxcHostName ) );
@@ -145,10 +145,10 @@ public class RestService
 
 
     @PUT
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}/start")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response startNode( @PathParam("clusterName") String clusterName,
-                               @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}/start" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response startNode( @PathParam( "clusterName" ) String clusterName,
+                               @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, prestoManager.startNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
@@ -156,10 +156,10 @@ public class RestService
 
 
     @PUT
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}/stop")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response stopNode( @PathParam("clusterName") String clusterName,
-                              @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}/stop" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response stopNode( @PathParam( "clusterName" ) String clusterName,
+                              @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, prestoManager.stopNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();
@@ -167,10 +167,10 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response checkNode( @PathParam("clusterName") String clusterName,
-                               @PathParam("lxcHostName") String lxcHostName )
+    @Path( "clusters/{clusterName}/nodes/{lxcHostName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response checkNode( @PathParam( "clusterName" ) String clusterName,
+                               @PathParam( "lxcHostName" ) String lxcHostName )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, prestoManager.checkNode( clusterName, lxcHostName ) );
         return Response.status( Response.Status.OK ).entity( operationId ).build();

@@ -13,12 +13,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "config", name = "get-config-template",
-        description = "Gets the content of given configuration tempalte")
+@Command( scope = "config", name = "get-config-template",
+        description = "Gets the content of given configuration tempalte" )
 public class GetConfigTemplateCommand extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( GetConfigTemplateCommand.class );
-    @Argument(index = 0, name = "pathToFile", required = true, multiValued = false, description = "Path to file")
+    @Argument( index = 0, name = "pathToFile", required = true, multiValued = false, description = "Path to file" )
     String pathToFile;
     private TextInjector textInjector;
 

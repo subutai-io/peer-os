@@ -62,7 +62,10 @@ public class TemplateDaoTest
         }
 
 
-        public void setDbUtil( DbUtil dbUtil ) {this.dbUtil = dbUtil;}
+        public void setDbUtil( DbUtil dbUtil )
+        {
+            this.dbUtil = dbUtil;
+        }
     }
 
 
@@ -96,7 +99,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullDataSource() throws Exception
     {
         new TemplateDAO( null );
@@ -112,7 +115,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testGetAllTemplatesException() throws Exception
     {
         throwDbException();
@@ -151,7 +154,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testGetChildTemplatesException() throws Exception
     {
         throwDbException();
@@ -190,7 +193,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testGetTemplateByNameException() throws Exception
     {
         throwDbException();
@@ -268,7 +271,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testRemoteTemplateException() throws Exception
     {
 
@@ -293,7 +296,7 @@ public class TemplateDaoTest
     }
 
 
-    @Test(expected = DaoException.class)
+    @Test( expected = DaoException.class )
     public void testSetupDbException() throws Exception
     {
 

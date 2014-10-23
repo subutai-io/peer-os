@@ -8,15 +8,15 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "template", name = "export", description = "export template")
+@Command( scope = "template", name = "export", description = "export template" )
 public class ExportTemplate extends OsgiCommandSupport
 {
 
     private TemplateManager templateManager;
 
-    @Argument(index = 0, required = true)
+    @Argument( index = 0, required = true )
     private String hostName;
-    @Argument(index = 1, required = true)
+    @Argument( index = 1, required = true )
     private String templateName;
 
 

@@ -31,7 +31,8 @@ public class CommandJsonTest
     public void shouldReturnRequestCommandJson()
     {
 
-        String actual = CommandJson.getRequestCommandJson( TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() ) );
+        String actual =
+                CommandJson.getRequestCommandJson( TestUtils.getRequestTemplate( UUIDUtil.generateTimeBasedUUID() ) );
         String expected = GSON.toJson( GSON.fromJson( actual, CommandJson.CommandImpl.class ) );
 
 

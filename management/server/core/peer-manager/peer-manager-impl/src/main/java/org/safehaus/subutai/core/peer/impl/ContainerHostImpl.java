@@ -115,6 +115,4 @@ public class ContainerHostImpl extends HostImpl implements ContainerHost
     {
         return templateArch;
     }
-
-
 }

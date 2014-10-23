@@ -108,7 +108,8 @@ public class UndoSoftTest
     @Test
     public void shouldThrowException() throws GitException
     {
-        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).undoSoft( eq( agent ), anyString(), anyList() );
+        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
+               .undoSoft( eq( agent ), anyString(), anyList() );
         UndoSoft undoSoft = new UndoSoft( gitManager, agentManager );
         undoSoft.setHostname( HOSTNAME );
         undoSoft.setFiles( FILES );

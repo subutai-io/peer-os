@@ -23,6 +23,7 @@ public class Environment
     private EnvironmentStatusEnum status;
     private long creationTimestamp;
 
+
     public Environment( String name )
     {
         this.name = name;

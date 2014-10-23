@@ -57,7 +57,7 @@ public class SendButtonListenerTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullExecutor()
     {
 

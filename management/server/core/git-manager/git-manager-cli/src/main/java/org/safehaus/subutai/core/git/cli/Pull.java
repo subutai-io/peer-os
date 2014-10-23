@@ -18,19 +18,19 @@ import com.google.common.base.Preconditions;
 /**
  * Pulls from remote branch
  */
-@Command(scope = "git", name = "pull", description = "Pull from remote branch")
+@Command( scope = "git", name = "pull", description = "Pull from remote branch" )
 public class Pull extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( Pull.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "branch name", required = false, multiValued = false,
-            description = "branch name to pull from (master = default)")
+    @Argument( index = 2, name = "branch name", required = false, multiValued = false,
+            description = "branch name to pull from (master = default)" )
     String branchName;
 
     private final GitManager gitManager;

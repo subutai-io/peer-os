@@ -14,11 +14,11 @@ import com.google.common.base.Preconditions;
 /**
  * Displays agent details searching by agents' container hostname
  */
-@Command(scope = "agent", name = "get-agent-by-hostname", description = "get agent by hostname")
+@Command( scope = "agent", name = "get-agent-by-hostname", description = "get agent by hostname" )
 public class GetAgentByHostnameCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
     private final AgentManager agentManager;
 

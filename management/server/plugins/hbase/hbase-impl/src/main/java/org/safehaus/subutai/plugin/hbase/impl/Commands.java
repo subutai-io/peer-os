@@ -103,8 +103,8 @@ public class Commands
                                            String hMasterMachineHostname )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
-                                hMasterMachineHostname ) ), agents );
+                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) ),
+                agents );
     }
 
 

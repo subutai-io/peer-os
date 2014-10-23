@@ -1,6 +1,8 @@
-@mixin dashboard-reports-view {
+@mixin dashboard-reports-view
+{
 
-  .reports .drafts {
+  .reports .drafts
+  {
     padding-bottom: 100px;
 
     -webkit-user-select: none;
@@ -9,15 +11,18 @@
     user-select: none;
   }
 
-  .reports .drafts .v-slot {
+  .reports .drafts .v-slot
+  {
     padding: 0 10px;
   }
 
-  .reports .create {
+  .reports .create
+  {
     padding: 10px 0;
   }
 
-  .reports .create .v-slot {
+  .reports .create .v-slot
+  {
     border: 1px solid rgba(255, 255, 255, .1);
     background: rgba(255, 255, 255, .05);
     width: 160px;
@@ -25,13 +30,15 @@
     padding: 0;
   }
 
-  .reports .drafts .h1 {
+  .reports .drafts .h1
+  {
     color: #fff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, .25);
     margin-bottom: 20px;
   }
 
-  .reports .draft-thumb {
+  .reports .draft-thumb
+  {
     cursor: pointer;
     /* TODO remove from base theme */
     overflow: visible;
@@ -40,7 +47,8 @@
     padding: 10px;
   }
 
-  .reports .draft-thumb .v-label {
+  .reports .draft-thumb .v-label
+  {
     /* TODO why on earth does a label have display: inline-block as an inline style */
     display: block !important;
     color: #fff;
@@ -50,21 +58,25 @@
     line-height: 18px;
   }
 
-  .reports .draft-thumb .v-label span {
+  .reports .draft-thumb .v-label span
+  {
     color: #c1c3c8;
     font-size: 12px;
   }
 
-  .reports .draft-thumb .v-image {
+  .reports .draft-thumb .v-image
+  {
     @include box-shadow(0 2px 7px 1px rgba(0, 0, 0, .5));
   }
 
-  .reports .draft-thumb .v-image:hover {
+  .reports .draft-thumb .v-image:hover
+  {
     border: 2px solid #5198df;
     margin: -2px;
   }
 
-  .reports .palette {
+  .reports .palette
+  {
     position: fixed;
     color: #fff;
     text-shadow: 0 1px 1px rgba(0, 0, 0, .5);
@@ -72,7 +84,8 @@
     width: 17%;
   }
 
-  .reports .palette .help {
+  .reports .palette .help
+  {
     font-size: 12px;
     color: #cfd1d3;
     display: block;
@@ -81,30 +94,36 @@
     width: 140px;
   }
 
-  .reports .palette .v-caption {
+  .reports .palette .v-caption
+  {
     display: none;
   }
 
-  .reports .palette .v-ddwrapper {
+  .reports .palette .v-ddwrapper
+  {
     display: block;
     text-align: center;
   }
 
-  .reports .palette .v-image {
+  .reports .palette .v-image
+  {
     width: 75px;
     height: 47px;
     margin: 2em 0 .3em 0;
   }
 
-  .reports .palette .v-label {
+  .reports .palette .v-label
+  {
     display: block !important;
   }
 
-  .canvas {
+  .canvas
+  {
     padding: 2em !important;
   }
 
-  .canvas-layout {
+  .canvas-layout
+  {
     min-height: 29cm;
     background: #fff;
 
@@ -116,7 +135,8 @@
     /* 	box-shadow: 0 2px 20px rgba(0,0,0,.5); */
   }
 
-  .reports .canvas .title {
+  .reports .canvas .title
+  {
     font-size: 24px;
     font-weight: 600;
     border: 1px solid transparent;
@@ -128,28 +148,33 @@
     margin-bottom: 1cm;
   }
 
-  .reports .canvas .title:hover {
+  .reports .canvas .title:hover
+  {
     background: #fff9e6;
   }
 
-  .reports .canvas .title:focus {
+  .reports .canvas .title:focus
+  {
     cursor: text;
     border-color: #eee;
     background: transparent;
   }
 
-  .reports .canvas .placeholder {
+  .reports .canvas .placeholder
+  {
     text-align: center;
   }
 
-  .reports .canvas .placeholder .v-label {
+  .reports .canvas .placeholder .v-label
+  {
     min-height: 10cm;
     line-height: 5cm;
     color: #979699;
     font-size: 18px;
   }
 
-  .reports .v-tabsheet-content::before {
+  .reports .v-tabsheet-content::before
+  {
     background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0.3)), color-stop(100%, rgba(0, 0, 0, 0)));
     background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
@@ -158,7 +183,8 @@
     height: .5em;
   }
 
-  .reports .v-tabsheet-content {
+  .reports .v-tabsheet-content
+  {
 
     background: #75787c;
 
@@ -170,31 +196,37 @@
     /* 	background-image: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%,rgba(255,255,255,0) 100%), url(../img/dark-canvas-bg.jpg); */
   }
 
-  .reports .v-timeline-widget-display-hscale-left {
+  .reports .v-timeline-widget-display-hscale-left
+  {
     font-size: 10px;
     margin-top: -14px;
     padding-left: 3px;
   }
 
-  .reports .canvas .v-ddwrapper {
+  .reports .canvas .v-ddwrapper
+  {
     padding-top: 20px;
     padding-bottom: 20px;
   }
 
-  .reports .text-editor {
+  .reports .text-editor
+  {
     position: relative;
     overflow: visible;
   }
 
-  .reports .text-editor:hover {
+  .reports .text-editor:hover
+  {
     background: #fff9e6;
   }
 
-  .reports .text-editor.edit:hover {
+  .reports .text-editor.edit:hover
+  {
     background: transparent;
   }
 
-  .text-editor .v-button {
+  .text-editor .v-button
+  {
     position: absolute;
     top: 50%;
     margin-top: -12px;
@@ -202,22 +234,26 @@
     display: none;
   }
 
-  .text-editor .v-button-wrap:before {
+  .text-editor .v-button-wrap:before
+  {
     margin: 0 -.3em;
   }
 
-  .text-editor:hover .v-button {
+  .text-editor:hover .v-button
+  {
     display: inline-block;
   }
 
-  .reports .text-editor.edit .v-button {
+  .reports .text-editor.edit .v-button
+  {
     display: inline-block;
     position: static;
     margin-top: 3px;
   }
 
   /* TODO maybe offer this as a mixin */
-  .delete-button {
+  .delete-button
+  {
     width: 19px;
     height: 19px;
     border: 1px solid #a3a7ab;
@@ -233,39 +269,47 @@
     @include box-shadow(0 2px 4px rgba(0, 0, 0, .5));
   }
 
-  .delete-button:hover {
+  .delete-button:hover
+  {
     background: #4e5153;
   }
 
-  .delete-button:focus {
+  .delete-button:focus
+  {
     outline: none;
   }
 
-  .delete-button:active {
+  .delete-button:active
+  {
     background: #3c3f40;
   }
 
-  .draft-thumb .delete-button {
+  .draft-thumb .delete-button
+  {
     position: absolute;
     top: 1px;
     right: 1px;
     display: none;
   }
 
-  .draft-thumb:hover .delete-button {
+  .draft-thumb:hover .delete-button
+  {
     display: block;
   }
 
-  .help-overlay.palette {
+  .help-overlay.palette
+  {
     top: 200px !important;
     left: 200px !important;
   }
 
-  .help-overlay.reorder {
+  .help-overlay.reorder
+  {
     margin-left: 200px !important;
   }
 
-  .reports .transaction {
+  .reports .transaction
+  {
     position: relative;
     float: left;
     width: 47%;
@@ -276,7 +320,8 @@
     border: 1px solid #e0e0e0;
 
     .time,
-    .seats {
+    .seats
+    {
       font-size: 12px;
       color: #9fa2a6;
       position: absolute;
@@ -285,14 +330,16 @@
       line-height: normal;
     }
 
-    .movie-title {
+    .movie-title
+    {
       font-size: 16px;
       font-weight: 300;
       white-space: normal;
       padding: 40px 5px 5px;
     }
 
-    .seats {
+    .seats
+    {
       left: 60%;
     }
 
