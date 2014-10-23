@@ -74,7 +74,7 @@ public class ImportTemplateCommand extends OsgiCommandSupport
 
         //        peerManager.peers();
         PeerCommandMessage getTemplateCommand =
-                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, UUID.fromString( peerId ), null );
+                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, UUID.fromString( peerId ), null );
 
         getTemplateCommand.setInput( templateName );
         peerCommandDispatcher.invoke( getTemplateCommand );

@@ -48,7 +48,7 @@ public class PeerContainer extends Container
     public DefaultCommandMessage start() throws ContainerException
     {
         peerManager.startContainer( this );
-        return new DefaultCommandMessage( PeerCommandType.START, null, null, null );
+        return new DefaultCommandMessage( PeerCommandType.START, null, null );
     }
 
 
@@ -56,7 +56,7 @@ public class PeerContainer extends Container
     public DefaultCommandMessage stop() throws ContainerException
     {
         peerManager.stopContainer( this );
-        return new DefaultCommandMessage( PeerCommandType.STOP, null, null, null );
+        return new DefaultCommandMessage( PeerCommandType.STOP, null, null );
     }
 
 
@@ -64,6 +64,6 @@ public class PeerContainer extends Container
     public DefaultCommandMessage isConnected() throws ContainerException
     {
         peerManager.isContainerConnected( this );
-        return new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, null, null, null );
+        return new DefaultCommandMessage( PeerCommandType.IS_CONNECTED, null, null );
     }
 }
