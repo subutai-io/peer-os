@@ -19,11 +19,9 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
@@ -97,9 +95,21 @@ public class SolrImpl implements Solr
     }
 
 
+    public void setContainerManager( final ContainerManager containerManager )
+    {
+        this.containerManager = containerManager;
+    }
+
+
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
     }
 
 
@@ -115,15 +125,15 @@ public class SolrImpl implements Solr
     }
 
 
-    public AgentManager getAgentManager()
+    public void setCommandRunner( final CommandRunner commandRunner )
     {
-        return agentManager;
+        this.commandRunner = commandRunner;
     }
 
 
-    public Tracker getTracker()
+    public AgentManager getAgentManager()
     {
-        return tracker;
+        return agentManager;
     }
 
 
@@ -133,27 +143,15 @@ public class SolrImpl implements Solr
     }
 
 
-    public void setCommandRunner( final CommandRunner commandRunner )
+    public Tracker getTracker()
     {
-        this.commandRunner = commandRunner;
+        return tracker;
     }
 
 
     public void setTracker( final Tracker tracker )
     {
         this.tracker = tracker;
-    }
-
-
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
-    {
-        this.environmentManager = environmentManager;
-    }
-
-
-    public void setContainerManager( final ContainerManager containerManager )
-    {
-        this.containerManager = containerManager;
     }
 
 

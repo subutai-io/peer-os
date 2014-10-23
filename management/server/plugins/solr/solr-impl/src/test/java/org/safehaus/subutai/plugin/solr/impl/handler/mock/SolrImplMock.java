@@ -5,11 +5,6 @@ import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
-import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
-import org.safehaus.subutai.plugin.common.mock.DbManagerMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
@@ -52,5 +47,4 @@ public class SolrImplMock extends SolrImpl
     {
         return clusterSolrClusterConfig;
     }
-
 }

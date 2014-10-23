@@ -18,7 +18,7 @@ import static junit.framework.Assert.assertTrue;
 public class InstallOperationHandlerTest
 {
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testWithNullConfig()
     {
         new SolrImplMock().installCluster( null );

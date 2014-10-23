@@ -6,10 +6,13 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -27,6 +30,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -38,6 +42,8 @@ import org.safehaus.subutai.plugin.mongodb.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.StartNodeOperationHandler;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.UninstallOperationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -51,34 +57,21 @@ import com.google.common.collect.Sets;
 public class MongoImpl implements Mongo
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( MongoImpl.class.getName() );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private Tracker tracker;
     private ContainerManager containerManager;
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
-    private PluginDAO pluginDAO;
     private Commands commands;
+    private PluginDaoNew pluginDAO;
+    private DataSource dataSource;
 
 
-    public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                      ContainerManager containerManager, EnvironmentManager environmentManager )
+    public MongoImpl( DataSource dataSource )
     {
-
-        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
-        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
-        Preconditions.checkNotNull( tracker, "Tracker is null" );
-        Preconditions.checkNotNull( containerManager, "Container manager is null" );
-        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
-
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.tracker = tracker;
-        this.containerManager = containerManager;
-        this.environmentManager = environmentManager;
-        this.pluginDAO = new PluginDAO( dbManager );
-        this.commands = new Commands( commandRunner );
+        this.dataSource = dataSource;
     }
 
 
@@ -88,7 +81,7 @@ public class MongoImpl implements Mongo
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDaoNew getPluginDAO()
     {
         return pluginDAO;
     }
@@ -124,8 +117,60 @@ public class MongoImpl implements Mongo
     }
 
 
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
+
+
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager )
+    {
+        this.containerManager = containerManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
+    }
+
+
+    public void setCommands( final Commands commands )
+    {
+        this.commands = commands;
+    }
+
+
     public void init()
     {
+        try
+        {
+            this.pluginDAO = new PluginDaoNew( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        this.commands = new Commands( commandRunner );
+
         executor = Executors.newCachedThreadPool();
     }
 
