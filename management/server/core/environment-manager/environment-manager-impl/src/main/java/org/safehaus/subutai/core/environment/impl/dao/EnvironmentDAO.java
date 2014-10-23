@@ -182,8 +182,9 @@ public class EnvironmentDAO
     {
         try
         {
+            String id = blueprint.getId().toString();
             String json = GSON.toJson( blueprint );
-            dbUtil.update( "merge into blueprint (id, info) values (? , ?)", blueprint.getId(), json );
+            dbUtil.update( "merge into blueprint (id, info) values (? , ?)", UUID.fromString( id ), json );
         }
         catch ( JsonParseException | SQLException e )
         {
@@ -220,7 +221,8 @@ public class EnvironmentDAO
     {
         try
         {
-            dbUtil.update( "delete from blueprint where id = ?", blueprintId );
+            String id = blueprintId.toString();
+            dbUtil.update( "delete from blueprint where id = ?", UUID.fromString( id ) );
             return true;
         }
         catch ( SQLException e )
@@ -234,7 +236,8 @@ public class EnvironmentDAO
     {
         try
         {
-            ResultSet rs = dbUtil.select( "select info from blueprint where id = ?", blueprintId );
+            String id = blueprintId.toString();
+            ResultSet rs = dbUtil.select( "select info from blueprint where id = ?", UUID.fromString( id ) );
             if ( rs != null && rs.next() )
             {
                 Clob infoClob = rs.getClob( "info" );
