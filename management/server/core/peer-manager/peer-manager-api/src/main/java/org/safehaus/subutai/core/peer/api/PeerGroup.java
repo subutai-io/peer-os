@@ -13,25 +13,25 @@ public class PeerGroup
 {
     Set<UUID> peerIds;
     private String name;
-    private UUID uuid;
+    private UUID id;
 
 
     public PeerGroup()
     {
         this.peerIds = new HashSet<>();
-        this.uuid = UUID.randomUUID();
+        this.id = UUID.randomUUID();
     }
 
 
-    public UUID getUuid()
+    public UUID getId()
     {
-        return uuid;
+        return id;
     }
 
 
-    public void setUuid( final UUID uuid )
+    public void setId( final UUID id )
     {
-        this.uuid = uuid;
+        this.id = id;
     }
 
 
@@ -67,6 +67,6 @@ public class PeerGroup
 
     public UUID getUUID()
     {
-        return uuid;
+        return id;
     }
 }

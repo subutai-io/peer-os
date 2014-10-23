@@ -610,4 +610,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             return false;
         }
     }
+
+
+    @Override
+    public boolean saveBuildProcessB2PG( final UUID envId, final UUID peerGroupId )
+    {
+        return true;
+    }
 }

@@ -728,7 +728,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public boolean savePeerGroup( final PeerGroup group )
     {
-        return peerDAO.saveInfo( PEER_GROUP, group.getUuid().toString(), group );
+        return peerDAO.saveInfo( PEER_GROUP, group.getId().toString(), group );
     }
 
 

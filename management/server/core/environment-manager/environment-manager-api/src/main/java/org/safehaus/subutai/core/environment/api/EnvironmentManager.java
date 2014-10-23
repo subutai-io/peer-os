@@ -77,4 +77,6 @@ public interface EnvironmentManager
 
     boolean saveBuildProcess( UUID blueprintId, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
                               TopologyEnum topologyEnum );
+
+    boolean saveBuildProcessB2PG( UUID envId, UUID peerGroupId );
 }
