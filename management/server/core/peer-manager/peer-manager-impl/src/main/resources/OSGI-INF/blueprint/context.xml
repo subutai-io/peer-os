@@ -19,12 +19,18 @@
 
   <reference id="templateRegistry" interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
 
+  <reference id="communicationManager" interface="org.safehaus.subutai.core.communication.api.CommunicationManager" />
+
+  <reference id="strategyManager" interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
+
   <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
         class="org.safehaus.subutai.core.peer.impl.PeerManagerImpl">
     <property name="agentManager" ref="agentManager" />
     <property name="containerManager" ref="containerManager" />
     <property name="commandRunner" ref="commandRunner" />
     <property name="templateRegistry" ref="templateRegistry" />
+    <property name="communicationManager" ref="communicationManager" />
+    <property name="strategyManager" ref="strategyManager" />
     <argument ref="dataSource" />
   </bean>
 

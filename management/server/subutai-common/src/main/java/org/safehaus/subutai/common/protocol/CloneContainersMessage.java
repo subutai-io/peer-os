@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class CloneContainersMessage extends PeerCommandMessage
 {
+    private UUID envId;
     private String template;
     private int numberOfNodes;
     private String Strategy;
@@ -23,9 +24,9 @@ public class CloneContainersMessage extends PeerCommandMessage
     //    private Set<Agent> agents;
 
 
-    public CloneContainersMessage( UUID envId, UUID peerId )
+    public CloneContainersMessage( /*UUID envId, */UUID peerId )
     {
-        super( PeerCommandType.CLONE, envId, peerId, null );
+        super( PeerCommandType.CLONE,/* envId, */peerId, null );
     }
 
 
@@ -77,6 +78,18 @@ public class CloneContainersMessage extends PeerCommandMessage
     }
 
 
+    public UUID getEnvId()
+    {
+        return envId;
+    }
+
+
+    public void setEnvId( final UUID envId )
+    {
+        this.envId = envId;
+    }
+
+
     @Override
     public Type getResultObjectType()
     {
@@ -92,20 +105,6 @@ public class CloneContainersMessage extends PeerCommandMessage
         return new TypeToken<String>()
         {
         }.getType();
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "CloneContainersMessage{" +
-                "envId=" + envId +
-                ", template='" + template + '\'' +
-                ", numberOfNodes=" + numberOfNodes +
-                ", Strategy='" + Strategy + '\'' +
-                ", criteria=" + criteria +
-                ", success=" + success +
-                '}';
     }
 
 
@@ -128,5 +127,18 @@ public class CloneContainersMessage extends PeerCommandMessage
             throw new IllegalArgumentException( "Template could not be null." );
         }
         this.templates.add( t );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "CloneContainersMessage{" +
+                "template='" + template + '\'' +
+                ", numberOfNodes=" + numberOfNodes +
+                ", Strategy='" + Strategy + '\'' +
+                ", criteria=" + criteria +
+                ", templates=" + templates +
+                '}';
     }
 }

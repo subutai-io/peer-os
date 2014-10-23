@@ -21,7 +21,6 @@ import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
-import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,17 +39,10 @@ public class RestServiceImpl implements RestService
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private PeerManager peerManager;
-    private PeerCommandDispatcher peerCommandDispatcher;
 
 
     public RestServiceImpl()
     {
-    }
-
-
-    public void setPeerCommandDispatcher( final PeerCommandDispatcher peerCommandDispatcher )
-    {
-        this.peerCommandDispatcher = peerCommandDispatcher;
     }
 
 
@@ -97,8 +89,8 @@ public class RestServiceImpl implements RestService
     @Override
     public String getCreateContainersMsgJsonFormat()
     {
-        CloneContainersMessage ccm =
-                new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
+        CloneContainersMessage ccm = new CloneContainersMessage( UUIDUtil.generateTimeBasedUUID() );
+        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
         ccm.setStrategy( "ROUND_ROBIN" );
         //        ccm.setEnvId( UUIDUtil.generateTimeBasedUUID() );
         ccm.setNumberOfNodes( 2 );

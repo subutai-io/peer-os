@@ -10,9 +10,9 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -27,12 +27,12 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
 
     private final ZookeeperClusterConfig zookeeperClusterConfig;
     private final ZookeeperImpl zookeeperManager;
-    private final ProductOperation po;
+    private final TrackerOperation po;
     private final Environment environment;
 
 
     public ZookeeperStandaloneSetupStrategy( final Environment environment,
-                                             final ZookeeperClusterConfig zookeeperClusterConfig, ProductOperation po,
+                                             final ZookeeperClusterConfig zookeeperClusterConfig, TrackerOperation po,
                                              ZookeeperImpl zookeeperManager )
     {
         Preconditions.checkNotNull( environment, "Environment is null" );
@@ -69,19 +69,19 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy
                     String.format( "Cluster with name '%s' already exists", zookeeperClusterConfig.getClusterName() ) );
         }
 
-        if ( environment.getNodes().size() < zookeeperClusterConfig.getNumberOfNodes() )
+        if ( environment.getContainers().size() < zookeeperClusterConfig.getNumberOfNodes() )
         {
             throw new ClusterSetupException( String.format( "Environment needs to have %d nodes but has only %d nodes",
-                    zookeeperClusterConfig.getNumberOfNodes(), environment.getNodes().size() ) );
+                    zookeeperClusterConfig.getNumberOfNodes(), environment.getContainers().size() ) );
         }
 
         Set<Agent> zkAgents = new HashSet<>();
-        for ( Node node : environment.getNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            if ( node.getTemplate().getProducts()
+            if ( environmentContainer.getTemplate().getProducts()
                      .contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) )
             {
-                zkAgents.add( node.getAgent() );
+                zkAgents.add( environmentContainer.getAgent() );
             }
         }
 

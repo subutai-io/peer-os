@@ -24,7 +24,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -35,7 +35,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
         final ElasticsearchClusterConfiguration elasticsearchClusterConfiguration = manager.getCluster( clusterName );
         if ( elasticsearchClusterConfiguration == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -43,25 +43,25 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
         if ( !elasticsearchClusterConfiguration.getNodes().contains( agent ) )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
         if ( elasticsearchClusterConfiguration.getNodes().size() == 1 )
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
             return;
         }
-        productOperation.addLog( "Uninstalling Mahout..." );
+        trackerOperation.addLog( "Uninstalling Mahout..." );
         Command uninstallCommand = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( uninstallCommand );
 
@@ -72,31 +72,31 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
             {
                 if ( result.getStdOut().contains( "Package ksks-elasticsearch is not installed, so not removed" ) )
                 {
-                    productOperation.addLog( String.format( "Elasticsearch is not installed, so not removed on node %s",
+                    trackerOperation.addLog( String.format( "Elasticsearch is not installed, so not removed on node %s",
                             agent.getHostname() ) );
                 }
                 else
                 {
-                    productOperation
+                    trackerOperation
                             .addLog( String.format( "Elasticsearch is removed from node %s", agent.getHostname() ) );
                 }
             }
             else
             {
-                productOperation
+                trackerOperation
                         .addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
             }
 
             elasticsearchClusterConfiguration.getNodes().remove( agent );
-            productOperation.addLog( "Updating db..." );
+            trackerOperation.addLog( "Updating db..." );
 
             manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                     elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration );
-            productOperation.addLogDone( "Cluster info update in DB\nDone" );
+            trackerOperation.addLogDone( "Cluster info update in DB\nDone" );
         }
         else
         {
-            productOperation.addLogFailed( "Uninstallation failed, command timed out" );
+            trackerOperation.addLogFailed( "Uninstallation failed, command timed out" );
         }
     }
 }

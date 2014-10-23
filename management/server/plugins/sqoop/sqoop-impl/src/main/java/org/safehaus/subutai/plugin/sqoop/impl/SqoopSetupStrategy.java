@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.sqoop.impl;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 
@@ -13,10 +13,10 @@ abstract class SqoopSetupStrategy implements ClusterSetupStrategy
 
     final SqoopImpl manager;
     final SqoopConfig config;
-    final ProductOperation po;
+    final TrackerOperation po;
 
 
-    public SqoopSetupStrategy( SqoopImpl manager, SqoopConfig config, ProductOperation po )
+    public SqoopSetupStrategy( SqoopImpl manager, SqoopConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;

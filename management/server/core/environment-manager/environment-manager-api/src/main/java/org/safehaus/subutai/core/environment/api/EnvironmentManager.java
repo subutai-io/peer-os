@@ -7,14 +7,21 @@ package org.safehaus.subutai.core.environment.api;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.Peer;
 
 
 /**
@@ -41,14 +48,15 @@ public interface EnvironmentManager
      */
     boolean destroyEnvironment( String environmentName ) throws EnvironmentDestroyException;
 
-    /**
-     * Saves blueprint test into database
-     */
     boolean saveBlueprint( String blueprint );
 
-    List<EnvironmentBuildTask> getBlueprints();
+    List<EnvironmentBuildTask> getBlueprintTasks();
 
-    boolean deleteBlueprint( String name );
+    List<EnvironmentBlueprint> getBlueprints();
+
+    boolean deleteBlueprintTask( String name );
+
+    boolean deleteBlueprint( UUID blueprintId );
 
     void saveEnvironment( final Environment environment );
 
@@ -65,4 +73,13 @@ public interface EnvironmentManager
     void invoke( PeerCommandMessage commandMessage, long timeout );
 
     Set<EnvironmentContainer> getConnectedContainers( Environment environment );
+
+    Environment getEnvironmentByUUID( UUID environmentId );
+
+    boolean saveBuildProcess( UUID blueprintId, Map<Object, Peer> topology, Map<Object, NodeGroup> map,
+                              TopologyEnum topologyEnum );
+
+    boolean saveBuildProcessB2PG( UUID blueprintId, UUID peerGroupId ) throws EnvironmentManagerException;
+
+    EnvironmentBlueprint getEnvironmentBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
 }

@@ -68,7 +68,6 @@ public class Commands
 
     public Command getWriteSSHCommand( List<Agent> agentList, String key )
     {
-        System.out.println(key);
         return commandDispatcher.createCommand( new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' > /root/.ssh/authorized_keys && " +

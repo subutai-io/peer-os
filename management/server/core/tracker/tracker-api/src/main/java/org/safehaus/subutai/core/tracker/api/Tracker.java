@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 
 
 /**
@@ -28,7 +28,7 @@ public interface Tracker
      *
      * @return - product operation view
      */
-    public ProductOperationView getProductOperation( String source, UUID operationTrackId );
+    public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId );
 
     /**
      * Creates product operation and save it to DB
@@ -38,7 +38,7 @@ public interface Tracker
      *
      * @return - returns created product operation
      */
-    public ProductOperation createProductOperation( String source, String description );
+    public TrackerOperation createTrackerOperation( String source, String description );
 
     /**
      * Returns list of product operations (views) filtering them by date interval
@@ -50,14 +50,14 @@ public interface Tracker
      *
      * @return - list of product operation views
      */
-    public List<ProductOperationView> getProductOperations( String source, Date fromDate, Date toDate, int limit );
+    public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit );
 
     /**
      * Returns list of all sources of product operations for which product operations exist in DB
      *
      * @return list of product operation sources
      */
-    public List<String> getProductOperationSources();
+    public List<String> getTrackerOperationSources();
 
     /**
      * Prints log of product operation to std out stream

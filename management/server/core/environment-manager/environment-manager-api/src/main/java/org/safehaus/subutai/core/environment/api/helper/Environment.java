@@ -10,7 +10,6 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 
@@ -18,25 +17,44 @@ public class Environment
 {
 
     private final ServiceLocator serviceLocator;
-    private UUID uuid;
-    private Set<Node> nodes;
+    private UUID id;
     private String name;
     private Set<EnvironmentContainer> containers;
-
+    private EnvironmentStatusEnum status;
+    private long creationTimestamp;
 
     public Environment( String name )
     {
-        this.nodes = new HashSet<>();
         this.name = name;
-        this.uuid = UUIDUtil.generateTimeBasedUUID();
+        this.id = UUIDUtil.generateTimeBasedUUID();
         this.containers = new HashSet<>();
         this.serviceLocator = new ServiceLocator();
+        this.status = EnvironmentStatusEnum.EMPTY;
+        this.creationTimestamp = System.currentTimeMillis();
+    }
+
+
+    public long getCreationTimestamp()
+    {
+        return creationTimestamp;
+    }
+
+
+    public EnvironmentStatusEnum getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( final EnvironmentStatusEnum status )
+    {
+        this.status = status;
     }
 
 
     public void addContainer( EnvironmentContainer container )
     {
-        container.setEnvironmentId( uuid );
+        container.setEnvironmentId( id );
         this.containers.add( container );
     }
 
@@ -59,15 +77,9 @@ public class Environment
     }
 
 
-    public Set<Node> getNodes()
+    public UUID getId()
     {
-        return nodes;
-    }
-
-
-    public UUID getUuid()
-    {
-        return uuid;
+        return id;
     }
 
 
@@ -84,17 +96,5 @@ public class Environment
             commandMessage.setExceptionMessage( e.toString() );
             //            commandMessage.setSuccess( false );
         }
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Environment{" +
-                "uuid=" + uuid +
-                ", nodes=" + nodes +
-                ", name='" + name + '\'' +
-                ", containers=" + containers +
-                '}';
     }
 }

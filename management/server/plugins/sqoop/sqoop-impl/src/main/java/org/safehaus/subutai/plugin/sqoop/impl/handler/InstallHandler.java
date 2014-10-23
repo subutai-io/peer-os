@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.sqoop.impl.handler;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -20,7 +20,7 @@ public class InstallHandler extends AbstractHandler
     private HadoopClusterConfig hadoopConfig;
 
 
-    public InstallHandler( SqoopImpl manager, String clusterName, ProductOperation po )
+    public InstallHandler( SqoopImpl manager, String clusterName, TrackerOperation po )
     {
         super( manager, clusterName, po );
     }
@@ -47,7 +47,7 @@ public class InstallHandler extends AbstractHandler
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         Environment env = null;
         if ( config.getSetupType() == SetupType.WITH_HADOOP )
         {

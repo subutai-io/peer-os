@@ -6,7 +6,7 @@ import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.common.api.OperationType;
@@ -48,8 +48,8 @@ public class OperationTask implements Runnable {
 
         if ( trackID != null ) {
             while ( true ) {
-                ProductOperationView prevPo =
-                        tracker.getProductOperation(clusterConfig.getProductKey(), trackID);
+                TrackerOperationView prevPo =
+                        tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
                 if ( prevPo.getState() == ProductOperationState.RUNNING ) {
                     try {
                         Thread.sleep( 1000 );
@@ -76,8 +76,8 @@ public class OperationTask implements Runnable {
         NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() ) {
-            ProductOperationView po =
-                    tracker.getProductOperation(clusterConfig.getProductKey(), trackID);
+            TrackerOperationView po =
+                    tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
             if ( po != null ) {
                 if ( po.getState() != ProductOperationState.RUNNING ) {
                     if ( po.getLog().toLowerCase().contains( getProductStoppedIdentifier( product ).toLowerCase() ) ) {

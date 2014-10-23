@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.nutch.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
@@ -22,7 +22,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<NutchI
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( NutchConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( NutchConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -30,7 +30,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<NutchI
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         NutchConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -92,7 +92,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<NutchI
 
     private boolean uninstall( Agent agent )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling " + NutchConfig.PRODUCT_KEY );
 
         Command cmd = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
@@ -120,7 +120,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<NutchI
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
+            trackerOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
             return false;
         }
     }

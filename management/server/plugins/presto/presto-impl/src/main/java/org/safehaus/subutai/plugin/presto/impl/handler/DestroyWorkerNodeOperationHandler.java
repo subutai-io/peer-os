@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
@@ -23,7 +23,7 @@ public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<
     {
         super( manager, clusterName );
         this.hostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( PrestoClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -31,7 +31,7 @@ public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<
     @Override
     public void run()
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
@@ -92,7 +92,7 @@ public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<
 
     private boolean uninstall( Agent agent )
     {
-        ProductOperation po = productOperation;
+        TrackerOperation po = trackerOperation;
         po.addLog( "Uninstalling Presto..." );
 
         Command cmd = manager.getCommands().getUninstallCommand( Sets.newHashSet( agent ) );
@@ -120,7 +120,7 @@ public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<
         }
         catch ( LxcDestroyException ex )
         {
-            productOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
+            trackerOperation.addLog( "Failed to destroy node: " + ex.getMessage() );
             return false;
         }
     }

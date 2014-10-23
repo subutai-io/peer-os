@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
 //import org.safehaus.subutai.core.peer.api.helpers.CloneContainersMessage;
@@ -17,32 +16,25 @@ import org.safehaus.subutai.common.util.UUIDUtil;
  */
 public class EnvironmentBuildProcess
 {
-    private UUID uuid;
-    private boolean completeStatus;
+    private UUID id;
     private ProcessStatusEnum processStatusEnum;
     private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
-    private EnvironmentBlueprint environmentBlueprint;
+    private UUID blueprintId;
 
 
-    public EnvironmentBuildProcess( EnvironmentBlueprint environmentBlueprint )
+    public EnvironmentBuildProcess( UUID blueprintId )
     {
-        this.environmentBlueprint = environmentBlueprint;
-        this.uuid = UUIDUtil.generateTimeBasedUUID();
+        this.blueprintId = blueprintId;
+        this.id = UUIDUtil.generateTimeBasedUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.messageMap = new HashMap<>();
     }
 
 
-    public EnvironmentBlueprint getEnvironmentBlueprint()
+    public UUID getBlueprintId()
     {
-        return environmentBlueprint;
-    }
-
-
-    public void setEnvironmentBlueprint( final EnvironmentBlueprint environmentBlueprint )
-    {
-        this.environmentBlueprint = environmentBlueprint;
+        return blueprintId;
     }
 
 
@@ -94,26 +86,14 @@ public class EnvironmentBuildProcess
     }
 
 
-    public UUID getUuid()
+    public UUID getId()
     {
-        return uuid;
+        return id;
     }
 
 
-    public void setUuid( final UUID uuid )
+    public void setId( final UUID id )
     {
-        this.uuid = uuid;
-    }
-
-
-    public boolean isCompleteStatus()
-    {
-        return completeStatus;
-    }
-
-
-    public void setCompleteStatus( final boolean completeStatus )
-    {
-        this.completeStatus = completeStatus;
+        this.id = id;
     }
 }

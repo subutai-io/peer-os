@@ -7,9 +7,9 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.nutch.api.NutchConfig;
 
 
@@ -19,7 +19,7 @@ class WithHadoopSetupStrategy extends NutchSetupStrategy
     Environment environment;
 
 
-    public WithHadoopSetupStrategy( NutchImpl manager, NutchConfig config, ProductOperation po )
+    public WithHadoopSetupStrategy( NutchImpl manager, NutchConfig config, TrackerOperation po )
     {
         super( manager, config, po );
     }
@@ -48,13 +48,13 @@ class WithHadoopSetupStrategy extends NutchSetupStrategy
             throw new ClusterSetupException( "Environment not specified" );
         }
 
-        if ( environment.getNodes() == null || environment.getNodes().isEmpty() )
+        if ( environment.getContainers() == null || environment.getContainers().isEmpty() )
         {
             throw new ClusterSetupException( "Environment has no nodes" );
         }
 
         Set<Agent> nutchNodes = new HashSet<>(), allNodes = new HashSet<>();
-        for ( Node n : environment.getNodes() )
+        for ( EnvironmentContainer n : environment.getContainers() )
         {
             allNodes.add( n.getAgent() );
             if ( n.getTemplate().getProducts().contains( Commands.PACKAGE_NAME ) )
@@ -78,9 +78,9 @@ class WithHadoopSetupStrategy extends NutchSetupStrategy
             }
         }
 
-        productOperation.addLog( "Saving to db..." );
+        trackerOperation.addLog( "Saving to db..." );
         manager.getPluginDao().saveInfo( NutchConfig.PRODUCT_KEY, config.getClusterName(), config );
-        productOperation.addLog( "Cluster info successfully saved" );
+        trackerOperation.addLog( "Cluster info successfully saved" );
 
         return config;
     }

@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 
@@ -11,10 +11,10 @@ public class ClusterConfiguration
 {
 
     private ElasticsearchImpl manager;
-    private ProductOperation po;
+    private TrackerOperation po;
 
 
-    public ClusterConfiguration( final ElasticsearchImpl manager, final ProductOperation po )
+    public ClusterConfiguration( final ElasticsearchImpl manager, final TrackerOperation po )
     {
         this.manager = manager;
         this.po = po;

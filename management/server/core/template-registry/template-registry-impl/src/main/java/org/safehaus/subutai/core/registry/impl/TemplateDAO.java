@@ -171,7 +171,9 @@ public class TemplateDAO
     public void saveTemplate( Template template ) throws DaoException
     {
         Type templateType = new TypeToken<Template>()
-        {}.getType();
+        {
+
+        }.getType();
         try
         {
             dbUtil.update( "merge into template_registry_info(template, arch, parent, info) values(?,?,?,?)",

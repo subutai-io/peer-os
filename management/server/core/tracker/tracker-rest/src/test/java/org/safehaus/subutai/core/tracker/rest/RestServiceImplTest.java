@@ -15,11 +15,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.core.tracker.impl.ProductOperationImpl;
-import org.safehaus.subutai.core.tracker.impl.ProductOperationViewImpl;
+import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
+import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 
 import com.google.common.collect.Lists;
@@ -56,12 +56,12 @@ public class RestServiceImplTest
     {
 
         restService = new RestServiceImpl( tracker );
-        final ProductOperationView productOperationView = new ProductOperationViewImpl(
-                new ProductOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) ) );
-        when( tracker.getProductOperation( SOURCE, OPERATION_ID ) ).thenReturn( productOperationView );
-        when( tracker.getProductOperationSources() ).thenReturn( Collections.<String>emptyList() );
-        when( tracker.getProductOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
-                .thenReturn( Lists.newArrayList( productOperationView ) );
+        final TrackerOperationView trackerOperationView = new TrackerOperationViewImpl(
+                new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) ) );
+        when( tracker.getTrackerOperation( SOURCE, OPERATION_ID ) ).thenReturn( trackerOperationView );
+        when( tracker.getTrackerOperationSources() ).thenReturn( Collections.<String>emptyList() );
+        when( tracker.getTrackerOperations( anyString(), any( Date.class ), any( Date.class ), anyInt() ) )
+                .thenReturn( Lists.newArrayList( trackerOperationView ) );
     }
 
 
@@ -78,7 +78,7 @@ public class RestServiceImplTest
 
         Response response = restService.getProductOperation( SOURCE, OPERATION_ID.toString() );
 
-        ProductOperationView pov = JsonUtil.fromJson( response.getEntity().toString(), ProductOperationViewImpl.class );
+        TrackerOperationView pov = JsonUtil.fromJson( response.getEntity().toString(), TrackerOperationViewImpl.class );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertNotNull( pov );
@@ -118,13 +118,13 @@ public class RestServiceImplTest
     public void testGetProductOperations() throws Exception
     {
         SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        Type listPOVType = new TypeToken<List<ProductOperationViewImpl>>()
+        Type listPOVType = new TypeToken<List<TrackerOperationViewImpl>>()
         {}.getType();
 
 
         Response response =
                 restService.getProductOperations( SOURCE, df.format( new Date() ), df.format( new Date() ), 1 );
-        List<ProductOperationView> pov = JsonUtil.fromJson( response.getEntity().toString(), listPOVType );
+        List<TrackerOperationView> pov = JsonUtil.fromJson( response.getEntity().toString(), listPOVType );
 
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );

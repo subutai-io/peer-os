@@ -260,7 +260,7 @@ public class Template
     }
 
 
-    public void setPeerId( final UUID peerId )
+    private void setPeerId( final UUID peerId )
     {
         this.peerId = peerId;
     }
@@ -272,9 +272,19 @@ public class Template
     }
 
 
-    public void setRemote( final boolean remote )
+    private void setRemote( final boolean remote )
     {
         this.remote = remote;
+    }
+
+
+    public Template getRemoteClone( UUID peerId )
+    {
+        Template result = new Template( this.lxcArch, this.lxcUtsname, this.subutaiConfigPath, this.subutaiParent,
+                this.subutaiGitBranch, this.subutaiGitUuid, this.packagesManifest, this.md5sum );
+        result.setRemote( true );
+        result.setPeerId( peerId );
+        return result;
     }
 
 

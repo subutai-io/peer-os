@@ -351,11 +351,6 @@
         <artifactId>monitoring-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>monitoring-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- network-manager -->
@@ -400,12 +395,13 @@
         <artifactId>peer-command-dispatcher-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <!--
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>peer-command-dispatcher-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      -->
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- peer-manager -->
       <dependency>
@@ -428,7 +424,11 @@
         <artifactId>peer-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>peer-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- strategy-manager -->
       <dependency>
@@ -950,6 +950,23 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>cassandra-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- jetty -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>jetty-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>jetty-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>jetty-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!-- elasticsearch -->

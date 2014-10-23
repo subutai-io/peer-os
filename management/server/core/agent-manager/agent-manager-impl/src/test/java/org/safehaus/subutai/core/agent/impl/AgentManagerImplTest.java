@@ -200,7 +200,7 @@ public class AgentManagerImplTest
     @Test
     public void shouldReturnAgentByUUID()
     {
-        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();;
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
         when( response.getUuid() ).thenReturn( agentUUID );
 

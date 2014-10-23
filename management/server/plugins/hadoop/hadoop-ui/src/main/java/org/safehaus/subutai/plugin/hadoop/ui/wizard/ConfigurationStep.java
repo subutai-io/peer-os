@@ -34,6 +34,7 @@ public class ConfigurationStep extends VerticalLayout
         content.setMargin( true );
 
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
+        clusterNameTxtFld.setId("HadoopClusterNameTxtField");
         clusterNameTxtFld.setInputPrompt("Cluster name");
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength( 20 );
@@ -62,6 +63,7 @@ public class ConfigurationStep extends VerticalLayout
         }
 
         ComboBox slaveNodesComboBox = new ComboBox( "Choose number of slave nodes", slaveNodeCountList );
+        slaveNodesComboBox.setId("HadoopSlavesNodeComboBox");
         //        slaveNodesComboBox.setMultiSelect(false);
         slaveNodesComboBox.setImmediate(true);
         slaveNodesComboBox.setTextInputAllowed(false);
@@ -88,6 +90,7 @@ public class ConfigurationStep extends VerticalLayout
         slaveNodeCountList.add( connected_fai_count - 1, connected_fai_count + "");
         //configuration replication factor
         ComboBox replicationFactorComboBox = new ComboBox( "Choose replication factor for slave nodes", slaveNodeCountList );
+        replicationFactorComboBox.setId("HadoopReplicationFactorComboBox");
         //        replicationFactorComboBox.setMultiSelect(false);
         replicationFactorComboBox.setImmediate( true );
         replicationFactorComboBox.setTextInputAllowed( false );
@@ -104,6 +107,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         TextField domain = new TextField( "Enter domain name" );
+        domain.setId("HadoopDomainTxttField");
         domain.setInputPrompt( wizard.getHadoopClusterConfig().getDomainName() );
         domain.setValue( wizard.getHadoopClusterConfig().getDomainName() );
         domain.setMaxLength( 20 );
@@ -121,6 +125,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button next = new Button( "Next" );
+        next.setId("HadoopBtnNext");
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -139,6 +144,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
+        back.setId("HadoopConfigBack");
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

@@ -1,16 +1,17 @@
 package org.safehaus.subutai.core.environment.ui.manage;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.safehaus.subutai.common.exception.ContainerException;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
-import org.safehaus.subutai.core.environment.api.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 
 import com.vaadin.ui.Button;
@@ -35,6 +36,9 @@ public class EnvironmentsForm
     private static final String START = "Start";
     private static final String STOP = "Stop";
     private static final String MANAGE_TITLE = "Manage environment containers";
+    private static final String ID = "ID";
+    private static final String STATUS = "Status";
+    private static final String DATE_CREATED = "Date";
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -72,6 +76,9 @@ public class EnvironmentsForm
     {
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
+        table.addContainerProperty( ID, String.class, null );
+        table.addContainerProperty( DATE_CREATED, String.class, null );
+        table.addContainerProperty( STATUS, String.class, null );
         table.addContainerProperty( MANAGE, Button.class, null );
         table.addContainerProperty( CONFIGURE, Button.class, null );
         table.addContainerProperty( DESTROY, Button.class, null );
@@ -110,7 +117,7 @@ public class EnvironmentsForm
                 {
                     try
                     {
-                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getUuid().toString() );
+                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId().toString() );
                         environmentsButton.click();
                     }
                     catch ( EnvironmentDestroyException e )
@@ -132,11 +139,22 @@ public class EnvironmentsForm
                 }
             } );
 
+
+            String cdate = getCreationDate( environment.getCreationTimestamp() );
             environmentsTable.addItem( new Object[] {
-                    environment.getName() + " " + environment.getUuid(), manageButton, configureButton, destroyButton
-            }, environment.getUuid() );
+                    environment.getName(), environment.getId().toString(), cdate, environment.getStatus().toString(),
+                    manageButton, configureButton, destroyButton
+            }, environment.getId() );
         }
         environmentsTable.refreshRowCache();
+    }
+
+
+    private String getCreationDate( long ts )
+    {
+        SimpleDateFormat sdf = new SimpleDateFormat( "MMM dd,yyyy HH:mm" );
+        Date cdate = new Date( ts );
+        return sdf.format( cdate );
     }
 
 
@@ -205,6 +223,7 @@ public class EnvironmentsForm
 
         Table containersTable = new Table();
         containersTable.addContainerProperty( NAME, String.class, null );
+        containersTable.addContainerProperty( "Peer", String.class, null );
         containersTable.addContainerProperty( PROPERTIES, Button.class, null );
         containersTable.addContainerProperty( START, Button.class, null );
         containersTable.addContainerProperty( STOP, Button.class, null );
@@ -219,7 +238,7 @@ public class EnvironmentsForm
         {
 
             containersTable.addItem( new Object[] {
-                    container.getName() + " on " + container.getPeerId(), propertiesButton( container ),
+                    container.getName(), container.getPeerId().toString(), propertiesButton( container ),
                     startButton( environment, container ), stopButton( environment, container ),
                     destroyButton( environment, container )
             }, null );

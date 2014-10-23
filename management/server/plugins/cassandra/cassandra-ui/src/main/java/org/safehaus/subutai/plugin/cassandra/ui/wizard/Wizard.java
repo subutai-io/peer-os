@@ -23,7 +23,7 @@ public class Wizard
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final Cassandra cassandra;
-    GridLayout grid;
+    private GridLayout grid;
     private int step = 1;
     private CassandraClusterConfig config = new CassandraClusterConfig();
 

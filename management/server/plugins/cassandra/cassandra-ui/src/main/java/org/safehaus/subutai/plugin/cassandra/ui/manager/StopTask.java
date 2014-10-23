@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.cassandra.ui.manager;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -39,7 +39,7 @@ public class StopTask implements Runnable
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
-            ProductOperationView po = tracker.getProductOperation( CassandraClusterConfig.PRODUCT_KEY, trackID );
+            TrackerOperationView po = tracker.getTrackerOperation( CassandraClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
                 if ( po.getState() != ProductOperationState.RUNNING )

@@ -21,10 +21,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>db-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
     </dependency>
     <dependency>
@@ -34,6 +30,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-registry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>communication-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>

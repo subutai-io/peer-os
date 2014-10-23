@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
@@ -20,7 +19,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -44,15 +43,15 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
         try
         {
             //setup up HBase cluster
-            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, productOperation );
+            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, trackerOperation );
 //            HadoopClusterConfig hadoopClusterConfig = manager.getC
             setupStrategy.setup();
 
-            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }

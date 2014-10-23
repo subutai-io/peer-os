@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
@@ -27,7 +27,7 @@ public class InstallHandler extends AbstractHandler
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        this.productOperation = manager.getTracker().createProductOperation( StormConfig.PRODUCT_NAME,
+        this.trackerOperation = manager.getTracker().createTrackerOperation( StormConfig.PRODUCT_NAME,
                 "Install cluster " + config.getClusterName() );
     }
 
@@ -39,32 +39,32 @@ public class InstallHandler extends AbstractHandler
         EnvironmentBuildTask eb = manager.getDefaultEnvironmentBlueprint( config );
         try
         {
-            productOperation.addLog( "Building environment..." );
+            trackerOperation.addLog( "Building environment..." );
             env = manager.getEnvironmentManager().buildEnvironment( eb );
-            productOperation.addLog( "Building environment completed" );
+            trackerOperation.addLog( "Building environment completed" );
 
-            productOperation.addLog( "Installing cluster..." );
-            ClusterSetupStrategy s = manager.getClusterSetupStrategy( env, config, productOperation );
+            trackerOperation.addLog( "Installing cluster..." );
+            ClusterSetupStrategy s = manager.getClusterSetupStrategy( env, config, trackerOperation );
             s.setup();
-            productOperation.addLog( "Installing cluster completed" );
-            productOperation.addLogDone( null );
+            trackerOperation.addLog( "Installing cluster completed" );
+            trackerOperation.addLogDone( null );
         }
         catch ( EnvironmentBuildException ex )
         {
             String m = "Failed to build environment";
-            productOperation.addLogFailed( m );
+            trackerOperation.addLogFailed( m );
             manager.getLogger().error( m, ex );
         }
         catch ( ClusterSetupException ex )
         {
             String m = "Failed to setup cluster";
-            productOperation.addLog( ex.getMessage() );
-            productOperation.addLogFailed( m );
+            trackerOperation.addLog( ex.getMessage() );
+            trackerOperation.addLogFailed( m );
             manager.getLogger().error( m, ex );
         }
         finally
         {
-            if ( productOperation.getState() != ProductOperationState.SUCCEEDED )
+            if ( trackerOperation.getState() != ProductOperationState.SUCCEEDED )
             {
                 destroyNodes( env );
             }
@@ -75,26 +75,26 @@ public class InstallHandler extends AbstractHandler
     void destroyNodes( Environment env )
     {
 
-        if ( env == null || env.getNodes().isEmpty() )
+        if ( env == null || env.getContainers().isEmpty() )
         {
             return;
         }
 
-        Set<Agent> set = new HashSet<>( env.getNodes().size() );
-        for ( Node n : env.getNodes() )
+        Set<Agent> set = new HashSet<>( env.getContainers().size() );
+        for ( EnvironmentContainer n : env.getContainers() )
         {
             set.add( n.getAgent() );
         }
-        productOperation.addLog( "Destroying node(s)..." );
+        trackerOperation.addLog( "Destroying node(s)..." );
         try
         {
             manager.getContainerManager().clonesDestroy( set );
-            productOperation.addLog( "Destroying node(s) completed" );
+            trackerOperation.addLog( "Destroying node(s) completed" );
         }
         catch ( LxcDestroyException ex )
         {
             String m = "Failed to destroy node(s)";
-            productOperation.addLog( m );
+            trackerOperation.addLog( m );
             manager.getLogger().error( m, ex );
         }
     }

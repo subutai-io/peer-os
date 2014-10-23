@@ -44,7 +44,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -52,7 +52,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -65,7 +65,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                 Strings.isNullOrEmpty( config.getInstanceName() ) ||
                 Strings.isNullOrEmpty( config.getPassword() ) )
         {
-            productOperation.addLogFailed( "Malformed configuration" );
+            trackerOperation.addLogFailed( "Malformed configuration" );
             return;
         }
 
@@ -85,14 +85,14 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
         try
         {
             //setup up Accumulo cluster
-            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, productOperation );
+            ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, trackerOperation );
             setupStrategy.setup();
 
-            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
@@ -110,24 +110,24 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
 
             //setup Hadoop cluster
             ClusterSetupStrategy hadoopClusterSetupStrategy =
-                    manager.getHadoopManager().getClusterSetupStrategy( productOperation, hadoopClusterConfig, env );
+                    manager.getHadoopManager().getClusterSetupStrategy( trackerOperation, hadoopClusterConfig, env );
             hadoopClusterSetupStrategy.setup();
 
             //setup ZK cluster
             ClusterSetupStrategy zkClusterSetupStrategy =
-                    manager.getZkManager().getClusterSetupStrategy( env, zookeeperClusterConfig, productOperation );
+                    manager.getZkManager().getClusterSetupStrategy( env, zookeeperClusterConfig, trackerOperation );
             zkClusterSetupStrategy.setup();
 
             //setup up Accumulo cluster
             ClusterSetupStrategy accumuloSetupStrategy =
-                    manager.getClusterSetupStrategy( env, config, productOperation );
+                    manager.getClusterSetupStrategy( env, config, trackerOperation );
             accumuloSetupStrategy.setup();
 
-            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( EnvironmentBuildException | ClusterSetupException e )
         {
-            productOperation
+            trackerOperation
                     .addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }

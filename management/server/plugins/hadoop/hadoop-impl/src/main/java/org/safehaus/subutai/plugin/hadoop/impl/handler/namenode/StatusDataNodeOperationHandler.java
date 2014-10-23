@@ -20,7 +20,7 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
     {
         super( manager, clusterName );
         this.lxcHostName = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Checking DataNode in %s", clusterName ) );
     }
 
@@ -32,20 +32,20 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
 
         if ( hadoopClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( hadoopClusterConfig.getNameNode() == null )
         {
-            productOperation.addLogFailed( String.format( "DataNode on %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "DataNode on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostName );
         if ( node == null )
         {
-            productOperation.addLogFailed( "DataNode is not connected" );
+            trackerOperation.addLogFailed( "DataNode is not connected" );
             return;
         }
         Command statusCommand = manager.getCommands().getNameNodeCommand( node, "status" );
@@ -80,11 +80,11 @@ public class StatusDataNodeOperationHandler extends AbstractOperationHandler<Had
 
         if ( NodeState.UNKNOWN.equals( nodeState ) )
         {
-            productOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
+            trackerOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
         }
         else
         {
-            productOperation.addLogDone( String.format( "DataNode of %s is %s", node.getHostname(), nodeState ) );
+            trackerOperation.addLogDone( String.format( "DataNode of %s is %s", node.getHostname(), nodeState ) );
         }
     }
 }

@@ -10,12 +10,12 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
@@ -32,11 +32,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
 
     private Environment environment;
     private HadoopImpl hadoopManager;
-    private ProductOperation po;
+    private TrackerOperation po;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-    public HadoopSetupStrategy( ProductOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig )
+    public HadoopSetupStrategy( TrackerOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -48,7 +48,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    public HadoopSetupStrategy( ProductOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig,
+    public HadoopSetupStrategy( TrackerOperation po, HadoopImpl hadoopManager, HadoopClusterConfig hadoopClusterConfig,
                                 Environment environment )
     {
         Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
@@ -138,7 +138,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     }
 
 
-    private void destroyLXC( ProductOperation po, String log )
+    private void destroyLXC( TrackerOperation po, String log )
     {
         //destroy all lxcs also
         po.addLog( "Destroying lxc containers" );
@@ -162,14 +162,14 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<Agent> masterNodes = new HashSet<>();
 
-        for ( Node node : this.environment.getNodes() )
+        for ( EnvironmentContainer environmentContainer : this.environment.getContainers() )
         {
-            if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) )
+            if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                if ( node.getTemplate().getProducts()
+                if ( environmentContainer.getTemplate().getProducts()
                          .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
                 {
-                    masterNodes.add( node.getAgent() );
+                    masterNodes.add( environmentContainer.getAgent() );
                 }
             }
         }
@@ -191,14 +191,14 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
     {
         Set<Agent> slaveNodes = new HashSet<>();
 
-        for ( Node node : environment.getNodes() )
+        for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) )
+            if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
-                if ( node.getTemplate().getProducts()
+                if ( environmentContainer.getTemplate().getProducts()
                          .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
                 {
-                    slaveNodes.add( node.getAgent() );
+                    slaveNodes.add( environmentContainer.getAgent() );
                 }
             }
         }

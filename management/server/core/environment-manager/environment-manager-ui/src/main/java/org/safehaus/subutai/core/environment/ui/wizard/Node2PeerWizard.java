@@ -6,10 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.safehaus.subutai.common.protocol.CloneContainersMessage;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentBuildProcess;
+import org.safehaus.subutai.core.environment.api.TopologyEnum;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.peer.api.Peer;
 
@@ -30,7 +29,7 @@ public class Node2PeerWizard extends Window
 {
 
     private int step = 0;
-    private EnvironmentBuildTask environmentBuildTask;
+    private EnvironmentBlueprint blueprint;
     private Table peersTable;
     private Table containerToPeerTable;
     private EnvironmentManagerPortalModule managerUI;
@@ -38,7 +37,7 @@ public class Node2PeerWizard extends Window
 
 
     public Node2PeerWizard( final String caption, EnvironmentManagerPortalModule managerUI,
-                            EnvironmentBuildTask environmentBuildTask )
+                            EnvironmentBlueprint blueprint )
     {
         super( caption );
         setCaption( caption );
@@ -48,7 +47,7 @@ public class Node2PeerWizard extends Window
         setWidth( "800px" );
         setHeight( "500px" );
         this.managerUI = managerUI;
-        this.environmentBuildTask = environmentBuildTask;
+        this.blueprint = blueprint;
         next();
     }
 
@@ -66,17 +65,17 @@ public class Node2PeerWizard extends Window
         {
             case 1:
             {
-                setContent( genPeersTable() );
+                setContent( genPeersLayout() );
                 break;
             }
             case 2:
             {
-                setContent( genContainerToPeersTable() );
+                setContent( genNodesToPeersLayout() );
                 break;
             }
             default:
             {
-                setContent( genPeersTable() );
+                setContent( genPeersLayout() );
                 break;
             }
         }
@@ -101,9 +100,10 @@ public class Node2PeerWizard extends Window
     }
 
 
-    private VerticalLayout genPeersTable()
+    private VerticalLayout genPeersLayout()
     {
         VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
 
         peersTable = new Table();
         peersTable.addContainerProperty( "Name", String.class, null );
@@ -150,9 +150,10 @@ public class Node2PeerWizard extends Window
     }
 
 
-    private VerticalLayout genContainerToPeersTable()
+    private VerticalLayout genNodesToPeersLayout()
     {
         VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
 
         containerToPeerTable = new Table();
         containerToPeerTable.addContainerProperty( "Container", String.class, null );
@@ -163,19 +164,19 @@ public class Node2PeerWizard extends Window
         containerToPeerTable.setImmediate( true );
         containerToPeerTable.setSizeFull();
         nodeGroupMap = new HashMap<>();
-        for ( NodeGroup ng : environmentBuildTask.getEnvironmentBlueprint().getNodeGroups() )
+        for ( NodeGroup ng : blueprint.getNodeGroups() )
         {
             for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
             {
-                ComboBox comboBox = new ComboBox();
+                ComboBox peersBox = new ComboBox();
                 BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
                 bic.addAll( selectedPeers() );
-                comboBox.setContainerDataSource( bic );
-                comboBox.setNullSelectionAllowed( false );
-                comboBox.setTextInputAllowed( false );
-                comboBox.setItemCaptionPropertyId( "name" );
+                peersBox.setContainerDataSource( bic );
+                peersBox.setNullSelectionAllowed( false );
+                peersBox.setTextInputAllowed( false );
+                peersBox.setItemCaptionPropertyId( "name" );
                 Object itemId = containerToPeerTable.addItem( new Object[] {
-                        ng.getTemplateName(), comboBox
+                        ng.getTemplateName(), peersBox
                 }, null );
                 nodeGroupMap.put( itemId, ng );
             }
@@ -189,9 +190,9 @@ public class Node2PeerWizard extends Window
                 Map<Object, Peer> topology = topologySelection();
                 if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
                 {
-                    EnvironmentBuildProcess process = createEnvironmentBuildProcess( environmentBuildTask, topology );
-
-                    managerUI.getEnvironmentManager().saveBuildProcess( process );
+                    Map<Object, NodeGroup> map = getNodeGroupMap();
+                    managerUI.getEnvironmentManager()
+                             .saveBuildProcess( blueprint.getId(), topology, map, TopologyEnum.NODE_2_PEER );
                 }
                 else
                 {
@@ -245,38 +246,6 @@ public class Node2PeerWizard extends Window
     public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
     {
         this.nodeGroupMap = nodeGroupMap;
-    }
-
-
-    public EnvironmentBuildProcess createEnvironmentBuildProcess( EnvironmentBuildTask ebt, Map<Object, Peer> topology )
-    {
-        EnvironmentBuildProcess process = new EnvironmentBuildProcess( ebt.getEnvironmentBlueprint() );
-
-        Map<Object, NodeGroup> map = getNodeGroupMap();
-        for ( Object itemId : map.keySet() )
-        {
-            Peer peer = topology.get( itemId );
-            NodeGroup ng = map.get( itemId );
-
-            StringBuilder key = new StringBuilder();
-            key.append( peer.getId().toString() );
-            key.append( ng.getTemplateName() );
-
-            if ( !process.getMessageMap().containsKey( key.toString() ) )
-            {
-                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
-                ccm.setTemplate( ng.getTemplateName() );
-                ccm.setNumberOfNodes( 1 );
-                ccm.setStrategy( ng.getPlacementStrategy().toString() );
-                process.putCloneContainerMessage( key.toString(), ccm );
-            }
-            else
-            {
-                process.getMessageMap().get( key.toString() ).incrementNumberOfNodes();
-            }
-        }
-
-        return process;
     }
 
 

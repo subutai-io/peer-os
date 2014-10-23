@@ -9,9 +9,12 @@
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.ui.CassandraPortalModule"
         init-method="init" destroy-method="destroy">
+
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

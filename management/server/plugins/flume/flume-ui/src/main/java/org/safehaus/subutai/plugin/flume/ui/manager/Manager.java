@@ -11,8 +11,6 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -57,7 +55,7 @@ public class Manager
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String STYLE_NAME = "default";
-    private static final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Flume flume;
     private final Tracker tracker;
@@ -89,6 +87,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
+        nodesTable.setId("FluNodesTbl");
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -101,6 +100,7 @@ public class Manager
         getAddNodeButton( controlsContent );
 
         PROGRESS_ICON.setVisible( false );
+        PROGRESS_ICON.setId("indicator");
         controlsContent.addComponent( PROGRESS_ICON );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -111,6 +111,7 @@ public class Manager
     private void getAddNodeButton( HorizontalLayout controlsContent )
     {
         Button addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
+        addNodeBtn.setId("FluAddNodeBtn");
         addNodeBtn.addStyleName( "default" );
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -162,6 +163,7 @@ public class Manager
     private void getDestroyClusterButton( HorizontalLayout controlsContent )
     {
         Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
+        destroyClusterBtn.setId("FluDestroyClusterBtn");
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -251,6 +253,7 @@ public class Manager
     private void getRefreshClusterButton( HorizontalLayout controlsContent )
     {
         Button refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
+        refreshClustersBtn.setId("FluRefreshClusterBtn");
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -268,6 +271,7 @@ public class Manager
     private void getClusterCombo( HorizontalLayout controlsContent )
     {
         clusterCombo = new ComboBox();
+        clusterCombo.setId("FluClusterCombo");
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -309,9 +313,14 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            destroyBtn.setId(agent.getListIP().get(0)+"-flumeDestroy");
             final Button startBtn = new Button( START_BUTTON_CAPTION );
+            startBtn.setId(agent.getListIP().get(0)+"-flumeStart");
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
+            stopBtn.setId(agent.getListIP().get(0)+"-flumeStop");
+
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
+            checkBtn.setId(agent.getListIP().get(0)+"-flumeCheck");
 
             enableButton( stopBtn, startBtn, checkBtn, destroyBtn );
 

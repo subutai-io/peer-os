@@ -18,7 +18,7 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Accum
     public StartClusterOperationHandler( AccumuloImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        trackerOperation = manager.getTracker().createTrackerOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Starting cluster %s", clusterName ) );
     }
 
@@ -26,7 +26,7 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Accum
     @Override
     public UUID getTrackerId()
     {
-        return productOperation.getId();
+        return trackerOperation.getId();
     }
 
 
@@ -36,30 +36,30 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Accum
         AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null )
         {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            trackerOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() )
                 == null )
         {
-            productOperation.addLogFailed( String.format( "Master node '%s' is not connected",
+            trackerOperation.addLogFailed( String.format( "Master node '%s' is not connected",
                     accumuloClusterConfig.getMasterNode().getHostname() ) );
             return;
         }
 
-        productOperation.addLog( "Starting cluster..." );
+        trackerOperation.addLog( "Starting cluster..." );
 
         Command startCommand = manager.getCommands().getStartCommand( accumuloClusterConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( startCommand );
 
         if ( startCommand.hasSucceeded() )
         {
-            productOperation.addLogDone( "Cluster started successfully" );
+            trackerOperation.addLogDone( "Cluster started successfully" );
         }
         else
         {
-            productOperation.addLogFailed(
+            trackerOperation.addLogFailed(
                     String.format( "Failed to start cluster %s, %s", clusterName, startCommand.getAllErrors() ) );
         }
     }
