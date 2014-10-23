@@ -16,25 +16,25 @@ import org.safehaus.subutai.common.util.UUIDUtil;
  */
 public class EnvironmentBuildProcess
 {
-    private UUID uuid;
+    private UUID id;
     private ProcessStatusEnum processStatusEnum;
     private long timestamp;
     private Map<String, CloneContainersMessage> messageMap;
-    private UUID blueprintUUID;
+    private UUID blueprintId;
 
 
-    public EnvironmentBuildProcess( UUID blueprintUUID )
+    public EnvironmentBuildProcess( UUID blueprintId )
     {
-        this.blueprintUUID = blueprintUUID;
-        this.uuid = UUIDUtil.generateTimeBasedUUID();
+        this.blueprintId = blueprintId;
+        this.id = UUIDUtil.generateTimeBasedUUID();
         this.processStatusEnum = ProcessStatusEnum.NEW_PROCESS;
         this.messageMap = new HashMap<>();
     }
 
 
-    public UUID getBlueprintUUID()
+    public UUID getBlueprintId()
     {
-        return blueprintUUID;
+        return blueprintId;
     }
 
 
@@ -86,14 +86,14 @@ public class EnvironmentBuildProcess
     }
 
 
-    public UUID getUuid()
+    public UUID getId()
     {
-        return uuid;
+        return id;
     }
 
 
-    public void setUuid( final UUID uuid )
+    public void setId( final UUID id )
     {
-        this.uuid = uuid;
+        this.id = id;
     }
 }

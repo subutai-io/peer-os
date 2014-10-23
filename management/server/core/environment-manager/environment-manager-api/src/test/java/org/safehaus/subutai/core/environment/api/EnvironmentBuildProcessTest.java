@@ -53,8 +53,8 @@ public class EnvironmentBuildProcessTest
     public void testUuid() throws Exception
     {
         UUID uuid = UUIDUtil.generateTimeBasedUUID();
-        process.setUuid( uuid );
-        assertEquals( uuid, process.getUuid() );
+        process.setId( uuid );
+        assertEquals( uuid, process.getId() );
     }
 
 

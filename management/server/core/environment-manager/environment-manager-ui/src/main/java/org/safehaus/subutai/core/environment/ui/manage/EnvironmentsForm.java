@@ -117,7 +117,7 @@ public class EnvironmentsForm
                 {
                     try
                     {
-                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getUuid().toString() );
+                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId().toString() );
                         environmentsButton.click();
                     }
                     catch ( EnvironmentDestroyException e )
@@ -142,9 +142,9 @@ public class EnvironmentsForm
 
             String cdate = getCreationDate( environment.getCreationTimestamp() );
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), environment.getUuid().toString(), cdate, environment.getStatus().toString(),
+                    environment.getName(), environment.getId().toString(), cdate, environment.getStatus().toString(),
                     manageButton, configureButton, destroyButton
-            }, environment.getUuid() );
+            }, environment.getId() );
         }
         environmentsTable.refreshRowCache();
     }

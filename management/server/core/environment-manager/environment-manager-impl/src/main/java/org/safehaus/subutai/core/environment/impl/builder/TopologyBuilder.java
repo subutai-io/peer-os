@@ -33,7 +33,7 @@ public class TopologyBuilder
 
             if ( !process.getMessageMap().containsKey( key.toString() ) )
             {
-                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
+                CloneContainersMessage ccm = new CloneContainersMessage( process.getId(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
                 ccm.setNumberOfNodes( 1 );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );
@@ -64,7 +64,7 @@ public class TopologyBuilder
 
             if ( !process.getMessageMap().containsKey( key ) )
             {
-                CloneContainersMessage ccm = new CloneContainersMessage( process.getUuid(), peer.getId() );
+                CloneContainersMessage ccm = new CloneContainersMessage( process.getId(), peer.getId() );
                 ccm.setTemplate( ng.getTemplateName() );
                 ccm.setNumberOfNodes( ng.getNumberOfNodes() );
                 ccm.setStrategy( ng.getPlacementStrategy().toString() );

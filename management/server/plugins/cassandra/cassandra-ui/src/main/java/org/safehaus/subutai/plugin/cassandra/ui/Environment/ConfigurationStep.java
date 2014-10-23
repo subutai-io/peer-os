@@ -114,7 +114,7 @@ public class ConfigurationStep extends VerticalLayout
             public void valueChange( Property.ValueChangeEvent event )
             {
                 Environment e = ( Environment ) event.getProperty().getValue();
-                environmentWizard.getConfig().setEnvironmentId( e.getUuid() );
+                environmentWizard.getConfig().setEnvironmentId( e.getId() );
             }
         } );
 

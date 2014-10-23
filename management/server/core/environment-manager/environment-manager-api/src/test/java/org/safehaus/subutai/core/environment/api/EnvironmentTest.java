@@ -61,7 +61,7 @@ public class EnvironmentTest
     @Test
     public void testUUIDNotNull() throws Exception
     {
-        UUID uuid = environment.getUuid();
+        UUID uuid = environment.getId();
         assertNotNull( uuid );
     }
 

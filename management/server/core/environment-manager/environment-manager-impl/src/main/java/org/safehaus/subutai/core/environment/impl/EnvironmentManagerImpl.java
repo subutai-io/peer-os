@@ -332,14 +332,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void saveEnvironment( final Environment environment )
     {
-        environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+        environmentDAO.saveInfo( ENVIRONMENT, environment.getId().toString(), environment );
     }
 
 
     @Override
     public boolean saveBuildProcess( final EnvironmentBuildProcess buildProgress )
     {
-        return environmentDAO.saveInfo( PROCESS, buildProgress.getUuid().toString(), buildProgress );
+        return environmentDAO.saveInfo( PROCESS, buildProgress.getId().toString(), buildProgress );
     }
 
 
@@ -355,7 +355,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         try
         {
-            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintUUID() );
+            EnvironmentBlueprint blueprint = environmentDAO.getBlueprint( process.getBlueprintId() );
 
             Environment environment = new Environment( blueprint.getName() );
             saveEnvironment( environment );
@@ -366,7 +366,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             for ( String key : process.getMessageMap().keySet() )
             {
                 CloneContainersMessage ccm = process.getMessageMap().get( key );
-                ccm.setEnvId( environment.getUuid() );
+                ccm.setEnvId( environment.getId() );
 
                 containerCount = containerCount + ccm.getNumberOfNodes();
                 timeout = 1000 * 30 * ccm.getNumberOfNodes();
@@ -502,7 +502,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public void deleteBuildProcess( final EnvironmentBuildProcess environmentBuildProcess )
     {
-        environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getUuid().toString() );
+        environmentDAO.deleteInfo( PROCESS, environmentBuildProcess.getId().toString() );
     }
 
 
@@ -534,7 +534,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         for ( UUID peerId : peers )
         {
             PeerCommandMessage cmd =
-                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, environment.getUuid(), peerId,
+                    new DefaultCommandMessage( PeerCommandType.GET_CONNECTED_CONTAINERS, environment.getId(), peerId,
                             null );
 
             peerCommandDispatcher.invoke( cmd, TIMEOUT );
@@ -549,7 +549,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 for ( Container c : containers )
                 {
                     EnvironmentContainer ec = new EnvironmentContainer();
-                    ec.setEnvironmentId( environment.getUuid() );
+                    ec.setEnvironmentId( environment.getId() );
 
                     ec.setAgentId( c.getAgentId() );
                     ec.setPeerId( c.getPeerId() );
@@ -603,7 +603,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
         if ( process != null )
         {
-            return environmentDAO.saveInfo( PROCESS, process.getUuid().toString(), process );
+            return environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
         }
         else
         {
