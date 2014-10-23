@@ -19,7 +19,7 @@ public interface PeerInterface
 
     public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
-    public Set<ContainerHost> createContainers( UUID environmentId, String templateName, int quantity,
+    public Set<ContainerHost> createContainers( UUID ownerPeerId, UUID environmentId, String templateName, int quantity,
                                                 String strategyId, List<Criteria> criteria )
             throws ContainerCreateException;
 

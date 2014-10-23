@@ -24,4 +24,6 @@ public interface ResourceHost extends Host
     public void addContainerHost( ContainerHost containerHost );
 
     public ServerMetric getMetric() throws CommandException;
+
+    public Set<ContainerHost> getContainerHosts();
 }
