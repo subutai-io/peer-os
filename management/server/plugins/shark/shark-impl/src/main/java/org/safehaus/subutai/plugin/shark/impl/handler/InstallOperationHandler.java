@@ -108,7 +108,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         {
             try
             {
-                manager.getEnvironmentManager().destroyEnvironment( env.getUuid().toString() );
+                manager.getEnvironmentManager().destroyEnvironment( env.getId().toString() );
                 trackerOperation.addLog( "Environment destroyed" );
             }
             catch ( EnvironmentDestroyException ex )

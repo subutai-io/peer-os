@@ -92,7 +92,7 @@ public class EnvironmentBuilder
             try
             {
                 Set<Agent> agents = containerManager
-                        .clone( environment.getUuid(), template.getTemplateName(), nodeGroup.getNumberOfNodes(),
+                        .clone( environment.getId(), template.getTemplateName(), nodeGroup.getNumberOfNodes(),
                                 physicalAgents, placementStrategy );
                 for ( Agent agent : agents )
                 {
