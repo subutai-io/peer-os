@@ -1,11 +1,13 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -24,7 +26,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.AddNodeOperationHandler;
@@ -37,6 +39,8 @@ import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StartNodeOperation
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.elasticsearch.impl.handler.UninstallOperationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -45,7 +49,8 @@ import com.google.common.collect.Sets;
 
 public class ElasticsearchImpl implements Elasticsearch
 {
-    private static final Logger LOG = Logger.getLogger( ElasticsearchImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ElasticsearchImpl.class.getName() );
+    DataSource dataSource;
     private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
@@ -53,15 +58,27 @@ public class ElasticsearchImpl implements Elasticsearch
     private NetworkManager networkManager;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private PluginDAO pluginDAO;
+    private PluginDaoNew pluginDAO;
     private ContainerManager containerManager;
     private EnvironmentManager environmentManager;
     private Commands commands;
 
 
-    public PluginDAO getPluginDAO()
+    public ElasticsearchImpl( DataSource dataSource )
+    {
+        this.dataSource = dataSource;
+    }
+
+
+    public PluginDaoNew getPluginDAO()
     {
         return pluginDAO;
+    }
+
+
+    public void setPluginDAO( final PluginDaoNew pluginDAO )
+    {
+        this.pluginDAO = pluginDAO;
     }
 
 
@@ -71,7 +88,7 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public void setCommandRunner( CommandRunner commandRunner )
+    public void setCommandRunner( final CommandRunner commandRunner )
     {
         this.commandRunner = commandRunner;
     }
@@ -95,7 +112,7 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public void setDbManager( DbManager dbManager )
+    public void setDbManager( final DbManager dbManager )
     {
         this.dbManager = dbManager;
     }
@@ -107,7 +124,7 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public void setAgentManager( AgentManager agentManager )
+    public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
     }
@@ -125,13 +142,37 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
+    public void setLxcManager( final LxcManager lxcManager )
+    {
+        this.lxcManager = lxcManager;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
+        this.networkManager = networkManager;
+    }
+
+
+    public void setDataSource( final DataSource dataSource )
+    {
+        this.dataSource = dataSource;
+    }
+
+
     public Tracker getTracker()
     {
         return tracker;
     }
 
 
-    public void setTracker( Tracker tracker )
+    public void setTracker( final Tracker tracker )
     {
         this.tracker = tracker;
     }
@@ -139,8 +180,16 @@ public class ElasticsearchImpl implements Elasticsearch
 
     public void init()
     {
-        commands = new Commands( commandRunner );
-        this.pluginDAO = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDaoNew( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        this.commands = new Commands( commandRunner );
+
         executor = Executors.newCachedThreadPool();
     }
 
@@ -151,21 +200,15 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
+    public void setCommands( final Commands commands )
+    {
+        this.commands = commands;
+    }
+
+
     public void destroy()
     {
         executor.shutdown();
-    }
-
-
-    public void setLxcManager( LxcManager lxcManager )
-    {
-        this.lxcManager = lxcManager;
-    }
-
-
-    public void setNetworkManager( NetworkManager networkManager )
-    {
-        this.networkManager = networkManager;
     }
 
 

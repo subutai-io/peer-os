@@ -39,15 +39,9 @@ public class Commands
     public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
-<<<<<<< HEAD
                 new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 360 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
-=======
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 600 )
-                                                                                              .withStdOutRedirection(
-                                                                                                      OutputRedirection.NO ),
->>>>>>> master
                 agents );
     }
 
@@ -55,11 +49,7 @@ public class Commands
     public Command getUninstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
-<<<<<<< HEAD
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ),
-=======
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-accumulo" ).withTimeout( 600 ),
->>>>>>> master
                 agents );
     }
 
