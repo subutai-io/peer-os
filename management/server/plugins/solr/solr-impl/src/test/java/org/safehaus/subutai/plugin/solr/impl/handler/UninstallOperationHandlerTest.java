@@ -28,6 +28,7 @@ public class UninstallOperationHandlerTest
     }
 
 
+    @Ignore
     @Test
     public void testClusterDeletionSuccess()
     {

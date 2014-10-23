@@ -1,7 +1,10 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
@@ -23,8 +26,10 @@ public class SolrImplMock extends SolrImpl
 
     public SolrImplMock()
     {
-        super( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
-                mock( EnvironmentManager.class ), mock( ContainerManager.class ) );
+        super( mock( DataSource.class ) );
+        setCommandRunner( mock( CommandRunner.class ) );
+        setAgentManager( mock( AgentManager.class ) );
+        setTracker( new TrackerMock() );
     }
 
 
@@ -48,10 +53,4 @@ public class SolrImplMock extends SolrImpl
         return clusterSolrClusterConfig;
     }
 
-
-    public SolrImplMock setAgentManager( AgentManager agentManager )
-    {
-        this.agentManager = agentManager;
-        return this;
-    }
 }
