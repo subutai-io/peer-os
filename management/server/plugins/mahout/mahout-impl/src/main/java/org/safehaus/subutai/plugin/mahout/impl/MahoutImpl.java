@@ -30,12 +30,12 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDaoNew;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.SetupType;
-import org.safehaus.subutai.plugin.mahout.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.InstallHandler;
@@ -51,7 +51,7 @@ public class MahoutImpl implements Mahout
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( MahoutImpl.class.getName() );
-    private PluginDAO pluginDAO;
+    private PluginDaoNew pluginDAO;
     private Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
@@ -70,13 +70,13 @@ public class MahoutImpl implements Mahout
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDaoNew getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDAO pluginDAO )
+    public void setPluginDAO( final PluginDaoNew pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }
@@ -188,7 +188,7 @@ public class MahoutImpl implements Mahout
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
+            this.pluginDAO = new PluginDaoNew( dataSource );
         }
         catch ( SQLException e )
         {
