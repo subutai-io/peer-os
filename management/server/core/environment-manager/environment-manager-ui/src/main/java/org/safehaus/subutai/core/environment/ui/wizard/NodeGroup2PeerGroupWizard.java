@@ -1,11 +1,18 @@
 package org.safehaus.subutai.core.environment.ui.wizard;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
+import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerGroup;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -13,6 +20,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -63,7 +71,6 @@ public class NodeGroup2PeerGroupWizard extends Window
             case 2:
             {
                 setContent( generateNodeGroupLayout() );
-                close();
                 break;
             }
             default:
@@ -75,20 +82,39 @@ public class NodeGroup2PeerGroupWizard extends Window
     }
 
 
+    private Table ngTopgTable;
+    private Map<Object, NodeGroup> nodeGroupMap;
+
+
     private Component generateNodeGroupLayout()
     {
+
         VerticalLayout vl = new VerticalLayout();
         vl.setMargin( true );
 
-        List<PeerGroup> peerGroups = module.getPeerManager().peersGroups();
-
-        BeanItemContainer<PeerGroup> bic = new BeanItemContainer<>( PeerGroup.class );
-        bic.addAll( peerGroups );
-
-        peerGroupsCombo.setContainerDataSource( bic );
-        peerGroupsCombo.setNullSelectionAllowed( false );
-        peerGroupsCombo.setTextInputAllowed( false );
-        peerGroupsCombo.setItemCaptionPropertyId( "name" );
+        ngTopgTable = new Table();
+        ngTopgTable.addContainerProperty( "Node Group", String.class, null );
+        ngTopgTable.addContainerProperty( "Put", ComboBox.class, null );
+        ngTopgTable.setPageLength( 10 );
+        ngTopgTable.setSelectable( false );
+        ngTopgTable.setEnabled( true );
+        ngTopgTable.setImmediate( true );
+        ngTopgTable.setSizeFull();
+        nodeGroupMap = new HashMap<>();
+        for ( NodeGroup ng : blueprint.getNodeGroups() )
+        {
+            ComboBox comboBox = new ComboBox();
+            BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
+            bic.addAll( selectedPeers() );
+            comboBox.setContainerDataSource( bic );
+            comboBox.setNullSelectionAllowed( false );
+            comboBox.setTextInputAllowed( false );
+            comboBox.setItemCaptionPropertyId( "name" );
+            Object itemId = ngTopgTable.addItem( new Object[] {
+                    ng.getName(), comboBox
+            }, null );
+            nodeGroupMap.put( itemId, ng );
+        }
 
         Button nextButton = new Button( "Next" );
         nextButton.addClickListener( new Button.ClickListener()
@@ -117,9 +143,23 @@ public class NodeGroup2PeerGroupWizard extends Window
         } );
 
 
-        vl.addComponent( peerGroupsCombo );
+        vl.addComponent( ngTopgTable );
         vl.addComponent( nextButton );
         return vl;
+    }
+
+
+    private Set<Peer> selectedPeers()
+    {
+        Set<Peer> peerSet = new HashSet<>();
+        PeerGroup peerGroup = getSelectedPeerGroup();
+        for ( UUID uuid : peerGroup.getPeerIds() )
+        {
+            Peer peer = module.getPeerManager().getPeerByUUID( uuid );
+            peerSet.add( peer );
+        }
+
+        return peerSet;
     }
 
 
