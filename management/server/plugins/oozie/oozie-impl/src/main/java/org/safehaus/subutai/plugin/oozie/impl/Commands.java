@@ -67,6 +67,7 @@ public class Commands
     {
 
         return commandRunnerBase.createCommand(
+
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + SERVER_PACKAGE_NAME )
                         .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
@@ -76,6 +77,7 @@ public class Commands
     {
 
         return commandRunnerBase.createCommand(
+
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + CLIENT_PACKAGE_NAME )
                         .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
@@ -120,9 +122,11 @@ public class Commands
     public Command getUninstallServerCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
+
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + SERVER_PACKAGE_NAME ).withTimeout( 90 )
                                                                                                      .withStdOutRedirection(
                                                                                                              OutputRedirection.NO ),
+
                 agents );
     }
 
@@ -130,9 +134,11 @@ public class Commands
     public Command getUninstallClientsCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
+
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge " + CLIENT_PACKAGE_NAME ).withTimeout( 90 )
                                                                                                      .withStdOutRedirection(
                                                                                                              OutputRedirection.NO ),
+
                 agents );
     }
 

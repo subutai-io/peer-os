@@ -28,6 +28,7 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     private Set<Agent> dataNodes = new HashSet<>();
 
 
+
     public static String getTemplateName()
     {
         return templateName;

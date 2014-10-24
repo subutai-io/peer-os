@@ -42,8 +42,9 @@ public class CassandraComponent extends CustomComponent
         sheet.addTab( wizard.getContent(), "Install" );
         sheet.getTab( 0 ).setId( "CassandraInstallTab" );
         sheet.addTab( environmentWizard.getContent(), "Configure environment" );
+        sheet.getTab( 1 ).setId( "CassandraConfigureEnviromentTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab( 1 ).setId( "CassandraManageTab" );
+        sheet.getTab( 2 ).setId( "CassandraManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

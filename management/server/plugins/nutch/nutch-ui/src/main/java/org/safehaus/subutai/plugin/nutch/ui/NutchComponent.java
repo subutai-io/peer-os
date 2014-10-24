@@ -35,7 +35,9 @@ public class NutchComponent extends CustomComponent
         final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
+        sheet.getTab( 0 ).setId( "NutchInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
+        sheet.getTab( 1 ).setId( "NutchManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

@@ -165,7 +165,7 @@ public class Manager
         addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId( "spinner" );
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -543,12 +543,16 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
+            checkButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchCheck" );
             final Button startButton = new Button( START_BUTTON_CAPTION );
+            startButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchStart" );
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
+            stopButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchStop" );
 
             addStyleNameToButtons( checkButton, startButton, stopButton );
             enableButtons( startButton, stopButton );
             PROGRESS_ICON.setVisible( false );
+            PROGRESS_ICON.setId( "indicator" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );

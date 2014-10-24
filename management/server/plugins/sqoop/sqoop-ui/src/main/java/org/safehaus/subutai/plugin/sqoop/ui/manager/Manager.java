@@ -310,6 +310,25 @@ public class Manager
     }
 
 
+
+
+    public void addStyleNameToButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.addStyleName( BUTTON_STYLE_NAME );
+        }
+    }
+
+
+    public void addGivenComponents( Layout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
     private void populateTable( final Table table, Collection<Agent> agents )
     {
 
@@ -363,22 +382,6 @@ public class Manager
     }
 
 
-    public void addStyleNameToButtons( Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            b.addStyleName( BUTTON_STYLE_NAME );
-        }
-    }
-
-
-    public void addGivenComponents( Layout layout, Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            layout.addComponent( b );
-        }
-    }
 
 
     public void addClickListenerToDestroyButton( final Agent agent, Button destroyBtn )

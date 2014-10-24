@@ -63,12 +63,6 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    public synchronized void incrementProcessCount()
-    {
-        processCount++;
-    }
-
-
     public synchronized void disableProgressBar()
     {
         if ( processCount > 0 )
@@ -82,10 +76,16 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
+    public synchronized void incrementProcessCount()
+    {
+        processCount++;
+    }
+
     public synchronized void decrementProcessCount()
     {
         processCount--;
     }
+
 
 
     public HorizontalLayout getStatusLayout( final Item row )
@@ -243,6 +243,7 @@ public abstract class BaseManager implements BaseManagerInterface
             }
         }
     }
+
 
 
     public HorizontalLayout getAvailableOperationsLayout( Item row )

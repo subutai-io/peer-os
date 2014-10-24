@@ -292,6 +292,7 @@ public class Manager extends BaseManager
     }
 
 
+
     private void populateServerTable( final Table table, final Agent agent )
     {
         List<Agent> agentList = new ArrayList<>();
@@ -360,6 +361,7 @@ public class Manager extends BaseManager
 
     public Table createTableTemplate( String caption )
     {
+
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
@@ -412,6 +414,7 @@ public class Manager extends BaseManager
 
     protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
     {
+
         if ( availableOperationsLayout == null )
         {
             return null;
@@ -743,4 +746,5 @@ public class Manager extends BaseManager
             }
         };
     }
+
 }
