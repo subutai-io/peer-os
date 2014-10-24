@@ -4,7 +4,10 @@ package org.safehaus.subutai.core.peer.rest;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -16,11 +19,15 @@ import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.container.api.ContainerCreateException;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.PeerStatus;
 import org.safehaus.subutai.core.peer.api.message.PeerMessageException;
+import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -272,5 +279,27 @@ public class RestServiceImpl implements RestService
 
 
         return "127.0.0.1";
+    }
+
+
+    @Override
+    public Response createContainers( final String ownerPeerId, final String environmentId, final String templateName,
+                                      final int quantity, final String strategyId, final String criteria )
+    {
+
+        //TODO: Implement criteria restoring
+        List<Criteria> criteriaList = new ArrayList();
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            Set<ContainerHost> result = localPeer
+                    .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ), templateName,
+                            quantity, strategyId, criteriaList );
+            return Response.ok( JsonUtil.toJson( result ) ).build();
+        }
+        catch ( ContainerCreateException e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
     }
 }

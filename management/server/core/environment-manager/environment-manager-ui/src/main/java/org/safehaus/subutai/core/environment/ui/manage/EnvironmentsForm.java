@@ -117,7 +117,7 @@ public class EnvironmentsForm
                 {
                     try
                     {
-                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getUuid().toString() );
+                        managerUI.getEnvironmentManager().destroyEnvironment( environment.getId().toString() );
                         environmentsButton.click();
                     }
                     catch ( EnvironmentDestroyException e )
@@ -142,9 +142,9 @@ public class EnvironmentsForm
 
             String cdate = getCreationDate( environment.getCreationTimestamp() );
             environmentsTable.addItem( new Object[] {
-                    environment.getName(), environment.getUuid().toString(), cdate, environment.getStatus().toString(),
+                    environment.getName(), environment.getId().toString(), cdate, environment.getStatus().toString(),
                     manageButton, configureButton, destroyButton
-            }, environment.getUuid() );
+            }, environment.getId() );
         }
         environmentsTable.refreshRowCache();
     }
@@ -223,6 +223,7 @@ public class EnvironmentsForm
 
         Table containersTable = new Table();
         containersTable.addContainerProperty( NAME, String.class, null );
+        containersTable.addContainerProperty( "Peer", String.class, null );
         containersTable.addContainerProperty( PROPERTIES, Button.class, null );
         containersTable.addContainerProperty( START, Button.class, null );
         containersTable.addContainerProperty( STOP, Button.class, null );
@@ -237,7 +238,7 @@ public class EnvironmentsForm
         {
 
             containersTable.addItem( new Object[] {
-                    container.getName() + " on " + container.getPeerId(), propertiesButton( container ),
+                    container.getName(), container.getPeerId().toString(), propertiesButton( container ),
                     startButton( environment, container ), stopButton( environment, container ),
                     destroyButton( environment, container )
             }, null );

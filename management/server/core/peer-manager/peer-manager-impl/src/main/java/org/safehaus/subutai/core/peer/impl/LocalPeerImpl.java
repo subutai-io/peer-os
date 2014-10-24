@@ -70,9 +70,9 @@ public class LocalPeerImpl extends Peer implements LocalPeer
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID environmentId, final String templateName, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria )
-            throws ContainerCreateException
+    public Set<ContainerHost> createContainers( final UUID ownerPeerId, final UUID environmentId,
+                                                final String templateName, final int quantity, final String strategyId,
+                                                final List<Criteria> criteria ) throws ContainerCreateException
     {
         Set<Agent> agents = containerManager.clone( environmentId, templateName, quantity, strategyId, criteria );
         Set<ContainerHost> result = new HashSet<>();
@@ -81,9 +81,11 @@ public class LocalPeerImpl extends Peer implements LocalPeer
             for ( Agent agent : agents )
             {
                 ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-                ContainerHost containerHost = new ContainerHostImpl();
+                ContainerHostImpl containerHost = new ContainerHostImpl();
                 containerHost.setParentAgent( resourceHost.getAgent() );
                 containerHost.setAgent( agent );
+                containerHost.setOwnerPeerId( ownerPeerId );
+                containerHost.setTemplateName( templateName );
                 resourceHost.addContainerHost( containerHost );
                 result.add( containerHost );
             }
@@ -165,6 +167,34 @@ public class LocalPeerImpl extends Peer implements LocalPeer
     }
 
 
+    private Host findHostByName( String hostname ) throws PeerException
+    {
+        Host result = null;
+        ManagementHost managementHost = getManagementHost();
+        if ( managementHost.getHostname().equals( hostname ) )
+        {
+            result = managementHost;
+        }
+        else
+        {
+            Iterator<ResourceHost> iterator = managementHost.getResourceHosts().iterator();
+            while ( result == null && iterator.hasNext() )
+            {
+                ResourceHost rh = iterator.next();
+                if ( rh.getHostname().equals( hostname ) )
+                {
+                    result = rh;
+                }
+                else
+                {
+                    result = rh.getContainerHostByName( hostname );
+                }
+            }
+        }
+        return result;
+    }
+
+
     @Override
     public void startContainer( final ContainerHost containerHost ) throws PeerException, CommandException
     {
@@ -191,7 +221,12 @@ public class LocalPeerImpl extends Peer implements LocalPeer
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        return peerManager.isConnected( host );
+        Host result = findHostByName( host.getHostname() );
+        if ( result == null )
+        {
+            throw new PeerException( "Host not found." );
+        }
+        return result.isConnected();
     }
 
 

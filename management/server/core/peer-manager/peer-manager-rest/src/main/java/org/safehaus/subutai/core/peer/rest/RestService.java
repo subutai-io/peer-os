@@ -66,6 +66,16 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public Response invoke( @FormParam("commandType") String commandType, @FormParam("command") String command );
 
+
+    @POST
+    @Path("container/create")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createContainers( @FormParam( "ownerPeerId" ) String ownerPeerId,
+                                      @FormParam("environmentId") String environmentId,
+                                      @FormParam("templateName") String templateName,
+                                      @FormParam("quantity") int quantity, @FormParam("strategyId") String strategyId,
+                                      @FormParam("criteria") String criteria );
+
     @GET
     @Path("ping")
     public Response ping();

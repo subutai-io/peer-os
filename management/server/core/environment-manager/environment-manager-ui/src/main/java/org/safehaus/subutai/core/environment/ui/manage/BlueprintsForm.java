@@ -3,7 +3,7 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
 import org.safehaus.subutai.core.environment.ui.wizard.Blueprint2PeerGroupWizard;
 import org.safehaus.subutai.core.environment.ui.wizard.Node2PeerWizard;
@@ -84,10 +84,10 @@ public class BlueprintsForm
     private void updateTableData()
     {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildTask> tasks = module.getEnvironmentManager().getBlueprints();
+        List<EnvironmentBlueprint> tasks = module.getEnvironmentManager().getBlueprints();
         if ( !tasks.isEmpty() )
         {
-            for ( final EnvironmentBuildTask task : tasks )
+            for ( final EnvironmentBlueprint blueprint : tasks )
             {
 
                 final Button view = new Button( VIEW );
@@ -96,7 +96,7 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        Window window = blueprintDetails( task );
+                        Window window = blueprintDetails( blueprint );
                         contentRoot.getUI().addWindow( window );
                         window.setVisible( true );
                     }
@@ -108,7 +108,7 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        Node2PeerWizard node2PeerWizard = new Node2PeerWizard( N2P, module, task );
+                        Node2PeerWizard node2PeerWizard = new Node2PeerWizard( N2P, module, blueprint );
                         contentRoot.getUI().addWindow( node2PeerWizard );
                         node2PeerWizard.setVisible( true );
                     }
@@ -120,7 +120,8 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        Blueprint2PeerGroupWizard node2PeerWizard = new Blueprint2PeerGroupWizard( B2PG, module, task );
+                        Blueprint2PeerGroupWizard node2PeerWizard =
+                                new Blueprint2PeerGroupWizard( B2PG, module, blueprint );
                         contentRoot.getUI().addWindow( node2PeerWizard );
                         node2PeerWizard.setVisible( true );
                     }
@@ -133,7 +134,7 @@ public class BlueprintsForm
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         NodeGroup2PeerGroupWizard node2PeerWizard =
-                                new NodeGroup2PeerGroupWizard( NG2PG, module, task );
+                                new NodeGroup2PeerGroupWizard( NG2PG, module, blueprint );
                         contentRoot.getUI().addWindow( node2PeerWizard );
                         node2PeerWizard.setVisible( true );
                     }
@@ -145,7 +146,7 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        NodeGroup2PeerWizard node2PeerWizard = new NodeGroup2PeerWizard( NG2P, module, task );
+                        NodeGroup2PeerWizard node2PeerWizard = new NodeGroup2PeerWizard( NG2P, module, blueprint );
                         contentRoot.getUI().addWindow( node2PeerWizard );
                         node2PeerWizard.setVisible( true );
                     }
@@ -157,13 +158,21 @@ public class BlueprintsForm
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        module.getEnvironmentManager().deleteBlueprint( task.getUuid().toString() );
-                        environmentsButton.click();
+                        boolean result = module.getEnvironmentManager().deleteBlueprint( blueprint.getId() );
+                        if ( result )
+                        {
+                            Notification.show( "Blueprint deleted" );
+                            environmentsButton.click();
+                        }
+                        else
+                        {
+                            Notification.show( "Problem deleting blueprint." );
+                        }
                     }
                 } );
 
                 environmentsTable.addItem( new Object[] {
-                        task.getEnvironmentBlueprint().getName(), view, N2P_BTN, NG2P_BTN, B2PG_BTN, NG2PG_BTN, delete
+                        blueprint.getName(), view, N2P_BTN, NG2P_BTN, B2PG_BTN, NG2PG_BTN, delete
                 }, null );
             }
         }
@@ -175,12 +184,12 @@ public class BlueprintsForm
     }
 
 
-    private Window blueprintDetails( final EnvironmentBuildTask task )
+    private Window blueprintDetails( final EnvironmentBlueprint blueprint )
     {
         Window window = createWindow( "Blueprint details" );
         TextArea area = new TextArea();
         area.setSizeFull();
-        area.setValue( GSON.toJson( task.getEnvironmentBlueprint() ) );
+        area.setValue( GSON.toJson( blueprint ) );
         window.setContent( area );
         return window;
     }

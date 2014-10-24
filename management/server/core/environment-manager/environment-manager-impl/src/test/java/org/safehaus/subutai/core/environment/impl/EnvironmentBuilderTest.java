@@ -58,8 +58,7 @@ public class EnvironmentBuilderTest
     public void test() throws EnvironmentBuildException
     {
 
-        EnvironmentBuildTask task = createTask();
-        environmentBuilder.build( task );
+
     }
 
 
