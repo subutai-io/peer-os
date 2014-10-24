@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
@@ -16,6 +17,12 @@ public class ManagementHostImpl extends HostImpl implements ManagementHost
 {
     //    private static final String DEFAULT_MANAGEMENT_HOSTNAME = "management";
     private Set<ResourceHost> resourceHosts = new HashSet();
+
+
+    protected ManagementHostImpl( final Agent agent )
+    {
+        super( agent );
+    }
 
 
     @Override

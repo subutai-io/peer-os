@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.peer.api;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
 

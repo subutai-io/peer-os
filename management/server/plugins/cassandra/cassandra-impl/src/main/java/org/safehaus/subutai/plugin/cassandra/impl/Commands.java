@@ -16,7 +16,7 @@ import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 import com.google.common.base.Preconditions;

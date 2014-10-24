@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.collect.Sets;

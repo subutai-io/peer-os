@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.enums.ResponseType;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CloneContainersMessage;
@@ -29,6 +30,7 @@ import org.safehaus.subutai.common.protocol.DestroyContainersMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.protocol.Template;
@@ -39,8 +41,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandException;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerDestroyException;
@@ -442,8 +442,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 params.put( Common.ENV_ID_PARAM_NAME, environmentId );
                 String response = RestUtil.get( String.format( Common.GET_AGENTS_URL, peer.getIp() ), params );
                 return JsonUtil.fromJson( response, new TypeToken<Set<Agent>>()
-                {
-                }.getType() );
+                {}.getType() );
             }
             catch ( JsonSyntaxException | HTTPException e )
             {
@@ -954,8 +953,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             {
                 if ( managementHost == null )
                 {
-                    managementHost = new ManagementHostImpl();
-                    managementHost.setAgent( PeerUtils.buildAgent( response ) );
+                    managementHost = new ManagementHostImpl( PeerUtils.buildAgent( response ) );
                     managementHost.setParentAgent( NullAgent.getInstance() );
                 }
                 managementHost.updateHeartbeat();
@@ -972,8 +970,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 ResourceHost host = managementHost.getResourceHostByName( response.getHostname() );
                 if ( host == null )
                 {
-                    host = new ResourceHostImpl();
-                    host.setAgent( PeerUtils.buildAgent( response ) );
+                    host = new ResourceHostImpl( PeerUtils.buildAgent( response ) );
                     host.setParentAgent( managementHost.getAgent() );
                     managementHost.addResourceHost( host );
                 }
@@ -991,8 +988,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
 
             if ( containerHost == null )
             {
-                containerHost = new ContainerHostImpl();
-                containerHost.setAgent( PeerUtils.buildAgent( response ) );
+                containerHost = new ContainerHostImpl( PeerUtils.buildAgent( response ) );
                 containerHost.setParentAgent( resourceHost.getAgent() );
                 resourceHost.addContainerHost( containerHost );
             }

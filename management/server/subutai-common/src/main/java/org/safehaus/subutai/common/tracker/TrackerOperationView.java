@@ -11,43 +11,43 @@ import java.util.UUID;
 
 
 /**
- * This is an interface for product operation view
+ * This is an interface for operation view
  */
 public interface TrackerOperationView
 {
 
     /**
-     * Returns product operation description
+     * Returns operation description
      *
-     * @return product operation description
+     * @return operation description
      */
     public String getDescription();
 
     /**
-     * Returns product operation creation date
+     * Returns operation creation date
      *
-     * @return product operation create date
+     * @return operation create date
      */
     public Date getCreateDate();
 
     /**
-     * Returns id of product operation
+     * Returns id of operation
      *
-     * @return product operation id
+     * @return operation id
      */
     public UUID getId();
 
     /**
-     * Returns product operation log
+     * Returns operation log
      *
-     * @return log of product operation
+     * @return log of operation
      */
     public String getLog();
 
     /**
-     * Returns state of product operation
+     * Returns state of operation
      *
-     * @return product operation state
+     * @return operation state
      */
     public OperationState getState();
 }
