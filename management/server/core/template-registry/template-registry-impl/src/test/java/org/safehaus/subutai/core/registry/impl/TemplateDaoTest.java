@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.common.util.JsonUtil;

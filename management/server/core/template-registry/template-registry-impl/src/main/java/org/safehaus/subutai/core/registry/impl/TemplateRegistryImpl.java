@@ -21,10 +21,11 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.protocol.Template;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;

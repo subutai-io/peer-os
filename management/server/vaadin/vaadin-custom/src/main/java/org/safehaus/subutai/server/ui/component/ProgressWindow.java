@@ -9,14 +9,13 @@ package org.safehaus.subutai.server.ui.component;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -120,8 +119,8 @@ public class ProgressWindow
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
 
-                        if ( po.getState() == ProductOperationState.SUCCEEDED
-                                || po.getState() == ProductOperationState.FAILED )
+                        if ( po.getState() == OperationState.SUCCEEDED
+                                || po.getState() == OperationState.FAILED )
                         {
                             hideProgress();
                             break;
@@ -158,7 +157,7 @@ public class ProgressWindow
     {
         try
         {
-            VaadinSession.getCurrent().getLockInstance().lock();
+//            VaadinSession.getCurrent().getLockInstance().lock();
 
             if ( !Strings.isNullOrEmpty( output ) )
             {
@@ -168,7 +167,7 @@ public class ProgressWindow
         }
         finally
         {
-            VaadinSession.getCurrent().getLockInstance().unlock();
+//            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
 

@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
@@ -103,7 +103,7 @@ public class AddNodeWindow extends Window
                             {
                                 setOutput(
                                         po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                                if ( po.getState() != ProductOperationState.RUNNING )
+                                if ( po.getState() != OperationState.RUNNING )
                                 {
 
                                     hideProgress();

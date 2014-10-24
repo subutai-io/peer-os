@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -355,11 +355,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean running = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean running = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( !running );
                             stopBtn.setEnabled( running );
@@ -397,11 +397,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean started = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean started = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( !started );
                             stopBtn.setEnabled( started );
@@ -439,11 +439,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean stopped = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean stopped = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( stopped );
                             stopBtn.setEnabled( !stopped );
@@ -481,11 +481,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean ok = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean ok = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( !ok );
                             stopBtn.setEnabled( ok );

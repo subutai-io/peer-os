@@ -17,8 +17,8 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -64,8 +64,9 @@ public class TrackerImpl implements Tracker
     {
 
         String sql =
-                "SET MAX_LENGTH_INPLACE_LOB 2048; create table if not exists product_operation(source varchar(100), " +
-                        "id uuid, ts timestamp, " + "info clob, PRIMARY KEY (source, id));";
+                "SET MAX_LENGTH_INPLACE_LOB 2048; create table if not exists tracker_operation(source varchar(100), " +
+                        "id uuid, ts timestamp, "
+                        + "info clob, PRIMARY KEY (source, id));";
 
         dbUtil.update( sql );
     }
@@ -89,7 +90,7 @@ public class TrackerImpl implements Tracker
             ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and id = ?",
                     source.toLowerCase(), operationTrackId );
 
-            return constructProductOperation( rs );
+            return createTrackerOperation( rs );
         }
         catch ( SQLException | RuntimeException e )
         {
@@ -99,7 +100,7 @@ public class TrackerImpl implements Tracker
     }
 
 
-    private TrackerOperationViewImpl constructProductOperation( ResultSet rs ) throws SQLException
+    private TrackerOperationViewImpl createTrackerOperation( ResultSet rs ) throws SQLException
     {
         if ( rs != null && rs.next() )
         {
@@ -123,20 +124,20 @@ public class TrackerImpl implements Tracker
      *
      * @return - true if all went well, false otherwise
      */
-    boolean saveProductOperation( String source, TrackerOperationImpl po )
+    boolean saveTrackerOperation( String source, TrackerOperationImpl po )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
-        Preconditions.checkNotNull( po, "Product operation is null" );
+        Preconditions.checkNotNull( po, "Tracker operation is null" );
 
         try
         {
-            dbUtil.update( "merge into product_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
+            dbUtil.update( "merge into tracker_operation(source,id,ts,info) values(?,?,?,?)", source.toLowerCase(),
                     po.getId(), po.createDate(), new StringReader( GSON.toJson( po ) ) );
             return true;
         }
         catch ( SQLException e )
         {
-            LOG.error( "Error in saveProductOperation", e );
+            LOG.error( "Error in saveTrackerOperation", e );
         }
 
         return false;
@@ -157,7 +158,7 @@ public class TrackerImpl implements Tracker
         Preconditions.checkNotNull( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
 
         TrackerOperationImpl po = new TrackerOperationImpl( source.toLowerCase(), description, this );
-        if ( saveProductOperation( source, po ) )
+        if ( saveTrackerOperation( source, po ) )
         {
             return po;
         }
@@ -185,14 +186,14 @@ public class TrackerImpl implements Tracker
         List<TrackerOperationView> list = new ArrayList<>();
         try
         {
-            ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and ts between ? and ?"
+            ResultSet rs = dbUtil.select( "select info from tracker_operation where source = ? and ts between ? and ?"
                     + " order by ts desc limit ?", source.toLowerCase(), fromDate, toDate, limit );
 
-            TrackerOperationViewImpl productOperationViewImpl = constructProductOperation( rs );
+            TrackerOperationViewImpl productOperationViewImpl = createTrackerOperation( rs );
             while ( productOperationViewImpl != null )
             {
                 list.add( productOperationViewImpl );
-                productOperationViewImpl = constructProductOperation( rs );
+                productOperationViewImpl = createTrackerOperation( rs );
             }
         }
         catch ( SQLException | JsonSyntaxException ex )
@@ -213,7 +214,7 @@ public class TrackerImpl implements Tracker
         List<String> sources = new ArrayList<>();
         try
         {
-            ResultSet rs = dbUtil.select( "select distinct source from product_operation" );
+            ResultSet rs = dbUtil.select( "select distinct source from tracker_operation" );
 
             while ( rs != null && rs.next() )
             {
@@ -258,7 +259,7 @@ public class TrackerImpl implements Tracker
                 //return if operation is completed
                 //or if time limit is reached
                 long ts = System.currentTimeMillis() - startedTs;
-                if ( po.getState() != ProductOperationState.RUNNING || ts > maxOperationDurationMs )
+                if ( po.getState() != OperationState.RUNNING || ts > maxOperationDurationMs )
                 {
                     return;
                 }
@@ -274,7 +275,7 @@ public class TrackerImpl implements Tracker
             }
             else
             {
-                LOG.warn( "Product operation not found" );
+                LOG.warn( "Tracker operation not found" );
                 return;
             }
         }

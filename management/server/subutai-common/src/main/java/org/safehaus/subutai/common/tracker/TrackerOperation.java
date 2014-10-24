@@ -44,7 +44,7 @@ public interface TrackerOperation
      *
      * @return state of product operation
      */
-    public ProductOperationState getState();
+    public OperationState getState();
 
     /**
      * Adds log to operation

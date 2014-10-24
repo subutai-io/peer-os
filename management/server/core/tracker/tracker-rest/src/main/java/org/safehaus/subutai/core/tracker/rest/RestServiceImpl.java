@@ -41,7 +41,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getProductOperation( final String source, final String uuid )
+    public Response getTrackerOperation( final String source, final String uuid )
     {
         try
         {
@@ -67,7 +67,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getProductOperations( final String source, final String fromDate, final String toDate,
+    public Response getTrackerOperations( final String source, final String fromDate, final String toDate,
                                           final int limit )
     {
         try
@@ -89,7 +89,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getProductOperationSources()
+    public Response getTrackerOperationSources()
     {
         return Response.ok().entity( GSON.toJson( tracker.getTrackerOperationSources() ) ).build();
     }

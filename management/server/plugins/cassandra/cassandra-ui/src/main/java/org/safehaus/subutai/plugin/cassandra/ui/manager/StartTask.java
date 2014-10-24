@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.cassandra.ui.manager;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
@@ -42,7 +42,7 @@ public class StartTask implements Runnable
             TrackerOperationView po = tracker.getTrackerOperation( CassandraClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
-                if ( po.getState() != ProductOperationState.RUNNING )
+                if ( po.getState() != OperationState.RUNNING )
                 {
                     completeEvent.onComplete( po.getLog() );
                     break;

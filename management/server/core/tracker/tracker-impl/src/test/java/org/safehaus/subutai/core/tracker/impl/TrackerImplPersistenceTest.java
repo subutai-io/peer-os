@@ -83,7 +83,7 @@ public class TrackerImplPersistenceTest
 
         TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, ti );
 
-        ti.saveProductOperation( SOURCE, poi );
+        ti.saveTrackerOperation( SOURCE, poi );
 
         verify( preparedStatement, times( 2 ) ).executeUpdate();
     }
