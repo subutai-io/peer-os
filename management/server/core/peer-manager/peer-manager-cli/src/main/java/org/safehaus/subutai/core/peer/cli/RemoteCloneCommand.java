@@ -5,16 +5,17 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.core.peer.api.ContainerHost;
-import org.safehaus.subutai.core.peer.api.LocalPeer;
+import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.RemotePeer;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "peer", name = "clone")
-public class CloneCommand extends OsgiCommandSupport
+@Command(scope = "peer", name = "remote-clone")
+public class RemoteCloneCommand extends OsgiCommandSupport
 {
 
     private PeerManager peerManager;
@@ -32,16 +33,20 @@ public class CloneCommand extends OsgiCommandSupport
     }
 
 
-    @Argument(index = 0, name = "envId", multiValued = false, description = "Environment UUID")
+    @Argument(index = 0, name = "peerId", multiValued = false, description = "Remote peer UUID")
+    private String peerId;
+
+
+    @Argument(index = 1, name = "envId", multiValued = false, description = "Environment UUID")
     private String envId;
 
-    @Argument(index = 1, name = "templateName", multiValued = false, description = "Remote template name")
+    @Argument(index = 2, name = "templateName", multiValued = false, description = "Remote template name")
     private String templateName;
 
-    @Argument(index = 2, name = "quantity", multiValued = false, description = "Number of containers to clone")
+    @Argument(index = 3, name = "quantity", multiValued = false, description = "Number of containers to clone")
     private int quantity;
 
-    @Argument(index = 3, name = "strategyId", multiValued = false, description = "Container placement strategy")
+    @Argument(index = 4, name = "strategyId", multiValued = false, description = "Container placement strategy")
     private String strategyId;
 
 
@@ -49,12 +54,17 @@ public class CloneCommand extends OsgiCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        LocalPeer localPeer = peerManager.getLocalPeer();
-
+        PeerInterface peer = peerManager.getPeer( UUID.fromString( peerId ) );
+        if ( peer == null || !( peer instanceof RemotePeer ) )
+        {
+            System.out.println( "Could not get RemotePeer interface." );
+            return null;
+        }
 
         UUID environmentId = UUID.fromString( envId );
-        Set<ContainerHost> containers = localPeer
-                .createContainers( peerManager.getSiteId(), environmentId, templateName, quantity, strategyId, null );
+        Set<ContainerHost> containers =
+                peer.createContainers( peerManager.getSiteId(), environmentId, templateName, quantity, strategyId,
+                        null );
 
         System.out.println(
                 String.format( "Containers successfully created.\nList of new %d containers:\n", containers.size() ) );
