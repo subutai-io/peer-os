@@ -14,6 +14,7 @@ public class ContainerHostImpl extends HostImpl implements ContainerHost
 
     private String templateName;
     private String templateArch;
+    private UUID ownerPeerId;
     //
     //    @Override
     //    public String getHostname()
@@ -117,4 +118,15 @@ public class ContainerHostImpl extends HostImpl implements ContainerHost
     }
 
 
+    @Override
+    public UUID getOwnerPeerId()
+    {
+        return ownerPeerId;
+    }
+
+
+    public void setOwnerPeerId( final UUID ownerPeerId )
+    {
+        this.ownerPeerId = ownerPeerId;
+    }
 }

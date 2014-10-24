@@ -12,6 +12,11 @@ public interface ContainerHost extends Host
 
     public UUID getEnvironmentId();
 
+    // id of peer who initiated creation of this container
+    public UUID getOwnerPeerId();
+
+//    public void setOwnerPeerId( UUID uuid );
+
     public String getTemplateName();
 
     public String getTemplateArch();

@@ -27,7 +27,7 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
 {
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
     private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
-    Set<ContainerHostImpl> containersHosts = new HashSet();
+    Set<ContainerHost> containersHosts = new HashSet();
 
 
     public void addContainerHost( ContainerHost host )
@@ -36,7 +36,7 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
         {
             throw new IllegalArgumentException( "Container host could not be null." );
         }
-        containersHosts.add( ( ContainerHostImpl ) host );
+        containersHosts.add( host );
     }
 
 
@@ -107,6 +107,13 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
             serverMetric.setAverageMetrics( gatherAvgMetrics() );
         }
         return serverMetric;
+    }
+
+
+    @Override
+    public Set<ContainerHost> getContainerHosts()
+    {
+        return containersHosts;
     }
 
 
@@ -273,13 +280,13 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
     }
 
 
-    public Set<ContainerHostImpl> getContainersHosts()
+    public Set<ContainerHost> getContainersHosts()
     {
         return containersHosts;
     }
 
 
-    public void setContainersHosts( final Set<ContainerHostImpl> containersHosts )
+    public void setContainersHosts( final Set<ContainerHost> containersHosts )
     {
         this.containersHosts = containersHosts;
     }

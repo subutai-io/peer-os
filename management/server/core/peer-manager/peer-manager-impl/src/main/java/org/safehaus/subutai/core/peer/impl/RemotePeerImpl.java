@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
  */
 public class RemotePeerImpl implements RemotePeer
 {
-    private Peer peer;
+    protected Peer peer;
 
 
     public RemotePeerImpl( final Peer peer )
@@ -50,11 +50,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<ContainerHost> createContainers( final UUID environmentId, final String templateName, final int quantity,
-                                                final String strategyId, final List<Criteria> criteria )
-            throws ContainerCreateException
+    public Set<ContainerHost> createContainers( final UUID ownerPeerId, final UUID environmentId,
+                                                final String templateName, final int quantity, final String strategyId,
+                                                final List<Criteria> criteria ) throws ContainerCreateException
     {
-        return null;
+        RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000 );
+        return remotePeerRestClient
+                .createRemoteContainers( peer.getIp(), "8181", ownerPeerId, environmentId, templateName, quantity,
+                        strategyId, criteria );
     }
 
 
