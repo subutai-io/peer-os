@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that provides functionality to run pre and post
+# execution scripts
+# ==========================================================================
+
+
+function execute_prescripts {
+  scripts="$1"
+  lxc="$2"
+  if [ -z "$scripts" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  IFS=' ' read -a scriptArray <<< "$scripts"
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    script=$(echo " $script " | tr -d ' ')
+    msg_info "      - Running $script"
+  done
+
+  msg_info "    - ${FUNCNAME[0]} $scripts"
+  
+}
+
+
+function execute_all_prescripts {
+  binding=$1
+  lxc="$2"
+  if [ -z "$binding" ]; then
+    msg_error "No binding passed to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+  #TODO initialize scripts with all the scripts under subutai_pre_script_base 
+  # starting with pre-${FUNCNAME[0]}
+  scripts="prescript1 prescript2"
+  IFS=' ' read -a scriptArray <<< "$scripts"
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    script=$(echo " $script " | tr -d ' ')
+    msg_info "      - Running $script"
+  done
+
+  msg_info "    - ${FUNCNAME[0]} for $binding"
+}
+
+
+function execute_postscripts {
+  scripts="$1"
+  lxc="$2"
+  if [ -z "$scripts" ]; then
+    msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  IFS=' ' read -a scriptArray <<< "$scripts"
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    script=$(echo " $script " | tr -d ' ')
+    msg_info "      - Running $script"
+  done
+
+  msg_info "    - ${FUNCNAME[0]} $scripts"
+}
+
+
+function execute_all_postscripts {
+  binding=$1
+  lxc="$2"
+  if [ -z "$binding" ]; then
+    msg_error "No binding passed to ${FUNCNAME[0]}! Aborting.."
+    exit 1
+  fi
+
+  msg_info "    - ${FUNCNAME[0]} for $binding"
+}
+
+
+

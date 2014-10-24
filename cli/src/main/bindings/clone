@@ -6,7 +6,7 @@ function clone_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Clone a new container instance from a temlate.
   echo
-  echo "        "subutai \[-qh\] clone parent child
+  echo "        "subutai \[-qh\] clone parent child \[-e environmentId\] \[-b \[pre-execution-scripts\]] \[-a \[post-execution-scripts\]]
   echo
   echo -----------------------------------------------------------------------
 }
@@ -30,12 +30,12 @@ function clone {
 
   if [ -z "$parent" ]; then
     msg_error "Parameters not provided. Aborting ..."
-    show_usage "`usage`"
+    show_usage "`clone_usage`"
   fi
 
   if [ -z "$child" ]; then
     msg_error "Child parameter not provided. Aborting ..."
-    show_usage "`usage`"
+    show_usage "`clone_usage`"
   fi
   
   OPTIND=0
@@ -46,27 +46,43 @@ function clone {
   #getting environmentId using getopts
   local environmentId=""
   shift_amount=0;
-  while getopts ":e:" opt; do
-     case $opt in
-       e)
-          environmentId=$OPTARG;
+  while getopts ":e:b:a:" opt; do
+    case $opt in
+      e)
+	 environmentId=$OPTARG
+         ;;
+      b)
+	 preScriptsEnabled="true"
+	 preScripts=$OPTARG
+	 ;;
+       a)
+	  postScriptsEnabled="true"
+	  postScripts=$OPTARG
           ;;
-       \?)
-          msg_error "Unrecognized option -$OPTARG"
-          exit 1
-          ;;
-     esac
-     shift_amount=$(($shift_amount + 1))
+      \?)
+         msg_error "Unrecognized option -$OPTARG"
+         exit 1
+         ;;
+    esac
+    shift_amount=$(($shift_amount + 1))
   done
-   
+
+  if [ "x$preScriptsEnabled" == "xtrue" ]; then
+    if [ "x$preScripts" == "xall" ]; then
+      execute_all_prescripts "${FUNCNAME[0]}" 
+    else
+      execute_prescripts "$preScripts"
+    fi
+  fi
+
   lock_container_write $parent $child
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
-  
+
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
   if [ -z "$environmentId" ]; then
-     environmentId="null"
+    environmentId="null"
   fi
-  
+
   #cloning operation is starting..
   lxc_clone $parent $child $environmentId "`usage`"
   
@@ -75,6 +91,14 @@ function clone {
   echo "lxc.network.veth.pair = $child-2" >> $config
   
   git_child_branch $child
+ 
+  if [ "x$postScriptsEnabled" == "xtrue" ]; then
+    if [ "x$postScripts" == "xall" ]; then
+      execute_all_postscripts "${FUNCNAME[0]}" $child
+    else
+      execute_postscripts "$postScripts" $child
+    fi
+  fi
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

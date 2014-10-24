@@ -14,6 +14,7 @@ init
 . $subutai_lib_base/deb_ops
 . $subutai_lib_base/lock_ops
 . $subutai_lib_base/monitor_ops
+. $subutai_lib_base/pre_post_ops
 # Function addmount:
 # -----------------------------------------------------------------------------
 # 
