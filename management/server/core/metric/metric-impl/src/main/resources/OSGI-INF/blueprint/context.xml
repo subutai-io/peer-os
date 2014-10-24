@@ -7,9 +7,13 @@
     <property name="password" value="" />
   </bean>
 
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
+
   <bean id="monitor" class="org.safehaus.subutai.core.metric.impl.MonitorImpl"
         scope="singleton" activation="eager">
     <argument ref="dataSource" />
+    <argument ref="peerManager" />
   </bean>
 
   <service ref="monitor" interface="org.safehaus.subutai.core.metric.api.Monitor" />

@@ -16,10 +16,4 @@ public abstract class ResourceHostMetric extends Metric
     {
         return peerId;
     }
-
-
-    protected void setPeerId( final UUID peerId )
-    {
-        this.peerId = peerId;
-    }
 }

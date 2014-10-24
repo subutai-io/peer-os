@@ -53,4 +53,6 @@ public interface Monitor
      * @param environment environment to monitor
      */
     public void stopMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
+
+    public void alertThresholdExcess( String alertBody ) throws MonitorException;
 }
