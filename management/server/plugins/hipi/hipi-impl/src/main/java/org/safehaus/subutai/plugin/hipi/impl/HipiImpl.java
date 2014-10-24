@@ -15,7 +15,6 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -42,7 +41,6 @@ public class HipiImpl implements Hipi
     protected Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private Hadoop hadoopManager;
     private ExecutorService executor;
@@ -97,18 +95,6 @@ public class HipiImpl implements Hipi
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 

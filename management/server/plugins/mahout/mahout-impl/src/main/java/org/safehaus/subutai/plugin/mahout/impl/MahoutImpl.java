@@ -26,7 +26,6 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -55,7 +54,6 @@ public class MahoutImpl implements Mahout
     private Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
@@ -145,18 +143,6 @@ public class MahoutImpl implements Mahout
     public void setAgentManager( final AgentManager agentManager )
     {
         this.agentManager = agentManager;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 

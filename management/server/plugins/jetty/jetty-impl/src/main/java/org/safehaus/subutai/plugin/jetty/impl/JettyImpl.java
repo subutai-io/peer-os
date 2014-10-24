@@ -26,7 +26,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
@@ -55,7 +54,6 @@ public class JettyImpl implements Jetty
 {
     private static final Logger LOG = LoggerFactory.getLogger( JettyImpl.class.getName() );
     private Commands commands;
-    private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
@@ -71,18 +69,6 @@ public class JettyImpl implements Jetty
     public JettyImpl( DataSource dataSource )
     {
         this.dataSource = dataSource;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 

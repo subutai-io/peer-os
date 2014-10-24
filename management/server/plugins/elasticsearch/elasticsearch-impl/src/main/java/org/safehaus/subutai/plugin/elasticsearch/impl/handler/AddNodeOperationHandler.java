@@ -78,7 +78,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         elasticsearchClusterConfiguration.getNodes().add( agent );
         trackerOperation.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        if ( manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
         {
             trackerOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );

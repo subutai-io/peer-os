@@ -21,7 +21,6 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
@@ -51,7 +50,6 @@ public class ElasticsearchImpl implements Elasticsearch
 {
     private static final Logger LOG = LoggerFactory.getLogger( ElasticsearchImpl.class.getName() );
     DataSource dataSource;
-    private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
@@ -103,18 +101,6 @@ public class ElasticsearchImpl implements Elasticsearch
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 

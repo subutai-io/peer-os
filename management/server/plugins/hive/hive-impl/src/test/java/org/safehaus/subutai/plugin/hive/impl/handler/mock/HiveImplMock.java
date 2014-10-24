@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
-import org.safehaus.subutai.plugin.common.mock.DbManagerMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.impl.HiveImpl;
@@ -28,7 +27,6 @@ public class HiveImplMock extends HiveImpl
         super( mock( DataSource.class ) );
         setAgentManager( new AgentManagerMock() );
         setCommandRunner( new CommandRunnerMock() );
-        setDbManager( new DbManagerMock() );
         setTracker( new TrackerMock() );
     }
 

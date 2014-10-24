@@ -18,7 +18,6 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -47,7 +46,6 @@ public class HiveImpl implements Hive
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
     protected Tracker tracker;
-    protected DbManager dbManager;
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
     protected Hadoop hadoopManager;
@@ -116,18 +114,6 @@ public class HiveImpl implements Hive
     public void setTracker( Tracker tracker )
     {
         this.tracker = tracker;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 

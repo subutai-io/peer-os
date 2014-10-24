@@ -15,6 +15,8 @@ import static org.mockito.Mockito.mock;
 public class SparkImplMock extends SparkImpl
 {
 
+    private SparkClusterConfig clusterConfig;
+
     public SparkImplMock()
     {
         super( mock( DataSource.class ) );
@@ -22,15 +24,6 @@ public class SparkImplMock extends SparkImpl
         setAgentManager( mock( AgentManager.class ) );
         setTracker( new TrackerMock() );
     }
-
-
-    private SparkClusterConfig clusterConfig;
-
-    //    public SparkImplMock() {
-    //        super( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ),
-    // new TrackerMock() );
-    //    }
-
 
     public SparkImplMock setClusterConfig( SparkClusterConfig clusterConfig )
     {

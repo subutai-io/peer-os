@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDao;
@@ -27,7 +26,6 @@ public abstract class StormBase implements Storm
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
     protected Tracker tracker;
-    protected DbManager dbManager;
     protected Zookeeper zookeeperManager;
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
@@ -91,18 +89,6 @@ public abstract class StormBase implements Storm
     public void setTracker( Tracker tracker )
     {
         this.tracker = tracker;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( DbManager dbManager )
-    {
-        this.dbManager = dbManager;
     }
 
 
