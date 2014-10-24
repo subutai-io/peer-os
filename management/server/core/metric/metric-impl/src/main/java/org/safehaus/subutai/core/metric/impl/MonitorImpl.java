@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -9,7 +10,9 @@ import java.util.concurrent.Executors;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
@@ -21,10 +24,12 @@ import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -42,6 +47,7 @@ public class MonitorImpl implements Monitor
     private final ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     private final MonitorDao monitorDao;
     private final PeerManager peerManager;
+    private final Commands commands = new Commands();
 
 
     public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws DaoException
@@ -58,17 +64,50 @@ public class MonitorImpl implements Monitor
     @Override
     public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
     {
+        Set<ContainerHostMetric> metrics = new HashSet<>();
+
         //check if environment exists
         //iterate containers within the environment and get their metrics
-        return null;
+
+        return metrics;
     }
 
 
     @Override
     public Set<ResourceHostMetric> getResourceHostMetrics() throws MonitorException
     {
-        //iterate resource hosts and get their metrics
-        return null;
+        Set<ResourceHostMetric> metrics = new HashSet<>();
+        try
+        {
+            //obtain resource hosts
+            Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+            //iterate resource hosts and get their metrics
+            for ( ResourceHost resourceHost : resourceHosts )
+            {
+                CommandResult result = resourceHost.execute( commands.getReadResourceHostMetricCommand() );
+                if ( result.hasSucceeded() )
+                {
+                    ResourceHostMetricImpl metric =
+                            JsonUtil.fromJson( result.getStdOut(), ResourceHostMetricImpl.class );
+                    //set peer id for future reference
+                    metric.setPeerId( peerManager.getLocalPeer().getId() );
+                    metrics.add( metric );
+                }
+                else
+                {
+                    throw new MonitorException(
+                            String.format( "Could not get metrics from %s : %s", resourceHost.getHostname(),
+                                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+                }
+            }
+        }
+        catch ( CommandException | PeerException | JsonSyntaxException e )
+        {
+            LOG.error( "Error in getResourceHostMetrics", e );
+            throw new MonitorException( e );
+        }
+
+        return metrics;
     }
 
 

@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -116,8 +116,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set DataNodes for NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -140,8 +140,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set TaskTrackers for JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
@@ -149,8 +149,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove DataNode from NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -158,8 +158,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove TaskTrackers from JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 

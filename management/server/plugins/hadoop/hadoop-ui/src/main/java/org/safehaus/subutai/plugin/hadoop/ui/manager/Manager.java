@@ -173,6 +173,32 @@ public class Manager extends BaseManager
     }
 
 
+
+    public Table createTableTemplate( String caption )
+    {
+        final Table table = new Table( caption );
+        table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
+        table.addContainerProperty( STATUS_COLUMN_CAPTION, HorizontalLayout.class, null );
+        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
+
+        table.setColumnExpandRatio( HOST_COLUMN_CAPTION, 0.1f );
+        table.setColumnExpandRatio( IP_COLUMN_CAPTION, 0.1f );
+        table.setColumnExpandRatio( NODE_ROLE_COLUMN_CAPTION, 0.15f );
+        table.setColumnExpandRatio( STATUS_COLUMN_CAPTION, 0.35f );
+        table.setColumnExpandRatio( AVAILABLE_OPERATIONS_COLUMN_CAPTION, 0.30f );
+        table.setSizeFull();
+        table.setPageLength( 10 );
+        table.setSelectable( false );
+        table.setImmediate( true );
+
+        table.addItemClickListener( managerListener.getTableClickListener( table ) );
+
+        return table;
+    }
+
+
     private void refreshUI()
     {
         if ( hadoopCluster != null )
@@ -195,14 +221,6 @@ public class Manager extends BaseManager
     }
 
 
-    public List<Agent> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
-    {
-        List<Agent> masterNodeList = new ArrayList<>();
-        masterNodeList.add( hadoopCluster.getNameNode() );
-        masterNodeList.add( hadoopCluster.getJobTracker() );
-        masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
-        return masterNodeList;
-    }
 
 
     private void startAllNodes( Table table )
@@ -389,6 +407,15 @@ public class Manager extends BaseManager
         return contentRoot;
     }
 
+
+    public List<Agent> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
+    {
+        List<Agent> masterNodeList = new ArrayList<>();
+        masterNodeList.add( hadoopCluster.getNameNode() );
+        masterNodeList.add( hadoopCluster.getJobTracker() );
+        masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
+        return masterNodeList;
+    }
 
     public AgentManager getAgentManager()
     {
@@ -620,30 +647,6 @@ public class Manager extends BaseManager
         }
     }
 
-
-    public Table createTableTemplate( String caption )
-    {
-        final Table table = new Table( caption );
-        table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( NODE_ROLE_COLUMN_CAPTION, String.class, null );
-        table.addContainerProperty( STATUS_COLUMN_CAPTION, HorizontalLayout.class, null );
-        table.addContainerProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION, HorizontalLayout.class, null );
-
-        table.setColumnExpandRatio( HOST_COLUMN_CAPTION, 0.1f );
-        table.setColumnExpandRatio( IP_COLUMN_CAPTION, 0.1f );
-        table.setColumnExpandRatio( NODE_ROLE_COLUMN_CAPTION, 0.15f );
-        table.setColumnExpandRatio( STATUS_COLUMN_CAPTION, 0.35f );
-        table.setColumnExpandRatio( AVAILABLE_OPERATIONS_COLUMN_CAPTION, 0.30f );
-        table.setSizeFull();
-        table.setPageLength( 10 );
-        table.setSelectable( false );
-        table.setImmediate( true );
-
-        table.addItemClickListener( managerListener.getTableClickListener( table ) );
-
-        return table;
-    }
 
 
     private List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final Agent agent )

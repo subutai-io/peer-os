@@ -3,6 +3,7 @@ package org.safehaus.subutai.core.peer.impl;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
@@ -15,6 +16,12 @@ public class ContainerHostImpl extends HostImpl implements ContainerHost
     private String templateName;
     private String templateArch;
     private UUID ownerPeerId;
+
+
+    protected ContainerHostImpl( final Agent agent )
+    {
+        super( agent );
+    }
     //
     //    @Override
     //    public String getHostname()

@@ -13,7 +13,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 
 import com.google.common.base.Preconditions;
@@ -151,8 +151,8 @@ public class Commands
     public Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s", slaveNode.getHostname() ) ),
-                nodes );
+                        String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s",
+                                slaveNode.getHostname() ) ), nodes );
     }
 
 
@@ -175,8 +175,8 @@ public class Commands
     public Command getAddPropertyCommand( String propertyName, String propertyValue, Set<Agent> agents )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName, propertyValue ) ),
-                agents );
+                        String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName,
+                                propertyValue ) ), agents );
     }
 
 

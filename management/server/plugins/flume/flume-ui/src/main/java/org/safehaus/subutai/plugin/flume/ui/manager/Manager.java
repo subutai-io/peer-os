@@ -462,6 +462,7 @@ public class Manager
                                         getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
+
                                     PROGRESS_ICON.setVisible( false );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );

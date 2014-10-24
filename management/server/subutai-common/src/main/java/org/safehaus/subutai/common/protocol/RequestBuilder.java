@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.core.command.api.command;
+package org.safehaus.subutai.common.protocol;
 
 
 import java.util.Arrays;
@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.enums.RequestType;
-import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.NumUtil;
 

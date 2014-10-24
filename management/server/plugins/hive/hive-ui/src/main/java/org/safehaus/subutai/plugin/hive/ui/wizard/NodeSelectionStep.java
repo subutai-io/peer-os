@@ -169,6 +169,7 @@ public class NodeSelectionStep extends Panel
     private ComboBox makeServerNodeComboBox( final HiveConfig config )
     {
         ComboBox cb = new ComboBox( "Server node" );
+        cb.setId( "HiveserverNodecb" );
         cb.setImmediate( true );
         cb.setTextInputAllowed( false );
         cb.setRequired( true );

@@ -36,6 +36,13 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public UUID getId()
+    {
+        return peer.getId();
+    }
+
+
+    @Override
     public UUID getOwnerId()
     {
         return null;

@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 
@@ -103,8 +103,8 @@ public class Commands
                                            String hMasterMachineHostname )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) ),
-                agents );
+                        String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
+                                hMasterMachineHostname ) ), agents );
     }
 
 
