@@ -1,8 +1,8 @@
-Package: ksks-oozie-client 
+Package: subutai-oozie-client 
 Priority: optional
 Section: devel
 Installed-Size: 79000
-Maintainer: kiskis
+Maintainer: subutai
 Architecture: all
 Version: 1.0.3
-Description: This is a oozie client package of kiskis distribution.
+Description: This is a oozie client package of subutai distribution.

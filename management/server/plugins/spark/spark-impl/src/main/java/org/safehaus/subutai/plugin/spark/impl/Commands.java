@@ -5,9 +5,11 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 import com.google.common.collect.Sets;
 
@@ -15,7 +17,7 @@ import com.google.common.collect.Sets;
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = "ksks-spark";
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + SparkClusterConfig.PRODUCT_KEY.toLowerCase();
     private final CommandRunnerBase commandRunnerBase;
 
 
@@ -45,7 +47,8 @@ public class Commands
 
     public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return commandRunnerBase.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+        return commandRunnerBase.createCommand(
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
     }
 
 

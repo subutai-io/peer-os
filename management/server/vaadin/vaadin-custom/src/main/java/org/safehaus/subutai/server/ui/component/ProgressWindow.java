@@ -9,7 +9,7 @@ package org.safehaus.subutai.server.ui.component;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
@@ -83,7 +83,7 @@ public class ProgressWindow
         } );
 
         indicator = new Label();
-        indicator.setId("indicator");
+        indicator.setId( "indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Sizeable.Unit.PIXELS );
@@ -119,8 +119,8 @@ public class ProgressWindow
                     {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
 
-                        if ( po.getState() == ProductOperationState.SUCCEEDED
-                                || po.getState() == ProductOperationState.FAILED )
+                        if ( po.getState() == OperationState.SUCCEEDED
+                                || po.getState() == OperationState.FAILED )
                         {
                             hideProgress();
                             break;
@@ -155,19 +155,23 @@ public class ProgressWindow
 
     private void setOutput( String output )
     {
-        try {
-//            VaadinSession.getCurrent().getLockInstance().lock();
+        try
+        {
+            //VaadinSession.getCurrent().getLockInstance().lock();
 
-            if ( !Strings.isNullOrEmpty( output ) ) {
+
+            if ( !Strings.isNullOrEmpty( output ) )
+            {
                 outputTxtArea.setValue( output );
                 outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
             }
         }
-        finally {
-//            VaadinSession.getCurrent().getLockInstance().unlock();
+        finally
+        {
+            //VaadinSession.getCurrent().getLockInstance().unlock();
+
         }
     }
-
 
 
     private void hideProgress()

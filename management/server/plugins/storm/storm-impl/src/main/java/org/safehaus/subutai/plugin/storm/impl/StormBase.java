@@ -1,16 +1,18 @@
 package org.safehaus.subutai.plugin.storm.impl;
 
 
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.slf4j.Logger;
@@ -20,24 +22,31 @@ import org.slf4j.LoggerFactory;
 public abstract class StormBase implements Storm
 {
 
-    static final Logger logger = LoggerFactory.getLogger( StormImpl.class );
-
+    private static final Logger LOG = LoggerFactory.getLogger( StormImpl.class.getName() );
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
     protected Tracker tracker;
-    protected DbManager dbManager;
     protected Zookeeper zookeeperManager;
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
 
-    protected PluginDAO pluginDao;
+    protected PluginDao pluginDao;
     protected ExecutorService executor;
+    protected DataSource dataSource;
 
 
     public void init()
     {
+        try
+        {
+            this.pluginDao = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+
         executor = Executors.newCachedThreadPool();
-        pluginDao = new PluginDAO( dbManager );
     }
 
 
@@ -83,18 +92,6 @@ public abstract class StormBase implements Storm
     }
 
 
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( DbManager dbManager )
-    {
-        this.dbManager = dbManager;
-    }
-
-
     public Zookeeper getZookeeperManager()
     {
         return zookeeperManager;
@@ -131,13 +128,13 @@ public abstract class StormBase implements Storm
     }
 
 
-    public PluginDAO getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDao;
     }
 
 
-    public void setPluginDao( PluginDAO pluginDao )
+    public void setPluginDao( PluginDao pluginDao )
     {
         this.pluginDao = pluginDao;
     }
@@ -145,6 +142,6 @@ public abstract class StormBase implements Storm
 
     public Logger getLogger()
     {
-        return logger;
+        return LOG;
     }
 }

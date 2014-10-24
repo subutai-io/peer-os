@@ -36,7 +36,7 @@ import com.vaadin.ui.UI;
 /**
  * Container tree
  */
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 
 public final class EnvironmentTree extends ConcurrentComponent implements Disposable
 {

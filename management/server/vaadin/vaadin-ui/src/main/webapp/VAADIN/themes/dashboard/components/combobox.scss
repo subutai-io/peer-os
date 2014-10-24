@@ -1,10 +1,13 @@
-@mixin dashboard-combobox {
+@mixin dashboard-combobox
+{
 
-  .v-filterselect {
+  .v-filterselect
+  {
     position: relative;
   }
 
-  .v-filterselect-input {
+  .v-filterselect-input
+  {
     @include appearance(none);
     background: transparent;
     border: none;
@@ -14,11 +17,13 @@
     width: 100% !important;
   }
 
-  .v-filterselect-input:focus {
+  .v-filterselect-input:focus
+  {
     outline: none;
   }
 
-  .v-filterselect-button {
+  .v-filterselect-button
+  {
     position: absolute;
     right: 1.5em;
     width: 0;
@@ -30,35 +35,41 @@
     background: transparent;
   }
 
-  .v-filterselect-suggestpopup {
+  .v-filterselect-suggestpopup
+  {
     margin-top: .4em !important;
   }
 
-  .v-filterselect-suggestmenu tr {
+  .v-filterselect-suggestmenu tr
+  {
     line-height: inherit;
   }
 
   .v-filterselect-prevpage-off,
   .v-filterselect-prevpage,
   .v-filterselect-nextpage-off,
-  .v-filterselect-nextpage {
+  .v-filterselect-nextpage
+  {
     background: transparent;
   }
 
   .v-filterselect-prevpage-off,
-  .v-filterselect-prevpage {
+  .v-filterselect-prevpage
+  {
     padding-bottom: 5px;
   }
 
   .v-filterselect-nextpage-off,
-  .v-filterselect-nextpage {
+  .v-filterselect-nextpage
+  {
     padding-top: 5px;
   }
 
   .v-filterselect-prevpage-off span,
   .v-filterselect-prevpage span,
   .v-filterselect-nextpage-off span,
-  .v-filterselect-nextpage span {
+  .v-filterselect-nextpage span
+  {
     width: 0;
     height: 0;
     border: 1px solid;
@@ -69,19 +80,23 @@
   }
 
   .v-filterselect-nextpage-off span,
-  .v-filterselect-nextpage span {
+  .v-filterselect-nextpage span
+  {
     border-color: #aaa transparent transparent;
   }
 
-  .v-filterselect-prevpage:hover span {
+  .v-filterselect-prevpage:hover span
+  {
     border-bottom-color: #fff;
   }
 
-  .v-filterselect-nextpage:hover span {
+  .v-filterselect-nextpage:hover span
+  {
     border-top-color: #fff;
   }
 
-  .v-filterselect-status {
+  .v-filterselect-status
+  {
     color: #999;
     font-size: 13px;
   }

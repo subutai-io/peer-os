@@ -102,8 +102,8 @@ public class RevertCommitTest
     @Test
     public void shouldThrowException() throws GitException
     {
-        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).revertCommit( eq( agent ), anyString(),
-                anyString() );
+        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
+               .revertCommit( eq( agent ), anyString(), anyString() );
         RevertCommit revertCommit = new RevertCommit( gitManager, agentManager );
         revertCommit.setHostname( HOSTNAME );
 

@@ -1,8 +1,8 @@
-Package: ksks-spark
+Package: subutai-spark
 Priority: optional
 Section: devel
-Installed-Size: 100
-Maintainer: kiskis
+Installed-Size: 170055
+Maintainer: subutai
 Architecture: amd64 
 Version: 1.0.1
-Description: This is a spark package of kiskis distribution.
+Description: This is a spark package of subutai distribution.

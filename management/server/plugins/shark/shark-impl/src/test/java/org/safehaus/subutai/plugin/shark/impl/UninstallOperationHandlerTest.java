@@ -5,8 +5,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.shark.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.shark.impl.mock.SharkImplMock;
 
@@ -32,7 +32,7 @@ public class UninstallOperationHandlerTest
 
         TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
-        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
+        Assert.assertEquals( po.getState(), OperationState.FAILED );
     }
 }
 

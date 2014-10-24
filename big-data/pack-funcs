@@ -23,9 +23,9 @@ initializeVariables() {
   if ls *.deb ; then
     rm  *.deb
   fi
-  fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+  fileName=`ls | grep subutai | awk '{print $1}' | head -1`
   if [[ $fileName == "" ]]; then
-    fileName="ksks-$productName"
+    fileName="subutai-$productName"
     mkdir -p $fileName
   fi
   popd

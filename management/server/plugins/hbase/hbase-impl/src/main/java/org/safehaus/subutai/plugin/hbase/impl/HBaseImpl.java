@@ -19,11 +19,11 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.SetupType;
-import org.safehaus.subutai.plugin.hbase.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.InstallHandler;
@@ -47,11 +47,9 @@ public class HBaseImpl implements HBase
     private CommandRunner commandRunner;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
-    private PluginDAO pluginDAO;
+    private PluginDao pluginDAO;
     private Commands commands;
     private DataSource dataSource;
-
-
 
 
     public HBaseImpl( DataSource dataSource )
@@ -60,13 +58,13 @@ public class HBaseImpl implements HBase
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDAO pluginDAO )
+    public void setPluginDAO( final PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }
@@ -148,7 +146,7 @@ public class HBaseImpl implements HBase
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

@@ -28,10 +28,13 @@ public class TestUtils
                     + "lxc.mount.entry = /lxc-data/master-home home none bind,rw 0 0\n"
                     + "lxc.mount.entry = /lxc-data/master-var var none bind,rw 0 0";
 
-    public static final String PACKAGES_MANIFEST = "ii  kmod                             15-0ubuntu6                   " +
-            "amd64        tools for managing Linux kernel modules\n"
-            + "ii  ksks-logstash                    1.0.1                         amd64        This is a logstash " +
-            "package of kiskis distribution.";
+    public static final String PACKAGES_MANIFEST =
+            "ii  kmod                             15-0ubuntu6                   " +
+                    "amd64        tools for managing Linux kernel modules\n"
+                    + "ii  subutai-logstash                    1.0.1                         amd64        This is a " +
+                    "logstash "
+                    +
+                    "package of subutai distribution.";
 
     public static final String MD_5_SUM = "ec6c39f0aed6b6a1256321d2e927a392";
     public static final String TEMPLATE_NAME = "master";

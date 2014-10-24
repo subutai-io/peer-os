@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -37,7 +37,7 @@ public class WaitTask implements Runnable
             while ( true )
             {
                 TrackerOperationView po = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-                if ( po.getState() == ProductOperationState.RUNNING )
+                if ( po.getState() == OperationState.RUNNING )
                 {
                     try
                     {

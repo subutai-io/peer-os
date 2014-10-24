@@ -21,18 +21,18 @@ import com.google.common.base.Preconditions;
 /**
  * Adds file(s) to commit
  */
-@Command(scope = "git", name = "add-files", description = "Add files to commit")
+@Command( scope = "git", name = "add-files", description = "Add files to commit" )
 public class AddFiles extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( AddFiles.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to add")
+    @Argument( index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to add" )
     Collection<String> files;
     private final GitManager gitManager;
     private final AgentManager agentManager;

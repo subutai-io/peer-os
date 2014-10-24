@@ -70,7 +70,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Elasti
             AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
             if ( result.getExitCode() != null && result.getExitCode() == 0 )
             {
-                if ( result.getStdOut().contains( "Package ksks-elasticsearch is not installed, so not removed" ) )
+                if ( result.getStdOut().contains( "Package subutai-elasticsearch is not installed, so not removed" ) )
                 {
                     trackerOperation.addLog( String.format( "Elasticsearch is not installed, so not removed on node %s",
                             agent.getHostname() ) );

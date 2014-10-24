@@ -128,7 +128,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
                 AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
                 if ( result.getExitCode() != null && result.getExitCode() == 0 )
                 {
-                    if ( result.getStdOut().contains( "Package ksks-spark is not installed, so not removed" ) )
+                    if ( result.getStdOut().contains( "Package subutai-spark is not installed, so not removed" ) )
                     {
                         po.addLog( String.format( "Spark is not installed, so not removed on node %s",
                                 agent.getHostname() ) );

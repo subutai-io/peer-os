@@ -1,8 +1,10 @@
-@mixin dashboard-button {
+@mixin dashboard-button
+{
 
   $outline: 0 0 0 2px rgba(49, 50, 51, .07);
 
-  .v-button {
+  .v-button
+  {
     color: $text-color;
     padding: .3em 1.4em;
 
@@ -32,12 +34,14 @@
     /* 	background: linear-gradient(to bottom, #ffffff 0%,#fafafa 5%,#eaebec 94%,#e2e3e4 100%); */
   }
 
-  .v-webkit & .v-button {
+  .v-webkit & .v-button
+  {
     padding-bottom: .35em;
   }
 
   /* Align caption and icon vertically to middle when the button has an explicit height */
-  .v-has-height.v-button:before {
+  .v-has-height.v-button:before
+  {
     display: inline-block;
     content: "";
     vertical-align: middle;
@@ -45,13 +49,15 @@
     width: 0;
   }
 
-  .v-button:focus {
+  .v-button:focus
+  {
     outline: none;
     border-color: #69a5e4;
   }
 
   .v-button:active,
-  .v-pressed.v-button {
+  .v-pressed.v-button
+  {
     border-color: #9fa0a2;
     border-top-color: #b1b1b3;
     border-bottom-color: #bfc0c1;
@@ -68,12 +74,14 @@
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
 
-  .wide.v-button {
+  .wide.v-button
+  {
     padding-left: 1.8em;
     padding-right: 1.8em;
   }
 
-  .default.v-button {
+  .default.v-button
+  {
     color: #fff;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, .4);
     font-weight: bold;
@@ -93,13 +101,15 @@
     /* background: linear-gradient(to bottom, #4fa8f7 0%,#499bea 6%,#207ce5 100%); */
   }
 
-  .default.v-button:focus {
+  .default.v-button:focus
+  {
     xborder-color: #207ce5;
     @include box-shadow(0 0 4px #207ce5);
   }
 
   .default.v-button:active,
-  .v-pressed.v-button.default {
+  .v-pressed.v-button.default
+  {
     border-color: #1c64b1;
     border-top-color: #346d9f;
     border-bottom-color: #3c81be;
@@ -116,7 +126,8 @@
     @include box-shadow($outline);
   }
 
-  .small.v-button {
+  .small.v-button
+  {
     padding: .1em 1.2em;
     font-size: 13px;
   }
@@ -124,7 +135,8 @@
   .link.v-button,
   .link.v-button:active,
   .link.v-pressed.v-button,
-  .link.v-button:focus {
+  .link.v-button:focus
+  {
     background: transparent;
     border: none;
     font-weight: inherit;
@@ -139,18 +151,22 @@
     text-shadow: inherit;
   }
 
-  .icon-only.v-button {
+  .icon-only.v-button
+  {
     padding-left: .8em;
     padding-right: .8em;
   }
-  .icon-only.v-button .v-button-wrap:before {
+  .icon-only.v-button .v-button-wrap:before
+  {
     margin: 0;
   }
-  .icon-only.v-button .v-button-caption {
+  .icon-only.v-button .v-button-caption
+  {
     display: none;
   }
 
-  .borderless.v-button {
+  .borderless.v-button
+  {
     border: none !important;
     background: transparent !important;
     -webkit-box-shadow: none;

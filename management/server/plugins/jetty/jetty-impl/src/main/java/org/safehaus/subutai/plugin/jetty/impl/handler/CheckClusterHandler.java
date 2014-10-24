@@ -33,8 +33,8 @@ public class CheckClusterHandler extends AbstractOperationHandler<JettyImpl>
     public void run()
     {
         JettyConfig config = null;
-        config = manager.getPluginDAO().getInfo( JettyConfig.PRODUCT_KEY.toLowerCase(), clusterName,
-                JettyConfig.class );
+        config =
+                manager.getPluginDAO().getInfo( JettyConfig.PRODUCT_KEY.toLowerCase(), clusterName, JettyConfig.class );
 
         if ( config == null )
         {

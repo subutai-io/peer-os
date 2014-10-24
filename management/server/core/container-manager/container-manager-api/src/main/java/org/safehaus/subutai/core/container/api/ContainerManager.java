@@ -119,8 +119,6 @@ public interface ContainerManager
 
     /**
      * Returns the templates list
-     *
-     * @return
      */
     public List<String> getTemplates();
 }

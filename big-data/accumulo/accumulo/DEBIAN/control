@@ -1,9 +1,9 @@
-Package: ksks-accumulo
+Package: subutai-accumulo
 Priority: optional
 Section: devel
-Installed-Size: 100
-Maintainer: kiskis 
+Installed-Size: 42681
+Maintainer: subutai 
 Architecture: amd64 
 Version: 1.0.1
-Depends: ksks-hadoop, ksks-zookeeper, expect
-Description: This is a accumulo package of kiskis distribution.
+Depends: subutai-hadoop, subutai-zookeeper, expect
+Description: This is a accumulo package of subutai distribution.

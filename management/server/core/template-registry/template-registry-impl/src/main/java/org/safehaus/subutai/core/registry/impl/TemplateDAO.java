@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.slf4j.Logger;

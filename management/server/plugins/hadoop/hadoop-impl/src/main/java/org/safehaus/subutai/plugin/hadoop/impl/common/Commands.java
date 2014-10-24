@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
@@ -17,6 +18,7 @@ import com.google.common.collect.Sets;
  */
 public class Commands
 {
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase();
     private final CommandRunnerBase commandRunner;
 
 
@@ -31,7 +33,7 @@ public class Commands
     public Command getInstallCommand( HadoopClusterConfig hadoopClusterConfig )
     {
         return commandRunner.createCommand( "Installing hadoop deb package",
-                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install ksks-hadoop" )
+                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
                         .withTimeout( 180 ), Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
     }
 
@@ -39,7 +41,7 @@ public class Commands
     public Command getInstallCommand( Agent agent )
     {
         return commandRunner.createCommand( "Installing hadoop deb package",
-                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install ksks-hadoop" )
+                new RequestBuilder( "sleep 10;" + "apt-get --force-yes --assume-yes install " + PACKAGE_NAME )
                         .withTimeout( 180 ), Sets.newHashSet( agent ) );
     }
 
@@ -114,8 +116,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set DataNodes for NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -138,8 +140,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set TaskTrackers for JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
@@ -147,8 +149,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove DataNode from NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -156,8 +158,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove TaskTrackers from JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 

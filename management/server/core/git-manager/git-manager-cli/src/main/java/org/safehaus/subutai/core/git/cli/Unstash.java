@@ -18,18 +18,18 @@ import com.google.common.base.Preconditions;
 /**
  * Applies all stashed changes to current branch
  */
-@Command(scope = "git", name = "unstash", description = "Apply all stashed changes to current branch")
+@Command( scope = "git", name = "unstash", description = "Apply all stashed changes to current branch" )
 public class Unstash extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( Unstash.class.getName() );
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "stashName", required = true, multiValued = false,
-            description = "stash name to apply")
+    @Argument( index = 2, name = "stashName", required = true, multiValued = false,
+            description = "stash name to apply" )
     String stashName;
 
     private final GitManager gitManager;

@@ -61,15 +61,17 @@ public class BlockTaskTrackerOperationHandler extends AbstractOperationHandler<H
         logCommand( refreshCommand, trackerOperation );
 
         hadoopClusterConfig.getBlockedAgents().add( node );
-        manager.getPluginDAO().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                hadoopClusterConfig );
+        manager.getPluginDAO()
+               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(), hadoopClusterConfig );
         trackerOperation.addLogDone( "Cluster info saved to DB" );
     }
 
 
-    private void logCommand( Command command, TrackerOperation po ) {
-        if ( command.hasSucceeded() ) {
-            po.addLog(String.format("Task's operation %s finished", command.getDescription()));
+    private void logCommand( Command command, TrackerOperation po )
+    {
+        if ( command.hasSucceeded() )
+        {
+            po.addLog( String.format( "Task's operation %s finished", command.getDescription() ) );
         }
         else if ( command.hasCompleted() )
         {

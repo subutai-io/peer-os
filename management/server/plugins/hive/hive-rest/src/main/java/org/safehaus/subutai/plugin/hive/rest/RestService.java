@@ -46,8 +46,8 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getClusters()
     {
 
@@ -65,9 +65,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         HiveConfig config = hiveManager.getCluster( clusterName );
         String cluster = JsonUtil.GSON.toJson( config );
@@ -76,11 +76,11 @@ public class RestService
 
 
     @POST
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @PathParam("clusterName") String clusterName,
-                                    @QueryParam("hadoopClusterName") String hadoopClusterName,
-                                    @QueryParam("server") String server, @QueryParam("clients") String clients )
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @PathParam( "clusterName" ) String clusterName,
+                                    @QueryParam( "hadoopClusterName" ) String hadoopClusterName,
+                                    @QueryParam( "server" ) String server, @QueryParam( "clients" ) String clients )
     {
 
         HiveConfig config = new HiveConfig();
@@ -105,11 +105,12 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{name}/{hadoopName}/{slaveNodesCount}/{replFactor}/{domainName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response install( @PathParam("name") String name, @PathParam("hadoopName") String hadoopName,
-                             @PathParam("slaveNodesCount") String slaveNodesCount,
-                             @PathParam("replFactor") String replFactor, @PathParam("domainName") String domainName )
+    @Path( "clusters/{name}/{hadoopName}/{slaveNodesCount}/{replFactor}/{domainName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response install( @PathParam( "name" ) String name, @PathParam( "hadoopName" ) String hadoopName,
+                             @PathParam( "slaveNodesCount" ) String slaveNodesCount,
+                             @PathParam( "replFactor" ) String replFactor,
+                             @PathParam( "domainName" ) String domainName )
     {
 
         HiveConfig config = new HiveConfig();
@@ -148,9 +149,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response uninstallCluster( @PathParam( "clusterName" ) String clusterName )
     {
         UUID uuid = hiveManager.uninstallCluster( clusterName );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
@@ -159,9 +160,9 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{hostname}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("hostname") String hostname )
+    @Path( "clusters/{clusterName}/nodes/{hostname}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response addNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "hostname" ) String hostname )
     {
         UUID uuid = hiveManager.addNode( clusterName, hostname );
         String operationId = JsonUtil.toJson( OPERATION_ID, uuid );
@@ -170,9 +171,10 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{hostname}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("hostname") String hostname )
+    @Path( "clusters/{clusterName}/nodes/{hostname}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyNode( @PathParam( "clusterName" ) String clusterName,
+                                 @PathParam( "hostname" ) String hostname )
     {
         UUID uuid = hiveManager.destroyNode( clusterName, hostname );
 

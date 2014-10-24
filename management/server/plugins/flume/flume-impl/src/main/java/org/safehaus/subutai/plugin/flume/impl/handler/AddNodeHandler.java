@@ -95,7 +95,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl>
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
+
         Command checkInstalledCommand = manager.getCommandRunner().createCommand(
                 new RequestBuilder( Commands.make( CommandType.STATUS ) ).withTimeout( 60 ), Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );

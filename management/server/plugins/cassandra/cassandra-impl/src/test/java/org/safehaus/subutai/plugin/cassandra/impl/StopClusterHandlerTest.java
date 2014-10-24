@@ -4,14 +4,14 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopClusterHandler;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 
 import static junit.framework.Assert.assertTrue;
@@ -35,7 +35,7 @@ public class StopClusterHandlerTest
         when( cassandraMock.getTracker() ).thenReturn( new TrackerMock() );
         when( cassandraMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
         when( cassandraMock.getCluster( anyString() ) ).thenReturn( null );
-        when( cassandraMock.getPluginDAO() ).thenReturn( mock( PluginDAO.class ) );
+        when( cassandraMock.getPluginDAO() ).thenReturn( mock( PluginDao.class ) );
         when( cassandraMock.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), "Cassandra",
                 CassandraClusterConfig.class ) ).thenReturn( null );
     }
@@ -49,6 +49,6 @@ public class StopClusterHandlerTest
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
 }

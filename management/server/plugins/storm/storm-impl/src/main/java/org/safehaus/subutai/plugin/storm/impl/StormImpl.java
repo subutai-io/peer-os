@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -27,6 +29,12 @@ import org.safehaus.subutai.plugin.storm.impl.handler.UninstallHandler;
 
 public class StormImpl extends StormBase
 {
+
+    public StormImpl( DataSource dataSource )
+    {
+        this.dataSource = dataSource;
+    }
+
 
     @Override
     public UUID installCluster( StormConfig config )

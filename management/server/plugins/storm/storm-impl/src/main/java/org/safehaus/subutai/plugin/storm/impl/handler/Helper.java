@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -68,7 +68,7 @@ class Helper
             if ( source != null && trackerId != null )
             {
                 TrackerOperationView p = null;
-                while ( p == null || p.getState() == ProductOperationState.RUNNING )
+                while ( p == null || p.getState() == OperationState.RUNNING )
                 {
                     p = manager.getTracker().getTrackerOperation( source, trackerId );
                     try

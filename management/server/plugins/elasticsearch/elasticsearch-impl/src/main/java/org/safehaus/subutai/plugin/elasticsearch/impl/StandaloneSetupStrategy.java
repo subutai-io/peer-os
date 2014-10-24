@@ -117,8 +117,8 @@ public class StandaloneSetupStrategy implements ClusterSetupStrategy
 
         po.addLog( "Saving cluster information to database..." );
 
-        elasticsearchManager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase(),
-                config.getClusterName(), config );
+        elasticsearchManager.getPluginDAO()
+                            .saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY, config.getClusterName(), config );
         po.addLog( "Cluster information saved to database" );
 
         return config;

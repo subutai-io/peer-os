@@ -18,16 +18,16 @@ import com.google.common.base.Preconditions;
 /**
  * Adds all files to commit
  */
-@Command(scope = "git", name = "add-all", description = "Add all files to commit")
+@Command( scope = "git", name = "add-all", description = "Add all files to commit" )
 public class AddAll extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( AddAll.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
     private final GitManager gitManager;
     private final AgentManager agentManager;

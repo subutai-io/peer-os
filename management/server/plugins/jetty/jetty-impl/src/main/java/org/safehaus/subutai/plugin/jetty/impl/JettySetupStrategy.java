@@ -27,28 +27,6 @@ public class JettySetupStrategy implements ClusterSetupStrategy
     }
 
 
-    void checkConfig() throws ClusterSetupException
-    {
-        String m = "Invalid configuration: ";
-
-        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
-        {
-            throw new ClusterSetupException( m + "Cluster name not specified" );
-        }
-
-        if ( manager.getCluster( config.getClusterName() ) != null )
-        {
-            throw new ClusterSetupException(
-                    m + String.format( "Cluster '%s' already exists", config.getClusterName() ) );
-        }
-
-        if ( CollectionUtils.isEmpty( config.getNodes() ) )
-        {
-            throw new ClusterSetupException( String.format( "No node is specified to install jetty on" ) );
-        }
-    }
-
-
     @Override
     public ConfigBase setup() throws ClusterSetupException
     {
@@ -125,5 +103,27 @@ public class JettySetupStrategy implements ClusterSetupStrategy
         }
 
         return config;
+    }
+
+
+    void checkConfig() throws ClusterSetupException
+    {
+        String m = "Invalid configuration: ";
+
+        if ( config.getClusterName() == null || config.getClusterName().isEmpty() )
+        {
+            throw new ClusterSetupException( m + "Cluster name not specified" );
+        }
+
+        if ( manager.getCluster( config.getClusterName() ) != null )
+        {
+            throw new ClusterSetupException(
+                    m + String.format( "Cluster '%s' already exists", config.getClusterName() ) );
+        }
+
+        if ( CollectionUtils.isEmpty( config.getNodes() ) )
+        {
+            throw new ClusterSetupException( String.format( "No node is specified to install jetty on" ) );
+        }
     }
 }

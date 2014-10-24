@@ -57,9 +57,9 @@ public class Manager
     protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
-    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final Pattern ELASTICSEARCH_PATTERN = Pattern.compile( ".*(elasticsearch.+?g).*" );
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final Table nodesTable;
     private final ExecutorService executorService;
     private final Tracker tracker;
@@ -90,8 +90,8 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Cluster nodes" );
-        nodesTable.setId("ElasticSearchMngNodesTable");
-        contentRoot.setId("ElasticSearchMngContentRoot");
+        nodesTable.setId( "ElasticSearchMngNodesTable" );
+        contentRoot.setId( "ElasticSearchMngContentRoot" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -104,7 +104,7 @@ public class Manager
 
         /**  Combo box  */
         clusterCombo = new ComboBox();
-        clusterCombo.setId("ElasticSearchMngClusterCombo");
+        clusterCombo.setId( "ElasticSearchMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -124,7 +124,7 @@ public class Manager
 
         /**  Refresh clusters button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("ElasticSearchMngRefresh");
+        refreshClustersBtn.setId( "ElasticSearchMngRefresh" );
         addClickListener( refreshClustersBtn );
 
         controlsContent.addComponent( refreshClustersBtn );
@@ -133,7 +133,7 @@ public class Manager
 
         /** Check all button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.setId("ElasticSearchMngCheckAll");
+        checkAllBtn.setId( "ElasticSearchMngCheckAll" );
         addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
@@ -141,7 +141,7 @@ public class Manager
 
         /**  Start all button */
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.setId("ElasticSearchMngStartAll");
+        startAllBtn.setId( "ElasticSearchMngStartAll" );
         addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
@@ -149,7 +149,7 @@ public class Manager
 
         /**  Stop all button  */
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.setId("ElasticSearchMngStopAll");
+        stopAllBtn.setId( "ElasticSearchMngStopAll" );
         addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
@@ -157,7 +157,7 @@ public class Manager
 
         /**  Destroy cluster button  */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("ElasticSearchMngDestroyCuster");
+        destroyClusterBtn.setId( "ElasticSearchMngDestroyCuster" );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
@@ -165,7 +165,7 @@ public class Manager
         addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("spinner");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -543,12 +543,16 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
+            checkButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchCheck" );
             final Button startButton = new Button( START_BUTTON_CAPTION );
+            startButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchStart" );
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
+            stopButton.setId( agent.getListIP().get( 0 ) + "-elasticsearchStop" );
 
             addStyleNameToButtons( checkButton, startButton, stopButton );
             enableButtons( startButton, stopButton );
             PROGRESS_ICON.setVisible( false );
+            PROGRESS_ICON.setId( "indicator" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );

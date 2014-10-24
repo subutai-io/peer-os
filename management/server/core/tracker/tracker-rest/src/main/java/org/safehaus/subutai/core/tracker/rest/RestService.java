@@ -15,18 +15,17 @@ public interface RestService
     @GET
     @Path( "operations/{source}/{uuid}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getProductOperation( @PathParam( "source" ) String source, @PathParam( "uuid" ) String uuid );
+    public Response getTrackerOperation( @PathParam("source") String source, @PathParam("uuid") String uuid );
 
 
     @GET
     @Path( "operations/{source}/{dateFrom}/{dateTo}/{limit}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getProductOperations( @PathParam( "source" ) String source,
-                                          @PathParam( "dateFrom" ) String fromDate,
-                                          @PathParam( "dateTo" ) String toDate, @PathParam( "limit" ) int limit );
+    public Response getTrackerOperations( @PathParam("source") String source, @PathParam("dateFrom") String fromDate,
+                                          @PathParam("dateTo") String toDate, @PathParam("limit") int limit );
 
     @GET
     @Path( "operations/sources" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getProductOperationSources();
+    public Response getTrackerOperationSources();
 }

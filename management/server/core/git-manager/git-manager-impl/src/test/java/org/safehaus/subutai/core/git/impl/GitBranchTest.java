@@ -23,7 +23,7 @@ public class GitBranchTest
     private static final String REMOTE_BRANCH_NAME = "origin/branch";
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailOnNullName()
     {
         new GitBranch( null, false );

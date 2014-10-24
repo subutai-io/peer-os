@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.pig.api.Pig;
@@ -54,7 +54,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox hadoopNodes = new ComboBox();
-        hadoopNodes.setId("PigAddHadoopNodes");
+        hadoopNodes.setId( "PigAddHadoopNodes" );
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
@@ -70,12 +70,12 @@ public class AddNodeWindow extends Window
         topContent.addComponent( hadoopNodes );
 
         final Button addNodeBtn = new Button( "Add" );
-        addNodeBtn.setId("PigAddNodesButton");
+        addNodeBtn.setId( "PigAddNodesButton" );
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
         final Button ok = new Button( "Ok" );
-        ok.setId("btnOk");
+        ok.setId( "btnOk" );
 
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -100,7 +100,7 @@ public class AddNodeWindow extends Window
                             {
                                 setOutput(
                                         po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                                if ( po.getState() != ProductOperationState.RUNNING )
+                                if ( po.getState() != OperationState.RUNNING )
                                 {
 
                                     hideProgress();
@@ -128,7 +128,7 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
-        outputTxtArea.setId("outputTxtArea");
+        outputTxtArea.setId( "outputTxtArea" );
         outputTxtArea.setRows( 10 );
         outputTxtArea.setColumns( 30 );
         outputTxtArea.setImmediate( true );
@@ -137,7 +137,7 @@ public class AddNodeWindow extends Window
         content.addComponent( outputTxtArea );
 
         indicator = new Label();
-        indicator.setId("indicator");
+        indicator.setId( "indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );

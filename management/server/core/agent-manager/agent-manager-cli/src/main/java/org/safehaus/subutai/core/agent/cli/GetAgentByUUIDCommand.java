@@ -16,11 +16,11 @@ import com.google.common.base.Preconditions;
 /**
  * Displays agent details searching by agents' id
  */
-@Command(scope = "agent", name = "get-agent-by-uuid", description = "get agent by uuid")
+@Command( scope = "agent", name = "get-agent-by-uuid", description = "get agent by uuid" )
 public class GetAgentByUUIDCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "uuid", required = true, multiValued = false, description = "agent uuid")
+    @Argument( index = 0, name = "uuid", required = true, multiValued = false, description = "agent uuid" )
     String uuid;
 
     private final AgentManager agentManager;

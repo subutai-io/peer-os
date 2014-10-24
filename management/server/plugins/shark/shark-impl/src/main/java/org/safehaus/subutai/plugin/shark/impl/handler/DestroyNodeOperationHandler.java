@@ -8,7 +8,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
-import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 
 
@@ -59,7 +58,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SharkI
             return;
         }
         trackerOperation.addLog( "Uninstalling Shark..." );
-        Command uninstallCommand = Commands.getUninstallCommand( new HashSet<>( Arrays.asList( agent ) ) );
+        Command uninstallCommand = manager.getCommands().getUninstallCommand( new HashSet<>( Arrays.asList( agent ) ) );
         manager.getCommandRunner().runCommand( uninstallCommand );
 
         if ( uninstallCommand.hasCompleted() )

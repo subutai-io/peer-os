@@ -30,9 +30,9 @@ public class SparkComponent extends CustomComponent
         final Manager manager = new Manager( executor, serviceLocator );
         Wizard wizard = new Wizard( executor, serviceLocator );
         sparkSheet.addTab( wizard.getContent(), "Install" );
-        sparkSheet.getTab(0).setId("SparkInstallTab");
+        sparkSheet.getTab( 0 ).setId( "SparkInstallTab" );
         sparkSheet.addTab( manager.getContent(), "Manage" );
-        sparkSheet.getTab(1).setId("SparkManageTab");
+        sparkSheet.getTab( 1 ).setId( "SparkManageTab" );
         sparkSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

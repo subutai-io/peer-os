@@ -129,7 +129,8 @@ public class HadoopClusterConfig implements ConfigBase
 
 
     @Override
-    public String getProductKey() {
+    public String getProductKey()
+    {
         return PRODUCT_KEY;
     }
 
@@ -143,66 +144,6 @@ public class HadoopClusterConfig implements ConfigBase
     public void setDomainName( String domainName )
     {
         this.domainName = domainName;
-    }
-
-
-    public Agent getNameNode()
-    {
-        return nameNode;
-    }
-
-
-    public void setNameNode( Agent nameNode )
-    {
-        this.nameNode = nameNode;
-    }
-
-
-    public Agent getJobTracker()
-    {
-        return jobTracker;
-    }
-
-
-    public void setJobTracker( Agent jobTracker )
-    {
-        this.jobTracker = jobTracker;
-    }
-
-
-    public Agent getSecondaryNameNode()
-    {
-        return secondaryNameNode;
-    }
-
-
-    public void setSecondaryNameNode( Agent secondaryNameNode )
-    {
-        this.secondaryNameNode = secondaryNameNode;
-    }
-
-
-    public List<Agent> getDataNodes()
-    {
-        return dataNodes;
-    }
-
-
-    public void setDataNodes( List<Agent> dataNodes )
-    {
-        this.dataNodes = dataNodes;
-    }
-
-
-    public List<Agent> getTaskTrackers()
-    {
-        return taskTrackers;
-    }
-
-
-    public void setTaskTrackers( List<Agent> taskTrackers )
-    {
-        this.taskTrackers = taskTrackers;
     }
 
 
@@ -256,6 +197,42 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
+    public Agent getNameNode()
+    {
+        return nameNode;
+    }
+
+
+    public void setNameNode( Agent nameNode )
+    {
+        this.nameNode = nameNode;
+    }
+
+
+    public Agent getJobTracker()
+    {
+        return jobTracker;
+    }
+
+
+    public void setJobTracker( Agent jobTracker )
+    {
+        this.jobTracker = jobTracker;
+    }
+
+
+    public Agent getSecondaryNameNode()
+    {
+        return secondaryNameNode;
+    }
+
+
+    public void setSecondaryNameNode( Agent secondaryNameNode )
+    {
+        this.secondaryNameNode = secondaryNameNode;
+    }
+
+
     public boolean isDataNode( Agent agent )
     {
         if ( getDataNodes().contains( agent ) )
@@ -269,6 +246,18 @@ public class HadoopClusterConfig implements ConfigBase
     }
 
 
+    public List<Agent> getDataNodes()
+    {
+        return dataNodes;
+    }
+
+
+    public void setDataNodes( List<Agent> dataNodes )
+    {
+        this.dataNodes = dataNodes;
+    }
+
+
     public boolean isTaskTracker( Agent agent )
     {
         if ( getTaskTrackers().contains( agent ) )
@@ -279,6 +268,18 @@ public class HadoopClusterConfig implements ConfigBase
         {
             return false;
         }
+    }
+
+
+    public List<Agent> getTaskTrackers()
+    {
+        return taskTrackers;
+    }
+
+
+    public void setTaskTrackers( List<Agent> taskTrackers )
+    {
+        this.taskTrackers = taskTrackers;
     }
 
 

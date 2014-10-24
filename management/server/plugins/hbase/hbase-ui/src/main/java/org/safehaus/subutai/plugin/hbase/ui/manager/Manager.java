@@ -110,8 +110,8 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( TABLE_CAPTION );
-        contentRoot.setId("HbaseMngContentRoot");
-        nodesTable.setId("HbaseMngNodesTable");
+        contentRoot.setId( "HbaseMngContentRoot" );
+        nodesTable.setId( "HbaseMngNodesTable" );
 
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -122,7 +122,7 @@ public class Manager
         controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("HbaseMngClusterCombo");
+        clusterCombo.setId( "HbaseMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -143,7 +143,7 @@ public class Manager
 
         /** Refresh Cluster button */
         refreshClustersBtn = new Button( REFRESH_CLUSTER_CAPTION );
-        refreshClustersBtn.setId("HbaseMngRefresh");
+        refreshClustersBtn.setId( "HbaseMngRefresh" );
         refreshClustersBtn.addStyleName( BUTTON_STYLE_NAME );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -159,7 +159,7 @@ public class Manager
 
         /** Check All button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.setId("HbaseMngCheck");
+        checkAllBtn.setId( "HbaseMngCheck" );
         checkAllBtn.addStyleName( BUTTON_STYLE_NAME );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -182,7 +182,7 @@ public class Manager
 
         /** Start All button */
         startAllNodesBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllNodesBtn.setId("HbaseMngStart");
+        startAllNodesBtn.setId( "HbaseMngStart" );
         startAllNodesBtn.addStyleName( BUTTON_STYLE_NAME );
         startAllNodesBtn.addClickListener( new Button.ClickListener()
         {
@@ -205,7 +205,7 @@ public class Manager
 
         /** Stop All button */
         stopAllNodesBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllNodesBtn.setId("HbaseMngStop");
+        stopAllNodesBtn.setId( "HbaseMngStop" );
         stopAllNodesBtn.addStyleName( BUTTON_STYLE_NAME );
         stopAllNodesBtn.addClickListener( new Button.ClickListener()
         {
@@ -228,7 +228,7 @@ public class Manager
 
         /** Destroy All button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("HbaseMngDestroy");
+        destroyClusterBtn.setId( "HbaseMngDestroy" );
         destroyClusterBtn.addStyleName( BUTTON_STYLE_NAME );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -273,7 +273,7 @@ public class Manager
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -343,10 +343,12 @@ public class Manager
     }
 
 
-    private void startHadoopCluster(){
+    private void startHadoopCluster()
+    {
         HadoopClusterConfig hadoopClusterConfig = hadoop.getCluster( config.getHadoopClusterName() );
         hadoop.startNameNode( hadoopClusterConfig );
     }
+
 
     private void disableOREnableAllButtonsOnTable( Table table, boolean value )
     {
@@ -376,7 +378,7 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId(agent.getListIP().get(0) + "-hbaseCheck");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-hbaseCheck" );
             checkBtn.addStyleName( BUTTON_STYLE_NAME );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
             startBtn.addStyleName( BUTTON_STYLE_NAME );

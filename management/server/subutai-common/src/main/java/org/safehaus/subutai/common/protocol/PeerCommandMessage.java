@@ -18,7 +18,7 @@ public abstract class PeerCommandMessage
     protected UUID id;
     protected UUID agentId;
     protected UUID peerId;
-//    protected UUID envId;
+    //    protected UUID envId;
     protected PeerCommandType type = PeerCommandType.UNKNOWN;
     protected String exceptionMessage;
     protected boolean success = false;
@@ -57,7 +57,7 @@ public abstract class PeerCommandMessage
         this.id = UUIDUtil.generateTimeBasedUUID();
         this.peerId = peerId;
         this.agentId = agentId;
-//        this.envId = envId;
+        //        this.envId = envId;
         this.type = type;
     }
 
@@ -154,17 +154,18 @@ public abstract class PeerCommandMessage
     }
 
 
-//    public UUID getEnvId()
-//    {
-//        return envId;
-//    }
-//
-//
-//    public void setEnvId( final UUID envId )
-//    {
-//        this.envId = envId;
-//    }
-//
+    //    public UUID getEnvId()
+    //    {
+    //        return envId;
+    //    }
+    //
+    //
+    //    public void setEnvId( final UUID envId )
+    //    {
+    //        this.envId = envId;
+    //    }
+    //
+
 
     public Object getResult()
     {

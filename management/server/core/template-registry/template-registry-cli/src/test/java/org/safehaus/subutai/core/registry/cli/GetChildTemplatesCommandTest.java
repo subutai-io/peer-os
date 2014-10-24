@@ -34,10 +34,16 @@ public class GetChildTemplatesCommandTest extends TestParent
         }
 
 
-        public void setLxcArch( String lxcArch ) {this.lxcArch = lxcArch;}
+        public void setLxcArch( String lxcArch )
+        {
+            this.lxcArch = lxcArch;
+        }
 
 
-        public void setParentTemplateName( String parentTemplateName1 ) {this.parentTemplateName = parentTemplateName1;}
+        public void setParentTemplateName( String parentTemplateName1 )
+        {
+            this.parentTemplateName = parentTemplateName1;
+        }
     }
 
 
