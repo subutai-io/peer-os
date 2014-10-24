@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.environment.api.helper;
 
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 
 public class Environment
@@ -63,6 +65,13 @@ public class Environment
     public Set<EnvironmentContainer> getContainers()
     {
         return containers;
+    }
+
+
+    //TODO implement this method after migrating to new domain model
+    public Set<ContainerHost> getContainerHosts()
+    {
+        return Collections.EMPTY_SET;
     }
 
 
