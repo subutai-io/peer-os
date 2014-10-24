@@ -76,6 +76,16 @@ function execute_all_postscripts {
     msg_error "No binding passed to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
+  #TODO initialize scripts with all the scripts under subutai_pre_script_base 
+  # starting with pre-${FUNCNAME[0]}
+  scripts="postscript1 postscript2"
+  IFS=' ' read -a scriptArray <<< "$scripts"
+  for script in "${scriptArray[@]}"
+  do
+    # Remove unnecessary whitespaces if any
+    script=$(echo " $script " | tr -d ' ')
+    msg_info "      - Running $script"
+  done
 
   msg_info "    - ${FUNCNAME[0]} for $binding"
 }

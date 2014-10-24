@@ -5,7 +5,7 @@ function monitor_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Monitor containers.
   echo
-  echo "        "subutai \[-qh\] monitor \[-p\] \[container_name\]
+  echo "        "subutai \[-qh\] monitor \[-p\|container_name\] 
   echo
   echo -----------------------------------------------------------------------
 }

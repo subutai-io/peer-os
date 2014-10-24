@@ -52,7 +52,7 @@ function export {
   # (1) perform some sanity checks
   # ----------------------------------------------------------------------------
 
-  lxc_assert $container "`usage`"
+  lxc_assert $container "`export_usage`"
 
   if [ "$container" == "master" ]; then
     echo "Please use master_export command!"

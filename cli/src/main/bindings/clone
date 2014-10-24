@@ -21,28 +21,27 @@ function clone {
 
   local parent="$1"
   local child="$2"
+
+  # Check that parent exists
+  lxc_assert "$parent" "`clone_usage`"
+  # Check that container name is legal and it does not exist
+  lxc_assert_name $child
+  lxc_assert_no $child
+
   config=/var/lib/lxc/$child/config
+
   if [ "`are_containers_readable $parent $child`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
 
-  if [ -z "$parent" ]; then
-    msg_error "Parameters not provided. Aborting ..."
-    show_usage "`clone_usage`"
-  fi
-
-  if [ -z "$child" ]; then
-    msg_error "Child parameter not provided. Aborting ..."
-    show_usage "`clone_usage`"
-  fi
-  
   OPTIND=0
   if [ "$2" == $child ]; then
     shift
     shift
   fi
+
   #getting environmentId using getopts
   local environmentId=""
   shift_amount=0;
@@ -84,14 +83,12 @@ function clone {
   fi
 
   #cloning operation is starting..
-  lxc_clone $parent $child $environmentId "`usage`"
-  
-  #defining 2 veth pair for each lxc container
-  sed -i "/lxc.network.veth.pair =.*/c\lxc.network.veth.pair = $child" $config
-  echo "lxc.network.veth.pair = $child-2" >> $config
-  
+  lxc_clone $parent $child $environmentId "`clone_usage`"
+
+  ovs_configure_lxc $child
   git_child_branch $child
- 
+  lxc_install_agent $child
+
   if [ "x$postScriptsEnabled" == "xtrue" ]; then
     if [ "x$postScripts" == "xall" ]; then
       execute_all_postscripts "${FUNCNAME[0]}" $child
@@ -99,6 +96,7 @@ function clone {
       execute_postscripts "$postScripts" $child
     fi
   fi
+  
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
