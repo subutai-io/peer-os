@@ -45,7 +45,7 @@ function clone {
   #getting environmentId using getopts
   local environmentId=""
   shift_amount=0;
-  while getopts ":e" opt; do
+  while getopts ":e:" opt; do
      case $opt in
        e)
           environmentId=$OPTARG;
