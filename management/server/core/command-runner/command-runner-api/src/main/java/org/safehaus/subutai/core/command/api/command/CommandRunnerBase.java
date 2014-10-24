@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.command.api.command;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 
 /**
