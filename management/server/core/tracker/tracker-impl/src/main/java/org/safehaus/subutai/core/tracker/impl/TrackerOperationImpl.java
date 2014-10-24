@@ -130,7 +130,7 @@ public class TrackerOperationImpl implements TrackerOperation
             log.append( logString );
         }
         this.state = state;
-        tracker.saveProductOperation( source, this );
+        tracker.saveTrackerOperation( source, this );
     }
 
 

@@ -114,7 +114,7 @@ public class TrackerOperationImplTest
 
         poi.addLogFailed( DUMMY_LOG );
 
-        verify( ti ).saveProductOperation( SOURCE, poi );
+        verify( ti ).saveTrackerOperation( SOURCE, poi );
     }
 
 
