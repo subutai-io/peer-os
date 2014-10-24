@@ -95,7 +95,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("PrestoNodesTable");
+        nodesTable.setId( "PrestoNodesTable" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -104,7 +104,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("PresClusterCombo");
+        clusterCombo.setId( "PresClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -123,42 +123,42 @@ public class Manager
 
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("PresRefreshClustersBtn");
+        refreshClustersBtn.setId( "PresRefreshClustersBtn" );
         addClickListener( refreshClustersBtn );
         controlsContent.addComponent( refreshClustersBtn );
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
 
 
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.setId("PresCheckAll");
+        checkAllBtn.setId( "PresCheckAll" );
         addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
 
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.setId("PresStartAll");
+        startAllBtn.setId( "PresStartAll" );
         addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
 
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.setId("PresStopAll");
+        stopAllBtn.setId( "PresStopAll" );
         addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
 
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("PresDestroyClusters");
+        destroyClusterBtn.setId( "PresDestroyClusters" );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
 
         addNodeBtn = new Button( ADD_NODE_CAPTION );
-        addNodeBtn.setId("PresAddNode");
+        addNodeBtn.setId( "PresAddNode" );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
         controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
@@ -167,7 +167,7 @@ public class Manager
                 addNodeBtn );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -370,19 +370,20 @@ public class Manager
         for ( final Agent agent : workers )
         {
             final Label resultHolder = new Label();
-            resultHolder.setId(agent.getListIP().get(0)+"-prestoResult");
+            resultHolder.setId( agent.getListIP().get( 0 ) + "-prestoResult" );
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId(agent.getListIP().get(0)+"-prestoCheck");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-prestoCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId(agent.getListIP().get(0)+"-prestoStart");
+            startBtn.setId( agent.getListIP().get( 0 ) + "-prestoStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId(agent.getListIP().get(0)+"-prestoStop");
+            stopBtn.setId( agent.getListIP().get( 0 ) + "-prestoStop" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-prestoDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
             PROGRESS_ICON.setVisible( false );
-            PROGRESS_ICON.setId("indicator");
+            PROGRESS_ICON.setId( "indicator" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );
@@ -396,7 +397,7 @@ public class Manager
             }, null );
 
             /** add click listeners to button */
-            addClickListenerToSlavesCheckButton( agent, resultHolder, checkBtn, startBtn, stopBtn,destroyBtn );
+            addClickListenerToSlavesCheckButton( agent, resultHolder, checkBtn, startBtn, stopBtn, destroyBtn );
             addClickListenerToStartButtons( agent, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToStopButtons( agent, startBtn, stopBtn, checkBtn );
             addClickListenerToDestroyButton( agent, destroyBtn );
@@ -404,13 +405,13 @@ public class Manager
 
         /** add Coordinator here */
         final Label resultHolder = new Label();
-        resultHolder.setId(coordinator.getListIP().get(0)+"-prestoResult");
+        resultHolder.setId( coordinator.getListIP().get( 0 ) + "-prestoResult" );
         final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-        checkBtn.setId(coordinator.getListIP().get(0)+"-prestoCheck");
+        checkBtn.setId( coordinator.getListIP().get( 0 ) + "-prestoCheck" );
         final Button startBtn = new Button( START_BUTTON_CAPTION );
-        startBtn.setId(coordinator.getListIP().get(0)+"-prestoStart");
+        startBtn.setId( coordinator.getListIP().get( 0 ) + "-prestoStart" );
         final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-        stopBtn.setId(coordinator.getListIP().get(0)+"-prestoStop");
+        stopBtn.setId( coordinator.getListIP().get( 0 ) + "-prestoStop" );
 
         addStyleNameToButtons( checkBtn, startBtn, stopBtn );
 
@@ -649,7 +650,7 @@ public class Manager
                                     PROGRESS_ICON.setVisible( false );
                                     for ( Button b : buttons )
                                     {
-                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION )  || b.getCaption().equals(
+                                        if ( b.getCaption().equals( CHECK_BUTTON_CAPTION ) || b.getCaption().equals(
                                                 DESTROY_BUTTON_CAPTION ) )
                                         {
                                             enableButtons( b );
