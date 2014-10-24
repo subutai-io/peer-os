@@ -52,7 +52,7 @@ public class ConfigurationStep extends Panel
         content.setMargin( true );
 
         TextField nameTxt = new TextField( "Cluster name" );
-        nameTxt.setId("hbaseClusterName");
+        nameTxt.setId( "hbaseClusterName" );
         nameTxt.setRequired( true );
         nameTxt.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -65,7 +65,7 @@ public class ConfigurationStep extends Panel
         nameTxt.setValue( wizard.getConfig().getClusterName() );
 
         Button next = new Button( "Next" );
-        next.setId("HbaseNext");
+        next.setId( "HbaseNext" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -77,7 +77,7 @@ public class ConfigurationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("HbaseBack");
+        back.setId( "HbaseBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -120,11 +120,11 @@ public class ConfigurationStep extends Panel
         final TwinColSelect quorumPeers = new TwinColSelect( "Quroum Peers", new ArrayList<Agent>() );
         final TwinColSelect backUpMasters = new TwinColSelect( "Backup Masters", new ArrayList<Agent>() );
 
-        hadoopClustersCombo.setId("HbaseConfHadoopCluster");
-        masterNodeCombo.setId("HbaseMasters");
-        regionServers.setId("HbaseRegions");
-        quorumPeers.setId("HbaseQuorums");
-        backUpMasters.setId("HbaseBackupMasters");
+        hadoopClustersCombo.setId( "HbaseConfHadoopCluster" );
+        masterNodeCombo.setId( "HbaseMasters" );
+        regionServers.setId( "HbaseRegions" );
+        quorumPeers.setId( "HbaseQuorums" );
+        backUpMasters.setId( "HbaseBackupMasters" );
 
         masterNodeCombo.setImmediate( true );
         masterNodeCombo.setTextInputAllowed( false );

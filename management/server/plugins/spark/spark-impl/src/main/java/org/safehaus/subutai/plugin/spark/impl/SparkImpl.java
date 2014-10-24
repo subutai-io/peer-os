@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -37,6 +39,12 @@ import com.google.common.base.Preconditions;
 
 public class SparkImpl extends SparkBase implements Spark
 {
+
+    public SparkImpl( DataSource dataSource )
+    {
+        this.dataSource = dataSource;
+    }
+
 
     @Override
     public UUID installCluster( final SparkClusterConfig config )

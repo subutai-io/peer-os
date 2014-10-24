@@ -16,8 +16,8 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieImpl>
 {
 
-    private String lxcHostName;
     private final TrackerOperation trackerOperation;
+    private String lxcHostName;
 
 
     public DestroyNodeOperationHandler( OozieImpl manager, String clusterName, String lxcHostName )
@@ -35,6 +35,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
     {
         return trackerOperation.getId();
     }
+
 
     @Override
     public void run()
@@ -75,6 +76,5 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
                .saveInfo( OozieClusterConfig.PRODUCT_KEY, oozieClusterConfig.getClusterName(), oozieClusterConfig );
         trackerOperation.addLogDone( "Cluster info saved to DB" );
     }
-
 }
 

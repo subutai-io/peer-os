@@ -16,7 +16,7 @@ import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 public class DestroyAllOperationHandler extends AbstractHandler
 {
 
-    public DestroyAllOperationHandler( SqoopImpl manager, String clusterName,  TrackerOperation po )
+    public DestroyAllOperationHandler( SqoopImpl manager, String clusterName, TrackerOperation po )
     {
         super( manager, clusterName, po );
     }
@@ -76,8 +76,7 @@ public class DestroyAllOperationHandler extends AbstractHandler
 
 
         String s = CommandFactory.build( CommandType.PURGE, null );
-        Command cmd = manager.getCommandRunner()
-                             .createCommand( new RequestBuilder( s ), config.getNodes() );
+        Command cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ), config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )
@@ -107,5 +106,4 @@ public class DestroyAllOperationHandler extends AbstractHandler
             return false;
         }
     }
-
 }

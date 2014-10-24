@@ -48,7 +48,7 @@ public class VerificationStep extends Panel
         }
 
         Button install = new Button( "Install" );
-        install.setId("OozieVerificationInstall");
+        install.setId( "OozieVerificationInstall" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -60,8 +60,7 @@ public class VerificationStep extends Panel
                         OozieClusterConfig.PRODUCT_KEY );
                 final ConfirmationDialog alert = new ConfirmationDialog(
                         String.format( "Do you want to restart the %s hadoop cluster for changes to take effect?",
-                                wizard.getConfig().getHadoopClusterName() ), "Yes", "No"
-                );
+                                wizard.getConfig().getHadoopClusterName() ), "Yes", "No" );
 
                 alert.getOk().addClickListener( new Button.ClickListener()
                 {
@@ -71,11 +70,9 @@ public class VerificationStep extends Panel
                         Hadoop hadoopManager = wizard.getHadoopManager();
                         String hadoopClusterName = wizard.getConfig().getHadoopClusterName();
                         HadoopClusterConfig cluster = hadoopManager.getCluster( hadoopClusterName );
-                        UUID trackID =
-                                hadoopManager.restartNameNode( cluster );
-                        ProgressWindow window =
-                                new ProgressWindow( wizard.getExecutor(), wizard.getTracker(), trackID,
-                                        HadoopClusterConfig.PRODUCT_KEY );
+                        UUID trackID = hadoopManager.restartNameNode( cluster );
+                        ProgressWindow window = new ProgressWindow( wizard.getExecutor(), wizard.getTracker(), trackID,
+                                HadoopClusterConfig.PRODUCT_KEY );
                         getUI().addWindow( window.getWindow() );
                     }
                 } );
@@ -103,7 +100,7 @@ public class VerificationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("OozieVerificationBack");
+        back.setId( "OozieVerificationBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -126,5 +123,4 @@ public class VerificationStep extends Panel
 
         setContent( grid );
     }
-
 }

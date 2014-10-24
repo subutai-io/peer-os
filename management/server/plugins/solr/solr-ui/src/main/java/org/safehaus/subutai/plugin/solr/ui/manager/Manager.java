@@ -57,9 +57,8 @@ public class Manager
     protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
-    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     final Button refreshClustersBtn, destroyInstallationBtn;
-
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
@@ -89,7 +88,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("SlrNodeTbl");
+        nodesTable.setId( "SlrNodeTbl" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -99,7 +98,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("SlrClusterCombo");
+        clusterCombo.setId( "SlrClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -117,7 +116,7 @@ public class Manager
 
         /**  Refresh clusters button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("SlrRefreshClustersBtn");
+        refreshClustersBtn.setId( "SlrRefreshClustersBtn" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -132,7 +131,7 @@ public class Manager
 
         /**  Destroy cluster button  */
         destroyInstallationBtn = new Button( DESTROY_INSTALLATION_BUTTON_CAPTION );
-        destroyInstallationBtn.setId("SolrDestroyCluster");
+        destroyInstallationBtn.setId( "SolrDestroyCluster" );
         destroyInstallationBtn.addStyleName( "default" );
         addClickListenerToDestroyInstallationButton();
         controlsContent.addComponent( destroyInstallationBtn );
@@ -140,7 +139,7 @@ public class Manager
         addStyleNameToButtons( refreshClustersBtn, destroyInstallationBtn );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -211,13 +210,13 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Label resultHolder = new Label();
-            resultHolder.setId(agent.getListIP().get(0)+"-solrResult");
+            resultHolder.setId( agent.getListIP().get( 0 ) + "-solrResult" );
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId(agent.getListIP().get(0)+"-solrCheck");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-solrCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId(agent.getListIP().get(0)+"-solrStart");
+            startBtn.setId( agent.getListIP().get( 0 ) + "-solrStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId(agent.getListIP().get(0)+"-solrStop");
+            stopBtn.setId( agent.getListIP().get( 0 ) + "-solrStop" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn );
             enableButtons( startBtn, stopBtn );

@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.common.mock;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.TrackerOperation;
 
 
 public class TrackerOperationMock implements TrackerOperation

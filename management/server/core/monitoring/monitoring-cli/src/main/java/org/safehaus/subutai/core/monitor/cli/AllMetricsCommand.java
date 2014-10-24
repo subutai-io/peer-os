@@ -20,8 +20,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 
-@Command(scope = "monitor", name = "all-metrics",
-        description = "List all metrics for given host within given number of last days up to given limit")
+@Command( scope = "monitor", name = "all-metrics",
+        description = "List all metrics for given host within given number of last days up to given limit" )
 public class AllMetricsCommand extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( AllMetricsCommand.class.getName() );
@@ -31,7 +31,7 @@ public class AllMetricsCommand extends OsgiCommandSupport
     protected String hostname;
     @Argument( index = 1, name = "days", required = false, multiValued = false )
     protected int days = 1;
-    @Argument(index = 2, name = "limit", required = false, multiValued = false)
+    @Argument( index = 2, name = "limit", required = false, multiValued = false )
     protected int limit = 100;
 
     private final Monitoring monitoring;

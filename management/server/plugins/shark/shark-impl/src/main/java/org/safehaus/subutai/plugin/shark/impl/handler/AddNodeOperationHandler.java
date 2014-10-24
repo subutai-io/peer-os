@@ -77,7 +77,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
 
         //check installed packages
         Set<Agent> set = new HashSet<>( Arrays.asList( agent ) );
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( set );
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( set );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -110,14 +110,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
 
         trackerOperation.addLog( "Installing Shark..." );
 
-        Command installCommand = Commands.getInstallCommand( set );
+        Command installCommand = manager.getCommands().getInstallCommand( set );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )
         {
             trackerOperation.addLog( "Installation succeeded. Setting Master IP..." );
 
-            Command cmd = Commands.getSetMasterIPCommand( set, sparkConfig.getMasterNode() );
+            Command cmd = manager.getCommands().getSetMasterIPCommand( set, sparkConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( cmd );
 
             if ( cmd.hasSucceeded() )

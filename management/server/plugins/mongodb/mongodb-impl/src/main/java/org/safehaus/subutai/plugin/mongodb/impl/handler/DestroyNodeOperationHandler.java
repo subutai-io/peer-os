@@ -103,22 +103,21 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
                                                                       config.getCfgSrvPort(), config.getDomainName(),
                                                                       config.getConfigServers(),
                                                                       config.getRouterServers() ), new CommandCallback()
-                        {
+                {
 
-                            @Override
-                            public void onResponse( Response response, AgentResult agentResult, Command command )
+                    @Override
+                    public void onResponse( Response response, AgentResult agentResult, Command command )
+                    {
+                        for ( AgentResult result : command.getResults().values() )
+                        {
+                            if ( result.getStdOut().contains( "child process started successfully, parent exiting" )
+                                    && okCount.incrementAndGet() == config.getRouterServers().size() )
                             {
-                                for ( AgentResult result : command.getResults().values() )
-                                {
-                                    if ( result.getStdOut()
-                                               .contains( "child process started successfully, parent exiting" )
-                                            && okCount.incrementAndGet() == config.getRouterServers().size() )
-                                    {
-                                        stop();
-                                    }
-                                }
+                                stop();
                             }
-                        } );
+                        }
+                    }
+                } );
 
                 if ( okCount.get() != config.getRouterServers().size() )
                 {

@@ -1,11 +1,14 @@
-@mixin dashboard-transactions-view {
+@mixin dashboard-transactions-view
+{
 
   /* TODO move to table styles once finalized */
-  .transactions .h1 {
+  .transactions .h1
+  {
     padding: 10px 1em .5em 8px;
   }
 
-  .transactions .borderless .v-table-header-wrap {
+  .transactions .borderless .v-table-header-wrap
+  {
     border-top: 1px solid #d4d5d5;
   }
 

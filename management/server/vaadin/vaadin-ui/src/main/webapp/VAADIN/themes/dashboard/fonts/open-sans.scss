@@ -1,6 +1,8 @@
-@mixin font-open-sans {
+@mixin font-open-sans
+{
 
-  @font-face {
+  @font-face
+  {
     font-family: 'Open Sans';
     src: url('OpenSans-Light-webfont.eot');
     src: url('OpenSans-Light-webfont.eot?#iefix') format('embedded-opentype'),
@@ -11,7 +13,8 @@
     font-style: normal;
   }
 
-  @font-face {
+  @font-face
+  {
     font-family: 'Open Sans';
     src: url('OpenSans-Regular-webfont.eot');
     src: url('OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
@@ -22,7 +25,8 @@
     font-style: normal;
   }
 
-  @font-face {
+  @font-face
+  {
     font-family: 'Open Sans';
     src: url('OpenSans-Semibold-webfont.eot');
     src: url('OpenSans-Semibold-webfont.eot?#iefix') format('embedded-opentype'),

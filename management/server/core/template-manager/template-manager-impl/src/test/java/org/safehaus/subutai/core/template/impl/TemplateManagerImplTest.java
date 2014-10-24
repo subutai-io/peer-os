@@ -52,7 +52,7 @@ public class TemplateManagerImplTest
     }
 
 
-//    @Test
+    //    @Test
     public void testCloneParentTemplateExists() throws TemplateException
     {
 

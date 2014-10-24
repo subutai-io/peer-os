@@ -44,7 +44,8 @@ public class AgentNotifierTest
         agentListener = mock( AgentListener.class );
         agentListenerQueue = new ConcurrentLinkedQueue<>();
         agentListenerQueue.add( agentListener );
-        UUID agentId = UUIDUtil.generateTimeBasedUUID();;
+        UUID agentId = UUIDUtil.generateTimeBasedUUID();
+        ;
         AgentManagerImpl agentManager = mock( AgentManagerImpl.class );
         when( agentManager.isNotifyAgentListeners() ).thenReturn( true );
         agents = MockUtils.getAgents( agentId );

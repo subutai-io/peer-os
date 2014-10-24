@@ -12,7 +12,7 @@ import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-public class SetupStrategyOverSpark extends SetupStartegyBase implements ClusterSetupStrategy
+public class SetupStrategyOverSpark extends SetupStrategyBase implements ClusterSetupStrategy
 {
 
     public SetupStrategyOverSpark( SharkImpl manager, SharkClusterConfig config, TrackerOperation po )
@@ -33,7 +33,7 @@ public class SetupStrategyOverSpark extends SetupStartegyBase implements Cluster
 
         po.addLog( "Checking installed packages..." );
 
-        Command checkCmd = Commands.getCheckInstalledCommand( config.getNodes() );
+        Command checkCmd = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkCmd );
         if ( !checkCmd.hasCompleted() )
         {
@@ -64,7 +64,7 @@ public class SetupStrategyOverSpark extends SetupStartegyBase implements Cluster
         }
 
         po.addLog( "Installing Shark..." );
-        Command installCommand = Commands.getInstallCommand( config.getNodes() );
+        Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasSucceeded() )

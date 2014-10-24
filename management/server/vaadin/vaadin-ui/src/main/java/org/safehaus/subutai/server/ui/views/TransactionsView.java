@@ -25,6 +25,7 @@ public class TransactionsView extends VerticalLayout implements View
         addStyleName( "transactions" );
     }
 
+
     @Override
     public void enter( ViewChangeEvent event )
     {

@@ -28,7 +28,7 @@ public class ConfigurationStep extends VerticalLayout
         content.setMargin( true );
 
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name:" );
-        clusterNameTxtFld.setId("ElasticSearchConfClusterName");
+        clusterNameTxtFld.setId( "ElasticSearchConfClusterName" );
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setMaxLength( 20 );
         clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -43,7 +43,7 @@ public class ConfigurationStep extends VerticalLayout
 
         final ComboBox nodesCountCombo =
                 new ComboBox( "Number of nodes:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        nodesCountCombo.setId("ElasticSearchConfNumNodes");
+        nodesCountCombo.setId( "ElasticSearchConfNumNodes" );
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setTextInputAllowed( false );
         nodesCountCombo.setNullSelectionAllowed( false );
@@ -60,7 +60,7 @@ public class ConfigurationStep extends VerticalLayout
 
         final ComboBox mastersCountCombo =
                 new ComboBox( "Number of master nodes:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        mastersCountCombo.setId("ElasticSearchConfNumMasterNodes");
+        mastersCountCombo.setId( "ElasticSearchConfNumMasterNodes" );
         mastersCountCombo.setImmediate( true );
         mastersCountCombo.setTextInputAllowed( false );
         mastersCountCombo.setNullSelectionAllowed( false );
@@ -77,7 +77,7 @@ public class ConfigurationStep extends VerticalLayout
 
         final ComboBox dataNodesCountCombo =
                 new ComboBox( "Number of data nodes:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        dataNodesCountCombo.setId("ElasticSearchConfNumDataNodes");
+        dataNodesCountCombo.setId( "ElasticSearchConfNumDataNodes" );
         dataNodesCountCombo.setImmediate( true );
         dataNodesCountCombo.setTextInputAllowed( false );
         dataNodesCountCombo.setNullSelectionAllowed( false );
@@ -94,7 +94,7 @@ public class ConfigurationStep extends VerticalLayout
 
         ComboBox numberOfShardsCombo =
                 new ComboBox( "Number of shards:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        numberOfShardsCombo.setId("ElasticSearchConfNumShards");
+        numberOfShardsCombo.setId( "ElasticSearchConfNumShards" );
         numberOfShardsCombo.setImmediate( true );
         numberOfShardsCombo.setTextInputAllowed( false );
         numberOfShardsCombo.setNullSelectionAllowed( false );
@@ -111,7 +111,7 @@ public class ConfigurationStep extends VerticalLayout
 
         ComboBox numberOfReplicasCombo =
                 new ComboBox( "Number of replicas:", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-        numberOfReplicasCombo.setId("ElasticSearchConfNumReplicas");
+        numberOfReplicasCombo.setId( "ElasticSearchConfNumReplicas" );
         numberOfReplicasCombo.setImmediate( true );
         numberOfReplicasCombo.setTextInputAllowed( false );
         numberOfReplicasCombo.setNullSelectionAllowed( false );
@@ -127,7 +127,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button next = new Button( "Next" );
-        next.setId("ElasticSearchConfNext");
+        next.setId( "ElasticSearchConfNext" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -163,7 +163,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
-        back.setId("ElasticSearchConfBack");
+        back.setId( "ElasticSearchConfBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

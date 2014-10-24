@@ -119,8 +119,7 @@ public class MergeTest
     @Test
     public void shouldThrowException() throws GitException
     {
-        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
-               .merge( eq( agent ), anyString() );
+        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).merge( eq( agent ), anyString() );
         Merge merge = new Merge( gitManager, agentManager );
         merge.setHostname( HOSTNAME );
 

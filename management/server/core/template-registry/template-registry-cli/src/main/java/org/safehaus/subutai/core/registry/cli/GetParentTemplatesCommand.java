@@ -17,14 +17,14 @@ import com.google.common.base.Strings;
 /**
  * CLI for TemplateRegistryManager.getParentTemplates command
  */
-@Command(scope = "registry", name = "get-parent-templates", description = "Get all parent templates")
+@Command( scope = "registry", name = "get-parent-templates", description = "Get all parent templates" )
 public class GetParentTemplatesCommand extends OsgiCommandSupport
 {
-    @Argument(index = 0, name = "child template name", required = true, multiValued = false,
-            description = "child template name")
+    @Argument( index = 0, name = "child template name", required = true, multiValued = false,
+            description = "child template name" )
     String childTemplateName;
-    @Argument(index = 1, name = "lxc arch", required = false, multiValued = false,
-            description = "lxc arch, default = amd64")
+    @Argument( index = 1, name = "lxc arch", required = false, multiValued = false,
+            description = "lxc arch, default = amd64" )
     String lxcArch;
 
     private final TemplateRegistry templateRegistry;

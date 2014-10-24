@@ -120,9 +120,9 @@
                   <type>war</type>
                 </artifactItem>
                 <!--<artifactItem>-->
-                  <!--<groupId>${project.groupId}</groupId>-->
-                  <!--<artifactId>vaadin-custom</artifactId>-->
-                  <!--<outputDirectory>target/assembly/system/</outputDirectory>-->
+                <!--<groupId>${project.groupId}</groupId>-->
+                <!--<artifactId>vaadin-custom</artifactId>-->
+                <!--<outputDirectory>target/assembly/system/</outputDirectory>-->
                 <!--</artifactItem>-->
               </artifactItems>
             </configuration>

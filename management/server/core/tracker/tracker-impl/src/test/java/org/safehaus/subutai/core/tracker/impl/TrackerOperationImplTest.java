@@ -35,21 +35,21 @@ public class TrackerOperationImplTest
     private final String DESCRIPTION = "description";
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailNullSource()
     {
         new TrackerOperationImpl( null, DESCRIPTION, mock( TrackerImpl.class ) );
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailNullDescription()
     {
         new TrackerOperationImpl( SOURCE, null, mock( TrackerImpl.class ) );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullTracker()
     {
         new TrackerOperationImpl( SOURCE, DESCRIPTION, null );
@@ -145,7 +145,7 @@ public class TrackerOperationImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void poViewConstructorShouldFailNullPO()
     {
         new TrackerOperationViewImpl( null );

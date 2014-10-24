@@ -14,7 +14,7 @@ import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-public class SetupStrategyWithHadoopSpark extends SetupStartegyBase implements ClusterSetupStrategy
+public class SetupStrategyWithHadoopSpark extends SetupStrategyBase implements ClusterSetupStrategy
 {
     Environment environment;
 

@@ -26,7 +26,7 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class Manager extends VerticalLayout
 {
 

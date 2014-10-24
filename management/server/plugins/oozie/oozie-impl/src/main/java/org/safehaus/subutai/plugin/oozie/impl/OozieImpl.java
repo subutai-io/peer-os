@@ -25,11 +25,11 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
-import org.safehaus.subutai.plugin.oozie.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.oozie.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.DestroyNodeOperationHandler;
@@ -49,7 +49,7 @@ public class OozieImpl implements Oozie
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( OozieImpl.class.getName() );
-    private PluginDAO pluginDAO;
+    private PluginDao pluginDAO;
     private Commands commands;
     private AgentManager agentManager;
     private Tracker tracker;
@@ -72,7 +72,7 @@ public class OozieImpl implements Oozie
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
@@ -90,13 +90,13 @@ public class OozieImpl implements Oozie
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDAO pluginDAO )
+    public void setPluginDAO( final PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }

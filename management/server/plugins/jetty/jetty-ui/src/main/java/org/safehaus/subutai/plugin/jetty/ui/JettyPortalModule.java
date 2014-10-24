@@ -15,7 +15,6 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.jetty.ui.JettyComponent;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -25,9 +24,9 @@ import com.vaadin.ui.Component;
 public class JettyPortalModule implements PortalModule
 {
 
-    protected Logger LOG = Logger.getLogger( JettyPortalModule.class.getName() );
     public static final String MODULE_IMAGE = "jetty.png";
     private final ServiceLocator serviceLocator;
+    protected Logger LOG = Logger.getLogger( JettyPortalModule.class.getName() );
     private ExecutorService executor;
 
 

@@ -59,10 +59,9 @@ public class Manager
     protected static final String IP_COLUMN_CAPTION = "IP List";
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected static final String BUTTON_STYLE_NAME = "default";
-    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String MESSAGE = "No cluster is installed !";
     final Button refreshClustersBtn, destroyClusterBtn, addNodeBtn;
-
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ComboBox clusterCombo;
     private final Table serverTable, clientsTable;
     private final Hive hive;
@@ -90,10 +89,10 @@ public class Manager
         contentRoot.setColumns( 1 );
 
         //tables go here
-        serverTable = createTableTemplate(SERVER_TABLE_CAPTION);
-        serverTable.setId("HiveTable");
-        clientsTable = createTableTemplate(CLIENT_TABLE_CAPTION);
-        clientsTable.setId("HiveClientsTable");
+        serverTable = createTableTemplate( SERVER_TABLE_CAPTION );
+        serverTable.setId( "HiveTable" );
+        clientsTable = createTableTemplate( CLIENT_TABLE_CAPTION );
+        clientsTable.setId( "HiveClientsTable" );
         /*
         nodesTable = createTableTemplate( SERVER_TABLE_CAPTION );
         nodesTable.setId("HiveTable");
@@ -106,7 +105,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("HiveClusterCb");
+        clusterCombo.setId( "HiveClusterCb" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -123,7 +122,7 @@ public class Manager
 
         /** Refresh Cluster Button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("hiveRefreshClusterBtn");
+        refreshClustersBtn.setId( "hiveRefreshClusterBtn" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -136,13 +135,13 @@ public class Manager
 
         /** Destroy Cluster Button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("HiveDestroyClusterBtn");
+        destroyClusterBtn.setId( "HiveDestroyClusterBtn" );
         addClickListenerToDestroyClusterButton();
 
 
         /** Add Node Button */
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId("HiveAddNodeBtn");
+        addNodeBtn.setId( "HiveAddNodeBtn" );
         addClickListenerToAddNodeButton();
 
 
@@ -161,7 +160,7 @@ public class Manager
 
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( tablesLayout, 0, 1, 0, 9 );
@@ -347,7 +346,7 @@ public class Manager
         if ( config != null )
         {
             Set<Agent> cli_agents = new HashSet<>();
-            cli_agents.add(config.getServer());
+            cli_agents.add( config.getServer() );
             populateTable( serverTable, cli_agents );
             populateTable( clientsTable, config.getClients() );
         }
@@ -366,13 +365,13 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId(agent.getListIP().get(0)+"-hiveCheck");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-hiveCheck" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId(agent.getListIP().get(0)+"-hiveStart");
+            startBtn.setId( agent.getListIP().get( 0 ) + "-hiveStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId(agent.getListIP().get(0)+"-hiveStop");
+            stopBtn.setId( agent.getListIP().get( 0 ) + "-hiveStop" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId(agent.getListIP().get(0)+"-hiveDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-hiveDestroy" );
 
             addStyleNameToButtons( checkBtn, startBtn, stopBtn, destroyBtn );
             disableButtons( startBtn, stopBtn );
@@ -423,7 +422,7 @@ public class Manager
             }
 
             table.addItem( new Object[] {
-                    agent.getHostname(), agent.getListIP().get( 0 ),checkNodeRole(agent), availableOperations
+                    agent.getHostname(), agent.getListIP().get( 0 ), checkNodeRole( agent ), availableOperations
             }, null );
 
             addClickListenerToCheckButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );

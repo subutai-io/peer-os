@@ -19,15 +19,15 @@ import com.google.common.base.Preconditions;
 /**
  * Displays the current git branch
  */
-@Command(scope = "git", name = "get-current-branch", description = "Get current branch")
+@Command( scope = "git", name = "get-current-branch", description = "Get current branch" )
 public class GetCurrentBranch extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( GetCurrentBranch.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
 
     private final GitManager gitManager;

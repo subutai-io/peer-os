@@ -21,7 +21,8 @@
 @import "views/reports.scss";
 @import "views/transactions.scss";
 
-@mixin dashboard {
+@mixin dashboard
+{
 
   @include base;
 
@@ -42,19 +43,23 @@
   @include dashboard-reports-view;
   @include dashboard-transactions-view;
 
-  .v-view {
+  .v-view
+  {
     overflow: hidden;
   }
 
-  &.v-app {
+  &.v-app
+  {
     background: #353637;
   }
 
-  &.v-app[id*="overlays"] {
+  &.v-app[id*="overlays"]
+  {
     height: 0;
   }
 
-  .login-bg {
+  .login-bg
+  {
     content: "";
     position: absolute;
     z-index: 1;
@@ -84,16 +89,19 @@
   }
 
   .main-view,
-  .login-layout {
+  .login-layout
+  {
     position: relative;
     z-index: 2;
   }
 
-  div.login-panel {
+  div.login-panel
+  {
     @include move-up-100;
   }
 
-  .login-panel {
+  .login-panel
+  {
     background: #fff;
     @include border-radius(4px);
     @include box-shadow(0 4px 20px rgba(0, 0, 0, .5));
@@ -101,40 +109,48 @@
   }
 
   .login-panel .labels,
-  .login-panel .fields {
+  .login-panel .fields
+  {
     display: block;
   }
 
-  .login-panel .v-textfield {
+  .login-panel .v-textfield
+  {
     width: 150px;
   }
 
-  .login-panel .h2 {
+  .login-panel .h2
+  {
     padding: 0;
     font-size: 20px;
     color: #c4cacf;
     letter-spacing: -0.05em;
   }
 
-  .login-panel .error {
+  .login-panel .error
+  {
     font-size: 13px;
     height: 20px;
     padding-left: 14px;
   }
 
-  .v-animate-reveal {
+  .v-animate-reveal
+  {
     @include reveal;
   }
 
-  .v-animate-hide {
+  .v-animate-hide
+  {
     @include hide;
   }
 
-  .login .login-bg {
+  .login .login-bg
+  {
     opacity: 1;
   }
 
-  .sidebar {
+  .sidebar
+  {
     background: #414243 url(img/sidebar-gradient.png) repeat-y top right;
     @include move-right;
     -webkit-user-select: none;
@@ -143,13 +159,15 @@
     user-select: none;
   }
 
-  .sidebar .branding {
+  .sidebar .branding
+  {
     border-bottom: 1px solid #353637;
     position: relative;
     -webkit-font-smoothing: antialiased;
   }
 
-  .sidebar .branding .v-label {
+  .sidebar .branding .v-label
+  {
     position: relative;
     z-index: 2;
 
@@ -166,13 +184,15 @@
     //@include box-shadow(inset 0 0 5px 2px rgba(0,0,0,.5));
   }
 
-  .sidebar .branding .v-label span {
+  .sidebar .branding .v-label span
+  {
     font-size: 13px;
     color: #d0d1d3;
     display: block;
   }
 
-  .sidebar .branding .v-image {
+  .sidebar .branding .v-image
+  {
     position: absolute;
     z-index: 1;
     top: 0;
@@ -180,27 +200,32 @@
     width: 100%;
   }
 
-  .sidebar .menu {
+  .sidebar .menu
+  {
     overflow: auto;
     height: 100%;
   }
 
-  .sidebar .menu .v-ddwrapper {
+  .sidebar .menu .v-ddwrapper
+  {
     padding: 2px;
   }
 
-  .sidebar .menu .v-ddwrapper .v-nativebutton {
+  .sidebar .menu .v-ddwrapper .v-nativebutton
+  {
     margin: -2px -2px;
   }
 
-  .sidebar .menu .v-ddwrapper-over {
+  .sidebar .menu .v-ddwrapper-over
+  {
     padding: 0;
     border: 2px solid #2d90f3;
     background: transparent;
     @include border-radius(4px);
   }
 
-  .sidebar .menu .v-nativebutton {
+  .sidebar .menu .v-nativebutton
+  {
     /* TODO mixin */
     -webkit-appearance: none;
 
@@ -230,7 +255,8 @@
     /* 		transition: color ease-in-out 100ms, background-color linear 60ms; */
   }
 
-  .sidebar .menu:after {
+  .sidebar .menu:after
+  {
     content: "";
     display: block;
     border-top: 1px solid #4b4c4d;
@@ -238,7 +264,8 @@
     height: 0;
   }
 
-  .sidebar .menu .v-nativebutton-caption {
+  .sidebar .menu .v-nativebutton-caption
+  {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -246,22 +273,26 @@
     margin: .2em 0 0 0;
   }
 
-  .sidebar .menu .v-nativebutton:focus {
+  .sidebar .menu .v-nativebutton:focus
+  {
     outline: none;
   }
 
   .sidebar .menu .v-nativebutton:hover,
-  .sidebar .menu .v-nativebutton:focus {
+  .sidebar .menu .v-nativebutton:focus
+  {
     color: #e1e1e1;
   }
 
-  .sidebar .menu .v-nativebutton:before {
+  .sidebar .menu .v-nativebutton:before
+  {
     font-size: 24px;
     line-height: 1;
     margin: 0;
   }
 
-  .v-webkit & .menu .v-nativebutton:before {
+  .v-webkit & .menu .v-nativebutton:before
+  {
     /* TODO mixin */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #e8e8e8), color-stop(100%, #d3d3d3));
     background: -webkit-linear-gradient(top, #fff 0%, #777 100%);
@@ -280,15 +311,18 @@
   }
 
   .v-webkit & .menu .v-nativebutton:hover:before,
-  .v-webkit & .menu .v-nativebutton:focus:before {
+  .v-webkit & .menu .v-nativebutton:focus:before
+  {
     opacity: 1;
   }
 
-  .sidebar .menu .v-nativebutton:active {
+  .sidebar .menu .v-nativebutton:active
+  {
     background: rgba(0, 0, 0, .1);
   }
 
-  .sidebar .menu .v-nativebutton.selected {
+  .sidebar .menu .v-nativebutton.selected
+  {
     color: #e1e1e1;
     text-shadow: 0 2px 2px rgba(0, 0, 0, .5);
 
@@ -308,13 +342,15 @@
     -webkit-transition: none;
   }
 
-  .v-webkit & .menu .v-nativebutton.selected:before {
+  .v-webkit & .menu .v-nativebutton.selected:before
+  {
     text-shadow: none;
     opacity: 1;
   }
 
   .badge,
-  .notifications .v-button-caption {
+  .notifications .v-button-caption
+  {
     display: inline-block;
     font-size: 11px;
     line-height: 1;
@@ -338,13 +374,15 @@
     @include box-shadow(0 1px 1px rgba(0, 0, 0, .3));
   }
 
-  .menu .v-nativebutton .badge {
+  .menu .v-nativebutton .badge
+  {
     position: absolute;
     top: 6px;
     right: 8px;
   }
 
-  .sidebar .user {
+  .sidebar .user
+  {
     display: block;
 
     border-top: 1px solid #303132;
@@ -357,22 +395,26 @@
     @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, .08));
   }
 
-  .sidebar .user > .v-slot {
+  .sidebar .user > .v-slot
+  {
     display: inline-block;
     width: 50%;
   }
 
-  .sidebar .user > .v-slot:first-child {
+  .sidebar .user > .v-slot:first-child
+  {
     width: 34px;
   }
 
-  .sidebar .user .v-image {
+  .sidebar .user .v-image
+  {
     width: 34px;
     height: 34px;
     border-right: 1px solid #313132;
   }
 
-  .sidebar .user .v-label {
+  .sidebar .user .v-label
+  {
     white-space: normal;
     font-size: 12px;
     line-height: 14px;
@@ -386,7 +428,8 @@
   }
 
   .sidebar .user .v-nativebutton,
-  .sidebar .user .v-menubar {
+  .sidebar .user .v-menubar
+  {
     /* TODO mixin */
     -webkit-appearance: none;
 
@@ -399,21 +442,25 @@
     color: inherit;
   }
 
-  .sidebar .user .v-nativebutton:focus {
+  .sidebar .user .v-nativebutton:focus
+  {
     outline: none;
   }
 
   .sidebar .user .v-nativebutton:hover,
-  .sidebar .user .v-menubar-menuitem:hover {
+  .sidebar .user .v-menubar-menuitem:hover
+  {
     color: #e1e1e1;
   }
 
-  .sidebar .user .v-nativebutton-caption {
+  .sidebar .user .v-nativebutton-caption
+  {
     display: none;
   }
 
   .sidebar .user .v-nativebutton:before,
-  .sidebar .user .v-menubar-menuitem:before {
+  .sidebar .user .v-menubar-menuitem:before
+  {
     font-size: 16px;
     margin: 0;
     display: block;
@@ -421,17 +468,20 @@
     padding: .3em 0 .4em;
   }
 
-  .sidebar .user .v-menubar-menuitem {
+  .sidebar .user .v-menubar-menuitem
+  {
     border-right: 1px solid #434445;
     display: block !important;
     cursor: pointer;
   }
 
-  .sidebar .user .icon-cancel {
+  .sidebar .user .icon-cancel
+  {
     border-left: 1px solid #303132;
   }
 
-  .layout-panel {
+  .layout-panel
+  {
     background: #fff;
     @include border-radius(4px);
     /* TODO make this work in the Sass compiler */
@@ -441,23 +491,28 @@
     box-shadow: 0 2px 3px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .07);
   }
 
-  .v-ie8 & .layout-panel {
+  .v-ie8 & .layout-panel
+  {
     border: 1px solid #d8d9d9;
   }
 
-  .main-view {
+  .main-view
+  {
     @include fade-in;
   }
 
-  .view-content {
+  .view-content
+  {
     overflow: visible;
   }
 
-  .main-view {
+  .main-view
+  {
     background: #fff;
   }
 
-  .help-overlay {
+  .help-overlay
+  {
     @include border-radius(2px);
     @include box-shadow(0 3px 10px rgba(0, 0, 0, .5));
     padding: 15px 20px;
@@ -477,62 +532,74 @@
 
     max-width: 50em;
 
-    .v-window-outerheader {
+    .v-window-outerheader
+    {
       padding: 0;
       color: #fff;
       font-size: 14px;
       line-height: 1;
     }
 
-    .v-window-header {
+    .v-window-header
+    {
       font-weight: normal;
       overflow: visible;
     }
 
-    .v-window-footer {
+    .v-window-footer
+    {
       height: 0;
     }
 
-    .v-window-closebox {
+    .v-window-closebox
+    {
 
     }
 
-    .v-label p {
+    .v-label p
+    {
       margin: 7px 0 0 0;
     }
 
-    a {
+    a
+    {
       color: #a6a9aa;
       text-decoration: underline;
     }
 
   }
 
-  .help-overlay.login {
+  .help-overlay.login
+  {
     top: auto !important;
     bottom: 20px;
   }
 
-  .dashboard-view .v-horizontallayout {
+  .dashboard-view .v-horizontallayout
+  {
     padding: 0 20px 20px;
   }
 
-  .dashboard-view .v-spacing {
+  .dashboard-view .v-spacing
+  {
     width: 20px;
     height: 20px;
   }
 
-  .dashboard-view .toolbar .v-spacing {
+  .dashboard-view .toolbar .v-spacing
+  {
     width: 10px;
   }
 
-  .dashboard-view .v-csslayout {
+  .dashboard-view .v-csslayout
+  {
     padding: 50px 20px 0;
     overflow: auto;
     position: relative;
   }
 
-  .dashboard-view .v-caption {
+  .dashboard-view .v-caption
+  {
     font-weight: 600;
     font-size: 13px;
     color: #349aff;
@@ -547,18 +614,21 @@
     right: 0;
   }
 
-  .dashboard-view .configure {
+  .dashboard-view .configure
+  {
     position: absolute;
     z-index: 1;
     top: 9px;
     right: 5px;
   }
 
-  .dashboard-view .notes {
+  .dashboard-view .notes
+  {
     padding: 40px 0 0;
   }
 
-  .dashboard-view .notes .v-caption {
+  .dashboard-view .notes .v-caption
+  {
     color: #fff;
     text-shadow: 0 1px 1px #000;
     background: #5d6167;
@@ -570,7 +640,8 @@
     /* background: linear-gradient(to bottom, #5d6167 0%,#393939 100%); */
   }
 
-  .dashboard-view .notes .v-textarea {
+  .dashboard-view .notes .v-textarea
+  {
     border: none;
     padding: 20px 20px 0;
     line-height: 20px;
@@ -578,38 +649,45 @@
     color: #545145;
   }
 
-  .dashboard-view .notes .v-textarea:focus {
+  .dashboard-view .notes .v-textarea:focus
+  {
     outline: none;
   }
 
-  .dashboard-view .notes .configure {
+  .dashboard-view .notes .configure
+  {
     color: #ddd;
     text-shadow: 0 1px 1px #000;
   }
 
-  .dashboard-view .toolbar {
+  .dashboard-view .toolbar
+  {
     padding: 20px;
     text-shadow: 0 1px 1px rgba(255, 255, 255, .5);
     background: transparent;
   }
 
-  .dashboard-view .toolbar .v-button {
+  .dashboard-view .toolbar .v-button
+  {
     position: relative;
     font-size: 16px;
   }
 
-  .dashboard-view .toolbar .notifications.unread .v-button-caption {
+  .dashboard-view .toolbar .notifications.unread .v-button-caption
+  {
     display: block;
     position: absolute;
     top: 2px;
     right: 3px;
   }
 
-  .dashboard-view .h1 {
+  .dashboard-view .h1
+  {
     padding-right: 1em;
   }
 
-  .dashboard-view {
+  .dashboard-view
+  {
     background: #dfe0e1;
 
     /* TODO mixin */
@@ -621,17 +699,20 @@
     /* 	background: linear-gradient(to bottom, #d8d9da 0%,#e6e7e8 10%,#e0e1e2 100%); */
   }
 
-  .notifications.v-window {
+  .notifications.v-window
+  {
     margin-top: 45px !important;
     margin-left: -193px !important;
     font-size: 13px;
   }
 
-  .notifications.v-window .v-widget {
+  .notifications.v-window .v-widget
+  {
     font-size: 13px;
   }
 
-  .notifications.v-window::before {
+  .notifications.v-window::before
+  {
     content: "";
     position: absolute;
     top: -14px;
@@ -645,33 +726,39 @@
     margin-left: -7px;
   }
 
-  .notifications.v-window .v-window-outerheader {
+  .notifications.v-window .v-window-outerheader
+  {
     font-size: 16px;
     color: #f16433;
     line-height: 25px;
     padding-left: 14px;
   }
 
-  .notifications.v-window .v-label span {
+  .notifications.v-window .v-label span
+  {
     font-size: 12px;
     color: #979699;
   }
 
-  .notifications.v-window .v-label hr {
+  .notifications.v-window .v-label hr
+  {
     height: 0;
     border: none;
     border-top: 1px solid #ddd;
     margin: 0 -12px 12px;
   }
 
-  .v-formlayout-captioncell {
+  .v-formlayout-captioncell
+  {
     vertical-align: top;
   }
 
-  .edit-dashboard .v-formlayout {
+  .edit-dashboard .v-formlayout
+  {
     padding: 10px 8px;
 
-    .v-formlayout-captioncell {
+    .v-formlayout-captioncell
+    {
       vertical-align: middle;
     }
   }

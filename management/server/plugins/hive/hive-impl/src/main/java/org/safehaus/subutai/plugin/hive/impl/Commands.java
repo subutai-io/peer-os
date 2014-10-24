@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hive.impl;
 
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 
 
 public class Commands
@@ -16,7 +17,7 @@ public class Commands
         switch ( type )
         {
             case LIST:
-                return "dpkg -l | grep '^ii' | grep ksks";
+                return "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
             case INSTALL:
             case PURGE:
                 sb = new StringBuilder( "apt-get --force-yes --assume-yes " );

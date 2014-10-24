@@ -18,18 +18,18 @@ import com.google.common.base.Preconditions;
 /**
  * Deletes local branch
  */
-@Command(scope = "git", name = "delete-branch", description = "Delete local branch")
+@Command( scope = "git", name = "delete-branch", description = "Delete local branch" )
 public class DeleteBranch extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( DeleteBranch.class.getName() );
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "branch name", required = true, multiValued = false,
-            description = "branch name to delete")
+    @Argument( index = 2, name = "branch name", required = true, multiValued = false,
+            description = "branch name to delete" )
     String branchName;
 
     private final GitManager gitManager;

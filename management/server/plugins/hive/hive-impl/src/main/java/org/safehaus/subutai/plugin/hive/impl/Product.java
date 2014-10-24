@@ -1,11 +1,15 @@
 package org.safehaus.subutai.plugin.hive.impl;
 
 
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.plugin.hive.api.HiveConfig;
+
+
 public enum Product
 {
 
-    HIVE( "ksks-hive", "hive-thrift", true ),
-    DERBY( "ksks-derby", "derby", false );
+    HIVE( Common.PACKAGE_PREFIX + HiveConfig.PRODUCT_KEY.toLowerCase(), "hive-thrift", true ),
+    DERBY( Common.PACKAGE_PREFIX + "derby", "derby", false );
 
     private final String packageName, serviceName;
     private final boolean profileScriptRun;

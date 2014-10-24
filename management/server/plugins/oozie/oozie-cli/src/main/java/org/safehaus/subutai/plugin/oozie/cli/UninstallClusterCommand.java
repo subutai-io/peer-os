@@ -9,20 +9,20 @@ import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
-import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
  * Displays the last log entries
  */
-@Command(scope = "oozie", name = "uninstall-cluster", description = "Command to uninstall Oozie cluster")
+@Command( scope = "oozie", name = "uninstall-cluster", description = "Command to uninstall Oozie cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Oozie oozieManager;
     private Tracker tracker;

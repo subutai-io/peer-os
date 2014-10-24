@@ -18,9 +18,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
@@ -119,7 +119,8 @@ public class RestServiceImplTest
     {
         SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         Type listPOVType = new TypeToken<List<TrackerOperationViewImpl>>()
-        {}.getType();
+        {
+        }.getType();
 
 
         Response response =

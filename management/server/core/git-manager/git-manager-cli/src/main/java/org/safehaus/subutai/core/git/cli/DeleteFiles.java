@@ -21,18 +21,18 @@ import com.google.common.base.Preconditions;
 /**
  * Deletes file(s) from working directory and index
  */
-@Command(scope = "git", name = "delete-files", description = "Delete files from repo")
+@Command( scope = "git", name = "delete-files", description = "Delete files from repo" )
 public class DeleteFiles extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( DeleteFiles.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to delete")
+    @Argument( index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to delete" )
     Collection<String> files;
 
     private final GitManager gitManager;

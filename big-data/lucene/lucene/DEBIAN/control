@@ -1,8 +1,8 @@
-Package: ksks-lucene
+Package: subutai-lucene
 Priority: optional
 Section: devel
 Installed-Size: 149000
-Maintainer: kiskis
+Maintainer: subutai
 Architecture: amd64
 Version: 1.0.2
-Description: This is a lucene package of kiskis distribution.
+Description: This is a lucene package of subutai distribution.

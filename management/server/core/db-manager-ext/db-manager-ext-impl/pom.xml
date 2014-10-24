@@ -57,7 +57,7 @@
       <artifactId>javax.persistence</artifactId>
       <version>${org.eclipse.persistence.version}</version>
     </dependency>
-</dependencies>
+  </dependencies>
   <!--db-manager-ext-impl-->
 
   <!-- Compression libraries for the protocol. -->

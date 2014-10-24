@@ -9,6 +9,7 @@ package org.safehaus.subutai.plugin.accumulo.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
@@ -33,4 +34,8 @@ public interface Accumulo extends ApiBase<AccumuloClusterConfig>
     public UUID addProperty( String clusterName, String propertyName, String propertyValue );
 
     public UUID removeProperty( String clusterName, String propertyName );
+
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( AccumuloClusterConfig config );
+
+    UUID configureEnvironmentCluster( AccumuloClusterConfig config );
 }

@@ -115,11 +115,11 @@ public class Manager
 
         //tables go here
         mastersTable = createTableTemplate( "Masters" );
-        mastersTable.setId("MastersTable");
+        mastersTable.setId( "MastersTable" );
         tracersTable = createTableTemplate( "Tracers" );
-        tracersTable.setId("TracersTable");
+        tracersTable.setId( "TracersTable" );
         slavesTable = createTableTemplate( "Tablet Servers" );
-        slavesTable.setId("Slavestable");
+        slavesTable.setId( "Slavestable" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -144,7 +144,7 @@ public class Manager
                 addPropertyBtn, checkAllBtn, removePropertyBtn, destroyClusterBtn );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -158,7 +158,7 @@ public class Manager
     private ComboBox getClusterCombo()
     {
         clusterCombo = new ComboBox();
-        clusterCombo.setId("ClusterCb");
+        clusterCombo.setId( "ClusterCb" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -179,7 +179,7 @@ public class Manager
     private Button getRefreshClustersButton()
     {
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("ResfreshClustersBtn");
+        refreshClustersBtn.setId( "ResfreshClustersBtn" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
 
@@ -196,7 +196,7 @@ public class Manager
     private Button getCheckAllButton()
     {
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.setId("CheckAllBtn");
+        checkAllBtn.setId( "CheckAllBtn" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener()
         {
@@ -218,11 +218,11 @@ public class Manager
         Label propertyNameLabel = new Label( "Property Name" );
         customPropertyContent.addComponent( propertyNameLabel );
         final TextField propertyNameTextField = new TextField();
-        propertyNameTextField.setId("propertyNameTxt");
+        propertyNameTextField.setId( "propertyNameTxt" );
         customPropertyContent.addComponent( propertyNameTextField );
 
         removePropertyBtn = new Button( "Remove" );
-        removePropertyBtn.setId("removePropertyBtn");
+        removePropertyBtn.setId( "removePropertyBtn" );
         removePropertyBtn.addStyleName( "default" );
         removePropertyBtn.addClickListener( new Button.ClickListener()
         {
@@ -264,11 +264,11 @@ public class Manager
         Label propertyValueLabel = new Label( "Property Value" );
         customPropertyContent.addComponent( propertyValueLabel );
         final TextField propertyValueTextField = new TextField();
-        propertyValueTextField.setId("propertyValueTxt");
+        propertyValueTextField.setId( "propertyValueTxt" );
         customPropertyContent.addComponent( propertyValueTextField );
 
         addPropertyBtn = new Button( "Add" );
-        addPropertyBtn.setId("addProperty");
+        addPropertyBtn.setId( "addProperty" );
         addPropertyBtn.addStyleName( "default" );
         addPropertyBtn.addClickListener( new Button.ClickListener()
         {
@@ -319,7 +319,7 @@ public class Manager
     private Button getAddSlaveButton()
     {
         addTabletServerButton = new Button( ADD_SLAVE_BUTTON_CAPTION );
-        addTabletServerButton.setId("addTabletServer");
+        addTabletServerButton.setId( "addTabletServer" );
         addTabletServerButton.addClickListener( new Button.ClickListener()
         {
 
@@ -372,7 +372,7 @@ public class Manager
     private Button getAddTracerNodeButton()
     {
         addTracerBtn = new Button( ADD_TRACER_BUTTON_CAPTION );
-        addTracerBtn.setId("addTracer");
+        addTracerBtn.setId( "addTracer" );
         addTracerBtn.addClickListener( new Button.ClickListener()
         {
 
@@ -426,7 +426,7 @@ public class Manager
     private Button getDestroyClusterButton()
     {
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("destroyClusterBtn");
+        destroyClusterBtn.setId( "destroyClusterBtn" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
 
@@ -472,7 +472,7 @@ public class Manager
     private Button getStartAllButton()
     {
         startClusterBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startClusterBtn.setId("startAll");
+        startClusterBtn.setId( "startAll" );
         startClusterBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -500,7 +500,7 @@ public class Manager
     private Button getStopAllButton()
     {
         stopClusterBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopClusterBtn.setId("stopAll");
+        stopClusterBtn.setId( "stopAll" );
         stopClusterBtn.addStyleName( "default" );
         stopClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -652,11 +652,11 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId(agent.getListIP().get(0)+"-accumuloCheck");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-accumuloCheck" );
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId(agent.getListIP().get(0)+"-accumuloDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-accumuloDestroy" );
             final Label resultHolder = new Label();
-            resultHolder.setId(agent.getListIP().get(0)+"accumuloResult");
+            resultHolder.setId( agent.getListIP().get( 0 ) + "accumuloResult" );
 
             HorizontalLayout availableOperations = new HorizontalLayout();
             availableOperations.setSpacing( true );

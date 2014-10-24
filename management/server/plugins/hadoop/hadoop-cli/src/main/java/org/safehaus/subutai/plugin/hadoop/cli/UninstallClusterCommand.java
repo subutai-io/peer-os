@@ -17,12 +17,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hadoop", name = "uninstall-cluster", description = "Command to uninstall Hadoop cluster")
+@Command( scope = "hadoop", name = "uninstall-cluster", description = "Command to uninstall Hadoop cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Hadoop hadoopManager;
     private Tracker tracker;

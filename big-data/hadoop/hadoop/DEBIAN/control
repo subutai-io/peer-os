@@ -1,8 +1,8 @@
-Package: ksks-hadoop
+Package: subutai-hadoop
 Priority: optional
 Section: devel
 Installed-Size: 89000
-Maintainer: kiskis
+Maintainer: subutai
 Architecture: all
 Version: 1.0.12
-Description: This is a hadoop package of kiskis distribution.
+Description: This is a hadoop package of subutai distribution.

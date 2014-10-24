@@ -21,18 +21,18 @@ import com.google.common.base.Preconditions;
 /**
  * Undoes all uncommitted changes to specified files
  */
-@Command(scope = "git", name = "undo-soft", description = "Undo all uncommitted changes to specified files")
+@Command( scope = "git", name = "undo-soft", description = "Undo all uncommitted changes to specified files" )
 public class UndoSoft extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( UndoSoft.class.getName() );
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "file(s)", required = true, multiValued = true,
-            description = "file(s) to undo changes to")
+    @Argument( index = 2, name = "file(s)", required = true, multiValued = true,
+            description = "file(s) to undo changes to" )
     Collection<String> files;
 
     private final GitManager gitManager;

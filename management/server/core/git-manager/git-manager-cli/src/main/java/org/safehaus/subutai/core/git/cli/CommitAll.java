@@ -18,18 +18,18 @@ import com.google.common.base.Preconditions;
 /**
  * Commits all files
  */
-@Command(scope = "git", name = "commit-all", description = "Commit all files")
+@Command( scope = "git", name = "commit-all", description = "Commit all files" )
 public class CommitAll extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( CommitAll.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "message", required = true, multiValued = false, description = "commit message")
+    @Argument( index = 2, name = "message", required = true, multiValued = false, description = "commit message" )
     String message;
 
     private final GitManager gitManager;

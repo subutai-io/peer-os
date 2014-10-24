@@ -17,12 +17,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "sqoop", name = "uninstall-cluster", description = "Command to uninstall Sqoop cluster")
+@Command( scope = "sqoop", name = "uninstall-cluster", description = "Command to uninstall Sqoop cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Sqoop sqoopManager;
     private Tracker tracker;

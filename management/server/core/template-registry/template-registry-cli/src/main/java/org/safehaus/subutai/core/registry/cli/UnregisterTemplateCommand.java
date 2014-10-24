@@ -13,11 +13,11 @@ import com.google.common.base.Preconditions;
 /**
  * CLI for TemplateRegistryManager.unregisterTemplate command
  */
-@Command(scope = "registry", name = "unregister-template", description = "Unregister template")
+@Command( scope = "registry", name = "unregister-template", description = "Unregister template" )
 public class UnregisterTemplateCommand extends OsgiCommandSupport
 {
-    @Argument(index = 0, name = "template name", required = true, multiValued = false,
-            description = "template name")
+    @Argument( index = 0, name = "template name", required = true, multiValued = false,
+            description = "template name" )
     String templateName;
 
     private final TemplateRegistry templateRegistry;

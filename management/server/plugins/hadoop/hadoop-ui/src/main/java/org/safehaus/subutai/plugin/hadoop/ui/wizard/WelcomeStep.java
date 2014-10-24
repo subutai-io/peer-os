@@ -17,8 +17,6 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
-import javax.naming.NamingException;
-
 
 /**
  * @author dilshat
@@ -49,7 +47,7 @@ public class WelcomeStep extends VerticalLayout
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start" );
-        next.setId("HadoopWelcomeBtnStart");
+        next.setId( "HadoopWelcomeBtnStart" );
         next.addStyleName( "default" );
         next.setWidth( 100, Unit.PIXELS );
         grid.addComponent( next, 6, 4, 6, 4 );

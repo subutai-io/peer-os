@@ -1,10 +1,13 @@
 package org.safehaus.subutai.plugin.nutch.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -12,11 +15,10 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.nutch.api.Nutch;
@@ -26,6 +28,8 @@ import org.safehaus.subutai.plugin.nutch.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.nutch.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.nutch.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.nutch.impl.handler.UninstallOperationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
@@ -34,29 +38,21 @@ public class NutchImpl implements Nutch
 {
 
     protected Commands commands;
+    private static final Logger LOG = LoggerFactory.getLogger( NutchImpl.class.getName() );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private Hadoop hadoopManager;
     private ExecutorService executor;
-    private PluginDAO pluginDao;
+    private PluginDao pluginDao;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
+    private DataSource dataSource;
 
 
-    public NutchImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                      Hadoop hadoopManager, EnvironmentManager environmentManager, ContainerManager containerManager )
+    public NutchImpl( DataSource dataSource )
     {
-        this.commands = new Commands( commandRunner );
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
-        this.hadoopManager = hadoopManager;
-        this.environmentManager = environmentManager;
-        this.containerManager = containerManager;
-        pluginDao = new PluginDAO( dbManager );
+        this.dataSource = dataSource;
     }
 
 
@@ -84,19 +80,13 @@ public class NutchImpl implements Nutch
     }
 
 
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
     public Tracker getTracker()
     {
         return tracker;
     }
 
 
-    public PluginDAO getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDao;
     }
@@ -114,8 +104,66 @@ public class NutchImpl implements Nutch
     }
 
 
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public void setCommands( final Commands commands )
+    {
+        this.commands = commands;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
+
+
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager )
+    {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager )
+    {
+        this.containerManager = containerManager;
+    }
+
+
     public void init()
     {
+        try
+        {
+            this.pluginDao = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        this.commands = new Commands( commandRunner );
+
         executor = Executors.newCachedThreadPool();
     }
 

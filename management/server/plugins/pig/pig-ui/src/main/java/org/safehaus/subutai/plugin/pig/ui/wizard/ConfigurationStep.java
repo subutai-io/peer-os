@@ -60,7 +60,7 @@ public class ConfigurationStep extends Panel
         // Buttons
 
         Button next = new Button( "Next" );
-        next.setId("PigConfNext");
+        next.setId( "PigConfNext" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -79,7 +79,7 @@ public class ConfigurationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("PigConfBack");
+        back.setId( "PigConfBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -109,10 +109,10 @@ public class ConfigurationStep extends Panel
     {
 
         final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
-        select.setId("PigConfSlaveNodes");
+        select.setId( "PigConfSlaveNodes" );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
-        hadoopClusters.setId("PigConfHadoopCluster");
+        hadoopClusters.setId( "PigConfHadoopCluster" );
         hadoopClusters.setImmediate( true );
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );
@@ -196,7 +196,7 @@ public class ConfigurationStep extends Panel
         Collection<Integer> col = Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
 
         final TextField txtHadoopClusterName = new TextField( "Hadoop cluster name" );
-        txtHadoopClusterName.setId("PigConfHadoopCluster");
+        txtHadoopClusterName.setId( "PigConfHadoopCluster" );
         txtHadoopClusterName.setRequired( true );
         txtHadoopClusterName.setMaxLength( 20 );
         if ( hadoopConfig.getClusterName() != null )
@@ -215,7 +215,7 @@ public class ConfigurationStep extends Panel
         } );
 
         ComboBox cmbSlaveNodes = new ComboBox( "Number of Hadoop slave nodes", col );
-        cmbSlaveNodes.setId("PigConfSlaveNodes");
+        cmbSlaveNodes.setId( "PigConfSlaveNodes" );
         cmbSlaveNodes.setImmediate( true );
         cmbSlaveNodes.setTextInputAllowed( false );
         cmbSlaveNodes.setNullSelectionAllowed( false );
@@ -230,7 +230,7 @@ public class ConfigurationStep extends Panel
         } );
 
         ComboBox cmbReplFactor = new ComboBox( "Replication factor for Hadoop slave nodes", col );
-        cmbReplFactor.setId("PigConfReplFactor");
+        cmbReplFactor.setId( "PigConfReplFactor" );
         cmbReplFactor.setImmediate( true );
         cmbReplFactor.setTextInputAllowed( false );
         cmbReplFactor.setNullSelectionAllowed( false );
@@ -245,7 +245,7 @@ public class ConfigurationStep extends Panel
         } );
 
         TextField txtHadoopDomain = new TextField( "Hadoop cluster domain name" );
-        txtHadoopDomain.setId("PigConfHadoopClusterDomain");
+        txtHadoopDomain.setId( "PigConfHadoopClusterDomain" );
         txtHadoopDomain.setInputPrompt( hadoopConfig.getDomainName() );
         txtHadoopDomain.setValue( hadoopConfig.getDomainName() );
         txtHadoopDomain.setMaxLength( 20 );

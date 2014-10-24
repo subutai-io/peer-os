@@ -12,12 +12,12 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "lucene", name = "uninstall-cluster", description = "Command to uninstall Lucene cluster")
+@Command( scope = "lucene", name = "uninstall-cluster", description = "Command to uninstall Lucene cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Lucene luceneManager;
     private Tracker tracker;

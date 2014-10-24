@@ -78,7 +78,8 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy
 
         po.addLog( "Installing Flume..." );
         String s = Commands.make( CommandType.INSTALL );
-        cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ).withTimeout( 1800 ), config.getNodes() );
+        cmd = manager.getCommandRunner()
+                     .createCommand( new RequestBuilder( s ).withTimeout( 1800 ), config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

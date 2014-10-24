@@ -4,6 +4,8 @@ package org.safehaus.subutai.plugin.presto.impl;
 import java.util.List;
 import java.util.UUID;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
@@ -27,8 +29,9 @@ import com.google.common.base.Preconditions;
 public class PrestoImpl extends PrestoBase implements Presto
 {
 
-    public PrestoImpl()
+    public PrestoImpl( DataSource dataSource )
     {
+        this.dataSource = dataSource;
     }
 
 
