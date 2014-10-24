@@ -38,16 +38,16 @@ import com.google.gson.JsonSyntaxException;
 public class MonitorImpl implements Monitor
 {
     protected static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
-    //max length of subscriber id length to store in database varchar(100) field
+    //max length of subscriber id to store in database varchar(100) field
     private static final int MAX_SUBSCRIBER_ID_LEN = 100;
     //set of metric subscribers
     private final Set<MetricListener> metricListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MetricListener, Boolean>() );
 
     private final ExecutorService notificationExecutor = Executors.newCachedThreadPool();
+    private final Commands commands = new Commands();
     private final MonitorDao monitorDao;
     private final PeerManager peerManager;
-    private final Commands commands = new Commands();
 
 
     public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws DaoException
@@ -60,15 +60,41 @@ public class MonitorImpl implements Monitor
     }
 
 
-    //TODO implement
     @Override
     public Set<ContainerHostMetric> getContainerMetrics( final Environment environment ) throws MonitorException
     {
+        Preconditions.checkNotNull( environment, "Environment is null" );
+
         Set<ContainerHostMetric> metrics = new HashSet<>();
+        try
+        {
 
-        //check if environment exists
-        //iterate containers within the environment and get their metrics
-
+            Set<ContainerHost> containerHosts = environment.getContainerHosts();
+            //iterate containers within the environment and get their metrics
+            for ( ContainerHost containerHost : containerHosts )
+            {
+                CommandResult result = containerHost
+                        .execute( commands.getReadContainerHostMetricCommand( containerHost.getHostname() ) );
+                if ( result.hasSucceeded() )
+                {
+                    ContainerHostMetricImpl metric =
+                            JsonUtil.fromJson( result.getStdOut(), ContainerHostMetricImpl.class );
+                    metric.setEnvironmentId( environment.getId() );
+                    metrics.add( metric );
+                }
+                else
+                {
+                    throw new MonitorException(
+                            String.format( "Could not get metrics from %s : %s", containerHost.getHostname(),
+                                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+                }
+            }
+        }
+        catch ( CommandException | JsonSyntaxException e )
+        {
+            LOG.error( "Error in getContainerMetrics", e );
+            throw new MonitorException( e );
+        }
         return metrics;
     }
 
@@ -183,8 +209,16 @@ public class MonitorImpl implements Monitor
             //find container's owner peer
             PeerInterface ownerPeer = peerManager.getPeer( containerHost.getOwnerPeerId() );
 
+            //if container is "owned" by local peer, alert local peer
+            if ( peerManager.getLocalPeer().getId().compareTo( ownerPeer.getId() ) == 0 )
+            {
+                alertThresholdExcess( containerHostMetric );
+            }
             //send metric to owner peer
-            //TODO send alert to ownerPeer once message queue is implemented
+            else
+            {
+                //TODO send alert to ownerPeer once message queue is implemented
+            }
         }
         catch ( PeerException | RuntimeException e )
         {
@@ -201,7 +235,7 @@ public class MonitorImpl implements Monitor
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
     @Override
-    public void alertThresholdExcess( final ContainerHostMetric metric )
+    public void alertThresholdExcess( final ContainerHostMetric metric ) throws MonitorException
     {
         try
         {
@@ -217,6 +251,7 @@ public class MonitorImpl implements Monitor
         catch ( DaoException e )
         {
             LOG.error( "Error in alertThresholdExcess", e );
+            throw new MonitorException( e );
         }
     }
 
@@ -232,14 +267,6 @@ public class MonitorImpl implements Monitor
                 return;
             }
         }
-    }
-
-
-    @Override
-    public String getSubscriberId()
-    {
-        //since this module is not a subscriber to itself then no-op
-        return null;
     }
 
 
