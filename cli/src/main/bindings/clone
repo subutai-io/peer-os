@@ -6,7 +6,7 @@ function clone_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Clone a new container instance from a temlate.
   echo
-  echo "        "subutai \[-qh\] clone parent child
+  echo "        "subutai \[-qh\] clone parent child \[-e\]
   echo
   echo -----------------------------------------------------------------------
 }
@@ -21,28 +21,27 @@ function clone {
 
   local parent="$1"
   local child="$2"
+
+  # Check that parent exists
+  lxc_assert "$parent" "`usage`"
+  # Check that container name is legal and it does not exist
+  lxc_assert_name $child
+  lxc_assert_no $child
+
   config=/var/lib/lxc/$child/config
+
   if [ "`are_containers_readable $parent $child`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
 
-  if [ -z "$parent" ]; then
-    msg_error "Parameters not provided. Aborting ..."
-    show_usage "`usage`"
-  fi
-
-  if [ -z "$child" ]; then
-    msg_error "Child parameter not provided. Aborting ..."
-    show_usage "`usage`"
-  fi
-  
   OPTIND=0
   if [ "$2" == $child ]; then
     shift
     shift
   fi
+
   #getting environmentId using getopts
   local environmentId=""
   shift_amount=0;
@@ -58,23 +57,21 @@ function clone {
      esac
      shift_amount=$(($shift_amount + 1))
   done
-   
+
   lock_container_write $parent $child
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
-  
+
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
   if [ -z "$environmentId" ]; then
      environmentId="null"
   fi
-  
+
   #cloning operation is starting..
   lxc_clone $parent $child $environmentId "`usage`"
-  
-  #defining 2 veth pair for each lxc container
-  sed -i "/lxc.network.veth.pair =.*/c\lxc.network.veth.pair = $child" $config
-  echo "lxc.network.veth.pair = $child-2" >> $config
-  
+
+  ovs_configure_lxc $child
   git_child_branch $child
+  lxc_install_agent $child
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi

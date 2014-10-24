@@ -133,5 +133,8 @@ isSuccesful=`expr $? + $isSuccesful`
 #------------------------------------------------------
 if [ $isSuccesful != 0 ]; then
   echo "Commit or push is not succesful, please fix the errors first!"
+  # Revert back the auto updated version
+  git reset HEAD^
+  git checkout -- debian/changelog
   exit 1
 fi

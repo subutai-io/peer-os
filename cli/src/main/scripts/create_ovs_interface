@@ -1,0 +1,6 @@
+#!/bin/bash
+# creating default ovs bridge and ports durin lxc startup
+BRIDGE="br-int"
+ovs-vsctl --may-exist add-br $BRIDGE
+ovs-vsctl --if-exists del-port $BRIDGE $5
+ovs-vsctl --may-exist add-port $BRIDGE $5
