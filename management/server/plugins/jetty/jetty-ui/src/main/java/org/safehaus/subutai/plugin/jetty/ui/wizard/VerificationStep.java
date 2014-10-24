@@ -41,7 +41,7 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Domain Name", wizard.getConfig().getDomainName() );
 
         Button install = new Button( "Install" );
-        install.setId("jettyInstall");
+        install.setId( "jettyInstall" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -64,7 +64,7 @@ public class VerificationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
-        back.setId("jettyBack");
+        back.setId( "jettyBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

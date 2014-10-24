@@ -35,9 +35,9 @@ public class HipiComponent extends CustomComponent
         final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.getTab(0).setId("HipiInstallTab");
+        sheet.getTab( 0 ).setId( "HipiInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab(1).setId("HipiManageTab");
+        sheet.getTab( 1 ).setId( "HipiManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

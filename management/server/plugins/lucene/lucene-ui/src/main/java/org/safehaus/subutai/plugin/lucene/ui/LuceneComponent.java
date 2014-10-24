@@ -35,9 +35,9 @@ public class LuceneComponent extends CustomComponent
         final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.getTab(0).setId("LuceneInstallTab");
+        sheet.getTab( 0 ).setId( "LuceneInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab(1).setId("LuceneManageTab");
+        sheet.getTab( 1 ).setId( "LuceneManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

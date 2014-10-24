@@ -36,6 +36,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
         return trackerOperation.getId();
     }
 
+
     @Override
     public void run()
     {
@@ -75,6 +76,5 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieI
                .saveInfo( OozieClusterConfig.PRODUCT_KEY, oozieClusterConfig.getClusterName(), oozieClusterConfig );
         trackerOperation.addLogDone( "Cluster info saved to DB" );
     }
-
 }
 

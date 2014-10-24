@@ -63,8 +63,7 @@ public class Commands
 
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-server" )
-                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents
-                            );
+                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
@@ -73,8 +72,7 @@ public class Commands
 
         return commandRunnerBase.createCommand(
                 new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-client" )
-                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents
-                            );
+                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
@@ -101,8 +99,7 @@ public class Commands
 
         return commandRunnerBase.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
-                        + ".root.hosts %s", param
-                                                               ) ), agents );
+                        + ".root.hosts %s", param ) ), agents );
     }
 
 
@@ -111,8 +108,7 @@ public class Commands
 
         return commandRunnerBase.createCommand( new RequestBuilder( String.format(
                 ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
-                        + ".root.groups '\\*' "
-                                                               ) ), agents );
+                        + ".root.groups '\\*' " ) ), agents );
     }
 
 
@@ -122,8 +118,7 @@ public class Commands
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-oozie-server" ).withTimeout( 90 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
-                agents
-                            );
+                agents );
     }
 
 
@@ -133,8 +128,7 @@ public class Commands
                 new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-oozie-client" ).withTimeout( 90 )
                                                                                                 .withStdOutRedirection(
                                                                                                         OutputRedirection.NO ),
-                agents
-                            );
+                agents );
     }
 
 

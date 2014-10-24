@@ -202,6 +202,7 @@ public class CassandraImpl implements Cassandra
         return operationHandler.getTrackerId();
     }
 
+
     public UUID configureEnvironmentCluster( final CassandraClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );

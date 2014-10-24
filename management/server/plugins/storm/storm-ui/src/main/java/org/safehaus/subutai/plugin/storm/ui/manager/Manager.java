@@ -72,8 +72,8 @@ public class Manager
         //tables go here
         masterTable = createTableTemplate( "Master node", true );
         workersTable = createTableTemplate( "Workers", false );
-        masterTable.setId("StormMngMasterNode");
-        workersTable.setId("StormMngWorkerNodes");
+        masterTable.setId( "StormMngMasterNode" );
+        workersTable.setId( "StormMngWorkerNodes" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -83,7 +83,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("StormMngClusterCombo");
+        clusterCombo.setId( "StormMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -99,7 +99,7 @@ public class Manager
         } );
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
-        refreshClustersBtn.setId("StormMngRefresh");
+        refreshClustersBtn.setId( "StormMngRefresh" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -112,7 +112,7 @@ public class Manager
         } );
 
         Button destroyClusterBtn = new Button( "Destroy cluster" );
-        destroyClusterBtn.setId("StormMngDestroy");
+        destroyClusterBtn.setId( "StormMngDestroy" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -143,7 +143,7 @@ public class Manager
         } );
 
         Button addNodeBtn = new Button( "Add Node" );
-        addNodeBtn.setId("StormMngAddNode");
+        addNodeBtn.setId( "StormMngAddNode" );
         addNodeBtn.addStyleName( "default" );
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -181,10 +181,10 @@ public class Manager
         controlsContent.addComponent( makeBatchOperationButton( "Restart all", "Restart" ) );
         controlsContent.addComponent( addNodeBtn );
 
-        controlsContent.getComponent(3).setId("StormMngCheckAll");
-        controlsContent.getComponent(4).setId("StormMngStartAll");
-        controlsContent.getComponent(5).setId("StormMngStopAll");
-        controlsContent.getComponent(6).setId("StormMngRestartAll");
+        controlsContent.getComponent( 3 ).setId( "StormMngCheckAll" );
+        controlsContent.getComponent( 4 ).setId( "StormMngStartAll" );
+        controlsContent.getComponent( 5 ).setId( "StormMngStopAll" );
+        controlsContent.getComponent( 6 ).setId( "StormMngRestartAll" );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( masterTable, 0, 1, 0, 5 );

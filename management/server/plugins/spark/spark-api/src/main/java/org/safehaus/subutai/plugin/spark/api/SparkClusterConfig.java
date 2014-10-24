@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.spark.api;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
@@ -56,8 +57,10 @@ public class SparkClusterConfig implements ConfigBase
         return PRODUCT_KEY;
     }
 
+
     @Override
-    public String getProductKey() {
+    public String getProductKey()
+    {
         return PRODUCT_KEY;
     }
 
@@ -164,7 +167,5 @@ public class SparkClusterConfig implements ConfigBase
     {
         return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
     }
-
-
 }
 

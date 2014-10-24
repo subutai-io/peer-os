@@ -19,8 +19,7 @@ public class StopTask implements Runnable
     private Tracker tracker;
 
 
-    public StopTask( Flume flume, Tracker tracker, String clusterName, String lxcHostname,
-                     CompleteEvent completeEvent )
+    public StopTask( Flume flume, Tracker tracker, String clusterName, String lxcHostname, CompleteEvent completeEvent )
     {
         this.flume = flume;
         this.tracker = tracker;

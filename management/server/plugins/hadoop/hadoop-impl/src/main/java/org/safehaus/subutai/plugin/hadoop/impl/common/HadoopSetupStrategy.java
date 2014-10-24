@@ -16,8 +16,8 @@ import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.common.api.NodeType;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 import com.google.common.base.Preconditions;
@@ -167,7 +167,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
                 if ( environmentContainer.getTemplate().getProducts()
-                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
                 {
                     masterNodes.add( environmentContainer.getAgent() );
                 }
@@ -196,7 +196,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy
             if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( environmentContainer.getNodeGroupName() ) )
             {
                 if ( environmentContainer.getTemplate().getProducts()
-                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
+                                         .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) )
                 {
                     slaveNodes.add( environmentContainer.getAgent() );
                 }

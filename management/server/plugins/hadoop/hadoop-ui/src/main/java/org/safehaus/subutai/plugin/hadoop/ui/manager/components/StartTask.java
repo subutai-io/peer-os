@@ -6,20 +6,21 @@
 package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.common.api.NodeType;
-
-import java.util.UUID;
 
 
-public class StartTask implements Runnable {
+public class StartTask implements Runnable
+{
 
     private final CompleteEvent completeEvent;
     private final Tracker tracker;
@@ -30,8 +31,9 @@ public class StartTask implements Runnable {
     private NodeType nodeType;
 
 
-    public StartTask( Hadoop hadoop, Tracker tracker, NodeType nodeType, HadoopClusterConfig hadoopClusterConfig, CompleteEvent completeEvent, UUID trackID,
-                      Agent agent ) {
+    public StartTask( Hadoop hadoop, Tracker tracker, NodeType nodeType, HadoopClusterConfig hadoopClusterConfig,
+                      CompleteEvent completeEvent, UUID trackID, Agent agent )
+    {
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.completeEvent = completeEvent;
@@ -42,65 +44,83 @@ public class StartTask implements Runnable {
     }
 
 
-    public void run() {
+    public void run()
+    {
 
-        if ( trackID != null ) {
-            while ( true ) {
-                TrackerOperationView prevPo =
-                        tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-                if ( prevPo.getState() == ProductOperationState.RUNNING ) {
-                    try {
+        if ( trackID != null )
+        {
+            while ( true )
+            {
+                TrackerOperationView prevPo = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
+                if ( prevPo.getState() == ProductOperationState.RUNNING )
+                {
+                    try
+                    {
                         Thread.sleep( 1000 );
                     }
-                    catch ( InterruptedException ex ) {
+                    catch ( InterruptedException ex )
+                    {
                         break;
                     }
                 }
-                else {
+                else
+                {
                     break;
                 }
             }
         }
 
         NodeState state = NodeState.UNKNOWN;
-        if ( agent != null ) {
-            if ( nodeType.equals( NodeType.NAMENODE ) ) {
-                trackID = hadoop.startNameNode(hadoopClusterConfig);
+        if ( agent != null )
+        {
+            if ( nodeType.equals( NodeType.NAMENODE ) )
+            {
+                trackID = hadoop.startNameNode( hadoopClusterConfig );
             }
-            else if ( nodeType.equals( NodeType.JOBTRACKER ) ) {
-                trackID = hadoop.startJobTracker(hadoopClusterConfig);
+            else if ( nodeType.equals( NodeType.JOBTRACKER ) )
+            {
+                trackID = hadoop.startJobTracker( hadoopClusterConfig );
             }
-            else if ( nodeType.equals( NodeType.DATANODE )  ) {
-                trackID = hadoop.startDataNode(hadoopClusterConfig, agent);
+            else if ( nodeType.equals( NodeType.DATANODE ) )
+            {
+                trackID = hadoop.startDataNode( hadoopClusterConfig, agent );
             }
-            else {
-                trackID = hadoop.startTaskTracker(hadoopClusterConfig, agent);
+            else
+            {
+                trackID = hadoop.startTaskTracker( hadoopClusterConfig, agent );
             }
 
 
             long start = System.currentTimeMillis();
-            while ( !Thread.interrupted() ) {
-                TrackerOperationView po =
-                        tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-                if ( po != null ) {
-                    if ( po.getState() != ProductOperationState.RUNNING ) {
-                        if ( po.getLog().contains( NodeState.STOPPED.toString() ) ) {
+            while ( !Thread.interrupted() )
+            {
+                TrackerOperationView po = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
+                if ( po != null )
+                {
+                    if ( po.getState() != ProductOperationState.RUNNING )
+                    {
+                        if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
+                        {
                             state = NodeState.STOPPED;
                         }
-                        else if ( po.getLog().contains( NodeState.RUNNING.toString() ) ) {
+                        else if ( po.getLog().contains( NodeState.RUNNING.toString() ) )
+                        {
                             state = NodeState.RUNNING;
                         }
                         break;
                     }
                 }
 
-                try {
+                try
+                {
                     Thread.sleep( 1000 );
                 }
-                catch ( InterruptedException ex ) {
+                catch ( InterruptedException ex )
+                {
                     break;
                 }
-                if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 ) {
+                if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 )
+                {
                     break;
                 }
             }

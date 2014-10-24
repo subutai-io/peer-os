@@ -51,7 +51,7 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Replication factor", wizard.getHadoopClusterConfig().getReplicationFactor() + "" );
 
         Button install = new Button( "Install" );
-        install.setId("HadoopBtnInstall");
+        install.setId( "HadoopBtnInstall" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -74,7 +74,7 @@ public class VerificationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
-        back.setId("HadoopVerBack");
+        back.setId( "HadoopVerBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

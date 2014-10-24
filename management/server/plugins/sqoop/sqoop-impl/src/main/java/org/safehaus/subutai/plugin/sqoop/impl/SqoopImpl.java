@@ -106,7 +106,6 @@ public class SqoopImpl extends SqoopBase
     }
 
 
-
     @Override
     public UUID exportData( ExportSetting settings )
     {

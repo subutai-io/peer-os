@@ -48,14 +48,14 @@ public class AddNodeWindow extends Window
         content.setSpacing( true );
 
         HorizontalLayout topContent = new HorizontalLayout();
-        topContent.setId("MahoutAddNodeTopContent");
+        topContent.setId( "MahoutAddNodeTopContent" );
         topContent.setSpacing( true );
 
         content.addComponent( topContent );
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox hadoopNodes = new ComboBox();
-        hadoopNodes.setId("mahoutAddHadoopNodes");
+        hadoopNodes.setId( "mahoutAddHadoopNodes" );
         hadoopNodes.setImmediate( true );
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
@@ -71,7 +71,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( hadoopNodes );
 
         final Button addNodeBtn = new Button( "Add" );
-        addNodeBtn.setId("MahoutAddNodesButton");
+        addNodeBtn.setId( "MahoutAddNodesButton" );
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
@@ -129,7 +129,7 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
-        outputTxtArea.setId("outputTxtArea" );
+        outputTxtArea.setId( "outputTxtArea" );
         outputTxtArea.setRows( 10 );
         outputTxtArea.setColumns( 30 );
         outputTxtArea.setImmediate( true );
@@ -139,7 +139,7 @@ public class AddNodeWindow extends Window
 
         indicator = new Label();
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
-        indicator.setId("indicator");
+        indicator.setId( "indicator" );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );
         indicator.setWidth( 50, Unit.PIXELS );
@@ -147,7 +147,7 @@ public class AddNodeWindow extends Window
 
 
         ok.addStyleName( "default" );
-        ok.setId("btnOk");
+        ok.setId( "btnOk" );
         ok.addClickListener( new Button.ClickListener()
         {
             @Override

@@ -29,9 +29,11 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
 
 
     @Override
-    public String getProductKey() {
+    public String getProductKey()
+    {
         return PRODUCT_KEY;
     }
+
 
     public static String getTemplateName()
     {

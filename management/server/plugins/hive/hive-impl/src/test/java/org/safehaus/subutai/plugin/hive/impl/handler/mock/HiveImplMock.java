@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.hive.impl.handler.mock;
 
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -32,7 +31,8 @@ public class HiveImplMock extends HiveImpl
     public static Agent createAgent( String hostname )
     {
         return new Agent( UUIDUtil.generateTimeBasedUUID(), hostname, "parent-host", "00:00:00:00",
-                Arrays.asList( "127.0.0.1", "127.0.0.1" ), true, "transportId", UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
+                Arrays.asList( "127.0.0.1", "127.0.0.1" ), true, "transportId", UUIDUtil.generateTimeBasedUUID(),
+                UUIDUtil.generateTimeBasedUUID() );
     }
 
 

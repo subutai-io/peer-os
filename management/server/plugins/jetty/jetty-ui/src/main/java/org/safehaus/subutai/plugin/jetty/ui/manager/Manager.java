@@ -91,7 +91,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Cluster nodes" );
-        nodesTable.setId("jettyMngNodesTable");
+        nodesTable.setId( "jettyMngNodesTable" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -106,7 +106,7 @@ public class Manager
         controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("hipiClusterCombo");
+        clusterCombo.setId( "hipiClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -125,7 +125,7 @@ public class Manager
 
         /** Refresh button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("hipiRefresh");
+        refreshClustersBtn.setId( "hipiRefresh" );
         addClickListener( refreshClustersBtn );
         controlsContent.addComponent( refreshClustersBtn );
         controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
@@ -133,7 +133,7 @@ public class Manager
 
         /** Check all button */
         checkAllBtn = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllBtn.setId("jettyCheckAll");
+        checkAllBtn.setId( "jettyCheckAll" );
         addClickListener( checkAllBtn );
         controlsContent.addComponent( checkAllBtn );
         controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
@@ -141,7 +141,7 @@ public class Manager
 
         /** Start all button */
         startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.setId("jettyStartAll");
+        startAllBtn.setId( "jettyStartAll" );
         addClickListener( startAllBtn );
         controlsContent.addComponent( startAllBtn );
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
@@ -149,7 +149,7 @@ public class Manager
 
         /** Stop all button */
         stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.setId("jettyStopAll");
+        stopAllBtn.setId( "jettyStopAll" );
         addClickListener( stopAllBtn );
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
@@ -157,7 +157,7 @@ public class Manager
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("jettyDestroy");
+        destroyClusterBtn.setId( "jettyDestroy" );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
@@ -165,7 +165,7 @@ public class Manager
         addStyleNameToButtons( refreshClustersBtn, checkAllBtn, startAllBtn, stopAllBtn, destroyClusterBtn );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
@@ -193,8 +193,8 @@ public class Manager
                             stopAllBtn.click();
                             UUID trackID = jetty.uninstallCluster( config.getClusterName() );
 
-                            ProgressWindow window = new ProgressWindow( executorService, tracker, trackID,
-                                    JettyConfig.PRODUCT_KEY );
+                            ProgressWindow window =
+                                    new ProgressWindow( executorService, tracker, trackID, JettyConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -394,11 +394,11 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-            checkButton.setId(agent.getListIP().get(0)+"-jettyCheck");
+            checkButton.setId( agent.getListIP().get( 0 ) + "-jettyCheck" );
             final Button startButton = new Button( START_BUTTON_CAPTION );
-            startButton.setId(agent.getListIP().get(0)+"-jettyStart");
+            startButton.setId( agent.getListIP().get( 0 ) + "-jettyStart" );
             final Button stopButton = new Button( STOP_BUTTON_CAPTION );
-            stopButton.setId(agent.getListIP().get(0)+"-jettyStop");
+            stopButton.setId( agent.getListIP().get( 0 ) + "-jettyStop" );
 
             addStyleNameToButtons( checkButton, startButton, stopButton );
 
@@ -444,19 +444,19 @@ public class Manager
             {
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
-                executorService.execute( new StopTask( jetty, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                executorService.execute(
+                        new StopTask( jetty, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
@@ -472,19 +472,18 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( jetty, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new StartTask( jetty, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
             }
         } );
     }
@@ -500,29 +499,28 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( jetty, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CheckTask( jetty, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    resultHolder.setValue( result );
+                                    if ( resultHolder.getValue().contains( "not" ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( resultHolder.getValue().contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
                                     }
-                                } ) );
+                                    else
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        } ) );
             }
         } );
     }

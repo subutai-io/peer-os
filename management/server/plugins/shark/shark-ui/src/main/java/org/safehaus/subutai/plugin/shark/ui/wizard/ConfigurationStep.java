@@ -41,7 +41,7 @@ public class ConfigurationStep extends Panel
         final SharkClusterConfig config = wizard.getConfig();
 
         TextField nameTxt = new TextField( "Cluster name" );
-        nameTxt.setId("SharkClusterName");
+        nameTxt.setId( "SharkClusterName" );
         nameTxt.setRequired( true );
         nameTxt.addValueChangeListener( new Property.ValueChangeListener()
         {
@@ -70,12 +70,12 @@ public class ConfigurationStep extends Panel
         }
 
         Button next = new Button( "Next" );
-        next.setId("SharkNext");
+        next.setId( "SharkNext" );
         next.addStyleName( "default" );
         next.addClickListener( new NextClickHandler( wizard ) );
 
         Button back = new Button( "Back" );
-        back.setId("SharkBack");
+        back.setId( "SharkBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -104,7 +104,7 @@ public class ConfigurationStep extends Panel
     private void addOverSparkComponents( ComponentContainer parent, Spark spark, final SharkClusterConfig config )
     {
         ComboBox sparkClusters = new ComboBox( "Spark cluster" );
-        sparkClusters.setId("sharkSparkClustersCb");
+        sparkClusters.setId( "sharkSparkClustersCb" );
         sparkClusters.setImmediate( true );
         sparkClusters.setTextInputAllowed( false );
         sparkClusters.setRequired( true );

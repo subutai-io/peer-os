@@ -17,7 +17,8 @@ import static org.junit.Assert.assertEquals;
 public class CheckEnvironmentContainerNodeOperationHandlerTest
 {
 
-    private static final Logger LOG = Logger.getLogger( CheckEnvironmentContainerNodeOperationHandlerTest.class.getName() );
+    private static final Logger LOG =
+            Logger.getLogger( CheckEnvironmentContainerNodeOperationHandlerTest.class.getName() );
 
 
     @Test

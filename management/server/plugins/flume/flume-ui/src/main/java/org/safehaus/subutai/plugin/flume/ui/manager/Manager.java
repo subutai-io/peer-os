@@ -87,7 +87,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("FluNodesTbl");
+        nodesTable.setId( "FluNodesTbl" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -100,7 +100,7 @@ public class Manager
         getAddNodeButton( controlsContent );
 
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -111,7 +111,7 @@ public class Manager
     private void getAddNodeButton( HorizontalLayout controlsContent )
     {
         Button addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId("FluAddNodeBtn");
+        addNodeBtn.setId( "FluAddNodeBtn" );
         addNodeBtn.addStyleName( "default" );
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -163,7 +163,7 @@ public class Manager
     private void getDestroyClusterButton( HorizontalLayout controlsContent )
     {
         Button destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("FluDestroyClusterBtn");
+        destroyClusterBtn.setId( "FluDestroyClusterBtn" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -207,6 +207,7 @@ public class Manager
         controlsContent.addComponent( destroyClusterBtn );
     }
 
+
     public void checkAllNodes()
     {
         if ( nodesTable != null )
@@ -229,6 +230,7 @@ public class Manager
         }
     }
 
+
     protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
     {
         if ( availableOperationsLayout == null )
@@ -249,11 +251,10 @@ public class Manager
     }
 
 
-
     private void getRefreshClusterButton( HorizontalLayout controlsContent )
     {
         Button refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("FluRefreshClusterBtn");
+        refreshClustersBtn.setId( "FluRefreshClusterBtn" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -271,7 +272,7 @@ public class Manager
     private void getClusterCombo( HorizontalLayout controlsContent )
     {
         clusterCombo = new ComboBox();
-        clusterCombo.setId("FluClusterCombo");
+        clusterCombo.setId( "FluClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -313,14 +314,14 @@ public class Manager
         {
             final Label resultHolder = new Label();
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId(agent.getListIP().get(0)+"-flumeDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-flumeDestroy" );
             final Button startBtn = new Button( START_BUTTON_CAPTION );
-            startBtn.setId(agent.getListIP().get(0)+"-flumeStart");
+            startBtn.setId( agent.getListIP().get( 0 ) + "-flumeStart" );
             final Button stopBtn = new Button( STOP_BUTTON_CAPTION );
-            stopBtn.setId(agent.getListIP().get(0)+"-flumeStop");
+            stopBtn.setId( agent.getListIP().get( 0 ) + "-flumeStop" );
 
             final Button checkBtn = new Button( CHECK_BUTTON_CAPTION );
-            checkBtn.setId(agent.getListIP().get(0)+"-flumeCheck");
+            checkBtn.setId( agent.getListIP().get( 0 ) + "-flumeCheck" );
 
             enableButton( stopBtn, startBtn, checkBtn, destroyBtn );
 
@@ -337,7 +338,7 @@ public class Manager
 
             addCheckButtonClickListener( agent, resultHolder, checkBtn, startBtn, stopBtn, destroyBtn );
             addClickListenerToStartButton( agent, checkBtn, startBtn, stopBtn, destroyBtn );
-            addClickListenerToStopButton ( agent, checkBtn, startBtn, stopBtn, destroyBtn );
+            addClickListenerToStopButton( agent, checkBtn, startBtn, stopBtn, destroyBtn );
 
             destroyBtn.addClickListener( new Button.ClickListener()
             {
@@ -408,37 +409,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( flume, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
-                                {
-                                    @Override
-                                    public void onComplete( String result )
-                                    {
-                                        enableButton( buttons );
-                                        PROGRESS_ICON.setVisible( false );
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).click();
-                                        }
-                                    }
-                                } ) );
-            }
-        } );
-    }
-
-
-    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
-    {
-        getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                PROGRESS_ICON.setVisible( true );
-                disableButtons( buttons );
-                executorService.execute( new StopTask( flume, tracker, config.getClusterName(), agent.getHostname(),
-                        new CompleteEvent()
+                        new StartTask( flume, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
                         {
                             @Override
                             public void onComplete( String result )
@@ -456,6 +427,36 @@ public class Manager
         } );
     }
 
+
+    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    {
+        getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                PROGRESS_ICON.setVisible( true );
+                disableButtons( buttons );
+                executorService.execute(
+                        new StopTask( flume, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            @Override
+                            public void onComplete( String result )
+                            {
+                                enableButton( buttons );
+                                PROGRESS_ICON.setVisible( false );
+                                synchronized ( PROGRESS_ICON )
+                                {
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).click();
+                                }
+                            }
+                        } ) );
+            }
+        } );
+    }
+
+
     public void addCheckButtonClickListener( final Agent agent, final Label resultHolder, final Button... buttons )
     {
         getButton( CHECK_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
@@ -466,30 +467,29 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new CheckTask( flume, tracker, config.getClusterName(), agent.getHostname(),
-                                new CompleteEvent()
+                        new CheckTask( flume, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                        {
+                            public void onComplete( String result )
+                            {
+                                synchronized ( PROGRESS_ICON )
                                 {
-                                    public void onComplete( String result )
+                                    resultHolder.setValue( result );
+                                    if ( resultHolder.getValue().contains( "not" ) )
                                     {
-                                        synchronized ( PROGRESS_ICON )
-                                        {
-                                            resultHolder.setValue( result );
-                                            if ( resultHolder.getValue().contains( "not" ) )
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                            }
-                                            else
-                                            {
-                                                getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
-                                                getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            }
-                                            PROGRESS_ICON.setVisible( false );
-                                            getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                            getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
-                                        }
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( false );
                                     }
-                                } ) );
+                                    else
+                                    {
+                                        getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
+                                        getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    }
+                                    PROGRESS_ICON.setVisible( false );
+                                    getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                    getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
+                                }
+                            }
+                        } ) );
             }
         } );
     }

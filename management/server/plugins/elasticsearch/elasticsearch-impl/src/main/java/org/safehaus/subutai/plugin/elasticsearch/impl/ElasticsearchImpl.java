@@ -300,9 +300,8 @@ public class ElasticsearchImpl implements Elasticsearch
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint
-                .setName( String.format( "%s-%s", ElasticsearchClusterConfiguration.PRODUCT_KEY, UUIDUtil
-                        .generateTimeBasedUUID() ) );
+        environmentBlueprint.setName( String.format( "%s-%s", ElasticsearchClusterConfiguration.PRODUCT_KEY,
+                UUIDUtil.generateTimeBasedUUID() ) );
 
         // Node group
         NodeGroup nodesGroup = new NodeGroup();

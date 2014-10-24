@@ -114,8 +114,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set DataNodes for NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -138,8 +138,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Set TaskTrackers for JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves %s; ",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 
@@ -147,8 +147,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove DataNode from NameNode", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getNameNode() ) );
     }
 
 
@@ -156,8 +156,8 @@ public class Commands
     {
 
         return commandRunner.createCommand( "Remove TaskTrackers from JobTracker", new RequestBuilder(
-                String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s", agent.getHostname() ) ),
-                Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
+                        String.format( ". /etc/profile && " + "hadoop-master-slave.sh slaves clear %s",
+                                agent.getHostname() ) ), Sets.newHashSet( hadoopClusterConfig.getJobTracker() ) );
     }
 
 

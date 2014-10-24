@@ -19,8 +19,7 @@ public class StopTask implements Runnable
     private Tracker tracker;
 
 
-    public StopTask( Jetty jetty, Tracker tracker, String clusterName, String lxcHostname,
-                     CompleteEvent completeEvent )
+    public StopTask( Jetty jetty, Tracker tracker, String clusterName, String lxcHostname, CompleteEvent completeEvent )
     {
         this.jetty = jetty;
         this.tracker = tracker;

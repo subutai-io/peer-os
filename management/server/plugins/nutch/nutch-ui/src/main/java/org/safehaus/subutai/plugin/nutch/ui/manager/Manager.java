@@ -84,7 +84,7 @@ public class Manager
         contentRoot.setColumns( 1 );
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("nodesTable");
+        nodesTable.setId( "nodesTable" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -93,7 +93,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("clusterCombo");
+        clusterCombo.setId( "clusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -111,7 +111,7 @@ public class Manager
 
         /** Refresh Cluster button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("refreshClustersBtn");
+        refreshClustersBtn.setId( "refreshClustersBtn" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -125,7 +125,7 @@ public class Manager
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("destroyClusterBtn");
+        destroyClusterBtn.setId( "destroyClusterBtn" );
         destroyClusterBtn.addStyleName( "default" );
         addClickListenerToDestorClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
@@ -133,7 +133,7 @@ public class Manager
 
         /** Add Node button */
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId("addNodeBtn");
+        addNodeBtn.setId( "addNodeBtn" );
         addNodeBtn.addStyleName( "default" );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
@@ -304,7 +304,7 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId(agent.getListIP().get( 0 )+"-nutchDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-nutchDestroy" );
             destroyBtn.addStyleName( "default" );
 
             final HorizontalLayout availableOperations = new HorizontalLayout();

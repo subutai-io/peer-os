@@ -61,7 +61,7 @@ public class ConfigurationStep extends Panel
         // Buttons
 
         Button next = new Button( "Next" );
-        next.setId("ConfNext");
+        next.setId( "ConfNext" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -80,7 +80,7 @@ public class ConfigurationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("ConfBack");
+        back.setId( "ConfBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
@@ -112,7 +112,7 @@ public class ConfigurationStep extends Panel
         final TwinColSelect select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
 
         ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
-        hadoopClusters.setId("hadoopClusters");
+        hadoopClusters.setId( "hadoopClusters" );
         hadoopClusters.setImmediate( true );
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );

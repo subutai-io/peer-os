@@ -44,7 +44,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
         {
             //setup up HBase cluster
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, trackerOperation );
-//            HadoopClusterConfig hadoopClusterConfig = manager.getC
+            //            HadoopClusterConfig hadoopClusterConfig = manager.getC
             setupStrategy.setup();
 
             trackerOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );

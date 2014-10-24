@@ -45,7 +45,7 @@ public class VerificationStep extends VerticalLayout
         cfgView.addStringCfg( "Number of seeds", wizard.getConfig().getNumberOfSeeds() + "" );
 
         Button install = new Button( "Install" );
-        install.setId("CassConfigInstallBtn");
+        install.setId( "CassConfigInstallBtn" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -68,7 +68,7 @@ public class VerificationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
-        back.setId("CassVerBack");
+        back.setId( "CassVerBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

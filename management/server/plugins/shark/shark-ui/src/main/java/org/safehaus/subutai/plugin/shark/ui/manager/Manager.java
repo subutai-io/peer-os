@@ -94,7 +94,7 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("SharkNodesTable");
+        nodesTable.setId( "SharkNodesTable" );
 
         HorizontalLayout controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
@@ -103,7 +103,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("sharkClusterCb");
+        clusterCombo.setId( "sharkClusterCb" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -122,7 +122,7 @@ public class Manager
 
         /** Refresh Cluster button */
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("SharkRefreshClustersBtn");
+        refreshClustersBtn.setId( "SharkRefreshClustersBtn" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
             @Override
@@ -136,20 +136,20 @@ public class Manager
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterBtn.setId("SharkDestroyClusterBtn");
+        destroyClusterBtn.setId( "SharkDestroyClusterBtn" );
         addClickListenerToDestroyClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
 
 
         /** Add Node button */
         addNodeBtn = new Button( ADD_NODE_CAPTION );
-        addNodeBtn.setId("SharkAddnodeBtn");
+        addNodeBtn.setId( "SharkAddnodeBtn" );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
 
         addStyleNameToButtons( refreshClustersBtn, destroyClusterBtn, addNodeBtn );
         PROGRESS_ICON.setVisible( false );
-        PROGRESS_ICON.setId("indicator");
+        PROGRESS_ICON.setId( "indicator" );
         controlsContent.addComponent( PROGRESS_ICON );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -350,7 +350,7 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button destroyBtn = new Button( DESTROY_BUTTON_CAPTION );
-            destroyBtn.setId(agent.getListIP().get(0)+"-sharkDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-sharkDestroy" );
 
             addStyleNameToButtons( destroyBtn );
             PROGRESS_ICON.setVisible( false );

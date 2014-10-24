@@ -52,12 +52,12 @@ public class StepStart extends Panel
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button startOverHadoopNZK = new Button( "Start over Hadoop installation" );
-        startOverHadoopNZK.setId("OozieStartOverHadoop");
+        startOverHadoopNZK.setId( "OozieStartOverHadoop" );
         startOverHadoopNZK.addStyleName( "default" );
         grid.addComponent( startOverHadoopNZK, 7, 4, 7, 4 );
         grid.setComponentAlignment( startOverHadoopNZK, Alignment.BOTTOM_RIGHT );
         Button startWithHadoopNZK = new Button( "Start with Hadoop installation" );
-        startWithHadoopNZK.setId("OozieStartOverHadoop");
+        startWithHadoopNZK.setId( "OozieStartOverHadoop" );
         startWithHadoopNZK.addStyleName( "default" );
         grid.addComponent( startWithHadoopNZK, 8, 4, 8, 4 );
         grid.setComponentAlignment( startWithHadoopNZK, Alignment.BOTTOM_RIGHT );

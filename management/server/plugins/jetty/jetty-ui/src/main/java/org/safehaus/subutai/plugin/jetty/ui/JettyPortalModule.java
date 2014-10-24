@@ -15,7 +15,6 @@ import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.ServiceLocator;
-import org.safehaus.subutai.plugin.jetty.ui.JettyComponent;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 

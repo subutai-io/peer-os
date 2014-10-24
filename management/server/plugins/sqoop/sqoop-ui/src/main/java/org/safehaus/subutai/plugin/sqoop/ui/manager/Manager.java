@@ -87,8 +87,8 @@ public class Manager
 
         //tables go here
         nodesTable = createTableTemplate( "Nodes" );
-        nodesTable.setId("sqoopMngNodesTable");
-        contentRoot.setId("sqoopMngContentRoot");
+        nodesTable.setId( "sqoopMngNodesTable" );
+        contentRoot.setId( "sqoopMngContentRoot" );
 
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -100,7 +100,7 @@ public class Manager
 
         /**  Combo box  */
         clusterCombo = new ComboBox();
-        clusterCombo.setId("sqoopMngClusterCombo");
+        clusterCombo.setId( "sqoopMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -118,7 +118,7 @@ public class Manager
 
 
         refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId("sqoopMngRefresh");
+        refreshClustersBtn.setId( "sqoopMngRefresh" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -133,16 +133,15 @@ public class Manager
 
         /** Destroy Cluster button */
         destroyClusterBtn = new Button( DESTROY_ALL_INSTALLATIONS_BUTTON_CAPTION );
-        destroyClusterBtn.setId("sqoopMngDestroy");
+        destroyClusterBtn.setId( "sqoopMngDestroy" );
         destroyClusterBtn.addStyleName( "default" );
         addClickListenerToDestorClusterButton();
         controlsContent.addComponent( destroyClusterBtn );
 
 
-
         /** Add Node button */
         addNodeBtn = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeBtn.setId("sqoopMngAddNode");
+        addNodeBtn.setId( "sqoopMngAddNode" );
         addNodeBtn.addStyleName( "default" );
         addClickListenerToAddNodeButton();
         controlsContent.addComponent( addNodeBtn );
@@ -263,7 +262,8 @@ public class Manager
     }
 
 
-    public void addItemClickListenerToTable( final Table table ){
+    public void addItemClickListenerToTable( final Table table )
+    {
         table.addItemClickListener( new ItemClickEvent.ItemClickListener()
         {
             @Override
@@ -309,6 +309,7 @@ public class Manager
         }
     }
 
+
     public void addStyleNameToButtons( Button... buttons )
     {
         for ( Button b : buttons )
@@ -316,7 +317,6 @@ public class Manager
             b.addStyleName( BUTTON_STYLE_NAME );
         }
     }
-
 
 
     public void addGivenComponents( Layout layout, Button... buttons )
@@ -336,11 +336,11 @@ public class Manager
         for ( final Agent agent : agents )
         {
             final Button importBtn = new Button( "Import" );
-            importBtn.setId(agent.getListIP().get(0)+"-sqoopImport");
+            importBtn.setId( agent.getListIP().get( 0 ) + "-sqoopImport" );
             final Button exportBtn = new Button( "Export" );
-            exportBtn.setId(agent.getListIP().get(0)+"-sqoopExport");
+            exportBtn.setId( agent.getListIP().get( 0 ) + "-sqoopExport" );
             final Button destroyBtn = new Button( "Destroy" );
-            destroyBtn.setId(agent.getListIP().get(0)+"-sqoopDestroy");
+            destroyBtn.setId( agent.getListIP().get( 0 ) + "-sqoopDestroy" );
 
             addStyleNameToButtons( importBtn, exportBtn, destroyBtn );
 
@@ -381,7 +381,8 @@ public class Manager
     }
 
 
-    public void addClickListenerToDestroyButton( final Agent agent, Button destroyBtn ){
+    public void addClickListenerToDestroyButton( final Agent agent, Button destroyBtn )
+    {
         destroyBtn.addClickListener( new Button.ClickListener()
         {
 

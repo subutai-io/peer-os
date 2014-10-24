@@ -7,9 +7,9 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.common.api.NodeType;
 
 
 /**
@@ -32,11 +32,11 @@ public class SecondaryNameNode extends ClusterNode
         setHostname( cluster.getSecondaryNameNode().getHostname() );
 
         restartButton.setVisible( false );
-        restartButton.setId("secondaryRestart");
+        restartButton.setId( "secondaryRestart" );
         startButton.setEnabled( false );
-        startButton.setId("secondaryStart");
+        startButton.setId( "secondaryStart" );
         stopButton.setEnabled( false );
-        stopButton.setId("secondaryStop");
+        stopButton.setId( "secondaryStop" );
 
         getStatus( null );
     }
@@ -47,28 +47,30 @@ public class SecondaryNameNode extends ClusterNode
     {
         setLoading( true );
 
-        executorService.execute( new CheckTask( hadoop, tracker, NodeType.SECONDARY_NAMENODE, cluster, new CompleteEvent() {
-
-            public void onComplete( NodeState state )
-            {
-                synchronized ( progressButton )
+        executorService
+                .execute( new CheckTask( hadoop, tracker, NodeType.SECONDARY_NAMENODE, cluster, new CompleteEvent()
                 {
-                    boolean isRunning = false;
-                    if ( state == NodeState.RUNNING )
-                    {
-                        isRunning = true;
-                    }
-                    else if ( state == NodeState.STOPPED )
-                    {
-                        isRunning = false;
-                    }
 
-                    setLoading( false );
-                    startButton.setVisible( isRunning );
-                    stopButton.setVisible( !isRunning );
-                }
-            }
-        }, trackID, cluster.getSecondaryNameNode() ) );
+                    public void onComplete( NodeState state )
+                    {
+                        synchronized ( progressButton )
+                        {
+                            boolean isRunning = false;
+                            if ( state == NodeState.RUNNING )
+                            {
+                                isRunning = true;
+                            }
+                            else if ( state == NodeState.STOPPED )
+                            {
+                                isRunning = false;
+                            }
+
+                            setLoading( false );
+                            startButton.setVisible( isRunning );
+                            stopButton.setVisible( !isRunning );
+                        }
+                    }
+                }, trackID, cluster.getSecondaryNameNode() ) );
     }
 
 
@@ -78,6 +80,6 @@ public class SecondaryNameNode extends ClusterNode
         startButton.setVisible( !isLoading );
         stopButton.setVisible( !isLoading );
         progressButton.setVisible( isLoading );
-        progressButton.setId("secondaryProgress");
+        progressButton.setId( "secondaryProgress" );
     }
 }

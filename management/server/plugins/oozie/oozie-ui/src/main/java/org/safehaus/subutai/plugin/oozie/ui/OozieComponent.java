@@ -36,9 +36,9 @@ public class OozieComponent extends CustomComponent
         manager = new Manager( executorService, serviceLocator );
         wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.getTab(0).setId("OozieInstallTab");
+        sheet.getTab( 0 ).setId( "OozieInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab(1).setId("OozieManageTab");
+        sheet.getTab( 1 ).setId( "OozieManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

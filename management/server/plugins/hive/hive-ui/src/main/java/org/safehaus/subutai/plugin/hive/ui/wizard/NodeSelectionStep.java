@@ -77,7 +77,7 @@ public class NodeSelectionStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("HiveNodeSelectionBack");
+        back.setId( "HiveNodeSelectionBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {
