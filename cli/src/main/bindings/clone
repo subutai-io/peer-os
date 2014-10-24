@@ -6,7 +6,7 @@ function clone_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Clone a new container instance from a temlate.
   echo
-  echo "        "subutai \[-qh\] clone parent child \[-e environmentId\] \[-b \[pre-execution-scripts\]] \[-a \[post-execution-scripts\]]
+  echo "        "subutai \[-qh\] clone parent child \[-e environmentId\] \[-b \[pre-execution-scripts\|\"all\"\]\] \[-a \[post-execution-scripts\|\"all\"\]\]
   echo
   echo -----------------------------------------------------------------------
 }
@@ -48,34 +48,38 @@ function clone {
   while getopts ":e:b:a:" opt; do
     case $opt in
       e)
-	 environmentId=$OPTARG
-         ;;
+        environmentId=$OPTARG
+        ;;
       b)
-	 preScriptsEnabled="true"
-	 preScripts=$OPTARG
-	 ;;
-       a)
-	  postScriptsEnabled="true"
-	  postScripts=$OPTARG
-          ;;
+        preScriptsEnabled="true"
+        preScripts=$OPTARG
+	;;
+      a)
+        postScriptsEnabled="true"
+        postScripts=$OPTARG
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument"
+        exit 1
+        ;;
       \?)
-         msg_error "Unrecognized option -$OPTARG"
-         exit 1
-         ;;
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
     esac
     shift_amount=$(($shift_amount + 1))
   done
 
+  lock_container_write $parent $child
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
   if [ "x$preScriptsEnabled" == "xtrue" ]; then
     if [ "x$preScripts" == "xall" ]; then
-      execute_all_prescripts "${FUNCNAME[0]}" 
+      execute_all_prescripts "${FUNCNAME[0]}"
     else
       execute_prescripts "$preScripts"
     fi
   fi
-
-  lock_container_write $parent $child
-  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
   if [ -z "$environmentId" ]; then
