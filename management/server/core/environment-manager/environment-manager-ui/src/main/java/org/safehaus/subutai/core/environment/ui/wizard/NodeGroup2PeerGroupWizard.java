@@ -1,23 +1,17 @@
 package org.safehaus.subutai.core.environment.ui.wizard;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.core.environment.api.TopologyEnum;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
-import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerGroup;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -29,14 +23,11 @@ public class NodeGroup2PeerGroupWizard extends Window
 {
 
     private int step = 0;
-    private Table peersTable;
-    private Table containerToPeerTable;
-    private EnvironmentManagerPortalModule managerUI;
-    private Map<Object, NodeGroup> nodeGroupMap;
+    private EnvironmentManagerPortalModule module;
     private EnvironmentBlueprint blueprint;
 
 
-    public NodeGroup2PeerGroupWizard( final String caption, EnvironmentManagerPortalModule managerUI,
+    public NodeGroup2PeerGroupWizard( final String caption, EnvironmentManagerPortalModule module,
                                       EnvironmentBlueprint blueprint )
     {
         super( caption );
@@ -45,8 +36,8 @@ public class NodeGroup2PeerGroupWizard extends Window
         setClosable( true );
         setVisible( false );
         setWidth( "800px" );
-        setHeight( "500px" );
-        this.managerUI = managerUI;
+        setHeight( "200px" );
+        this.module = module;
         this.blueprint = blueprint;
         next();
     }
@@ -65,32 +56,32 @@ public class NodeGroup2PeerGroupWizard extends Window
         {
             case 1:
             {
-                setContent( genPeersTable() );
+                setContent( generatePeerGroupsLayout() );
                 break;
             }
             case 2:
             {
-                setContent( genNodeGroupToPeerGroupTable() );
+                close();
                 break;
             }
             default:
             {
-                setContent( genPeersTable() );
+                close();
                 break;
             }
         }
     }
 
 
-    public EnvironmentManagerPortalModule getManagerUI()
+    public EnvironmentManagerPortalModule getModule()
     {
-        return managerUI;
+        return module;
     }
 
 
-    public void setManagerUI( final EnvironmentManagerPortalModule managerUI )
+    public void setModule( final EnvironmentManagerPortalModule module )
     {
-        this.managerUI = managerUI;
+        this.module = module;
     }
 
 
@@ -100,164 +91,59 @@ public class NodeGroup2PeerGroupWizard extends Window
     }
 
 
-    private VerticalLayout genPeersTable()
+    final ComboBox peerGroupsCombo = new ComboBox();
+
+
+    private VerticalLayout generatePeerGroupsLayout()
     {
         VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
 
-        peersTable = new Table();
-        peersTable.addContainerProperty( "Name", String.class, null );
-        peersTable.addContainerProperty( "Select", CheckBox.class, null );
-        peersTable.setPageLength( 10 );
-        peersTable.setSelectable( false );
-        peersTable.setEnabled( true );
-        peersTable.setImmediate( true );
-        peersTable.setSizeFull();
+        List<PeerGroup> peerGroups = module.getPeerManager().peersGroups();
 
+        BeanItemContainer<PeerGroup> bic = new BeanItemContainer<>( PeerGroup.class );
+        bic.addAll( peerGroups );
 
-        List<Peer> peers = managerUI.getPeerManager().peers();
-        if ( !peers.isEmpty() )
-        {
-            for ( Peer peer : peers )
-            {
-                CheckBox checkBox = new CheckBox();
-                peersTable.addItem( new Object[] {
-                        peer.getName(), checkBox
-                }, peer );
-            }
-        }
+        peerGroupsCombo.setContainerDataSource( bic );
+        peerGroupsCombo.setNullSelectionAllowed( false );
+        peerGroupsCombo.setTextInputAllowed( false );
+        peerGroupsCombo.setItemCaptionPropertyId( "name" );
+
         Button nextButton = new Button( "Next" );
         nextButton.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                if ( !selectedPeers().isEmpty() )
+                PeerGroup peerGroup = getSelectedPeerGroup();
+                if ( peerGroup != null )
                 {
+                    try
+                    {
+                        module.getEnvironmentManager().saveBuildProcessNG2PG( blueprint.getId(), peerGroup.getId() );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        Notification.show( e.getMessage() );
+                    }
                     next();
                 }
                 else
                 {
-                    Notification.show( "Please select peers", Notification.Type.HUMANIZED_MESSAGE );
+                    Notification.show( "Please select peer group", Notification.Type.HUMANIZED_MESSAGE );
                 }
             }
         } );
 
 
-        vl.addComponent( peersTable );
+        vl.addComponent( peerGroupsCombo );
         vl.addComponent( nextButton );
         return vl;
     }
 
 
-    private VerticalLayout genNodeGroupToPeerGroupTable()
+    private PeerGroup getSelectedPeerGroup()
     {
-        VerticalLayout vl = new VerticalLayout();
-
-        containerToPeerTable = new Table();
-        containerToPeerTable.addContainerProperty( "Container", String.class, null );
-        containerToPeerTable.addContainerProperty( "Put", ComboBox.class, null );
-        containerToPeerTable.setPageLength( 10 );
-        containerToPeerTable.setSelectable( false );
-        containerToPeerTable.setEnabled( true );
-        containerToPeerTable.setImmediate( true );
-        containerToPeerTable.setSizeFull();
-        nodeGroupMap = new HashMap<>();
-        for ( NodeGroup ng : blueprint.getNodeGroups() )
-        {
-            for ( int i = 0; i < ng.getNumberOfNodes(); i++ )
-            {
-                ComboBox comboBox = new ComboBox();
-                BeanItemContainer<Peer> bic = new BeanItemContainer<>( Peer.class );
-                bic.addAll( selectedPeers() );
-                comboBox.setContainerDataSource( bic );
-                comboBox.setNullSelectionAllowed( false );
-                comboBox.setTextInputAllowed( false );
-                comboBox.setItemCaptionPropertyId( "name" );
-                Object itemId = containerToPeerTable.addItem( new Object[] {
-                        ng.getTemplateName(), comboBox
-                }, null );
-                nodeGroupMap.put( itemId, ng );
-            }
-        }
-        Button nextButton = new Button( "Build" );
-        nextButton.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent clickEvent )
-            {
-                Map<Object, Peer> topology = topologySelection();
-                if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
-                {
-                    Map<Object, NodeGroup> map = getNodeGroupMap();
-                    managerUI.getEnvironmentManager().saveBuildProcess( blueprint.getId(), topology, map,
-                            TopologyEnum.NODE_GROUP_2_PEER_GROUP );
-                }
-                else
-                {
-                    Notification.show( "Topology is not properly set" );
-                }
-                close();
-            }
-        } );
-
-
-        vl.addComponent( containerToPeerTable );
-        vl.addComponent( nextButton );
-
-        return vl;
-    }
-
-
-    private List<Peer> selectedPeers()
-    {
-        List<Peer> peers = new ArrayList<>();
-        for ( Object itemId : getPeersTable().getItemIds() )
-        {
-            CheckBox selection = ( CheckBox ) getPeersTable().getItem( itemId ).getItemProperty( "Select" ).getValue();
-            if ( selection.getValue() )
-            {
-                peers.add( ( Peer ) itemId );
-            }
-        }
-        return peers;
-    }
-
-
-    public Table getPeersTable()
-    {
-        return peersTable;
-    }
-
-
-    public Table getContainerToPeerTable()
-    {
-        return containerToPeerTable;
-    }
-
-
-    public Map<Object, NodeGroup> getNodeGroupMap()
-    {
-        return nodeGroupMap;
-    }
-
-
-    public void setNodeGroupMap( final Map<Object, NodeGroup> nodeGroupMap )
-    {
-        this.nodeGroupMap = nodeGroupMap;
-    }
-
-
-    public Map<Object, Peer> topologySelection()
-    {
-        Map<Object, Peer> topology = new HashMap<>();
-        for ( Object itemId : getContainerToPeerTable().getItemIds() )
-        {
-            ComboBox selection =
-                    ( ComboBox ) getContainerToPeerTable().getItem( itemId ).getItemProperty( "Put" ).getValue();
-            Peer peer = ( Peer ) selection.getValue();
-
-            topology.put( itemId, peer );
-        }
-        return topology;
+        return ( PeerGroup ) peerGroupsCombo.getValue();
     }
 }

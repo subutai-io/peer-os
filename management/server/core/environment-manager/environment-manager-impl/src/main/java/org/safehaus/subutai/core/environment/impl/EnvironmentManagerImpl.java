@@ -651,6 +651,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
+    public boolean saveBuildProcessNG2PG( final UUID blueprintId, final UUID peerGroupId )
+            throws EnvironmentManagerException
+    {
+        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
+        try
+        {
+            EnvironmentBuildProcess process =
+                    topologyBuilder.createEnvironmentBuildProcessNG2PG( blueprintId, peerGroupId );
+            if ( process != null )
+            {
+                return environmentDAO.saveInfo( PROCESS, process.getId().toString(), process );
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch ( EnvironmentBuildException e )
+        {
+            throw new EnvironmentManagerException( e.getMessage() );
+        }
+    }
+
+
+    @Override
     public EnvironmentBlueprint getEnvironmentBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
     {
         try
