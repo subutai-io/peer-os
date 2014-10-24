@@ -11,6 +11,7 @@ import org.safehaus.subutai.core.peer.api.PeerGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -61,6 +62,7 @@ public class NodeGroup2PeerGroupWizard extends Window
             }
             case 2:
             {
+                setContent( generateNodeGroupLayout() );
                 close();
                 break;
             }
@@ -70,6 +72,54 @@ public class NodeGroup2PeerGroupWizard extends Window
                 break;
             }
         }
+    }
+
+
+    private Component generateNodeGroupLayout()
+    {
+        VerticalLayout vl = new VerticalLayout();
+        vl.setMargin( true );
+
+        List<PeerGroup> peerGroups = module.getPeerManager().peersGroups();
+
+        BeanItemContainer<PeerGroup> bic = new BeanItemContainer<>( PeerGroup.class );
+        bic.addAll( peerGroups );
+
+        peerGroupsCombo.setContainerDataSource( bic );
+        peerGroupsCombo.setNullSelectionAllowed( false );
+        peerGroupsCombo.setTextInputAllowed( false );
+        peerGroupsCombo.setItemCaptionPropertyId( "name" );
+
+        Button nextButton = new Button( "Next" );
+        nextButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent clickEvent )
+            {
+                PeerGroup peerGroup = getSelectedPeerGroup();
+                if ( peerGroup != null )
+                {
+                    try
+                    {
+                        module.getEnvironmentManager().saveBuildProcessB2PG( blueprint.getId(), peerGroup.getId() );
+                    }
+                    catch ( EnvironmentManagerException e )
+                    {
+                        Notification.show( e.getMessage() );
+                    }
+                    next();
+                }
+                else
+                {
+                    Notification.show( "Please select peer group", Notification.Type.HUMANIZED_MESSAGE );
+                }
+            }
+        } );
+
+
+        vl.addComponent( peerGroupsCombo );
+        vl.addComponent( nextButton );
+        return vl;
     }
 
 
@@ -115,23 +165,7 @@ public class NodeGroup2PeerGroupWizard extends Window
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                PeerGroup peerGroup = getSelectedPeerGroup();
-                if ( peerGroup != null )
-                {
-                    try
-                    {
-                        module.getEnvironmentManager().saveBuildProcessNG2PG( blueprint.getId(), peerGroup.getId() );
-                    }
-                    catch ( EnvironmentManagerException e )
-                    {
-                        Notification.show( e.getMessage() );
-                    }
-                    next();
-                }
-                else
-                {
-                    Notification.show( "Please select peer group", Notification.Type.HUMANIZED_MESSAGE );
-                }
+                next();
             }
         } );
 
