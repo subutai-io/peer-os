@@ -105,6 +105,9 @@ public class ManagerListener
                     final QuestionDialog questionDialog =
                             new QuestionDialog<Integer>( ADD_ITEM_ACTION, "How many nodes do you want to add?",
                                     Integer.class, "Next", "Cancel" );
+                    questionDialog.getOk().setId( "addNodeOk" );
+                    questionDialog.getCancel().setId( "addNodeCancel" );
+                    questionDialog.getInputField().setId( "addNodeInput" );
                     questionDialog.getOk().addClickListener( new Button.ClickListener()
                     {
                         @Override
@@ -426,13 +429,6 @@ public class ManagerListener
     }
 
 
-    private void enableCheckAllButton()
-    {
-        if ( hadoopManager.getProcessCount() == 0 )
-        {
-            hadoopManager.getCheckAllButton().setEnabled( true );
-        }
-    }
 
 
     protected Button.ClickListener secondaryNameNodeURLButtonListener( final Agent agent )
@@ -728,8 +724,6 @@ public class ManagerListener
                             new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.DATANODE,
                                     hadoopManager.getHadoopCluster(), new CompleteEvent()
                             {
-
-
                                 public void onComplete( NodeState state )
                                 {
                                     if ( state == NodeState.RUNNING )
@@ -748,6 +742,8 @@ public class ManagerListener
                                         excludeIncludeNodeButton.setCaption( "Not connected" );
                                         excludeIncludeNodeButton.setEnabled( false );
                                     }
+
+
 
                                     if ( hadoopManager.getCheckAllButton().isEnabled() )
                                     {
@@ -797,6 +793,14 @@ public class ManagerListener
         };
     }
 
+    private void enableCheckAllButton()
+    {
+        if ( hadoopManager.getProcessCount() == 0 )
+        {
+            hadoopManager.getCheckAllButton().setEnabled( true );
+        }
+    }
+
 
     private void executeSlaveNodeCheckButtonFinishCommands( Item row, Button checkButton )
     {
@@ -808,6 +812,7 @@ public class ManagerListener
         if ( agent != null )
         {
             statusDecommission.setValue( Manager.DECOMMISSION_STATUS_CAPTION + hadoopManager
+
                     .getDecommissionStatus( hadoopManager.getDecommissionStatus(), agent ) );
             checkButton.setEnabled( true );
             destroyButton.setEnabled( true );
@@ -847,6 +852,7 @@ public class ManagerListener
                                 executeSlaveNodeCheckButtonFinishCommands( row, checkButton );
                             }
                         }, null ) );
+
     }
 
 

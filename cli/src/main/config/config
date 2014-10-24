@@ -13,7 +13,7 @@ export SUBUTAI_SITE_GIT=git@gw:subutai.git
 export SUBUTAI_TMPDIR=/lxc-data/tmpdir
 
 # Default set of packages to install on all containers
-export SUBUTAI_PACKAGES=subutai-mastertemplate-setup,git
+export SUBUTAI_PACKAGES=git
 
 # The Subutai user to use for container's non-root user and will also
 # be used to make commits to git and possibly perform additional things
