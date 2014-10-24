@@ -37,13 +37,22 @@ function promote {
   copyit="false"
   newname=""
 
-  while getopts ":cn:" opt; do
+
+  while getopts ":cn:b:" opt; do
     case $opt in
       n)
         newname="$OPTARG"
         ;;
       c)
         copyit="true"
+        ;;
+      b)
+        preScriptsEnabled="true"
+        preScripts=$OPTARG
+        ;;
+      :)
+        msg_error "Option -$OPTARG requires an argument"
+        exit 1
         ;;
       \?)
         msg_error "Unrecognized option -$OPTARG"
@@ -68,6 +77,7 @@ function promote {
     done
   fi
 
+  TEST_MODE="true"
   if [ "$TEST_MODE" == "true" ]; then
     echo ---- TEST_MODE DUMP ----
     echo -e "operand count\t= $#"
@@ -78,15 +88,23 @@ function promote {
   fi
  
   local lxc="$1"
-
+  
   if [ "`are_containers_writable $lxc`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
-
+  
   lock_container_read $lxc
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
+  if [ "x$preScriptsEnabled" == "xtrue" ]; then
+    if [ "x$preScripts" == "xall" ]; then
+      execute_all_prescripts "${FUNCNAME[0]}"
+    else
+      execute_prescripts "$preScripts"
+    fi
+  fi
 
   # The master is already a template
   if [ "$lxc" == "master" ]; then
@@ -146,12 +164,12 @@ function promote {
   # if a newname is specified check to see such a container does not exist
   # make a copy of the container before converting it into a template
   if [ -n "$newname" -a "true" == "$copyit" ]; then
-    lxc_assert_no "$newname" "`usage`"
+    lxc_assert_no "$newname" "`promote_usage`"
     lxc_stop "$lxc"
     lxc_copy "$lxc" "$newname"
     lxc_template="$newname"
   elif [ -n "$newname" -a "false" == "$copyit" ]; then
-    lxc_assert_no "$newname" "`usage`"
+    lxc_assert_no "$newname" "`promote_usage`"
     lxc_stop "$lxc"
     lxc_rename "$lxc" "$newname"
     lxc_template="$newname"
