@@ -83,7 +83,7 @@ public class ProgressWindow
         } );
 
         indicator = new Label();
-        indicator.setId("indicator");
+        indicator.setId( "indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Sizeable.Unit.PIXELS );
@@ -155,19 +155,21 @@ public class ProgressWindow
 
     private void setOutput( String output )
     {
-        try {
-//            VaadinSession.getCurrent().getLockInstance().lock();
+        try
+        {
+            //            VaadinSession.getCurrent().getLockInstance().lock();
 
-            if ( !Strings.isNullOrEmpty( output ) ) {
+            if ( !Strings.isNullOrEmpty( output ) )
+            {
                 outputTxtArea.setValue( output );
                 outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
             }
         }
-        finally {
-//            VaadinSession.getCurrent().getLockInstance().unlock();
+        finally
+        {
+            //            VaadinSession.getCurrent().getLockInstance().unlock();
         }
     }
-
 
 
     private void hideProgress()

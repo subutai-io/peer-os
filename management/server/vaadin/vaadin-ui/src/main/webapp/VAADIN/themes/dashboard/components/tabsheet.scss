@@ -1,24 +1,30 @@
-@mixin dashboard-tabsheet {
+@mixin dashboard-tabsheet
+{
 
-  .v-tabsheet {
+  .v-tabsheet
+  {
     border: 1px solid #d3d6d6;
     @include border-radius(4px);
   }
 
   .v-tabsheet-tabcontainer,
-  .v-tabsheet-content {
+  .v-tabsheet-content
+  {
     border: none;
   }
 
-  .v-tabsheet-tabcontainer {
+  .v-tabsheet-tabcontainer
+  {
     height: auto !important;
   }
 
-  .v-tabsheet-deco {
+  .v-tabsheet-deco
+  {
     height: 0;
   }
 
-  .v-tabsheet-tabcontainer {
+  .v-tabsheet-tabcontainer
+  {
     background: #e6e7e8;
 
     /* TODO mixin */
@@ -30,12 +36,14 @@
     /* 	background: linear-gradient(to bottom, #f5f5f5 0%,#e6e6e7 100%); */
   }
 
-  .v-tabsheet-tabs {
+  .v-tabsheet-tabs
+  {
     border-collapse: separate;
     border-spacing: 0;
   }
 
-  .v-tabsheet-tabitemcell {
+  .v-tabsheet-tabitemcell
+  {
     color: #979699;
     text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
     font-size: 13px;
@@ -47,36 +55,44 @@
 
   /* TODO make tabsheet accept clicks on the TD & DIV elements as well as the inner v-caption DIVs */
   /* TODO better yet, redesign the DOM for tabsheet completely */
-  .v-tabsheet-tabitem {
+  .v-tabsheet-tabitem
+  {
     padding: 0;
   }
-  .v-tabsheet-tabitem .v-caption {
+  .v-tabsheet-tabitem .v-caption
+  {
     padding: 10px 1.3em;
   }
 
-  .v-tabsheet-tabitemcell-selected .v-caption {
+  .v-tabsheet-tabitemcell-selected .v-caption
+  {
     padding-bottom: 11px;
   }
 
-  .v-tabsheet-tabitemcell-selected {
+  .v-tabsheet-tabitemcell-selected
+  {
     background: #fff;
     color: #404346;
     border-bottom-width: 0;
   }
 
-  .v-tabsheet-tabitemcell .v-caption {
+  .v-tabsheet-tabitemcell .v-caption
+  {
     color: inherit;
   }
 
-  .v-tabsheet-tabitemcell .v-captiontext {
+  .v-tabsheet-tabitemcell .v-captiontext
+  {
     vertical-align: baseline;
   }
 
-  .v-tabsheet-tabitem {
+  .v-tabsheet-tabitem
+  {
     border: none;
   }
 
-  .v-tabsheet-spacertd div {
+  .v-tabsheet-spacertd div
+  {
     border: none;
     font-size: 13px;
     line-height: 1;
@@ -84,7 +100,8 @@
     border-bottom: .1em solid #cfd1d1;
   }
 
-  .v-tabsheet-content:before {
+  .v-tabsheet-content:before
+  {
     content: "";
     display: block;
     position: absolute;
@@ -104,12 +121,14 @@
     /* 	background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); */
   }
 
-  .v-tabsheet-borderless {
+  .v-tabsheet-borderless
+  {
     border: none;
     @include border-radius(0);
   }
 
-  .v-tabsheet-caption-close {
+  .v-tabsheet-caption-close
+  {
     margin: -2px 0 0 5px;
     font-size: 16px;
     font-weight: normal;
@@ -117,21 +136,25 @@
     @include border-radius(2px);
   }
 
-  .v-tabsheet-caption-close:hover {
+  .v-tabsheet-caption-close:hover
+  {
     background: #e7e7e7;
   }
 
-  .v-tabsheet-caption-close:active {
+  .v-tabsheet-caption-close:active
+  {
     background: #999;
     color: #fff;
   }
 
-  .v-tabsheet-tabs-small .v-tabsheet-tabitem .v-caption {
+  .v-tabsheet-tabs-small .v-tabsheet-tabitem .v-caption
+  {
     padding: 0.5em 1.2em;
     font-size: 12px;
   }
 
-  .v-tabsheet-content-small::before {
+  .v-tabsheet-content-small::before
+  {
     display: none;
   }
 
