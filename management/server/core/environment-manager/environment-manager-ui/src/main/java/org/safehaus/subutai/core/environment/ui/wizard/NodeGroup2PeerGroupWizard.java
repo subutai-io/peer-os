@@ -45,7 +45,7 @@ public class NodeGroup2PeerGroupWizard extends Window
         setClosable( true );
         setVisible( false );
         setWidth( "800px" );
-        setHeight( "200px" );
+        setHeight( "500px" );
         this.module = module;
         this.blueprint = blueprint;
         next();
