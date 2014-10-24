@@ -8,13 +8,13 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "template", name = "setup", description = "checks enviroonment and setups master template")
+@Command( scope = "template", name = "setup", description = "checks enviroonment and setups master template" )
 public class CheckAndSetup extends OsgiCommandSupport
 {
 
     private TemplateManager templateManager;
 
-    @Argument(index = 0, required = true)
+    @Argument( index = 0, required = true )
     private String hostName;
 
 

@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
@@ -79,7 +80,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void constructorShouldFailOnNullDataSource() throws Exception
     {
         new TemplateRegistryImpl( null );
@@ -95,7 +96,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testRegisterTemplateRuntimeException() throws Exception
     {
         Mockito.doThrow( new RuntimeException() ).when( templateDAO )
@@ -123,7 +124,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testRegisterTemplateDuplicate() throws Exception
     {
         when( templateDAO.getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
@@ -133,7 +134,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testRegisterTemplateDuplicateByMd5Sum() throws Exception
     {
         List<Template> allTemplates = Lists.newArrayList( TestUtils.getParentTemplate() );
@@ -143,7 +144,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testRegisterTemplateException() throws Exception
     {
         Mockito.doThrow( new DaoException( null ) ).when( templateDAO ).saveTemplate( any( Template.class ) );
@@ -187,7 +188,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testUnregisterTemplateException() throws Exception
     {
         when( templateDAO.getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
@@ -198,14 +199,14 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testUnregisterTemplateException2() throws Exception
     {
         templateRegistry.unregisterTemplate( TestUtils.TEMPLATE_NAME );
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testUnregisterTemplateException3() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
@@ -216,7 +217,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testUnregisterTemplateException4() throws Exception
     {
         when( templateDAO.getTemplateByName( TestUtils.TEMPLATE_NAME, TestUtils.LXC_ARCH ) )
@@ -379,7 +380,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testUpdateTemplateUsageException2() throws Exception
     {
         Template template = TestUtils.getParentTemplate();
@@ -390,7 +391,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testUpdateTemplateUsageException() throws Exception
     {
         templateRegistry.updateTemplateUsage( "hostname", TestUtils.TEMPLATE_NAME, true );
@@ -413,7 +414,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testIsTemplateInUseException() throws Exception
     {
         templateRegistry.isTemplateInUse( TestUtils.TEMPLATE_NAME );
@@ -429,7 +430,7 @@ public class TemplateRegistryImplTest
     }
 
 
-    @Test( expected = RegistryException.class )
+    @Test(expected = RegistryException.class)
     public void testRegisterTemplate2Exception() throws Exception
     {
         Mockito.doThrow( new DaoException( null ) ).when( templateDAO ).saveTemplate( TestUtils.getChildTemplate() );

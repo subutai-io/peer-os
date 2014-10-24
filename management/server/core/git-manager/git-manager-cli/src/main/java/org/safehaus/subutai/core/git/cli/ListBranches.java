@@ -21,19 +21,19 @@ import com.google.common.base.Preconditions;
 /**
  * Displays branches
  */
-@Command(scope = "git", name = "list-branches", description = "List local/remote branches")
+@Command( scope = "git", name = "list-branches", description = "List local/remote branches" )
 public class ListBranches extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ListBranches.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "remote", required = false, multiValued = false,
-            description = "list remote branches (true/false = default)")
+    @Argument( index = 2, name = "remote", required = false, multiValued = false,
+            description = "list remote branches (true/false = default)" )
     boolean remote;
 
     private final GitManager gitManager;

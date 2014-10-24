@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for CommandImpl
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class CommandImplTest
 {
     private static final String COMMAND = "pwd";

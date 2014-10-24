@@ -16,7 +16,6 @@ import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -92,9 +91,10 @@ public class RemovePackageCommandTest
         Mockito.doThrow( new AptRepoException( ERR_MSG ) ).when( aptRepositoryManager )
                .removePackageByName( any( Agent.class ), anyString() );
 
-        RemovePackageCommand removePackageCommand = new RemovePackageCommand( aptRepositoryManager, mock( AgentManager.class ) );
+        RemovePackageCommand removePackageCommand =
+                new RemovePackageCommand( aptRepositoryManager, mock( AgentManager.class ) );
         removePackageCommand.doExecute();
 
-        assertEquals(ERR_MSG, getSysOut());
+        assertEquals( ERR_MSG, getSysOut() );
     }
 }

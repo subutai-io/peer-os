@@ -50,15 +50,15 @@ public class Manager extends BaseManager
     private final Label replicationFactor;
     private final Label domainName;
     private final Label slaveNodeCount;
-    private Button checkAllButton;
-    private HadoopClusterConfig hadoopCluster;
-    private String decommissionStatus;
-    private ManagerListener managerListener;
     private final Hadoop hadoop;
     private final Tracker tracker;
     private final ExecutorService executorService;
     private final CommandRunner commandRunner;
     private final AgentManager agentManager;
+    private Button checkAllButton;
+    private HadoopClusterConfig hadoopCluster;
+    private String decommissionStatus;
+    private ManagerListener managerListener;
 
 
     public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
@@ -173,6 +173,7 @@ public class Manager extends BaseManager
     }
 
 
+
     public Table createTableTemplate( String caption )
     {
         final Table table = new Table( caption );
@@ -218,6 +219,8 @@ public class Manager extends BaseManager
             slaveNodeCount.setValue( "" );
         }
     }
+
+
 
 
     private void startAllNodes( Table table )
@@ -284,6 +287,236 @@ public class Manager extends BaseManager
     protected void show( String notification )
     {
         Notification.show( notification );
+    }
+
+
+    protected Agent getAgentByRow( final Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
+
+        List<Agent> hadoopNodeList = hadoopCluster.getAllNodes();
+        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+
+        for ( Agent agent : hadoopNodeList )
+        {
+            if ( agent.getHostname().equals( lxcHostname ) )
+            {
+                return agent;
+            }
+        }
+        return null;
+    }
+
+
+    protected Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 0 );
+    }
+
+
+    protected Label getStatusTaskTrackerLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 1 );
+    }
+
+
+    protected Label getStatusDecommissionLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 2 );
+    }
+
+
+    protected NodeState getDecommissionStatus( final String operationLog, final Agent agent )
+    {
+        NodeState decommissionState = NodeState.UNKNOWN;
+        String ipOfNode = agent.getListIP().get( 0 );
+
+        if ( operationLog != null && operationLog.contains( ipOfNode ) )
+        {
+            String[] array = operationLog.split( "\n" );
+
+            for ( int i = 0; i < array.length; i++ )
+            {
+                String status = array[i];
+                if ( status.contains( ipOfNode ) )
+                {
+                    String decommissionStatus = array[i + 1];
+                    if ( decommissionStatus.toLowerCase().contains( "normal".toLowerCase() ) )
+                    {
+                        decommissionState = NodeState.NORMAL;
+                        break;
+                    }
+                    else if ( decommissionStatus.toLowerCase().contains( "progress".toLowerCase() ) )
+                    {
+                        decommissionState = NodeState.DECOMMISSION_IN_PROGRESS;
+                        break;
+                    }
+                    else if ( decommissionStatus.toLowerCase().contains( "decommissioned".toLowerCase() ) )
+                    {
+                        decommissionState = NodeState.DECOMMISSIONED;
+                        break;
+                    }
+                    else
+                    {
+                        decommissionState = NodeState.UNKNOWN;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            decommissionState = NodeState.UNKNOWN;
+        }
+
+        if ( decommissionState == NodeState.NORMAL && hadoopCluster.getBlockedAgents().contains( agent ) )
+        {
+            decommissionState = NodeState.DECOMMISSIONED;
+        }
+
+        return decommissionState;
+    }
+
+
+    protected void checkAllIfNoProcessRunning()
+    {
+        if ( getProcessCount() == 0 )
+        {
+            checkAllButton.click();
+        }
+    }
+
+
+    public Component getContent()
+    {
+        return contentRoot;
+    }
+
+
+    public List<Agent> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
+    {
+        List<Agent> masterNodeList = new ArrayList<>();
+        masterNodeList.add( hadoopCluster.getNameNode() );
+        masterNodeList.add( hadoopCluster.getJobTracker() );
+        masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
+        return masterNodeList;
+    }
+
+    public AgentManager getAgentManager()
+    {
+        return agentManager;
+    }
+
+
+    public CommandRunner getCommandRunner()
+    {
+        return commandRunner;
+    }
+
+
+    public Hadoop getHadoop()
+    {
+        return hadoop;
+    }
+
+
+    public Tracker getTracker()
+    {
+        return tracker;
+    }
+
+
+    public ExecutorService getExecutorService()
+    {
+        return executorService;
+    }
+
+
+    public HadoopClusterConfig getHadoopCluster()
+    {
+        return hadoopCluster;
+    }
+
+
+    public GridLayout getContentRoot()
+    {
+        return contentRoot;
+    }
+
+
+    public ComboBox getClusterList()
+    {
+        return clusterList;
+    }
+
+
+    public Table getMasterNodesTable()
+    {
+        return masterNodesTable;
+    }
+
+
+    public Table getSlaveNodesTable()
+    {
+        return slaveNodesTable;
+    }
+
+
+    public Label getReplicationFactor()
+    {
+        return replicationFactor;
+    }
+
+
+    public Label getDomainName()
+    {
+        return domainName;
+    }
+
+
+    public Label getSlaveNodeCount()
+    {
+        return slaveNodeCount;
+    }
+
+
+    public Button getCheckAllButton()
+    {
+        return checkAllButton;
+    }
+
+
+    public String getDecommissionStatus()
+    {
+        return decommissionStatus;
+    }
+
+
+    public void setDecommissionStatus( String decommissionStatus )
+    {
+        this.decommissionStatus = decommissionStatus;
+    }
+
+
+    @Override
+    public void refreshClustersInfo()
+    {
+        managerListener.refreshClusterList();
     }
 
 
@@ -415,6 +648,7 @@ public class Manager extends BaseManager
     }
 
 
+
     private List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final Agent agent )
     {
         List<NodeType> nodeRoles = new ArrayList<>();
@@ -455,236 +689,5 @@ public class Manager extends BaseManager
                            .open( "http://" + agent.getListIP().get( 0 ) + ":50030", "JobTracker", false );
             }
         };
-    }
-
-
-    protected Agent getAgentByRow( final Item row )
-    {
-        if ( row == null )
-        {
-            return null;
-        }
-
-        List<Agent> hadoopNodeList = hadoopCluster.getAllNodes();
-        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-
-        for ( Agent agent : hadoopNodeList )
-        {
-            if ( agent.getHostname().equals( lxcHostname ) )
-            {
-                return agent;
-            }
-        }
-        return null;
-    }
-
-
-    protected Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout )
-    {
-        if ( statusGroupLayout == null )
-        {
-            return null;
-        }
-        return ( Label ) statusGroupLayout.getComponent( 0 );
-    }
-
-
-    protected Label getStatusTaskTrackerLabel( final HorizontalLayout statusGroupLayout )
-    {
-        if ( statusGroupLayout == null )
-        {
-            return null;
-        }
-        return ( Label ) statusGroupLayout.getComponent( 1 );
-    }
-
-
-    protected Label getStatusDecommissionLabel( final HorizontalLayout statusGroupLayout )
-    {
-        if ( statusGroupLayout == null )
-        {
-            return null;
-        }
-        return ( Label ) statusGroupLayout.getComponent( 2 );
-    }
-
-
-    protected NodeState getDecommissionStatus( final String operationLog, final Agent agent )
-    {
-        NodeState decommissionState = NodeState.UNKNOWN;
-        String ipOfNode = agent.getListIP().get( 0 );
-
-        if ( operationLog != null && operationLog.contains( ipOfNode ) )
-        {
-            String[] array = operationLog.split( "\n" );
-
-            for ( int i = 0; i < array.length; i++ )
-            {
-                String status = array[i];
-                if ( status.contains( ipOfNode ) )
-                {
-                    String decommissionStatus = array[i + 1];
-                    if ( decommissionStatus.toLowerCase().contains( "normal".toLowerCase() ) )
-                    {
-                        decommissionState = NodeState.NORMAL;
-                        break;
-                    }
-                    else if ( decommissionStatus.toLowerCase().contains( "progress".toLowerCase() ) )
-                    {
-                        decommissionState = NodeState.DECOMMISSION_IN_PROGRESS;
-                        break;
-                    }
-                    else if ( decommissionStatus.toLowerCase().contains( "decommissioned".toLowerCase() ) )
-                    {
-                        decommissionState = NodeState.DECOMMISSIONED;
-                        break;
-                    }
-                    else
-                    {
-                        decommissionState = NodeState.UNKNOWN;
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-            decommissionState = NodeState.UNKNOWN;
-        }
-
-        if ( decommissionState == NodeState.NORMAL && hadoopCluster.getBlockedAgents().contains( agent ) )
-        {
-            decommissionState = NodeState.DECOMMISSIONED;
-        }
-
-        return decommissionState;
-    }
-
-
-    protected void checkAllIfNoProcessRunning()
-    {
-        if ( getProcessCount() == 0 )
-        {
-            checkAllButton.click();
-        }
-    }
-
-
-    public Component getContent()
-    {
-        return contentRoot;
-    }
-
-
-    public List<Agent> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
-    {
-        List<Agent> masterNodeList = new ArrayList<>();
-        masterNodeList.add( hadoopCluster.getNameNode() );
-        masterNodeList.add( hadoopCluster.getJobTracker() );
-        masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
-        return masterNodeList;
-    }
-
-
-    public AgentManager getAgentManager()
-    {
-        return agentManager;
-    }
-
-
-    public CommandRunner getCommandRunner()
-    {
-        return commandRunner;
-    }
-
-
-    public Hadoop getHadoop()
-    {
-        return hadoop;
-    }
-
-
-    public Tracker getTracker()
-    {
-        return tracker;
-    }
-
-
-    public ExecutorService getExecutorService()
-    {
-        return executorService;
-    }
-
-
-    public HadoopClusterConfig getHadoopCluster()
-    {
-        return hadoopCluster;
-    }
-
-
-    public GridLayout getContentRoot()
-    {
-        return contentRoot;
-    }
-
-
-    public ComboBox getClusterList()
-    {
-        return clusterList;
-    }
-
-
-    public Table getMasterNodesTable()
-    {
-        return masterNodesTable;
-    }
-
-
-    public Table getSlaveNodesTable()
-    {
-        return slaveNodesTable;
-    }
-
-
-    public Label getReplicationFactor()
-    {
-        return replicationFactor;
-    }
-
-
-    public Label getDomainName()
-    {
-        return domainName;
-    }
-
-
-    public Label getSlaveNodeCount()
-    {
-        return slaveNodeCount;
-    }
-
-
-    public Button getCheckAllButton()
-    {
-        return checkAllButton;
-    }
-
-
-    public String getDecommissionStatus()
-    {
-        return decommissionStatus;
-    }
-
-
-    public void setDecommissionStatus( String decommissionStatus )
-    {
-        this.decommissionStatus = decommissionStatus;
-    }
-
-
-    @Override
-    public void refreshClustersInfo()
-    {
-        managerListener.refreshClusterList();
     }
 }

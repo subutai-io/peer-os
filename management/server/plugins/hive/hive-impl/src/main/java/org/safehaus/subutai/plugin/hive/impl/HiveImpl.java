@@ -1,12 +1,15 @@
 package org.safehaus.subutai.plugin.hive.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -15,11 +18,10 @@ import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
@@ -34,6 +36,8 @@ import org.safehaus.subutai.plugin.hive.impl.handler.StartHandler;
 import org.safehaus.subutai.plugin.hive.impl.handler.StatusHandler;
 import org.safehaus.subutai.plugin.hive.impl.handler.StopHandler;
 import org.safehaus.subutai.plugin.hive.impl.handler.UninstallHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class HiveImpl implements Hive
@@ -42,19 +46,32 @@ public class HiveImpl implements Hive
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
     protected Tracker tracker;
-    protected DbManager dbManager;
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
     protected Hadoop hadoopManager;
-
-    protected PluginDAO pluginDao;
+    private static final Logger LOG = LoggerFactory.getLogger( HiveImpl.class.getName() );
+    private DataSource dataSource;
+    private PluginDao pluginDao;
     protected ExecutorService executor;
+
+
+    public HiveImpl( DataSource dataSource )
+    {
+        this.dataSource = dataSource;
+    }
 
 
     public void init()
     {
+        try
+        {
+            this.pluginDao = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
         executor = Executors.newCachedThreadPool();
-        pluginDao = new PluginDAO( dbManager );
     }
 
 
@@ -100,18 +117,6 @@ public class HiveImpl implements Hive
     }
 
 
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( DbManager dbManager )
-    {
-        this.dbManager = dbManager;
-    }
-
-
     public ContainerManager getContainerManager()
     {
         return containerManager;
@@ -148,7 +153,7 @@ public class HiveImpl implements Hive
     }
 
 
-    public PluginDAO getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDao;
     }

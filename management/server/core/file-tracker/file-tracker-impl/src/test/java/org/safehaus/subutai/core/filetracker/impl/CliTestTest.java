@@ -35,14 +35,14 @@ public class CliTestTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void shouldThrowNullPointerExceptionOnSetAgentManager()
     {
         cliTest.setAgentManager( null );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void shouldThrowNullPointerExceptionOnSetFileTracker()
     {
         cliTest.setFileTracker( null );

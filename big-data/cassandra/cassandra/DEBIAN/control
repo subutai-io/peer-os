@@ -1,8 +1,8 @@
-Package: ksks-cassandra
+Package: subutai-cassandra
 Priority: optional
 Section: devel
-Installed-Size: 100
-Maintainer: kiskis
+Installed-Size: 74955
+Maintainer: subutai
 Architecture: amd64 
 Version: 1.2.10
-Description: This is a cassandra package of kiskis distribution.
+Description: This is a cassandra package of subutai distribution.

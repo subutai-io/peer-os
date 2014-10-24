@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -64,7 +64,7 @@ public class InstallHandler extends AbstractHandler
         }
         finally
         {
-            if ( trackerOperation.getState() != ProductOperationState.SUCCEEDED )
+            if ( trackerOperation.getState() != OperationState.SUCCEEDED )
             {
                 destroyNodes( env );
             }

@@ -27,5 +27,4 @@ public interface ConfigBase
      * @return - product key
      */
     public String getProductKey();
-
 }

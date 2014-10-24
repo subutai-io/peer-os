@@ -81,21 +81,11 @@ public abstract class BaseManager implements BaseManagerInterface
         processCount++;
     }
 
-
     public synchronized void decrementProcessCount()
     {
         processCount--;
     }
 
-
-    public HorizontalLayout getAvailableOperationsLayout( Item row )
-    {
-        if ( row == null )
-        {
-            return null;
-        }
-        return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-    }
 
 
     public HorizontalLayout getStatusLayout( final Item row )
@@ -105,26 +95,6 @@ public abstract class BaseManager implements BaseManagerInterface
             return null;
         }
         return ( HorizontalLayout ) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
-    }
-
-
-    public Button getCheckButton( final HorizontalLayout availableOperationsLayout )
-    {
-        if ( availableOperationsLayout == null )
-        {
-            return null;
-        }
-        else
-        {
-            for ( Component component : availableOperationsLayout )
-            {
-                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) )
-                {
-                    return ( Button ) component;
-                }
-            }
-            return null;
-        }
     }
 
 
@@ -222,6 +192,24 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
+    public Item getAgentRow( final Table table, final Agent agent )
+    {
+
+        int rowId = getAgentRowId( table, agent );
+        Item row = null;
+        if ( rowId >= 0 )
+        {
+            row = table.getItem( rowId );
+        }
+        if ( row == null )
+        {
+            Notification.show( "Agent rowId should have been found inside " + table.getCaption()
+                    + " but could not find! " );
+        }
+        return row;
+    }
+
+
     protected int getAgentRowId( final Table table, final Agent agent )
     {
         if ( table != null && agent != null )
@@ -241,24 +229,6 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    public Item getAgentRow( final Table table, final Agent agent )
-    {
-
-        int rowId = getAgentRowId( table, agent );
-        Item row = null;
-        if ( rowId >= 0 )
-        {
-            row = table.getItem( rowId );
-        }
-        if ( row == null )
-        {
-            Notification.show( "Agent rowId should have been found inside " + table.getCaption()
-                    + " but could not find! " );
-        }
-        return row;
-    }
-
-
     public void clickAllCheckButtons( Table table )
     {
         for ( Object o : table.getItemIds() )
@@ -271,6 +241,37 @@ public abstract class BaseManager implements BaseManagerInterface
             {
                 checkButton.click();
             }
+        }
+    }
+
+
+
+    public HorizontalLayout getAvailableOperationsLayout( Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
+        return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+    }
+
+
+    public Button getCheckButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
         }
     }
 

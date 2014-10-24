@@ -11,7 +11,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hbase", name = "install-cluster", description = "Command to install HBase cluster")
+@Command( scope = "hbase", name = "install-cluster", description = "Command to install HBase cluster" )
 public class InstallHBaseClusterCommand extends OsgiCommandSupport
 {
 

@@ -18,9 +18,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
@@ -76,7 +76,7 @@ public class RestServiceImplTest
     public void testGetProductOperation() throws Exception
     {
 
-        Response response = restService.getProductOperation( SOURCE, OPERATION_ID.toString() );
+        Response response = restService.getTrackerOperation( SOURCE, OPERATION_ID.toString() );
 
         TrackerOperationView pov = JsonUtil.fromJson( response.getEntity().toString(), TrackerOperationViewImpl.class );
 
@@ -89,7 +89,7 @@ public class RestServiceImplTest
     public void testGetProductOperationNotFound() throws Exception
     {
 
-        Response response = restService.getProductOperation( SOURCE, OPERATION_ID2.toString() );
+        Response response = restService.getTrackerOperation( SOURCE, OPERATION_ID2.toString() );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
     }
@@ -99,7 +99,7 @@ public class RestServiceImplTest
     public void testGetProductOperationException() throws Exception
     {
 
-        Response response = restService.getProductOperation( SOURCE, null );
+        Response response = restService.getTrackerOperation( SOURCE, null );
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }
@@ -108,7 +108,7 @@ public class RestServiceImplTest
     @Test
     public void testGetProductOperationSources() throws Exception
     {
-        Response response = restService.getProductOperationSources();
+        Response response = restService.getTrackerOperationSources();
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
     }
@@ -119,11 +119,12 @@ public class RestServiceImplTest
     {
         SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         Type listPOVType = new TypeToken<List<TrackerOperationViewImpl>>()
-        {}.getType();
+        {
+        }.getType();
 
 
         Response response =
-                restService.getProductOperations( SOURCE, df.format( new Date() ), df.format( new Date() ), 1 );
+                restService.getTrackerOperations( SOURCE, df.format( new Date() ), df.format( new Date() ), 1 );
         List<TrackerOperationView> pov = JsonUtil.fromJson( response.getEntity().toString(), listPOVType );
 
 
@@ -135,7 +136,7 @@ public class RestServiceImplTest
     @Test
     public void testGetProductOperationsException() throws Exception
     {
-        Response response = restService.getProductOperations( SOURCE, null, "", 1 );
+        Response response = restService.getTrackerOperations( SOURCE, null, "", 1 );
 
         assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
     }

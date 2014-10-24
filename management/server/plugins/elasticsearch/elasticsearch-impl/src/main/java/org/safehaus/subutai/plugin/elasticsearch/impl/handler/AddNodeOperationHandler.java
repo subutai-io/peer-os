@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.elasticsearch.impl.handler;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.ElasticsearchClusterConfiguration;
@@ -54,20 +55,20 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
 
         trackerOperation.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
             trackerOperation
-                    .addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+                    .addLogFailed( "Failed to check presence of installed subutai packages\nInstallation aborted" );
             return;
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( "ksks-elasticsearch" ) )
+        if ( result.getStdOut()
+                   .contains( Common.PACKAGE_PREFIX + ElasticsearchClusterConfiguration.PRODUCT_KEY.toLowerCase() ) )
         {
             trackerOperation.addLogFailed(
                     String.format( "Node %s already has Elasticsearch installed\nInstallation aborted", lxcHostname ) );
@@ -77,7 +78,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<Elasticsea
         elasticsearchClusterConfiguration.getNodes().add( agent );
         trackerOperation.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
+        if ( manager.getPluginDAO().saveInfo( ElasticsearchClusterConfiguration.PRODUCT_KEY,
                 elasticsearchClusterConfiguration.getClusterName(), elasticsearchClusterConfiguration ) )
         {
             trackerOperation.addLog( "Cluster info updated in DB\nInstalling Mahout..." );

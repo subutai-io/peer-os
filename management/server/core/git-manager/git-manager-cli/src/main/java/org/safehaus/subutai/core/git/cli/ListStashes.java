@@ -20,15 +20,15 @@ import com.google.common.base.Preconditions;
 /**
  * Displays stashes
  */
-@Command(scope = "git", name = "list-stashes", description = "Display stashes")
+@Command( scope = "git", name = "list-stashes", description = "Display stashes" )
 public class ListStashes extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( ListStashes.class.getName() );
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
 
     private final GitManager gitManager;
@@ -72,7 +72,7 @@ public class ListStashes extends OsgiCommandSupport
             catch ( GitException e )
             {
                 LOG.error( "Error in doExecute", e );
-                System.out.println(e.getMessage());
+                System.out.println( e.getMessage() );
             }
         }
 

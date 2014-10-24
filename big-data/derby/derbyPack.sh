@@ -5,14 +5,14 @@ if ls | grep .deb ; then
         rm  *.deb
 fi
 
-rm -rf ksks-derby*/*
-cp -r  ../workspace/big-data/derby/derby/* ksks-derby*/
-cd ksks-derby*
+rm -rf subutai-derby*/*
+cp -r  ../workspace/big-data/derby/derby/* subutai-derby*/
+cd subutai-derby*
 mkdir opt
 wget -P opt http://archive.apache.org/dist/db/derby/db-derby-10.4.2.0/db-derby-10.4.2.0-bin.tar.gz
 cd -
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+fileName=`ls | grep subutai | awk '{print $1}' | head -1`
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
@@ -29,7 +29,7 @@ versionThird=$(echo $version | awk -F"." '{print $3}')
 updatedVersion=$(echo `expr $versionThird + 1`)
 
 updatedRelease=$versionFirst.$versionSecond.$updatedVersion
-updatedFileName="ksks-derby-"$updatedRelease"-amd64"
+updatedFileName="subutai-derby-"$updatedRelease"-amd64"
 
 replaceVersion="Version: $updatedRelease"
 sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'

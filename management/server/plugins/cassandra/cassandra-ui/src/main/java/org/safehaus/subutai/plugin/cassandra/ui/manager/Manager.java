@@ -59,9 +59,9 @@ public class Manager
     protected static final String NODE_ROLE_COLUMN_CAPTION = "Node Role";
     protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String BUTTON_STYLE_NAME = "default";
-    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private static final String MESSAGE = "No cluster is installed !";
     final Button refreshClustersBtn, startAllBtn, stopAllBtn, checkAllBtn, destroyClusterBtn;
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final ExecutorService executorService;
     private final Tracker tracker;
     private final AgentManager agentManager;

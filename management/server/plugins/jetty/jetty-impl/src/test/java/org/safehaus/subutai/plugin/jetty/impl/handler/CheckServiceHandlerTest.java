@@ -6,13 +6,15 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -34,13 +36,12 @@ import static org.mockito.Mockito.when;
 
 public class CheckServiceHandlerTest
 {
+    JettyImpl manager = new JettyImpl( mock( DataSource.class ) );
+    CheckServiceHandler handler;
     private String clusterName = "testClusterName";
     private String hostName = "testHostName";
     private Agent testAgent;
     private JettyConfig config;
-    JettyImpl manager = new JettyImpl();
-
-    CheckServiceHandler handler;
 
 
     @Before
@@ -56,7 +57,7 @@ public class CheckServiceHandlerTest
 
         manager.setTracker( mock( Tracker.class ) );
         manager.setCommandRunner( mock( CommandRunner.class ) );
-        manager.setPluginDAO( mock( PluginDAO.class ) );
+        manager.setPluginDAO( mock( PluginDao.class ) );
         manager.setAgentManager( mock( AgentManager.class ) );
 
         doReturn( new TrackerOperationMock() ).when( manager.getTracker() )

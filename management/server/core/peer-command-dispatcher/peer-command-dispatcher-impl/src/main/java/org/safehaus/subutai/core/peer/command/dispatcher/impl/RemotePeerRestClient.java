@@ -131,23 +131,23 @@ public class RemotePeerRestClient
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
                 peerCommandMessage.setResult( result.getResult() );
-//                peerCommandMessage.setSuccess( result.isSuccess() );
+                //                peerCommandMessage.setSuccess( result.isSuccess() );
                 LOG.debug( String.format( "Remote command result: %s", result.toString() ) );
-//                return ccm;
+                //                return ccm;
             }
             else
             {
-//                peerCommandMessage.setSuccess( false );
+                //                peerCommandMessage.setSuccess( false );
                 peerCommandMessage.setExceptionMessage( result.getExceptionMessage() );
-//                return ccm;
+                //                return ccm;
             }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
-//            peerCommandMessage.setSuccess( false );
+            //            peerCommandMessage.setSuccess( false );
             peerCommandMessage.setExceptionMessage( e.toString() );
-//            throw new RuntimeException( "Error while invoking REST Client" );
+            //            throw new RuntimeException( "Error while invoking REST Client" );
         }
 
         //return null;

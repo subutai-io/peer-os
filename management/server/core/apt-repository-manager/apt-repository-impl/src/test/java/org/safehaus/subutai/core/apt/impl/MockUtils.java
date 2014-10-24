@@ -48,8 +48,8 @@ public class MockUtils
         when( agentResult.getAgentUUID() ).thenReturn( agentId );
 
         Map<UUID, AgentResult> results = mock( Map.class );
-        when(command.getResults()).thenReturn( results );
-        when(results.get( agentId )) .thenReturn( agentResult );
+        when( command.getResults() ).thenReturn( results );
+        when( results.get( agentId ) ).thenReturn( agentResult );
 
         return command;
     }

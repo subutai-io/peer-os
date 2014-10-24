@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -47,7 +47,7 @@ public class AddEnvironmentContainerNodeOperationHandlerTest
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
 
 
@@ -90,6 +90,6 @@ public class AddEnvironmentContainerNodeOperationHandlerTest
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
 }

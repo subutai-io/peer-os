@@ -1,10 +1,14 @@
 package org.safehaus.subutai.plugin.flume.impl;
 
 
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+
+
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = "ksks-flume";
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + FlumeConfig.PRODUCT_KEY.toLowerCase();
 
 
     public static String make( CommandType type )
@@ -12,7 +16,7 @@ public class Commands
         switch ( type )
         {
             case STATUS:
-                return "dpkg -l | grep '^ii' | grep ksks";
+                return "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
             case INSTALL:
             case PURGE:
                 StringBuilder sb = new StringBuilder();

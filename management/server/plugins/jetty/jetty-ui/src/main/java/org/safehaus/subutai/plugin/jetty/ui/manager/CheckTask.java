@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.jetty.ui.manager;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.jetty.api.Jetty;
@@ -44,7 +44,7 @@ public class CheckTask implements Runnable
             TrackerOperationView po = tracker.getTrackerOperation( JettyConfig.PRODUCT_KEY, trackID );
             if ( po != null )
             {
-                if ( po.getState() != ProductOperationState.RUNNING )
+                if ( po.getState() != OperationState.RUNNING )
                 {
                     completeEvent.onComplete( po.getLog() );
                     break;

@@ -16,6 +16,8 @@ public class Common
     public static final String MESSAGE_PARAM_NAME = "message";
     public static final String PEER_ID_PARAM_NAME = "peerId";
     public static final String RECIPIENT_PARAM_NAME = "recipient";
+
+
     private Common()
     {
     }

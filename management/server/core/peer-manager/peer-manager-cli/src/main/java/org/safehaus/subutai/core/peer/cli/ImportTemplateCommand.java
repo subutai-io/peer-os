@@ -6,10 +6,10 @@ import java.util.UUID;
 import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.command.dispatcher.api.PeerCommandDispatcher;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -20,7 +20,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  *
  */
-@Command(scope = "peer", name = "import-template")
+@Command( scope = "peer", name = "import-template" )
 public class ImportTemplateCommand extends OsgiCommandSupport
 {
 
@@ -30,10 +30,10 @@ public class ImportTemplateCommand extends OsgiCommandSupport
 
     private TemplateRegistry templateRegistry;
 
-    @Argument(index = 0, name = "peerId", multiValued = false, description = "Remote Peer UUID")
+    @Argument( index = 0, name = "peerId", multiValued = false, description = "Remote Peer UUID" )
     private String peerId;
 
-    @Argument(index = 1, name = "templateName", multiValued = false, description = "Remote template name")
+    @Argument( index = 1, name = "templateName", multiValued = false, description = "Remote template name" )
     private String templateName;
 
 
@@ -74,7 +74,7 @@ public class ImportTemplateCommand extends OsgiCommandSupport
 
         //        peerManager.peers();
         PeerCommandMessage getTemplateCommand =
-                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, null, UUID.fromString( peerId ), null );
+                new DefaultCommandMessage( PeerCommandType.GET_TEMPLATE, UUID.fromString( peerId ), null );
 
         getTemplateCommand.setInput( templateName );
         peerCommandDispatcher.invoke( getTemplateCommand );

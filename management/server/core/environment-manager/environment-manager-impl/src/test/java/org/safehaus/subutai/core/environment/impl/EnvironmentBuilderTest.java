@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by bahadyr on 9/25/14.
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class EnvironmentBuilderTest
 {
     private static final String TEMPLATE = "master";
@@ -58,8 +58,7 @@ public class EnvironmentBuilderTest
     public void test() throws EnvironmentBuildException
     {
 
-        EnvironmentBuildTask task = createTask();
-        environmentBuilder.build( task );
+
     }
 
 

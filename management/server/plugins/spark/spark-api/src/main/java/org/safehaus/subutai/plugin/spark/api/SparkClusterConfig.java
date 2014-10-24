@@ -142,6 +142,15 @@ public class SparkClusterConfig implements ConfigBase
 
 
     @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 67 * hash + Objects.hashCode( this.clusterName );
+        return hash;
+    }
+
+
+    @Override
     public boolean equals( Object obj )
     {
         if ( obj instanceof SparkClusterConfig )
@@ -150,15 +159,6 @@ public class SparkClusterConfig implements ConfigBase
             return clusterName.equals( other.clusterName );
         }
         return false;
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        int hash = 3;
-        hash = 67 * hash + Objects.hashCode( this.clusterName );
-        return hash;
     }
 
 

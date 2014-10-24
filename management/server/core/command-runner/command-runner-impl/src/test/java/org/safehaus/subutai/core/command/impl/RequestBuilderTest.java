@@ -69,7 +69,7 @@ public class RequestBuilderTest
                                          .withStdOutRedirection( STD_REDIRECTION );
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailEmptyOrNullCommand()
     {
         new RequestBuilder( null );

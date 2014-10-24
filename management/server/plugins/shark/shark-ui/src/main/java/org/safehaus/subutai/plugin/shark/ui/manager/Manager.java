@@ -308,42 +308,6 @@ public class Manager
     }
 
 
-    public void addGivenComponents( Layout layout, Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            layout.addComponent( b );
-        }
-    }
-
-
-    public void addStyleNameToButtons( Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            b.addStyleName( BUTTON_STYLE_NAME );
-        }
-    }
-
-
-    public void disableButtons( Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            b.setEnabled( false );
-        }
-    }
-
-
-    public void enableButtons( Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            b.setEnabled( true );
-        }
-    }
-
-
     private void populateTable( final Table table, Set<Agent> agents )
     {
         table.removeAllItems();
@@ -398,6 +362,24 @@ public class Manager
     }
 
 
+    public void addGivenComponents( Layout layout, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            layout.addComponent( b );
+        }
+    }
+
+
+    public void addStyleNameToButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.addStyleName( BUTTON_STYLE_NAME );
+        }
+    }
+
+
     public void refreshClustersInfo()
     {
         List<SharkClusterConfig> clustersInfo = shark.getClusters();
@@ -426,6 +408,24 @@ public class Manager
             {
                 clusterCombo.setValue( clustersInfo.iterator().next() );
             }
+        }
+    }
+
+
+    public void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
+    }
+
+
+    public void enableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( true );
         }
     }
 

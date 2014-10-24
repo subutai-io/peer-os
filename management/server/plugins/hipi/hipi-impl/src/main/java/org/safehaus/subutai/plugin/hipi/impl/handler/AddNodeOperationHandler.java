@@ -92,7 +92,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<HipiImpl>
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 

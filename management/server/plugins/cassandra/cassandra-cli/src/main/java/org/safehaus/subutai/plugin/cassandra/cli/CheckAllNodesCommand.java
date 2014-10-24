@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.cassandra.cli;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
@@ -18,12 +18,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "check-cluster", description = "Command to check Cassandra cluster")
+@Command( scope = "cassandra", name = "check-cluster", description = "Command to check Cassandra cluster" )
 public class CheckAllNodesCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Cassandra cassandraManager;
     private Tracker tracker;
@@ -69,7 +69,7 @@ public class CheckAllNodesCommand extends OsgiCommandSupport
                     System.out.flush();
                     logSize = po.getLog().length();
                 }
-                if ( po.getState() != ProductOperationState.RUNNING )
+                if ( po.getState() != OperationState.RUNNING )
                 {
                     break;
                 }

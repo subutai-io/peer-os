@@ -49,7 +49,6 @@ public interface ApiBase<T extends ConfigBase>
      * Add specified node to specified cluster
      *
      * @param clusterName - name of cluster
-     *
      * @param agentHostName - name of node to be added to cluster
      *
      * @return - UUID of operation to track

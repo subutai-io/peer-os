@@ -9,7 +9,7 @@ package org.safehaus.subutai.common.tracker;
 /**
  * State of operation
  */
-public enum ProductOperationState
+public enum OperationState
 {
 
     RUNNING, SUCCEEDED, FAILED

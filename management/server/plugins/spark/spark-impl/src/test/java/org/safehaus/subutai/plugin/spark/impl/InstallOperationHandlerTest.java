@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
@@ -32,7 +32,7 @@ public class InstallOperationHandlerTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void testWithNullConfig()
     {
         handler = new InstallOperationHandler( mock, null );
@@ -51,7 +51,7 @@ public class InstallOperationHandlerTest
 
         TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "malformed" ) );
-        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
+        Assert.assertEquals( po.getState(), OperationState.FAILED );
     }
 
 
@@ -71,6 +71,6 @@ public class InstallOperationHandlerTest
         TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "exists" ) );
         Assert.assertTrue( po.getLog().toLowerCase().contains( config.getClusterName() ) );
-        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
+        Assert.assertEquals( po.getState(), OperationState.FAILED );
     }
 }

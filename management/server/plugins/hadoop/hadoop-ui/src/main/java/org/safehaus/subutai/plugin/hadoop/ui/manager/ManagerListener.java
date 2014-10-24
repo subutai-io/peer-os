@@ -203,6 +203,51 @@ public class ManagerListener
     }
 
 
+    protected void refreshClusterList()
+    {
+        if ( hadoopManager.getHadoop() == null )
+        {
+            return;
+        }
+        List<HadoopClusterConfig> hadoopClusterList = hadoopManager.getHadoop().getClusters();
+        HadoopClusterConfig clusterInfo = ( HadoopClusterConfig ) hadoopManager.getClusterList().getValue();
+        hadoopManager.getClusterList().removeAllItems();
+        if ( hadoopClusterList != null && hadoopClusterList.size() > 0 )
+        {
+            for ( HadoopClusterConfig hadoopCluster : hadoopClusterList )
+            {
+                if ( hadoopCluster.getNameNode() != null )
+                {
+                    hadoopManager.getClusterList().addItem( hadoopCluster );
+                    hadoopManager.getClusterList().setItemCaption( hadoopCluster, hadoopCluster.getClusterName() );
+                }
+            }
+            if ( clusterInfo != null )
+            {
+                for ( HadoopClusterConfig hadoopCluster : hadoopClusterList )
+                {
+                    if ( hadoopCluster.getClusterName().equals( clusterInfo.getClusterName() ) )
+                    {
+                        hadoopManager.getClusterList().setValue( hadoopCluster );
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                for ( HadoopClusterConfig hadoopCluster : hadoopClusterList )
+                {
+                    if ( hadoopCluster.getNameNode() != null )
+                    {
+                        hadoopManager.getClusterList().setValue( hadoopCluster );
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+
     protected Button.ClickListener slaveNodeDestroyButtonListener( final Item row )
     {
         final Agent agent = hadoopManager.getAgentByRow( row );
@@ -382,6 +427,8 @@ public class ManagerListener
             }
         };
     }
+
+
 
 
     protected Button.ClickListener secondaryNameNodeURLButtonListener( final Agent agent )
@@ -677,8 +724,6 @@ public class ManagerListener
                             new CheckTask( hadoopManager.getHadoop(), hadoopManager.getTracker(), NodeType.DATANODE,
                                     hadoopManager.getHadoopCluster(), new CompleteEvent()
                             {
-
-
                                 public void onComplete( NodeState state )
                                 {
                                     if ( state == NodeState.RUNNING )
@@ -697,6 +742,8 @@ public class ManagerListener
                                         excludeIncludeNodeButton.setCaption( "Not connected" );
                                         excludeIncludeNodeButton.setEnabled( false );
                                     }
+
+
 
                                     if ( hadoopManager.getCheckAllButton().isEnabled() )
                                     {
@@ -746,57 +793,11 @@ public class ManagerListener
         };
     }
 
-
     private void enableCheckAllButton()
     {
         if ( hadoopManager.getProcessCount() == 0 )
         {
             hadoopManager.getCheckAllButton().setEnabled( true );
-        }
-    }
-
-
-    protected void refreshClusterList()
-    {
-        if ( hadoopManager.getHadoop() == null )
-        {
-            return;
-        }
-        List<HadoopClusterConfig> hadoopClusterList = hadoopManager.getHadoop().getClusters();
-        HadoopClusterConfig clusterInfo = ( HadoopClusterConfig ) hadoopManager.getClusterList().getValue();
-        hadoopManager.getClusterList().removeAllItems();
-        if ( hadoopClusterList != null && hadoopClusterList.size() > 0 )
-        {
-            for ( HadoopClusterConfig hadoopCluster : hadoopClusterList )
-            {
-                if ( hadoopCluster.getNameNode() != null )
-                {
-                    hadoopManager.getClusterList().addItem( hadoopCluster );
-                    hadoopManager.getClusterList().setItemCaption( hadoopCluster, hadoopCluster.getClusterName() );
-                }
-            }
-            if ( clusterInfo != null )
-            {
-                for ( HadoopClusterConfig hadoopCluster : hadoopClusterList )
-                {
-                    if ( hadoopCluster.getClusterName().equals( clusterInfo.getClusterName() ) )
-                    {
-                        hadoopManager.getClusterList().setValue( hadoopCluster );
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                for ( HadoopClusterConfig hadoopCluster : hadoopClusterList )
-                {
-                    if ( hadoopCluster.getNameNode() != null )
-                    {
-                        hadoopManager.getClusterList().setValue( hadoopCluster );
-                        return;
-                    }
-                }
-            }
         }
     }
 
@@ -811,7 +812,8 @@ public class ManagerListener
         if ( agent != null )
         {
             statusDecommission.setValue( Manager.DECOMMISSION_STATUS_CAPTION + hadoopManager
-                            .getDecommissionStatus( hadoopManager.getDecommissionStatus(), agent ) );
+
+                    .getDecommissionStatus( hadoopManager.getDecommissionStatus(), agent ) );
             checkButton.setEnabled( true );
             destroyButton.setEnabled( true );
             hadoopManager.disableProgressBar();
@@ -850,6 +852,25 @@ public class ManagerListener
                                 executeSlaveNodeCheckButtonFinishCommands( row, checkButton );
                             }
                         }, null ) );
+
+    }
+
+
+    public Button.ClickListener checkAllButtonListener( final Button checkAllButton )
+    {
+        return new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                refreshClusterList();
+                if ( hadoopManager.getClusterList().getValue() != null )
+                {
+                    checkAllButton.setEnabled( false );
+                    checkAllStatuses();
+                }
+            }
+        };
     }
 
 
@@ -871,24 +892,6 @@ public class ManagerListener
                                 enableCheckAllButton();
                             }
                         }, null ) );
-    }
-
-
-    public Button.ClickListener checkAllButtonListener( final Button checkAllButton )
-    {
-        return new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                refreshClusterList();
-                if ( hadoopManager.getClusterList().getValue() != null )
-                {
-                    checkAllButton.setEnabled( false );
-                    checkAllStatuses();
-                }
-            }
-        };
     }
 
 

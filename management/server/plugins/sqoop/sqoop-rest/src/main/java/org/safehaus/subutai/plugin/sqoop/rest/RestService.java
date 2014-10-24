@@ -51,8 +51,8 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getClusters()
     {
 
@@ -70,9 +70,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         SqoopConfig config = sqoopManager.getCluster( clusterName );
 
@@ -82,9 +82,10 @@ public class RestService
 
 
     @POST
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @PathParam("clusterName") String clusterName, @QueryParam("nodes") String nodes )
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @PathParam( "clusterName" ) String clusterName,
+                                    @QueryParam( "nodes" ) String nodes )
     {
 
         SqoopConfig config = new SqoopConfig();
@@ -111,10 +112,10 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{hostname}")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters/{clusterName}/nodes/{hostname}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     @Deprecated()
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("hostname") String hostname )
+    public Response addNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "hostname" ) String hostname )
     {
         String operationId = JsonUtil.toJson( OPERATION_ID, null );
         return Response.status( Response.Status.CREATED ).entity( operationId ).build();
@@ -122,9 +123,10 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{hostname}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("hostname") String hostname )
+    @Path( "clusters/{clusterName}/nodes/{hostname}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyNode( @PathParam( "clusterName" ) String clusterName,
+                                 @PathParam( "hostname" ) String hostname )
     {
         UUID uuid = sqoopManager.destroyNode( clusterName, hostname );
 
@@ -134,13 +136,13 @@ public class RestService
 
 
     @POST
-    @Path("importData")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response importData( @QueryParam("dataSourceType") String dataSourceType,
-                                @QueryParam("importAllTables") String importAllTables,
-                                @QueryParam("datasourceDatabase") String datasourceDatabase,
-                                @QueryParam("datasourceTableName") String datasourceTableName,
-                                @QueryParam("datasourceColumnFamily") String datasourceColumnFamily )
+    @Path( "importData" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response importData( @QueryParam( "dataSourceType" ) String dataSourceType,
+                                @QueryParam( "importAllTables" ) String importAllTables,
+                                @QueryParam( "datasourceDatabase" ) String datasourceDatabase,
+                                @QueryParam( "datasourceTableName" ) String datasourceTableName,
+                                @QueryParam( "datasourceColumnFamily" ) String datasourceColumnFamily )
     {
         ImportSetting settings = new ImportSetting();
 
@@ -175,9 +177,9 @@ public class RestService
 
 
     @GET
-    @Path("exportData")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response exportData( @QueryParam("hdfsPath") String hdfsPath )
+    @Path( "exportData" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response exportData( @QueryParam( "hdfsPath" ) String hdfsPath )
     {
         ExportSetting setting = new ExportSetting();
         setting.setHdfsPath( hdfsPath );

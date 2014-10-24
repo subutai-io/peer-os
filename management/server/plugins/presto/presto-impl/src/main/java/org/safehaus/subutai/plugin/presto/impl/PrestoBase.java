@@ -1,38 +1,51 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
 
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class PrestoBase
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( PrestoBase.class.getName() );
     CommandRunner commandRunner;
     AgentManager agentManager;
-    DbManager dbManager;
     Tracker tracker;
     Hadoop hadoopManager;
     EnvironmentManager environmentManager;
     ContainerManager containerManager;
     ExecutorService executor;
-    PluginDAO pluginDAO;
+    PluginDao pluginDAO;
     Commands commands;
+    public DataSource dataSource;
 
 
     public void init()
     {
-        commands = new Commands( commandRunner );
-        pluginDAO = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        this.commands = new Commands( commandRunner );
+
         executor = Executors.newCachedThreadPool();
     }
 
@@ -73,18 +86,6 @@ public abstract class PrestoBase
     }
 
 
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( DbManager dbManager )
-    {
-        this.dbManager = dbManager;
-    }
-
-
     public Tracker getTracker()
     {
         return tracker;
@@ -121,6 +122,12 @@ public abstract class PrestoBase
     }
 
 
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
+    }
+
+
     public ContainerManager getContainerManager()
     {
         return containerManager;
@@ -133,13 +140,13 @@ public abstract class PrestoBase
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( PluginDAO pluginDAO )
+    public void setPluginDAO( PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }

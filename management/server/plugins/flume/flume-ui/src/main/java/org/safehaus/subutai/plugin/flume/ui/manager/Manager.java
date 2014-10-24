@@ -208,6 +208,47 @@ public class Manager
     }
 
 
+    private void getRefreshClusterButton( HorizontalLayout controlsContent )
+    {
+        Button refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
+        refreshClustersBtn.setId( "FluRefreshClusterBtn" );
+        refreshClustersBtn.addStyleName( "default" );
+        refreshClustersBtn.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+                refreshClustersInfo();
+            }
+        } );
+
+        controlsContent.addComponent( refreshClustersBtn );
+    }
+
+
+    private void getClusterCombo( HorizontalLayout controlsContent )
+    {
+        clusterCombo = new ComboBox();
+        clusterCombo.setId( "FluClusterCombo" );
+        clusterCombo.setImmediate( true );
+        clusterCombo.setTextInputAllowed( false );
+        clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
+            {
+                config = ( FlumeConfig ) event.getProperty().getValue();
+                refreshUI();
+                checkAllNodes();
+                checkAllNodes();
+            }
+        } );
+
+        controlsContent.addComponent( clusterCombo );
+    }
+
+
     public void checkAllNodes()
     {
         if ( nodesTable != null )
@@ -248,47 +289,6 @@ public class Manager
             }
             return null;
         }
-    }
-
-
-    private void getRefreshClusterButton( HorizontalLayout controlsContent )
-    {
-        Button refreshClustersBtn = new Button( REFRESH_CLUSTERS_CAPTION );
-        refreshClustersBtn.setId( "FluRefreshClusterBtn" );
-        refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                refreshClustersInfo();
-            }
-        } );
-
-        controlsContent.addComponent( refreshClustersBtn );
-    }
-
-
-    private void getClusterCombo( HorizontalLayout controlsContent )
-    {
-        clusterCombo = new ComboBox();
-        clusterCombo.setId( "FluClusterCombo" );
-        clusterCombo.setImmediate( true );
-        clusterCombo.setTextInputAllowed( false );
-        clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                config = ( FlumeConfig ) event.getProperty().getValue();
-                refreshUI();
-                checkAllNodes();
-                checkAllNodes();
-            }
-        } );
-
-        controlsContent.addComponent( clusterCombo );
     }
 
 
@@ -373,28 +373,6 @@ public class Manager
                     contentRoot.getUI().addWindow( alert.getAlert() );
                 }
             } );
-        }
-    }
-
-
-    private Button getButton( String caption, Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            if ( b.getCaption().equals( caption ) )
-            {
-                return b;
-            }
-        }
-        return null;
-    }
-
-
-    private void disableButtons( Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            b.setEnabled( false );
         }
     }
 
@@ -484,6 +462,7 @@ public class Manager
                                         getButton( START_BUTTON_CAPTION, buttons ).setEnabled( false );
                                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     }
+
                                     PROGRESS_ICON.setVisible( false );
                                     getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                                     getButton( DESTROY_BUTTON_CAPTION, buttons ).setEnabled( true );
@@ -492,6 +471,28 @@ public class Manager
                         } ) );
             }
         } );
+    }
+
+
+    private Button getButton( String caption, Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            if ( b.getCaption().equals( caption ) )
+            {
+                return b;
+            }
+        }
+        return null;
+    }
+
+
+    private void disableButtons( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
     }
 
 
@@ -509,15 +510,6 @@ public class Manager
         for ( Button b : buttons )
         {
             b.setEnabled( true );
-        }
-    }
-
-
-    private void disableButton( Button... buttons )
-    {
-        for ( Button b : buttons )
-        {
-            b.setEnabled( false );
         }
     }
 
@@ -617,6 +609,15 @@ public class Manager
     private void show( String notification )
     {
         Notification.show( notification );
+    }
+
+
+    private void disableButton( Button... buttons )
+    {
+        for ( Button b : buttons )
+        {
+            b.setEnabled( false );
+        }
     }
 
 

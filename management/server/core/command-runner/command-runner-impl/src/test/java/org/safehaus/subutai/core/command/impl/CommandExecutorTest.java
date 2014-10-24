@@ -20,14 +20,14 @@ import static org.mockito.Mockito.mock;
 public class CommandExecutorTest
 {
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullCommand()
     {
         new CommandExecutor( null, mock( CommandCallback.class ) );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullCallback()
     {
         new CommandExecutor( mock( CommandImpl.class ), null );

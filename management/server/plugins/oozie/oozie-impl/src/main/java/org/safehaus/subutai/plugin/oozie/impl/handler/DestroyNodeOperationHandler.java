@@ -16,8 +16,8 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<OozieImpl>
 {
 
-    private String lxcHostName;
     private final TrackerOperation trackerOperation;
+    private String lxcHostName;
 
 
     public DestroyNodeOperationHandler( OozieImpl manager, String clusterName, String lxcHostName )

@@ -1,39 +1,53 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
 
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class SparkBase
 {
 
+    private static final Logger LOG = LoggerFactory.getLogger( SparkBase.class.getName() );
     CommandRunner commandRunner;
     AgentManager agentManager;
     Tracker tracker;
-    DbManager dbManager;
     EnvironmentManager environmentManager;
     Hadoop hadoopManager;
     ContainerManager containerManager;
 
     ExecutorService executor;
-    PluginDAO pluginDAO;
     Commands commands;
+
+    public PluginDao pluginDAO;
+    public DataSource dataSource;
 
 
     public void init()
     {
-        commands = new Commands( commandRunner );
-        pluginDAO = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        this.commands = new Commands( commandRunner );
+
         executor = Executors.newCachedThreadPool();
     }
 
@@ -86,18 +100,6 @@ public abstract class SparkBase
     }
 
 
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( DbManager dbManager )
-    {
-        this.dbManager = dbManager;
-    }
-
-
     public EnvironmentManager getEnvironmentManager()
     {
         return environmentManager;
@@ -107,6 +109,12 @@ public abstract class SparkBase
     public void setEnvironmentManager( EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
     }
 
 
@@ -140,7 +148,7 @@ public abstract class SparkBase
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }

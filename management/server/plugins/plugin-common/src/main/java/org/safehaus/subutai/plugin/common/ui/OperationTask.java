@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeType;
@@ -54,7 +54,7 @@ public class OperationTask implements Runnable
             while ( true )
             {
                 TrackerOperationView prevPo = tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
-                if ( prevPo.getState() == ProductOperationState.RUNNING )
+                if ( prevPo.getState() == OperationState.RUNNING )
                 {
                     try
                     {
@@ -89,7 +89,7 @@ public class OperationTask implements Runnable
             TrackerOperationView po = tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
             if ( po != null )
             {
-                if ( po.getState() != ProductOperationState.RUNNING )
+                if ( po.getState() != OperationState.RUNNING )
                 {
                     if ( po.getLog().toLowerCase().contains( getProductStoppedIdentifier( product ).toLowerCase() ) )
                     {

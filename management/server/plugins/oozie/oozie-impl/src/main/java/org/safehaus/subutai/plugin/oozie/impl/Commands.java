@@ -5,17 +5,22 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = "ksks-oozie-*";
-    public static final String SERVER_PACKAGE_NAME = "ksks-oozie-server";
-    public static final String CLIENT_PACKAGE_NAME = "ksks-oozie-client";
+    public static final String PACKAGE_NAME =
+            Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-*";
+    public static final String SERVER_PACKAGE_NAME =
+            Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-server";
+    public static final String CLIENT_PACKAGE_NAME =
+            Common.PACKAGE_PREFIX + OozieClusterConfig.PRODUCT_KEY.toLowerCase() + "-client";
 
     private final CommandRunnerBase commandRunnerBase;
 
@@ -31,7 +36,7 @@ public class Commands
         switch ( type )
         {
             case STATUS:
-                return "dpkg -l | grep '^ii' | grep ksks";
+                return "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
             case INSTALL_SERVER:
                 return "export DEBIAN_FRONTEND=noninteractive && apt-get --assume-yes --force-yes install "
                         + SERVER_PACKAGE_NAME;
@@ -62,8 +67,9 @@ public class Commands
     {
 
         return commandRunnerBase.createCommand(
-                new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-server" )
-                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+
+                new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + SERVER_PACKAGE_NAME )
+                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
@@ -71,8 +77,9 @@ public class Commands
     {
 
         return commandRunnerBase.createCommand(
-                new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-client" )
-                        .withTimeout( 1800 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+
+                new RequestBuilder( "sleep 1; apt-get --force-yes --assume-yes install " + CLIENT_PACKAGE_NAME )
+                        .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
@@ -115,9 +122,11 @@ public class Commands
     public Command getUninstallServerCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-oozie-server" ).withTimeout( 90 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
+
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + SERVER_PACKAGE_NAME ).withTimeout( 90 )
+                                                                                                     .withStdOutRedirection(
+                                                                                                             OutputRedirection.NO ),
+
                 agents );
     }
 
@@ -125,16 +134,18 @@ public class Commands
     public Command getUninstallClientsCommand( Set<Agent> agents )
     {
         return commandRunnerBase.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-oozie-client" ).withTimeout( 90 )
-                                                                                                .withStdOutRedirection(
-                                                                                                        OutputRedirection.NO ),
+
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + CLIENT_PACKAGE_NAME ).withTimeout( 90 )
+                                                                                                     .withStdOutRedirection(
+                                                                                                             OutputRedirection.NO ),
+
                 agents );
     }
 
 
     public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return commandRunnerBase.createCommand( "Check installed ksks packages",
-                new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+        return commandRunnerBase.createCommand( "Check installed subutai packages",
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
     }
 }

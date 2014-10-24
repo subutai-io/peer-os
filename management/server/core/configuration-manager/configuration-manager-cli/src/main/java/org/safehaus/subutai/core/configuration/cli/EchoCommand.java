@@ -13,15 +13,15 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "config", name = "echo", description = "Executes cat command on given host")
+@Command( scope = "config", name = "echo", description = "Executes cat command on given host" )
 public class EchoCommand extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( EchoCommand.class );
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "Agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "Agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "pathToFile", required = true, multiValued = false, description = "Path to file")
+    @Argument( index = 1, name = "pathToFile", required = true, multiValued = false, description = "Path to file" )
     String pathToFile;
-    @Argument(index = 2, name = "content", required = true, multiValued = false, description = "File content")
+    @Argument( index = 2, name = "content", required = true, multiValued = false, description = "File content" )
     String content;
     private TextInjector textInjector;
 

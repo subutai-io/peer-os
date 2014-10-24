@@ -12,9 +12,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationImpl;
 import org.safehaus.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import org.safehaus.subutai.core.tracker.impl.TrackerImpl;
 
 import com.google.common.collect.Lists;
 

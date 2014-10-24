@@ -292,31 +292,22 @@ public class Manager extends BaseManager
     }
 
 
-    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
-    {
-        if ( availableOperationsLayout == null )
-        {
-            return null;
-        }
-        else
-        {
-            for ( Component component : availableOperationsLayout )
-            {
-                if ( component.getCaption().equals( caption ) )
-                {
-                    return ( Button ) component;
-                }
-            }
-            return null;
-        }
-    }
-
 
     private void populateServerTable( final Table table, final Agent agent )
     {
         List<Agent> agentList = new ArrayList<>();
         agentList.add( agent );
         //agentList.add(config.getServer());
+        populateTable( table, agentList );
+    }
+
+
+    private void populateClientsTable( final Table table, Set<Agent> clientNodes )
+    {
+
+        table.removeAllItems();
+        List<Agent> agentList = new ArrayList<>();
+        agentList.addAll( clientNodes );
         populateTable( table, agentList );
     }
 
@@ -352,24 +343,25 @@ public class Manager extends BaseManager
     }
 
 
-    private void populateClientsTable( final Table table, Set<Agent> clientNodes )
+    @Override
+    public void addRowComponents( Table table, final Agent agent )
     {
-
-        table.removeAllItems();
-        List<Agent> agentList = new ArrayList<>();
-        agentList.addAll( clientNodes );
-        populateTable( table, agentList );
-    }
-
-
-    private void show( String notification )
-    {
-        Notification.show( notification );
+        Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
+        Preconditions.checkNotNull( agent, "Cannot add null agent to the table" );
+        if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) )
+        {
+            addServerRow( table, agent );
+        }
+        else
+        {
+            addClientRow( table, agent );
+        }
     }
 
 
     public Table createTableTemplate( String caption )
     {
+
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
@@ -414,25 +406,36 @@ public class Manager extends BaseManager
     }
 
 
-    public Component getContent()
+    private void show( String notification )
     {
-        return contentRoot;
+        Notification.show( notification );
     }
 
 
-    @Override
-    public void addRowComponents( Table table, final Agent agent )
+    protected Button getButton( final HorizontalLayout availableOperationsLayout, String caption )
     {
-        Preconditions.checkNotNull( table, "Cannot add components to not existing table" );
-        Preconditions.checkNotNull( agent, "Cannot add null agent to the table" );
-        if ( table.getCaption().equals( SERVER_TABLE_CAPTION ) )
+
+        if ( availableOperationsLayout == null )
         {
-            addServerRow( table, agent );
+            return null;
         }
         else
         {
-            addClientRow( table, agent );
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( caption ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
         }
+    }
+
+
+    public Component getContent()
+    {
+        return contentRoot;
     }
 
 
@@ -584,6 +587,37 @@ public class Manager extends BaseManager
     }
 
 
+    private Label getStatusLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 0 );
+    }
+
+
+    protected Agent getAgentByRow( final Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
+
+        Set<Agent> clusterNodeList = config.getAllOozieAgents();
+        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+
+        for ( Agent agent : clusterNodeList )
+        {
+            if ( agent.getHostname().equals( lxcHostname ) )
+            {
+                return agent;
+            }
+        }
+        return null;
+    }
+
+
     private Button.ClickListener destroyButtonListener( final Item row )
     {
         return new Button.ClickListener()
@@ -713,34 +747,4 @@ public class Manager extends BaseManager
         };
     }
 
-
-    protected Agent getAgentByRow( final Item row )
-    {
-        if ( row == null )
-        {
-            return null;
-        }
-
-        Set<Agent> clusterNodeList = config.getAllOozieAgents();
-        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-
-        for ( Agent agent : clusterNodeList )
-        {
-            if ( agent.getHostname().equals( lxcHostname ) )
-            {
-                return agent;
-            }
-        }
-        return null;
-    }
-
-
-    private Label getStatusLabel( final HorizontalLayout statusGroupLayout )
-    {
-        if ( statusGroupLayout == null )
-        {
-            return null;
-        }
-        return ( Label ) statusGroupLayout.getComponent( 0 );
-    }
 }

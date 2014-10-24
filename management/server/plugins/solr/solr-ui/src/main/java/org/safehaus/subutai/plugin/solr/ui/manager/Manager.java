@@ -57,9 +57,8 @@ public class Manager
     protected static final String STATUS_COLUMN_CAPTION = "Status";
     protected static final String BUTTON_STYLE_NAME = "default";
     private static final String MESSAGE = "No cluster is installed !";
-    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     final Button refreshClustersBtn, destroyInstallationBtn;
-
+    private final Embedded PROGRESS_ICON = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;

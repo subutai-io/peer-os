@@ -93,7 +93,6 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 

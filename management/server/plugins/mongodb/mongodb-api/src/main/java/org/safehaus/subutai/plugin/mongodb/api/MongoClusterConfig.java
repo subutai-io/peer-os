@@ -20,8 +20,8 @@ import org.safehaus.subutai.common.settings.Common;
 public class MongoClusterConfig implements ConfigBase
 {
 
-    public static final String PRODUCT_KEY = "MongoDB2";
-    public static final String PRODUCT_NAME = "mongodb";
+    public static final String PRODUCT_KEY = "MongoDB";
+    public static final String PRODUCT_NAME = "mongo";
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private String replicaSetName = "repl";

@@ -1,12 +1,15 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -22,12 +25,11 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -59,6 +61,8 @@ import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StatusSecondaryN
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StopDataNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.StopNameNodeOperationHandler;
 import org.safehaus.subutai.plugin.hadoop.impl.handler.namenode.UnblockDataNodeOperationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -67,42 +71,24 @@ import com.google.common.base.Strings;
 public class HadoopImpl implements Hadoop
 {
     public static final int INITIAL_CAPACITY = 2;
-
+    private static final Logger LOG = LoggerFactory.getLogger( HadoopImpl.class.getName() );
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private ContainerManager containerManager;
     private NetworkManager networkManager;
     private ExecutorService executor;
     private EnvironmentManager environmentManager;
-    private PluginDAO pluginDAO;
     private Commands commands;
 
 
-    public HadoopImpl( AgentManager agentManager, Tracker tracker, CommandRunner commandRunner, DbManager dbManager,
-                       NetworkManager networkManager, ContainerManager containerManager,
-                       EnvironmentManager environmentManager )
+    private PluginDao pluginDAO;
+    private DataSource dataSource;
+
+
+    public HadoopImpl( DataSource dataSource )
     {
-
-        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
-        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
-        Preconditions.checkNotNull( tracker, "Tracker is null" );
-        Preconditions.checkNotNull( containerManager, "Container manager is null" );
-        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
-        Preconditions.checkNotNull( networkManager, "Network manager is null" );
-
-        this.agentManager = agentManager;
-        this.tracker = tracker;
-        this.commandRunner = commandRunner;
-        this.dbManager = dbManager;
-        this.networkManager = networkManager;
-        this.containerManager = containerManager;
-        this.environmentManager = environmentManager;
-
-        pluginDAO = new PluginDAO( dbManager );
-        commands = new Commands( commandRunner );
+        this.dataSource = dataSource;
     }
 
 
@@ -114,6 +100,16 @@ public class HadoopImpl implements Hadoop
 
     public void init()
     {
+        try
+        {
+            this.pluginDAO = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        this.commands = new Commands( commandRunner );
+
         executor = Executors.newCachedThreadPool();
     }
 
@@ -127,12 +123,6 @@ public class HadoopImpl implements Hadoop
     public CommandRunner getCommandRunner()
     {
         return commandRunner;
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
     }
 
 
@@ -172,9 +162,57 @@ public class HadoopImpl implements Hadoop
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
+
+
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager )
+    {
+        this.containerManager = containerManager;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
+        this.networkManager = networkManager;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public void setCommands( final Commands commands )
+    {
+        this.commands = commands;
     }
 
 

@@ -24,9 +24,9 @@ import com.vaadin.ui.Component;
 public class JettyPortalModule implements PortalModule
 {
 
-    protected Logger LOG = Logger.getLogger( JettyPortalModule.class.getName() );
     public static final String MODULE_IMAGE = "jetty.png";
     private final ServiceLocator serviceLocator;
+    protected Logger LOG = Logger.getLogger( JettyPortalModule.class.getName() );
     private ExecutorService executor;
 
 

@@ -324,28 +324,21 @@ public class Manager
                         }
                         else
                         {
-                            button.addClickListener( new Button.ClickListener()
+                            progressIcon.setVisible( true );
+                            disableOREnableAllButtonsOnTable( nodesTable, false );
+                            executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
+                                    config.getMasterNode().getHostname(), new CompleteEvent()
                             {
                                 @Override
-                                public void buttonClick( final Button.ClickEvent event )
+                                public void onComplete( String result )
                                 {
-                                    progressIcon.setVisible( true );
-                                    disableOREnableAllButtonsOnTable( nodesTable, false );
-                                    executor.execute( new StartAllTask( spark, tracker, config.getClusterName(),
-                                            config.getMasterNode().getHostname(), new CompleteEvent()
+                                    synchronized ( progressIcon )
                                     {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( progressIcon )
-                                            {
-                                                disableOREnableAllButtonsOnTable( nodesTable, true );
-                                                checkAllNodesStatus();
-                                            }
-                                        }
-                                    } ) );
+                                        disableOREnableAllButtonsOnTable( nodesTable, true );
+                                        checkAllNodesStatus();
+                                    }
                                 }
-                            } );
+                            } ) );
                         }
                     }
                 } );
@@ -362,28 +355,22 @@ public class Manager
                         }
                         else
                         {
-                            button.addClickListener( new Button.ClickListener()
+
+                            progressIcon.setVisible( true );
+                            disableOREnableAllButtonsOnTable( nodesTable, false );
+                            executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
+                                    config.getMasterNode().getHostname(), new CompleteEvent()
                             {
                                 @Override
-                                public void buttonClick( final Button.ClickEvent event )
+                                public void onComplete( String result )
                                 {
-                                    progressIcon.setVisible( true );
-                                    disableOREnableAllButtonsOnTable( nodesTable, false );
-                                    executor.execute( new StopAllTask( spark, tracker, config.getClusterName(),
-                                            config.getMasterNode().getHostname(), new CompleteEvent()
+                                    synchronized ( progressIcon )
                                     {
-                                        @Override
-                                        public void onComplete( String result )
-                                        {
-                                            synchronized ( progressIcon )
-                                            {
-                                                disableOREnableAllButtonsOnTable( nodesTable, true );
-                                                checkAllNodesStatus();
-                                            }
-                                        }
-                                    } ) );
+                                        disableOREnableAllButtonsOnTable( nodesTable, true );
+                                        checkAllNodesStatus();
+                                    }
                                 }
-                            } );
+                            } ) );
                         }
                     }
                 } );

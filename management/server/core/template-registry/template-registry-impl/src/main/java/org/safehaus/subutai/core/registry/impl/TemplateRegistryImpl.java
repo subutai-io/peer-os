@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;

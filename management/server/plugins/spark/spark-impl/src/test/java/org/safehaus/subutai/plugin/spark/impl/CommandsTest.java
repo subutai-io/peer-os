@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.spark.impl;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 
@@ -52,7 +53,7 @@ public class CommandsTest
         Command command = commands.getCheckInstalledCommand( null );
 
         assertNotNull( command );
-        assertEquals( "dpkg -l | grep '^ii' | grep ksks", command.getDescription() );
+        assertEquals( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH, command.getDescription() );
     }
 
 

@@ -76,11 +76,13 @@ public class StrategyManagerImplTest
         assertNotNull( result );
 
         result = strategyManager
-                .getPlacementDistribution( MockUtils.getServerMetrics(), 15, roundRobinPlacementStrategy.getId(), null );
+                .getPlacementDistribution( MockUtils.getServerMetrics(), 15, roundRobinPlacementStrategy.getId(),
+                        null );
         assertNotNull( result );
 
         result = strategyManager
-                .getPlacementDistribution( MockUtils.getServerMetrics(), 20, roundRobinPlacementStrategy.getId(), null );
+                .getPlacementDistribution( MockUtils.getServerMetrics(), 20, roundRobinPlacementStrategy.getId(),
+                        null );
         assertNotNull( result );
 
         strategyManager.unregisterStrategy( roundRobinPlacementStrategy );

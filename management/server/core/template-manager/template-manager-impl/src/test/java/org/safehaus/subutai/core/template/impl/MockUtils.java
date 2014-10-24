@@ -9,11 +9,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.template.api.ActionType;
 
 import static org.mockito.Matchers.any;
@@ -113,7 +113,7 @@ public class MockUtils
     {
         //        Template master = new Template( Template.ARCH_AMD64, "master", "/", "master", "", "", "", "" );
         Template tmock = mock( Template.class );
-//        when( tmock.getTemplateName() ).thenReturn( "master" );
+        //        when( tmock.getTemplateName() ).thenReturn( "master" );
         return Arrays.asList( tmock );
     }
 }

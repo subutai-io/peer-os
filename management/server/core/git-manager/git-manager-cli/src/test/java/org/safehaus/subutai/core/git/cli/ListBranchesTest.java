@@ -107,8 +107,8 @@ public class ListBranchesTest
     @Test
     public void shouldThrowException() throws GitException
     {
-        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).listBranches( eq( agent ), anyString(),
-                anyBoolean() );
+        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
+               .listBranches( eq( agent ), anyString(), anyBoolean() );
         ListBranches listBranches = new ListBranches( gitManager, agentManager );
         listBranches.setHostname( HOSTNAME );
 

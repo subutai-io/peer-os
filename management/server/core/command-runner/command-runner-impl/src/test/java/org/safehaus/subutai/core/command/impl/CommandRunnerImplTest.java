@@ -58,7 +58,8 @@ public class CommandRunnerImplTest
     private CommunicationManager communicationManager;
     private CommandRunnerImpl commandRunner;
     private final static String ERR_MSG = "some error message";
-    private static final Set<Agent> TWO_AGENTS = MockUtils.getAgents( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
+    private static final Set<Agent> TWO_AGENTS =
+            MockUtils.getAgents( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
 
 
     @BeforeClass
@@ -156,10 +157,10 @@ public class CommandRunnerImplTest
     {
         Assume.assumeTrue( allTests );
 
-        CommandImpl command = ( CommandImpl ) commandRunner
-                .createCommand( Sets.newHashSet( MockUtils.getAgentRequestBuilder( TWO_AGENTS.iterator().next(), "cmd'" ) ) );
+        CommandImpl command = ( CommandImpl ) commandRunner.createCommand(
+                Sets.newHashSet( MockUtils.getAgentRequestBuilder( TWO_AGENTS.iterator().next(), "cmd'" ) ) );
 
-        assertEquals( TWO_AGENTS.iterator().next().getUuid() , command.getRequests().iterator().next().getUuid() );
+        assertEquals( TWO_AGENTS.iterator().next().getUuid(), command.getRequests().iterator().next().getUuid() );
     }
 
 

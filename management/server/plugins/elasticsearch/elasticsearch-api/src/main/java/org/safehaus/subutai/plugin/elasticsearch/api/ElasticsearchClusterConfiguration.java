@@ -14,7 +14,7 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     public static final String PRODUCT_KEY = "Elasticsearch";
     public static final String PRODUCT_NAME = "elasticsearch";
 
-    public static final String templateName = "osman";
+    public static final String templateName = "elastic";
 
     private String clusterName = "";
     private int numberOfNodes;
@@ -27,12 +27,6 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
     private Set<Agent> masterNodes = new HashSet<>();
     private Set<Agent> dataNodes = new HashSet<>();
 
-
-    @Override
-    public String getProductKey()
-    {
-        return PRODUCT_KEY;
-    }
 
 
     public static String getTemplateName()
@@ -56,6 +50,13 @@ public class ElasticsearchClusterConfiguration implements ConfigBase
 
     @Override
     public String getProductName()
+    {
+        return PRODUCT_KEY;
+    }
+
+
+    @Override
+    public String getProductKey()
     {
         return PRODUCT_KEY;
     }

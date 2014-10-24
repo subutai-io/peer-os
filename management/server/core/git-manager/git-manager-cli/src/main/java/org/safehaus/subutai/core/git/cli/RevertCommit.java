@@ -18,20 +18,20 @@ import com.google.common.base.Preconditions;
 /**
  * Reverts the specified commit
  */
-@Command(scope = "git", name = "revert-commit",
-        description = "Reverts the repo to the state previous to the specified commit")
+@Command( scope = "git", name = "revert-commit",
+        description = "Reverts the repo to the state previous to the specified commit" )
 public class RevertCommit extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( RevertCommit.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "commit id", required = true, multiValued = false,
-            description = "commit id to revert")
+    @Argument( index = 2, name = "commit id", required = true, multiValued = false,
+            description = "commit id to revert" )
     String commitId;
 
     private final GitManager gitManager;

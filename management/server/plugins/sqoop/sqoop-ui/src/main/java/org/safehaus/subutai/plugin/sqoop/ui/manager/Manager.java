@@ -310,6 +310,8 @@ public class Manager
     }
 
 
+
+
     public void addStyleNameToButtons( Button... buttons )
     {
         for ( Button b : buttons )
@@ -326,7 +328,6 @@ public class Manager
             layout.addComponent( b );
         }
     }
-
 
     private void populateTable( final Table table, Collection<Agent> agents )
     {
@@ -379,6 +380,8 @@ public class Manager
             addClickListenerToDestroyButton( agent, destroyBtn );
         }
     }
+
+
 
 
     public void addClickListenerToDestroyButton( final Agent agent, Button destroyBtn )
