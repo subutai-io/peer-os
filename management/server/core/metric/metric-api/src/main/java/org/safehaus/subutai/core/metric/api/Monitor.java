@@ -2,9 +2,9 @@ package org.safehaus.subutai.core.metric.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.monitor.api.MonitorException;
 
 
 /**
@@ -43,7 +43,8 @@ public interface Monitor
      * @param environment environment to monitor
      */
 
-    public void startMonitoring( MetricListener metricListener, Environment environment );
+    public void startMonitoring( MetricListener metricListener, Environment environment )
+            throws org.safehaus.subutai.core.monitor.api.MonitorException;
 
     /**
      * Disables {@code MetricListener} to be triggered for the given environment
@@ -51,5 +52,5 @@ public interface Monitor
      * @param metricListener metricListener  to trigger
      * @param environment environment to monitor
      */
-    public void stopMonitoring( MetricListener metricListener, Environment environment );
+    public void stopMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
 }
