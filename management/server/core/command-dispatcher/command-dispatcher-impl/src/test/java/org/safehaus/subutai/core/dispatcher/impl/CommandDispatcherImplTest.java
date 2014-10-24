@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.enums.RequestType;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for CommandDispatcherImpl
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class CommandDispatcherImplTest
 {
     @Mock
@@ -90,36 +91,36 @@ public class CommandDispatcherImplTest
         when( connection.prepareStatement( anyString() ) ).thenReturn( preparedStatement );
         when( dataSource.getConnection() ).thenReturn( connection );
         ResultSet resultSet = mock( ResultSet.class );
-        when(preparedStatement.executeQuery()).thenReturn( resultSet );
-        ResultSetMetaData metadata = mock( ResultSetMetaData.class);
-        when(metadata.getColumnCount()).thenReturn( 1 );
-        when(resultSet.getMetaData()).thenReturn( metadata);
+        when( preparedStatement.executeQuery() ).thenReturn( resultSet );
+        ResultSetMetaData metadata = mock( ResultSetMetaData.class );
+        when( metadata.getColumnCount() ).thenReturn( 1 );
+        when( resultSet.getMetaData() ).thenReturn( metadata );
         commandDispatcher = new CommandDispatcherImpl( agentManager, commandRunner, peerManager, dataSource );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullAgentManager() throws DaoException
     {
         new CommandDispatcherImpl( null, commandRunner, peerManager, dataSource );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullCommandRunner() throws DaoException
     {
         new CommandDispatcherImpl( agentManager, null, peerManager, dataSource );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullDatasource() throws DaoException
     {
         new CommandDispatcherImpl( agentManager, commandRunner, peerManager, null );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullPeerManager() throws DaoException
     {
         new CommandDispatcherImpl( agentManager, commandRunner, null, dataSource );
@@ -334,7 +335,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = PeerMessageException.class)
+    @Test( expected = PeerMessageException.class )
     public void testOnMessageForRequestsThrowDbException() throws PeerMessageException, DaoException, SQLException
     {
         Peer peer = mock( Peer.class );
@@ -349,7 +350,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = PeerMessageException.class)
+    @Test( expected = PeerMessageException.class )
     public void shouldThrowPeerException() throws PeerMessageException, DaoException
     {
 
@@ -357,7 +358,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = RunCommandException.class)
+    @Test( expected = RunCommandException.class )
     public void shouldThrowRunCommandException()
     {
 
@@ -371,7 +372,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = RunCommandException.class)
+    @Test( expected = RunCommandException.class )
     public void shouldThrowRunCommandException2() throws PeerException, PeerMessageException
     {
 
@@ -396,7 +397,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = RunCommandException.class)
+    @Test( expected = RunCommandException.class )
     public void shouldThrowRunCommandException3() throws PeerException, PeerMessageException
     {
 
@@ -419,7 +420,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = RunCommandException.class)
+    @Test( expected = RunCommandException.class )
     public void shouldThrowRunCommandException4() throws PeerException, PeerMessageException
     {
 
@@ -441,7 +442,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = RunCommandException.class)
+    @Test( expected = RunCommandException.class )
     public void shouldThrowRunCommandException5() throws PeerException, PeerMessageException
     {
 
@@ -465,7 +466,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = RunCommandException.class)
+    @Test( expected = RunCommandException.class )
     public void shouldThrowRunCommandException6() throws PeerException, PeerMessageException
     {
 
@@ -488,7 +489,7 @@ public class CommandDispatcherImplTest
     }
 
 
-    @Test(expected = RunCommandException.class)
+    @Test( expected = RunCommandException.class )
     public void shouldThrowRunCommandException7()
     {
         commandDispatcher.saveResponse( null );

@@ -38,14 +38,14 @@ public class WelcomeStep extends Panel
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start (embedded Zookeeper)" );
-        next.setId("StormStartEmbedded");
+        next.setId( "StormStartEmbedded" );
         next.addStyleName( "default" );
         next.addClickListener( new NextClickHandler( wizard, false ) );
         grid.addComponent( next, 6, 4, 6, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
         Button nextExt = new Button( "Start (external Zookeeper)" );
-        nextExt.setId("StormExternal");
+        nextExt.setId( "StormExternal" );
         nextExt.addStyleName( "default" );
         nextExt.addClickListener( new NextClickHandler( wizard, true ) );
         grid.addComponent( nextExt, 7, 4, 7, 4 );

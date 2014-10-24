@@ -72,7 +72,6 @@ public class Commands
                 "chmod 700 /root/.ssh && " +
                 "echo '%s' > /root/.ssh/authorized_keys && " +
                 "chmod 644 /root/.ssh/authorized_keys", key ) ), Sets.newHashSet( agentList ) );
-
     }
 
 

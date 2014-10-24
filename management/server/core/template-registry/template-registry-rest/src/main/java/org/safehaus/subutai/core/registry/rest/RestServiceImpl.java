@@ -8,11 +8,11 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 import org.slf4j.Logger;

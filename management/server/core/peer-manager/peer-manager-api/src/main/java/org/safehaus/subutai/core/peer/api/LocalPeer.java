@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 
 /**

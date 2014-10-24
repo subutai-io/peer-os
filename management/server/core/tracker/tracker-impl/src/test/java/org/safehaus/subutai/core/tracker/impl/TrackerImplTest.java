@@ -131,7 +131,7 @@ public class TrackerImplTest
     @Test
     public void testSaveProductOperation() throws Exception
     {
-        assertTrue( tracker.saveProductOperation( SOURCE, productOperation ) );
+        assertTrue( tracker.saveTrackerOperation( SOURCE, productOperation ) );
     }
 
 
@@ -140,7 +140,7 @@ public class TrackerImplTest
     {
         when( dbUtil.update( anyString(), anyVararg() ) ).thenThrow( new SQLException() );
 
-        assertFalse( tracker.saveProductOperation( SOURCE, productOperation ) );
+        assertFalse( tracker.saveTrackerOperation( SOURCE, productOperation ) );
     }
 
 

@@ -10,8 +10,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.CheckSlaveNodeOperationHandler;
@@ -40,7 +40,7 @@ public class CheckEnvironmentContainerNodeOperationHandlerTest
 
         TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
-        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
+        Assert.assertEquals( po.getState(), OperationState.FAILED );
     }
 
 
@@ -57,6 +57,6 @@ public class CheckEnvironmentContainerNodeOperationHandlerTest
 
         TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not connected" ) );
-        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
+        Assert.assertEquals( po.getState(), OperationState.FAILED );
     }
 }

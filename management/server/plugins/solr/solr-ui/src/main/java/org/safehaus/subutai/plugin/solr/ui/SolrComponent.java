@@ -35,9 +35,9 @@ public class SolrComponent extends CustomComponent
         final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.getTab(0).setId("SolrInstallTab");
+        sheet.getTab( 0 ).setId( "SolrInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab(1).setId("SolrManageTab");
+        sheet.getTab( 1 ).setId( "SolrManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

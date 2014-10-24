@@ -40,8 +40,10 @@ public class FlumeConfig implements ConfigBase
         return PRODUCT_KEY;
     }
 
+
     @Override
-    public String getProductKey() {
+    public String getProductKey()
+    {
         return PRODUCT_KEY;
     }
 

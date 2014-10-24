@@ -6,9 +6,6 @@
 package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
 
-import org.safehaus.subutai.common.enums.NodeState;
-
-
 /**
  * @author dilshat
  */
@@ -16,5 +13,4 @@ public interface CompleteEvent
 {
 
     public void onComplete( String operationLog );
-
 }

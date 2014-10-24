@@ -18,18 +18,18 @@ import com.google.common.base.Preconditions;
 /**
  * Pushes to remote branch
  */
-@Command(scope = "git", name = "push", description = "Push to remote branch")
+@Command( scope = "git", name = "push", description = "Push to remote branch" )
 public class Push extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( Push.class.getName() );
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "branch name", required = true, multiValued = false,
-            description = "branch name to push to")
+    @Argument( index = 2, name = "branch name", required = true, multiValued = false,
+            description = "branch name to push to" )
     String branchName;
 
     private final GitManager gitManager;

@@ -44,7 +44,7 @@ public class WelcomeStep extends Panel
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start over-Hadoop installation" );
-        next.setId("MahoutStartOverHadoop");
+        next.setId( "MahoutStartOverHadoop" );
         next.addStyleName( "default" );
         grid.addComponent( next, 4, 4, 4, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
@@ -59,7 +59,7 @@ public class WelcomeStep extends Panel
         } );
 
         Button next2 = new Button( "Start with-Hadoop installation" );
-        next2.setId("MahoutStartWithHadoop");
+        next2.setId( "MahoutStartWithHadoop" );
         next2.setStyleName( "default" );
         next2.addClickListener( new Button.ClickListener()
         {

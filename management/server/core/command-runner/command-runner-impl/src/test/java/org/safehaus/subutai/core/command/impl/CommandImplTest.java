@@ -370,10 +370,10 @@ public class CommandImplTest
     {
 
         Set<AgentRequestBuilder> ag = new HashSet<>();
-        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ), "cmd" )
-                .withTimeout( MAX_TIMEOUT - 1 ) );
-        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ), "cmd" )
-                .withTimeout( MAX_TIMEOUT ) );
+        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ),
+                "cmd" ).withTimeout( MAX_TIMEOUT - 1 ) );
+        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ),
+                "cmd" ).withTimeout( MAX_TIMEOUT ) );
         command = new CommandImpl( null, ag, mock( AbstractCommandRunner.class ) );
 
         assertEquals( MAX_TIMEOUT, command.getTimeout() );

@@ -1,12 +1,15 @@
 package org.safehaus.subutai.plugin.jetty.impl;
 
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -23,13 +26,12 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.jetty.api.Jetty;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -41,6 +43,8 @@ import org.safehaus.subutai.plugin.jetty.impl.handler.StartServiceHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.StopClusterHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.jetty.impl.handler.UninstallOperationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -48,8 +52,8 @@ import com.google.common.base.Strings;
 
 public class JettyImpl implements Jetty
 {
+    private static final Logger LOG = LoggerFactory.getLogger( JettyImpl.class.getName() );
     private Commands commands;
-    private DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;
@@ -58,24 +62,13 @@ public class JettyImpl implements Jetty
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
-    private PluginDAO pluginDAO;
+    private PluginDao pluginDAO;
+    private DataSource dataSource;
 
 
-    public JettyImpl()
+    public JettyImpl( DataSource dataSource )
     {
-
-    }
-
-
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
+        this.dataSource = dataSource;
     }
 
 
@@ -175,13 +168,13 @@ public class JettyImpl implements Jetty
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDAO pluginDAO )
+    public void setPluginDAO( final PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }
@@ -192,14 +185,23 @@ public class JettyImpl implements Jetty
         return commands;
     }
 
-    public void setCommands(Commands commands) {
+
+    public void setCommands( Commands commands )
+    {
         this.commands = commands;
     }
 
 
     public void init()
     {
-        this.pluginDAO = new PluginDAO( dbManager );
+        try
+        {
+            this.pluginDAO = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
         this.commands = new Commands( commandRunner );
 
         executor = Executors.newCachedThreadPool();

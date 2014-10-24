@@ -12,40 +12,48 @@ import javax.persistence.Table;
 
 
 @Entity
-@Table(name = "user")
+@Table( name = "user" )
 
-public class User implements Serializable {
-    
+public class User implements Serializable
+{
+
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
-    @Column(name = "id")
-    private long  id;
-    
-    @Column(name = "type")
+    @Column( name = "id" )
+    private long id;
+
+    @Column( name = "type" )
     private short type;
 
-    public  User() {
-        
+
+    public User()
+    {
+
     }
-    
-    public long getId() {
+
+
+    public long getId()
+    {
         return id;
     }
 
 
-    public void setId(long id) {
+    public void setId( long id )
+    {
         this.id = id;
     }
 
-    public short getType() {
+
+    public short getType()
+    {
         return type;
     }
 
 
-    public void setType(short type) {
+    public void setType( short type )
+    {
         this.type = type;
     }
-
 }

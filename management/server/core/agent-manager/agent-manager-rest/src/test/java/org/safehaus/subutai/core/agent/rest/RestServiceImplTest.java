@@ -35,7 +35,8 @@ public class RestServiceImplTest
     private static final String HOSTNAME = "hostname";
     private static final String PARENT_NAME = "parent";
     private static final String MAC_ADDRESS = "MAC";
-    private static final UUID RANDOM_ID = UUIDUtil.generateTimeBasedUUID();;
+    private static final UUID RANDOM_ID = UUIDUtil.generateTimeBasedUUID();
+    ;
     private static final List<String> IPS = Lists.newArrayList( "127.0.0.1" );
 
     private Agent agent =
@@ -71,7 +72,8 @@ public class RestServiceImplTest
         verify( agentManager ).getAgents();
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-        {}.getType() ) );
+        {
+        }.getType() ) );
     }
 
 
@@ -87,7 +89,8 @@ public class RestServiceImplTest
         verify( agentManager ).getPhysicalAgents();
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-        {}.getType() ) );
+        {
+        }.getType() ) );
     }
 
 
@@ -104,7 +107,8 @@ public class RestServiceImplTest
         verify( agentManager ).getLxcAgents();
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-        {}.getType() ) );
+        {
+        }.getType() ) );
     }
 
 
@@ -188,7 +192,8 @@ public class RestServiceImplTest
         verify( agentManager ).getLxcAgentsByParentHostname( HOSTNAME );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-        {}.getType() ) );
+        {
+        }.getType() ) );
     }
 
 
@@ -205,7 +210,8 @@ public class RestServiceImplTest
         verify( agentManager ).getAgentsByEnvironmentId( RANDOM_ID );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
         assertEquals( agents, JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<Agent>>()
-        {}.getType() ) );
+        {
+        }.getType() ) );
     }
 
 

@@ -6,10 +6,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
@@ -75,24 +77,26 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         boolean install = !agent.equals( config.getMasterNode() );
 
-        //check installed ksks packages
+        //check installed subutai packages
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
         {
-            po.addLogFailed( "Failed to check presence of installed ksks packages. Operation aborted" );
+            po.addLogFailed( "Failed to check presence of installed subutai packages. Operation aborted" );
             return;
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( "ksks-spark" ) && install )
+        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + SparkClusterConfig.PRODUCT_KEY.toLowerCase() )
+                && install )
         {
             po.addLogFailed( String.format( "Node %s already has Spark installed. Operation aborted", hostname ) );
             return;
         }
-        else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
+        else if ( !result.getStdOut()
+                         .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_KEY.toLowerCase() ) )
         {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation. Operation aborted", hostname ) );
             return;

@@ -12,10 +12,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.template.api.ActionType;
 import org.safehaus.subutai.core.template.api.TemplateException;
 
@@ -308,10 +308,10 @@ public class TemplateManagerImpl extends TemplateManagerBase
     }
 
 
-//    private String getPackageName( final Template template )
-//    {
-//        return String.format( "%s-subutai-template", template.getTemplateName() );
-//    }
+    //    private String getPackageName( final Template template )
+    //    {
+    //        return String.format( "%s-subutai-template", template.getTemplateName() );
+    //    }
 
 
     protected void updateRepository( Agent agent, Template template )

@@ -98,6 +98,7 @@ public class AgentManagerImplTest
         assertTrue( agentManager.getLxcAgents().isEmpty() );
     }
 
+
     @Test
     public void shouldSetNotifyListenersFlag()
     {
@@ -148,7 +149,8 @@ public class AgentManagerImplTest
     public void shouldReturnAgentWithMissingHostnameByUUID()
     {
 
-        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();;
+        UUID agentUUID = UUIDUtil.generateTimeBasedUUID();
+        ;
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
         when( response.getUuid() ).thenReturn( agentUUID );
         when( response.getHostname() ).thenReturn( null );
@@ -175,7 +177,8 @@ public class AgentManagerImplTest
     @Test
     public void shouldReturnAgentByEnvId()
     {
-        UUID id = UUIDUtil.generateTimeBasedUUID();;
+        UUID id = UUIDUtil.generateTimeBasedUUID();
+        ;
         Response response = MockUtils.getRegistrationRequestFromLxcAgentWithEnvironmentId( id );
 
         agentManager.onResponse( response );

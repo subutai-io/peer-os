@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
@@ -54,7 +54,7 @@ public class AddNodeWindow extends Window
         topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox availableNodesComboBox = new ComboBox();
-        availableNodesComboBox.setId("AddNodeWindowAvailableNodes");
+        availableNodesComboBox.setId( "AddNodeWindowAvailableNodes" );
         availableNodesComboBox.setImmediate( true );
         availableNodesComboBox.setTextInputAllowed( false );
         availableNodesComboBox.setNullSelectionAllowed( false );
@@ -70,12 +70,12 @@ public class AddNodeWindow extends Window
         topContent.addComponent( availableNodesComboBox );
 
         final Button addNodeBtn = new Button( "Add" );
-        addNodeBtn.setId("AddNode");
+        addNodeBtn.setId( "AddNode" );
         addNodeBtn.addStyleName( "default" );
         topContent.addComponent( addNodeBtn );
 
         final Button ok = new Button( "Ok" );
-        ok.setId("btnOk");
+        ok.setId( "btnOk" );
 
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -98,13 +98,12 @@ public class AddNodeWindow extends Window
                     {
                         while ( track )
                         {
-                            TrackerOperationView po =
-                                    tracker.getTrackerOperation( config.getProductKey(), trackID );
+                            TrackerOperationView po = tracker.getTrackerOperation( config.getProductKey(), trackID );
                             if ( po != null )
                             {
                                 setOutput(
                                         po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                                if ( po.getState() != ProductOperationState.RUNNING )
+                                if ( po.getState() != OperationState.RUNNING )
                                 {
 
                                     hideProgress();
@@ -132,7 +131,7 @@ public class AddNodeWindow extends Window
         } );
 
         outputTxtArea = new TextArea( "Operation output" );
-        outputTxtArea.setId("outputTxtArea");
+        outputTxtArea.setId( "outputTxtArea" );
         outputTxtArea.setRows( 10 );
         outputTxtArea.setColumns( 30 );
         outputTxtArea.setImmediate( true );
@@ -141,7 +140,7 @@ public class AddNodeWindow extends Window
         content.addComponent( outputTxtArea );
 
         indicator = new Label();
-        indicator.setId("indicator");
+        indicator.setId( "indicator" );
         indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
         indicator.setContentMode( ContentMode.HTML );
         indicator.setHeight( 11, Unit.PIXELS );

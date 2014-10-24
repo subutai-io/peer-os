@@ -51,8 +51,8 @@ public class ClusterConfiguration
 
         // setting data directory name
         po.addLog( "Setting data directory: " + config.getDataDirectory() );
-        Command setDataDirCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
-                "data_dir " + config.getDataDirectory() );
+        Command setDataDirCommand =
+                cassandraManager.getCommands().getConfigureCommand( agentSet, "data_dir " + config.getDataDirectory() );
         cassandraManager.getCommandRunner().runCommand( setDataDirCommand );
 
         if ( setDataDirCommand.hasSucceeded() )
@@ -99,9 +99,8 @@ public class ClusterConfiguration
 
         // setting rpc address
         po.addLog( "Setting rpc address" );
-        Command setRpcAddressCommand = cassandraManager.getCommands()
-                                                       .getConfigureRpcAndListenAddressesCommand( agentSet,
-                                                               "rpc_address" );
+        Command setRpcAddressCommand =
+                cassandraManager.getCommands().getConfigureRpcAndListenAddressesCommand( agentSet, "rpc_address" );
         cassandraManager.getCommandRunner().runCommand( setRpcAddressCommand );
 
         if ( setRpcAddressCommand.hasSucceeded() )
@@ -116,9 +115,8 @@ public class ClusterConfiguration
 
         // setting listen address
         po.addLog( "Setting listen address" );
-        Command setListenAddressCommand = cassandraManager.getCommands()
-                                                          .getConfigureRpcAndListenAddressesCommand( agentSet,
-                                                                  "listen_address" );
+        Command setListenAddressCommand =
+                cassandraManager.getCommands().getConfigureRpcAndListenAddressesCommand( agentSet, "listen_address" );
         cassandraManager.getCommandRunner().runCommand( setListenAddressCommand );
 
         if ( setListenAddressCommand.hasSucceeded() )

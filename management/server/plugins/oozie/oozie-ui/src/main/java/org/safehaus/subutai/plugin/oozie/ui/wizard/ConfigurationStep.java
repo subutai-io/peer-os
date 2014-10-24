@@ -45,9 +45,9 @@ public class ConfigurationStep extends Panel
         content.setMargin( true );
 
         hadoopClusters = new ComboBox( "Hadoop cluster" );
-        hadoopClusters.setId("OozieConfHadoopCluster");
+        hadoopClusters.setId( "OozieConfHadoopCluster" );
         oozieClusterName = new TextField();
-        oozieClusterName.setId("OozieClusterName");
+        oozieClusterName.setId( "OozieClusterName" );
         oozieClusterName.setCaption( "Oozie cluster name" );
 
         hadoopClusters.setImmediate( true );
@@ -100,7 +100,7 @@ public class ConfigurationStep extends Panel
 
 
         Button next = new Button( "Next" );
-        next.setId("OozieConfNext");
+        next.setId( "OozieConfNext" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -124,7 +124,7 @@ public class ConfigurationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("OozieConfBack");
+        back.setId( "OozieConfBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

@@ -21,20 +21,20 @@ import com.google.common.base.Preconditions;
 /**
  * Diffs branches
  */
-@Command(scope = "git", name = "diff-branches", description = "Diff branches to see changed files")
+@Command( scope = "git", name = "diff-branches", description = "Diff branches to see changed files" )
 public class DiffBranches extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( DiffBranches.class.getName() );
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "branch name 1", required = true, multiValued = false,
-            description = "branch name 1")
+    @Argument( index = 2, name = "branch name 1", required = true, multiValued = false,
+            description = "branch name 1" )
     String branchName1;
-    @Argument(index = 3, name = "branch name 2", required = false, multiValued = false,
-            description = "branch name 2 (master = default)")
+    @Argument( index = 3, name = "branch name 2", required = false, multiValued = false,
+            description = "branch name 2 (master = default)" )
     String branchName2;
     private final GitManager gitManager;
     private final AgentManager agentManager;

@@ -105,7 +105,7 @@ public class RestServiceImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void shouldThrowNullPointerExceptionForSettingNullValue()
     {
         restService.setTemplateRegistry( null );
@@ -239,7 +239,8 @@ public class RestServiceImplTest
         Response response = restService.getParentTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
-        {}.getType();
+        {
+        }.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -254,7 +255,8 @@ public class RestServiceImplTest
         Response response = restService.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {}.getType();
+        {
+        }.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -269,7 +271,8 @@ public class RestServiceImplTest
         Response response = restService.getChildTemplates( TEMPLATE_NAME );
 
         Type templateType = new TypeToken<List<String>>()
-        {}.getType();
+        {
+        }.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -284,7 +287,8 @@ public class RestServiceImplTest
         Response response = restService.getChildTemplates( TEMPLATE_NAME, ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {}.getType();
+        {
+        }.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -299,7 +303,8 @@ public class RestServiceImplTest
         Response response = restService.getParentTemplates( TEMPLATE_NAME, Common.DEFAULT_LXC_ARCH );
 
         Type templateType = new TypeToken<List<String>>()
-        {}.getType();
+        {
+        }.getType();
 
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templateType );
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -318,7 +323,8 @@ public class RestServiceImplTest
         when( templateRegistry.getTemplateTree() ).thenReturn( templateTree );
 
         Type templateType = new TypeToken<List<Template>>()
-        {}.getType();
+        {
+        }.getType();
 
         Response response = restService.getTemplateTree();
 
@@ -375,7 +381,8 @@ public class RestServiceImplTest
         when( templateRegistry.getAllTemplates() ).thenReturn( templates );
         Response response = restService.listTemplates();
         Type templateListType = new TypeToken<List<String>>()
-        {}.getType();
+        {
+        }.getType();
         List<String> responseTemplates = GSON.fromJson( String.valueOf( response.getEntity() ), templateListType );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
@@ -390,7 +397,8 @@ public class RestServiceImplTest
         Response response = restService.listTemplates( Common.DEFAULT_LXC_ARCH );
 
         Type templatesType = new TypeToken<List<String>>()
-        {}.getType();
+        {
+        }.getType();
         List<String> templateNames = GSON.fromJson( String.valueOf( response.getEntity() ), templatesType );
 
         assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );

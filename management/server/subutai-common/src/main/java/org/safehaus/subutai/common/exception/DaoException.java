@@ -1,8 +1,8 @@
-package org.safehaus.subutai.core.registry.impl;
+package org.safehaus.subutai.common.exception;
 
 
 /**
- * Exception thrown by TemplateDAO
+ * Exception thrown by DispatcherDAO
  */
 public class DaoException extends Exception
 {

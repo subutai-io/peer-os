@@ -70,7 +70,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField portTextField = new TextField( "Enter port" );
-        portTextField.setInputPrompt( ""+wizard.getConfig().getPort() );
+        portTextField.setInputPrompt( "" + wizard.getConfig().getPort() );
         portTextField.setRequired( true );
         portTextField.setValue( wizard.getConfig().getClusterName() );
         portTextField.addValueChangeListener( new Property.ValueChangeListener()
@@ -79,15 +79,15 @@ public class ConfigurationStep extends VerticalLayout
             public void valueChange( Property.ValueChangeEvent event )
             {
                 String value = event.getProperty().getValue().toString();
-                if( !StringUtils.isNumber(value)) {
-                    show("Please input numbers");
+                if ( !StringUtils.isNumber( value ) )
+                {
+                    show( "Please input numbers" );
                     return;
                 }
                 int port = Integer.valueOf( value );
                 wizard.getConfig().setPort( port );
             }
         } );
-
 
 
         final ComboBox nodesCountCombo =

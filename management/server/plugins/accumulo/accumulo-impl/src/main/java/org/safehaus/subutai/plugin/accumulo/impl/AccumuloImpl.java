@@ -1,17 +1,26 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.sql.DataSource;
+
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -22,25 +31,29 @@ import org.safehaus.subutai.plugin.accumulo.api.SetupType;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.AddPropertyOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.CheckNodeOperationHandler;
+import org.safehaus.subutai.plugin.accumulo.impl.handler.ConfigureEnvironmentClusterHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.RemovePropertyOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 
 public class AccumuloImpl implements Accumulo
 {
-
+    private static final Logger LOG = LoggerFactory.getLogger( AccumuloImpl.class.getName() );
     protected Commands commands;
     protected AgentManager agentManager;
     private CommandRunner commandRunner;
@@ -48,44 +61,33 @@ public class AccumuloImpl implements Accumulo
     private Hadoop hadoopManager;
     private Zookeeper zkManager;
     private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
     private ExecutorService executor;
-    private PluginDAO pluginDAO;
+    private PluginDao pluginDAO;
+    private DataSource dataSource;
 
 
-    public AccumuloImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager )
+    public AccumuloImpl( DataSource dataSource )
     {
-
-        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
-        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
-        Preconditions.checkNotNull( tracker, "Tracker is null" );
-        Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
-        Preconditions.checkNotNull( zkManager, "Zookeeper manager is null" );
-        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
-
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.tracker = tracker;
-        this.hadoopManager = hadoopManager;
-        this.zkManager = zkManager;
-        this.environmentManager = environmentManager;
-        this.pluginDAO = new PluginDAO( dbManager );
-        this.commands = new Commands( commandRunner );
-
-        commands = new Commands( commandRunner );
+        this.dataSource = dataSource;
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public EnvironmentManager getEnvironmentManager()
+    public ExecutorService getExecutor()
     {
-        return environmentManager;
+        return executor;
+    }
+
+
+    public void setExecutor( final ExecutorService executor )
+    {
+        this.executor = executor;
     }
 
 
@@ -95,9 +97,39 @@ public class AccumuloImpl implements Accumulo
     }
 
 
+    public void setCommandRunner( final CommandRunner commandRunner )
+    {
+        this.commandRunner = commandRunner;
+    }
+
+
     public AgentManager getAgentManager()
     {
         return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager )
+    {
+        this.agentManager = agentManager;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public Commands getCommands()
+    {
+        return commands;
     }
 
 
@@ -107,9 +139,21 @@ public class AccumuloImpl implements Accumulo
     }
 
 
+    public void setTracker( final Tracker tracker )
+    {
+        this.tracker = tracker;
+    }
+
+
     public Hadoop getHadoopManager()
     {
         return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager )
+    {
+        this.hadoopManager = hadoopManager;
     }
 
 
@@ -119,8 +163,36 @@ public class AccumuloImpl implements Accumulo
     }
 
 
+    public void setZkManager( final Zookeeper zkManager )
+    {
+        this.zkManager = zkManager;
+    }
+
+
+    public ContainerManager getContainerManager()
+    {
+        return containerManager;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager )
+    {
+        this.containerManager = containerManager;
+    }
+
+
     public void init()
     {
+        try
+        {
+            this.pluginDAO = new PluginDao( dataSource );
+        }
+        catch ( SQLException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        this.commands = new Commands( commandRunner );
+
         executor = Executors.newCachedThreadPool();
     }
 
@@ -128,12 +200,6 @@ public class AccumuloImpl implements Accumulo
     public void destroy()
     {
         executor.shutdown();
-    }
-
-
-    public Commands getCommands()
-    {
-        return commands;
     }
 
 
@@ -162,13 +228,14 @@ public class AccumuloImpl implements Accumulo
     }
 
 
+    @Override
     public List<AccumuloClusterConfig> getClusters()
     {
-
         return pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, AccumuloClusterConfig.class );
     }
 
 
+    @Override
     public AccumuloClusterConfig getCluster( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
@@ -295,6 +362,42 @@ public class AccumuloImpl implements Accumulo
 
         executor.execute( operationHandler );
 
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final AccumuloClusterConfig config )
+    {
+
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint
+                .setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
+
+        environmentBlueprint.setLinkHosts( true );
+        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+        environmentBlueprint.setExchangeSshKeys( true );
+
+        NodeGroup nodeGroup = new NodeGroup();
+        nodeGroup.setTemplateName( config.getTemplateName() );
+        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        nodeGroup.setNumberOfNodes( config.getAllNodes().size() );
+
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
+
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+
+        return environmentBuildTask;
+    }
+
+
+    public UUID configureEnvironmentCluster( final AccumuloClusterConfig config )
+    {
+        Preconditions.checkNotNull( config, "Configuration is null" );
+        AbstractOperationHandler operationHandler = new ConfigureEnvironmentClusterHandler( this, config );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 

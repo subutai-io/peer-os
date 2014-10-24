@@ -9,14 +9,14 @@ import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 
-public class SetupStartegyBase
+public class SetupStrategyBase
 {
     final SharkImpl manager;
     final SharkClusterConfig config;
     final TrackerOperation po;
 
 
-    public SetupStartegyBase( SharkImpl manager, SharkClusterConfig config, TrackerOperation po )
+    public SetupStrategyBase( SharkImpl manager, SharkClusterConfig config, TrackerOperation po )
     {
         this.manager = manager;
         this.config = config;
@@ -76,7 +76,7 @@ public class SetupStartegyBase
     {
         po.addLog( "Setting Master IP..." );
 
-        Command cmd = Commands.getSetMasterIPCommand( config.getNodes(), sparkMaster );
+        Command cmd = manager.getCommands().getSetMasterIPCommand( config.getNodes(), sparkMaster );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

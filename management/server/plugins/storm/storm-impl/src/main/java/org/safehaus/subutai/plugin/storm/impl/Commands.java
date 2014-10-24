@@ -1,10 +1,14 @@
 package org.safehaus.subutai.plugin.storm.impl;
 
 
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.plugin.storm.api.StormConfig;
+
+
 public class Commands
 {
 
-    public static final String PACKAGE_NAME = "ksks-storm";
+    public static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + StormConfig.PRODUCT_NAME.toLowerCase();
     private static final String EXEC_PROFILE = ". /etc/profile";
 
 
@@ -20,7 +24,7 @@ public class Commands
         switch ( type )
         {
             case LIST:
-                return "dpkg -l | grep '^ii' | grep ksks";
+                return "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH;
             case INSTALL:
             case PURGE:
                 sb = new StringBuilder( EXEC_PROFILE );

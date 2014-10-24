@@ -14,7 +14,7 @@ import org.safehaus.subutai.core.peer.api.ResourceHost;
  */
 public class ManagementHostImpl extends HostImpl implements ManagementHost
 {
-//    private static final String DEFAULT_MANAGEMENT_HOSTNAME = "management";
+    //    private static final String DEFAULT_MANAGEMENT_HOSTNAME = "management";
     private Set<ResourceHost> resourceHosts = new HashSet();
 
 

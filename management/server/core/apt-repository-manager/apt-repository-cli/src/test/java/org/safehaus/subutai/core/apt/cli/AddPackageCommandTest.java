@@ -95,6 +95,6 @@ public class AddPackageCommandTest
         AddPackageCommand addPackageCommand = new AddPackageCommand( aptRepositoryManager, mock( AgentManager.class ) );
         addPackageCommand.doExecute();
 
-        assertEquals(ERR_MSG, getSysOut());
+        assertEquals( ERR_MSG, getSysOut() );
     }
 }

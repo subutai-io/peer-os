@@ -39,9 +39,9 @@ public class SqoopComponent extends CustomComponent
         sheet = new TabSheet();
         sheet.setSizeFull();
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.getTab(0).setId("SqoopInstallTab");
+        sheet.getTab( 0 ).setId( "SqoopInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab(1).setId("SqoopManageTab");
+        sheet.getTab( 1 ).setId( "SqoopManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

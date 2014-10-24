@@ -10,7 +10,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "lucene", name = "list-clusters", description = "mydescription")
+@Command( scope = "lucene", name = "list-clusters", description = "mydescription" )
 public class ListClustersCommand extends OsgiCommandSupport
 {
 

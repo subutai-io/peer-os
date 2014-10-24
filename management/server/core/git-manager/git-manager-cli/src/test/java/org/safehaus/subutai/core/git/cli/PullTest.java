@@ -119,8 +119,7 @@ public class PullTest
     @Test
     public void shouldThrowException() throws GitException
     {
-        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
-               .pull( eq( agent ), anyString() );
+        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).pull( eq( agent ), anyString() );
         Pull pull = new Pull( gitManager, agentManager );
         pull.setHostname( HOSTNAME );
 
@@ -135,8 +134,7 @@ public class PullTest
     @Test
     public void shouldThrowException2() throws GitException
     {
-        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager )
-               .pull( eq( agent ), anyString(), anyString() );
+        Mockito.doThrow( new GitException( ERR_MSG ) ).when( gitManager ).pull( eq( agent ), anyString(), anyString() );
         Pull pull = new Pull( gitManager, agentManager );
         pull.setHostname( HOSTNAME );
         pull.setBranchName( BRANCH_NAME );

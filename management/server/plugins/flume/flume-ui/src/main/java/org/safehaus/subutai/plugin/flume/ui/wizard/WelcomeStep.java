@@ -39,7 +39,7 @@ public class WelcomeStep extends VerticalLayout
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start over-Hadoop installation" );
-        next.setId("FlumeStartOverHadoop");
+        next.setId( "FlumeStartOverHadoop" );
         next.addStyleName( "default" );
         grid.addComponent( next, 6, 4, 6, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
@@ -54,7 +54,7 @@ public class WelcomeStep extends VerticalLayout
         } );
 
         Button next2 = new Button( "Start with-Hadoop installation" );
-        next2.setId("FlumeStartWithHadoop");
+        next2.setId( "FlumeStartWithHadoop" );
         next2.setStyleName( "default" );
         next2.addClickListener( new Button.ClickListener()
         {

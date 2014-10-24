@@ -74,15 +74,15 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
 
         if ( environment.getContainers().size() < config.getNumberOfNodes() )
         {
-            throw new ClusterSetupException(
-                    String.format( "Environment has %d nodes but %d nodes are required", environment.getContainers().size(),
-                            config.getNumberOfNodes() ) );
+            throw new ClusterSetupException( String.format( "Environment has %d nodes but %d nodes are required",
+                    environment.getContainers().size(), config.getNumberOfNodes() ) );
         }
 
         Set<EnvironmentContainer> solrEnvironmentContainers = new HashSet<>();
         for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) )
+            if ( environmentContainer.getTemplate().getProducts()
+                                     .contains( Common.PACKAGE_PREFIX + SolrClusterConfig.PRODUCT_NAME ) )
             {
                 solrEnvironmentContainers.add( environmentContainer );
             }
@@ -91,10 +91,10 @@ public class SolrSetupStrategy implements ClusterSetupStrategy
         if ( solrEnvironmentContainers.size() < config.getNumberOfNodes() )
         {
             throw new ClusterSetupException(
-                    String.format( "Number of nodes with Solr installed is %d, but %d is required", solrEnvironmentContainers
+                    String.format( "Number of nodes with Solr installed is %d, but %d is required",
+                            solrEnvironmentContainers
 
-                            .size(),
-                            config.getNumberOfNodes() ) );
+                                    .size(), config.getNumberOfNodes() ) );
         }
 
         Set<Agent> solrAgents = new HashSet<>();

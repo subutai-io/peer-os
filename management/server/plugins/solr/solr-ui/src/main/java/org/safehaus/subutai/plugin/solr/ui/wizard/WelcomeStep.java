@@ -43,7 +43,7 @@ public class WelcomeStep extends VerticalLayout
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
         Button next = new Button( "Start" );
-        next.setId("SlrWelStart");
+        next.setId( "SlrWelStart" );
         next.addStyleName( "default" );
         next.setWidth( 100, Unit.PIXELS );
         grid.addComponent( next, 4, 4, 4, 4 );

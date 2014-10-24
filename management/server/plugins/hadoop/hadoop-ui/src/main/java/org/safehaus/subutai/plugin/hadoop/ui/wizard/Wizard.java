@@ -45,7 +45,8 @@ public class Wizard
     }
 
 
-    private void putForm() {
+    private void putForm()
+    {
         grid.removeAllComponents();
         Component component = null;
         switch ( step )
@@ -84,19 +85,22 @@ public class Wizard
     }
 
 
-    protected void next() {
+    protected void next()
+    {
         step++;
         putForm();
     }
 
 
-    protected void back() {
+    protected void back()
+    {
         step--;
         putForm();
     }
 
 
-    protected void init() {
+    protected void init()
+    {
         step = 1;
         hadoopClusterConfig = new HadoopClusterConfig();
         putForm();

@@ -66,6 +66,7 @@ public interface RestService
     @Produces(MediaType.APPLICATION_JSON)
     public Response invoke( @FormParam("commandType") String commandType, @FormParam("command") String command );
 
+
     @POST
     @Path("container/create")
     @Produces(MediaType.APPLICATION_JSON)
