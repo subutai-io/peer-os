@@ -14,7 +14,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -57,7 +57,7 @@ public class CheckServiceHandlerTest
 
         manager.setTracker( mock( Tracker.class ) );
         manager.setCommandRunner( mock( CommandRunner.class ) );
-        manager.setPluginDAO( mock( PluginDaoNew.class ) );
+        manager.setPluginDAO( mock( PluginDao.class ) );
         manager.setAgentManager( mock( AgentManager.class ) );
 
         doReturn( new TrackerOperationMock() ).when( manager.getTracker() )

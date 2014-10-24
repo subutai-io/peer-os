@@ -29,7 +29,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -82,7 +82,7 @@ public class HadoopImpl implements Hadoop
     private Commands commands;
 
 
-    private PluginDaoNew pluginDAO;
+    private PluginDao pluginDAO;
     private DataSource dataSource;
 
 
@@ -102,7 +102,7 @@ public class HadoopImpl implements Hadoop
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
@@ -162,7 +162,7 @@ public class HadoopImpl implements Hadoop
     }
 
 
-    public PluginDaoNew getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }

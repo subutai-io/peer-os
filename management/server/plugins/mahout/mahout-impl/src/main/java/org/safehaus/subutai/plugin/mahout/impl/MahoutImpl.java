@@ -30,7 +30,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
@@ -51,7 +51,7 @@ public class MahoutImpl implements Mahout
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( MahoutImpl.class.getName() );
-    private PluginDaoNew pluginDAO;
+    private PluginDao pluginDAO;
     private Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
@@ -70,13 +70,13 @@ public class MahoutImpl implements Mahout
     }
 
 
-    public PluginDaoNew getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDaoNew pluginDAO )
+    public void setPluginDAO( final PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }
@@ -188,7 +188,7 @@ public class MahoutImpl implements Mahout
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

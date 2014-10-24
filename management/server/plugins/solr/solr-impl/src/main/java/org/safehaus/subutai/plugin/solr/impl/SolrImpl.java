@@ -22,7 +22,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.handler.AddNodeOperationHandler;
@@ -51,7 +51,7 @@ public class SolrImpl implements Solr
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
     private ExecutorService executor;
-    private PluginDaoNew pluginDAO;
+    private PluginDao pluginDAO;
     private DataSource dataSource;
 
 
@@ -61,7 +61,7 @@ public class SolrImpl implements Solr
     }
 
 
-    public PluginDaoNew getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
@@ -71,7 +71,7 @@ public class SolrImpl implements Solr
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

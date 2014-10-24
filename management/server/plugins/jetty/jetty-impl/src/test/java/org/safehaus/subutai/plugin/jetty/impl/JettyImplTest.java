@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -40,7 +40,7 @@ public class JettyImplTest
 {
     private CommandRunner commandRunner = mock( CommandRunner.class );
     private ExecutorService executor = mock( ExecutorService.class );
-    private PluginDaoNew pluginDAO = mock( PluginDaoNew.class );
+    private PluginDao pluginDAO = mock( PluginDao.class );
     private Tracker tracker = new TrackerMock();
     private AgentManager agentManager = new AgentManagerMock();
     private ContainerManager containerManager = mock( ContainerManager.class );

@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Pig;
@@ -46,7 +46,7 @@ public class PigImpl implements Pig
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
     private Hadoop hadoopManager;
-    private PluginDaoNew pluginDao;
+    private PluginDao pluginDao;
     private DataSource dataSource;
 
 
@@ -96,7 +96,7 @@ public class PigImpl implements Pig
     {
         try
         {
-            this.pluginDao = new PluginDaoNew( dataSource );
+            this.pluginDao = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
@@ -138,7 +138,7 @@ public class PigImpl implements Pig
     }
 
 
-    public PluginDaoNew getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDao;
     }

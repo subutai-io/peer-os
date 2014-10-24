@@ -19,7 +19,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
@@ -45,7 +45,7 @@ public class FlumeImpl implements Flume
     private AgentManager agentManager;
     private Tracker tracker;
     private DbManager dbManager;
-    private PluginDaoNew pluginDao;
+    private PluginDao pluginDao;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
     private Hadoop hadoopManager;
@@ -108,7 +108,7 @@ public class FlumeImpl implements Flume
     }
 
 
-    public PluginDaoNew getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDao;
     }
@@ -160,7 +160,7 @@ public class FlumeImpl implements Flume
     {
         try
         {
-            this.pluginDao = new PluginDaoNew( dataSource );
+            this.pluginDao = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

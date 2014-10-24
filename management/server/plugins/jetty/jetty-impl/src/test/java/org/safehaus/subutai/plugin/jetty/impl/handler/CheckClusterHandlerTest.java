@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -41,7 +41,7 @@ public class CheckClusterHandlerTest
     {
         manager.setTracker( mock( Tracker.class ) );
         manager.setCommandRunner( mock( CommandRunner.class ) );
-        manager.setPluginDAO( mock( PluginDaoNew.class ) );
+        manager.setPluginDAO( mock( PluginDao.class ) );
         manager.setCommands( new Commands( manager.getCommandRunner() ) );
 
         doReturn( new TrackerOperationMock() ).when( manager.getTracker() )

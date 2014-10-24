@@ -13,7 +13,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public abstract class StormBase implements Storm
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
 
-    protected PluginDaoNew pluginDao;
+    protected PluginDao pluginDao;
     protected ExecutorService executor;
     protected DataSource dataSource;
 
@@ -41,7 +41,7 @@ public abstract class StormBase implements Storm
     {
         try
         {
-            this.pluginDao = new PluginDaoNew( dataSource );
+            this.pluginDao = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
@@ -142,13 +142,13 @@ public abstract class StormBase implements Storm
     }
 
 
-    public PluginDaoNew getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDao;
     }
 
 
-    public void setPluginDao( PluginDaoNew pluginDao )
+    public void setPluginDao( PluginDao pluginDao )
     {
         this.pluginDao = pluginDao;
     }

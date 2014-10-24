@@ -32,7 +32,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.api.NodeType;
 import org.safehaus.subutai.plugin.jetty.api.Jetty;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
@@ -64,7 +64,7 @@ public class JettyImpl implements Jetty
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
-    private PluginDaoNew pluginDAO;
+    private PluginDao pluginDAO;
     private DataSource dataSource;
 
 
@@ -182,13 +182,13 @@ public class JettyImpl implements Jetty
     }
 
 
-    public PluginDaoNew getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDaoNew pluginDAO )
+    public void setPluginDAO( final PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }
@@ -210,7 +210,7 @@ public class JettyImpl implements Jetty
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

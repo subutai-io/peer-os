@@ -11,7 +11,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 
 import static junit.framework.Assert.assertTrue;
@@ -36,7 +36,7 @@ public class CheckClusterHandlerTest
         when( cassandraMock.getTracker() ).thenReturn( new TrackerMock() );
         when( cassandraMock.getContainerManager() ).thenReturn( mock( ContainerManager.class ) );
         when( cassandraMock.getCluster( anyString() ) ).thenReturn( null );
-        when( cassandraMock.getPluginDAO() ).thenReturn( mock( PluginDaoNew.class ) );
+        when( cassandraMock.getPluginDAO() ).thenReturn( mock( PluginDao.class ) );
         when( cassandraMock.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), "Cassandra",
                 CassandraClusterConfig.class ) ).thenReturn( null );
     }

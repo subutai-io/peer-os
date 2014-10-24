@@ -22,7 +22,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
@@ -59,7 +59,7 @@ public class ZookeeperImpl implements Zookeeper
     private ExecutorService executor;
     private static final Logger LOG = LoggerFactory.getLogger( ZookeeperImpl.class.getName() );
 
-    private PluginDaoNew pluginDAO;
+    private PluginDao pluginDAO;
     private DataSource dataSource;
 
 
@@ -75,7 +75,7 @@ public class ZookeeperImpl implements Zookeeper
     }
 
 
-    public PluginDaoNew getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
@@ -169,7 +169,7 @@ public class ZookeeperImpl implements Zookeeper
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

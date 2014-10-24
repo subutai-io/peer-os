@@ -12,7 +12,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public abstract class PrestoBase
     EnvironmentManager environmentManager;
     ContainerManager containerManager;
     ExecutorService executor;
-    PluginDaoNew pluginDAO;
+    PluginDao pluginDAO;
     Commands commands;
     public DataSource dataSource;
 
@@ -38,7 +38,7 @@ public abstract class PrestoBase
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
@@ -140,13 +140,13 @@ public abstract class PrestoBase
     }
 
 
-    public PluginDaoNew getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( PluginDaoNew pluginDAO )
+    public void setPluginDAO( PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }

@@ -13,7 +13,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public abstract class SqoopBase implements Sqoop
     protected AgentManager agentManager;
     protected Tracker tracker;
     protected DbManager dbManager;
-    protected PluginDaoNew pluginDAO;
+    protected PluginDao pluginDAO;
     protected Hadoop hadoopManager;
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
@@ -42,7 +42,7 @@ public abstract class SqoopBase implements Sqoop
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
@@ -107,13 +107,13 @@ public abstract class SqoopBase implements Sqoop
     }
 
 
-    public PluginDaoNew getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDao( PluginDaoNew pluginDao )
+    public void setPluginDao( PluginDao pluginDao )
     {
         this.pluginDAO = pluginDao;
     }

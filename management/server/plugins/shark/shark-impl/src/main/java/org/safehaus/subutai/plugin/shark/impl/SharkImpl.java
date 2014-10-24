@@ -17,7 +17,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.SetupType;
@@ -46,7 +46,7 @@ public class SharkImpl implements Shark
     private Tracker tracker;
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
-    private PluginDaoNew pluginDAO;
+    private PluginDao pluginDAO;
     private DataSource dataSource;
     protected Commands commands;
 
@@ -87,7 +87,7 @@ public class SharkImpl implements Shark
     }
 
 
-    public PluginDaoNew getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDAO;
     }
@@ -97,7 +97,7 @@ public class SharkImpl implements Shark
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

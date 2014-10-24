@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
@@ -47,7 +47,7 @@ public class LuceneImpl implements Lucene
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
     private DataSource dataSource;
-    private PluginDaoNew pluginDao;
+    private PluginDao pluginDao;
 
 
     public LuceneImpl( DataSource dataSource )
@@ -86,7 +86,7 @@ public class LuceneImpl implements Lucene
     }
 
 
-    public PluginDaoNew getPluginDao()
+    public PluginDao getPluginDao()
     {
         return pluginDao;
     }
@@ -150,7 +150,7 @@ public class LuceneImpl implements Lucene
     {
         try
         {
-            this.pluginDao = new PluginDaoNew( dataSource );
+            this.pluginDao = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

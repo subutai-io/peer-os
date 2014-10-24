@@ -38,7 +38,7 @@ import org.safehaus.subutai.plugin.accumulo.impl.handler.RemovePropertyOperation
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.plugin.common.PluginDaoNew;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
@@ -63,7 +63,7 @@ public class AccumuloImpl implements Accumulo
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
     private ExecutorService executor;
-    private PluginDaoNew pluginDAO;
+    private PluginDao pluginDAO;
     private DataSource dataSource;
 
 
@@ -73,7 +73,7 @@ public class AccumuloImpl implements Accumulo
     }
 
 
-    public PluginDaoNew getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
@@ -185,7 +185,7 @@ public class AccumuloImpl implements Accumulo
     {
         try
         {
-            this.pluginDAO = new PluginDaoNew( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
