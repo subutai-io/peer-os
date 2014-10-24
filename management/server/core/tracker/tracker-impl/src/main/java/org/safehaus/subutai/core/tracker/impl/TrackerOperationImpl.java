@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
@@ -24,11 +24,11 @@ public class TrackerOperationImpl implements TrackerOperation
 {
 
     /**
-     * product operation id
+     * operation id
      */
     private final UUID id;
     /**
-     * product operation description
+     * operation description
      */
     private final String description;
     /**
@@ -37,21 +37,21 @@ public class TrackerOperationImpl implements TrackerOperation
     private final transient TrackerImpl tracker;
 
     /**
-     * log of product operation
+     * log of operation
      */
     private final StringBuilder log;
     /**
-     * Creation date of product operation
+     * Creation date of operation
      */
     private final Date createDate;
     /**
-     * Source of product operation
+     * Source of operation
      */
     private final String source;
     /**
-     * State of product operation
+     * State of operation
      */
-    private ProductOperationState state;
+    private OperationState state;
 
 
     public TrackerOperationImpl( String source, String description, TrackerImpl tracker )
@@ -64,7 +64,7 @@ public class TrackerOperationImpl implements TrackerOperation
         this.source = source;
         this.tracker = tracker;
         log = new StringBuilder();
-        state = ProductOperationState.RUNNING;
+        state = OperationState.RUNNING;
         id = UUIDUtil.generateTimeBasedUUID();
         createDate = new Date();
     }
@@ -94,7 +94,7 @@ public class TrackerOperationImpl implements TrackerOperation
     }
 
 
-    public ProductOperationState getState()
+    public OperationState getState()
     {
         return state;
     }
@@ -108,17 +108,17 @@ public class TrackerOperationImpl implements TrackerOperation
 
     public void addLogDone( String logString )
     {
-        addLog( logString, ProductOperationState.SUCCEEDED );
+        addLog( logString, OperationState.SUCCEEDED );
     }
 
 
     public void addLogFailed( String logString )
     {
-        addLog( logString, ProductOperationState.FAILED );
+        addLog( logString, OperationState.FAILED );
     }
 
 
-    private void addLog( String logString, ProductOperationState state )
+    private void addLog( String logString, OperationState state )
     {
         if ( !Strings.isNullOrEmpty( logString ) )
         {

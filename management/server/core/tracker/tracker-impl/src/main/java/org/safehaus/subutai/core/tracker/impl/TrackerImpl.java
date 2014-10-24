@@ -18,7 +18,7 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.DbUtil;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -259,7 +259,7 @@ public class TrackerImpl implements Tracker
                 //return if operation is completed
                 //or if time limit is reached
                 long ts = System.currentTimeMillis() - startedTs;
-                if ( po.getState() != ProductOperationState.RUNNING || ts > maxOperationDurationMs )
+                if ( po.getState() != OperationState.RUNNING || ts > maxOperationDurationMs )
                 {
                     return;
                 }

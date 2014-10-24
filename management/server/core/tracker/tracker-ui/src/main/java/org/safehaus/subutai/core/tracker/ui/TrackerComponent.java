@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
@@ -316,12 +316,12 @@ public class TrackerComponent extends CustomComponent
     {
         boolean sortNeeded = false;
         Embedded progressIcon;
-        if ( po.getState() == ProductOperationState.RUNNING )
+        if ( po.getState() == OperationState.RUNNING )
         {
             final String loadIconSource = "img/spinner.gif";
             progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
         }
-        else if ( po.getState() == ProductOperationState.FAILED )
+        else if ( po.getState() == OperationState.FAILED )
         {
             final String errorIconSource = "img/cancel.png";
             progressIcon = new Embedded( "", new ThemeResource( errorIconSource ) );
@@ -373,14 +373,14 @@ public class TrackerComponent extends CustomComponent
             if ( po != null )
             {
                 setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                if ( po.getState() != ProductOperationState.RUNNING )
+                if ( po.getState() != OperationState.RUNNING )
                 {
                     trackID = null;
                 }
             }
             else
             {
-                setOutput( "Product operation not found. Check logs" );
+                setOutput( "Operation not found. Check logs" );
             }
         }
     }

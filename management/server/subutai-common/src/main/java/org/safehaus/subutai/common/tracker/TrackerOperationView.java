@@ -49,5 +49,5 @@ public interface TrackerOperationView
      *
      * @return product operation state
      */
-    public ProductOperationState getState();
+    public OperationState getState();
 }

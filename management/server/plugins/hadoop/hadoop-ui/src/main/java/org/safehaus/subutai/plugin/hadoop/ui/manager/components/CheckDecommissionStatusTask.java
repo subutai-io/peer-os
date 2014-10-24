@@ -9,7 +9,7 @@ package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -55,7 +55,7 @@ public class CheckDecommissionStatusTask implements Runnable
             while ( true )
             {
                 TrackerOperationView prevPo = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-                if ( prevPo.getState() == ProductOperationState.RUNNING )
+                if ( prevPo.getState() == OperationState.RUNNING )
                 {
                     try
                     {
@@ -81,7 +81,7 @@ public class CheckDecommissionStatusTask implements Runnable
         while ( !Thread.interrupted() )
         {
             TrackerOperationView po = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-            if ( po != null && po.getState() != ProductOperationState.RUNNING )
+            if ( po != null && po.getState() != OperationState.RUNNING )
             {
                 if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
                 {
@@ -115,7 +115,7 @@ public class CheckDecommissionStatusTask implements Runnable
             while ( !Thread.interrupted() )
             {
                 TrackerOperationView po = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-                if ( po != null && po.getState() != ProductOperationState.RUNNING )
+                if ( po != null && po.getState() != OperationState.RUNNING )
                 {
                     operationLog = po.getLog();
                     break;

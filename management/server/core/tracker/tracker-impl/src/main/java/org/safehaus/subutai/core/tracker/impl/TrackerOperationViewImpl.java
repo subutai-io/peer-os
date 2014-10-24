@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 
@@ -23,30 +23,30 @@ public class TrackerOperationViewImpl implements TrackerOperationView
 {
 
     /**
-     * id of product operation
+     * id of operation
      */
     private final UUID id;
     /**
-     * description of product operation
+     * description of operation
      */
     private final String description;
     /**
-     * log of product operation
+     * log of operation
      */
     private final String log;
     /**
-     * state of product operation
+     * state of operation
      */
-    private final ProductOperationState state;
+    private final OperationState state;
     /**
-     * Creation date of product operation
+     * Creation date of operation
      */
     private final Date createDate;
 
 
     public TrackerOperationViewImpl( TrackerOperation po )
     {
-        Preconditions.checkNotNull( po, "Product operation is null" );
+        Preconditions.checkNotNull( po, "Operation is null" );
 
         id = po.getId();
         description = po.getDescription();
@@ -80,7 +80,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
     }
 
 
-    public ProductOperationState getState()
+    public OperationState getState()
     {
         return state;
     }
@@ -112,7 +112,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
     @Override
     public String toString()
     {
-        return "ProductOperationViewImpl{" +
+        return "TrackerOperationViewImpl{" +
                 "id=" + id +
                 ", description='" + description + '\'' +
                 ", log='" + log + '\'' +

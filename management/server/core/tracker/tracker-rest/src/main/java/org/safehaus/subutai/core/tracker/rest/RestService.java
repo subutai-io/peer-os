@@ -27,5 +27,5 @@ public interface RestService
     @GET
     @Path( "operations/sources" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getProductOperationSources();
+    public Response getTrackerOperationSources();
 }

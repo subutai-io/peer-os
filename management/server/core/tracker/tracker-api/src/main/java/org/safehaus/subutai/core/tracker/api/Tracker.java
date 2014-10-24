@@ -21,48 +21,48 @@ public interface Tracker
 {
 
     /**
-     * Get view of product operation by operation id
+     * Get view of operation by operation id
      *
-     * @param source - source of product operation, usually this is a module name
+     * @param source - source of operation, usually this is a module name
      * @param operationTrackId - id of operation
      *
-     * @return - product operation view
+     * @return - operation view
      */
     public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId );
 
     /**
-     * Creates product operation and save it to DB
+     * Creates operation and save it to DB
      *
-     * @param source - source of product operation, usually this is a module
+     * @param source - source of operation, usually this is a module
      * @param description - description of operation
      *
-     * @return - returns created product operation
+     * @return - returns created operation
      */
     public TrackerOperation createTrackerOperation( String source, String description );
 
     /**
-     * Returns list of product operations (views) filtering them by date interval
+     * Returns list of operations (views) filtering them by date interval
      *
-     * @param source - source of product operation, usually this is a module
+     * @param source - source of operation, usually this is a module
      * @param fromDate - beginning date of filter
      * @param toDate - ending date of filter
      * @param limit - limit of records to return
      *
-     * @return - list of product operation views
+     * @return - list of operation views
      */
     public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit );
 
     /**
-     * Returns list of all sources of product operations for which product operations exist in DB
+     * Returns list of all sources of operations for which operations exist in DB
      *
-     * @return list of product operation sources
+     * @return list of operation sources
      */
     public List<String> getTrackerOperationSources();
 
     /**
-     * Prints log of product operation to std out stream
+     * Prints log of operation to std out stream
      *
-     * @param source - source of product operation, usually this is a module name
+     * @param source - source of operation, usually this is a module name
      * @param operationTrackId - id of operation
      * @param maxOperationDurationMs - max operation duration timeout after which printing ceases
      */

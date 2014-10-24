@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.plugin.solr.impl.handler.mock.MockBuilder;
@@ -37,7 +37,7 @@ public class InstallOperationHandlerTest
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Malformed configuration" ) );
-        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
 
 
@@ -52,7 +52,7 @@ public class InstallOperationHandlerTest
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "test-cluster" ) );
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "already exists" ) );
-        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
 
 
@@ -64,7 +64,7 @@ public class InstallOperationHandlerTest
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Installation succeeded" ) );
-        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.SUCCEEDED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.SUCCEEDED );
     }
 
 
@@ -76,6 +76,6 @@ public class InstallOperationHandlerTest
         operationHandler.run();
 
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "Installation failed" ) );
-        assertEquals( operationHandler.getTrackerOperation().getState(), ProductOperationState.FAILED );
+        assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );
     }
 }

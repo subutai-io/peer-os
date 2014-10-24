@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.util.UUIDUtil;
 
 import static org.junit.Assert.assertEquals;
@@ -62,7 +62,7 @@ public class TrackerOperationImplTest
         TrackerOperationImpl poi = new TrackerOperationImpl( SOURCE, DESCRIPTION, mock( TrackerImpl.class ) );
 
         assertEquals( DESCRIPTION, poi.getDescription() );
-        assertEquals( ProductOperationState.RUNNING, poi.getState() );
+        assertEquals( OperationState.RUNNING, poi.getState() );
         assertNotNull( poi.createDate() );
         assertNotNull( poi.getId() );
     }
@@ -89,7 +89,7 @@ public class TrackerOperationImplTest
 
         assertEquals( DUMMY_LOG, poi.getLog() );
 
-        assertEquals( ProductOperationState.SUCCEEDED, poi.getState() );
+        assertEquals( OperationState.SUCCEEDED, poi.getState() );
     }
 
 
@@ -102,7 +102,7 @@ public class TrackerOperationImplTest
 
         assertEquals( DUMMY_LOG, poi.getLog() );
 
-        assertEquals( ProductOperationState.FAILED, poi.getState() );
+        assertEquals( OperationState.FAILED, poi.getState() );
     }
 
 
@@ -158,7 +158,7 @@ public class TrackerOperationImplTest
         TrackerOperationImpl poi = mock( TrackerOperationImpl.class );
         when( poi.getId() ).thenReturn( ID );
         when( poi.getDescription() ).thenReturn( DESCRIPTION );
-        when( poi.getState() ).thenReturn( ProductOperationState.RUNNING );
+        when( poi.getState() ).thenReturn( OperationState.RUNNING );
         when( poi.getLog() ).thenReturn( DUMMY_LOG );
         when( poi.createDate() ).thenReturn( new Date() );
 

@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeType;
@@ -53,7 +53,7 @@ public class CheckTask implements Runnable
             while ( true )
             {
                 TrackerOperationView prevPo = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-                if ( prevPo.getState() == ProductOperationState.RUNNING )
+                if ( prevPo.getState() == OperationState.RUNNING )
                 {
                     try
                     {
@@ -102,7 +102,7 @@ public class CheckTask implements Runnable
                 TrackerOperationView po = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
                 if ( po != null )
                 {
-                    if ( po.getState() != ProductOperationState.RUNNING )
+                    if ( po.getState() != OperationState.RUNNING )
                     {
                         if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
                         {

@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -495,7 +495,7 @@ public class Manager
                     public void run()
                     {
                         TrackerOperationView po = null;
-                        while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                        while ( po == null || po.getState() == OperationState.RUNNING )
                         {
                             po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
                         }
@@ -524,7 +524,7 @@ public class Manager
                     public void run()
                     {
                         TrackerOperationView po = null;
-                        while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                        while ( po == null || po.getState() == OperationState.RUNNING )
                         {
                             po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackID );
                         }
@@ -553,12 +553,12 @@ public class Manager
                     public void run()
                     {
                         TrackerOperationView po = null;
-                        while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                        while ( po == null || po.getState() == OperationState.RUNNING )
                         {
                             po = tracker.getTrackerOperation( HiveConfig.PRODUCT_KEY, trackId );
                         }
                         PROGRESS_ICON.setVisible( false );
-                        boolean running = po.getState() == ProductOperationState.SUCCEEDED;
+                        boolean running = po.getState() == OperationState.SUCCEEDED;
                         getButton( CHECK_BUTTON_CAPTION, buttons ).setEnabled( true );
                         getButton( START_BUTTON_CAPTION, buttons ).setEnabled( !running );
                         getButton( STOP_BUTTON_CAPTION, buttons ).setEnabled( running );
