@@ -10,7 +10,7 @@ import org.safehaus.subutai.core.monitor.api.MonitorException;
 /**
  * Interface for monitor
  */
-public interface Monitor extends MetricListener
+public interface Monitor
 {
     /**
      * Returns current metrics of containers belonging to the given environment
@@ -54,9 +54,18 @@ public interface Monitor extends MetricListener
     public void stopMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
 
     /**
-     * This method is triggered by alert indicating that some container hosted on the local peer is under stress.
+     * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
+     * stress.
      *
      * @param alertBody - body of alert in JSON
      */
     public void alertThresholdExcess( String alertBody ) throws MonitorException;
+
+    /**
+     * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
+     * belonging to this peer
+     *
+     * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
+     */
+    public void alertThresholdExcess( ContainerHostMetric metric ) throws MonitorException;
 }
