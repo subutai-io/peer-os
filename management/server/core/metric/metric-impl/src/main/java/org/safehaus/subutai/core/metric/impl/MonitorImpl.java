@@ -235,7 +235,7 @@ public class MonitorImpl implements Monitor
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
     @Override
-    public void alertThresholdExcess( final ContainerHostMetric metric )
+    public void alertThresholdExcess( final ContainerHostMetric metric ) throws MonitorException
     {
         try
         {
@@ -251,6 +251,7 @@ public class MonitorImpl implements Monitor
         catch ( DaoException e )
         {
             LOG.error( "Error in alertThresholdExcess", e );
+            throw new MonitorException( e );
         }
     }
 
@@ -266,14 +267,6 @@ public class MonitorImpl implements Monitor
                 return;
             }
         }
-    }
-
-
-    @Override
-    public String getSubscriberId()
-    {
-        //since this module is not a subscriber to itself then no-op
-        return null;
     }
 
 
