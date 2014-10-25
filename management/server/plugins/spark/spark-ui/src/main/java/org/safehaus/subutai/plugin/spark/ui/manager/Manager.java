@@ -568,7 +568,7 @@ public class Manager
                         ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
                 if ( availableOperationsLayout != null )
                 {
-                    Button checkBtn = getButton( availableOperationsLayout );
+                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION);
                     if ( checkBtn != null )
                     {
                         checkBtn.click();
