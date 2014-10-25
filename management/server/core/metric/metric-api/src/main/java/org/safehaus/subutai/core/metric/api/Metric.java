@@ -1,9 +1,6 @@
 package org.safehaus.subutai.core.metric.api;
 
 
-import com.google.common.base.Objects;
-
-
 /**
  * Interface for metrics
  *
@@ -13,7 +10,7 @@ import com.google.common.base.Objects;
 public abstract class Metric
 {
 
-    protected String hostname;
+    protected String host;
     protected Double availableRam;
     protected Double usedRam;
     protected Double totalRam;
@@ -23,9 +20,9 @@ public abstract class Metric
     protected Double cpuLoad5;
 
 
-    public String getHostname()
+    public String getHost()
     {
-        return hostname;
+        return host;
     }
 
 
@@ -68,14 +65,5 @@ public abstract class Metric
     public Double getCpuLoad5()
     {
         return cpuLoad5;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return Objects.toStringHelper( this ).add( "hostname", hostname ).add( "availableRam", availableRam )
-                      .add( "usedRam", usedRam ).add( "totalRam", totalRam ).add( "availableDisk", availableDisk )
-                      .add( "usedDisk", usedDisk ).add( "totalDisk", totalDisk ).add( "cpuLoad5", cpuLoad5 ).toString();
     }
 }

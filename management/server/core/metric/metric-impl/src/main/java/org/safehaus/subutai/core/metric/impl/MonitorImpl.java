@@ -205,7 +205,7 @@ public class MonitorImpl implements Monitor
                     JsonUtil.fromJson( alertMetric, ContainerHostMetricImpl.class );
             //find associated container host
             ContainerHost containerHost =
-                    peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHostname() );
+                    peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
             //set metric's environment id for future reference on the receiving end
             containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
 
