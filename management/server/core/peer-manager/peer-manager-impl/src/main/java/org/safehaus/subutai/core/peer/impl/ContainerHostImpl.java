@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Host;
 
 
 /**
@@ -135,5 +136,12 @@ public class ContainerHostImpl extends HostImpl implements ContainerHost
     public void setOwnerPeerId( final UUID ownerPeerId )
     {
         this.ownerPeerId = ownerPeerId;
+    }
+
+
+    @Override
+    public boolean isConnected( Host host )
+    {
+        throw new UnsupportedOperationException( "Container host has no child host." );
     }
 }

@@ -97,7 +97,7 @@ public class LocalPeerImpl extends Peer implements LocalPeer
             for ( Agent agent : agents )
             {
                 ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-                ContainerHostImpl containerHost = new ContainerHostImpl(agent);
+                ContainerHostImpl containerHost = new ContainerHostImpl( agent );
                 containerHost.setParentAgent( resourceHost.getAgent() );
                 containerHost.setOwnerPeerId( ownerPeerId );
                 containerHost.setTemplateName( templateName );
@@ -245,12 +245,12 @@ public class LocalPeerImpl extends Peer implements LocalPeer
     @Override
     public boolean isConnected( final Host host ) throws PeerException
     {
-        Host result = findHostByName( host.getHostname() );
+        Host result = findHostByName( host.getParentHostname() );
         if ( result == null )
         {
-            throw new PeerException( "Host not found." );
+            throw new PeerException( "Parent Host not found." );
         }
-        return result.isConnected();
+        return result.isConnected( host );
     }
 
 
