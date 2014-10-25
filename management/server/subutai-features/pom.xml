@@ -215,11 +215,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-manager-impl</artifactId>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-manager-ui</artifactId>
     </dependency>
-
+-->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- lxc-quota-manager -->
     <dependency>
