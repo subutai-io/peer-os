@@ -41,8 +41,6 @@ function exitIfNoCommits {
     echo "No change is made on debian package"
     exit 0
   fi
-  echo "Exiting for test purposes"
-  exit 1
 }
 
 
