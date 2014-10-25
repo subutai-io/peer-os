@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <groupId>org.safehaus.subutai</groupId>
     <artifactId>metric-parent</artifactId>
+    <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>metric-api</artifactId>
+  <artifactId>metric-rest</artifactId>
+  <name>Subutai Metric REST</name>
+  <description>Subutai Metric REST</description>
   <packaging>bundle</packaging>
-  <name>Subutai Metric API</name>
 
   <dependencies>
     <dependency>
@@ -21,7 +21,14 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>peer-manager-api</artifactId>
+      <artifactId>metric-api</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>metric-impl</artifactId>
+      <version>2.0.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -31,7 +38,16 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -45,7 +61,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.metric.api</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.metric.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
@@ -54,5 +70,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

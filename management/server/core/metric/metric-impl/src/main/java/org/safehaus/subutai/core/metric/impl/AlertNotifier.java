@@ -6,20 +6,25 @@ import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Notifies listener on alert
  */
 public class AlertNotifier implements Runnable
 {
-    protected static final Logger LOG = LoggerFactory.getLogger( AlertNotifier.class.getName() );
+    protected Logger LOG = LoggerFactory.getLogger( AlertNotifier.class.getName() );
 
-    private final ContainerHostMetric metric;
-    private final MetricListener listener;
+    protected ContainerHostMetric metric;
+    protected MetricListener listener;
 
 
     public AlertNotifier( final ContainerHostMetric metric, final MetricListener listener )
     {
+        Preconditions.checkNotNull( metric, "Metric is null" );
+        Preconditions.checkNotNull( listener, "Listener is null" );
+
         this.metric = metric;
         this.listener = listener;
     }
