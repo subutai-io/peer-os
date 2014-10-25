@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;

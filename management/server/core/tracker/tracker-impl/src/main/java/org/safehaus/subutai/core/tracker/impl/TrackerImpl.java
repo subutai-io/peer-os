@@ -87,7 +87,7 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            ResultSet rs = dbUtil.select( "select info from product_operation where source = ? and id = ?",
+            ResultSet rs = dbUtil.select( "select info from tracker_operation where source = ? and id = ?",
                     source.toLowerCase(), operationTrackId );
 
             return createTrackerOperation( rs );

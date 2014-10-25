@@ -4,11 +4,9 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 
@@ -33,7 +31,7 @@ class CustomPlacementStrategy extends LxcPlacementStrategy
     }
 
 
-    public static Map<Agent, Set<Agent>> createNodes( LxcManager lxcManager, int nodesCount ) throws LxcCreateException
+    /*public static Map<Agent, Set<Agent>> createNodes( LxcManager lxcManager, int nodesCount ) throws LxcCreateException
     {
         Map<String, Map<Agent, Set<Agent>>> map =
                 lxcManager.createLxcsByStrategy( new CustomPlacementStrategy( nodesCount ) );
@@ -56,7 +54,7 @@ class CustomPlacementStrategy extends LxcPlacementStrategy
             }
         }
         return res;
-    }
+    }*/
 
 
     @Override

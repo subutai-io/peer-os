@@ -30,7 +30,7 @@ import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
@@ -571,7 +571,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         for ( Agent a : agents )
         {
             group.setInstanceId( a.getUuid() );
-            dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), GSON.toJson( group ) );
+//            dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), GSON.toJson( group ) );
         }
     }
 }

@@ -8,7 +8,6 @@ import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckServiceHandler;
@@ -29,7 +28,7 @@ public class CheckServiceHandlerTest
 
 
     @Before
-    public void setup() throws DBException
+    public void setup()
     {
         cassandraMock = mock( CassandraImpl.class );
         when( cassandraMock.getAgentManager() ).thenReturn( mock( AgentManager.class ) );

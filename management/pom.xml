@@ -219,24 +219,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- db-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>db-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>db-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>db-manager-source</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- environment-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -792,11 +774,6 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- db-manager -->
-      <dependency>
-        <groupId>com.datastax.cassandra</groupId>
-        <artifactId>cassandra-driver-core</artifactId>
-        <version>2.1.0</version>
-      </dependency>
       <dependency>
         <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-core</artifactId>

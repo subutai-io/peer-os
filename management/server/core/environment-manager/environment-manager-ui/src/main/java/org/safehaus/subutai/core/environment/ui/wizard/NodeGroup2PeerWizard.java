@@ -30,7 +30,7 @@ public class NodeGroup2PeerWizard extends Window
 
     private int step = 0;
     private Table peersTable;
-    private Table containerToPeerTable;
+    private Table ngTopgTable;
     private EnvironmentManagerPortalModule managerUI;
     private Map<Object, NodeGroup> nodeGroupMap;
     private EnvironmentBlueprint blueprint;
@@ -155,14 +155,14 @@ public class NodeGroup2PeerWizard extends Window
         VerticalLayout vl = new VerticalLayout();
         vl.setMargin( true );
 
-        containerToPeerTable = new Table();
-        containerToPeerTable.addContainerProperty( "Node Group", String.class, null );
-        containerToPeerTable.addContainerProperty( "Put", ComboBox.class, null );
-        containerToPeerTable.setPageLength( 10 );
-        containerToPeerTable.setSelectable( false );
-        containerToPeerTable.setEnabled( true );
-        containerToPeerTable.setImmediate( true );
-        containerToPeerTable.setSizeFull();
+        ngTopgTable = new Table();
+        ngTopgTable.addContainerProperty( "Node Group", String.class, null );
+        ngTopgTable.addContainerProperty( "Put", ComboBox.class, null );
+        ngTopgTable.setPageLength( 10 );
+        ngTopgTable.setSelectable( false );
+        ngTopgTable.setEnabled( true );
+        ngTopgTable.setImmediate( true );
+        ngTopgTable.setSizeFull();
         nodeGroupMap = new HashMap<>();
         for ( NodeGroup ng : blueprint.getNodeGroups() )
         {
@@ -175,7 +175,7 @@ public class NodeGroup2PeerWizard extends Window
             comboBox.setNullSelectionAllowed( false );
             comboBox.setTextInputAllowed( false );
             comboBox.setItemCaptionPropertyId( "name" );
-            Object itemId = containerToPeerTable.addItem( new Object[] {
+            Object itemId = ngTopgTable.addItem( new Object[] {
                     ng.getName(), comboBox
             }, null );
             nodeGroupMap.put( itemId, ng );
@@ -188,7 +188,7 @@ public class NodeGroup2PeerWizard extends Window
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
                 Map<Object, Peer> topology = topologySelection();
-                if ( !topology.isEmpty() || containerToPeerTable.getItemIds().size() != topology.size() )
+                if ( !topology.isEmpty() || ngTopgTable.getItemIds().size() != topology.size() )
                 {
                     Map<Object, NodeGroup> map = getNodeGroupMap();
                     managerUI.getEnvironmentManager()
@@ -203,7 +203,7 @@ public class NodeGroup2PeerWizard extends Window
         } );
 
 
-        vl.addComponent( containerToPeerTable );
+        vl.addComponent( ngTopgTable );
         vl.addComponent( nextButton );
 
         return vl;
@@ -231,9 +231,9 @@ public class NodeGroup2PeerWizard extends Window
     }
 
 
-    public Table getContainerToPeerTable()
+    public Table getNgTopgTable()
     {
-        return containerToPeerTable;
+        return ngTopgTable;
     }
 
 
@@ -252,10 +252,10 @@ public class NodeGroup2PeerWizard extends Window
     public Map<Object, Peer> topologySelection()
     {
         Map<Object, Peer> topology = new HashMap<>();
-        for ( Object itemId : getContainerToPeerTable().getItemIds() )
+        for ( Object itemId : getNgTopgTable().getItemIds() )
         {
             ComboBox selection =
-                    ( ComboBox ) getContainerToPeerTable().getItem( itemId ).getItemProperty( "Put" ).getValue();
+                    ( ComboBox ) getNgTopgTable().getItem( itemId ).getItemProperty( "Put" ).getValue();
             Peer peer = ( Peer ) selection.getValue();
 
             topology.put( itemId, peer );

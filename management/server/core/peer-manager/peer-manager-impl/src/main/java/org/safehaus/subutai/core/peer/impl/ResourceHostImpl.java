@@ -10,9 +10,11 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandException;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -28,6 +30,12 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
     private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
     Set<ContainerHost> containersHosts = new HashSet();
+
+
+    protected ResourceHostImpl( final Agent agent )
+    {
+        super( agent );
+    }
 
 
     public void addContainerHost( ContainerHost host )
@@ -64,7 +72,7 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", container.getHostname() ) )
                         .withTimeout( 180 );
-        Command command = execute( requestBuilder );
+        execute( requestBuilder );
 
         return ContainerState.RUNNING.equals( getState( container ) );
     }
@@ -75,9 +83,9 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", container.getHostname() ) )
                         .withTimeout( 30 );
-        Command command = execute( requestBuilder );
+        CommandResult result = execute( requestBuilder );
 
-        String stdOut = getStdOut( command );
+        String stdOut = result.getStdOut();
 
         Matcher m = LXC_STATE_PATTERN.matcher( stdOut );
         if ( m.find() )
@@ -97,12 +105,12 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
         RequestBuilder requestBuilder =
                 new RequestBuilder( "free -m | grep buffers/cache ; df /lxc-data | grep /lxc-data ; uptime ; nproc" )
                         .withTimeout( 30 );
-        Command getMetricsCommand = execute( requestBuilder );
+        CommandResult result = execute( requestBuilder );
 
         ServerMetric serverMetric = null;
-        if ( getMetricsCommand.hasCompleted() )
+        if ( result.hasCompleted() )
         {
-            String[] metrics = getStdOut( getMetricsCommand ).split( "\n" );
+            String[] metrics = result.getStdOut().split( "\n" );
             serverMetric = gatherMetrics( metrics );
             serverMetric.setAverageMetrics( gatherAvgMetrics() );
         }
@@ -255,7 +263,7 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
         RequestBuilder requestBuilder =
                 new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", container.getHostname() ) )
                         .withTimeout( 180 );
-        Command command = execute( requestBuilder );
+        execute( requestBuilder );
 
         return ContainerState.STOPPED.equals( getState( container ) );
     }

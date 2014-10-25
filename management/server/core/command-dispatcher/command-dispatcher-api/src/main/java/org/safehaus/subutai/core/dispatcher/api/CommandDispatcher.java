@@ -6,7 +6,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 
 /**

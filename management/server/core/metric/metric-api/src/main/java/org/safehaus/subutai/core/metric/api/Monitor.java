@@ -4,13 +4,12 @@ package org.safehaus.subutai.core.metric.api;
 import java.util.Set;
 
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.monitor.api.MonitorException;
 
 
 /**
  * Interface for monitor
  */
-public interface Monitor extends MetricListener
+public interface Monitor
 {
     /**
      * Returns current metrics of containers belonging to the given environment
@@ -54,9 +53,10 @@ public interface Monitor extends MetricListener
     public void stopMonitoring( MetricListener metricListener, Environment environment ) throws MonitorException;
 
     /**
-     * This method is triggered by alert indicating that some container hosted on the local peer is under stress.
+     * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
+     * stress.
      *
-     * @param alertBody - body of alert in JSON
+     * @param alertMetric - body of alert in JSON
      */
-    public void alertThresholdExcess( String alertBody ) throws MonitorException;
+    public void alertThresholdExcess( String alertMetric ) throws MonitorException;
 }

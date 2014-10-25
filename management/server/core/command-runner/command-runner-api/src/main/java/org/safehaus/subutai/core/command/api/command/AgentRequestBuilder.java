@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 import com.google.common.base.Preconditions;
 

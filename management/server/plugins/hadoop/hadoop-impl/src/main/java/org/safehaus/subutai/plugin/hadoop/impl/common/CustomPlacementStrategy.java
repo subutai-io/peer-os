@@ -2,13 +2,10 @@ package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 
@@ -35,7 +32,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy
     }
 
 
-    public static Map<String, Set<Agent>> getNodes( LxcManager lxcManager, int masterNodes, int slaveNodes )
+    /*public static Map<String, Set<Agent>> getNodes( LxcManager lxcManager, int masterNodes, int slaveNodes )
             throws LxcCreateException
     {
 
@@ -69,7 +66,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy
             }
         }
         return res;
-    }
+    }*/
 
 
     @Override

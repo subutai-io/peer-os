@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -37,7 +37,6 @@ public class LocalPeerImpl extends Peer implements LocalPeer
     private PeerManager peerManager;
     private ContainerManager containerManager;
     private ConcurrentMap<String, AtomicInteger> sequences = new ConcurrentHashMap<>();
-    ;
 
 
     public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager )
@@ -81,9 +80,8 @@ public class LocalPeerImpl extends Peer implements LocalPeer
             for ( Agent agent : agents )
             {
                 ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
-                ContainerHostImpl containerHost = new ContainerHostImpl();
+                ContainerHostImpl containerHost = new ContainerHostImpl(agent);
                 containerHost.setParentAgent( resourceHost.getAgent() );
-                containerHost.setAgent( agent );
                 containerHost.setOwnerPeerId( ownerPeerId );
                 containerHost.setTemplateName( templateName );
                 resourceHost.addContainerHost( containerHost );

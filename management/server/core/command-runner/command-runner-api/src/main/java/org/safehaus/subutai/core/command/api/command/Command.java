@@ -9,6 +9,9 @@ package org.safehaus.subutai.core.command.api.command;
 import java.util.Map;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.CommandStatus;
+
 
 /**
  * Command to execute on agent(s)

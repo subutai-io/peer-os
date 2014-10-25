@@ -4,10 +4,11 @@ package org.safehaus.subutai.core.peer.api;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandException;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.CommandCallback;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 
 /**
@@ -16,8 +17,6 @@ import org.safehaus.subutai.core.command.api.command.RequestBuilder;
 public interface Host extends Serializable
 {
     public Agent getAgent();
-
-    public void setAgent( Agent agent );
 
     public Agent getParentAgent();
 
@@ -31,7 +30,14 @@ public interface Host extends Serializable
 
     public String getHostname();
 
-    public Command execute( RequestBuilder requestBuilder ) throws CommandException;
+    public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException;
+
+    public CommandResult execute( RequestBuilder requestBuilder, CommandCallback commandCallback )
+            throws CommandException;
+
+    public void executeAsync( RequestBuilder requestBuilder, CommandCallback commandCallback ) throws CommandException;
+
+    public void executeAsync( RequestBuilder requestBuilder ) throws CommandException;
 
     public boolean isConnected() throws PeerException;
 
