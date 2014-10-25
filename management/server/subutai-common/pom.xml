@@ -67,11 +67,10 @@
       <artifactId>com.springsource.javax.sql.rowset</artifactId>
       <version>1.0.1</version>
     </dependency>
-    <!--dependency>
-        <groupId>javax.sql</groupId>
-        <artifactId>rowset</artifactId>
-        <version>1.0.1</version>
-    </dependency!-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.h2database</groupId>

@@ -21,6 +21,7 @@ import com.google.common.base.Strings;
  */
 public class MonitorDao
 {
+    private static final String INVALID_ENV_ID = "Invalid environment id";
     protected DbUtil dbUtil;
 
 
@@ -53,7 +54,7 @@ public class MonitorDao
     public void addSubscription( UUID environmentId, String subscriberId ) throws DaoException
     {
 
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
         try
@@ -71,7 +72,7 @@ public class MonitorDao
     public void removeSubscription( UUID environmentId, String subscriberId ) throws DaoException
     {
 
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
         try
@@ -88,7 +89,7 @@ public class MonitorDao
 
     public Set<String> getEnvironmentSubscribersIds( UUID environmentId ) throws DaoException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions.checkNotNull( environmentId, INVALID_ENV_ID );
         Set<String> subscribersIds = new HashSet<>();
         try
         {

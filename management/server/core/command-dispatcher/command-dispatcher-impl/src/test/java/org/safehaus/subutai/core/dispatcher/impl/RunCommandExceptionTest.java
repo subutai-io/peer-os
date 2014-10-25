@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.dispatcher.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
+import org.safehaus.subutai.common.exception.RunCommandException;
 
 
 /**
