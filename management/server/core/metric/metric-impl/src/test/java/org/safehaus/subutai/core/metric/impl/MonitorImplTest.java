@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.safehaus.subutai.common.exception.DaoException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.safehaus.subutai.core.metric.api.MonitorException;
@@ -24,6 +25,8 @@ import org.safehaus.subutai.core.peer.api.LocalPeer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Sets;
 
@@ -65,6 +68,8 @@ public class MonitorImplTest
     MonitorImplExt monitor;
     @Mock
     ExecutorService notificationService;
+    @Mock
+    Environment environment;
 
 
     static class MonitorImplExt extends MonitorImpl
@@ -103,6 +108,7 @@ public class MonitorImplTest
         monitor.setNotificationExecutor( notificationService );
         when( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ) )
                 .thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
+        when( environment.getId() ).thenReturn( ENVIRONMENT_ID );
     }
 
 
@@ -238,5 +244,19 @@ public class MonitorImplTest
         when( localPeer.getContainerHostByName( HOST ) ).thenThrow( new PeerException( "" ) );
 
         monitor.alertThresholdExcess( METRIC_JSON );
+    }
+
+
+    @Test
+    public void testStopMonitoring() throws Exception
+    {
+
+        String longSubscriberId = StringUtils.repeat( "s", 101 );
+        String subscriberId = StringUtils.repeat( "s", 100 );
+        when( metricListener.getSubscriberId() ).thenReturn( longSubscriberId );
+
+        monitor.stopMonitoring( metricListener, environment );
+
+        verify( monitorDao ).removeSubscription( ENVIRONMENT_ID, subscriberId );
     }
 }
