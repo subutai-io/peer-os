@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
@@ -24,6 +25,8 @@ import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
+import org.safehaus.subutai.core.registry.api.RegistryException;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -36,14 +39,17 @@ public class LocalPeerImpl extends Peer implements LocalPeer
     private static final int MAX_LXC_NAME = 15;
     private PeerManager peerManager;
     private ContainerManager containerManager;
+    private TemplateRegistry templateRegistry;
     private ConcurrentMap<String, AtomicInteger> sequences = new ConcurrentHashMap<>();
     ;
 
 
-    public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager )
+    public LocalPeerImpl( PeerManager peerManager, ContainerManager containerManager,
+                          TemplateRegistry templateRegistry )
     {
         this.peerManager = peerManager;
         this.containerManager = containerManager;
+        this.templateRegistry = templateRegistry;
     }
 
     //
@@ -71,13 +77,24 @@ public class LocalPeerImpl extends Peer implements LocalPeer
 
     @Override
     public Set<ContainerHost> createContainers( final UUID ownerPeerId, final UUID environmentId,
-                                                final String templateName, final int quantity, final String strategyId,
-                                                final List<Criteria> criteria ) throws ContainerCreateException
+                                                final List<Template> templates, final int quantity,
+                                                final String strategyId, final List<Criteria> criteria )
+            throws ContainerCreateException
     {
-        Set<Agent> agents = containerManager.clone( environmentId, templateName, quantity, strategyId, criteria );
         Set<ContainerHost> result = new HashSet<>();
         try
         {
+            for ( Template t : templates )
+            {
+                if ( t.isRemote() )
+                {
+                    tryToRegister( t );
+                }
+            }
+            String templateName = templates.get( templates.size() - 1 ).getTemplateName();
+            Set<Agent> agents = containerManager.clone( environmentId, templateName, quantity, strategyId, criteria );
+
+
             for ( Agent agent : agents )
             {
                 ResourceHost resourceHost = getResourceHostByName( agent.getParentHostName() );
@@ -90,11 +107,20 @@ public class LocalPeerImpl extends Peer implements LocalPeer
                 result.add( containerHost );
             }
         }
-        catch ( PeerException e )
+        catch ( PeerException | RegistryException e )
         {
             throw new ContainerCreateException( e.toString() );
         }
         return result;
+    }
+
+
+    private void tryToRegister( final Template template ) throws RegistryException
+    {
+        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
+        {
+            templateRegistry.registerTemplate( template );
+        }
     }
 
 

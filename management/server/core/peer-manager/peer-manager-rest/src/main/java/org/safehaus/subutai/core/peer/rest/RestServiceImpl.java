@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
@@ -31,6 +32,7 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -283,7 +285,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createContainers( final String ownerPeerId, final String environmentId, final String templateName,
+    public Response createContainers( final String ownerPeerId, final String environmentId, final Template templates,
                                       final int quantity, final String strategyId, final String criteria )
     {
 
@@ -293,8 +295,8 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             Set<ContainerHost> result = localPeer
-                    .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ), templateName,
-                            quantity, strategyId, criteriaList );
+                    .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
+                            Lists.newArrayList( templates ), quantity, strategyId, criteriaList );
             return Response.ok( JsonUtil.toJson( result ) ).build();
         }
         catch ( ContainerCreateException e )

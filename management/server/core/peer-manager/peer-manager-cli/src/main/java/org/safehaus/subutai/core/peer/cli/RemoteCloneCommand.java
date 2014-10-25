@@ -1,13 +1,16 @@
 package org.safehaus.subutai.core.peer.cli;
 
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerInterface;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.core.peer.api.RemotePeer;
+import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -19,11 +22,18 @@ public class RemoteCloneCommand extends OsgiCommandSupport
 {
 
     private PeerManager peerManager;
+    private TemplateRegistry templateRegistry;
 
 
     public PeerManager getPeerManager()
     {
         return peerManager;
+    }
+
+
+    public void setTemplateRegistry( final TemplateRegistry templateRegistry )
+    {
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -62,9 +72,11 @@ public class RemoteCloneCommand extends OsgiCommandSupport
         }
 
         UUID environmentId = UUID.fromString( envId );
+        Template template = templateRegistry.getTemplate( templateName );
+        List<Template> templates = templateRegistry.getParentTemplates( templateName );
+        templates.add( template );
         Set<ContainerHost> containers =
-                peer.createContainers( peerManager.getSiteId(), environmentId, templateName, quantity, strategyId,
-                        null );
+                peer.createContainers( peerManager.getSiteId(), environmentId, templates, quantity, strategyId, null );
 
         System.out.println(
                 String.format( "Containers successfully created.\nList of new %d containers:\n", containers.size() ) );

@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
@@ -76,7 +77,7 @@ public class RemotePeerRestClient
 
 
     public Set<ContainerHost> createRemoteContainers( String ip, String port, UUID ownerPeerId, UUID environemntId,
-                                                      String templateName, int quantity, String strategyId,
+                                                      List<Template> templates, int quantity, String strategyId,
                                                       List<Criteria> criteria ) throws ContainerCreateException
     {
         String path = "peer/container/create";
@@ -86,10 +87,11 @@ public class RemotePeerRestClient
 
         WebClient client = WebClient.create( baseUrl );
 
+        Template template = templates.get( 0 );
         Form form = new Form();
         form.set( "ownerPeerId", ownerPeerId.toString() );
         form.set( "environmentId", environemntId.toString() );
-        form.set( "templateName", templateName );
+        form.set( "templates", JsonUtil.toJson( template ) );
         form.set( "quantity", quantity );
         form.set( "strategyId", strategyId );
         // TODO: implement criteria transfer

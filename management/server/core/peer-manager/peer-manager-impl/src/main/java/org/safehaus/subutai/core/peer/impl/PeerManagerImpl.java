@@ -114,7 +114,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             LOG.error( e.getMessage(), e );
         }
         communicationManager.addListener( this );
-        localPeer = new LocalPeerImpl( this, containerManager );
+        localPeer = new LocalPeerImpl( this, containerManager, templateRegistry );
     }
 
 

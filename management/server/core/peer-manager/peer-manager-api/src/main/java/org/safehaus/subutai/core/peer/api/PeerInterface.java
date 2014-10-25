@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.strategy.api.Criteria;
@@ -19,8 +20,8 @@ public interface PeerInterface
 
     public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;
 
-    public Set<ContainerHost> createContainers( UUID ownerPeerId, UUID environmentId, String templateName, int quantity,
-                                                String strategyId, List<Criteria> criteria )
+    public Set<ContainerHost> createContainers( UUID ownerPeerId, UUID environmentId, List<Template> templates,
+                                                int quantity, String strategyId, List<Criteria> criteria )
             throws ContainerCreateException;
 
     public void startContainer( ContainerHost containerHost ) throws PeerException, CommandException;

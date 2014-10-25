@@ -46,6 +46,7 @@
     <command name="peer/clone">
       <action class="org.safehaus.subutai.core.peer.cli.CloneCommand">
         <property name="peerManager" ref="peerManager" />
+        <property name="templateRegistry" ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>
@@ -54,6 +55,7 @@
     <command name="peer/remote-clone">
       <action class="org.safehaus.subutai.core.peer.cli.RemoteCloneCommand">
         <property name="peerManager" ref="peerManager" />
+        <property name="templateRegistry" ref="templateRegistry" />
       </action>
     </command>
   </command-bundle>

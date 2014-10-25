@@ -15,12 +15,18 @@
     <jaxrs:serviceBeans>
       <ref component-id="peerRestServiceImpl" />
     </jaxrs:serviceBeans>
+    <!--
+    <jaxrs:providers>
+      <ref component-id="paramConverterProvider" />
+    </jaxrs:providers>
+    -->
   </jaxrs:server>
 
   <bean id="peerRestServiceImpl" class="org.safehaus.subutai.core.peer.rest.RestServiceImpl">
     <property name="peerManager" ref="peerManager" />
   </bean>
 
+  <bean id="paramConverterProvider" class="org.safehaus.subutai.core.peer.rest.SubutaiParamConvertProvider" />
   <reference id="peerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.Host;
@@ -51,12 +52,12 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public Set<ContainerHost> createContainers( final UUID ownerPeerId, final UUID environmentId,
-                                                final String templateName, final int quantity, final String strategyId,
+                                                final List<Template> templates, final int quantity, final String strategyId,
                                                 final List<Criteria> criteria ) throws ContainerCreateException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000 );
         return remotePeerRestClient
-                .createRemoteContainers( peer.getIp(), "8181", ownerPeerId, environmentId, templateName, quantity,
+                .createRemoteContainers( peer.getIp(), "8181", ownerPeerId, environmentId, templates, quantity,
                         strategyId, criteria );
     }
 
