@@ -10,4 +10,10 @@ public class MonitorException extends Exception
     {
         super( cause );
     }
+
+
+    public MonitorException( final String message )
+    {
+        super( message );
+    }
 }

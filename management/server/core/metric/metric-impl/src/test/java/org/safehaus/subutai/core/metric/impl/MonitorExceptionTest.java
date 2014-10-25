@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.metric.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.core.monitor.api.MonitorException;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -12,6 +12,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class MonitorExceptionTest
 {
+    private static final String ERR_MSG = "OOPS";
+
+
     @Test
     public void testNestedException() throws Exception
     {
@@ -19,5 +22,14 @@ public class MonitorExceptionTest
         MonitorException monitorException = new MonitorException( nestedException );
 
         assertEquals( nestedException, monitorException.getCause() );
+    }
+
+
+    @Test
+    public void testMessage() throws Exception
+    {
+        MonitorException monitorException = new MonitorException( ERR_MSG );
+
+        assertEquals( ERR_MSG, monitorException.getMessage() );
     }
 }

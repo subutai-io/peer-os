@@ -18,8 +18,8 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.safehaus.subutai.core.monitor.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInterface;
@@ -43,13 +43,13 @@ public class MonitorImpl implements Monitor
     //max length of subscriber id to store in database varchar(100) field
     private static final int MAX_SUBSCRIBER_ID_LEN = 100;
     //set of metric subscribers
-    private final Set<MetricListener> metricListeners =
+    protected Set<MetricListener> metricListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MetricListener, Boolean>() );
-
-    private final ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     private final Commands commands = new Commands();
-    private final MonitorDao monitorDao;
     private final PeerManager peerManager;
+
+    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
+    protected MonitorDao monitorDao;
 
 
     public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws DaoException
@@ -249,7 +249,7 @@ public class MonitorImpl implements Monitor
             for ( String subscriberId : subscribersIds )
             {
                 //notify subscriber on alert
-                notify( metric, subscriberId );
+                notifyListener( metric, subscriberId );
             }
         }
         catch ( DaoException e )
@@ -260,7 +260,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    private void notify( final ContainerHostMetric metric, String subscriberId )
+    protected void notifyListener( final ContainerHostMetric metric, String subscriberId )
     {
         for ( final MetricListener listener : metricListeners )
         {

@@ -16,10 +16,10 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
 import org.safehaus.subutai.core.metric.impl.ContainerHostMetricImpl;
 import org.safehaus.subutai.core.metric.impl.ResourceHostMetricImpl;
-import org.safehaus.subutai.core.monitor.api.MonitorException;
 
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for RestServiceImpl
  */
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class RestServiceImplTest
 {
     @Mock
@@ -59,14 +59,14 @@ public class RestServiceImplTest
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void testConstructorShouldFailOnNullMonitor() throws Exception
     {
         new RestServiceImpl( null, environmentManager );
     }
 
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void testConstructorShouldFailOnNullEnvironmentManager() throws Exception
     {
         new RestServiceImpl( monitor, null );

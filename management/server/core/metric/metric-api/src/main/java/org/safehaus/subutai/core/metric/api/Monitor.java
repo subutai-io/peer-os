@@ -4,7 +4,6 @@ package org.safehaus.subutai.core.metric.api;
 import java.util.Set;
 
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.monitor.api.MonitorException;
 
 
 /**
