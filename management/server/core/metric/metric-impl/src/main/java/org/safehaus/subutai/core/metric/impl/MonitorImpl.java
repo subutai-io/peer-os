@@ -37,7 +37,7 @@ import com.google.gson.JsonSyntaxException;
  */
 public class MonitorImpl implements Monitor
 {
-    protected static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
     //max length of subscriber id to store in database varchar(100) field
     private static final int MAX_SUBSCRIBER_ID_LEN = 100;
     //set of metric subscribers
