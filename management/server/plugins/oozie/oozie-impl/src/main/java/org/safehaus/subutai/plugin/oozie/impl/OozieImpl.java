@@ -21,7 +21,6 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
@@ -54,7 +53,7 @@ public class OozieImpl implements Oozie
     private AgentManager agentManager;
     private Tracker tracker;
     private CommandRunner commandRunner;
-    private LxcManager lxcManager;
+//    private LxcManager lxcManager;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
     private Hadoop hadoopManager;
@@ -138,7 +137,7 @@ public class OozieImpl implements Oozie
     }
 
 
-    public LxcManager getLxcManager()
+    /*public LxcManager getLxcManager()
     {
         return lxcManager;
     }
@@ -147,7 +146,7 @@ public class OozieImpl implements Oozie
     public void setLxcManager( final LxcManager lxcManager )
     {
         this.lxcManager = lxcManager;
-    }
+    }*/
 
 
     public EnvironmentManager getEnvironmentManager()
