@@ -8,7 +8,6 @@ import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 
@@ -37,7 +36,7 @@ public class StopServiceHandlerTest
 
 
     @Test
-    public void testWithoutCluster() throws DBException
+    public void testWithoutCluster()
     {
         AbstractOperationHandler operationHandler =
                 new StopServiceHandler( cassandraMock, "test-cluster", "test-node" );
