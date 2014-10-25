@@ -50,7 +50,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SparkImpl
             return;
         }
 
-        po.addLog( String.format( "isMaster : % ", master ) );
+        po.addLog( String.format( "isMaster : %s ", master ) );
 
         if ( master && !config.getMasterNode().equals( node ) )
         {
