@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
@@ -333,5 +334,48 @@ public class MonitorImplTest
         when( localPeer.getResourceHosts() ).thenThrow( new PeerException( "" ) );
 
         monitor.getResourceHostMetrics();
+    }
+
+
+    @Test
+    public void testGetContainerHostMetrics() throws Exception
+    {
+        ContainerHost containerHost = mock( ContainerHost.class );
+        when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
+        CommandResult commandResult = mock( CommandResult.class );
+        when( containerHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+        when( commandResult.getStdOut() ).thenReturn( METRIC_JSON );
+
+        Set<ContainerHostMetric> metrics = monitor.getContainerMetrics( environment );
+
+        ContainerHostMetric metric = metrics.iterator().next();
+        assertEquals( ENVIRONMENT_ID, metric.getEnvironmentId() );
+        assertEquals( HOST, metric.getHost() );
+        assertEquals( METRIC_VALUE, metric.getTotalRam() );
+    }
+
+
+    @Test( expected = MonitorException.class )
+    public void testGetContainerHostMetricsWithException() throws Exception
+    {
+        ContainerHost containerHost = mock( ContainerHost.class );
+        when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
+        CommandResult commandResult = mock( CommandResult.class );
+        when( containerHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
+        when( commandResult.hasSucceeded() ).thenReturn( false );
+
+        monitor.getContainerMetrics( environment );
+    }
+
+
+    @Test( expected = MonitorException.class )
+    public void testGetContainerHostMetricsWithException2() throws Exception
+    {
+        ContainerHost containerHost = mock( ContainerHost.class );
+        when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
+        when( containerHost.execute( any( RequestBuilder.class ) ) ).thenThrow( new CommandException( "" ) );
+
+        monitor.getContainerMetrics( environment );
     }
 }
