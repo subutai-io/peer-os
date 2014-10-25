@@ -512,6 +512,7 @@ public class Manager
         }
     }
 
+
     private void startAllNodes()
     {
         if ( nodesTable != null )
@@ -520,7 +521,8 @@ public class Manager
             {
                 int rowId = ( Integer ) o;
                 Item row = nodesTable.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
                 if ( availableOperationsLayout != null )
                 {
                     Button checkBtn = getButton( availableOperationsLayout, START_BUTTON_CAPTION );
@@ -542,7 +544,8 @@ public class Manager
             {
                 int rowId = ( Integer ) o;
                 Item row = nodesTable.getItem( rowId );
-                HorizontalLayout availableOperationsLayout = ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+                HorizontalLayout availableOperationsLayout =
+                        ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
                 if ( availableOperationsLayout != null )
                 {
                     Button checkBtn = getButton( availableOperationsLayout, STOP_BUTTON_CAPTION );
@@ -568,7 +571,7 @@ public class Manager
                         ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
                 if ( availableOperationsLayout != null )
                 {
-                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION);
+                    Button checkBtn = getButton( availableOperationsLayout, CHECK_BUTTON_CAPTION );
                     if ( checkBtn != null )
                     {
                         checkBtn.click();

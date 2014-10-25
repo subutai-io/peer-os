@@ -17,6 +17,7 @@ public class SparkImplMock extends SparkImpl
 
     private SparkClusterConfig clusterConfig;
 
+
     public SparkImplMock()
     {
         super( mock( DataSource.class ) );
@@ -24,6 +25,7 @@ public class SparkImplMock extends SparkImpl
         setAgentManager( mock( AgentManager.class ) );
         setTracker( new TrackerMock() );
     }
+
 
     public SparkImplMock setClusterConfig( SparkClusterConfig clusterConfig )
     {
