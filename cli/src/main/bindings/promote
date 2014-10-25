@@ -5,7 +5,7 @@ function promote_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Converts an instance container into a template
   echo
-  echo "        "subutai promote container
+  echo "        "subutai \[-qh\] promote container \[\[-c\] -n new_container_name\] \[-b pre-execution-scripts\|\"all\"\] 
   echo
   echo -----------------------------------------------------------------------
 }
@@ -31,6 +31,13 @@ function promote {
 
   OPTIND=0
   if [ "$1" == "promote" ]; then
+    shift
+  fi
+
+  local lxc="$1"
+  lxc_assert "$lxc" "`promote_usage`"
+
+  if [ $1 = $lxc ]; then
     shift
   fi
 
@@ -60,51 +67,31 @@ function promote {
         ;;
     esac
   done
-
+ 
   if [ "$copyit" == "true" -a -z "$newname" ]; then
     msg_error "Cannot use -c option without -n option"
     exit 1
   fi
 
-  if [ -n "$newname" ]; then
-    while true; do
-      if [ "$1" == "$newname" ]; then
-        shift
-        break
-      else
-        shift
-      fi
-    done
-  fi
-
-  TEST_MODE="true"
   if [ "$TEST_MODE" == "true" ]; then
     echo ---- TEST_MODE DUMP ----
+    echo -e "optind\t= $OPTIND"
     echo -e "operand count\t= $#"
     echo -e "operands\t= $@"
     echo -e "newname\t= $newname"
     echo -e "copyit\t= $copyit"
+    echo -e "prescripts\t= $preScripts"
     echo
   fi
- 
-  local lxc="$1"
   
   if [ "`are_containers_writable $lxc`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
-  
+ 
   lock_container_read $lxc
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
-
-  if [ "x$preScriptsEnabled" == "xtrue" ]; then
-    if [ "x$preScripts" == "xall" ]; then
-      execute_all_prescripts "${FUNCNAME[0]}"
-    else
-      execute_prescripts "$preScripts"
-    fi
-  fi
 
   # The master is already a template
   if [ "$lxc" == "master" ]; then
@@ -117,7 +104,6 @@ function promote {
   # ---------------------------------------------------------------------------
   # (1) perform some sanity checks
   # ---------------------------------------------------------------------------
-  lxc_assert $lxc
 
   # check to make sure the container is NOT already a template
   if [ "`zfs_is_template $lxc`" == "true" ]; then
@@ -128,15 +114,19 @@ function promote {
   else
     msg_info "    - check passed: \"$lxc\" is NOT a template"
   fi
-
+  templatename="$lxc"
+  if [ -n $newname ]; then
+    templatename="$newname"
+    lxc_assert_no "$templatename" "`promote_usage`"
+  fi
   # check to make sure container is NOT registered as a template
-  if [ "`is_registered $lxc`" == "true" -a "x$SUBUTAI_OFFLINE_MODE" != "xtrue" ]; then
-    msg_error "A template with name \"$lxc\" is registered. Aborting ..."
+  if [ "`is_registered $templatename`" == "true" -a "x$SUBUTAI_OFFLINE_MODE" != "xtrue" ]; then
+    msg_error "A template with name \"$templatename\" is registered. Aborting ..."
     unlock_container_read $lxc
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
-    msg_info "    - check passed: \"$lxc\" is NOT registered"
+    msg_info "    - check passed: \"$templatename\" is NOT registered"
   fi
 
   parent=`zfs_get_parent $lxc`
@@ -164,12 +154,10 @@ function promote {
   # if a newname is specified check to see such a container does not exist
   # make a copy of the container before converting it into a template
   if [ -n "$newname" -a "true" == "$copyit" ]; then
-    lxc_assert_no "$newname" "`promote_usage`"
     lxc_stop "$lxc"
     lxc_copy "$lxc" "$newname"
     lxc_template="$newname"
   elif [ -n "$newname" -a "false" == "$copyit" ]; then
-    lxc_assert_no "$newname" "`promote_usage`"
     lxc_stop "$lxc"
     lxc_rename "$lxc" "$newname"
     lxc_template="$newname"
@@ -185,16 +173,22 @@ function promote {
   # ---------------------------------------------------------------------------
   # (2) replace package manifest next to config file
   # ---------------------------------------------------------------------------
+  if [ "x$preScriptsEnabled" == "xtrue" ]; then
+    if [ "x$preScripts" == "xall" ]; then
+      execute_all_prescripts "${FUNCNAME[0]}"
+    else
+      execute_prescripts "$preScripts"
+    fi
+  fi
+
   lxc_remove_agent $lxc_template
   lxc_home=/var/lib/lxc/$lxc_template
   for debpkg in "`lxc-attach -n $lxc_template -- dpkg -l`"; do
     echo "$debpkg" >> $lxc_home/packages
   done
-
   # ---------------------------------------------------------------------------
   # (3) git operations
   # ---------------------------------------------------------------------------
-
   # add and commit all uncommitted files (should be some: /etc/hosts)
   if [ -n "$newname" ]; then
     `git_rename_branch $lxc $lxc_template`

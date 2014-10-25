@@ -7,12 +7,14 @@
 
 
 function execute_prescripts {
-  scripts="$1"
-  lxc="$2"
+  local scripts="$1"
+  local lxc="$2"
   if [ -z "$scripts" ]; then
     msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
+
+  msg_info "    - ${FUNCNAME[0]} $scripts"
 
   IFS=' ' read -a scriptArray <<< "$scripts"
   for script in "${scriptArray[@]}"
@@ -21,19 +23,19 @@ function execute_prescripts {
     script=$(echo " $script " | tr -d ' ')
     msg_info "      - Running $script"
   done
-
-  msg_info "    - ${FUNCNAME[0]} $scripts"
-  
 }
 
 
 function execute_all_prescripts {
-  binding=$1
-  lxc="$2"
+  local binding=$1
+  local lxc="$2"
   if [ -z "$binding" ]; then
     msg_error "No binding passed to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
+
+  msg_info "    - ${FUNCNAME[0]} for $binding"
+
   #TODO initialize scripts with all the scripts under subutai_pre_script_base 
   # starting with pre-${FUNCNAME[0]}
   scripts="prescript1 prescript2"
@@ -44,18 +46,18 @@ function execute_all_prescripts {
     script=$(echo " $script " | tr -d ' ')
     msg_info "      - Running $script"
   done
-
-  msg_info "    - ${FUNCNAME[0]} for $binding"
 }
 
 
 function execute_postscripts {
-  scripts="$1"
-  lxc="$2"
+  local scripts="$1"
+  local lxc="$2"
   if [ -z "$scripts" ]; then
     msg_error "No arguments provided to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
+
+  msg_info "    - ${FUNCNAME[0]} $scripts"
 
   IFS=' ' read -a scriptArray <<< "$scripts"
   for script in "${scriptArray[@]}"
@@ -64,18 +66,19 @@ function execute_postscripts {
     script=$(echo " $script " | tr -d ' ')
     msg_info "      - Running $script"
   done
-
-  msg_info "    - ${FUNCNAME[0]} $scripts"
 }
 
 
 function execute_all_postscripts {
-  binding=$1
-  lxc="$2"
+  local binding=$1
+  local lxc="$2"
   if [ -z "$binding" ]; then
     msg_error "No binding passed to ${FUNCNAME[0]}! Aborting.."
     exit 1
   fi
+
+  msg_info "    - ${FUNCNAME[0]} for $binding"
+
   #TODO initialize scripts with all the scripts under subutai_pre_script_base 
   # starting with pre-${FUNCNAME[0]}
   scripts="postscript1 postscript2"
@@ -86,9 +89,6 @@ function execute_all_postscripts {
     script=$(echo " $script " | tr -d ' ')
     msg_info "      - Running $script"
   done
-
-  msg_info "    - ${FUNCNAME[0]} for $binding"
 }
-
 
 
