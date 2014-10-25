@@ -44,7 +44,6 @@ import org.safehaus.subutai.core.container.api.ContainerEventType;
 import org.safehaus.subutai.core.container.api.ContainerException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.api.ContainerState;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
@@ -76,14 +75,14 @@ public class ContainerManagerImpl extends ContainerManagerBase
 
     public ContainerManagerImpl( AgentManager agentManager, CommandRunner commandRunner, Monitoring monitoring,
                                  TemplateManager templateManager, TemplateRegistry templateRegistry,
-                                 DbManager dbManager, StrategyManager strategyManager )
+                                  StrategyManager strategyManager )
     {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.monitoring = monitoring;
         this.templateManager = templateManager;
         this.templateRegistry = templateRegistry;
-        this.dbManager = dbManager;
+
         this.strategyManager = strategyManager;
         this.commands = new Commands( commandRunner );
     }

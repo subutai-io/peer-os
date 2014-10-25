@@ -17,8 +17,8 @@
              interface="org.safehaus.subutai.core.template.api.TemplateManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="org.safehaus.subutai.core.registry.api.TemplateRegistry" />
-  <reference id="dbManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.db.api.DbManager" />
+<!--  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.db.api.DbManager" />-->
   <reference id="strategyManager" availability="mandatory"
              interface="org.safehaus.subutai.core.strategy.api.StrategyManager" />
   <reference id="quotaManager" availability="mandatory"
@@ -40,7 +40,7 @@
     <argument ref="monitoring" />
     <argument ref="templateManager" />
     <argument ref="templateRegistry" />
-    <argument ref="dbManager" />
+    <!--<argument ref="dbManager" />-->
     <argument ref="strategyManager" />
   </bean>
 

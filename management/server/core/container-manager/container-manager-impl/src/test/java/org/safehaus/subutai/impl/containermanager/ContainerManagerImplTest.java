@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.container.impl.ContainerManagerImpl;
-import org.safehaus.subutai.core.db.api.DbManager;
+//import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.monitor.api.Monitoring;
 import org.safehaus.subutai.core.registry.api.TemplateRegistry;
 import org.safehaus.subutai.core.strategy.api.StrategyManager;
@@ -32,7 +32,7 @@ public class ContainerManagerImplTest
     private ContainerManager containerManager;
     private TemplateManager templateManager;
     private TemplateRegistry templateRegistry;
-    private DbManager dbManager;
+//    private DbManager dbManager;
     private StrategyManager strategyManager;
 
 
@@ -45,10 +45,10 @@ public class ContainerManagerImplTest
         //                .thenReturn( Collections.EMPTY_MAP );
         templateManager = mock( TemplateManager.class );
         templateRegistry = mock( TemplateRegistry.class );
-        dbManager = mock( DbManager.class );
+//        dbManager = mock( DbManager.class );
         strategyManager = mock( StrategyManager.class );
         containerManager = new ContainerManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor,
-                templateManager, templateRegistry, dbManager, strategyManager );
+                templateManager, templateRegistry, strategyManager );
         ( ( ContainerManagerImpl ) containerManager ).init();
     }
 
