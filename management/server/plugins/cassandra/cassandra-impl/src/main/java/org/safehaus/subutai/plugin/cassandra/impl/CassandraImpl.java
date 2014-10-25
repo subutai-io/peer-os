@@ -21,10 +21,8 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -53,9 +51,9 @@ public class CassandraImpl implements Cassandra
     private static final Logger LOG = LoggerFactory.getLogger( CassandraImpl.class.getName() );
     private Commands commands;
     private Tracker tracker;
-    private LxcManager lxcManager;
+//    private LxcManager lxcManager;
     private ExecutorService executor;
-    private NetworkManager networkManager;
+//    private NetworkManager networkManager;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
@@ -82,7 +80,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public LxcManager getLxcManager()
+   /* public LxcManager getLxcManager()
     {
         return lxcManager;
     }
@@ -91,7 +89,7 @@ public class CassandraImpl implements Cassandra
     public void setLxcManager( final LxcManager lxcManager )
     {
         this.lxcManager = lxcManager;
-    }
+    }*/
 
 
     public ExecutorService getExecutor()
@@ -106,7 +104,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public NetworkManager getNetworkManager()
+    /*public NetworkManager getNetworkManager()
     {
         return networkManager;
     }
@@ -115,7 +113,7 @@ public class CassandraImpl implements Cassandra
     public void setNetworkManager( final NetworkManager networkManager )
     {
         this.networkManager = networkManager;
-    }
+    }*/
 
 
     public CommandRunner getCommandRunner()
