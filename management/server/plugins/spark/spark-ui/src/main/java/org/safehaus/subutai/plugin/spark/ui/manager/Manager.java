@@ -818,7 +818,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStopButton( final Agent agent, boolean isMaster, final Button... buttons )
+    public void addClickListenerToStopButton( final Agent agent, final boolean isMaster, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
