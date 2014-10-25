@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.ManagementHost;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 
@@ -22,6 +23,14 @@ public class ManagementHostImpl extends HostImpl implements ManagementHost
     protected ManagementHostImpl( final Agent agent )
     {
         super( agent );
+    }
+
+
+    @Override
+    public boolean isConnected( final Host host )
+    {
+        //TODO: Implement me
+        return true;
     }
 
 

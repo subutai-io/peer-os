@@ -37,8 +37,8 @@ public abstract class HostImpl implements Host
 
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
-    private long lastHeartbeat;
-    private long inactiveTime = 5 * 1000 * 60; // 5 min
+//    private long lastHeartbeat;
+//    private long inactiveTime = 5 * 1000 * 60; // 5 min
 
 
     protected HostImpl( final Agent agent )
@@ -172,10 +172,7 @@ public abstract class HostImpl implements Host
     }
 
 
-    public boolean isConnected()
-    {
-        return System.currentTimeMillis() - lastHeartbeat > inactiveTime;
-    }
+    public abstract boolean isConnected( Host host );
 
 
     public String echo( String text ) throws CommandException
@@ -228,9 +225,9 @@ public abstract class HostImpl implements Host
     }
 
 
-    @Override
-    public void updateHeartbeat()
-    {
-        lastHeartbeat = System.currentTimeMillis();
-    }
+//    @Override
+//    public void updateHeartbeat()
+//    {
+//        lastHeartbeat = System.currentTimeMillis();
+//    }
 }
