@@ -31,10 +31,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>container-manager-api</artifactId>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>db-manager-api</artifactId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>template-manager-api</artifactId>

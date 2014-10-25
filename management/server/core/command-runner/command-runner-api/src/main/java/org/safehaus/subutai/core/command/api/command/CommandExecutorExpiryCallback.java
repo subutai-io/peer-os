@@ -1,6 +1,9 @@
 package org.safehaus.subutai.core.command.api.command;
 
 
+import org.safehaus.subutai.common.protocol.CommandStatus;
+
+
 /**
  * Callback for command expiry event
  */

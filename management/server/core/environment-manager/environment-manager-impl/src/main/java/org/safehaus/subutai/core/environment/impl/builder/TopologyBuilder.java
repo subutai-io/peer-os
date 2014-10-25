@@ -128,6 +128,39 @@ public class TopologyBuilder
     }
 
 
+    public EnvironmentBuildProcess createEnvironmentBuildProcessNG2PG( final UUID blueprintId, final UUID peerGroupId )
+            throws EnvironmentBuildException
+    {
+        EnvironmentBuildProcess process = new EnvironmentBuildProcess( blueprintId );
+        try
+        {
+            EnvironmentBlueprint blueprint = environmentManager.getEnvironmentBlueprint( blueprintId );
+            PeerGroup peerGroup = environmentManager.getPeerManager().getPeerGroup( peerGroupId );
+
+            List<UUID> uuidList = Lists.newArrayList( peerGroup.getPeerIds().iterator() );
+
+            Set<NodeGroup> groupSet = blueprint.getNodeGroups();
+            for ( NodeGroup nodeGroup : groupSet )
+            {
+                UUID peerId = uuidList.get( randomInt( uuidList.size() ) );
+                String key = peerId.toString() + "-" + nodeGroup.getTemplateName();
+                CloneContainersMessage ccm = new CloneContainersMessage( peerId );
+                ccm.setEnvId( process.getId() );
+                ccm.setTemplate( nodeGroup.getTemplateName() );
+                ccm.setNumberOfNodes( nodeGroup.getNumberOfNodes() );
+                ccm.setStrategy( nodeGroup.getPlacementStrategy().toString() );
+                process.putCloneContainerMessage( key, ccm );
+            }
+
+            return process;
+        }
+        catch ( EnvironmentManagerException e )
+        {
+            throw new EnvironmentBuildException( e.getMessage() );
+        }
+    }
+
+
     private int randomInt( int max )
     {
         Random random = new Random();

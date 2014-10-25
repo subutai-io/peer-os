@@ -9,7 +9,7 @@ import org.safehaus.subutai.core.command.api.command.CommandCallback;
 
 
 /**
- * Created by dilshat on 10/24/14.
+ * CommandCallback wrapper for Host.execute method
  */
 public class HostCommandCallback extends CommandCallback
 {
@@ -26,6 +26,7 @@ public class HostCommandCallback extends CommandCallback
     public void onResponse( final Response response, final AgentResult agentResult, final Command command )
     {
         commandCallback.onResponse( response,
-                new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr() ) );
+                new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
+                        command.getCommandStatus() ) );
     }
 }

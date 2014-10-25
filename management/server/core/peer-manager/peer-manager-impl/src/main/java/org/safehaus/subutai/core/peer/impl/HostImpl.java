@@ -8,6 +8,7 @@ import javax.naming.NamingException;
 import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.NullAgent;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Response;
@@ -98,11 +99,12 @@ public abstract class HostImpl implements Host
 
         if ( agentResult != null )
         {
-            return new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr() );
+            return new CommandResult( agentResult.getExitCode(), agentResult.getStdOut(), agentResult.getStdErr(),
+                    command.getCommandStatus() );
         }
         else
         {
-            return new CommandResult( null, null, null );
+            return new CommandResult( null, null, null, CommandStatus.TIMEOUT );
         }
     }
 
