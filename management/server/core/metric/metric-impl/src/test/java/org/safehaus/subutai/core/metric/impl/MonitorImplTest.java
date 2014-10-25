@@ -248,6 +248,29 @@ public class MonitorImplTest
 
 
     @Test
+    public void testStartMonitoring() throws Exception
+    {
+
+        String longSubscriberId = StringUtils.repeat( "s", 101 );
+        String subscriberId = StringUtils.repeat( "s", 100 );
+        when( metricListener.getSubscriberId() ).thenReturn( longSubscriberId );
+
+        monitor.startMonitoring( metricListener, environment );
+
+        verify( monitorDao ).addSubscription( ENVIRONMENT_ID, subscriberId );
+    }
+
+
+    @Test( expected = MonitorException.class )
+    public void testStartMonitoringException() throws Exception
+    {
+        doThrow( new DaoException( null ) ).when( monitorDao ).addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
+
+        monitor.startMonitoring( metricListener, environment );
+    }
+
+
+    @Test
     public void testStopMonitoring() throws Exception
     {
 
@@ -258,5 +281,14 @@ public class MonitorImplTest
         monitor.stopMonitoring( metricListener, environment );
 
         verify( monitorDao ).removeSubscription( ENVIRONMENT_ID, subscriberId );
+    }
+
+
+    @Test( expected = MonitorException.class )
+    public void testStopMonitoringException() throws Exception
+    {
+        doThrow( new DaoException( null ) ).when( monitorDao ).removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
+
+        monitor.stopMonitoring( metricListener, environment );
     }
 }
