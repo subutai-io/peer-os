@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 
@@ -29,7 +30,7 @@ public class CommandsTest
         Command command = commands.getInstallCommand( null );
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes install " + commands.PACKAGE_NAME, command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription() );
     }
 
 
@@ -79,7 +80,7 @@ public class CommandsTest
         Command command = commands.getUninstallCommand( null );
 
         assertNotNull( command );
-        assertEquals( "apt-get --force-yes --assume-yes purge " + commands.PACKAGE_NAME, command.getDescription() );
+        assertEquals( "apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command.getDescription() );
     }
 
 
@@ -89,6 +90,6 @@ public class CommandsTest
         Command command = commands.getCheckInstalledCommand( null );
 
         assertNotNull( command );
-        assertEquals( "dpkg -l | grep '^ii' | grep ksks", command.getDescription() );
+        assertEquals( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH, command.getDescription() );
     }
 }

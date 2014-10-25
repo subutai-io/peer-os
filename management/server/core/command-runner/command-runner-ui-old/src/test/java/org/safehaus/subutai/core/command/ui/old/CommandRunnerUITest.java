@@ -20,7 +20,7 @@ public class CommandRunnerUITest
             new CommandRunnerUI( mock( CommandRunner.class ), mock( AgentManager.class ) );
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullCommandRunner()
     {
 
@@ -28,7 +28,7 @@ public class CommandRunnerUITest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullAgentManager()
     {
 

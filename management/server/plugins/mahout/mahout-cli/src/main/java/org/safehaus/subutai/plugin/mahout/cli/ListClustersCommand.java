@@ -13,7 +13,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "mahout", name = "list-clusters", description = "mydescription")
+@Command( scope = "mahout", name = "list-clusters", description = "mydescription" )
 public class ListClustersCommand extends OsgiCommandSupport
 {
 

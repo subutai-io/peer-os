@@ -4,12 +4,14 @@ package org.safehaus.subutai.plugin.jetty.impl.handler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
 import org.safehaus.subutai.plugin.common.mock.TrackerOperationMock;
@@ -28,10 +30,10 @@ import static org.mockito.Mockito.when;
 
 public class InstallOperationHandlerTest
 {
-    private String clusterName = "testClusterName";
-    JettyImpl manager = new JettyImpl();
+    JettyImpl manager = new JettyImpl( mock( DataSource.class ) );
     JettyConfig config = new JettyConfig();
     InstallOperationHandler handler;
+    private String clusterName = "testClusterName";
 
 
     @Before
@@ -39,7 +41,7 @@ public class InstallOperationHandlerTest
     {
         manager.setTracker( mock( Tracker.class ) );
         manager.setCommandRunner( mock( CommandRunner.class ) );
-        manager.setPluginDAO( mock( PluginDAO.class ) );
+        manager.setPluginDAO( mock( PluginDao.class ) );
         manager.setCommands( new Commands( manager.getCommandRunner() ) );
         manager.setAgentManager( new AgentManagerMock() );
 

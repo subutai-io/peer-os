@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 
@@ -16,6 +15,9 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
  */
 public interface PeerInterface
 {
+
+    public UUID getId();
+
     public UUID getOwnerId();
 
     public Set<ContainerHost> getContainerHostsByEnvironmentId( UUID environmentId ) throws PeerException;

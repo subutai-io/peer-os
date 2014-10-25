@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
@@ -78,7 +78,8 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy
 
         po.addLog( "Installing Flume..." );
         String s = Commands.make( CommandType.INSTALL );
-        cmd = manager.getCommandRunner().createCommand( new RequestBuilder( s ).withTimeout( 1800 ), config.getNodes() );
+        cmd = manager.getCommandRunner()
+                     .createCommand( new RequestBuilder( s ).withTimeout( 1800 ), config.getNodes() );
         manager.getCommandRunner().runCommand( cmd );
 
         if ( cmd.hasSucceeded() )

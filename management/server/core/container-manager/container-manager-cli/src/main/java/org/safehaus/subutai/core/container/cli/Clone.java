@@ -17,17 +17,17 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "container", name = "clone")
+@Command( scope = "container", name = "clone" )
 public class Clone extends OsgiCommandSupport implements ContainerEventListener
 {
 
     ContainerManager containerManager;
 
-    @Argument(index = 0, required = true)
+    @Argument( index = 0, required = true )
     private String hostname;
-    @Argument(index = 1, required = true)
+    @Argument( index = 1, required = true )
     private String templateName;
-    @Argument(index = 2, required = true)
+    @Argument( index = 2, required = true )
     private String cloneName;
 
 
@@ -41,7 +41,8 @@ public class Clone extends OsgiCommandSupport implements ContainerEventListener
     protected Object doExecute() throws Exception
     {
         containerManager.addListener( this );
-        UUID envId = UUIDUtil.generateTimeBasedUUID();;
+        UUID envId = UUIDUtil.generateTimeBasedUUID();
+        ;
         try
         {
             Agent a = containerManager.clone( envId, hostname, templateName, cloneName );

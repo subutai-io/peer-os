@@ -45,13 +45,13 @@ public class TestUtils
     public static final String PACKAGES_MANIFEST =
             "ii  kmod                             15-0ubuntu6                   " +
                     "amd64        tools for managing Linux kernel modules\n"
-                    + "ii  ksks-logstash                    1.0.1                         amd64        This is a " +
+                    + "ii  subutai-logstash                    1.0.1                         amd64        This is a " +
                     "logstash " +
-                    "package of kiskis distribution.";
+                    "package of subutai distribution.";
     public static final String CHILD_PACKAGES_MANIFEST =
-            "ii  ksks-test                    1.0.1                         amd64        This is a test package";
-    public static final String PARENT_PACKAGE = "ksks-logstash";
-    public static final String CHILD_PACKAGE = "ksks-test";
+            "ii  subutai-test                    1.0.1                         amd64        This is a test package";
+    public static final String PARENT_PACKAGE = "subutai-logstash";
+    public static final String CHILD_PACKAGE = "subutai-test";
 
     public static final String MD_5_SUM = "ec6c39f0aed6b6a1256321d2e927a392";
     public static final String TEMPLATE_NAME = "master";

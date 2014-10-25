@@ -52,7 +52,6 @@ public class JsonUtil
     public static String toJson( Object value, Type type )
     {
 
-        return GSON.toJson( value, type);
+        return GSON.toJson( value, type );
     }
-
 }

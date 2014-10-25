@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySet;
@@ -48,8 +48,8 @@ public class MockUtils
         when( agentResult.getAgentUUID() ).thenReturn( agentId );
 
         Map<UUID, AgentResult> results = mock( Map.class );
-        when(command.getResults()).thenReturn( results );
-        when(results.get( agentId )) .thenReturn( agentResult );
+        when( command.getResults() ).thenReturn( results );
+        when( results.get( agentId ) ).thenReturn( agentResult );
 
         return command;
     }

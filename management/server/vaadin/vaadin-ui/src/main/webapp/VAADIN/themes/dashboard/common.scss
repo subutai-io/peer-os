@@ -3,9 +3,11 @@ $font-size: 14px;
 // TODO error in compiler, we need to declare this in another way
 //$font: normal #{$font-size}/1.5 "Open Sans", Arial, sans-serif;
 
-@mixin dashboard-common {
+@mixin dashboard-common
+{
 
-  .v-widget {
+  .v-widget
+  {
     color: inherit;
     font: inherit;
     font-size: 14px;
@@ -20,7 +22,8 @@ $font-size: 14px;
   .v-popupview-popup,
   .v-Notification,
   .v-window,
-  .v-tooltip {
+  .v-tooltip
+  {
     color: $text-color;
     //font: $font;
     font-family: "Open Sans", Arial, sans-serif;
@@ -28,35 +31,42 @@ $font-size: 14px;
     line-height: 1.5;
   }
 
-  .v-spacing {
+  .v-spacing
+  {
     height: 12px;
     width: 12px;
   }
 
   /* TODO fix in base theme (and use a less precise selector) */
-  .v-caption .v-captiontext {
+  .v-caption .v-captiontext
+  {
     overflow: visible;
   }
 
-  .v-caption {
+  .v-caption
+  {
     font-size: 13px;
     color: #6c737a;
   }
 
-  .v-caption-on-top .v-caption {
+  .v-caption-on-top .v-caption
+  {
     padding-bottom: .3em;
   }
 
-  .v-drag-element {
+  .v-drag-element
+  {
     opacity: .7;
     cursor: move;
   }
 
-  .v-drag-element * {
+  .v-drag-element *
+  {
     cursor: move !important;
   }
 
-  .v-drag-element.v-widget {
+  .v-drag-element.v-widget
+  {
     border: 2px solid #2d90f3;
     background: #fff;
     padding: 4px;
@@ -66,7 +76,8 @@ $font-size: 14px;
   }
 
   .v-icon,
-  .v-embbedded img {
+  .v-embbedded img
+  {
     -ms-interpolation-mode: bicubic;
   }
 
@@ -78,7 +89,8 @@ $font-size: 14px;
   .v-popupview-popup,
   .v-tooltip,
   .v-window.dialog,
-  .v-Notification-tray {
+  .v-Notification-tray
+  {
     background: #343638;
     background: rgba(52, 54, 56, .92);
     @include box-shadow(0 2px 5px rgba(0, 0, 0, .5));
@@ -97,42 +109,49 @@ $font-size: 14px;
   }
 
   .v-tooltip,
-  .v-window.dialog {
+  .v-window.dialog
+  {
     min-width: 0;
   }
 
-  .v-tooltip {
+  .v-tooltip
+  {
     font-size: 12px;
     padding: 0 4px;
   }
 
   .v-contextmenu table,
   .v-filterselect-suggestpopup table,
-  .v-menubar-submenu {
+  .v-menubar-submenu
+  {
     width: 100%;
     background: transparent;
   }
 
-  .v-filterselect-suggestpopup table {
+  .v-filterselect-suggestpopup table
+  {
     width: auto;
   }
 
   .v-contextmenu,
   .v-menubar-popup,
-  .v-filterselect-suggestpopup-small {
+  .v-filterselect-suggestpopup-small
+  {
     font-size: 13px;
   }
 
   .v-contextmenu .gwt-MenuItem,
   .v-menubar-popup .v-menubar-menuitem,
-  .v-filterselect-suggestpopup .gwt-MenuItem {
+  .v-filterselect-suggestpopup .gwt-MenuItem
+  {
     padding: .1em .6em;
     @include border-radius(.2em);
   }
 
   .v-contextmenu .gwt-MenuItem-selected,
   .v-menubar-popup .v-menubar-menuitem-selected,
-  .v-filterselect-suggestpopup .gwt-MenuItem-selected {
+  .v-filterselect-suggestpopup .gwt-MenuItem-selected
+  {
     text-shadow: 0 .1em .1em rgba(0, 0, 0, .3);
 
     background: #6ba7e4;
@@ -144,16 +163,19 @@ $font-size: 14px;
     /* background: linear-gradient(to bottom, #75b0e7 0%,#5f9de1 100%); */
   }
 
-  .v-contextmenu .gwt-MenuItem-selected div {
+  .v-contextmenu .gwt-MenuItem-selected div
+  {
     background: transparent;
   }
 
-  .v-contextmenu .v-off div:before {
+  .v-contextmenu .v-off div:before
+  {
     opacity: .3;
   }
 
   .v-contextmenu .v-off div:before,
-  .v-contextmenu .v-on div:before {
+  .v-contextmenu .v-on div:before
+  {
     display: inline;
     content: '\2713';
     font-family: 'fontello';
@@ -163,23 +185,28 @@ $font-size: 14px;
     margin-right: .5em;
   }
 
-  .v-contextmenu .v-off {
+  .v-contextmenu .v-off
+  {
     color: #fff;
   }
 
-  .v-contextmenu .gwt-MenuItem-selected .v-off {
+  .v-contextmenu .gwt-MenuItem-selected .v-off
+  {
     opacity: 1;
   }
 
-  .v-shadow {
+  .v-shadow
+  {
     display: none;
   }
 
-  .v-ie8 & .v-shadow {
+  .v-ie8 & .v-shadow
+  {
     display: block;
   }
 
-  .v-menubar-separator span {
+  .v-menubar-separator span
+  {
     border-top-color: rgba(255, 255, 255, .1);
   }
 

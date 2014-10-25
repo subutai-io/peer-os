@@ -20,14 +20,14 @@ import static org.junit.Assert.assertNotEquals;
  */
 public class AgentRequestBuilderTest
 {
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullAgent()
     {
         new AgentRequestBuilder( null, "cmd" );
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailOnNullOrEmptyCmd()
     {
         new AgentRequestBuilder( null, null );

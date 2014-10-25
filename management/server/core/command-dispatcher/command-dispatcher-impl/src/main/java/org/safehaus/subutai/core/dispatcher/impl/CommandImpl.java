@@ -17,7 +17,7 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.AbstractCommand;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -119,14 +119,14 @@ public class CommandImpl extends AbstractCommand
         for ( Agent agent : agents )
         {
             //check that all agents belong to the same environment
-//            if ( environmentId == null )
-//            {
-//                environmentId = agent.getEnvironmentId();
-//            }
-//            else
-//            {
-//                Preconditions.checkState( environmentId.compareTo( agent.getEnvironmentId() ) == 0 );
-//            }
+            //            if ( environmentId == null )
+            //            {
+            //                environmentId = agent.getEnvironmentId();
+            //            }
+            //            else
+            //            {
+            //                Preconditions.checkState( environmentId.compareTo( agent.getEnvironmentId() ) == 0 );
+            //            }
             Request request = requestBuilder.build( agent.getUuid(), commandUUID );
             //this is a local agent
             if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 )
@@ -238,14 +238,14 @@ public class CommandImpl extends AbstractCommand
         {
             Agent agent = requestBuilder.getAgent();
             //check that all agents belong to the same environment
-//            if ( environmentId == null )
-//            {
-//                environmentId = agent.getEnvironmentId();
-//            }
-//            else
-//            {
-//                Preconditions.checkState( environmentId == agent.getEnvironmentId() );
-//            }
+            //            if ( environmentId == null )
+            //            {
+            //                environmentId = agent.getEnvironmentId();
+            //            }
+            //            else
+            //            {
+            //                Preconditions.checkState( environmentId == agent.getEnvironmentId() );
+            //            }
             Request request = requestBuilder.build( commandUUID );
             if ( requestBuilder.getTimeout() > maxTimeout )
             {

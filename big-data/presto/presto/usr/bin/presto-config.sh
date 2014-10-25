@@ -24,9 +24,9 @@ coordinator)
 	echo "task.max-memory=1GB" >> config.properties
 	echo "discovery-server.enabled=true" >> config.properties
 	echo "discovery.uri=http://$ip:8413" >> config.properties
-	if [ -f "/etc/ksks-agent/config/uuid.txt" ]; 
+	if [ -f "/etc/subutai-agent/config/uuid.txt" ]; 
 	then 
-		uuid=`cat /etc/ksks-agent/config/uuid.txt`
+		uuid=`cat /etc/subutai-agent/config/uuid.txt`
 		sed -i "s/node.id=ffffffff-ffff-ffff-ffff-ffffffffffff/node.id=$uuid/g" node.properties
 	fi
 	sed -i s/presto-server-[0-9]*.[0-9]*'\/'/presto-server-$prestoVer'\/'/g jvm.config
@@ -41,9 +41,9 @@ worker)
 	echo "http-server.http.port=8413" >> config.properties
 	echo "task.max-memory=1GB" >> config.properties
 	echo "discovery.uri=http://$ip:8413" >> config.properties
-	if [ -f "/etc/ksks-agent/config/uuid.txt" ]; 
+	if [ -f "/etc/subutai-agent/config/uuid.txt" ]; 
 	then 
-		uuid=`cat /etc/ksks-agent/config/uuid.txt`
+		uuid=`cat /etc/subutai-agent/config/uuid.txt`
 		sed -i "s/node.id=ffffffff-ffff-ffff-ffff-ffffffffffff/node.id=$uuid/g" node.properties
 	fi
 	sed -i s/presto-server-[0-9]*.[0-9]*'\/'/presto-server-$prestoVer'\/'/g jvm.config

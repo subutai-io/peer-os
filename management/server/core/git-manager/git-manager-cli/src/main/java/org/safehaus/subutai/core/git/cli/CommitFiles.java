@@ -21,22 +21,22 @@ import com.google.common.base.Preconditions;
 /**
  * Commits file(s)
  */
-@Command(scope = "git", name = "commit-files", description = "Commit files")
+@Command( scope = "git", name = "commit-files", description = "Commit files" )
 public class CommitFiles extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( CommitFiles.class.getName() );
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "message", required = true, multiValued = false, description = "commit message")
+    @Argument( index = 2, name = "message", required = true, multiValued = false, description = "commit message" )
     String message;
-    @Argument(index = 3, name = "file(s)", required = true, multiValued = true, description = "file(s) to commit")
+    @Argument( index = 3, name = "file(s)", required = true, multiValued = true, description = "file(s) to commit" )
     Collection<String> files;
-    @Argument(index = 4, name = "conflict resolution", required = false, multiValued = false,
-            description = "commit after conflict resolution (true/false = default)")
+    @Argument( index = 4, name = "conflict resolution", required = false, multiValued = false,
+            description = "commit after conflict resolution (true/false = default)" )
     boolean afterConflictResolved;
 
     private final GitManager gitManager;

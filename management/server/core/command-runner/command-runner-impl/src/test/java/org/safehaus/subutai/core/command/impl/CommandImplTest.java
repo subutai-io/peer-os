@@ -21,10 +21,10 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.command.AbstractCommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 import com.jayway.awaitility.Awaitility;
 
@@ -370,10 +370,10 @@ public class CommandImplTest
     {
 
         Set<AgentRequestBuilder> ag = new HashSet<>();
-        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ), "cmd" )
-                .withTimeout( MAX_TIMEOUT - 1 ) );
-        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ), "cmd" )
-                .withTimeout( MAX_TIMEOUT ) );
+        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ),
+                "cmd" ).withTimeout( MAX_TIMEOUT - 1 ) );
+        ag.add( ( AgentRequestBuilder ) new AgentRequestBuilder( MockUtils.getAgent( UUIDUtil.generateTimeBasedUUID() ),
+                "cmd" ).withTimeout( MAX_TIMEOUT ) );
         command = new CommandImpl( null, ag, mock( AbstractCommandRunner.class ) );
 
         assertEquals( MAX_TIMEOUT, command.getTimeout() );

@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.google.common.collect.Sets;
@@ -57,7 +57,7 @@ public class SendButtonListenerTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailOnNullExecutor()
     {
 

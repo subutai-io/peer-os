@@ -18,21 +18,21 @@ import com.google.common.base.Preconditions;
 /**
  * Brings current branch to the state of the specified remote branch, effectively undoing all local changes
  */
-@Command(scope = "git", name = "undo-hard",
+@Command( scope = "git", name = "undo-hard",
         description = "Bring current branch to the state of the specified remote branch, "
-                + "effectively undoing all local changes")
+                + "effectively undoing all local changes" )
 public class UndoHard extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( UndoHard.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "branch name", required = false, multiValued = false,
-            description = "name of remote branch whose state to restore current branch to (master = default)")
+    @Argument( index = 2, name = "branch name", required = false, multiValued = false,
+            description = "name of remote branch whose state to restore current branch to (master = default)" )
     String branchName;
 
     private final GitManager gitManager;

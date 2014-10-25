@@ -11,7 +11,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.jetty.api.JettyConfig;
 
 import com.google.common.base.Preconditions;
@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 
 public class Commands
 {
-    private final int STOP_TIMEOUT = 60*1000;
+    private final int STOP_TIMEOUT = 60 * 1000;
     private final CommandRunnerBase commandRunner;
 
 
@@ -71,7 +71,8 @@ public class Commands
 
     public Command getStopCommand( Set<Agent> agents )
     {
-        return commandRunner.createCommand( new RequestBuilder( "service jetty stop" ).withTimeout( STOP_TIMEOUT ), agents );
+        return commandRunner
+                .createCommand( new RequestBuilder( "service jetty stop" ).withTimeout( STOP_TIMEOUT ), agents );
     }
 
 

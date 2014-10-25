@@ -5,8 +5,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.DestroyWorkerNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
@@ -34,7 +34,7 @@ public class DestroyWorkerEnvironmentContainerNodeOperationHandlerTest
 
         TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
-        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
+        Assert.assertEquals( po.getState(), OperationState.FAILED );
     }
 
 
@@ -46,6 +46,6 @@ public class DestroyWorkerEnvironmentContainerNodeOperationHandlerTest
 
         TrackerOperation po = handler.getTrackerOperation();
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not connected" ) );
-        Assert.assertEquals( po.getState(), ProductOperationState.FAILED );
+        Assert.assertEquals( po.getState(), OperationState.FAILED );
     }
 }

@@ -43,8 +43,8 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getClusters()
     {
 
@@ -62,9 +62,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         LuceneConfig config = luceneManager.getCluster( clusterName );
 
@@ -74,11 +74,11 @@ public class RestService
 
 
     @POST
-    @Path("clusters/")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @PathParam("clusterName") String clusterName,
-                                    @QueryParam("hadoopClusterName") String hadoopClusterName,
-                                    @QueryParam("nodes") String nodes )
+    @Path( "clusters/" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @PathParam( "clusterName" ) String clusterName,
+                                    @QueryParam( "hadoopClusterName" ) String hadoopClusterName,
+                                    @QueryParam( "nodes" ) String nodes )
     {
 
         LuceneConfig config = new LuceneConfig();
@@ -101,9 +101,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response uninstallCluster( @PathParam( "clusterName" ) String clusterName )
     {
         UUID uuid = luceneManager.uninstallCluster( clusterName );
 
@@ -113,9 +113,9 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response addNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = luceneManager.addNode( clusterName, node );
 
@@ -125,9 +125,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = luceneManager.destroyNode( clusterName, node );
 

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.flume.cli;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.flume.api.Flume;
@@ -17,12 +17,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "flume", name = "uninstall-cluster", description = "Command to uninstall Flume cluster")
+@Command( scope = "flume", name = "uninstall-cluster", description = "Command to uninstall Flume cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport
 {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Flume flumeManager;
     private Tracker tracker;
@@ -68,7 +68,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport
                     System.out.flush();
                     logSize = po.getLog().length();
                 }
-                if ( po.getState() != ProductOperationState.RUNNING )
+                if ( po.getState() != OperationState.RUNNING )
                 {
                     break;
                 }

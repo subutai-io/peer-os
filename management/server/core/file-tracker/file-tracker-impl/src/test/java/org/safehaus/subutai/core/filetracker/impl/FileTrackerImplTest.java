@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import static org.mockito.Matchers.any;
@@ -47,14 +47,14 @@ public class FileTrackerImplTest
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void shouldThrowNullPointerExceptionOnSetCommandRunner()
     {
         fileTracker.setCommandRunner( null );
     }
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void shouldThrowNullPointerExceptionOnSetCommunicationManager()
     {
         fileTracker.setCommunicationManager( null );

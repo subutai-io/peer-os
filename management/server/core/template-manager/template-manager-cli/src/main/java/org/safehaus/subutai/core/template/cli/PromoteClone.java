@@ -8,19 +8,19 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "template", name = "promote", description = "promote clone to template")
+@Command( scope = "template", name = "promote", description = "promote clone to template" )
 public class PromoteClone extends OsgiCommandSupport
 {
 
     private TemplateManager templateManager;
 
-    @Argument(index = 0, required = true)
+    @Argument( index = 0, required = true )
     private String hostName;
-    @Argument(index = 1, required = true)
+    @Argument( index = 1, required = true )
     private String cloneName;
-    @Argument(index = 2, description = "new name for template")
+    @Argument( index = 2, description = "new name for template" )
     private String newName;
-    @Argument(index = 3, description = "specify 'true' to copy clone first")
+    @Argument( index = 3, description = "specify 'true' to copy clone first" )
     private String copyit;
 
 

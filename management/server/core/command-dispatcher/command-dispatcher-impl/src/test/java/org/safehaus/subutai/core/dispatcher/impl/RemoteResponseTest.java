@@ -23,16 +23,17 @@ public class RemoteResponseTest
         new RemoteResponse( null );
     }
 
+
     @Test
-    public void shouldReturnProperties(){
+    public void shouldReturnProperties()
+    {
         UUID commandId = UUIDUtil.generateTimeBasedUUID();
-        Response response = mock(Response.class);
+        Response response = mock( Response.class );
         when( response.getTaskUuid() ).thenReturn( commandId );
 
         RemoteResponse remoteResponse = new RemoteResponse( response );
 
-        assertEquals(commandId, remoteResponse.getCommandId());
-        assertEquals(response, remoteResponse.getResponse());
-
+        assertEquals( commandId, remoteResponse.getCommandId() );
+        assertEquals( response, remoteResponse.getResponse() );
     }
 }

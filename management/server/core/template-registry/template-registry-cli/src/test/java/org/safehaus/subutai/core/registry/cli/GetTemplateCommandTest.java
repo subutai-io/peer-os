@@ -30,10 +30,16 @@ public class GetTemplateCommandTest extends TestParent
         }
 
 
-        public void setLxcArch( String lxcArch ) {this.lxcArch = lxcArch;}
+        public void setLxcArch( String lxcArch )
+        {
+            this.lxcArch = lxcArch;
+        }
 
 
-        public void setTemplateName( String templateName ) {this.templateName = templateName;}
+        public void setTemplateName( String templateName )
+        {
+            this.templateName = templateName;
+        }
     }
 
 
@@ -66,6 +72,7 @@ public class GetTemplateCommandTest extends TestParent
         assertTrue( getSysOut().contains( MockUtils.CHILD_TWO_TEMPLATE_NAME ) );
     }
 
+
     @Test
     public void testNullLxcArch() throws Exception
     {
@@ -75,6 +82,7 @@ public class GetTemplateCommandTest extends TestParent
 
         assertTrue( getSysOut().contains( MockUtils.CHILD_TWO_TEMPLATE_NAME ) );
     }
+
 
     @Test
     public void shouldPrint2SysOut() throws Exception

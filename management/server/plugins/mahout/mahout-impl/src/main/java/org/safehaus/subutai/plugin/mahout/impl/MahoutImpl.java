@@ -26,16 +26,15 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.SetupType;
-import org.safehaus.subutai.plugin.mahout.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.InstallHandler;
@@ -51,11 +50,10 @@ public class MahoutImpl implements Mahout
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( MahoutImpl.class.getName() );
-    private PluginDAO pluginDAO;
+    private PluginDao pluginDAO;
     private Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
@@ -70,13 +68,13 @@ public class MahoutImpl implements Mahout
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
 
 
-    public void setPluginDAO( final PluginDAO pluginDAO )
+    public void setPluginDAO( final PluginDao pluginDAO )
     {
         this.pluginDAO = pluginDAO;
     }
@@ -148,18 +146,6 @@ public class MahoutImpl implements Mahout
     }
 
 
-    public DbManager getDbManager()
-    {
-        return dbManager;
-    }
-
-
-    public void setDbManager( final DbManager dbManager )
-    {
-        this.dbManager = dbManager;
-    }
-
-
     public Tracker getTracker()
     {
         return tracker;
@@ -188,7 +174,7 @@ public class MahoutImpl implements Mahout
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {

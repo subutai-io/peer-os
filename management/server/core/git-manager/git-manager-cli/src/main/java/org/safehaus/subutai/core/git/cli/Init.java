@@ -18,15 +18,15 @@ import com.google.common.base.Preconditions;
 /**
  * Initializes specified directory as git repo
  */
-@Command(scope = "git", name = "init", description = "Init git repo")
+@Command( scope = "git", name = "init", description = "Init git repo" )
 public class Init extends OsgiCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( Init.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
 
     private final GitManager gitManager;

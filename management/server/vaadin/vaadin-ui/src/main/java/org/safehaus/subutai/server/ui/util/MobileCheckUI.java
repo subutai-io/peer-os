@@ -11,8 +11,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
 
-@Theme(Reindeer.THEME_NAME)
-@Title("QuickTickets Dashboard")
+@Theme( Reindeer.THEME_NAME )
+@Title( "QuickTickets Dashboard" )
 public class MobileCheckUI extends UI
 {
 

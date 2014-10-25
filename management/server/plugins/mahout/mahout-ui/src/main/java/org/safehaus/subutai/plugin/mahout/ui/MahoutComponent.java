@@ -36,9 +36,9 @@ public class MahoutComponent extends CustomComponent
         final Manager manager = new Manager( executorService, serviceLocator );
         Wizard wizard = new Wizard( executorService, serviceLocator );
         sheet.addTab( wizard.getContent(), "Install" );
-        sheet.getTab(0).setId("MahoutInstallTab");
+        sheet.getTab( 0 ).setId( "MahoutInstallTab" );
         sheet.addTab( manager.getContent(), "Manage" );
-        sheet.getTab(1).setId("MahoutManageTab");
+        sheet.getTab( 1 ).setId( "MahoutManageTab" );
         sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
         {
             @Override

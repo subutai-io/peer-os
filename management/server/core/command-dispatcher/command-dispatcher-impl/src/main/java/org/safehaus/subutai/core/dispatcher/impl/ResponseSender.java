@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;

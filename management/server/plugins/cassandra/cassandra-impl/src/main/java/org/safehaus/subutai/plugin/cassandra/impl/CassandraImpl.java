@@ -28,7 +28,6 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.plugin.cassandra.impl.dao.PluginDAO;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckServiceHandler;
@@ -39,6 +38,7 @@ import org.safehaus.subutai.plugin.cassandra.impl.handler.StartServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallClusterHandler;
+import org.safehaus.subutai.plugin.common.PluginDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class CassandraImpl implements Cassandra
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
-    private PluginDAO pluginDAO;
+    private PluginDao pluginDAO;
     private DataSource dataSource;
 
 
@@ -176,7 +176,7 @@ public class CassandraImpl implements Cassandra
     {
         try
         {
-            this.pluginDAO = new PluginDAO( dataSource );
+            this.pluginDAO = new PluginDao( dataSource );
         }
         catch ( SQLException e )
         {
@@ -202,6 +202,7 @@ public class CassandraImpl implements Cassandra
         return operationHandler.getTrackerId();
     }
 
+
     public UUID configureEnvironmentCluster( final CassandraClusterConfig config )
     {
         Preconditions.checkNotNull( config, "Configuration is null" );
@@ -223,7 +224,6 @@ public class CassandraImpl implements Cassandra
     public List<CassandraClusterConfig> getClusters()
     {
         return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-        //        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
     }
 
 
@@ -232,9 +232,6 @@ public class CassandraImpl implements Cassandra
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
-
-        //        return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName,
-        // CassandraClusterConfig.class );
     }
 
 
@@ -245,7 +242,7 @@ public class CassandraImpl implements Cassandra
     }
 
 
-    public PluginDAO getPluginDAO()
+    public PluginDao getPluginDAO()
     {
         return pluginDAO;
     }
@@ -364,4 +361,6 @@ public class CassandraImpl implements Cassandra
 
         return environmentBuildTask;
     }
+
+
 }

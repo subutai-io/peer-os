@@ -1,9 +1,9 @@
-Package: ksks-hive
+Package: subutai-hive
 Priority: optional
 Section: devel
 Installed-Size: 69000
-Maintainer: kiskis
+Maintainer: subutai
 Architecture: all
 Version: 1.0.24
-Depends: ksks-hadoop
-Description: This is a hive package of kiskis distribution.
+Depends: subutai-hadoop
+Description: This is a hive package of subutai distribution.

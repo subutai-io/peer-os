@@ -31,7 +31,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 
 
-public class Manager extends BaseManager {
+public class Manager extends BaseManager
+{
 
     protected final static String START_NAMENODE_BUTTON_CAPTION = "Start Namenode";
     protected final static String START_JOBTRACKER_BUTTON_CAPTION = "Start JobTracker";
@@ -49,32 +50,33 @@ public class Manager extends BaseManager {
     private final Label replicationFactor;
     private final Label domainName;
     private final Label slaveNodeCount;
-    private Button checkAllButton;
-    private HadoopClusterConfig hadoopCluster;
-    private String decommissionStatus;
-    private ManagerListener managerListener;
     private final Hadoop hadoop;
     private final Tracker tracker;
     private final ExecutorService executorService;
     private final CommandRunner commandRunner;
     private final AgentManager agentManager;
+    private Button checkAllButton;
+    private HadoopClusterConfig hadoopCluster;
+    private String decommissionStatus;
+    private ManagerListener managerListener;
 
 
-    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException {
+    public Manager( ExecutorService executorService, ServiceLocator serviceLocator ) throws NamingException
+    {
         super();
         this.executorService = executorService;
         this.tracker = serviceLocator.getService( Tracker.class );
         this.hadoop = serviceLocator.getService( Hadoop.class );
-        this.commandRunner = serviceLocator.getService( CommandRunner.class);
-        this.agentManager = serviceLocator.getService( AgentManager.class);
+        this.commandRunner = serviceLocator.getService( CommandRunner.class );
+        this.agentManager = serviceLocator.getService( AgentManager.class );
 
         managerListener = new ManagerListener( this );
 
         //tables go here
         masterNodesTable = createTableTemplate( "Master Nodes" );
-        masterNodesTable.setId("HadoopMasterNodesTable");
+        masterNodesTable.setId( "HadoopMasterNodesTable" );
         slaveNodesTable = createTableTemplate( "Slave Nodes" );
-        slaveNodesTable.setId("HadoopSlaveNodesTable");
+        slaveNodesTable.setId( "HadoopSlaveNodesTable" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -84,13 +86,15 @@ public class Manager extends BaseManager {
         controlsContent.addComponent( clusterNameLabel );
 
         clusterList = new ComboBox();
-        clusterList.setId("HadoopClustersCb");
+        clusterList.setId( "HadoopClustersCb" );
         clusterList.setImmediate( true );
         clusterList.setTextInputAllowed( false );
         clusterList.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterList.addValueChangeListener( new Property.ValueChangeListener() {
+        clusterList.addValueChangeListener( new Property.ValueChangeListener()
+        {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange( Property.ValueChangeEvent event )
+            {
                 hadoopCluster = ( HadoopClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
@@ -99,7 +103,7 @@ public class Manager extends BaseManager {
         controlsContent.addComponent( clusterList );
 
         checkAllButton = new Button( CHECK_ALL_BUTTON_CAPTION );
-        checkAllButton.setId("HadoopCheckAll");
+        checkAllButton.setId( "HadoopCheckAll" );
         checkAllButton.addStyleName( "default" );
         checkAllButton.addClickListener( managerListener.checkAllButtonListener( checkAllButton ) );
 
@@ -107,36 +111,40 @@ public class Manager extends BaseManager {
 
 
         Button startAllBtn = new Button( START_ALL_BUTTON_CAPTION );
-        startAllBtn.setId("HadoopStartAll");
+        startAllBtn.setId( "HadoopStartAll" );
         startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
+        startAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 startAllNodes( masterNodesTable );
             }
         } );
         controlsContent.addComponent( startAllBtn );
 
         Button stopAllBtn = new Button( STOP_ALL_BUTTON_CAPTION );
-        stopAllBtn.setId("HadoopStopAll");
+        stopAllBtn.setId( "HadoopStopAll" );
         stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
+        stopAllBtn.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
                 stopAllNodes( masterNodesTable );
             }
         } );
         controlsContent.addComponent( stopAllBtn );
 
         Button destroyClusterButton = new Button( DESTROY_CLUSTER_BUTTON_CAPTION );
-        destroyClusterButton.setId("HadoopDestroyCluster");
+        destroyClusterButton.setId( "HadoopDestroyCluster" );
         destroyClusterButton.addStyleName( "default" );
         destroyClusterButton.addClickListener( managerListener.destroyClusterButtonListener() );
 
         controlsContent.addComponent( destroyClusterButton );
 
         Button addNodeButton = new Button( ADD_NODE_BUTTON_CAPTION );
-        addNodeButton.setId("HadoopaddNode");
+        addNodeButton.setId( "HadoopaddNode" );
         addNodeButton.addStyleName( "default" );
         addNodeButton.addClickListener( managerListener.addNodeButtonListener() );
 
@@ -165,7 +173,9 @@ public class Manager extends BaseManager {
     }
 
 
-    public Table createTableTemplate( String caption ) {
+
+    public Table createTableTemplate( String caption )
+    {
         final Table table = new Table( caption );
         table.addContainerProperty( HOST_COLUMN_CAPTION, String.class, null );
         table.addContainerProperty( IP_COLUMN_CAPTION, String.class, null );
@@ -189,16 +199,19 @@ public class Manager extends BaseManager {
     }
 
 
-    private void refreshUI() {
-        if ( hadoopCluster != null ) {
-//            refreshClustersInfo();
+    private void refreshUI()
+    {
+        if ( hadoopCluster != null )
+        {
+            //            refreshClustersInfo();
             populateTable( masterNodesTable, getMasterNodeList( hadoopCluster ) );
             populateTable( slaveNodesTable, hadoopCluster.getDataNodes() );
             replicationFactor.setValue( hadoopCluster.getReplicationFactor().toString() );
             domainName.setValue( hadoopCluster.getDomainName() );
             slaveNodeCount.setValue( hadoopCluster.getAllSlaveNodes().size() + "" );
         }
-        else {
+        else
+        {
             masterNodesTable.removeAllItems();
             slaveNodesTable.removeAllItems();
             replicationFactor.setValue( "" );
@@ -208,14 +221,20 @@ public class Manager extends BaseManager {
     }
 
 
-    private void startAllNodes( Table table ) {
-        for ( Object o : table.getItemIds() ) {
+
+
+    private void startAllNodes( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
             HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
-            if ( availableOperationsLayout != null ) {
+            if ( availableOperationsLayout != null )
+            {
                 Button startButton = getStartButton( availableOperationsLayout );
-                if ( startButton != null ) {
+                if ( startButton != null )
+                {
                     startButton.click();
                 }
             }
@@ -223,14 +242,18 @@ public class Manager extends BaseManager {
     }
 
 
-    private void stopAllNodes( Table table ) {
-        for ( Object o : table.getItemIds() ) {
+    private void stopAllNodes( Table table )
+    {
+        for ( Object o : table.getItemIds() )
+        {
             int rowId = ( Integer ) o;
             Item row = table.getItem( rowId );
             HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
-            if ( availableOperationsLayout != null ) {
+            if ( availableOperationsLayout != null )
+            {
                 Button startButton = getStopButton( availableOperationsLayout );
-                if ( startButton != null ) {
+                if ( startButton != null )
+                {
                     startButton.click();
                 }
             }
@@ -238,15 +261,20 @@ public class Manager extends BaseManager {
     }
 
 
-    protected Button getExcludeIncludeButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
+    protected Button getExcludeIncludeButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( EXCLUDE_BUTTON_CAPTION )
-                        || component.getCaption().equals( INCLUDE_BUTTON_CAPTION )
-                        || component.getCaption().equals( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION ) ) {
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( EXCLUDE_BUTTON_CAPTION ) || component.getCaption().equals(
+                        INCLUDE_BUTTON_CAPTION ) || component.getCaption()
+                                                             .equals( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -256,16 +284,247 @@ public class Manager extends BaseManager {
     }
 
 
-    protected void show( String notification ) {
+    protected void show( String notification )
+    {
         Notification.show( notification );
     }
 
 
-    @Override
-    public void addRowComponents( Table table, final Agent agent ) {
+    protected Agent getAgentByRow( final Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
 
-        final HadoopClusterConfig cluster =
-                hadoop.getCluster( hadoopCluster.getClusterName() );
+        List<Agent> hadoopNodeList = hadoopCluster.getAllNodes();
+        String lxcHostname = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
+
+        for ( Agent agent : hadoopNodeList )
+        {
+            if ( agent.getHostname().equals( lxcHostname ) )
+            {
+                return agent;
+            }
+        }
+        return null;
+    }
+
+
+    protected Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 0 );
+    }
+
+
+    protected Label getStatusTaskTrackerLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 1 );
+    }
+
+
+    protected Label getStatusDecommissionLabel( final HorizontalLayout statusGroupLayout )
+    {
+        if ( statusGroupLayout == null )
+        {
+            return null;
+        }
+        return ( Label ) statusGroupLayout.getComponent( 2 );
+    }
+
+
+    protected NodeState getDecommissionStatus( final String operationLog, final Agent agent )
+    {
+        NodeState decommissionState = NodeState.UNKNOWN;
+        String ipOfNode = agent.getListIP().get( 0 );
+
+        if ( operationLog != null && operationLog.contains( ipOfNode ) )
+        {
+            String[] array = operationLog.split( "\n" );
+
+            for ( int i = 0; i < array.length; i++ )
+            {
+                String status = array[i];
+                if ( status.contains( ipOfNode ) )
+                {
+                    String decommissionStatus = array[i + 1];
+                    if ( decommissionStatus.toLowerCase().contains( "normal".toLowerCase() ) )
+                    {
+                        decommissionState = NodeState.NORMAL;
+                        break;
+                    }
+                    else if ( decommissionStatus.toLowerCase().contains( "progress".toLowerCase() ) )
+                    {
+                        decommissionState = NodeState.DECOMMISSION_IN_PROGRESS;
+                        break;
+                    }
+                    else if ( decommissionStatus.toLowerCase().contains( "decommissioned".toLowerCase() ) )
+                    {
+                        decommissionState = NodeState.DECOMMISSIONED;
+                        break;
+                    }
+                    else
+                    {
+                        decommissionState = NodeState.UNKNOWN;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            decommissionState = NodeState.UNKNOWN;
+        }
+
+        if ( decommissionState == NodeState.NORMAL && hadoopCluster.getBlockedAgents().contains( agent ) )
+        {
+            decommissionState = NodeState.DECOMMISSIONED;
+        }
+
+        return decommissionState;
+    }
+
+
+    protected void checkAllIfNoProcessRunning()
+    {
+        if ( getProcessCount() == 0 )
+        {
+            checkAllButton.click();
+        }
+    }
+
+
+    public Component getContent()
+    {
+        return contentRoot;
+    }
+
+
+    public List<Agent> getMasterNodeList( final HadoopClusterConfig hadoopCluster )
+    {
+        List<Agent> masterNodeList = new ArrayList<>();
+        masterNodeList.add( hadoopCluster.getNameNode() );
+        masterNodeList.add( hadoopCluster.getJobTracker() );
+        masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
+        return masterNodeList;
+    }
+
+    public AgentManager getAgentManager()
+    {
+        return agentManager;
+    }
+
+
+    public CommandRunner getCommandRunner()
+    {
+        return commandRunner;
+    }
+
+
+    public Hadoop getHadoop()
+    {
+        return hadoop;
+    }
+
+
+    public Tracker getTracker()
+    {
+        return tracker;
+    }
+
+
+    public ExecutorService getExecutorService()
+    {
+        return executorService;
+    }
+
+
+    public HadoopClusterConfig getHadoopCluster()
+    {
+        return hadoopCluster;
+    }
+
+
+    public GridLayout getContentRoot()
+    {
+        return contentRoot;
+    }
+
+
+    public ComboBox getClusterList()
+    {
+        return clusterList;
+    }
+
+
+    public Table getMasterNodesTable()
+    {
+        return masterNodesTable;
+    }
+
+
+    public Table getSlaveNodesTable()
+    {
+        return slaveNodesTable;
+    }
+
+
+    public Label getReplicationFactor()
+    {
+        return replicationFactor;
+    }
+
+
+    public Label getDomainName()
+    {
+        return domainName;
+    }
+
+
+    public Label getSlaveNodeCount()
+    {
+        return slaveNodeCount;
+    }
+
+
+    public Button getCheckAllButton()
+    {
+        return checkAllButton;
+    }
+
+
+    public String getDecommissionStatus()
+    {
+        return decommissionStatus;
+    }
+
+
+    public void setDecommissionStatus( String decommissionStatus )
+    {
+        this.decommissionStatus = decommissionStatus;
+    }
+
+
+    @Override
+    public void refreshClustersInfo()
+    {
+        managerListener.refreshClusterList();
+    }
+
+
+    @Override
+    public void addRowComponents( Table table, final Agent agent )
+    {
+
+        final HadoopClusterConfig cluster = hadoop.getCluster( hadoopCluster.getClusterName() );
 
         // Layouts to be added to table
         final HorizontalLayout availableOperations = new HorizontalLayout();
@@ -279,15 +538,15 @@ public class Manager extends BaseManager {
 
         // Buttons to be added to availableOperations
         final Button checkButton = new Button( CHECK_BUTTON_CAPTION );
-        checkButton.setId(agent.getListIP().get(0)+"-hadoopCheck");
+        checkButton.setId( agent.getListIP().get( 0 ) + "-hadoopCheck" );
         final Button destroyButton = new Button( DESTROY_BUTTON_CAPTION );
-        destroyButton.setId(agent.getListIP().get(0)+"-hadoopDestroy");
+        destroyButton.setId( agent.getListIP().get( 0 ) + "-hadoopDestroy" );
         final Button startStopButton = new Button( START_STOP_BUTTON_DEFAULT_CAPTION );
-        startStopButton.setId(agent.getListIP().get(0)+"-hadoopStartStop");
+        startStopButton.setId( agent.getListIP().get( 0 ) + "-hadoopStartStop" );
         final Button excludeIncludeNodeButton = new Button( EXCLUDE_INCLUDE_BUTTON_DEFAULT_CAPTION );
-        excludeIncludeNodeButton.setId(agent.getListIP().get(0)+"-hadoopExcludeInclude");
+        excludeIncludeNodeButton.setId( agent.getListIP().get( 0 ) + "-hadoopExcludeInclude" );
         final Button urlButton = new Button( URL_BUTTON_CAPTION );
-        urlButton.setId(agent.getHostname()+"-hadoopUrl");
+        urlButton.setId( agent.getHostname() + "-hadoopUrl" );
 
         checkButton.addStyleName( "default" );
         startStopButton.addStyleName( "default" );
@@ -299,11 +558,11 @@ public class Manager extends BaseManager {
 
         // Labels to be added to statusGroup
         final Label statusDatanode = new Label( "" );
-        statusDatanode.setId(agent.getListIP().get(0)+"-hadoopStatusDataNode");
+        statusDatanode.setId( agent.getListIP().get( 0 ) + "-hadoopStatusDataNode" );
         final Label statusTaskTracker = new Label( "" );
-        statusTaskTracker.setId(agent.getListIP().get(0)+"-hadoopStatusTaskTracker");
+        statusTaskTracker.setId( agent.getListIP().get( 0 ) + "-hadoopStatusTaskTracker" );
         final Label statusDecommission = new Label( "" );
-        statusDecommission.setId(agent.getListIP().get(0)+"-hadoopStatusDecommission");
+        statusDecommission.setId( agent.getListIP().get( 0 ) + "-hadoopStatusDecommission" );
 
         statusDatanode.addStyleName( "default" );
         statusTaskTracker.addStyleName( "default" );
@@ -311,26 +570,31 @@ public class Manager extends BaseManager {
         // Labels to be added to statusGroup
 
 
-        if ( cluster.isMasterNode( agent ) ) {
-            if ( cluster.isNameNode( agent ) ) {
+        if ( cluster.isMasterNode( agent ) )
+        {
+            if ( cluster.isNameNode( agent ) )
+            {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusDatanode );
             }
-            else if ( cluster.isJobTracker( agent ) ) {
+            else if ( cluster.isJobTracker( agent ) )
+            {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( startStopButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusTaskTracker );
             }
-            else if ( cluster.isSecondaryNameNode( agent ) ) {
+            else if ( cluster.isSecondaryNameNode( agent ) )
+            {
                 availableOperations.addComponent( checkButton );
                 availableOperations.addComponent( urlButton );
                 statusGroup.addComponent( statusDatanode );
             }
         }
-        else {
+        else
+        {
             availableOperations.addComponent( checkButton );
             availableOperations.addComponent( excludeIncludeNodeButton );
             availableOperations.addComponent( destroyButton );
@@ -339,7 +603,8 @@ public class Manager extends BaseManager {
             statusGroup.addComponent( statusDecommission );
         }
         table.addItem( new Object[] {
-                agent.getHostname(), agent.getListIP().toString(), getNodeRoles( cluster, agent ).toString(), statusGroup, availableOperations
+                agent.getHostname(), agent.getListIP().toString(), getNodeRoles( cluster, agent ).toString(),
+                statusGroup, availableOperations
         }, null );
 
 
@@ -348,30 +613,33 @@ public class Manager extends BaseManager {
         // Add listeners according to node type
 
         // If master node
-        if ( cluster.isMasterNode( agent ) ) {
+        if ( cluster.isMasterNode( agent ) )
+        {
 
             // If Namenode
-            if ( cluster.isNameNode( agent ) ) {
+            if ( cluster.isNameNode( agent ) )
+            {
                 urlButton.addClickListener( managerListener.nameNodeURLButtonListener( agent ) );
                 checkButton.addClickListener( managerListener.nameNodeCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.nameNodeStartStopButtonListener( row ) );
-
             }
             // If Jobtracker
-            else if ( cluster.isJobTracker( agent ) ) {
-                urlButton.addClickListener( jobTrackerURLButtonListener( agent) );
+            else if ( cluster.isJobTracker( agent ) )
+            {
+                urlButton.addClickListener( jobTrackerURLButtonListener( agent ) );
                 checkButton.addClickListener( managerListener.jobTrackerCheckButtonListener( row ) );
                 startStopButton.addClickListener( managerListener.jobTrackerStartStopButtonListener( row ) );
             }
             // If SecondaryNameNode
-            else if ( cluster.isSecondaryNameNode( agent ) ) {
+            else if ( cluster.isSecondaryNameNode( agent ) )
+            {
                 urlButton.addClickListener( managerListener.secondaryNameNodeURLButtonListener( agent ) );
                 checkButton.addClickListener( managerListener.secondaryNameNodeCheckButtonListener( row ) );
-
             }
         }
         // If slave node
-        else {
+        else
+        {
 
             checkButton.addClickListener( managerListener.slaveNodeCheckButtonListener( row ) );
             excludeIncludeNodeButton.addClickListener( managerListener.slaveNodeExcludeIncludeButtonListener( row ) );
@@ -380,214 +648,46 @@ public class Manager extends BaseManager {
     }
 
 
+
     private List<NodeType> getNodeRoles( HadoopClusterConfig clusterConfig, final Agent agent )
     {
         List<NodeType> nodeRoles = new ArrayList<>();
 
         if ( clusterConfig.isNameNode( agent ) )
+        {
             nodeRoles.add( NodeType.NAMENODE );
+        }
         if ( clusterConfig.isSecondaryNameNode( agent ) )
+        {
             nodeRoles.add( NodeType.SECONDARY_NAMENODE );
+        }
         if ( clusterConfig.isJobTracker( agent ) )
+        {
             nodeRoles.add( NodeType.JOBTRACKER );
+        }
         if ( clusterConfig.isDataNode( agent ) )
+        {
             nodeRoles.add( NodeType.DATANODE );
+        }
         if ( clusterConfig.isTaskTracker( agent ) )
+        {
             nodeRoles.add( NodeType.TASKTRACKER );
+        }
 
         return nodeRoles;
     }
 
 
-    private Button.ClickListener jobTrackerURLButtonListener( final Agent agent ) {
-        return new Button.ClickListener() {
-            @Override
-            public void buttonClick( final Button.ClickEvent event ) {
-                contentRoot.getUI().getPage().open( "http://" + agent.getListIP().get( 0 ) + ":50030",
-                        "JobTracker", false );
-            }
-        } ;
-    }
-
-
-    protected Agent getAgentByRow( final Item row ) {
-        if ( row == null ) {
-            return null;
-        }
-
-        List<Agent> hadoopNodeList = hadoopCluster.getAllNodes();
-        String lxcHostname= row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-
-        for ( Agent agent : hadoopNodeList ) {
-            if ( agent.getHostname().equals( lxcHostname ) ) {
-                return agent;
-            }
-        }
-        return null;
-    }
-
-
-    protected Label getStatusDatanodeLabel( final HorizontalLayout statusGroupLayout ) {
-        if ( statusGroupLayout == null ) {
-            return null;
-        }
-        return (Label) statusGroupLayout.getComponent( 0 );
-    }
-
-
-    protected Label getStatusTaskTrackerLabel( final HorizontalLayout statusGroupLayout ) {
-        if ( statusGroupLayout == null ) {
-            return null;
-        }
-        return (Label) statusGroupLayout.getComponent( 1 );
-    }
-
-
-    protected Label getStatusDecommissionLabel( final HorizontalLayout statusGroupLayout ) {
-        if ( statusGroupLayout == null ) {
-            return null;
-        }
-        return (Label) statusGroupLayout.getComponent( 2 );
-    }
-
-
-    protected NodeState getDecommissionStatus( final String operationLog, final Agent agent ) {
-        NodeState decommissionState = NodeState.UNKNOWN;
-        String ipOfNode = agent.getListIP().get( 0 );
-
-        if ( operationLog != null && operationLog.contains( ipOfNode ) ) {
-            String[] array = operationLog.split( "\n" );
-
-            for ( int i = 0; i < array.length; i++ ) {
-                String status = array[i];
-                if ( status.contains( ipOfNode ) ) {
-                    String decommissionStatus = array[i+1];
-                    if ( decommissionStatus.toLowerCase().contains( "normal".toLowerCase() ) ) {
-                        decommissionState = NodeState.NORMAL;
-                        break;
-                    }
-                    else if ( decommissionStatus.toLowerCase().contains( "progress".toLowerCase() ) ) {
-                        decommissionState = NodeState.DECOMMISSION_IN_PROGRESS;
-                        break;
-                    }
-                    else if ( decommissionStatus.toLowerCase().contains( "decommissioned".toLowerCase() ) ) {
-                        decommissionState= NodeState.DECOMMISSIONED;
-                        break;
-                    }
-                    else {
-                        decommissionState = NodeState.UNKNOWN;
-                        break;
-                    }
-                }
-            }
-        }
-        else {
-            decommissionState = NodeState.UNKNOWN;
-        }
-
-        if ( decommissionState == NodeState.NORMAL && hadoopCluster.getBlockedAgents().contains( agent ) )
-            decommissionState = NodeState.DECOMMISSIONED;
-
-        return decommissionState;
-    }
-
-
-    protected void checkAllIfNoProcessRunning() {
-        if ( getProcessCount() == 0 ) {
-            checkAllButton.click();
-        }
-    }
-
-
-    public Component getContent() {
-        return contentRoot;
-    }
-
-
-    public List<Agent> getMasterNodeList( final HadoopClusterConfig hadoopCluster ) {
-        List<Agent> masterNodeList = new ArrayList<>();
-        masterNodeList.add( hadoopCluster.getNameNode() );
-        masterNodeList.add( hadoopCluster.getJobTracker() );
-        masterNodeList.add( hadoopCluster.getSecondaryNameNode() );
-        return masterNodeList;
-    }
-
-
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
-
-
-    public CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-
-    public Hadoop getHadoop() {
-        return hadoop;
-    }
-
-
-    public Tracker getTracker() {
-        return tracker;
-    }
-
-
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
-
-
-    public HadoopClusterConfig getHadoopCluster() {
-        return hadoopCluster;
-    }
-
-
-    public GridLayout getContentRoot() {
-        return contentRoot;
-    }
-
-    public ComboBox getClusterList() {
-        return clusterList;
-    }
-
-    public Table getMasterNodesTable() {
-        return masterNodesTable;
-    }
-
-    public Table getSlaveNodesTable() {
-        return slaveNodesTable;
-    }
-
-    public Label getReplicationFactor() {
-        return replicationFactor;
-    }
-
-    public Label getDomainName() {
-        return domainName;
-    }
-
-    public Label getSlaveNodeCount() {
-        return slaveNodeCount;
-    }
-
-    public Button getCheckAllButton() {
-        return checkAllButton;
-    }
-
-    public String getDecommissionStatus() {
-        return decommissionStatus;
-    }
-
-
-    public void setDecommissionStatus( String decommissionStatus ) {
-        this.decommissionStatus = decommissionStatus;
-    }
-
-
-    @Override
-    public void refreshClustersInfo()
+    private Button.ClickListener jobTrackerURLButtonListener( final Agent agent )
     {
-        managerListener.refreshClusterList();
+        return new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                contentRoot.getUI().getPage()
+                           .open( "http://" + agent.getListIP().get( 0 ) + ":50030", "JobTracker", false );
+            }
+        };
     }
 }

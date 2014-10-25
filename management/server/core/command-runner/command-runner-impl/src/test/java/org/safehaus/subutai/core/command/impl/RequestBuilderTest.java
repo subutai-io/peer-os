@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -69,7 +69,7 @@ public class RequestBuilderTest
                                          .withStdOutRedirection( STD_REDIRECTION );
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void constructorShouldFailEmptyOrNullCommand()
     {
         new RequestBuilder( null );

@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.plugin.flume.impl.Commands;
@@ -28,9 +28,8 @@ public class ServiceStatusHandler extends AbstractOperationHandler<FlumeImpl>
     {
         super( manager, clusterName );
         this.hostname = hostname;
-        this.trackerOperation =
-                manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
-                        "Check service on node " + hostname );
+        this.trackerOperation = manager.getTracker().createTrackerOperation( FlumeConfig.PRODUCT_KEY,
+                "Check service on node " + hostname );
     }
 
 
@@ -97,5 +96,4 @@ public class ServiceStatusHandler extends AbstractOperationHandler<FlumeImpl>
         }
         po.addLogDone( log.toString() );
     }
-
 }

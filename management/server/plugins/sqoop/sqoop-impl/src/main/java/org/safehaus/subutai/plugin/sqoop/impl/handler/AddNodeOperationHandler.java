@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -94,9 +94,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
+        //check installed subutai packages
         String s = CommandFactory.build( CommandType.LIST, null );
-        Command checkInstalledCommand = manager.getCommandRunner().createCommand( new RequestBuilder( s ), Sets.newHashSet( agent )  );
+        Command checkInstalledCommand =
+                manager.getCommandRunner().createCommand( new RequestBuilder( s ), Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() )
@@ -122,7 +123,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SqoopImpl>
         {
             po.addLog( "Installing Sqoop..." );
             s = CommandFactory.build( CommandType.INSTALL, null );
-            Command installCommand = manager.getCommandRunner().createCommand( new RequestBuilder( s ).withTimeout( 180 ),  Sets.newHashSet( agent ) );
+            Command installCommand = manager.getCommandRunner()
+                                            .createCommand( new RequestBuilder( s ).withTimeout( 180 ),
+                                                    Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() )

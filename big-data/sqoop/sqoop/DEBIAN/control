@@ -1,9 +1,9 @@
-Package: ksks-sqoop
+Package: subutai-sqoop
 Priority: optional
 Section: devel
-Installed-Size: 100
-Maintainer: kiskis
+Installed-Size: 7533
+Maintainer: subutai
 Architecture: amd64
 Version: 1.0.2
-Depends: ksks-hadoop
-Description: This is a sqoop package of kiskis distribution. 
+Depends: subutai-hadoop
+Description: This is a sqoop package of subutai distribution. 

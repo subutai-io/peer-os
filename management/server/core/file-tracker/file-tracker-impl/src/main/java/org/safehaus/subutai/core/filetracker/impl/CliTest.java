@@ -16,11 +16,11 @@ import com.google.common.base.Preconditions;
 /**
  * Needed mostly for testing FileTracker
  */
-@Command(scope = "file-tracker", name = "test")
+@Command( scope = "file-tracker", name = "test" )
 public class CliTest extends OsgiCommandSupport implements ResponseListener
 {
 
-    private static final String[] CONFIG_POINTS = new String[] { "/etc", "/etc/ksks-agent" };
+    private static final String[] CONFIG_POINTS = new String[] { "/etc", "/etc/subutai-agent" };
 
     private AgentManager agentManager;
 

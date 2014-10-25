@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import javax.naming.NamingException;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.common.util.ServiceLocator;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -72,8 +72,8 @@ public class Manager
         //tables go here
         masterTable = createTableTemplate( "Master node", true );
         workersTable = createTableTemplate( "Workers", false );
-        masterTable.setId("StormMngMasterNode");
-        workersTable.setId("StormMngWorkerNodes");
+        masterTable.setId( "StormMngMasterNode" );
+        workersTable.setId( "StormMngWorkerNodes" );
         //tables go here
 
         HorizontalLayout controlsContent = new HorizontalLayout();
@@ -83,7 +83,7 @@ public class Manager
         controlsContent.addComponent( clusterNameLabel );
 
         clusterCombo = new ComboBox();
-        clusterCombo.setId("StormMngClusterCombo");
+        clusterCombo.setId( "StormMngClusterCombo" );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
         clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
@@ -99,7 +99,7 @@ public class Manager
         } );
 
         Button refreshClustersBtn = new Button( "Refresh clusters" );
-        refreshClustersBtn.setId("StormMngRefresh");
+        refreshClustersBtn.setId( "StormMngRefresh" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener()
         {
@@ -112,7 +112,7 @@ public class Manager
         } );
 
         Button destroyClusterBtn = new Button( "Destroy cluster" );
-        destroyClusterBtn.setId("StormMngDestroy");
+        destroyClusterBtn.setId( "StormMngDestroy" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener()
         {
@@ -143,7 +143,7 @@ public class Manager
         } );
 
         Button addNodeBtn = new Button( "Add Node" );
-        addNodeBtn.setId("StormMngAddNode");
+        addNodeBtn.setId( "StormMngAddNode" );
         addNodeBtn.addStyleName( "default" );
         addNodeBtn.addClickListener( new Button.ClickListener()
         {
@@ -181,10 +181,10 @@ public class Manager
         controlsContent.addComponent( makeBatchOperationButton( "Restart all", "Restart" ) );
         controlsContent.addComponent( addNodeBtn );
 
-        controlsContent.getComponent(3).setId("StormMngCheckAll");
-        controlsContent.getComponent(4).setId("StormMngStartAll");
-        controlsContent.getComponent(5).setId("StormMngStopAll");
-        controlsContent.getComponent(6).setId("StormMngRestartAll");
+        controlsContent.getComponent( 3 ).setId( "StormMngCheckAll" );
+        controlsContent.getComponent( 4 ).setId( "StormMngStartAll" );
+        controlsContent.getComponent( 5 ).setId( "StormMngStopAll" );
+        controlsContent.getComponent( 6 ).setId( "StormMngRestartAll" );
 
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( masterTable, 0, 1, 0, 5 );
@@ -355,11 +355,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean running = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean running = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( !running );
                             stopBtn.setEnabled( running );
@@ -397,11 +397,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean started = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean started = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( !started );
                             stopBtn.setEnabled( started );
@@ -439,11 +439,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean stopped = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean stopped = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( stopped );
                             stopBtn.setEnabled( !stopped );
@@ -481,11 +481,11 @@ public class Manager
                         public void run()
                         {
                             TrackerOperationView po = null;
-                            while ( po == null || po.getState() == ProductOperationState.RUNNING )
+                            while ( po == null || po.getState() == OperationState.RUNNING )
                             {
                                 po = tracker.getTrackerOperation( StormConfig.PRODUCT_NAME, trackId );
                             }
-                            boolean ok = po.getState() == ProductOperationState.SUCCEEDED;
+                            boolean ok = po.getState() == OperationState.SUCCEEDED;
                             checkBtn.setEnabled( true );
                             startBtn.setEnabled( !ok );
                             stopBtn.setEnabled( ok );

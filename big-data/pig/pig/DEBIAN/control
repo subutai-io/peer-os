@@ -1,9 +1,9 @@
-Package: ksks-pig 
+Package: subutai-pig 
 Priority: optional
 Section: devel
-Installed-Size: 100
-Maintainer: kiskis 
+Installed-Size: 251962
+Maintainer: subutai 
 Architecture: amd64
 Version: 1.1.5
-Depends: ksks-hadoop
-Description: This is a pig package of kiskis distribution.
+Depends: subutai-hadoop
+Description: This is a pig package of subutai distribution.

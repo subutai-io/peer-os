@@ -30,7 +30,7 @@ public class AgentResultTest
     private final AgentResultImpl agentResult = new AgentResultImpl( agentUUID );
 
 
-    @Test(expected = NullPointerException.class)
+    @Test( expected = NullPointerException.class )
     public void constructorShouldFailNullAgentUUID()
     {
         new AgentResultImpl( null );
@@ -50,7 +50,8 @@ public class AgentResultTest
     @Test
     public void shouldNotAppendAlienResponse()
     {
-        Response response = MockUtils.getIntermediateResponse( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
+        Response response =
+                MockUtils.getIntermediateResponse( UUIDUtil.generateTimeBasedUUID(), UUIDUtil.generateTimeBasedUUID() );
         when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
 
         agentResult.appendResults( response );

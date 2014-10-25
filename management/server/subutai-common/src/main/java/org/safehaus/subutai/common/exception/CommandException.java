@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.command.api.command;
+package org.safehaus.subutai.common.exception;
 
 
 /**
@@ -9,5 +9,11 @@ public class CommandException extends Exception
     public CommandException( final String message )
     {
         super( message );
+    }
+
+
+    public CommandException( final Throwable cause )
+    {
+        super( cause );
     }
 }

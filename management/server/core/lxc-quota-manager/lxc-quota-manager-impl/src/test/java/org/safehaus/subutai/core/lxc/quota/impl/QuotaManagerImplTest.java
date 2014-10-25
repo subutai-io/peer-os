@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.lxc.quota.api.QuotaEnum;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +30,7 @@ public class QuotaManagerImplTest
     CommandRunner commandRunner;
     String expectedValue = "200000000";
     Agent agent;
+
 
     @Before
     public void setupClasses()

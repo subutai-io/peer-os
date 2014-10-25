@@ -55,7 +55,8 @@ public class TestUtils
     }
 
 
-    public static String getRequestCommandJson(){
+    public static String getRequestCommandJson()
+    {
         return "";
     }
 }

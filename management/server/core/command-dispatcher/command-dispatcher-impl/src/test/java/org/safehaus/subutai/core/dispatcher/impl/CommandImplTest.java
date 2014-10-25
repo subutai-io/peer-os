@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test for CommandImpl
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith( MockitoJUnitRunner.class )
 public class CommandImplTest
 {
     private static final String COMMAND = "pwd";

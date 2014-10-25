@@ -33,7 +33,10 @@ public class ListTemplatesCommandTest extends TestParent
         }
 
 
-        public void setLxcArch( String lxcArch ) {this.lxcArch = lxcArch;}
+        public void setLxcArch( String lxcArch )
+        {
+            this.lxcArch = lxcArch;
+        }
     }
 
 

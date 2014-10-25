@@ -8,19 +8,19 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "template", name = "clone", description = "clone new instance")
+@Command( scope = "template", name = "clone", description = "clone new instance" )
 public class CloneTemplate extends OsgiCommandSupport
 {
 
     private TemplateManager templateManager;
 
-    @Argument(index = 0, required = true)
+    @Argument( index = 0, required = true )
     private String hostName;
-    @Argument(index = 1, required = true)
+    @Argument( index = 1, required = true )
     private String templateName;
-    @Argument(index = 2, required = true)
+    @Argument( index = 2, required = true )
     private String cloneName;
-    @Argument(index = 3, required = true)
+    @Argument( index = 3, required = true )
     private String envId;
 
 

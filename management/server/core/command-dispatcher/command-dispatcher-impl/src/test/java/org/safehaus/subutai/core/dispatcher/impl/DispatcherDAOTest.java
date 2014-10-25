@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
 

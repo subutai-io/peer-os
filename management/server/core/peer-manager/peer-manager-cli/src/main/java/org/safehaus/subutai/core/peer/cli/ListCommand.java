@@ -13,7 +13,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 8/28/14.
  */
-@Command(scope = "peer", name = "ls")
+@Command( scope = "peer", name = "ls" )
 public class ListCommand extends OsgiCommandSupport
 {
 

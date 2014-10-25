@@ -40,7 +40,8 @@ public abstract class BaseManager implements BaseManagerInterface
     protected int processCount = 0;
 
 
-    public BaseManager() {
+    public BaseManager()
+    {
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
@@ -49,58 +50,66 @@ public abstract class BaseManager implements BaseManagerInterface
         contentRoot.setColumns( 1 );
 
         progressBar = new ProgressBar();
-        progressBar.setId("indicator");
+        progressBar.setId( "indicator" );
         progressBar.setIndeterminate( true );
         progressBar.setVisible( false );
     }
 
-    public synchronized void enableProgressBar() {
+
+    public synchronized void enableProgressBar()
+    {
         incrementProcessCount();
         progressBar.setVisible( true );
     }
 
 
-    public synchronized void disableProgressBar() {
-        if ( processCount > 0 ) {
+    public synchronized void disableProgressBar()
+    {
+        if ( processCount > 0 )
+        {
             decrementProcessCount();
         }
-        if ( processCount == 0 ) {
+        if ( processCount == 0 )
+        {
             progressBar.setVisible( false );
         }
     }
 
 
-    public synchronized void incrementProcessCount() {
+    public synchronized void incrementProcessCount()
+    {
         processCount++;
     }
 
-
-    public synchronized void decrementProcessCount() {
+    public synchronized void decrementProcessCount()
+    {
         processCount--;
     }
 
 
-    public HorizontalLayout getAvailableOperationsLayout( Item row ) {
+
+    public HorizontalLayout getStatusLayout( final Item row )
+    {
         if ( row == null )
-            return null;
-        return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
-    }
-
-
-    public HorizontalLayout getStatusLayout( final Item row ) {
-        if ( row == null )
-            return null;
-        return (HorizontalLayout) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
-    }
-
-
-    public Button getCheckButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) ) {
+        return ( HorizontalLayout ) row.getItemProperty( STATUS_COLUMN_CAPTION ).getValue();
+    }
+
+
+    public Button getDestroyButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( DESTROY_BUTTON_CAPTION ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -109,13 +118,18 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    public Button getDestroyButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
+    public Button getStartButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().equals( DESTROY_BUTTON_CAPTION ) ) {
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().contains( START_BUTTON_CAPTION ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -124,13 +138,18 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    public Button getStartButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
+    public Button getStopButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().contains( START_BUTTON_CAPTION ) ) {
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().contains( STOP_BUTTON_CAPTION ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -139,13 +158,19 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    public Button getStopButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
+    public Button getStartStopButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
             return null;
         }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().contains( STOP_BUTTON_CAPTION ) ) {
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().contains( START_BUTTON_CAPTION ) || component.getCaption().contains(
+                        STOP_BUTTON_CAPTION ) || component.getCaption().equals( START_STOP_BUTTON_DEFAULT_CAPTION ) )
+                {
                     return ( Button ) component;
                 }
             }
@@ -154,63 +179,54 @@ public abstract class BaseManager implements BaseManagerInterface
     }
 
 
-    public Button getStartStopButton( final HorizontalLayout availableOperationsLayout ) {
-        if ( availableOperationsLayout == null ) {
-            return null;
-        }
-        else {
-            for ( Component component : availableOperationsLayout ) {
-                if ( component.getCaption().contains( START_BUTTON_CAPTION )
-                        || component.getCaption().contains( STOP_BUTTON_CAPTION )
-                        || component.getCaption().equals( START_STOP_BUTTON_DEFAULT_CAPTION )
-                        ) {
-                    return ( Button ) component;
-                }
-            }
-            return null;
-        }
-    }
-
-
-    protected void populateTable( final Table table, List<Agent> agents ) {
+    protected void populateTable( final Table table, List<Agent> agents )
+    {
 
         table.removeAllItems();
 
         // Add UI components into relevant fields according to its role in cluster
-        for ( final Agent agent : agents ) {
+        for ( final Agent agent : agents )
+        {
             addRowComponents( table, agent );
         }
     }
 
 
-    protected int getAgentRowId( final Table table, final Agent agent ) {
-        if ( table != null && agent != null ) {
-            for ( Object o : table.getItemIds() ) {
+    public Item getAgentRow( final Table table, final Agent agent )
+    {
+
+        int rowId = getAgentRowId( table, agent );
+        Item row = null;
+        if ( rowId >= 0 )
+        {
+            row = table.getItem( rowId );
+        }
+        if ( row == null )
+        {
+            Notification.show( "Agent rowId should have been found inside " + table.getCaption()
+                    + " but could not find! " );
+        }
+        return row;
+    }
+
+
+    protected int getAgentRowId( final Table table, final Agent agent )
+    {
+        if ( table != null && agent != null )
+        {
+            for ( Object o : table.getItemIds() )
+            {
                 int rowId = ( Integer ) o;
                 Item row = table.getItem( rowId );
                 String hostName = row.getItemProperty( HOST_COLUMN_CAPTION ).getValue().toString();
-                if ( hostName.equals( agent.getHostname() ) ) {
+                if ( hostName.equals( agent.getHostname() ) )
+                {
                     return rowId;
                 }
             }
         }
         return -1;
     }
-
-
-    public Item getAgentRow( final Table table, final Agent agent) {
-
-        int rowId = getAgentRowId( table, agent );
-        Item row = null;
-        if ( rowId >= 0 ) {
-            row = table.getItem( rowId );
-        }
-        if ( row == null ) {
-            Notification.show( "Agent rowId should have been found inside " + table.getCaption() + " but could not find! " );
-        }
-        return row;
-    }
-
 
 
     public void clickAllCheckButtons( Table table )
@@ -221,13 +237,47 @@ public abstract class BaseManager implements BaseManagerInterface
             Item row = table.getItem( rowId );
             HorizontalLayout availableOperationsLayout = getAvailableOperationsLayout( row );
             Button checkButton = getCheckButton( availableOperationsLayout );
-            if ( checkButton != null ) {
+            if ( checkButton != null )
+            {
                 checkButton.click();
             }
         }
     }
 
-    public synchronized int getProcessCount() {
+
+
+    public HorizontalLayout getAvailableOperationsLayout( Item row )
+    {
+        if ( row == null )
+        {
+            return null;
+        }
+        return ( HorizontalLayout ) ( row.getItemProperty( AVAILABLE_OPERATIONS_COLUMN_CAPTION ).getValue() );
+    }
+
+
+    public Button getCheckButton( final HorizontalLayout availableOperationsLayout )
+    {
+        if ( availableOperationsLayout == null )
+        {
+            return null;
+        }
+        else
+        {
+            for ( Component component : availableOperationsLayout )
+            {
+                if ( component.getCaption().equals( CHECK_BUTTON_CAPTION ) )
+                {
+                    return ( Button ) component;
+                }
+            }
+            return null;
+        }
+    }
+
+
+    public synchronized int getProcessCount()
+    {
         return processCount;
     }
 

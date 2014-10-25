@@ -1,9 +1,9 @@
-Package: ksks-nutch
+Package: subutai-nutch
 Priority: optional
 Section: devel
-Installed-Size: 100
-Maintainer: kiskis
+Installed-Size: 81740
+Maintainer: subutai
 Architecture: amd64 
 Version: 1.0.1
-Depends: ksks-hadoop
-Description: This is a nutch package of kiskis distribution.
+Depends: subutai-hadoop
+Description: This is a nutch package of subutai distribution.

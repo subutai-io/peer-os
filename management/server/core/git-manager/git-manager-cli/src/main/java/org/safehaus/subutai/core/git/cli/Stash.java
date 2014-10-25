@@ -18,16 +18,16 @@ import com.google.common.base.Preconditions;
 /**
  * Stashes all changes in current branch and reverts it to HEAD commit
  */
-@Command(scope = "git", name = "stash", description = "Stash all changes in current branch and revert to HEAD commit")
+@Command( scope = "git", name = "stash", description = "Stash all changes in current branch and revert to HEAD commit" )
 public class Stash extends OsgiCommandSupport
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( Stash.class.getName() );
 
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
 
     private final GitManager gitManager;

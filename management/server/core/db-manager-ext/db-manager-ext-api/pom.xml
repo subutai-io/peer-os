@@ -21,17 +21,17 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
     <!--db-manager-ext-impl-->
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-          <version>${com.h2database.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.eclipse.persistence</groupId>
-          <artifactId>eclipselink</artifactId>
-          <version>${org.eclipse.eclipselink.version}</version>
-        </dependency>
-        <!--db-manager-ext-impl-->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${com.h2database.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>eclipselink</artifactId>
+      <version>${org.eclipse.eclipselink.version}</version>
+    </dependency>
+    <!--db-manager-ext-impl-->
   </dependencies>
 
   <build>

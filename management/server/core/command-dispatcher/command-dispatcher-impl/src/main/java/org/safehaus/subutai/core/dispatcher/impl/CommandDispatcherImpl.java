@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.protocol.Request;
@@ -23,11 +24,11 @@ import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.command.api.command.CommandExecutor;
 import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;

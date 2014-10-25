@@ -48,8 +48,8 @@ public class RestService
 
 
     @GET
-    @Path("clusters")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Path( "clusters" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getClusters()
     {
 
@@ -67,9 +67,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getCluster( @PathParam( "clusterName" ) String clusterName )
     {
         FlumeConfig config = flumeManager.getCluster( clusterName );
 
@@ -79,9 +79,10 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response installCluster( @PathParam("clusterName") String clusterName, @QueryParam("nodes") String nodes )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response installCluster( @PathParam( "clusterName" ) String clusterName,
+                                    @QueryParam( "nodes" ) String nodes )
     {
 
         FlumeConfig config = new FlumeConfig();
@@ -106,11 +107,12 @@ public class RestService
 
 
     @POST
-    @Path("install/{name}/{hadoopName}/{slaveNodesCount}/{replFactor}/{domainName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response install( @PathParam("name") String name, @PathParam("hadoopName") String hadoopName,
-                             @PathParam("slaveNodesCount") String slaveNodesCount,
-                             @PathParam("replFactor") String replFactor, @PathParam("domainName") String domainName )
+    @Path( "install/{name}/{hadoopName}/{slaveNodesCount}/{replFactor}/{domainName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response install( @PathParam( "name" ) String name, @PathParam( "hadoopName" ) String hadoopName,
+                             @PathParam( "slaveNodesCount" ) String slaveNodesCount,
+                             @PathParam( "replFactor" ) String replFactor,
+                             @PathParam( "domainName" ) String domainName )
     {
 
         FlumeConfig config = new FlumeConfig();
@@ -151,9 +153,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response uninstallCluster( @PathParam("clusterName") String clusterName )
+    @Path( "clusters/{clusterName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response uninstallCluster( @PathParam( "clusterName" ) String clusterName )
     {
         UUID uuid = flumeManager.uninstallCluster( clusterName );
 
@@ -163,9 +165,9 @@ public class RestService
 
 
     @POST
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response addNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response addNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = flumeManager.addNode( clusterName, node );
 
@@ -175,9 +177,9 @@ public class RestService
 
 
     @DELETE
-    @Path("clusters/{clusterName}/nodes/{node}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response destroyNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response destroyNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = flumeManager.destroyNode( clusterName, node );
 
@@ -187,9 +189,9 @@ public class RestService
 
 
     @PUT
-    @Path("clusters/{clusterName}/nodes/{node}/start")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response startNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}/start" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response startNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = flumeManager.startNode( clusterName, node );
 
@@ -199,9 +201,9 @@ public class RestService
 
 
     @PUT
-    @Path("clusters/{clusterName}/nodes/{node}/stop")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response stopNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}/stop" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response stopNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = flumeManager.stopNode( clusterName, node );
 
@@ -211,9 +213,9 @@ public class RestService
 
 
     @GET
-    @Path("clusters/{clusterName}/nodes/{node}/check")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response checkNode( @PathParam("clusterName") String clusterName, @PathParam("node") String node )
+    @Path( "clusters/{clusterName}/nodes/{node}/check" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response checkNode( @PathParam( "clusterName" ) String clusterName, @PathParam( "node" ) String node )
     {
         UUID uuid = flumeManager.checkNode( clusterName, node );
 

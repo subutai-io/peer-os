@@ -32,8 +32,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl>
 
         try
         {
-            Environment env = manager.getEnvironmentManager().buildEnvironment(
-                    manager.getDefaultEnvironmentBlueprint( solrClusterConfig ) );
+            Environment env = manager.getEnvironmentManager()
+                                     .buildEnvironment( manager.getDefaultEnvironmentBlueprint( solrClusterConfig ) );
 
             ClusterSetupStrategy clusterSetupStrategy =
                     manager.getClusterSetupStrategy( env, solrClusterConfig, trackerOperation );

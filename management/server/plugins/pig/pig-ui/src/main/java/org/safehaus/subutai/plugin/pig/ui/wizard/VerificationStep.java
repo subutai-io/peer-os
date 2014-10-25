@@ -64,7 +64,7 @@ public class VerificationStep extends Panel
         // Install button
 
         Button install = new Button( "Install" );
-        install.setId("PigVerificationInstall");
+        install.setId( "PigVerificationInstall" );
         install.addStyleName( "default" );
         install.addClickListener( new Button.ClickListener()
         {
@@ -97,7 +97,7 @@ public class VerificationStep extends Panel
         } );
 
         Button back = new Button( "Back" );
-        back.setId("PigVerificationBack");
+        back.setId( "PigVerificationBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

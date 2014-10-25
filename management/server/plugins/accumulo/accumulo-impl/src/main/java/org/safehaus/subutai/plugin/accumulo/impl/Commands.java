@@ -10,9 +10,11 @@ import java.util.Set;
 
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -21,6 +23,7 @@ import com.google.common.collect.Sets;
 public class Commands
 {
 
+    private static final String PACKAGE_NAME = Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME.toLowerCase();
     private final CommandRunnerBase commandRunner;
 
 
@@ -36,9 +39,9 @@ public class Commands
     public Command getInstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 600 )
-                                                                                              .withStdOutRedirection(
-                                                                                                      OutputRedirection.NO ),
+                new RequestBuilder( "apt-get --force-yes --assume-yes install " + PACKAGE_NAME ).withTimeout( 360 )
+                                                                                                .withStdOutRedirection(
+                                                                                                        OutputRedirection.NO ),
                 agents );
     }
 
@@ -46,14 +49,16 @@ public class Commands
     public Command getUninstallCommand( Set<Agent> agents )
     {
         return commandRunner.createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-accumulo" ).withTimeout( 600 ),
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge " + PACKAGE_NAME ).withTimeout( 60 ),
                 agents );
     }
 
 
     public Command getCheckInstalledCommand( Set<Agent> agents )
     {
-        return commandRunner.createCommand( new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ), agents );
+        // grep subutai-
+        return commandRunner.createCommand(
+                new RequestBuilder( "dpkg -l | grep '^ii' | grep " + Common.PACKAGE_PREFIX_WITHOUT_DASH ), agents );
     }
 
 
@@ -146,8 +151,8 @@ public class Commands
     public Command getClearSlaveCommand( Set<Agent> nodes, Agent slaveNode )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s", slaveNode.getHostname() ) ),
-                nodes );
+                        String.format( ". /etc/profile && accumuloSlavesConf.sh slaves clear %s",
+                                slaveNode.getHostname() ) ), nodes );
     }
 
 
@@ -170,8 +175,8 @@ public class Commands
     public Command getAddPropertyCommand( String propertyName, String propertyValue, Set<Agent> agents )
     {
         return commandRunner.createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName, propertyValue ) ),
-                agents );
+                        String.format( ". /etc/profile && accumulo-property.sh add %s %s", propertyName,
+                                propertyValue ) ), agents );
     }
 
 

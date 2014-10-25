@@ -10,12 +10,14 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 
-public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl> {
+public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<HadoopImpl>
+{
 
     private String lxcHostName;
 
 
-    public StartTaskTrackerOperationHandler( HadoopImpl manager, String clusterName, String lxcHostname ) {
+    public StartTaskTrackerOperationHandler( HadoopImpl manager, String clusterName, String lxcHostname )
+    {
         super( manager, clusterName );
         this.lxcHostName = lxcHostname;
         trackerOperation = manager.getTracker().createTrackerOperation( HadoopClusterConfig.PRODUCT_KEY,
@@ -24,22 +26,26 @@ public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<H
 
 
     @Override
-    public void run() {
+    public void run()
+    {
         HadoopClusterConfig hadoopClusterConfig = manager.getCluster( clusterName );
 
-        if ( hadoopClusterConfig == null ) {
+        if ( hadoopClusterConfig == null )
+        {
             trackerOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostName );
-        if ( ! hadoopClusterConfig.getTaskTrackers().contains( agent )) {
+        if ( !hadoopClusterConfig.getTaskTrackers().contains( agent ) )
+        {
             trackerOperation.addLogFailed( String.format( "TaskTracker on %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostName );
-        if ( node == null ) {
+        if ( node == null )
+        {
             trackerOperation.addLogFailed( "TaskTracker is not connected" );
             return;
         }
@@ -52,17 +58,23 @@ public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<H
         AgentResult result = statusCommand.getResults().get( node.getUuid() );
 
         NodeState nodeState = NodeState.UNKNOWN;
-        if ( statusCommand.hasCompleted() ) {
-            if ( result.getStdOut() != null && result.getStdOut().contains( "TaskTracker" ) ) {
+        if ( statusCommand.hasCompleted() )
+        {
+            if ( result.getStdOut() != null && result.getStdOut().contains( "TaskTracker" ) )
+            {
                 String[] array = result.getStdOut().split( "\n" );
 
-                for ( String status : array ) {
-                    if ( status.contains( "TaskTracker" ) ) {
+                for ( String status : array )
+                {
+                    if ( status.contains( "TaskTracker" ) )
+                    {
                         String temp = status.replaceAll( "TaskTracker is ", "" );
-                        if ( temp.toLowerCase().contains( "not" ) ) {
+                        if ( temp.toLowerCase().contains( "not" ) )
+                        {
                             nodeState = NodeState.STOPPED;
                         }
-                        else {
+                        else
+                        {
                             nodeState = NodeState.RUNNING;
                         }
                     }
@@ -70,10 +82,12 @@ public class StartTaskTrackerOperationHandler extends AbstractOperationHandler<H
             }
         }
 
-        if ( NodeState.UNKNOWN.equals( nodeState ) ) {
+        if ( NodeState.UNKNOWN.equals( nodeState ) )
+        {
             trackerOperation.addLogFailed( String.format( "Failed to check status of %s", node.getHostname() ) );
         }
-        else {
+        else
+        {
             trackerOperation.addLogDone( String.format( "TaskTracker of %s is %s", node.getHostname(), nodeState ) );
         }
     }

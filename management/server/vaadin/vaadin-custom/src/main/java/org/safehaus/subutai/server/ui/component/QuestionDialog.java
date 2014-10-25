@@ -33,7 +33,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 
-public class QuestionDialog<T> {
+public class QuestionDialog<T>
+{
 
     private Window alert;
     private Button cancel, ok;
@@ -43,13 +44,14 @@ public class QuestionDialog<T> {
     private Class<T> expectedParameterClass;
 
 
-    public QuestionDialog( Action action, String question, Class<T> expectedParameterClass,String yesLabel,
-                          String cancelLabel ) {
+    public QuestionDialog( Action action, String question, Class<T> expectedParameterClass, String yesLabel,
+                           String cancelLabel )
+    {
         this.expectedParameterClass = expectedParameterClass;
         l = new VerticalLayout();
         l.setSizeUndefined();
-        l.setMargin(true);
-        l.setSpacing(true);
+        l.setMargin( true );
+        l.setSpacing( true );
 
         alert = new Window( action.getCaption(), l );
         alert.setModal( true );
@@ -66,7 +68,8 @@ public class QuestionDialog<T> {
     }
 
 
-    public Window getAlert() {
+    public Window getAlert()
+    {
 
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.setWidth( "100%" );
@@ -76,83 +79,103 @@ public class QuestionDialog<T> {
 
         cancel.addStyleName( "small" );
         cancel.addStyleName( "wide" );
-        cancel.addClickListener( new Button.ClickListener() {
+        cancel.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
                 alert.close();
             }
-        });
+        } );
         buttons.addComponent( cancel );
 
 
         ok.addStyleName( "default" );
         ok.addStyleName( "small" );
         ok.addStyleName( "wide" );
-        ok.addClickListener( new Button.ClickListener() {
+        ok.addClickListener( new Button.ClickListener()
+        {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick( Button.ClickEvent event )
+            {
 
 
                 String uiValue = inputField.getValue();
-               if ( isConvertible( uiValue ) ) {
-                   inputField.setComponentError( null );
-                   inputField.setValidationVisible( false );
-                   alert.close();
+                if ( isConvertible( uiValue ) )
+                {
+                    inputField.setComponentError( null );
+                    inputField.setValidationVisible( false );
+                    alert.close();
                 }
-                else{
-                   inputField.setComponentError( new UserError( "Input " + uiValue +
-                           " could not be converted to " + expectedParameterClass ) );
-                   Notification.show( "Please enter proper input", Notification.Type.ERROR_MESSAGE );
+                else
+                {
+                    inputField.setComponentError( new UserError( "Input " + uiValue +
+                            " could not be converted to " + expectedParameterClass ) );
+                    Notification.show( "Please enter proper input", Notification.Type.ERROR_MESSAGE );
                 }
             }
         } );
 
-        buttons.addComponent(ok);
+        buttons.addComponent( ok );
         ok.focus();
 
-        alert.addShortcutListener(new ShortcutListener( "Cancel",
-                ShortcutAction.KeyCode.ESCAPE, null ) {
+        alert.addShortcutListener( new ShortcutListener( "Cancel", ShortcutAction.KeyCode.ESCAPE, null )
+        {
             @Override
-            public void handleAction( Object sender, Object target ) {
+            public void handleAction( Object sender, Object target )
+            {
                 alert.close();
             }
-        });
+        } );
 
         return alert;
     }
 
 
-    public Button getOk() {
+    public Button getOk()
+    {
         return ok;
     }
 
 
-    public Button getCancel() {
+    public Button getCancel()
+    {
         return cancel;
     }
 
 
-    public TextField getInputField() {
+    public TextField getInputField()
+    {
         return inputField;
     }
 
 
-    private void setConvertedValue ( T convertedValue) {
+    private void setConvertedValue( T convertedValue )
+    {
         this.convertedValue = convertedValue;
     }
 
 
-    public boolean isConvertible( String uiValue ) {
+    public boolean isConvertible( String uiValue )
+    {
         if ( uiValue == null )
+        {
             return false;
-        try {
+        }
+        try
+        {
             setConvertedValue( ( T ) inputField.getConvertedValue() );
             return true;
-        } catch (Converter.ConversionException e) {
+        }
+        catch ( Converter.ConversionException e )
+        {
             return false;
         }
     }
-    public T getConvertedValue() {
+
+
+    public T getConvertedValue()
+    {
         return convertedValue;
     }
 }

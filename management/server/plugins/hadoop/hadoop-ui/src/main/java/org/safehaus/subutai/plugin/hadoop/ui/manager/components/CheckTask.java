@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.api.NodeType;
@@ -32,9 +32,9 @@ public class CheckTask implements Runnable
     private NodeType nodeType;
 
 
-
     public CheckTask( Hadoop hadoop, Tracker tracker, NodeType nodeType, HadoopClusterConfig hadoopClusterConfig,
-                      CompleteEvent completeEvent, UUID trackID, Agent agent ) {
+                      CompleteEvent completeEvent, UUID trackID, Agent agent )
+    {
         this.hadoop = hadoop;
         this.tracker = tracker;
         this.completeEvent = completeEvent;
@@ -53,7 +53,7 @@ public class CheckTask implements Runnable
             while ( true )
             {
                 TrackerOperationView prevPo = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
-                if ( prevPo.getState() == ProductOperationState.RUNNING )
+                if ( prevPo.getState() == OperationState.RUNNING )
                 {
                     try
                     {
@@ -72,20 +72,26 @@ public class CheckTask implements Runnable
         }
 
         NodeState state = NodeState.UNKNOWN;
-        if ( agent != null ) {
-            if ( nodeType.equals( NodeType.NAMENODE ) ) {
+        if ( agent != null )
+        {
+            if ( nodeType.equals( NodeType.NAMENODE ) )
+            {
                 trackID = hadoop.statusNameNode( hadoopClusterConfig );
             }
-            else if ( nodeType.equals( NodeType.JOBTRACKER ) ) {
+            else if ( nodeType.equals( NodeType.JOBTRACKER ) )
+            {
                 trackID = hadoop.statusJobTracker( hadoopClusterConfig );
             }
-            else if ( nodeType.equals( NodeType.SECONDARY_NAMENODE ) ) {
+            else if ( nodeType.equals( NodeType.SECONDARY_NAMENODE ) )
+            {
                 trackID = hadoop.statusSecondaryNameNode( hadoopClusterConfig );
             }
-            if ( nodeType.equals( NodeType.DATANODE ) ) {
+            if ( nodeType.equals( NodeType.DATANODE ) )
+            {
                 trackID = hadoop.statusDataNode( hadoopClusterConfig, agent );
             }
-            else if ( nodeType.equals( NodeType.TASKTRACKER ) ){
+            else if ( nodeType.equals( NodeType.TASKTRACKER ) )
+            {
                 trackID = hadoop.statusTaskTracker( hadoopClusterConfig, agent );
             }
 
@@ -96,7 +102,7 @@ public class CheckTask implements Runnable
                 TrackerOperationView po = tracker.getTrackerOperation( HadoopClusterConfig.PRODUCT_KEY, trackID );
                 if ( po != null )
                 {
-                    if ( po.getState() != ProductOperationState.RUNNING )
+                    if ( po.getState() != OperationState.RUNNING )
                     {
                         if ( po.getLog().contains( NodeState.STOPPED.toString() ) )
                         {

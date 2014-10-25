@@ -20,19 +20,19 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command(scope = "container", name = "clone-many")
+@Command( scope = "container", name = "clone-many" )
 public class CloneMany extends OsgiCommandSupport implements ContainerEventListener
 {
 
     ContainerManager containerManager;
 
-    @Argument(index = 0, required = true)
+    @Argument( index = 0, required = true )
     private String template;
-    @Argument(index = 1, required = true)
+    @Argument( index = 1, required = true )
     private int nodesCount;
-    @Argument(index = 2, required = true)
+    @Argument( index = 2, required = true )
     private String strategyId;
-    @Argument(index = 3, required = false)
+    @Argument( index = 3, required = false )
     private String criteriaList;
 
 
@@ -46,7 +46,8 @@ public class CloneMany extends OsgiCommandSupport implements ContainerEventListe
     protected Object doExecute() throws Exception
     {
         containerManager.addListener( this );
-        UUID envId = UUIDUtil.generateTimeBasedUUID();;
+        UUID envId = UUIDUtil.generateTimeBasedUUID();
+        ;
         List<Criteria> criteria = getCriteria();
         Set<Agent> set = containerManager.clone( envId, template, nodesCount, strategyId, criteria );
         if ( set.isEmpty() )

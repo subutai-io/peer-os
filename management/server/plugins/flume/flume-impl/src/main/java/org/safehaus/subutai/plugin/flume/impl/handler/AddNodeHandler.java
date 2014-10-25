@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
@@ -95,7 +95,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl>
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
+
         Command checkInstalledCommand = manager.getCommandRunner().createCommand(
                 new RequestBuilder( Commands.make( CommandType.STATUS ) ).withTimeout( 60 ), Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );

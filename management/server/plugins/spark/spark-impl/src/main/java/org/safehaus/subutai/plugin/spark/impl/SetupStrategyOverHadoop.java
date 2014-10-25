@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
@@ -84,7 +85,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
 
         po.addLog( "Checking prerequisites..." );
 
-        //check installed ksks packages
+        //check installed subutai packages
         Set<Agent> allNodes = config.getAllNodes();
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( allNodes );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
@@ -92,7 +93,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
         if ( !checkInstalledCommand.hasCompleted() )
         {
             throw new ClusterSetupException(
-                    "Failed to check presence of installed ksks packages\nInstallation aborted" );
+                    "Failed to check presence of installed subutai packages\nInstallation aborted" );
         }
         for ( Iterator<Agent> it = allNodes.iterator(); it.hasNext(); )
         {
@@ -106,7 +107,8 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
                 config.getSlaveNodes().remove( node );
                 it.remove();
             }
-            else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
+            else if ( !result.getStdOut()
+                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME.toLowerCase() ) )
             {
                 po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                         node.getHostname() ) );

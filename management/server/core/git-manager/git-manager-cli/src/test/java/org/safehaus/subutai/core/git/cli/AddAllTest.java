@@ -34,6 +34,7 @@ public class AddAllTest
     private AgentManager agentManager = mock( AgentManager.class );
     private GitManager gitManager = mock( GitManager.class );
 
+
     @Before
     public void setUp()
     {

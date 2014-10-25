@@ -21,7 +21,7 @@ import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.command.api.command.CommandExecutor;
 import org.safehaus.subutai.core.command.api.command.CommandExecutorExpiryCallback;
 import org.safehaus.subutai.core.command.api.command.CommandStatus;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import com.google.common.base.Preconditions;

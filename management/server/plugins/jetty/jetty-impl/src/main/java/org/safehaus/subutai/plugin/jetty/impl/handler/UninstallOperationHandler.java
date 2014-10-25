@@ -10,11 +10,13 @@ import org.safehaus.subutai.plugin.jetty.impl.JettyImpl;
 public class UninstallOperationHandler extends AbstractOperationHandler<JettyImpl>
 {
 
-    public UninstallOperationHandler(final JettyImpl manager, final String clusterName) {
+    public UninstallOperationHandler( final JettyImpl manager, final String clusterName )
+    {
         super( manager, clusterName );
         trackerOperation = manager.getTracker().createTrackerOperation( JettyConfig.PRODUCT_KEY,
                 String.format( "Destroying %s cluster...", clusterName ) );
     }
+
 
     @Override
     public void run()

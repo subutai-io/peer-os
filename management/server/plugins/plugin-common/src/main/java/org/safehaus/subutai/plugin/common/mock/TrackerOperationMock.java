@@ -4,15 +4,15 @@ package org.safehaus.subutai.plugin.common.mock;
 import java.util.Date;
 import java.util.UUID;
 
+import org.safehaus.subutai.common.tracker.OperationState;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 
 public class TrackerOperationMock implements TrackerOperation
 {
     private final StringBuilder log = new StringBuilder();
 
-    private ProductOperationState state = ProductOperationState.RUNNING;
+    private OperationState state = OperationState.RUNNING;
 
 
     @Override
@@ -44,7 +44,7 @@ public class TrackerOperationMock implements TrackerOperation
 
 
     @Override
-    public ProductOperationState getState()
+    public OperationState getState()
     {
         return state;
     }
@@ -61,7 +61,7 @@ public class TrackerOperationMock implements TrackerOperation
     public void addLogDone( String logString )
     {
         addLog( logString );
-        state = ProductOperationState.SUCCEEDED;
+        state = OperationState.SUCCEEDED;
     }
 
 
@@ -69,6 +69,6 @@ public class TrackerOperationMock implements TrackerOperation
     public void addLogFailed( String logString )
     {
         addLog( logString );
-        state = ProductOperationState.FAILED;
+        state = OperationState.FAILED;
     }
 }

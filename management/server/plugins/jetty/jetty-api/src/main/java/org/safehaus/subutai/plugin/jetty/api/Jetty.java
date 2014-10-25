@@ -19,7 +19,7 @@ public interface Jetty extends ApiBase<JettyConfig>
 
     UUID stopCluster( String clusterName );
 
-    UUID startService(String clusterName, String lxchostname);
+    UUID startService( String clusterName, String lxchostname );
 
     UUID stopService( String clusterName, String lxchostname );
 

@@ -31,6 +31,7 @@ public class ConfigurationStep extends VerticalLayout
         content.setMargin( true );
 
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
+        clusterNameTxtFld.setId( "jettyClusterName" );
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -44,6 +45,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField domainNameTxtFld = new TextField( "Enter domain name" );
+        domainNameTxtFld.setId( "jettyDomainName" );
         domainNameTxtFld.setInputPrompt( "intra.lan" );
         domainNameTxtFld.setRequired( true );
         domainNameTxtFld.setValue( wizard.getConfig().getClusterName() );
@@ -57,6 +59,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField baseDirectoryText = new TextField( "Enter base directory" );
+        baseDirectoryText.setId( "jettyBaseDirectory" );
         baseDirectoryText.setInputPrompt( wizard.getConfig().getBaseDirectory() );
         baseDirectoryText.setRequired( true );
         baseDirectoryText.setValue( wizard.getConfig().getClusterName() );
@@ -70,7 +73,8 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         final TextField portTextField = new TextField( "Enter port" );
-        portTextField.setInputPrompt( ""+wizard.getConfig().getPort() );
+        portTextField.setId( "jettyPort" );
+        portTextField.setInputPrompt( "" + wizard.getConfig().getPort() );
         portTextField.setRequired( true );
         portTextField.setValue( wizard.getConfig().getClusterName() );
         portTextField.addValueChangeListener( new Property.ValueChangeListener()
@@ -79,8 +83,9 @@ public class ConfigurationStep extends VerticalLayout
             public void valueChange( Property.ValueChangeEvent event )
             {
                 String value = event.getProperty().getValue().toString();
-                if( !StringUtils.isNumber(value)) {
-                    show("Please input numbers");
+                if ( !StringUtils.isNumber( value ) )
+                {
+                    show( "Please input numbers" );
                     return;
                 }
                 int port = Integer.valueOf( value );
@@ -89,12 +94,13 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
 
-
         final ComboBox nodesCountCombo =
                 new ComboBox( "Choose number of nodes in cluster", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+        nodesCountCombo.setId( "jettyNumNodes" );
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setImmediate( true );
         nodesCountCombo.setNullSelectionAllowed( false );
+        nodesCountCombo.setTextInputAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
 
         nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener()
@@ -108,6 +114,7 @@ public class ConfigurationStep extends VerticalLayout
 
 
         Button next = new Button( "Next" );
+        next.setId( "jettyNext" );
         next.addStyleName( "default" );
         next.addClickListener( new Button.ClickListener()
         {
@@ -130,6 +137,7 @@ public class ConfigurationStep extends VerticalLayout
         } );
 
         Button back = new Button( "Back" );
+        back.setId( "jettyConfBack" );
         back.addStyleName( "default" );
         back.addClickListener( new Button.ClickListener()
         {

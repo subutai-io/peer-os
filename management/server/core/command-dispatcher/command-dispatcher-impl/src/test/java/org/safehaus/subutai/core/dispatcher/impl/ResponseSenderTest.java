@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.safehaus.subutai.common.enums.ResponseType;
+import org.safehaus.subutai.common.exception.DaoException;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.peer.api.Peer;

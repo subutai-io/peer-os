@@ -18,7 +18,7 @@ import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.command.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandRunnerBase;
-import org.safehaus.subutai.core.command.api.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
 
@@ -98,6 +98,8 @@ public class Commands
         startRoutersCommand.setData( CommandType.START_ROUTERS );
         commands.add( startRoutersCommand );
 
+        commands.add( getStopMongodbService( Sets.newHashSet( config.getDataNodes() ) ) );
+
         Command startDataNodesCommand = getStartDataNodeCommand( config.getDataNodePort(), config.getDataNodes() );
         startDataNodesCommand.setData( CommandType.START_DATA_NODES );
         commands.add( startDataNodesCommand );
@@ -110,6 +112,14 @@ public class Commands
                 config.getRouterServers().iterator().next() ) );
 
         return commands;
+    }
+
+
+    public Command getStopMongodbService( Set<Agent> dataNodes )
+    {
+        return commandRunnerBase.createCommand( "Stop mongodb service",
+                new RequestBuilder( "service mongodb stop" ).withTimeout( Timeouts.START_DATE_NODE_TIMEOUT_SEC ),
+                dataNodes );
     }
 
 
@@ -198,9 +208,10 @@ public class Commands
 
     public Command getStartDataNodeCommand( int dataNodePort, Set<Agent> dataNodes )
     {
-        return commandRunnerBase.createCommand( "Start data node(s)", new RequestBuilder(
-                String.format( "mongod --config %s --port %s --fork --logpath %s/mongodb.log",
-                        Constants.DATA_NODE_CONF_FILE, dataNodePort, Constants.LOG_DIR ) )
+        return commandRunnerBase.createCommand( "Start data node(s)", new RequestBuilder( String.format(
+                "export LANGUAGE=en_US.UTF-8 && export LANG=en_US.UTF-8 && "
+                        + "export LC_ALL=en_US.UTF-8 && mongod --config %s --port %s --fork --logpath %s/mongodb.log",
+                Constants.DATA_NODE_CONF_FILE, dataNodePort, Constants.LOG_DIR ) )
                 .withTimeout( Timeouts.START_DATE_NODE_TIMEOUT_SEC ), dataNodes );
     }
 

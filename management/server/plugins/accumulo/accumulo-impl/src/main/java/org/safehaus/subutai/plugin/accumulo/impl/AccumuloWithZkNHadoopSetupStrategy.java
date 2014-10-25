@@ -86,9 +86,10 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy
         Set<Agent> accumuloAgents = new HashSet<>();
         for ( EnvironmentContainer environmentContainer : environment.getContainers() )
         {
-            if ( environmentContainer.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
+            if ( environmentContainer.getTemplate().getProducts()
+                                     .contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME )
                     && environmentContainer.getTemplate().getProducts()
-                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
+                                           .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) )
             {
                 accumuloAgents.add( environmentContainer.getAgent() );
             }

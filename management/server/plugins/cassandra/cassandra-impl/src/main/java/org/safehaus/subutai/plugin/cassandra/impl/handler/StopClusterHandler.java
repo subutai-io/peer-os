@@ -37,7 +37,7 @@ public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl>
         }
 
         Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
-        Command stopServiceCommand = manager.getCommands().getStopCommand(agentSet );
+        Command stopServiceCommand = manager.getCommands().getStopCommand( agentSet );
         manager.getCommandRunner().runCommand( stopServiceCommand );
 
         if ( stopServiceCommand.hasSucceeded() )

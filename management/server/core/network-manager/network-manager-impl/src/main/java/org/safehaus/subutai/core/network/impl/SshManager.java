@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.Container;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.core.command.api.command.CommandException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
