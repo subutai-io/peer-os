@@ -27,9 +27,13 @@ function exitIfNoCommits {
   branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
   branch_name="(unnamed branch)"     # detached HEAD
   branch_name=${branch_name##refs/heads/}
-  
   # Check if there are local commits
   git_diff=$(git diff origin/$branch_name..HEAD)
+  local status=$?
+  if [ $status == "128" ]; then
+    echo "Please push your branch to continue!"
+    exit 1
+  fi
   isDiffEmpty=$(isEmpty $git_diff)
   echo "isDiffEmpty: $isDiffEmpty"
   echo "Checking if there are local commits for branch: $branch_name"
@@ -37,6 +41,8 @@ function exitIfNoCommits {
     echo "No change is made on debian package"
     exit 0
   fi
+  echo "Exiting for test purposes"
+  exit 1
 }
 
 
