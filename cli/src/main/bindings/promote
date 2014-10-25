@@ -115,7 +115,7 @@ function promote {
     msg_info "    - check passed: \"$lxc\" is NOT a template"
   fi
   templatename="$lxc"
-  if [ -n $newname ]; then
+  if [ -n $newname ] && [ "x$newname" != "x" ]; then
     templatename="$newname"
     lxc_assert_no "$templatename" "`promote_usage`"
   fi
@@ -191,7 +191,7 @@ function promote {
   # ---------------------------------------------------------------------------
   # add and commit all uncommitted files (should be some: /etc/hosts)
   if [ -n "$newname" ]; then
-    `git_rename_branch $lxc $lxc_template`
+    o=$(git_rename_branch $lxc $lxc_template > /dev/null 2>&1)
   fi
 
   uuid=`git_add_commit $lxc_template`
