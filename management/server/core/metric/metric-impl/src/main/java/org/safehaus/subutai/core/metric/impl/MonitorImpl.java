@@ -34,6 +34,8 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * Implementation of Monitor
+ *
+ * TODO subscribe to message queue (once implemented) for getting remote alerts
  */
 public class MonitorImpl implements Monitor
 {
@@ -191,15 +193,16 @@ public class MonitorImpl implements Monitor
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
-     * @param alertBody - body of alert in JSON
+     * @param alertMetric - body of alert in JSON
      */
     @Override
-    public void alertThresholdExcess( final String alertBody ) throws MonitorException
+    public void alertThresholdExcess( final String alertMetric ) throws MonitorException
     {
         try
         {
             //deserialize container metric
-            ContainerHostMetricImpl containerHostMetric = JsonUtil.fromJson( alertBody, ContainerHostMetricImpl.class );
+            ContainerHostMetricImpl containerHostMetric =
+                    JsonUtil.fromJson( alertMetric, ContainerHostMetricImpl.class );
             //find associated container host
             ContainerHost containerHost =
                     peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHostname() );
@@ -232,9 +235,10 @@ public class MonitorImpl implements Monitor
      * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
      * belonging to this peer
      *
+     * TODO call this method once remote alert arrives
+     *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
-    @Override
     public void alertThresholdExcess( final ContainerHostMetric metric ) throws MonitorException
     {
         try

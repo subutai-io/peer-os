@@ -57,15 +57,7 @@ public interface Monitor
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
-     * @param alertBody - body of alert in JSON
+     * @param alertMetric - body of alert in JSON
      */
-    public void alertThresholdExcess( String alertBody ) throws MonitorException;
-
-    /**
-     * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
-     * belonging to this peer
-     *
-     * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
-     */
-    public void alertThresholdExcess( ContainerHostMetric metric ) throws MonitorException;
+    public void alertThresholdExcess( String alertMetric ) throws MonitorException;
 }
