@@ -20,10 +20,8 @@ import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDao;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
@@ -51,9 +49,9 @@ public class ElasticsearchImpl implements Elasticsearch
     private static final Logger LOG = LoggerFactory.getLogger( ElasticsearchImpl.class.getName() );
     DataSource dataSource;
     private Tracker tracker;
-    private LxcManager lxcManager;
+//    private LxcManager lxcManager;
     private ExecutorService executor;
-    private NetworkManager networkManager;
+//    private NetworkManager networkManager;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private PluginDao pluginDAO;
@@ -128,10 +126,10 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public void setLxcManager( final LxcManager lxcManager )
+   /* public void setLxcManager( final LxcManager lxcManager )
     {
         this.lxcManager = lxcManager;
-    }
+    }*/
 
 
     public void setExecutor( final ExecutorService executor )
@@ -140,10 +138,10 @@ public class ElasticsearchImpl implements Elasticsearch
     }
 
 
-    public void setNetworkManager( final NetworkManager networkManager )
+    /*public void setNetworkManager( final NetworkManager networkManager )
     {
         this.networkManager = networkManager;
-    }
+    }*/
 
 
     public void setDataSource( final DataSource dataSource )

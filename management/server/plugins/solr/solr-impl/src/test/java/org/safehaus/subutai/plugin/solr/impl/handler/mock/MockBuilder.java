@@ -3,14 +3,14 @@ package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.plugin.common.mock.CommandMock;
-import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;;
-import org.safehaus.subutai.plugin.common.mock.LxcManagerMock;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.plugin.solr.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.solr.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.solr.impl.handler.UninstallOperationHandler;
+
+;
 
 
 public class MockBuilder
@@ -45,7 +45,7 @@ public class MockBuilder
 
     public static AbstractOperationHandler getAddNodeOperationWithResult( boolean success )
     {
-        LxcManagerMock lxcManagerMock = new LxcManagerMock().setMockLxcMap( CommonMockBuilder.getLxcMap() );
+//        LxcManagerMock lxcManagerMock = new LxcManagerMock().setMockLxcMap( CommonMockBuilder.getLxcMap() );
 
         SolrImpl solrImpl = new SolrImplMock().setCommands( getCommands( success ) )
                                               .setClusterSolrClusterConfig( new SolrClusterConfig() );
