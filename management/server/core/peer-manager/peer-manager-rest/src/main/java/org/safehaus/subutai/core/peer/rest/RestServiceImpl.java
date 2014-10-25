@@ -32,10 +32,10 @@ import org.safehaus.subutai.core.strategy.api.Criteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -285,7 +285,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createContainers( final String ownerPeerId, final String environmentId, final Template templates,
+    public Response createContainers( final String ownerPeerId, final String environmentId, final String templates,
                                       final int quantity, final String strategyId, final String criteria )
     {
 
@@ -296,8 +296,11 @@ public class RestServiceImpl implements RestService
             LocalPeer localPeer = peerManager.getLocalPeer();
             Set<ContainerHost> result = localPeer
                     .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
-                            Lists.newArrayList( templates ), quantity, strategyId, criteriaList );
+                            ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
+                            {
+                            }.getType() ), quantity, strategyId, criteriaList );
             return Response.ok( JsonUtil.toJson( result ) ).build();
+            //            return Response.ok().entity( result ).build();
         }
         catch ( ContainerCreateException e )
         {

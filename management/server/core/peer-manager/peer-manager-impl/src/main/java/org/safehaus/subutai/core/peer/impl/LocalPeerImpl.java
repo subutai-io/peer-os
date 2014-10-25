@@ -12,10 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Template;
-import org.safehaus.subutai.core.command.api.command.CommandException;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.container.api.ContainerManager;
 import org.safehaus.subutai.core.peer.api.ContainerHost;

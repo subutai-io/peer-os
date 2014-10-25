@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.exception.CommandException;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
 import org.safehaus.subutai.core.strategy.api.Criteria;
 

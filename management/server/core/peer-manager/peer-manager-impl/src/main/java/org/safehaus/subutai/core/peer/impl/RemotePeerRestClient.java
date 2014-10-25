@@ -76,7 +76,7 @@ public class RemotePeerRestClient
     }
 
 
-    public Set<ContainerHost> createRemoteContainers( String ip, String port, UUID ownerPeerId, UUID environemntId,
+    public Set<ContainerHost> createRemoteContainers( String ip, String port, UUID ownerPeerId, UUID environmentId,
                                                       List<Template> templates, int quantity, String strategyId,
                                                       List<Criteria> criteria ) throws ContainerCreateException
     {
@@ -87,11 +87,10 @@ public class RemotePeerRestClient
 
         WebClient client = WebClient.create( baseUrl );
 
-        Template template = templates.get( 0 );
         Form form = new Form();
         form.set( "ownerPeerId", ownerPeerId.toString() );
-        form.set( "environmentId", environemntId.toString() );
-        form.set( "templates", JsonUtil.toJson( template ) );
+        form.set( "environmentId", environmentId.toString() );
+        form.set( "templates", JsonUtil.toJson( templates ) );
         form.set( "quantity", quantity );
         form.set( "strategyId", strategyId );
         // TODO: implement criteria transfer

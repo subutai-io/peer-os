@@ -317,23 +317,22 @@ public class Template
     @Override
     public String toString()
     {
-//        return "Template{" +
-//                "templateName='" + templateName + '\'' +
-//                ", parentTemplateName='" + parentTemplateName + '\'' +
-//                ", lxcArch='" + lxcArch + '\'' +
-//                ", lxcUtsname='" + lxcUtsname + '\'' +
-//                ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
-//                ", subutaiParent='" + subutaiParent + '\'' +
-//                ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
-//                ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
-//                ", children=" + children +
-//                ", products=" + products +
-//                ", md5sum='" + md5sum + '\'' +
-//                ", faisUsingThisTemplate=" + faisUsingThisTemplate +
-//                ", peerId=" + peerId +
-//                ", remote=" + remote +
-//                '}';
-
-        return JsonUtil.toJson( this );
+        return "Template{" +
+                "templateName='" + templateName + '\'' +
+                ", parentTemplateName='" + parentTemplateName + '\'' +
+                ", lxcArch='" + lxcArch + '\'' +
+                ", lxcUtsname='" + lxcUtsname + '\'' +
+                ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
+                ", subutaiParent='" + subutaiParent + '\'' +
+                ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
+                ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
+                ", children=" + children +
+                ", products=" + products +
+                ", md5sum='" + md5sum + '\'' +
+                ", faisUsingThisTemplate=" + faisUsingThisTemplate +
+                ", peerId=" + peerId +
+                ", remote=" + remote +
+                '}';
     }
+
 }

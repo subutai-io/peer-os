@@ -1,6 +1,8 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -69,12 +71,12 @@ public interface RestService
 
 
     @POST
-    @Path( "container/create" )
-    @Produces( MediaType.APPLICATION_JSON )
+    @Path("container/create")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response createContainers( @FormParam("ownerPeerId") String ownerPeerId,
                                       @FormParam("environmentId") String environmentId,
-                                      @FormParam( "templates" ) Template templates, @FormParam("quantity") int quantity,
-                                      @FormParam("strategyId") String strategyId,
+                                      @FormParam("templates") String templates,
+                                      @FormParam("quantity") int quantity, @FormParam("strategyId") String strategyId,
                                       @FormParam("criteria") String criteria );
 
     @GET
