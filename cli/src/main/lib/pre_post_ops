@@ -21,7 +21,7 @@ function execute_prescripts {
   do
     # Remove unnecessary whitespaces if any
     script=$(echo " $script " | tr -d ' ')
-    msg_info "      - Running $script"
+    run_script "$subutai_pre_script_base/$script"
   done
 }
 
@@ -36,15 +36,15 @@ function execute_all_prescripts {
 
   msg_info "    - ${FUNCNAME[0]} for $binding"
 
-  #TODO initialize scripts with all the scripts under subutai_pre_script_base 
+  #Initialize scripts with all the scripts under subutai_pre_script_base 
   # starting with pre-${FUNCNAME[0]}
-  scripts="prescript1 prescript2"
-  IFS=' ' read -a scriptArray <<< "$scripts"
+  shopt -s nullglob
+  scriptArray=($subutai_pre_script_base/pre-$binding*)
   for script in "${scriptArray[@]}"
   do
     # Remove unnecessary whitespaces if any
     script=$(echo " $script " | tr -d ' ')
-    msg_info "      - Running $script"
+    run_script "$script"
   done
 }
 
@@ -64,7 +64,7 @@ function execute_postscripts {
   do
     # Remove unnecessary whitespaces if any
     script=$(echo " $script " | tr -d ' ')
-    msg_info "      - Running $script"
+    run_script "$subutai_post_script_base/$script"
   done
 }
 
@@ -81,14 +81,28 @@ function execute_all_postscripts {
 
   #TODO initialize scripts with all the scripts under subutai_pre_script_base 
   # starting with pre-${FUNCNAME[0]}
-  scripts="postscript1 postscript2"
-  IFS=' ' read -a scriptArray <<< "$scripts"
+  scriptArray=($subutai_post_script_base/post-$binding*)
   for script in "${scriptArray[@]}"
   do
     # Remove unnecessary whitespaces if any
     script=$(echo " $script " | tr -d ' ')
-    msg_info "      - Running $script"
+    run_script "$script"
   done
 }
 
-
+function run_script {
+  script_directory=$1
+  if [ -z $script_directory ]; then
+    msg_error "script directory is not provided. Aborting!"
+    exit 1
+  fi
+  message="      - running $script"
+  $script_directory > /dev/null
+  local status=$?
+  if [ $status == "0" ];then
+    msg_info "$message"
+  else
+    msg_error "$message"
+    exit 1
+  fi
+}
