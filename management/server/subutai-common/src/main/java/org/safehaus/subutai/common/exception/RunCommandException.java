@@ -1,8 +1,8 @@
-package org.safehaus.subutai.core.dispatcher.api;
+package org.safehaus.subutai.common.exception;
 
 
 /**
- * Exception that might be thrown by CommandDispatcher
+ * Exception that might be thrown by Command Runner
  */
 public class RunCommandException extends RuntimeException
 {

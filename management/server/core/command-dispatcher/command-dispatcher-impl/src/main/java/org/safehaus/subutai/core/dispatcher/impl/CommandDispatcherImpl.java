@@ -31,7 +31,7 @@ import org.safehaus.subutai.common.protocol.CommandStatus;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.ContainerRequestBuilder;
-import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
+import org.safehaus.subutai.common.exception.RunCommandException;
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerManager;
