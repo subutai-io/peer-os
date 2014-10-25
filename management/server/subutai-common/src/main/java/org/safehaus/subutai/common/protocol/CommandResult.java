@@ -9,13 +9,15 @@ public class CommandResult
     private final Integer exitCode;
     private final String stdOut;
     private final String stdErr;
+    private final CommandStatus status;
 
 
-    public CommandResult( final Integer exitCode, final String stdOut, final String stdErr )
+    public CommandResult( final Integer exitCode, final String stdOut, final String stdErr, CommandStatus status )
     {
         this.exitCode = exitCode;
         this.stdOut = stdOut;
         this.stdErr = stdErr;
+        this.status = status;
     }
 
 
@@ -39,18 +41,24 @@ public class CommandResult
 
     public boolean hasSucceeded()
     {
-        return exitCode == 0;
+        return status == CommandStatus.SUCCEEDED;
     }
 
 
     public boolean hasCompleted()
     {
-        return exitCode != null;
+        return status == CommandStatus.FAILED || status == CommandStatus.SUCCEEDED;
     }
 
 
     public boolean hasTimedOut()
     {
-        return exitCode == null;
+        return status == CommandStatus.TIMEOUT;
+    }
+
+
+    public CommandStatus getStatus()
+    {
+        return status;
     }
 }
