@@ -571,7 +571,7 @@ public class ContainerManagerImpl extends ContainerManagerBase
         for ( Agent a : agents )
         {
             group.setInstanceId( a.getUuid() );
-            dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), GSON.toJson( group ) );
+//            dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), GSON.toJson( group ) );
         }
     }
 }
