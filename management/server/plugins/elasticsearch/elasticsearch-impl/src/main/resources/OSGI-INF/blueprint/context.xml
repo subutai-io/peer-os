@@ -9,10 +9,6 @@
 
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.core.tracker.api.Tracker" />
-  <!--<reference id="lxcManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.container.api.lxcmanager.LxcManager" />-->
-  <!--<reference id="networkManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.network.api.NetworkManager" />-->
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
@@ -26,8 +22,6 @@
         class="org.safehaus.subutai.plugin.elasticsearch.impl.ElasticsearchImpl"
         init-method="init" destroy-method="destroy">
     <property name="tracker" ref="tracker" />
-    <!--<property name="lxcManager" ref="lxcManager" />-->
-    <!--<property name="networkManager" ref="networkManager" />-->
     <property name="commandRunner" ref="commandRunner" />
     <property name="agentManager" ref="agentManager" />
     <property name="containerManager" ref="containerManager" />
