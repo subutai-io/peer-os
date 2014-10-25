@@ -10,7 +10,7 @@ package org.safehaus.subutai.core.metric.api;
 public abstract class Metric
 {
 
-    protected String hostname;
+    protected String host;
     protected Double availableRam;
     protected Double usedRam;
     protected Double totalRam;
@@ -20,9 +20,9 @@ public abstract class Metric
     protected Double cpuLoad5;
 
 
-    public String getHostname()
+    public String getHost()
     {
-        return hostname;
+        return host;
     }
 
 

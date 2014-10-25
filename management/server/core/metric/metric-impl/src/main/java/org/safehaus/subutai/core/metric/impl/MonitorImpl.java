@@ -18,8 +18,8 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.metric.api.ContainerHostMetric;
 import org.safehaus.subutai.core.metric.api.MetricListener;
 import org.safehaus.subutai.core.metric.api.Monitor;
+import org.safehaus.subutai.core.metric.api.MonitorException;
 import org.safehaus.subutai.core.metric.api.ResourceHostMetric;
-import org.safehaus.subutai.core.monitor.api.MonitorException;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.core.peer.api.PeerException;
 import org.safehaus.subutai.core.peer.api.PeerInterface;
@@ -34,6 +34,8 @@ import com.google.gson.JsonSyntaxException;
 
 /**
  * Implementation of Monitor
+ *
+ * TODO subscribe to message queue (once implemented) for getting remote alerts
  */
 public class MonitorImpl implements Monitor
 {
@@ -41,13 +43,13 @@ public class MonitorImpl implements Monitor
     //max length of subscriber id to store in database varchar(100) field
     private static final int MAX_SUBSCRIBER_ID_LEN = 100;
     //set of metric subscribers
-    private final Set<MetricListener> metricListeners =
+    protected Set<MetricListener> metricListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<MetricListener, Boolean>() );
-
-    private final ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     private final Commands commands = new Commands();
-    private final MonitorDao monitorDao;
     private final PeerManager peerManager;
+
+    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
+    protected MonitorDao monitorDao;
 
 
     public MonitorImpl( final DataSource dataSource, PeerManager peerManager ) throws DaoException
@@ -191,18 +193,19 @@ public class MonitorImpl implements Monitor
      * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
      * stress.
      *
-     * @param alertBody - body of alert in JSON
+     * @param alertMetric - body of alert in JSON
      */
     @Override
-    public void alertThresholdExcess( final String alertBody ) throws MonitorException
+    public void alertThresholdExcess( final String alertMetric ) throws MonitorException
     {
         try
         {
             //deserialize container metric
-            ContainerHostMetricImpl containerHostMetric = JsonUtil.fromJson( alertBody, ContainerHostMetricImpl.class );
+            ContainerHostMetricImpl containerHostMetric =
+                    JsonUtil.fromJson( alertMetric, ContainerHostMetricImpl.class );
             //find associated container host
             ContainerHost containerHost =
-                    peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHostname() );
+                    peerManager.getLocalPeer().getContainerHostByName( containerHostMetric.getHost() );
             //set metric's environment id for future reference on the receiving end
             containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
 
@@ -232,9 +235,10 @@ public class MonitorImpl implements Monitor
      * This methods is called by REST endpoint when a remote peer sends an alert from one of its hosted containers
      * belonging to this peer
      *
+     * TODO call this method once remote alert arrives
+     *
      * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
      */
-    @Override
     public void alertThresholdExcess( final ContainerHostMetric metric ) throws MonitorException
     {
         try
@@ -245,7 +249,7 @@ public class MonitorImpl implements Monitor
             for ( String subscriberId : subscribersIds )
             {
                 //notify subscriber on alert
-                notify( metric, subscriberId );
+                notifyListener( metric, subscriberId );
             }
         }
         catch ( DaoException e )
@@ -256,7 +260,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    private void notify( final ContainerHostMetric metric, String subscriberId )
+    protected void notifyListener( final ContainerHostMetric metric, String subscriberId )
     {
         for ( final MetricListener listener : metricListeners )
         {
