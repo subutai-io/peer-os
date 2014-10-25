@@ -624,8 +624,8 @@ public class Manager
 
 
             addClickListenerToSlaveCheckButton( agent, resultHolder, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStartButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
-            addClickListenerToStopButton( agent, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStartButton( agent, false, startBtn, stopBtn, checkBtn, destroyBtn );
+            addClickListenerToStopButton( agent, false, startBtn, stopBtn, checkBtn, destroyBtn );
             addClickListenerToDestroyButton( agent, destroyBtn );
         }
 
@@ -657,8 +657,8 @@ public class Manager
         }, null );
 
         addClickListenerToMasterCheckButton( master, resultHolder, checkBtn, startBtn, stopBtn );
-        addClickListenerToStartButton( master, checkBtn, startBtn, stopBtn );
-        addClickListenerToStopButton( master, checkBtn, startBtn, stopBtn );
+        addClickListenerToStartButton( master, true, checkBtn, startBtn, stopBtn );
+        addClickListenerToStopButton( master, true, checkBtn, startBtn, stopBtn );
     }
 
 
@@ -756,7 +756,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStartButton( final Agent agent, final Button... buttons )
+    public void addClickListenerToStartButton( final Agent agent, final boolean isMaster, final Button... buttons )
     {
         getButton( START_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -765,7 +765,7 @@ public class Manager
             {
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
-                executor.execute( new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), true,
+                executor.execute( new StartTask( spark, tracker, config.getClusterName(), agent.getHostname(), isMaster,
                         new CompleteEvent()
                         {
                             @Override
@@ -818,7 +818,7 @@ public class Manager
     }
 
 
-    public void addClickListenerToStopButton( final Agent agent, final Button... buttons )
+    public void addClickListenerToStopButton( final Agent agent, boolean isMaster, final Button... buttons )
     {
         getButton( STOP_BUTTON_CAPTION, buttons ).addClickListener( new Button.ClickListener()
         {
@@ -827,7 +827,7 @@ public class Manager
             {
                 progressIcon.setVisible( true );
                 disableButtons( buttons );
-                executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), true,
+                executor.execute( new StopTask( spark, tracker, config.getClusterName(), agent.getHostname(), isMaster,
                         new CompleteEvent()
                         {
                             @Override
