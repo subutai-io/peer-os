@@ -231,7 +231,7 @@ function promote {
 
   msg_ok "Successfully promoted $lxc_template"
   unlock_container_read $lxc
-  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Release read lock of $lxc"; exit 1; fi
 }
 
 
