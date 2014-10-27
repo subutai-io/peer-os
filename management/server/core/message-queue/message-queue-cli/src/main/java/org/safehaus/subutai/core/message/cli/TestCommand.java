@@ -30,14 +30,9 @@ public class TestCommand extends OsgiCommandSupport
         this.queue = queue;
 
         listener = new MyMessageListener( "Test" );
-    }
-
-
-    public void init()
-    {
-
         queue.addMessageListener( listener );
     }
+
 
 
     @Override
