@@ -34,9 +34,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
     public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName )
     {
         super( manager, clusterName );
-        clusterConfiguration = new ClusterConfiguration( manager, trackerOperation );
         trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
+        clusterConfiguration = new ClusterConfiguration( manager, trackerOperation );
     }
 
 
@@ -44,9 +44,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        clusterConfiguration = new ClusterConfiguration( manager, trackerOperation );
         trackerOperation = manager.getTracker().createTrackerOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
+        clusterConfiguration = new ClusterConfiguration( manager, trackerOperation );
     }
 
 
@@ -290,8 +290,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             //reconfigure cluster
             try
             {
-                getClusterConfiguration().configureCluster( config );
-                //                new ClusterConfiguration( manager, productOperation ).configureCluster( config );
+                clusterConfiguration.configureCluster( config );
             }
             catch ( ClusterConfigurationException e )
             {
