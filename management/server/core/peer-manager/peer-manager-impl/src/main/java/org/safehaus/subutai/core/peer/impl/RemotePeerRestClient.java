@@ -111,7 +111,7 @@ public class RemotePeerRestClient
         String jsonObject = response.readEntity( String.class );
         if ( response.getStatus() == Response.Status.OK.getStatusCode() )
         {
-            Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHostImpl>>()
+            Set<ContainerHost> result = JsonUtil.fromJson( jsonObject, new TypeToken<Set<ContainerHost>>()
             {
             }.getType() );
             return result;
