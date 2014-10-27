@@ -59,8 +59,9 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public Set<ContainerHost> createContainers( final UUID ownerPeerId, final UUID environmentId,
-                                                final List<Template> templates, final int quantity, final String strategyId,
-                                                final List<Criteria> criteria ) throws ContainerCreateException
+                                                final List<Template> templates, final int quantity,
+                                                final String strategyId, final List<Criteria> criteria )
+            throws ContainerCreateException
     {
         RemotePeerRestClient remotePeerRestClient = new RemotePeerRestClient( 1000000 );
         return remotePeerRestClient
@@ -92,6 +93,20 @@ public class RemotePeerImpl implements RemotePeer
 
     @Override
     public boolean isConnected( final Host host ) throws PeerException
+    {
+        return true;
+    }
+
+
+    @Override
+    public boolean configureSshHosts( final Set<ContainerHost> containers ) throws PeerException
+    {
+        return true;
+    }
+
+
+    @Override
+    public boolean configureLinkHosts( final Set<ContainerHost> containers ) throws PeerException
     {
         return false;
     }

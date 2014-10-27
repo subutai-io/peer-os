@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 /**
  * This class creates containers according to supplied Environment Blueprint
  */
+@Deprecated
 public class EnvironmentBuilder
 {
 
@@ -49,6 +50,7 @@ public class EnvironmentBuilder
 
 
     //@todo destroy all containers of all groups inside environment on any failure ???
+    @Deprecated
     public Environment build( final EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException
     {
 
@@ -174,18 +176,17 @@ public class EnvironmentBuilder
     }
 
 
-    public Environment convertEnvironmentContainersToNodes( final Environment environment )
+    /*public Environment convertEnvironmentContainersToNodes( final Environment environment )
     {
         final Set<ContainerHost> environmentContainers = new HashSet<>();
         for ( ContainerHost container : environment.getContainers() )
         {
             Agent agent = agentManager.getAgentByHostname( container.getHostname() );
-            Template template = templateRegistry.getTemplate( container.getTemplateName() );
             ContainerHost environmentContainer = new ContainerHost( agent );
             environmentContainers.add( environmentContainer );
         }
 
         environment.setContainers( environmentContainers );
         return environment;
-    }
+    }*/
 }

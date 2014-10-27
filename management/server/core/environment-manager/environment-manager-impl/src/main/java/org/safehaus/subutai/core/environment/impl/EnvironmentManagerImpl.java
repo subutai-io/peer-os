@@ -55,7 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -118,6 +117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     PeerManager peerManager;
+    TopologyBuilder topologyBuilder;
 
 
     public void init()
@@ -125,6 +125,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         try
         {
             peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+            topologyBuilder = new TopologyBuilder( this );
             this.environmentDAO = new EnvironmentDAO( dataSource );
         }
         catch ( SQLException e )
@@ -226,11 +227,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
      * This method should be deprecated soon
      */
     @Override
-    public Environment buildEnvironment( final EnvironmentBuildTask environmentBuildTask )
-            throws EnvironmentBuildException
+    public Environment buildEnvironment( final EnvironmentBlueprint blueprint ) throws EnvironmentBuildException
     {
 
-        return environmentBuilder.build( environmentBuildTask );
+        saveBlueprint( GSON.toJson( blueprint ) );
+        EnvironmentBuildProcess process =
+                topologyBuilder.createEnvironmentBuildProcessB2P( blueprint.getId(), getPeerId() );
+
+        return buildEnvironment( process );
     }
 
 
@@ -360,7 +364,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
     @Override
-    public void buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
+    public Environment buildEnvironment( final EnvironmentBuildProcess process ) throws EnvironmentBuildException
     {
         try
         {
@@ -448,16 +452,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager
             }
             else
             {
-                Set<ContainerHost> containers = Sets.newHashSet();
-                containers.addAll( environment.getContainers() );
-
                 if ( blueprint.isExchangeSshKeys() )
                 {
-//                    networkManager.configSsh( containers );
+                    /*try
+                    {
+                        peerManager.getPeer( getPeerId() ).configureSshHosts( environment.getContainers() );
+                    }
+                    catch ( PeerException e )
+                    {
+                        LOG.error( e.getMessage(), e );
+                    }*/
+                    networkManager.configSshHosts( environment.getContainers() );
                 }
                 if ( blueprint.isLinkHosts() )
                 {
-//                    networkManager.configHosts( blueprint.getDomainName(), containers );
+                    /*try
+                    {
+                        peerManager.getPeer( getPeerId() ).configureLinkHosts( environment.getContainers() );
+                    }
+                    catch ( PeerException e )
+                    {
+                        LOG.error( e.getMessage(), e );
+                    }*/
+                    networkManager.configLinkHosts( blueprint.getDomainName(), environment.getContainers() );
                 }
                 if ( environment.getContainers().size() != containerCount )
                 {
@@ -470,6 +487,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 saveEnvironment( environment );
             }
             operation.addLogDone( "Complete" );
+            return environment;
         }
         catch ( EnvironmentPersistenceException e )
         {
@@ -562,7 +580,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         Environment environment = environmentDAO.getInfo( ENVIRONMENT, environmentId.toString(), Environment.class );
 
-        environmentBuilder.convertEnvironmentContainersToNodes( environment );
+        //        environmentBuilder.convertEnvironmentContainersToNodes( environment );
 
         return environment;
     }
@@ -573,7 +591,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                      final Map<Object, NodeGroup> map, TopologyEnum topologyEnum )
     {
         EnvironmentBuildProcess process = null;
-        TopologyBuilder topologyBuilder = new TopologyBuilder( this );
+
         switch ( topologyEnum )
         {
             case NODE_2_PEER:

@@ -266,4 +266,18 @@ public class LocalPeerImpl extends Peer implements LocalPeer
     {
         return getManagementHost().getResourceHosts();
     }
+
+
+    @Override
+    public boolean configureSshHosts( final Set<ContainerHost> containers ) throws PeerException
+    {
+        return true;
+    }
+
+
+    @Override
+    public boolean configureLinkHosts( final Set<ContainerHost> containers ) throws PeerException
+    {
+        return true;
+    }
 }

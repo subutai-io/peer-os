@@ -30,7 +30,7 @@ import org.safehaus.subutai.core.peer.api.Peer;
 public interface EnvironmentManager
 {
 
-    Environment buildEnvironment( EnvironmentBuildTask environmentBuildTask ) throws EnvironmentBuildException;
+    Environment buildEnvironment( EnvironmentBlueprint blueprint ) throws EnvironmentBuildException;
 
 
     /**
@@ -64,7 +64,7 @@ public interface EnvironmentManager
 
     List<EnvironmentBuildProcess> getBuildProcesses();
 
-    void buildEnvironment( EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException;
+    Environment buildEnvironment( EnvironmentBuildProcess environmentBuildProcess ) throws EnvironmentBuildException;
 
     void deleteBuildProcess( EnvironmentBuildProcess environmentBuildProcess );
 

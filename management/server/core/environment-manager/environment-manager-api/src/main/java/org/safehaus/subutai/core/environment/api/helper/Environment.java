@@ -68,16 +68,16 @@ public class Environment
     }
 
 
+    public void setContainers( final Set<ContainerHost> containers )
+    {
+        this.containers = containers;
+    }
+
+
     //TODO implement this method after migrating to new domain model
     public Set<ContainerHost> getContainerHosts()
     {
         return Collections.EMPTY_SET;
-    }
-
-
-    public void setContainers( final Set<ContainerHost> containers )
-    {
-        this.containers = containers;
     }
 
 

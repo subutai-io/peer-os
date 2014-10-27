@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
@@ -51,9 +50,9 @@ public class CassandraImpl implements Cassandra
     private static final Logger LOG = LoggerFactory.getLogger( CassandraImpl.class.getName() );
     private Commands commands;
     private Tracker tracker;
-//    private LxcManager lxcManager;
+    //    private LxcManager lxcManager;
     private ExecutorService executor;
-//    private NetworkManager networkManager;
+    //    private NetworkManager networkManager;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
@@ -335,30 +334,27 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final CassandraClusterConfig config )
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final CassandraClusterConfig config )
     {
 
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+        //        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
-        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint
-                .setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
+        EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
+        blueprint.setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
 
-        environmentBlueprint.setLinkHosts( true );
-        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-        environmentBlueprint.setExchangeSshKeys( true );
+        blueprint.setLinkHosts( true );
+        blueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+        blueprint.setExchangeSshKeys( true );
 
         NodeGroup nodeGroup = new NodeGroup();
         nodeGroup.setTemplateName( config.getTemplateName() );
         nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
         nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
+        blueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
-        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+        //        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
-        return environmentBuildTask;
+        return blueprint;
     }
-
-
 }
