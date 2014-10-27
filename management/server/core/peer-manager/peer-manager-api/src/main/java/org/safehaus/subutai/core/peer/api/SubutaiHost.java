@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.UUID;
@@ -17,10 +17,6 @@ import org.safehaus.subutai.core.command.api.command.AgentResult;
 import org.safehaus.subutai.core.command.api.command.Command;
 import org.safehaus.subutai.core.command.api.command.CommandCallback;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
-import org.safehaus.subutai.core.peer.api.Host;
-import org.safehaus.subutai.core.peer.api.Peer;
-import org.safehaus.subutai.core.peer.api.PeerException;
-import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,19 +25,19 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Base class for Host.
+ * Base subutai host class.
  */
-public abstract class HostImpl implements Host
+public abstract class SubutaiHost implements Host
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HostImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SubutaiHost.class );
 
     private Agent agent = NullAgent.getInstance();
     private Agent parentAgent = NullAgent.getInstance();
-//    private long lastHeartbeat;
-//    private long inactiveTime = 5 * 1000 * 60; // 5 min
+    //    private long lastHeartbeat;
+    //    private long inactiveTime = 5 * 1000 * 60; // 5 min
 
 
-    protected HostImpl( final Agent agent )
+    protected SubutaiHost( final Agent agent )
     {
         Preconditions.checkNotNull( agent, "Agent is null" );
 
@@ -172,7 +168,7 @@ public abstract class HostImpl implements Host
     }
 
 
-    public abstract boolean isConnected( Host host );
+    //    public abstract boolean isConnected( Host host );
 
 
     public String echo( String text ) throws CommandException
@@ -225,9 +221,9 @@ public abstract class HostImpl implements Host
     }
 
 
-//    @Override
-//    public void updateHeartbeat()
-//    {
-//        lastHeartbeat = System.currentTimeMillis();
-//    }
+    //    @Override
+    //    public void updateHeartbeat()
+    //    {
+    //        lastHeartbeat = System.currentTimeMillis();
+    //    }
 }
