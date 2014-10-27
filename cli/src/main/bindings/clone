@@ -73,14 +73,6 @@ function clone {
   lock_container_write $parent $child
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
-  if [ "x$preScriptsEnabled" == "xtrue" ]; then
-    if [ "x$preScripts" == "xall" ]; then
-      execute_all_prescripts "${FUNCNAME[0]}"
-    else
-      execute_prescripts "$preScripts"
-    fi
-  fi
-
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
   if [ -z "$environmentId" ]; then
     environmentId="null"

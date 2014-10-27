@@ -175,9 +175,9 @@ function promote {
   # ---------------------------------------------------------------------------
   if [ "x$preScriptsEnabled" == "xtrue" ]; then
     if [ "x$preScripts" == "xall" ]; then
-      execute_all_prescripts "${FUNCNAME[0]}"
+      execute_all_prescripts "${FUNCNAME[0]}" $lxc_template
     else
-      execute_prescripts "$preScripts"
+      execute_prescripts "$preScripts" $lxc_template
     fi
   fi
 
