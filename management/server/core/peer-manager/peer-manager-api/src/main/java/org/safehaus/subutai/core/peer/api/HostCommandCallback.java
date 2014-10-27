@@ -1,4 +1,4 @@
-package org.safehaus.subutai.core.peer.impl;
+package org.safehaus.subutai.core.peer.api;
 
 
 import org.safehaus.subutai.common.protocol.CommandResult;
