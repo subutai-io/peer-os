@@ -274,7 +274,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
     {
         try
         {
-
             //create lxc
             trackerOperation.addLog( "Creating lxc container..." );
 
