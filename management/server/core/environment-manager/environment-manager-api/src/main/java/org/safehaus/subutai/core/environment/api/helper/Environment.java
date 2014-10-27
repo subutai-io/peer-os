@@ -21,7 +21,7 @@ public class Environment
     private final ServiceLocator serviceLocator;
     private UUID id;
     private String name;
-    private Set<EnvironmentContainer> containers;
+    private Set<ContainerHost> containers;
     private EnvironmentStatusEnum status;
     private long creationTimestamp;
 
@@ -55,14 +55,14 @@ public class Environment
     }
 
 
-    public void addContainer( EnvironmentContainer container )
+    public void addContainer( ContainerHost container )
     {
         container.setEnvironmentId( id );
         this.containers.add( container );
     }
 
 
-    public Set<EnvironmentContainer> getContainers()
+    public Set<ContainerHost> getContainers()
     {
         return containers;
     }
@@ -75,7 +75,7 @@ public class Environment
     }
 
 
-    public void setContainers( final Set<EnvironmentContainer> containers )
+    public void setContainers( final Set<ContainerHost> containers )
     {
         this.containers = containers;
     }

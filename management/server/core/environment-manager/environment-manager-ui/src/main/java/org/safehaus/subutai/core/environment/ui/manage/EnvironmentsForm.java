@@ -6,13 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.common.exception.ContainerException;
-import org.safehaus.subutai.common.protocol.Container;
-import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerPortalModule;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -166,7 +163,7 @@ public class EnvironmentsForm
     }
 
 
-    private VerticalLayout genConfigureContainersTable( Environment environment, Set<EnvironmentContainer> containers )
+    private VerticalLayout genConfigureContainersTable( Environment environment, Set<ContainerHost> containers )
     {
         VerticalLayout vl = new VerticalLayout();
 
@@ -180,13 +177,13 @@ public class EnvironmentsForm
         containersTable.setImmediate( true );
         containersTable.setSizeFull();
 
-        for ( Container container : containers )
+        for ( ContainerHost container : containers )
         {
             TextField field = new TextField();
             field.setWidth( "200px" );
-            field.setValue( container.getIps().get( 0 ) );
+            field.setValue( "should be ip" );
             containersTable.addItem( new Object[] {
-                    container.getName(), container.getPeerId().toString(), field
+                    container.getTemplateName(), container.getPeerId().toString(), field
             }, null );
         }
 
@@ -217,7 +214,7 @@ public class EnvironmentsForm
     }
 
 
-    private VerticalLayout genContainersTable( Environment environment, Set<EnvironmentContainer> containers )
+    private VerticalLayout genContainersTable( Environment environment, Set<ContainerHost> containers )
     {
         VerticalLayout vl = new VerticalLayout();
 
@@ -234,11 +231,11 @@ public class EnvironmentsForm
         containersTable.setImmediate( true );
         containersTable.setSizeFull();
 
-        for ( Container container : containers )
+        for ( ContainerHost container : containers )
         {
 
             containersTable.addItem( new Object[] {
-                    container.getName(), container.getPeerId().toString(), propertiesButton( container ),
+                    container.getTemplateName(), container.getPeerId().toString(), propertiesButton( container ),
                     startButton( environment, container ), stopButton( environment, container ),
                     destroyButton( environment, container )
             }, null );
@@ -250,7 +247,7 @@ public class EnvironmentsForm
     }
 
 
-    private Object propertiesButton( final Container container )
+    private Object propertiesButton( final ContainerHost container )
     {
         Button button = new Button( PROPERTIES );
         button.addClickListener( new Button.ClickListener()
@@ -271,22 +268,19 @@ public class EnvironmentsForm
     }
 
 
-    private Table getContainerDetails( Container container )
+    private Table getContainerDetails( ContainerHost container )
     {
         Table table = new Table();
         table.setSizeFull();
         table.addContainerProperty( "Property", String.class, null );
         table.addContainerProperty( "Value", String.class, null );
         table.addItem( new Object[] { "Peer", container.getPeerId().toString() }, null );
-        table.addItem( new Object[] { "Agent", container.getAgentId().toString() }, null );
-        table.addItem( new Object[] { "IP", container.getIps().toString() }, null );
         table.addItem( new Object[] { "Environment ID", container.getEnvironmentId().toString() }, null );
-        table.addItem( new Object[] { "Description", container.getDescription() }, null );
         return table;
     }
 
 
-    private Object startButton( final Environment environment, final Container container )
+    private Object startButton( final Environment environment, final ContainerHost container )
     {
         Button button = new Button( START );
         button.addClickListener( new Button.ClickListener()
@@ -294,7 +288,7 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                try
+                /*try
                 {
                     DefaultCommandMessage commandMessage = container.start();
                     environment.invoke( commandMessage );
@@ -302,14 +296,14 @@ public class EnvironmentsForm
                 catch ( ContainerException e )
                 {
                     Notification.show( e.getMessage() );
-                }
+                }*/
             }
         } );
         return button;
     }
 
 
-    private Object stopButton( final Environment environment, final Container container )
+    private Object stopButton( final Environment environment, final ContainerHost container )
     {
         Button button = new Button( STOP );
         button.addClickListener( new Button.ClickListener()
@@ -317,7 +311,7 @@ public class EnvironmentsForm
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent )
             {
-                try
+                /*try
                 {
 
                     DefaultCommandMessage commandMessage = container.stop();
@@ -326,14 +320,14 @@ public class EnvironmentsForm
                 catch ( ContainerException e )
                 {
                     Notification.show( e.getMessage() );
-                }
+                }*/
             }
         } );
         return button;
     }
 
 
-    private Object destroyButton( Environment environment, final Container container )
+    private Object destroyButton( Environment environment, final ContainerHost container )
     {
         Button button = new Button( DESTROY );
         button.addClickListener( new Button.ClickListener()

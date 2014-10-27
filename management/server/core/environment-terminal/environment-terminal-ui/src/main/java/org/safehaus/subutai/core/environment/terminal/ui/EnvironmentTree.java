@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.EnvironmentContainer;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.server.ui.component.ConcurrentComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
                 LOG.info( "Refreshing containers state..." );
                 if ( environment != null )
                 {
-                    Set<EnvironmentContainer> containers = environmentManager.getConnectedContainers( environment );
+                    Set<ContainerHost> containers = environmentManager.getConnectedContainers( environment );
                     refreshContainers( containers );
                 }
                 LOG.info( "Refreshing done." );
@@ -162,17 +163,17 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         {
             Set<String> peers = new HashSet<>();
 
-            for ( EnvironmentContainer ec : environment.getContainers() )
+            for ( ContainerHost ec : environment.getContainers() )
             {
                 peers.add( ec.getPeerId().toString() );
             }
 
-            for ( EnvironmentContainer ec : environment.getContainers() )
+            for ( ContainerHost ec : environment.getContainers() )
             {
                 //TODO: remove next line when persistent API is JPA
                 ec.setEnvironmentId( environment.getId() );
                 String peerId = ec.getPeerId().toString();
-                String itemId = peerId + ":" + ec.getAgentId();
+                String itemId = peerId + ":" + ec.getCreatorPeerId();
 
                 Item peer = container.getItem( peerId );
                 if ( peer == null )
@@ -204,7 +205,7 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
     }
 
 
-    private void refreshContainers( final Set<EnvironmentContainer> freshContainers )
+    private void refreshContainers( final Set<ContainerHost> freshContainers )
     {
 
         if ( freshContainers == null || freshContainers.size() < 1 )
@@ -213,11 +214,11 @@ public final class EnvironmentTree extends ConcurrentComponent implements Dispos
         }
 
         List<String> agentIdList = new ArrayList<>();
-        for ( EnvironmentContainer container : freshContainers )
+        for ( ContainerHost container : freshContainers )
         {
 
             agentIdList.add( String
-                    .format( "%s:%s", container.getPeerId().toString(), container.getAgentId().toString() ) );
+                    .format( "%s:%s", container.getPeerId().toString(), container.getCreatorPeerId().toString() ) );
         }
 
         for ( Object itemObj : container.getItemIds() )
