@@ -50,12 +50,11 @@ public class CassandraImpl implements Cassandra
     private static final Logger LOG = LoggerFactory.getLogger( CassandraImpl.class.getName() );
     private Commands commands;
     private Tracker tracker;
-    //    private LxcManager lxcManager;
     private ExecutorService executor;
-    //    private NetworkManager networkManager;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
+    //TODO:remove container manager and use environment manager instead
     private ContainerManager containerManager;
     private PluginDao pluginDAO;
     private DataSource dataSource;
@@ -79,18 +78,6 @@ public class CassandraImpl implements Cassandra
     }
 
 
-   /* public LxcManager getLxcManager()
-    {
-        return lxcManager;
-    }
-
-
-    public void setLxcManager( final LxcManager lxcManager )
-    {
-        this.lxcManager = lxcManager;
-    }*/
-
-
     public ExecutorService getExecutor()
     {
         return executor;
@@ -101,18 +88,6 @@ public class CassandraImpl implements Cassandra
     {
         this.executor = executor;
     }
-
-
-    /*public NetworkManager getNetworkManager()
-    {
-        return networkManager;
-    }
-
-
-    public void setNetworkManager( final NetworkManager networkManager )
-    {
-        this.networkManager = networkManager;
-    }*/
 
 
     public CommandRunner getCommandRunner()

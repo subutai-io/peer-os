@@ -41,6 +41,7 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
         {
             Set<Agent> agentSet = manager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
             manager.getContainerManager().clonesDestroy( agentSet );
+//            manager.getEnvironmentManager().destroyEnvironment( config.getEnvironmentId() );
             trackerOperation.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex )
