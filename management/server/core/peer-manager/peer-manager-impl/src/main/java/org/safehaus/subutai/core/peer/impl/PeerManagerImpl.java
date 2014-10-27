@@ -114,7 +114,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
             LOG.error( e.getMessage(), e );
         }
         communicationManager.addListener( this );
-        localPeer = new LocalPeerImpl( this, containerManager );
+        localPeer = new LocalPeerImpl( this, containerManager, templateRegistry );
     }
 
 
@@ -956,7 +956,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                     managementHost = new ManagementHostImpl( PeerUtils.buildAgent( response ) );
                     managementHost.setParentAgent( NullAgent.getInstance() );
                 }
-                managementHost.updateHeartbeat();
+//                managementHost.updateHeartbeat();
                 return;
             }
 
@@ -974,7 +974,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                     host.setParentAgent( managementHost.getAgent() );
                     managementHost.addResourceHost( host );
                 }
-                host.updateHeartbeat();
+//                host.updateHeartbeat();
                 return;
             }
 
@@ -993,7 +993,7 @@ public class PeerManagerImpl implements PeerManager, ResponseListener
                 resourceHost.addContainerHost( containerHost );
             }
 
-            containerHost.updateHeartbeat();
+//            containerHost.updateHeartbeat();
         }
     }
 

@@ -297,11 +297,11 @@
         <artifactId>lxc-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+      <!--<dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-manager-ui</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- lxc-quota-manager -->
@@ -377,13 +377,13 @@
         <artifactId>peer-command-dispatcher-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--
+
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>peer-command-dispatcher-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
-      -->
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- peer-manager -->
       <dependency>
@@ -793,6 +793,11 @@
         <groupId>net.jpountz.lz4</groupId>
         <artifactId>lz4</artifactId>
         <version>1.2.0</version>
+      </dependency>
+      <dependency>
+      	<groupId>org.codehaus.jettison</groupId>
+      	<artifactId>jettison</artifactId>
+      	<version>1.3.5</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

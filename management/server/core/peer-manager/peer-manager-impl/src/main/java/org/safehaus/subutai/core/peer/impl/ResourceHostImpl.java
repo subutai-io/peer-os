@@ -10,14 +10,15 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CommandResult;
 import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.core.command.api.command.Command;
-import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.core.container.api.ContainerState;
 import org.safehaus.subutai.core.monitor.api.MetricType;
 import org.safehaus.subutai.core.peer.api.ContainerHost;
+import org.safehaus.subutai.core.peer.api.Host;
 import org.safehaus.subutai.core.peer.api.ResourceHost;
 import org.safehaus.subutai.core.strategy.api.ServerMetric;
 
@@ -29,6 +30,7 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
 {
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "State:(\\s*)(.*)" );
     private static final Pattern LOAD_AVERAGE_PATTERN = Pattern.compile( "load average: (.*)" );
+    private static final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS = 10000;
     Set<ContainerHost> containersHosts = new HashSet();
 
 
@@ -70,9 +72,16 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
     {
 
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", container.getHostname() ) )
+                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d &", container.getHostname() ) )
                         .withTimeout( 180 );
         execute( requestBuilder );
+        try
+        {
+            Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS );
+        }
+        catch ( InterruptedException ignore )
+        {
+        }
 
         return ContainerState.RUNNING.equals( getState( container ) );
     }
@@ -261,9 +270,17 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
     public boolean stopContainerHost( final ContainerHost container ) throws CommandException
     {
         RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", container.getHostname() ) )
+                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s &", container.getHostname() ) )
                         .withTimeout( 180 );
         execute( requestBuilder );
+
+        try
+        {
+            Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS );
+        }
+        catch ( InterruptedException ignore )
+        {
+        }
 
         return ContainerState.STOPPED.equals( getState( container ) );
     }
@@ -312,5 +329,19 @@ public class ResourceHostImpl extends HostImpl implements ResourceHost
             }
         }
         return result;
+    }
+
+
+    @Override
+    public boolean isConnected( final Host host )
+    {
+        try
+        {
+            return ContainerState.RUNNING.equals( getState( ( ContainerHost ) host ) );
+        }
+        catch ( CommandException e )
+        {
+            return false;
+        }
     }
 }

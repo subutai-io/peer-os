@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.safehaus.subutai.common.util.JsonUtil;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Expose;
@@ -16,6 +20,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Template represents template entry in registry
  */
+@XmlRootElement(name = "")
 public class Template
 {
 
@@ -79,6 +84,11 @@ public class Template
 
     @Expose
     private boolean remote = false;
+
+
+    public Template()
+    {
+    }
 
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
@@ -288,6 +298,22 @@ public class Template
     }
 
 
+    //    public static Template valueOf( String json )
+    //    {
+    //        ObjectMapper mapper = new ObjectMapper(); //Jackson's JSON marshaller
+    //        Template o = null;
+    //        try
+    //        {
+    //            o = mapper.readValue( json, Template.class );
+    //        }
+    //        catch ( IOException e )
+    //        {
+    //            throw new WebApplicationException( e );
+    //        }
+    //        return o;
+    //    }
+
+
     @Override
     public String toString()
     {
@@ -308,4 +334,5 @@ public class Template
                 ", remote=" + remote +
                 '}';
     }
+
 }

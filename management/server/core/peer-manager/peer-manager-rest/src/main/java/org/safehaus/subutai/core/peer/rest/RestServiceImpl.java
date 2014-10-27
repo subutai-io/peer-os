@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.protocol.DefaultCommandMessage;
 import org.safehaus.subutai.common.protocol.ExecuteCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandMessage;
 import org.safehaus.subutai.common.protocol.PeerCommandType;
+import org.safehaus.subutai.common.protocol.Template;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.container.api.ContainerCreateException;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 
 /**
@@ -283,7 +285,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createContainers( final String ownerPeerId, final String environmentId, final String templateName,
+    public Response createContainers( final String ownerPeerId, final String environmentId, final String templates,
                                       final int quantity, final String strategyId, final String criteria )
     {
 
@@ -293,9 +295,12 @@ public class RestServiceImpl implements RestService
         {
             LocalPeer localPeer = peerManager.getLocalPeer();
             Set<ContainerHost> result = localPeer
-                    .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ), templateName,
-                            quantity, strategyId, criteriaList );
+                    .createContainers( UUID.fromString( ownerPeerId ), UUID.fromString( environmentId ),
+                            ( List<Template> ) JsonUtil.fromJson( templates, new TypeToken<List<Template>>()
+                            {
+                            }.getType() ), quantity, strategyId, criteriaList );
             return Response.ok( JsonUtil.toJson( result ) ).build();
+            //            return Response.ok().entity( result ).build();
         }
         catch ( ContainerCreateException e )
         {
