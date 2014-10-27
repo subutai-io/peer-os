@@ -234,6 +234,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         EnvironmentBuildProcess process =
                 topologyBuilder.createEnvironmentBuildProcessB2P( blueprint.getId(), getPeerId() );
 
+
         return buildEnvironment( process );
     }
 

@@ -85,7 +85,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
 
         try
         {
-            new ClusterConfiguration( trackerOperation, cassandraManager ).configureCluster( config );
+            new ClusterConfiguration( trackerOperation, cassandraManager ).configureCluster( config, environment );
         }
         catch ( ClusterConfigurationException e )
         {

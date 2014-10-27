@@ -6,11 +6,16 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.exception.CommandException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CommandResult;
+import org.safehaus.subutai.common.protocol.RequestBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.TrackerOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.command.Command;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.peer.api.ContainerHost;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
@@ -29,17 +34,48 @@ public class ClusterConfiguration
     }
 
 
-    public void configureCluster( CassandraClusterConfig config ) throws ClusterConfigurationException
+    public void configureCluster( CassandraClusterConfig config, Environment environment )
+            throws ClusterConfigurationException
     {
 
         // setting cluster name
-        po.addLog( "Setting cluster name " + config.getClusterName() );
-        Set<Agent> agentSet = cassandraManager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
-        Command setClusterNameCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
-                "cluster_name " + config.getClusterName() );
-        cassandraManager.getCommandRunner().runCommand( setClusterNameCommand );
 
-        if ( setClusterNameCommand.hasSucceeded() )
+        /*Command setClusterNameCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
+                "cluster_name " + config.getClusterName() );
+        cassandraManager.getCommandRunner().runCommand( setClusterNameCommand );*/
+        String script = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s";
+        String clusterNameParam = "cluster_name " + config.getClusterName();
+        String dataDirParam = "data_dir " + config.getDataDirectory();
+        String commitLogDirParam = "commitlog_dir " + config.getCommitLogDirectory();
+        String savedCacheDirParam = "saved_cache_dir " + config.getCommitLogDirectory();
+        for ( ContainerHost containerHost : environment.getContainers() )
+        {
+            try
+            {
+                po.addLog( "Configuring node: " + containerHost.getId() );
+                CommandResult commandResult =
+                        containerHost.execute( new RequestBuilder( String.format( script, clusterNameParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                commandResult = containerHost.execute( new RequestBuilder( String.format( script, dataDirParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                commandResult =
+                        containerHost.execute( new RequestBuilder( String.format( script, commitLogDirParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+
+                commandResult =
+                        containerHost.execute( new RequestBuilder( String.format( script, savedCacheDirParam ) ) );
+                po.addLog( commandResult.getStdOut() );
+            }
+            catch ( CommandException e )
+            {
+                po.addLogFailed( String.format( "Installation failed" ) );
+                throw new ClusterConfigurationException( e.getMessage() );
+            }
+        }
+
+        /*if ( setClusterNameCommand.hasSucceeded() )
         {
             po.addLog( "Configure cluster name succeeded" );
         }
@@ -47,10 +83,10 @@ public class ClusterConfiguration
         {
             po.addLogFailed( String.format( "Installation failed, %s", setClusterNameCommand.getAllErrors() ) );
             return;
-        }
+        }*/
 
         // setting data directory name
-        po.addLog( "Setting data directory: " + config.getDataDirectory() );
+        /*po.addLog( "Setting data directory: " + config.getDataDirectory() );
         Command setDataDirCommand =
                 cassandraManager.getCommands().getConfigureCommand( agentSet, "data_dir " + config.getDataDirectory() );
         cassandraManager.getCommandRunner().runCommand( setDataDirCommand );
@@ -63,9 +99,9 @@ public class ClusterConfiguration
         {
             po.addLogFailed( String.format( "Installation failed, %s", setDataDirCommand.getAllErrors() ) );
             return;
-        }
+        }*/
 
-        // setting commit log directory
+        /*// setting commit log directory
         po.addLog( "Setting commit directory: " + config.getCommitLogDirectory() );
         Command setCommitDirCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
                 "commitlog_dir " + config.getCommitLogDirectory() );
@@ -79,10 +115,10 @@ public class ClusterConfiguration
         {
             po.addLogFailed( String.format( "Installation failed, %s", setCommitDirCommand.getAllErrors() ) );
             return;
-        }
+        }*/
 
         // setting saved cache directory
-        po.addLog( "Setting saved cache directory: " + config.getSavedCachesDirectory() );
+        /*po.addLog( "Setting saved cache directory: " + config.getSavedCachesDirectory() );
         Command setSavedCacheDirCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
                 "saved_cache_dir " + config.getSavedCachesDirectory() );
         cassandraManager.getCommandRunner().runCommand( setSavedCacheDirCommand );
@@ -95,7 +131,9 @@ public class ClusterConfiguration
         {
             po.addLogFailed( String.format( "Installation failed, %s", setSavedCacheDirCommand.getAllErrors() ) );
             return;
-        }
+        }*/
+
+        Set<Agent> agentSet = cassandraManager.getAgentManager().returnAgentsByGivenUUIDSet( config.getNodes() );
 
         // setting rpc address
         po.addLog( "Setting rpc address" );
