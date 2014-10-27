@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -39,7 +41,7 @@ public class StartServiceHandlerTest
     public void testWithoutCluster()
     {
         AbstractOperationHandler operationHandler =
-                new StartServiceHandler( cassandraMock, "test-cluster", "test-node" );
+                new StartServiceHandler( cassandraMock, "test-cluster", UUID.randomUUID() );
         operationHandler.run();
         assertTrue( operationHandler.getTrackerOperation().getLog().contains( "not exist" ) );
         assertEquals( operationHandler.getTrackerOperation().getState(), OperationState.FAILED );

@@ -248,9 +248,9 @@ public class CassandraImpl implements Cassandra
 
 
     @Override
-    public UUID startService( final String clusterName, final String lxchostname )
+    public UUID startService( final String clusterName, final UUID agentUUID )
     {
-        AbstractOperationHandler operationHandler = new StartServiceHandler( this, clusterName, lxchostname );
+        AbstractOperationHandler operationHandler = new StartServiceHandler( this, clusterName, agentUUID );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -312,8 +312,6 @@ public class CassandraImpl implements Cassandra
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final CassandraClusterConfig config )
     {
 
-        //        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-
         EnvironmentBlueprint blueprint = new EnvironmentBlueprint();
         blueprint.setName( String.format( "%s-%s", config.getProductKey(), UUIDUtil.generateTimeBasedUUID() ) );
 
@@ -327,8 +325,6 @@ public class CassandraImpl implements Cassandra
         nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
         blueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
-
-        //        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
 
         return blueprint;
     }

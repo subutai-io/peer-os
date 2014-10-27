@@ -484,7 +484,7 @@ public class Manager
                 PROGRESS_ICON.setVisible( true );
                 disableButtons( buttons );
                 executorService.execute(
-                        new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(),
+                        new StartTask( cassandra, tracker, config.getClusterName(), agent.getUuid(),
                                 new CompleteEvent()
                                 {
                                     @Override
@@ -595,11 +595,11 @@ public class Manager
     {
         for ( UUID agentUUID : config.getNodes() )
         {
-            Agent agent = agentManager.getAgentByUUID( agentUUID );
+//            Agent agent = agentManager.getAgentByUUID( agentUUID );
             PROGRESS_ICON.setVisible( true );
             disableOREnableAllButtonsOnTable( nodesTable, false );
             executorService.execute(
-                    new StartTask( cassandra, tracker, config.getClusterName(), agent.getHostname(), new CompleteEvent()
+                    new StartTask( cassandra, tracker, config.getClusterName(), agentUUID, new CompleteEvent()
                     {
                         @Override
                         public void onComplete( String result )
