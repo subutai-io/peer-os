@@ -4,13 +4,11 @@
              interface="org.safehaus.subutai.core.message.api.Queue" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-
     <command name="message-queue/test">
       <action class="org.safehaus.subutai.core.message.cli.TestCommand">
         <argument ref="messageQueue" />
       </action>
     </command>
-
   </command-bundle>
 
 </blueprint>
