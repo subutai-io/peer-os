@@ -70,11 +70,11 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy
         }
         config.setNodes( cassNodes );
 
-        Iterator nodesItr = cassNodes.iterator();
+        Iterator iterator = cassNodes.iterator();
         Set<UUID> seedNodes = new HashSet<>();
-        while ( nodesItr.hasNext() )
+        while ( iterator.hasNext() )
         {
-            seedNodes.add( ( UUID ) nodesItr.next() );
+            seedNodes.add( ( UUID ) iterator.next() );
             if ( seedNodes.size() == config.getNumberOfSeeds() )
             {
                 break;

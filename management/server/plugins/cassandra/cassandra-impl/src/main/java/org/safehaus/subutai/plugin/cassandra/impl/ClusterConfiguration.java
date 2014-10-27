@@ -97,7 +97,8 @@ public class ClusterConfiguration
                 throw new ClusterConfigurationException( e.getMessage() );
             }
         }
-
+        
+        config.setEnvironmentId( environment.getId() );
         cassandraManager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLogDone( "Cassandra cluster data saved into database" );
     }
