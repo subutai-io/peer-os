@@ -23,9 +23,9 @@ public class ClusterConfiguration
     private CassandraImpl cassandraManager;
 
 
-    public ClusterConfiguration( final TrackerOperation trackerOperation, final CassandraImpl cassandraManager )
+    public ClusterConfiguration( final TrackerOperation operation, final CassandraImpl cassandraManager )
     {
-        this.po = trackerOperation;
+        this.po = operation;
         this.cassandraManager = cassandraManager;
     }
 
@@ -34,11 +34,7 @@ public class ClusterConfiguration
             throws ClusterConfigurationException
     {
 
-        // setting cluster name
-
-        /*Command setClusterNameCommand = cassandraManager.getCommands().getConfigureCommand( agentSet,
-                "cluster_name " + config.getClusterName() );
-        cassandraManager.getCommandRunner().runCommand( setClusterNameCommand );*/
+        po.addLog( String.format( "Configuring cluster: %s", config.getClusterName() ) );
         String script = ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s";
         String clusterNameParam = "cluster_name " + config.getClusterName();
         String dataDirParam = "data_dir " + config.getDataDirectory();
@@ -104,6 +100,5 @@ public class ClusterConfiguration
 
         cassandraManager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         po.addLogDone( "Cassandra cluster data saved into database" );
-
     }
 }
