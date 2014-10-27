@@ -1,7 +1,6 @@
 package org.safehaus.subutai.core.message.rest;
 
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.core.message.api.MessageException;
@@ -31,7 +30,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processMessage( @FormParam( "message" ) final String message )
+    public Response processMessage( final String message )
     {
         try
         {
