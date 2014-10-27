@@ -2,15 +2,19 @@ package org.safehaus.subutai.core.message.impl;
 
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.safehaus.subutai.common.exception.HTTPException;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.util.RestUtil;
 import org.safehaus.subutai.core.message.api.Message;
 import org.safehaus.subutai.core.message.api.MessageException;
+import org.safehaus.subutai.core.message.api.MessageListener;
 import org.safehaus.subutai.core.message.api.MessageStatus;
 import org.safehaus.subutai.core.message.api.Queue;
 import org.safehaus.subutai.core.peer.api.Peer;
@@ -26,6 +30,8 @@ import com.google.gson.JsonSyntaxException;
 public class QueueImpl implements Queue
 {
     private static final Logger LOG = LoggerFactory.getLogger( QueueImpl.class.getName() );
+    private final Set<MessageListener> listeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<MessageListener, Boolean>() );
 
 
     @Override
@@ -61,19 +67,42 @@ public class QueueImpl implements Queue
     }
 
 
+    //TODO notify listener in thread pool (see metric)
     @Override
     public void processMessage( String messageJson ) throws MessageException
     {
         try
         {
             Message message = JsonUtil.fromJson( messageJson, MessageImpl.class );
-            Object payload = message.getPayload();
 
-            System.out.println( payload );
+            for ( MessageListener listener : listeners )
+            {
+                listener.onMessage( message );
+            }
         }
-        catch ( MessageException | JsonSyntaxException e )
+        catch ( JsonSyntaxException e )
         {
             LOG.error( "Error in processMessage", e );
+        }
+    }
+
+
+    @Override
+    public void addMessageListener( final MessageListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    @Override
+    public void removeMessageListener( final MessageListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
         }
     }
 }

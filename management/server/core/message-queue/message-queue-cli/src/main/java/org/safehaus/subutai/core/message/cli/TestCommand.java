@@ -1,15 +1,14 @@
 package org.safehaus.subutai.core.message.cli;
 
 
-import java.io.Serializable;
-
 import org.safehaus.subutai.core.message.api.Message;
+import org.safehaus.subutai.core.message.api.MessageException;
+import org.safehaus.subutai.core.message.api.MessageListener;
 import org.safehaus.subutai.core.message.api.Queue;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 
@@ -21,6 +20,7 @@ public class TestCommand extends OsgiCommandSupport
 {
 
     private final Queue queue;
+    private MyMessageListener listener;
 
 
     public TestCommand( final Queue queue )
@@ -28,6 +28,15 @@ public class TestCommand extends OsgiCommandSupport
         Preconditions.checkNotNull( queue, "Queue is null" );
 
         this.queue = queue;
+
+        listener = new MyMessageListener( "Test" );
+    }
+
+
+    public void init()
+    {
+
+        queue.addMessageListener( listener );
     }
 
 
@@ -37,29 +46,32 @@ public class TestCommand extends OsgiCommandSupport
 
         Message message = queue.createMessage( new CustomObject( 123, "hello world" ) );
 
-        queue.sendMessage( null, message, null, 0 );
+        queue.sendMessage( null, message, "Test", 0 );
 
         return null;
     }
 
 
-    static class CustomObject implements Serializable
+    static class MyMessageListener extends MessageListener
     {
-        private int num;
-        private String str;
 
-
-        CustomObject( final int num, final String str )
+        protected MyMessageListener( final String recipientId )
         {
-            this.num = num;
-            this.str = str;
+            super( recipientId );
         }
 
 
         @Override
-        public String toString()
+        public void onMessage( final Message message )
         {
-            return Objects.toStringHelper( this ).add( "num", num ).add( "str", str ).toString();
+            try
+            {
+                System.out.println( message.getPayload( CustomObject.class ) );
+            }
+            catch ( MessageException e )
+            {
+                e.printStackTrace();
+            }
         }
     }
 }

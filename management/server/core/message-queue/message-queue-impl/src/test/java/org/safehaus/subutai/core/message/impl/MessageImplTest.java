@@ -84,6 +84,6 @@ public class MessageImplTest
 
         MessageImpl message = new MessageImpl( customObject );
 
-        assertEquals( customObject, message.getPayload() );
+        assertEquals( customObject, message.getPayload( CustomObject.class ) );
     }
 }

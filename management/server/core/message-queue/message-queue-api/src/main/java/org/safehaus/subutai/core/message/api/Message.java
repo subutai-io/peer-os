@@ -11,7 +11,7 @@ public interface Message
      *
      * @return payload
      */
-    public Object getPayload() throws MessageException;
+    public <T> T getPayload( Class<T> clazz ) throws MessageException;
 
     /**
      * Returns sender of message

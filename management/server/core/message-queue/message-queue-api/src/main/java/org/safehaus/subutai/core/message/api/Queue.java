@@ -46,4 +46,8 @@ public interface Queue
     public MessageStatus getMessageStatus( UUID messageId );
 
     public void processMessage( String messageJson ) throws MessageException;
+
+    public void addMessageListener( MessageListener listener );
+
+    public void removeMessageListener( MessageListener listener );
 }
