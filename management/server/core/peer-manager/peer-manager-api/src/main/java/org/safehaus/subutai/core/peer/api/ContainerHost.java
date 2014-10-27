@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 public class ContainerHost extends SubutaiHost
 {
     private UUID environmentId;
-    private UUID ownerId;
+    private UUID creatorPeerId;
     private String templateName;
     private String templateArch;
 
@@ -35,15 +35,15 @@ public class ContainerHost extends SubutaiHost
     }
 
 
-    public UUID getOwnerId()
+    public UUID getCreatorPeerId()
     {
-        return ownerId;
+        return creatorPeerId;
     }
 
 
-    public void setOwnerId( final UUID ownerId )
+    public void setCreatorPeerId( final UUID creatorPeerId )
     {
-        this.ownerId = ownerId;
+        this.creatorPeerId = creatorPeerId;
     }
 
 

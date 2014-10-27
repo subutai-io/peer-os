@@ -210,7 +210,7 @@ public class MonitorImpl implements Monitor
             containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
 
             //find container's owner peer
-            PeerInterface ownerPeer = peerManager.getPeer( containerHost.getOwnerId() );
+            PeerInterface ownerPeer = peerManager.getPeer( containerHost.getCreatorPeerId() );
 
             //if container is "owned" by local peer, alert local peer
             if ( peerManager.getLocalPeer().getId().compareTo( ownerPeer.getId() ) == 0 )
