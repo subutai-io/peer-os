@@ -44,7 +44,7 @@ public class QueueImpl implements Queue
         {
             Map<String, String> params = new HashMap<>();
             params.put( "message", JsonUtil.toJson( message ) );
-            RestUtil.post( "http://management3:8181/cxf/queue/message", params );
+            RestUtil.post( "http://172.16.131.203:8181/cxf/queue/message", params );
         }
         catch ( HTTPException e )
         {
